@@ -1,0 +1,2040 @@
+<!DOCTYPE html>
+<!-- Bipolar Bear Landing Page © 2026 - All Rights Reserved -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+  <title>Bipolar Bear – Mood &amp; Mental Health Tracker</title>
+  <!-- Beta gate: must be first — fires before any render -->
+  <style>body{background:linear-gradient(135deg,#ff9500 0%,#ff6b00 100%)}</style>
+  <script>if(!window.Capacitor&&localStorage.getItem('bbWebUnlocked')!=='true'){location.replace('beta.html');}</script>
+  <meta name="description" content="Checkin with the Bear. Free mood journal and survival kit for people living with bipolar disorder. Track mood, energy, sleep and medication daily.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://www.bipolarbear.app/">
+
+  <!-- Favicon -->
+  <link rel="icon" href="/icons/favicons/favicon.ico">
+  <link rel="icon" href="/icons/favicons/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icons/favicons/apple-touch-icon.png">
+  <link rel="manifest" href="/icons/favicons/site.webmanifest">
+
+  <!-- Open Graph (link previews on WhatsApp, iMessage, Facebook, LinkedIn etc.) -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.bipolarbear.app/">
+  <meta property="og:site_name" content="Bipolar Bear">
+  <meta property="og:title" content="Bipolar Bear – Mood &amp; Mental Health Tracker">
+  <meta property="og:description" content="Free mood journal and survival kit for people living with bipolar disorder. Track mood, energy, sleep and medication daily.">
+  <meta property="og:image" content="https://www.bipolarbear.app/icons/favicons/web-app-manifest-512x512.png">
+  <meta property="og:image:width" content="512">
+  <meta property="og:image:height" content="512">
+
+  <!-- Twitter / X Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Bipolar Bear – Mood &amp; Mental Health Tracker">
+  <meta name="twitter:description" content="Free mood journal and survival kit for people living with bipolar disorder. Track mood, energy, sleep and medication daily.">
+  <meta name="twitter:image" content="https://www.bipolarbear.app/icons/favicons/web-app-manifest-512x512.png">
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Bipolar Bear",
+    "url": "https://www.bipolarbear.app",
+    "description": "Free mood journal and survival kit for people living with bipolar disorder.",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "iOS, Android, Web",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "GBP" }
+  }
+  </script>
+
+  <meta name="theme-color" content="#ff9500">
+  <meta name="color-scheme" content="light">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #ff9500 0%, #ff6b00 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: max(20px, calc(50vh - 280px)) 20px 130px;
+      color: white;
+    }
+    body.is-new-user {
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .logo-bounce-wrapper {
+      display: inline-block;
+      animation: logoBounce 2.4s ease-in-out infinite;
+      margin-bottom: 6px;
+    }
+
+    .logo-img {
+      max-width: 200px;
+      border-radius: 20px;
+      padding: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      cursor: pointer;
+      touch-action: manipulation;
+      display: block;
+    }
+
+    @keyframes logoBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    @keyframes hintFade {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+    @keyframes bbHintNudge { 0%,100%{transform:scale(1)} 25%{transform:scale(1.18) rotate(-4deg)} 75%{transform:scale(1.12) rotate(3deg)} }
+
+    @keyframes fabHintSlide {
+      0%, 100% { transform: translateX(0); opacity: 0.85; }
+      50% { transform: translateX(5px); opacity: 1; }
+    }
+    @keyframes signinHintPulse {
+      0%, 100% { opacity: 0.75; }
+      50% { opacity: 1; }
+    }
+    .fab-hint {
+      position: fixed;
+      bottom: 38px;
+      right: 82px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 55;
+      pointer-events: none;
+      animation: fabHintSlide 1.6s ease-in-out infinite;
+    }
+    @media (min-width: 520px) {
+      /* feedback hint: sits left of the feedback FAB */
+      .fab-hint:not(#waFabLabel) { right: calc(50% - 240px + 62px); }
+      /* WA hint: sits right of the WA FAB */
+      #waFabLabel { left: calc(50% - 240px + 62px); }
+    }
+    .fab-hint-label {
+      background: rgba(0,0,0,0.58);
+      color: white;
+      font-size: 0.8em;
+      font-weight: 700;
+      padding: 5px 11px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .fab-hint-arrow {
+      font-size: 1.1em;
+      line-height: 1;
+      color: white;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.35);
+    }
+
+    .logo-hint {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      margin-bottom: 36px;
+      pointer-events: none;
+      animation: hintFade 2.4s ease-in-out infinite;
+    }
+
+    .logo-hint span {
+      font-size: 0.78em;
+      font-weight: 700;
+      font-style: italic;
+      color: rgba(255,255,255,0.9);
+      white-space: nowrap;
+      font-family: 'Georgia', serif;
+      letter-spacing: 0.01em;
+    }
+
+    .logo {
+      font-size: 6em;
+      margin-bottom: 20px;
+      animation: bounce 2s ease-in-out 3;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    h1 {
+      font-size: 3.5em;
+      margin-bottom: 15px;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .tagline {
+      font-size: 1.4em;
+      margin-bottom: 50px;
+      opacity: 0.95;
+      font-weight: 300;
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 15px;
+      width: fit-content;
+      margin: 20px auto 0;
+    }
+
+    .btn-container {
+      display: block;
+      padding: 10px;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 20px 56px 20px 30px;
+      font-size: 1.15em;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 15px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      white-space: nowrap;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .btn-journal {
+      background: rgba(255, 255, 255, 0.22);
+      color: white;
+      border: 3px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .btn-survival {
+      background: rgba(255, 255, 255, 0.22);
+      color: white;
+      border: 3px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .btn.btn-whatsapp {
+      background: rgba(37, 211, 102, 0.2);
+      max-width: 250px;
+      color: white;
+      border: 3px solid rgba(37, 211, 102, 0.3);
+      padding: 14px 28px;
+      font-size: 1em;
+      min-width: 0;
+      gap: 8px;
+      border-radius: 15px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .btn.btn-whatsapp:hover {
+        background: rgba(37, 211, 102, 0.39);
+        color: white;
+        border-color: #25D366;
+        box-shadow: 0 8px 24px rgba(37, 211, 102, 0.4);
+      }
+    }
+    /* Hidden on web; shown only in native app via JS below */
+    .btn.btn-whatsapp { display: none !important; }
+    .is-native .btn.btn-whatsapp { display: flex !important; }
+
+    .icon {
+      font-size: 1.5em;
+    }
+
+    .features { display: none !important; }
+
+    .footer-link {
+      display: inline-block;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      font-size: 0.9em;
+      color: rgba(255, 255, 255, 0.9);
+      text-decoration: none;
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.22);
+      border-radius: 20px;
+      transition: all 0.3s ease;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .footer-link:hover {
+        background: rgba(255, 255, 255, 0.3);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2.5em;
+      }
+
+      .tagline {
+        font-size: 1.1em;
+      }
+
+      .logo-img {
+        width: 180px;      }
+
+      .logo {
+        font-size: 4em;
+      }
+
+      .buttons {
+        margin-bottom: 40px;
+      }
+
+      .btn-container {
+        padding: 5px;
+      }
+    }
+
+    /* ── Prevent double-tap zoom on iOS ── */
+    * { touch-action: manipulation; }
+
+    /* Force light mode — prevent OS dark mode from affecting colours */
+    :root { color-scheme: light; }
+    html { background-color: #ff6b00; }
+
+    /* ── Auth / Settings Modal ── */
+    .overlay-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .overlay-modal.active { display: flex; }
+    .modal-box {
+      background: white;
+      border-radius: 20px;
+      padding: 28px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .modal-box h3 { margin-bottom: 18px; font-size: 1.3em; color: #2d2d2d; }
+    .modal-input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid #e9ecef;
+      border-radius: 10px;
+      font-size: 1em;
+      margin-bottom: 12px;
+      box-sizing: border-box;
+      color: #2d2d2d;
+    }
+    .modal-input:focus { outline: none; border-color: #ff9500; }
+    .modal-btn {
+      width: 100%;
+      padding: 13px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 10px;
+      transition: all 0.2s;
+    }
+    .modal-btn-primary { background: #ff9500; color: white; }
+    .modal-btn-secondary { background: #f8f9fa; color: #495057; border: 2px solid #e9ecef; }
+    @media (hover: hover) and (pointer: fine) {
+      .modal-btn-primary:hover { background: #ff6b00; }
+      .modal-btn-secondary:hover { background: #e9ecef; }
+    }
+    .modal-toggle { text-align: center; font-size: 0.9em; color: #6c757d; margin-top: 4px; }
+    .modal-toggle span { color: #ff9500; cursor: pointer; font-weight: 600; }
+    .modal-error { color: #ff6b6b; font-size: 0.9em; margin-bottom: 10px; display: none; }
+
+    /* ── Entry status tick inside journal button ── */
+    .entry-tick {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px dashed rgba(255,255,255,0.55);
+      background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.55);
+      flex-shrink: 0;
+      pointer-events: none;
+      transition: border 0.25s ease, background 0.25s ease, color 0.25s ease;
+    }
+    .entry-tick[data-done="true"] {
+      border: 2px solid white;
+      background: white;
+      color: #ff9500;
+    }
+    /* ── White notch behind centre auth FAB ── */
+    .auth-notch {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 84px;
+      height: 80px;
+      background: white;
+      border-radius: 28px 28px 0 0;
+      z-index: 45;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.10);
+      pointer-events: none;
+    }
+
+    /* ── Feedback button ── */
+    .feedback-fab {
+      position: fixed;
+      bottom: 24px;
+      right: 20px;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #ff9500;
+      border: none;
+      color: white;
+      font-size: 1.4em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(255,149,0,0.35);
+      transition: transform 0.2s ease, background 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+      z-index: 50;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .feedback-fab:hover { background: #ff6b00; transform: scale(1.08); }
+    }
+    @media (min-width: 520px) {
+      .feedback-fab { right: calc(50% - 240px); }
+    }
+
+    /* ── WhatsApp FAB (bottom left) ── */
+    .whatsapp-fab {
+      position: fixed;
+      bottom: 24px;
+      left: 20px;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #25D366;
+      border: none;
+      color: white;
+      font-size: 1.5em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(37,211,102,0.35);
+      transition: transform 0.2s ease, background 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+      z-index: 50;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .whatsapp-fab:hover { background: #1fad55; transform: scale(1.08); }
+    }
+    @media (min-width: 520px) {
+      .whatsapp-fab { left: calc(50% - 240px); }
+    }
+    @keyframes waHintSlide {
+      0%, 100% { transform: translateX(0); opacity: 0.85; }
+      50% { transform: translateX(-5px); opacity: 1; }
+    }
+
+    /* WhatsApp confirmation modal */
+    .wa-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .wa-modal.active { display: flex; }
+    .wa-modal-box {
+      background: white;
+      border-radius: 20px;
+      padding: 28px 24px;
+      max-width: 340px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+
+    /* ── Feedback modal ── */
+    .feedback-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .feedback-modal.active { display: flex; }
+    .feedback-content {
+      background: white;
+      padding: 28px;
+      border-radius: 20px;
+      max-width: 420px;
+      width: 100%;
+      max-height: 85dvh;
+      overflow-y: auto;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      box-sizing: border-box;
+    }
+    .feedback-type-btn {
+      flex: 1;
+      padding: 10px 8px;
+      border: 2px solid #e9ecef;
+      border-radius: 10px;
+      background: #f8f9fa;
+      color: #495057;
+      font-weight: 600;
+      font-size: 0.9em;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .feedback-type-btn.selected {
+      border-color: #ff9500;
+      background: rgba(255,149,0,0.08);
+      color: #ff9500;
+    }
+  </style>
+</head>
+<body>
+  <!-- Hide permanently confirmation modal -->
+  <div id="hidePermanentlyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1100;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)document.getElementById('hidePermanentlyModal').style.display='none';">
+    <div style="background:white;border-radius:20px;padding:24px;max-width:300px;width:100%;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,0.25);">
+      <div style="font-size:1.6em;margin-bottom:10px;">🙈</div>
+      <div style="font-weight:700;font-size:1em;color:#333;margin-bottom:8px;">Hide permanently?</div>
+      <div style="font-size:0.85em;color:#6c757d;margin-bottom:20px;line-height:1.4;">This can't be undone. The button will be gone for good.</div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="document.getElementById('hidePermanentlyModal').style.display='none';" style="flex:1;padding:10px;background:white;color:#495057;border:2px solid #dee2e6;border-radius:10px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Cancel</button>
+        <button id="hidePermanentlyConfirmBtn" style="flex:1;padding:10px;background:#dc3545;color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Hide</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auth FAB: centred over white notch -->
+  <div id="authFabWrapper" style="position:fixed; bottom:18px; left:50%; transform:translateX(-50%); z-index:50; pointer-events:none; display:flex; align-items:center; justify-content:center;">
+    <button id="signinBtn" onclick="showAuthModal()" style="width:44px;height:44px;min-width:44px;background:white;color:#ff9500;border:2px solid #ff9500;border-radius:50%;cursor:pointer;font-size:1.15em;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 10px rgba(255,149,0,0.25);pointer-events:auto;">👤</button>
+    <div id="userInfo" style="display:none; flex-direction:row; align-items:center; pointer-events:auto;">
+      <button onclick="showAccountModal()" style="width:44px;height:44px;min-width:44px;background:#ff9500;color:white;border:none;border-radius:50%;cursor:pointer;font-size:1.15em;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 10px rgba(255,149,0,0.35);">👤</button>
+    </div>
+  </div>
+  <div class="container">
+    <div class="logo-bounce-wrapper"><img src="images/logos/good_logo.png" alt="My Bipolar Bear" class="logo-img"></div>
+    <div class="logo-hint" id="logoHint">
+      <svg width="24" height="22" viewBox="0 0 24 22" fill="none">
+        <path d="M 12,20 Q 8,10 12,2" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <polyline points="7,6 12,1 17,6" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span id="logoHintText">🐻 psst… click me!</span>
+    </div>
+
+    <div class="buttons">
+      <div class="btn-container" id="journalContainer">
+        <a href="journal.html" onclick="event.preventDefault(); localStorage.setItem('bbPrivacyNoteDismissed','1'); const _pn=document.getElementById('privacyNote'); if(_pn)_pn.style.display='none'; location.replace('journal.html')" class="btn btn-journal" id="journalBtn" style="position:relative;">
+          <span class="icon">📔</span>
+          <span>Mood Journal</span>
+          <span id="journalEntryTick" class="entry-tick" data-done="false">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+        </a>
+        <div id="journalTutorialProgress" style="text-align:center;font-size:0.7em;color:rgba(255,255,255,0.75);margin-top:4px;font-style:italic;display:none;"></div>
+      </div>
+      <div id="journalStartHint" style="display:none; flex-direction:column; align-items:center; gap:2px; pointer-events:none; animation:hintFade 2.4s ease-in-out infinite; margin-top:-4px;">
+        <svg width="24" height="22" viewBox="0 0 24 22" fill="none">
+          <path d="M 12,20 Q 8,10 12,2" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <polyline points="7,6 12,1 17,6" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <span style="font-size:0.78em;font-weight:700;font-style:italic;color:rgba(255,255,255,0.9);white-space:nowrap;font-family:'Georgia',serif;letter-spacing:0.01em;">🐻 Click here to get started!</span>
+      </div>
+      <div id="privacyNote" style="position:fixed; bottom:16px; left:0; right:0; text-align:center; font-size:0.75em; color:rgba(255,255,255,0.7); font-style:italic; padding:0 16px; line-height:1.5; pointer-events:none;">
+        🔒 Don't worry – all of your data is private and stored locally right now.
+      </div>
+      <div class="btn-container" id="survivalContainer">
+        <a href="survival-kit.html" onclick="event.preventDefault(); _advanceOnboardingStep(7); location.replace('survival-kit.html');" class="btn btn-survival" id="survivalBtn" style="position:relative;">
+          <span class="icon">🆘</span>
+          <span>Survival Kit</span>
+          <span id="survivalTick" class="entry-tick" data-done="false">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+        </a>
+        <div id="survivalProgress" style="text-align:center;font-size:0.7em;color:rgba(255,255,255,0.75);margin-top:4px;font-style:italic;display:none;"></div>
+      </div>
+      <div id="survivalKitHint" style="display:none; flex-direction:column; align-items:center; gap:2px; pointer-events:none; animation:hintFade 2.4s ease-in-out infinite; margin-top:-4px;">
+        <svg width="24" height="22" viewBox="0 0 24 22" fill="none">
+          <path d="M 12,20 Q 8,10 12,2" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <polyline points="7,6 12,1 17,6" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,255,255,0.9);font-family:'Georgia',serif;letter-spacing:0.01em;text-align:center;max-width:200px;line-height:1.4;">🐻 Click here to learn and share more about your bipolar</span>
+      </div>
+    </div>
+
+    <div class="features" id="features">
+      <div class="feature">
+        <div class="feature-icon">📈</div>
+        <div class="feature-title">Visual Insights</div>
+        <div class="feature-desc">See your mood patterns over time with charts</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🔒</div>
+        <div class="feature-title">Private & Secure</div>
+        <div class="feature-desc">Your data stays safe with you</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🎯</div>
+        <div class="feature-title">Stay On Track</div>
+        <div class="feature-desc">Build healthy habits with streaks</div>
+      </div>
+    </div>
+
+
+    <div style="text-align:center; margin-top: 14px; padding-bottom: 20px;">
+      <a href="https://www.jamesmarkey.co.uk/" target="_blank" rel="noopener noreferrer" class="footer-link">
+        Being built by James
+      </a>
+    </div>
+  </div>
+
+  <!-- Hint overlay for blocking hints -->
+  <div id="bbHintOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:500;pointer-events:none;transition:opacity 0.2s ease;"></div>
+
+  <!-- Auth hint (shown at step 4: save progress) -->
+  <div id="signinHint" style="display:none; position:fixed; bottom:76px; left:50%; transform:translateX(-50%); flex-direction:column; align-items:center; gap:4px; pointer-events:none; z-index:51;">
+    <div id="signinHintInner" style="animation:signinHintPulse 1.6s ease-in-out infinite; display:flex; flex-direction:column; align-items:center; gap:4px;">
+      <span style="color:white; font-size:0.72em; opacity:0.85;">Stored securely in Europe</span>
+      <span id="signinHintLabel" class="fab-hint-label">🐻 Save your progress here</span>
+      <svg width="16" height="18" viewBox="0 0 16 18" fill="none"><line x1="8" y1="1" x2="8" y2="14" stroke="rgba(255,255,255,0.85)" stroke-width="2" stroke-linecap="round"/><polyline points="3,9 8,15 13,9" stroke="rgba(255,255,255,0.85)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+    </div>
+  </div>
+
+
+  <!-- White notch behind centre auth FAB -->
+  <div class="auth-notch" aria-hidden="true"></div>
+
+  <!-- WhatsApp FAB (bottom left) -->
+  <div id="waFabLabel" class="fab-hint" style="left:82px;right:auto;animation:waHintSlide 1.6s ease-in-out infinite;display:none;">
+    <span class="fab-hint-arrow">←</span>
+    <span class="fab-hint-label">🐻 WhatsApp Group</span>
+  </div>
+  <button class="whatsapp-fab" onclick="openWhatsAppModal()" title="Join our WhatsApp group">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1.1em" height="1.1em" fill="currentColor">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+    </svg>
+  </button>
+
+  <!-- WhatsApp confirmation modal -->
+  <div class="wa-modal" id="waModal" onclick="if(event.target===this){_closeWaModal();_suppressFabHover();}">
+    <div class="wa-modal-box">
+      <div style="font-size:2em;margin-bottom:12px;">💬</div>
+      <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:8px;">Join Bipolar Anonymous</div>
+      <p style="font-size:0.9em;color:#6c757d;line-height:1.5;margin-bottom:20px;">Would you like to join our WhatsApp group Bipolar Anonymous?</p>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <a href="https://chat.whatsapp.com/Crsfo0x9u887tnTiQUpAvy" target="_blank" rel="noopener noreferrer"
+          onclick="_closeWaModal(); _suppressFabHover(); localStorage.setItem('bbWaJoined','1');"
+          style="display:block;padding:13px;background:#25D366;color:white;border-radius:12px;text-decoration:none;font-weight:700;font-size:0.95em;text-align:center;">
+          ✅ Join Group
+        </a>
+        <button onclick="_closeWaModal(); _suppressFabHover(); document.activeElement && document.activeElement.blur();"
+          style="padding:12px;background:white;color:#495057;border:2px solid #e9ecef;border-radius:12px;font-weight:600;font-size:0.95em;cursor:pointer;">
+          Cancel
+        </button>
+        <button onclick="_showHidePermanently('wa')"
+          style="padding:10px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+          🙈 Hide this button permanently
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Long-press context popup (hide button / reset page) -->
+  <div id="lpPopup" style="display:none;position:fixed;background:white;border-radius:14px;padding:14px 18px;box-shadow:0 8px 32px rgba(0,0,0,0.18);z-index:200;font-size:0.88em;font-weight:600;color:#495057;min-width:140px;text-align:center;pointer-events:auto;border:1.5px solid #e9ecef;"></div>
+
+  <!-- Feedback FAB hint (first launch only) -->
+  <div class="fab-hint" id="feedbackHint" style="display:none;">
+    <span class="fab-hint-label">🐻 Feedback</span>
+    <span class="fab-hint-arrow">→</span>
+  </div>
+
+  <!-- Feedback FAB -->
+  <button class="feedback-fab" onclick="openFeedbackModal()" title="Send feedback">📣</button>
+
+  <!-- Feedback Modal -->
+  <div class="feedback-modal" id="feedbackModal" onclick="if(event.target===this)closeFeedbackModal()">
+    <div class="feedback-content">
+      <h3 style="margin-bottom:4px;color:#333;">Share Feedback</h3>
+      <p id="fbMeta" style="font-size:0.78em;color:#adb5bd;margin-bottom:4px;"></p>
+      <p style="font-size:0.85em;color:#6c757d;margin-bottom:16px;">Help us make Bipolar Bear better.</p>
+
+      <div style="display:flex;gap:8px;margin-bottom:16px;">
+        <button class="feedback-type-btn" id="fbTypeBug" onclick="selectFeedbackType('bug')">🐛 Bug</button>
+        <button class="feedback-type-btn" id="fbTypeComment" onclick="selectFeedbackType('comment')">💬 Comment</button>
+        <button class="feedback-type-btn" id="fbTypeIdea" onclick="selectFeedbackType('idea')">💡 Idea</button>
+      </div>
+
+      <textarea id="fbMessage" placeholder="Tell us what's on your mind…" rows="4"
+        style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;box-sizing:border-box;resize:none;font-family:inherit;margin-bottom:12px;"></textarea>
+
+      <div id="fbEmailRow" style="margin-bottom:12px;display:none;">
+        <input type="email" id="fbEmail" placeholder="Your email (optional)"
+          style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;box-sizing:border-box;font-family:inherit;">
+      </div>
+
+      <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:0.88em;color:#495057;margin-bottom:18px;user-select:none;">
+        Keep me informed about my submission
+        <span style="position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;" onclick="var cb=document.getElementById('fbNotify');cb.checked=!cb.checked;document.getElementById('fbNotifyTrack').style.background=cb.checked?'#ff9500':'#ccc';document.getElementById('fbNotifyThumb').style.transform=cb.checked?'translateX(20px)':'translateX(0)';">
+          <input type="checkbox" id="fbNotify" checked style="opacity:0;width:0;height:0;position:absolute;pointer-events:none;">
+          <span id="fbNotifyTrack" style="position:absolute;inset:0;border-radius:24px;background:#ff9500;transition:background 0.2s;"></span>
+          <span id="fbNotifyThumb" style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:white;box-shadow:0 1px 3px rgba(0,0,0,0.3);transition:transform 0.2s;transform:translateX(20px);"></span>
+        </span>
+      </label>
+
+      <div id="fbError" style="color:#dc3545;font-size:0.85em;margin-bottom:10px;display:none;"></div>
+
+      <div style="display:flex;gap:10px;justify-content:center;">
+        <button onclick="submitFeedback()" style="padding:11px 24px;background:#ff9500;color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-size:0.95em;">Send</button>
+        <button onclick="closeFeedbackModal()" style="padding:11px 24px;background:white;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-weight:600;cursor:pointer;font-size:0.95em;">Cancel</button>
+      </div>
+      <button onclick="_showHidePermanently('feedback')" style="display:block;width:100%;margin-top:12px;padding:8px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;">🙈 Hide this button permanently</button>
+    </div>
+  </div>
+
+
+  <script>
+    const journalFeatures = [
+      { icon: '📈', title: 'Visual Insights', desc: 'See your mood patterns over time with charts' },
+      { icon: '🔒', title: 'Private & Secure', desc: 'Your data stays safe with you' },
+      { icon: '🎯', title: 'Stay On Track', desc: 'Build healthy habits with streaks' }
+    ];
+
+    const survivalFeatures = [
+      { icon: '⭐', title: 'Celebrities', desc: 'Stories from famous people living with bipolar' },
+      { icon: '🔬', title: 'Research', desc: 'Latest studies and evidence-based information' },
+      { icon: '🤝', title: 'Support', desc: 'Resources and tools for crisis moments' }
+    ];
+
+  </script>
+
+  <!-- Personal Details Modal -->
+  <div class="overlay-modal" id="personalDetailsModal" onclick="if(event.target===this)closePersonalDetailsModal()">
+    <div class="modal-box" style="max-height:85dvh;overflow-y:auto;">
+      <h3 style="margin-bottom:8px;">👤 Personal Details</h3>
+      <p style="color:#6c757d;font-size:0.82em;margin-bottom:16px;font-style:italic;">All fields optional. Appears on exported PDF reports for your healthcare provider.</p>
+      <div style="display:grid;gap:10px;">
+        <input type="text"  id="pdName"      placeholder="Name"                                       style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;">
+        <input type="text"  id="pdDOB"       placeholder="Date of Birth (e.g. 15 Jan 1990)"           style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;">
+        <input type="text"  id="pdMedNum"    placeholder="Medical # / NHS Number"                     style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;">
+        <input type="text"  id="pdDiagnosis" placeholder="Diagnosed as (e.g. Bipolar I, Bipolar II)"  style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;">
+        <input type="text"  id="pdDiagDate"  placeholder="Diagnosis Date (e.g. March 2020)"           style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;">
+        <input type="text"  id="pdAddress"   placeholder="Address"                                    style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;">
+        <input type="tel"   id="pdMobile"    placeholder="Mobile Number"                              style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;">
+        <input type="email" id="pdEmail"     placeholder="Email"                                      style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;">
+        <input type="text"  id="pdEmergency" placeholder="Emergency Contact (name & number)"          style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;">
+        <textarea           id="pdNotes"     placeholder="Notes (optional)" rows="3"                  style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;resize:vertical;font-family:inherit;"></textarea>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:20px;">
+        <button onclick="savePersonalDetails()" style="flex:1;padding:12px;background:#ff9500;color:white;border:none;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;">Save</button>
+        <button onclick="closePersonalDetailsModal()" style="padding:12px 18px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;cursor:pointer;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Account Modal -->
+  <div class="wa-modal" id="accountModal" onclick="if(event.target===this)closeAccountModal()">
+    <div class="wa-modal-box">
+      <div style="font-size:1.6em;margin-bottom:4px;">👤</div>
+      <div id="accountEmailDisplay" style="font-size:0.85em;color:#6c757d;margin-bottom:16px;word-break:break-all;"></div>
+
+      <div id="accountMsg" style="font-size:0.85em;margin-bottom:12px;display:none;padding:8px 12px;border-radius:8px;"></div>
+      <button onclick="logoutFromAccount()" style="width:100%;padding:12px;background:white;color:#dc3545;border:2px solid #dc3545;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;margin-bottom:10px;-webkit-tap-highlight-color:transparent;">Sign out</button>
+      <!-- Change password section -->
+      <div id="accountChangePassSection" style="margin-bottom:10px;">
+        <div id="accountPassFields" style="display:none;margin-bottom:8px;">
+          <input type="password" id="accountCurrentPass" placeholder="Current password" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;box-sizing:border-box;margin-bottom:6px;outline:none;">
+          <input type="password" id="accountNewPass" placeholder="New password" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;box-sizing:border-box;margin-bottom:8px;outline:none;">
+          <div style="display:flex;gap:8px;">
+            <button onclick="submitPasswordChange()" style="flex:1;padding:10px;background:#ff9500;color:white;border:none;border-radius:8px;font-size:0.9em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Save</button>
+            <button onclick="document.getElementById('accountPassFields').style.display='none';document.getElementById('accountPassToggleBtn').style.display='';" style="padding:10px 14px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Cancel</button>
+          </div>
+        </div>
+        <button id="accountPassToggleBtn" onclick="document.getElementById('accountPassFields').style.display='';document.getElementById('accountPassToggleBtn').style.display='none';document.getElementById('accountCurrentPass').focus();" style="width:100%;padding:12px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Change password</button>
+      </div>
+      <button onclick="openPersonalInfoFromAccount()" style="width:100%;padding:12px;background:white;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;margin-bottom:10px;-webkit-tap-highlight-color:transparent;">👤 Personal information</button>
+      <button onclick="closeAccountModal()" style="width:100%;padding:10px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:10px;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Auth Modal -->
+  <div class="overlay-modal" id="authModal">
+    <div class="modal-box">
+      <h3 id="authTitle">My Bipolar Bear</h3>
+      <div class="modal-error" id="authError"></div>
+      <input type="email" id="authEmail" class="modal-input" placeholder="Email" autocomplete="email">
+      <input type="password" id="authPassword" class="modal-input" placeholder="Password" autocomplete="current-password">
+      <button class="modal-btn modal-btn-primary" id="authSubmit">Sign In</button>
+      <button class="modal-btn modal-btn-secondary" onclick="closeAuthModal()">Continue as Guest</button>
+      <div class="modal-toggle" id="authToggle">Don't have an account? <span>Sign up</span></div>
+    </div>
+  </div>
+
+  <script>
+    // ── Beta gate (web only) ──
+    if (!window.Capacitor && localStorage.getItem('bbWebUnlocked') !== 'true') {
+      location.replace('beta.html');
+    }
+
+    // ── Firebase init ──
+    const firebaseConfig = {
+      apiKey: "AIzaSyBlF7DjbOvU4xgM47kAd6Ttx42_W1BPVUY",
+      authDomain: "bipolarbear-app.firebaseapp.com",
+      projectId: "bipolarbear-app",
+      storageBucket: "bipolarbear-app.firebasestorage.app",
+      messagingSenderId: "566288727451",
+      appId: "1:566288727451:web:8921f3242193df115df53e"
+    };
+    let auth, db, currentUser = null;
+    try {
+      firebase.initializeApp(firebaseConfig);
+      auth = firebase.auth();
+      db = firebase.firestore();
+      auth.onAuthStateChanged(user => {
+        currentUser = user && !user.isAnonymous ? user : null;
+        const signinBtn = document.getElementById('signinBtn');
+        const userInfo = document.getElementById('userInfo');
+        const userEmail = document.getElementById('userEmail');
+        if (user && !user.isAnonymous) {
+          if (signinBtn) signinBtn.style.display = 'none';
+          if (userInfo) { userInfo.style.display = 'flex'; }
+          if (userEmail) userEmail.textContent = user.email;
+          // Load user settings from Firestore (logo variant + survival kit data for ticks)
+          db.collection('userSettings').doc(user.uid).get().then(doc => {
+            if (!doc.exists) return;
+            const d = doc.data();
+            if (d.logoVariant !== undefined) {
+              localStorage.setItem('logoVariant', d.logoVariant);
+              applyLogoVariant(d.logoVariant);
+            }
+            // Populate survival kit keys so the tick check works without visiting the page first
+            if (d.moodDefinitions !== undefined) localStorage.setItem('moodDefinitions', JSON.stringify(d.moodDefinitions));
+            if (d.copingStrategies !== undefined) localStorage.setItem('copingStrategies', JSON.stringify(d.copingStrategies));
+            if (d.currentMedList  !== undefined) localStorage.setItem('currentMedList',  JSON.stringify(d.currentMedList));
+            if (d.dailyGoals      !== undefined) localStorage.setItem('dailyGoals',      JSON.stringify(d.dailyGoals));
+            // Re-run the survival tick check now that localStorage is populated
+            const sTick = document.getElementById('survivalTick');
+            if (sTick) {
+              try {
+                const defs  = JSON.parse(localStorage.getItem('moodDefinitions') || '{}');
+                const strats = JSON.parse(localStorage.getItem('copingStrategies') || '{}');
+                const meds  = JSON.parse(localStorage.getItem('currentMedList') || '[]');
+                const goals = JSON.parse(localStorage.getItem('dailyGoals') || '[]');
+                const done  = Object.values(defs).some(v => v && String(v).trim()) &&
+                              Object.values(strats).some(arr => Array.isArray(arr) && arr.length > 0) &&
+                              Array.isArray(meds) && meds.length > 0 &&
+                              Array.isArray(goals) && goals.length > 0;
+                sTick.setAttribute('data-done', done ? 'true' : 'false');
+              } catch(e) {}
+            }
+            // Sync onboarding step from Firestore (take max of local and server)
+            const _serverStep = d.onboardingStep || 0;
+            const _localStep = _getOnboardingStep();
+            let _finalStep = Math.max(_serverStep, _localStep);
+            // Web: skip step 9 (WA hint, native-only) if synced from a native session
+            const _isNatSync = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
+            if (_finalStep === 9 && !_isNatSync) _finalStep = 10;
+            if (_finalStep !== _localStep) {
+              localStorage.setItem('bbOnboardingStep', String(_finalStep));
+              db.collection('userSettings').doc(user.uid).set({ onboardingStep: _finalStep }, { merge: true }).catch(() => {});
+            } else if (_localStep > _serverStep) {
+              db.collection('userSettings').doc(user.uid).set({ onboardingStep: _localStep }, { merge: true }).catch(() => {});
+            }
+            // Restore personal details hint dismissal state from Firestore
+            if (d.personalHintDone) localStorage.setItem('bbPersonalHintDone', '1');
+            _applyOnboardingGating();
+            // If step reached 12 (via Firestore sync) but tutorial popup was never shown locally, show it now
+            if (_finalStep >= 12 && localStorage.getItem('bbTutorialToastShown') !== '1') {
+              localStorage.setItem('bbTutorialToastShown', '1');
+              setTimeout(_showTutorialCompleteModal, 600);
+            }
+          }).catch(() => {});
+          // Check Firestore for the current entry if the local cache is missing or stale
+          (function() {
+            const useToday = localStorage.getItem('journalDefaultToday') === 'true';
+            const target = new Date(); target.setHours(0, 0, 0, 0);
+            if (!useToday) target.setDate(target.getDate() - 1);
+            const toKey = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+            const targetKey = toKey(target);
+            // If cache confidently says done, trust it immediately — no need to hit server
+            try {
+              const _cached = JSON.parse(localStorage.getItem('bb_entryStatus') || 'null');
+              if (_cached && _cached.key === targetKey && _cached.done === true) return;
+            } catch(e) {}
+            // Single-field query only (compound queries need a Firestore index which may not exist)
+            db.collection('entries')
+              .where('userId', '==', user.uid)
+              .get()
+              .then(snap => {
+                const done = snap.docs.some(doc => {
+                  const d = doc.data().date;
+                  if (!d) return false;
+                  if (typeof d === 'string') return d.slice(0, 10) === targetKey;
+                  try { const dt = d.toDate ? d.toDate() : new Date(d); return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}` === targetKey; } catch(_) { return false; }
+                });
+                const tick = document.getElementById('journalEntryTick');
+                if (tick) tick.setAttribute('data-done', done ? 'true' : 'false');
+                try { localStorage.setItem('bb_entryStatus', JSON.stringify({ key: targetKey, done })); } catch(e) {}
+              }).catch(() => {});
+          })();
+        } else {
+          if (signinBtn) signinBtn.style.display = '';
+          if (userInfo) userInfo.style.display = 'none';
+          const _pdHint = document.getElementById('personalDetailsHint');
+          if (_pdHint) _pdHint.style.display = 'none';
+        }
+      });
+    } catch(e) { console.warn('Firebase init failed on index.html', e); }
+
+    // ── Onboarding step helpers ──
+    function _getOnboardingStep() {
+      // Migration: existing users with entries but no step → mark as complete
+      if (!localStorage.getItem('bbOnboardingStep') && localStorage.getItem('bbHasEntries') === '1') {
+        localStorage.setItem('bbOnboardingStep', '12');
+      }
+      return parseInt(localStorage.getItem('bbOnboardingStep') || '0', 10);
+    }
+    function _advanceOnboardingStep(to) {
+      const cur = _getOnboardingStep();
+      if (to <= cur) return;
+      const _isNat = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
+      if (to === 9 && !_isNat) to = 10; // auto-skip WA hint on web
+      localStorage.setItem('bbOnboardingStep', String(to));
+      if (typeof currentUser !== 'undefined' && currentUser && typeof db !== 'undefined' && db) {
+        db.collection('userSettings').doc(currentUser.uid).set({ onboardingStep: to }, { merge: true }).catch(() => {});
+      }
+      _applyOnboardingGating();
+    }
+    window._getOnboardingStep = _getOnboardingStep;
+    window._advanceOnboardingStep = _advanceOnboardingStep;
+
+    function _showTutorialCompleteModal() {
+      if (document.getElementById('tutorialCompleteModal')) return;
+      const overlay = document.createElement('div');
+      overlay.id = 'tutorialCompleteModal';
+      overlay.innerHTML = `<div style="background:linear-gradient(135deg,#ff6b00,#ff9500);border-radius:20px;padding:28px 32px;text-align:center;max-width:300px;width:calc(100vw - 64px);box-shadow:0 12px 48px rgba(255,107,0,0.55);">
+        <div style="font-size:2.6em;margin-bottom:10px;">🎓</div>
+        <div style="font-weight:800;font-size:1.1em;color:white;margin-bottom:6px;">Tutorial Complete!</div>
+        <div style="font-size:0.88em;color:rgba(255,255,255,0.9);line-height:1.5;margin-bottom:16px;">Done for now! There will be a few more hints as you progress.</div>
+        <div style="font-size:0.78em;color:rgba(255,255,255,0.65);">Tap to dismiss</div>
+      </div>`;
+      Object.assign(overlay.style, {
+        position:'fixed', inset:'0', display:'flex', alignItems:'center', justifyContent:'center',
+        background:'rgba(0,0,0,0.55)', zIndex:'9999', cursor:'pointer',
+      });
+      overlay.addEventListener('click', () => {
+        overlay.remove();
+        // Show feedback hint non-blockingly after popup dismissed
+        const _fbHint = document.getElementById('feedbackHint');
+        const _fbFab = document.querySelector('.feedback-fab');
+        if (_fbHint && _fbFab && localStorage.getItem('bbFeedbackFabHidden') !== '1') {
+          _fbHint.style.display = 'flex';
+        }
+      });
+      document.body.appendChild(overlay);
+      overlay.style.opacity = '0';
+      overlay.style.transition = 'opacity 0.3s ease';
+      requestAnimationFrame(() => { overlay.style.opacity = '1'; });
+    }
+
+    function _applyOnboardingGating() {
+      const step = _getOnboardingStep();
+      const _isNat = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
+      const _waPermaHidden = localStorage.getItem('bbWaFabHidden') === '1';
+      const _fbPermaHidden = localStorage.getItem('bbFeedbackFabHidden') === '1';
+
+      // Auth FAB wrapper + notch: visible from step 4
+      const _authWrap = document.getElementById('authFabWrapper');
+      const _notch = document.querySelector('.auth-notch');
+      if (_authWrap) _authWrap.style.display = step < 4 ? 'none' : '';
+      if (_notch) _notch.style.display = step < 4 ? 'none' : '';
+
+      // Survival kit: visible from step 6
+      const _survival = document.getElementById('survivalContainer');
+      if (_survival) _survival.style.display = step < 6 ? 'none' : '';
+
+      // WA FAB: native only, visible after tutorial complete (step 12)
+      const _waFab = document.querySelector('.whatsapp-fab');
+      if (_waFab) _waFab.style.display = (step >= 12 && _isNat && !_waPermaHidden) ? '' : 'none';
+
+      // Feedback FAB: visible after tutorial complete (step 12)
+      const _fbFab = document.querySelector('.feedback-fab');
+      if (_fbFab) _fbFab.style.display = (step >= 12 && !_fbPermaHidden) ? '' : 'none';
+
+      // Footer: visible from step 12
+      const _footer = document.querySelector('.footer-link');
+      if (_footer && _footer.parentElement) _footer.parentElement.style.display = step >= 12 ? '' : 'none';
+
+      // is-new-user class: steps 0-3 only
+      if (step < 4) document.body.classList.add('is-new-user');
+      else document.body.classList.remove('is-new-user');
+
+      // Privacy note: shown until first journal button click
+      const _pn = document.getElementById('privacyNote');
+      if (_pn) _pn.style.display = localStorage.getItem('bbPrivacyNoteDismissed') === '1' ? 'none' : '';
+
+      // ── Hints ──
+      // Hint 1 (journalStartHint): step 0 only
+      const _h1 = document.getElementById('journalStartHint');
+      if (_h1) _h1.style.display = step === 0 ? 'flex' : 'none';
+
+      // Logo hint: step 5 only
+      const _logoHint = document.getElementById('logoHint');
+      if (_logoHint) _logoHint.style.display = step === 5 ? '' : 'none';
+
+      // Hint 6 (survivalKitHint): step 6 only
+      const _h6 = document.getElementById('survivalKitHint');
+      if (_h6) _h6.style.display = step === 6 ? 'flex' : 'none';
+
+      // WA hint: permanently hidden (native-only, post-tutorial)
+      const _waLbl = document.getElementById('waFabLabel');
+      if (_waLbl) _waLbl.style.display = 'none';
+      // Feedback hint: don't force-hide at step 12 — popup dismiss handler shows it
+
+      // Auth area hint: step 4 (save progress) only
+      const _siHint = document.getElementById('signinHint');
+      const _siLbl = document.getElementById('signinHintLabel');
+      if (_siHint) {
+        if (step === 4) {
+          if (_siLbl) _siLbl.textContent = 'Save your progress here.';
+          setTimeout(() => { if (_getOnboardingStep() === 4) _siHint.style.display = 'flex'; }, 800);
+        } else {
+          _siHint.style.display = 'none';
+        }
+      }
+
+      // ── Hint overlay ──
+      const _blockingSteps = new Set([4, 5, 6]);
+      const _isBlocking = _blockingSteps.has(step);
+      const _overlay = document.getElementById('bbHintOverlay');
+      if (_overlay) _overlay.style.display = _isBlocking ? '' : 'none';
+
+      // Elevate hint + target above overlay when blocking
+      document.querySelectorAll('.bb-hint-elevated').forEach(el => {
+        el.classList.remove('bb-hint-elevated');
+        el.style.zIndex = el.dataset.prevZIndex !== undefined ? el.dataset.prevZIndex : '';
+        delete el.dataset.prevZIndex;
+      });
+      if (_isBlocking) {
+        const _elevMap = {
+          4:  [document.getElementById('signinHint'), document.getElementById('authFabWrapper')],
+          5:  [document.getElementById('logoHint'),   document.querySelector('.logo-bounce-wrapper')],
+          6:  [document.getElementById('survivalKitHint'), document.getElementById('survivalBtn')],
+        };
+        (_elevMap[step] || []).filter(Boolean).forEach(el => {
+          el.dataset.prevZIndex = el.style.zIndex;
+          el.style.zIndex = '601';
+          if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
+          el.classList.add('bb-hint-elevated');
+        });
+      }
+
+      // Journal tutorial progress: X/3 entries needed (hidden once advanced tutorial complete)
+      const _prog = document.getElementById('journalTutorialProgress');
+      if (_prog) {
+        // Count completed tutorial milestones directly from flags — not from step number,
+        // since step can reach 10+ via logo/survival/feedback flow without multiple entries.
+        const _e1 = localStorage.getItem('bbHasEntries') === '1';                     // Entry 1: first real entry
+        const _e2 = localStorage.getItem('bbSettingsHintDone') === '1';               // Entry 2: settings hint seen
+        const _e3 = localStorage.getItem('bbCloseSettingsHintDone') === '1';          // Entry 3: settings tutorial done
+        const _e4 = localStorage.getItem('bb_fmMoodTipShown') === '1';               // Entry 4: tap & hold hint done
+        if (_e4) {
+          _prog.style.display = 'none';
+        } else {
+          const _done = [_e1, _e2, _e3].filter(Boolean).length;
+          const _remaining = 4 - _done;
+          _prog.textContent = _remaining + ' more ' + (_remaining === 1 ? 'entry' : 'entries') + ' needed to complete tutorial';
+          _prog.style.display = '';
+        }
+      }
+    }
+    window._applyOnboardingGating = _applyOnboardingGating;
+
+    // ── Onboarding page lock ──
+    (function() {
+      // step → [targetId, hintId]
+      const _isNatLock = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
+      const _map = {
+        4:  ['authFabWrapper', 'signinHintInner'],
+        5:  ['.logo-img',       'logoHint'],
+        6:  ['survivalBtn',    'survivalKitHint'],
+      };
+      function _getTarget(s) { const e = _map[s]; if (!e) return null; const id = e[0]; return id.startsWith('.') ? document.querySelector(id) : document.getElementById(id); }
+      function _getHint(s)   { const e = _map[s]; if (!e) return null; return document.getElementById(e[1]); }
+      function _nudge() {
+        const s = _getOnboardingStep();
+        let tgt = _getTarget(s);
+        // authFabWrapper uses translateX(-50%) — nudging it directly breaks centering;
+        // nudge the visible inner button instead
+        if (tgt && tgt.id === 'authFabWrapper') {
+          tgt = tgt.querySelector('button:not([style*="display: none"])') || tgt.querySelector('button');
+        }
+        [_getHint(s), tgt].forEach(el => {
+          if (!el) return;
+          const _prev = el.style.animation;
+          el.style.animation = 'none';
+          el.offsetHeight;
+          el.style.animation = 'bbHintNudge 0.5s ease';
+          setTimeout(() => { el.style.animation = _prev; }, 520);
+        });
+      }
+      function _isModalOpen() {
+        return !!(document.querySelector('.overlay-modal.active, .wa-modal.active, .feedback-modal.active') ||
+          document.getElementById('hidePermanentlyModal')?.style.display === 'flex');
+      }
+      document.addEventListener('click', function(e) {
+        const s = _getOnboardingStep();
+        if (!_map[s]) return;
+        if (_isModalOpen()) return;
+        const t = _getTarget(s);
+        if (!t || t === e.target || t.contains(e.target)) return;
+        e.stopPropagation(); e.preventDefault();
+        _nudge();
+      }, true);
+    })();
+
+    // Show "Offline" instead of Sign In when there's no network
+    function updateOnlineStatus() {
+      const btn = document.getElementById('signinBtn');
+      if (!btn || btn.style.display === 'none') return; // signed in — don't touch
+      if (!navigator.onLine) {
+        btn.disabled = true;
+        btn.style.opacity = '0.35';
+        btn.onclick = null;
+      } else {
+        btn.disabled = false;
+        btn.style.opacity = '';
+        btn.onclick = showAuthModal;
+      }
+    }
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus();
+
+    function logout() {
+      // Clear all user-specific cached data before signing out.
+      // bbOnboardingStep is intentionally NOT cleared here — Firestore preserves it
+      // so the user resumes at the same onboarding step on re-login on any device.
+      const keysToRemove = [
+        'bb_entryStatus',
+        'moodDefinitions', 'copingStrategies',
+        'currentMedList', 'dailyGoals',
+        'unlockedAchievements',
+        'bbHasEntries',
+        'bbOnboardingStep',
+        // Mood step tutorial hints
+        'bb_moodTipShown', 'bb_fmMoodTipShown',
+        'bb_fmChooseMoodHintDone', 'bb_fmMoodInfoCloseHintDone',
+        // Settings / customise tutorial hints
+        'bbSettingsHintDone',
+        'bbCustomiseFormHintDone', 'bbCustomiseAdditionalHintDone', 'bbCloseSettingsHintDone',
+        'bbAdvancedTutorialToastShown',
+        // Advanced settings badge + tap-hold hint pending
+        'bbAdvancedBadgePending', 'bbAdvancedBadgeVisible',
+        'bb_fmTapHoldHintPending', 'bb_fmTapHoldHintReady',
+        // Misc hints
+        'bbPersonalHintDone',
+        'bbFavouriteHintSeen', 'bbPrivateHintSeen', 'bbFavAnniShown',
+        'bbFeedbackFabHidden', 'bbWaFabHidden', 'bbFooterHidden',
+        'bbLogoEasterEggFound',
+        'bbTutorialToastShown',
+        'bbPinEnabled', 'bbPinCode',
+        'bbWelcomeShown',
+      ];
+      keysToRemove.forEach(k => localStorage.removeItem(k));
+      sessionStorage.removeItem('bbPinUnlocked');
+
+      // Reset both ticks to inactive
+      const jTick = document.getElementById('journalEntryTick');
+      if (jTick) jTick.setAttribute('data-done', 'false');
+      const sTick = document.getElementById('survivalTick');
+      if (sTick) sTick.setAttribute('data-done', 'false');
+
+      if (auth) auth.signOut();
+    }
+
+    // ── Account Modal ──
+    function showAccountModal() {
+      const _step = _getOnboardingStep();
+      if (_step === 4) _advanceOnboardingStep(5);
+      const el = document.getElementById('accountEmailDisplay');
+      if (el && currentUser) el.textContent = currentUser.email;
+      const msg = document.getElementById('accountMsg');
+      if (msg) { msg.style.display = 'none'; msg.textContent = ''; }
+      const passFields = document.getElementById('accountPassFields');
+      if (passFields) passFields.style.display = 'none';
+      const passToggle = document.getElementById('accountPassToggleBtn');
+      if (passToggle) passToggle.style.display = '';
+      const cp = document.getElementById('accountCurrentPass');
+      const np = document.getElementById('accountNewPass');
+      if (cp) cp.value = '';
+      if (np) np.value = '';
+      document.getElementById('accountModal').classList.add('active');
+    }
+    function closeAccountModal() {
+      document.getElementById('accountModal').classList.remove('active');
+    }
+    function _accountShowMsg(text, ok) {
+      const msg = document.getElementById('accountMsg');
+      if (!msg) return;
+      msg.textContent = text;
+      msg.style.color = ok ? '#2ECC40' : '#dc3545';
+      msg.style.background = ok ? 'rgba(46,204,64,0.08)' : 'rgba(220,53,69,0.08)';
+      msg.style.display = 'block';
+    }
+    function submitPasswordChange() {
+      if (!currentUser || !auth) return;
+      const currentPass = (document.getElementById('accountCurrentPass').value || '').trim();
+      const newPass = (document.getElementById('accountNewPass').value || '').trim();
+      if (!currentPass || !newPass) { _accountShowMsg('⚠️ Please fill in both fields.', false); return; }
+      if (newPass.length < 6) { _accountShowMsg('⚠️ New password must be at least 6 characters.', false); return; }
+      const credential = firebase.auth.EmailAuthProvider.credential(currentUser.email, currentPass);
+      currentUser.reauthenticateWithCredential(credential).then(() => {
+        return currentUser.updatePassword(newPass);
+      }).then(() => {
+        _accountShowMsg('✅ Password updated successfully.', true);
+        document.getElementById('accountPassFields').style.display = 'none';
+        document.getElementById('accountPassToggleBtn').style.display = '';
+        document.getElementById('accountCurrentPass').value = '';
+        document.getElementById('accountNewPass').value = '';
+      }).catch(err => {
+        const wrongPass = err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential';
+        _accountShowMsg('⚠️ ' + (wrongPass ? 'Current password is incorrect.' : (err.message || 'Could not update password.')), false);
+      });
+    }
+    function openPersonalInfoFromAccount() {
+      closeAccountModal();
+      showPersonalDetailsModal();
+    }
+
+    const _pdFields = [
+      ['pdName','personalName'], ['pdDOB','personalDOB'], ['pdMedNum','personalMedicalNum'],
+      ['pdDiagnosis','personalDiagnosis'], ['pdDiagDate','personalDiagnosisDate'],
+      ['pdAddress','personalAddress'], ['pdMobile','personalMobile'],
+      ['pdEmail','personalEmail'], ['pdEmergency','personalEmergencyContact'], ['pdNotes','personalNotes']
+    ];
+
+    async function showPersonalDetailsModal() {
+      // Load from localStorage immediately so the modal opens without delay
+      _pdFields.forEach(([elId, lsKey]) => {
+        const el = document.getElementById(elId);
+        if (el) el.value = localStorage.getItem(lsKey) || '';
+      });
+      document.getElementById('personalDetailsModal').classList.add('active');
+      // Then try to freshen from Firestore in the background
+      if (currentUser && db) {
+        try {
+          const doc = await db.collection('personalDetails').doc(currentUser.uid).get();
+          if (doc.exists) {
+            const d = doc.data();
+            _pdFields.forEach(([elId, lsKey]) => {
+              if (d[lsKey] !== undefined) {
+                localStorage.setItem(lsKey, d[lsKey]);
+                const el = document.getElementById(elId);
+                if (el) el.value = d[lsKey];
+              }
+            });
+          }
+        } catch(e) {}
+      }
+    }
+    function closePersonalDetailsModal() {
+      document.getElementById('personalDetailsModal').classList.remove('active');
+    }
+    async function savePersonalDetails() {
+      const data = {};
+      _pdFields.forEach(([elId, lsKey]) => {
+        const val = (document.getElementById(elId) || {}).value || '';
+        localStorage.setItem(lsKey, val);
+        data[lsKey] = val;
+      });
+      if (currentUser && db) {
+        try { await db.collection('personalDetails').doc(currentUser.uid).set(data, { merge: true }); } catch(e) {}
+      }
+      closePersonalDetailsModal();
+    }
+    function logoutFromAccount() {
+      closeAccountModal();
+      logout();
+    }
+
+    // ── Auth Modal ──
+    function showAuthModal() {
+      const _step = _getOnboardingStep();
+      if (_step === 4) _advanceOnboardingStep(5);
+      document.getElementById('authModal').classList.add('active');
+    }
+    function closeAuthModal() {
+      document.getElementById('authModal').classList.remove('active');
+      // Briefly block pointer events on page content to prevent tap-through to buttons below modal
+      const _container = document.querySelector('.container');
+      if (_container) {
+        _container.style.pointerEvents = 'none';
+        setTimeout(() => { _container.style.pointerEvents = ''; }, 400);
+      }
+    }
+
+    let isSignUp = false;
+    document.getElementById('authToggle').addEventListener('click', () => {
+      isSignUp = !isSignUp;
+      document.getElementById('authTitle').textContent = isSignUp ? 'Create Account' : 'Welcome to Bipolar Bear 🐻';
+      document.getElementById('authSubmit').textContent = isSignUp ? 'Sign Up' : 'Sign In';
+      document.getElementById('authToggle').innerHTML = isSignUp
+        ? 'Already have an account? <span>Sign in</span>'
+        : 'Don\'t have an account? <span>Sign up</span>';
+      document.getElementById('authError').style.display = 'none';
+    });
+
+    document.getElementById('authSubmit').addEventListener('click', async () => {
+      if (!auth) return;
+      const email = document.getElementById('authEmail').value;
+      const password = document.getElementById('authPassword').value;
+      const errEl = document.getElementById('authError');
+      errEl.style.display = 'none';
+      try {
+        if (isSignUp) {
+          await auth.createUserWithEmailAndPassword(email, password);
+        } else {
+          await auth.signInWithEmailAndPassword(email, password);
+        }
+        closeAuthModal();
+      } catch(e) {
+        errEl.textContent = e.message;
+        errEl.style.display = 'block';
+      }
+    });
+
+    // ── Logo easter egg with persistence ──
+    const logoImg = document.querySelector('.logo-img');
+    const srcs = ['images/logos/good_logo.png', 'images/logos/elevated_logo.png', 'images/logos/sad_logo.png'];
+    let currentIndex = parseInt(localStorage.getItem('logoVariant') || '0');
+    let clickCount = 0;
+    let resetTimer = null;
+
+    function applyLogoVariant(idx) {
+      currentIndex = idx;
+      logoImg.src = srcs[idx];
+    }
+
+    function saveLogoVariant(idx) {
+      localStorage.setItem('logoVariant', idx);
+      if (currentUser && db) {
+        db.collection('userSettings').doc(currentUser.uid).set({ logoVariant: idx }, { merge: true }).catch(() => {});
+      }
+      if (window.webkit?.messageHandlers?.setSharedData) {
+        window.webkit.messageHandlers.setSharedData.postMessage({ logoVariant: idx });
+      } else if (window.Capacitor?.getPlatform?.() === 'android') {
+        window.Capacitor?.Plugins?.BipolarBearWidget?.setSharedData({ logoVariant: idx });
+      }
+    }
+
+    // Restore on load
+    applyLogoVariant(currentIndex);
+    logoImg.style.cursor = 'pointer';
+
+    // Logo hint — visibility controlled by _applyOnboardingGating (shown at step 4 only)
+    const _logoHintText = document.getElementById('logoHintText');
+
+    logoImg.addEventListener('click', () => {
+      clearTimeout(resetTimer);
+      clickCount++;
+
+      // Update hint text during step 4 (logo hint active)
+      const _logoHintEl = document.getElementById('logoHint');
+      if (_logoHintEl && _logoHintEl.style.display !== 'none') {
+        _logoHintEl.style.animation = 'none';
+        _logoHintEl.style.opacity = '1';
+        if (clickCount === 1 && _logoHintText) _logoHintText.textContent = 'Click me again!';
+        else if (clickCount === 2 && _logoHintText) _logoHintText.textContent = 'and again…';
+        else if (clickCount >= 3 && _logoHintText) _logoHintText.textContent = 'tap quicker…';
+      }
+
+      logoImg.style.transition = 'transform 0.1s ease';
+      logoImg.style.transform = 'scale(1.15) rotate(5deg)';
+      setTimeout(() => { logoImg.style.transform = ''; logoImg.style.transition = ''; }, 120);
+
+      if (clickCount === 5) {
+        clickCount = 0;
+        // Advance to step 6 (survival kit revealed) then trigger easter egg
+        _advanceOnboardingStep(6);
+        _doLogoCycle();
+      } else {
+        resetTimer = setTimeout(() => { clickCount = 0; }, 1500);
+      }
+    });
+
+    // ── Logo 5-second tap+hold: skip or restart tutorial ──
+    (function() {
+      let _lpHoldTimer = null;
+      let _lpProgress = null;
+
+      function _cancelLogoHold() {
+        clearTimeout(_lpHoldTimer);
+        _lpHoldTimer = null;
+        if (_lpProgress) { _lpProgress.remove(); _lpProgress = null; }
+      }
+
+      function _startLogoHold(e) {
+        _cancelLogoHold();
+
+        _lpHoldTimer = setTimeout(() => {
+          _cancelLogoHold();
+          const _step = _getOnboardingStep();
+          if (_step >= 12) {
+            // Tutorial already complete — confirm before restarting
+            const _confirmOverlay = document.createElement('div');
+            _confirmOverlay.innerHTML = `<div style="background:white;border-radius:20px;padding:24px 24px 20px;text-align:center;max-width:290px;width:calc(100vw - 64px);box-shadow:0 12px 48px rgba(0,0,0,0.25);">
+              <div style="font-weight:800;font-size:1em;color:#333;margin-bottom:10px;">Restart Tutorial?</div>
+              <div style="font-size:0.88em;color:#666;line-height:1.55;margin-bottom:18px;">This will reset all your settings to their defaults, but your journal entries and survival kit data will not be affected.</div>
+              <div style="display:flex;gap:10px;">
+                <button id="_restartCancelBtn" style="flex:1;padding:11px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-weight:600;font-size:0.9em;cursor:pointer;">Cancel</button>
+                <button id="_restartConfirmBtn" style="flex:1;padding:11px;background:#ff9500;color:white;border:none;border-radius:10px;font-weight:600;font-size:0.9em;cursor:pointer;">Restart</button>
+              </div>
+            </div>`;
+            Object.assign(_confirmOverlay.style, {
+              position:'fixed', inset:'0', display:'flex', alignItems:'center', justifyContent:'center',
+              background:'rgba(0,0,0,0.55)', zIndex:'9999',
+            });
+            document.body.appendChild(_confirmOverlay);
+            document.getElementById('_restartCancelBtn').addEventListener('click', () => _confirmOverlay.remove());
+            document.getElementById('_restartConfirmBtn').addEventListener('click', () => {
+              _confirmOverlay.remove();
+              // Reset tutorial flags
+              const _tutorialFlags = [
+                'bbHasEntries','bbWelcomeShown','bbTutorialToastShown',
+                'bb_fmChooseMoodHintDone','bb_fmMoodInfoCloseHintDone','bb_fmMoodTipShown',
+                'bb_fmTapHoldHintPending','bb_fmTapHoldHintReady',
+                'bbSettingsHintDone','bbCustomiseFormHintDone','bbCustomiseAdditionalHintDone','bbCloseSettingsHintDone',
+                'bbAdvancedTutorialToastShown','bbAdvancedBadgePending','bbAdvancedBadgeVisible',
+                'bbSurvivalKitVisited','bbMoodDefHintDone','bbLogoEasterEggFound',
+              ];
+              _tutorialFlags.forEach(k => localStorage.removeItem(k));
+              localStorage.removeItem('bbOnboardingStep');
+              // Reset settings to defaults (same keys as confirmResetSettings in journal.html)
+              [
+                'fmConfirmStep','fmAutoAdvance','fmAutoAdvanceMoreData',
+                'elaborateResponsesEnabled','intentionEnabled',
+                'incognitoMode','pdfHideByDefault',
+                'showMoodSuggestion','moreDataOpenByDefault',
+                'achievementToastsEnabled','statsStartDate','weeklySummaryEnabled',
+                'customiseFormEnabled','disabledSteps','moodLinkingEnabled',
+                'customTrackingFields','deletedDefaultCustomFields','deletedBuiltinFields',
+              ].forEach(k => localStorage.removeItem(k));
+              Object.keys(localStorage).filter(k =>
+                k.startsWith('trackCustom_') || k.startsWith('_labelOverride_') ||
+                ['trackGoals','trackBudget','trackExercise','trackOutside','trackAnxiety','trackAlcohol','trackEmotions'].includes(k)
+              ).forEach(k => localStorage.removeItem(k));
+              localStorage.setItem('focusedModeEnabled', '1');
+              if (typeof currentUser !== 'undefined' && currentUser && typeof db !== 'undefined' && db) {
+                db.collection('userSettings').doc(currentUser.uid).set({
+                  onboardingStep: 0,
+                  focusedModeEnabled: true, fmConfirmStep: false, elaborateResponsesEnabled: false,
+                  intentionEnabled: false, incognitoMode: false, moreDataOpenByDefault: false,
+                  achievementToastsEnabled: true, showMoodSuggestion: false, moodLinkingEnabled: false,
+                  customTrackingFields: [], trackingFields: {}, labelOverrides: {},
+                }, { merge: true }).catch(() => {});
+              }
+              _applyOnboardingGating();
+              setTimeout(_showWelcomePopup, 300);
+            });
+          } else {
+            // Skip tutorial — jump to step 12
+            localStorage.removeItem('bbOnboardingStep');
+            _advanceOnboardingStep(12);
+            localStorage.setItem('bbTutorialToastShown', '1');
+            localStorage.setItem('bbWelcomeShown', '1');
+            _applyOnboardingGating();
+            const _t = document.createElement('div');
+            Object.assign(_t.style, { position:'fixed', top:'calc(env(safe-area-inset-top,0px) + 12px)', left:'50%', transform:'translateX(-50%)', background:'#ff9500', color:'white', padding:'10px 20px', borderRadius:'20px', fontWeight:'700', fontSize:'0.9em', zIndex:'9999', whiteSpace:'nowrap', boxShadow:'0 4px 16px rgba(0,0,0,0.2)', pointerEvents:'none' });
+            _t.textContent = '✅ Tutorial skipped — enjoy the app!';
+            document.body.appendChild(_t);
+            setTimeout(() => _t.remove(), 2800);
+          }
+        }, 5000);
+      }
+
+      logoImg.addEventListener('touchstart', _startLogoHold, { passive: true });
+      logoImg.addEventListener('touchend', _cancelLogoHold);
+      logoImg.addEventListener('touchcancel', _cancelLogoHold);
+      logoImg.addEventListener('mousedown', _startLogoHold);
+      logoImg.addEventListener('mouseup', _cancelLogoHold);
+      logoImg.addEventListener('mouseleave', _cancelLogoHold);
+    })();
+  </script>
+
+  <script>
+    // ── Entry status tick ──
+    (function() {
+      const useToday = localStorage.getItem('journalDefaultToday') === 'true';
+      const target = new Date(); target.setHours(0, 0, 0, 0);
+      if (!useToday) target.setDate(target.getDate() - 1);
+      const toKey = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      const targetKey = toKey(target);
+
+      function setTickDone(done) {
+        const tick = document.getElementById('journalEntryTick');
+        if (tick) tick.setAttribute('data-done', done ? 'true' : 'false');
+      }
+
+      // 1. Check cached status written by journal.html on load
+      try {
+        const cached = JSON.parse(localStorage.getItem('bb_entryStatus') || 'null');
+        if (cached && cached.key === targetKey) { setTickDone(cached.done); return; }
+      } catch(e) {}
+
+      // 2. Fallback: scan guest entry:* localStorage keys
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (!k || !k.startsWith('entry:')) continue;
+        try {
+          const e = JSON.parse(localStorage.getItem(k) || '{}');
+          if (e.date && toKey(new Date(e.date)) === targetKey) { setTickDone(true); return; }
+        } catch(e) {}
+      }
+    })();
+  </script>
+
+  <script>
+    // ── Journal button lock icon ──
+    (function() {
+      const iconEl = document.querySelector('#journalBtn .icon');
+      if (!iconEl) return;
+      const pinEnabled = localStorage.getItem('bbPinEnabled') === '1';
+      iconEl.textContent = pinEnabled ? '🔒' : '📔';
+    })();
+  </script>
+
+  <script>
+    // ── Survival Kit setup tick ──
+    (function() {
+      const tick = document.getElementById('survivalTick');
+      if (!tick) return;
+
+      function check() {
+        try {
+          const defs = JSON.parse(localStorage.getItem('moodDefinitions') || '{}');
+          if (!Object.values(defs).some(v => v && String(v).trim())) return false;
+        } catch(e) { return false; }
+        try {
+          const strats = JSON.parse(localStorage.getItem('copingStrategies') || '{}');
+          if (!Object.values(strats).some(arr => Array.isArray(arr) && arr.length > 0)) return false;
+        } catch(e) { return false; }
+        try {
+          const meds = JSON.parse(localStorage.getItem('currentMedList') || '[]');
+          if (!Array.isArray(meds) || meds.length === 0) return false;
+        } catch(e) { return false; }
+        try {
+          const goals = JSON.parse(localStorage.getItem('dailyGoals') || '[]');
+          if (!Array.isArray(goals) || goals.length === 0) return false;
+        } catch(e) { return false; }
+        return true;
+      }
+
+      tick.setAttribute('data-done', check() ? 'true' : 'false');
+
+      // Survival kit progress counter
+      const _prog = document.getElementById('survivalProgress');
+      if (_prog) {
+        const _arr = k => { try { const v = JSON.parse(localStorage.getItem(k)||'[]'); return Array.isArray(v) && v.length > 0; } catch(e){ return false; } };
+        const _obj = k => { try { const v = JSON.parse(localStorage.getItem(k)||'{}'); return Object.values(v).some(a => Array.isArray(a) && a.length > 0); } catch(e){ return false; } };
+        let _c = 4; // mood-scale, books, media, spiritual — always complete
+        if (_arr('currentMedList')) _c++;
+        if (_arr('dailyGoals')) _c++;
+        if (_arr('survivalGratitude')) _c++;
+        const _rt = localStorage.getItem('rememberThis'); if (_rt && _rt.trim()) _c++;
+        if (_obj('copingStrategies')) _c++;
+        if (_obj('moodMemories')) _c++;
+        if (_arr('myCommitments')) _c++;
+        if (_arr('customReminders')) _c++;
+        _c++; // bipolar-anon section is always complete (info section)
+        if (_c >= 13) {
+          _prog.style.display = 'none';
+        } else {
+          _prog.textContent = _c + ' / 13 sections complete';
+          _prog.style.display = '';
+        }
+      }
+    })();
+  </script>
+
+  <style>
+    @keyframes bbCelebToast {
+      0%   { opacity: 0; transform: translateX(-50%) translateY(-12px) scale(0.92); }
+      15%  { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+      75%  { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-8px) scale(0.96); }
+    }
+  </style>
+  <script>
+    // ── Celebration confetti + toast (three states) ──
+    (function() {
+      const journalTick  = document.getElementById('journalEntryTick');
+      const survivalTick = document.getElementById('survivalTick');
+
+      function isDone(el) { return el && el.getAttribute('data-done') === 'true'; }
+
+      // Inject confetti keyframe once
+      const _cfStyle = document.createElement('style');
+      _cfStyle.textContent = `@keyframes bbConfettiFall {
+        0%   { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+        80%  { opacity: 1; }
+        100% { transform: translateY(105vh) rotate(720deg) scale(0.8); opacity: 0; }
+      }`;
+      document.head.appendChild(_cfStyle);
+
+      function launchConfetti(count, colors) {
+        for (let i = 0; i < count; i++) {
+          const el = document.createElement('div');
+          const color = colors[Math.floor(Math.random() * colors.length)];
+          const w = 6 + Math.random() * 8;
+          const h = Math.random() > 0.5 ? w : w * 0.45;
+          const x = Math.random() * 100;
+          const delay = Math.random() * 1.4;
+          const dur = 2.2 + Math.random() * 1.8;
+          Object.assign(el.style, {
+            position: 'fixed', top: '-12px', left: `${x}vw`,
+            width: `${w}px`, height: `${h}px`, background: color,
+            borderRadius: Math.random() > 0.5 ? '50%' : '2px',
+            zIndex: '9998', pointerEvents: 'none',
+            animation: `bbConfettiFall ${dur}s ${delay}s ease-in forwards`,
+          });
+          document.body.appendChild(el);
+          setTimeout(() => el.remove(), (dur + delay + 0.5) * 1000);
+        }
+      }
+
+      function showToast(msg, bg) {
+        const t = document.createElement('div');
+        Object.assign(t.style, {
+          position: 'fixed', top: 'calc(env(safe-area-inset-top, 0px) + 10px)', left: '50%',
+          transform: 'translateX(-50%) translateY(-12px)',
+          background: bg, color: 'white',
+          padding: '10px 20px', borderRadius: '20px',
+          fontWeight: '700', fontSize: '0.95em',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.22)',
+          whiteSpace: 'nowrap', zIndex: '9999', pointerEvents: 'none',
+          animation: 'bbCelebToast 3.2s ease forwards',
+        });
+        t.textContent = msg;
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 3400);
+      }
+
+      function _doLogoCycle() {
+        currentIndex = (currentIndex + 1) % srcs.length;
+        saveLogoVariant(currentIndex);
+        // Mark easter egg found on first discovery
+        const _firstFind = !localStorage.getItem('bbLogoEasterEggFound');
+        if (_firstFind) localStorage.setItem('bbLogoEasterEggFound', '1');
+        // Sync app icon (native only)
+        try {
+          if (window.webkit?.messageHandlers?.setAppIcon) {
+            const _iconNames = [null, 'AppIcon_Happy', 'AppIcon_Sad'];
+            window.webkit.messageHandlers.setAppIcon.postMessage({ name: _iconNames[currentIndex] || null });
+          }
+        } catch(e) {}
+        // Animate logo swap
+        logoImg.style.transition = 'transform 0.4s ease, opacity 0.3s ease';
+        logoImg.style.transform = 'scale(0) rotate(180deg)';
+        logoImg.style.opacity = '0';
+        setTimeout(() => {
+          logoImg.src = srcs[currentIndex];
+          logoImg.style.transform = 'scale(1.2) rotate(-5deg)';
+          logoImg.style.opacity = '1';
+          setTimeout(() => {
+            logoImg.style.transition = '';
+            logoImg.style.transform = '';
+            // Celebration
+            launchConfetti(18, ['#ff9500', '#ff6b00', '#ffd43b', '#ffffff', '#ff8c42']);
+            if (_firstFind) showToast('🎨 Easter egg found!', '#ff9500');
+          }, 200);
+        }, 300);
+      }
+
+      const _journalColors  = ['#ff9500','#ff6b00','#ffd43b','#ffec99','#ff8c42','#fab005'];
+      const _survivalColors = ['#51cf66','#339af0','#20c997','#74c0fc','#63e6be','#4dabf7'];
+      const _bothColors     = ['#ff9500','#ff6b00','#51cf66','#339af0','#f06595','#ffd43b','#a9e34b','#cc5de8'];
+
+      // Survival toast fires only once ever (localStorage); journal + combined fire every launch
+      let _bothFired = false;
+
+      function _fire(type) {
+        if (type === 'both') {
+          if (_bothFired) return;
+          _bothFired = true;
+          launchConfetti(90, _bothColors);
+          showToast('🎉 All done today — great work!', 'linear-gradient(135deg,#ff9500,#ff6b00)');
+        } else if (type === 'journal') {
+          if (_bothFired) return; // combined already fired, skip individual
+          launchConfetti(45, _journalColors);
+          showToast('📔 Journal up to date!', 'linear-gradient(135deg,#ff9500,#ff6b00)');
+        } else if (type === 'survival') {
+          if (localStorage.getItem('bbSurvivalCelebDone') === '1') return;
+          localStorage.setItem('bbSurvivalCelebDone', '1');
+          launchConfetti(45, _survivalColors);
+          showToast('🆘 Survival kit filled in!', 'linear-gradient(135deg,#ff9500,#ff6b00)');
+        }
+      }
+
+      function celebrate(changed) {
+        const jDone = isDone(journalTick);
+        const sDone = isDone(survivalTick);
+        if (jDone && sDone) { _fire('both'); }
+        else if (jDone && (changed === journalTick || changed === null)) { _fire('journal'); }
+        else if (sDone && (changed === survivalTick || changed === null)) { _fire('survival'); }
+      }
+
+      // Check sync state immediately (ticks already set by earlier scripts)
+      celebrate(null);
+
+      // Also watch for async tick updates (Firestore path)
+      const obs = new MutationObserver(mutations => {
+        mutations.forEach(m => { if (m.attributeName === 'data-done') celebrate(m.target); });
+      });
+      if (journalTick)  obs.observe(journalTick,  { attributes: true, attributeFilter: ['data-done'] });
+      if (survivalTick) obs.observe(survivalTick, { attributes: true, attributeFilter: ['data-done'] });
+      setTimeout(() => obs.disconnect(), 10000);
+
+      // Expose logo cycle globally so click handler (in earlier script block) can call it
+      window._doLogoCycle = _doLogoCycle;
+    })();
+  </script>
+
+  <script>
+    // Show WhatsApp button only in native app
+    if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
+      document.body.classList.add('is-native');
+    }
+
+    // Handle widget deep link — bipolarbear://journal opens journal page directly
+    (function() {
+      const App = window.Capacitor?.Plugins?.App;
+      if (!App) return;
+      App.addListener('appUrlOpen', function(data) {
+        if (data && data.url && data.url.includes('journal')) {
+          location.replace('journal.html');
+        }
+      });
+    })();
+  </script>
+
+  <script>
+    // ── Feedback ──
+    let _fbType = null;
+
+    function _handleIndexJournalNav() {
+      _advanceOnboardingStep(8);
+      location.replace('journal.html');
+    }
+    window._handleIndexJournalNav = _handleIndexJournalNav;
+
+    function _getFbPlatform() {
+      if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
+        return /android/i.test(navigator.userAgent) ? 'Android' : 'iOS';
+      }
+      return 'Web';
+    }
+
+    function openFeedbackModal() {
+      const _fbHintEl = document.getElementById('feedbackHint');
+      if (_fbHintEl) _fbHintEl.style.display = 'none';
+
+      _fbType = null;
+      document.getElementById('fbMessage').value = '';
+      document.getElementById('fbEmail').value = '';
+      document.getElementById('fbNotify').checked = true;
+      document.getElementById('fbNotifyTrack').style.background = '#ff9500';
+      document.getElementById('fbNotifyThumb').style.transform = 'translateX(20px)';
+      document.getElementById('fbError').style.display = 'none';
+      document.querySelectorAll('.feedback-type-btn').forEach(b => b.classList.remove('selected'));
+      // Show email field only when not logged in
+      document.getElementById('fbEmailRow').style.display = currentUser ? 'none' : '';
+      // Show version + platform
+      const _metaEl = document.getElementById('fbMeta');
+      if (_metaEl) _metaEl.textContent = `v0.67 · ${_getFbPlatform()}`;
+      document.getElementById('feedbackModal').classList.add('active');
+    }
+
+    // Brief pointer-events suppression on FABs to prevent sticky hover after modal close
+    function _suppressFabHover() {
+      document.querySelectorAll('.whatsapp-fab, .feedback-fab').forEach(el => {
+        el.style.pointerEvents = 'none';
+        setTimeout(() => { el.style.pointerEvents = ''; }, 400);
+      });
+    }
+
+    function openWhatsAppModal() {
+      document.getElementById('waModal').classList.add('active');
+      const _ov = document.getElementById('bbHintOverlay');
+      if (_ov) _ov.style.display = 'none';
+    }
+    function _closeWaModal() {
+      document.getElementById('waModal').classList.remove('active');
+      _advanceOnboardingStep(10);
+    }
+    window.openWhatsAppModal = openWhatsAppModal;
+
+    function closeFeedbackModal() {
+      document.getElementById('feedbackModal').classList.remove('active');
+      _suppressFabHover();
+      _advanceOnboardingStep(12);
+      // Ensure focus mode is on when tutorial completes (in case user exited it during onboarding)
+      localStorage.setItem('focusedModeEnabled', '1');
+      // Show tutorial complete toast after feedback modal closes (step 10→12)
+      if (localStorage.getItem('bbTutorialToastShown') !== '1') {
+        localStorage.setItem('bbTutorialToastShown', '1');
+        setTimeout(_showTutorialCompleteModal, 400);
+      }
+    }
+
+    function selectFeedbackType(type) {
+      _fbType = type;
+      document.querySelectorAll('.feedback-type-btn').forEach(b => b.classList.remove('selected'));
+      const map = { bug: 'fbTypeBug', comment: 'fbTypeComment', idea: 'fbTypeIdea' };
+      const btn = document.getElementById(map[type]);
+      if (btn) btn.classList.add('selected');
+    }
+
+    async function submitFeedback() {
+      const errEl = document.getElementById('fbError');
+      errEl.style.display = 'none';
+
+      if (!_fbType) { errEl.textContent = 'Please select a type.'; errEl.style.display = ''; return; }
+      const message = document.getElementById('fbMessage').value.trim();
+      if (!message) { errEl.textContent = 'Please enter a message.'; errEl.style.display = ''; return; }
+
+      const notify = document.getElementById('fbNotify').checked;
+      const emailInput = document.getElementById('fbEmail').value.trim();
+      const userEmail = currentUser ? currentUser.email : (emailInput || null);
+
+      const payload = {
+        type: _fbType,
+        message,
+        notify,
+        email: notify ? userEmail : null,
+        userId: currentUser ? currentUser.uid : null,
+        timestamp: Date.now(),
+        createdAt: new Date().toISOString(),
+        appVersion: '0.67',
+        platform: _getFbPlatform(),
+      };
+
+      try {
+        if (db) {
+          // Ensure auth for anonymous users so Firestore rules pass
+          if (!currentUser && auth) {
+            try { await auth.signInAnonymously(); } catch(e) {}
+          }
+          await db.collection('feedback').add(payload);
+        }
+        closeFeedbackModal();
+        alert('Thanks for your feedback! 🐻');
+      } catch(e) {
+        errEl.textContent = 'Could not send — please try again.';
+        errEl.style.display = '';
+      }
+    }
+
+    // Auto-open feedback modal if navigated here with #feedback hash
+    if (window.location.hash === '#feedback') {
+      history.replaceState(null, '', window.location.pathname);
+      window.addEventListener('load', () => setTimeout(openFeedbackModal, 300));
+    }
+
+    // ── Apply onboarding gating on page load ──
+    _applyOnboardingGating();
+
+    // ── Welcome popup (first-ever launch) ──
+    function _showWelcomePopup() {
+      if (document.getElementById('bbWelcomeModal')) return;
+      const overlay = document.createElement('div');
+      overlay.id = 'bbWelcomeModal';
+      overlay.innerHTML = `<div style="background:linear-gradient(135deg,#ff6b00,#ff9500);border-radius:20px;padding:28px 28px 24px;text-align:center;max-width:300px;width:calc(100vw - 64px);box-shadow:0 12px 48px rgba(255,107,0,0.55);">
+        <div style="font-size:2.4em;margin-bottom:10px;">🐻</div>
+        <div style="font-weight:800;font-size:1.05em;color:white;margin-bottom:10px;line-height:1.4;">Welcome to your BipolarBear.app!</div>
+        <div style="font-size:0.88em;color:rgba(255,255,255,0.92);line-height:1.55;margin-bottom:14px;">This will be your mood journal and personalised survival kit going forward.<br><br>I'm here to help you get started. Let's go!</div>
+        <div style="font-size:0.72em;color:rgba(255,255,255,0.7);line-height:1.5;margin-bottom:18px;font-style:italic;">If you want to skip the tutorial, tap &amp; hold the logo for 5+ seconds after dismissing this.</div>
+        <div style="font-size:0.78em;color:rgba(255,255,255,0.65);">Tap to dismiss</div>
+      </div>`;
+      Object.assign(overlay.style, {
+        position:'fixed', inset:'0', display:'flex', alignItems:'center', justifyContent:'center',
+        background:'rgba(0,0,0,0.6)', zIndex:'9999', cursor:'pointer',
+      });
+      overlay.addEventListener('click', () => {
+        overlay.remove();
+        localStorage.setItem('bbWelcomeShown', '1');
+      });
+      document.body.appendChild(overlay);
+      overlay.style.opacity = '0';
+      overlay.style.transition = 'opacity 0.3s ease';
+      requestAnimationFrame(() => { overlay.style.opacity = '1'; });
+    }
+
+    // Show welcome popup only on first launch AND only for new users (step 0, no entries)
+    if (!localStorage.getItem('bbWelcomeShown') && _getOnboardingStep() === 0 && !localStorage.getItem('bbHasEntries')) {
+      setTimeout(_showWelcomePopup, 600);
+    }
+
+    // On web, steps 9 and 10 have no blocking action (WA/feedback FABs are post-tutorial).
+    // Auto-advance through them and show the tutorial complete popup.
+    (function() {
+      const _isNat = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
+      if (!_isNat) {
+        const _s = _getOnboardingStep();
+        if (_s === 9 || _s === 10) {
+          _advanceOnboardingStep(12);
+          if (localStorage.getItem('bbTutorialToastShown') !== '1') {
+            localStorage.setItem('bbTutorialToastShown', '1');
+            setTimeout(_showTutorialCompleteModal, 400);
+          }
+        }
+      }
+    })();
+
+    // ── Long-press popup (hide button / reset page) ──
+    (function() {
+      const _popup = document.getElementById('lpPopup');
+      let _lpTimer = null;
+      let _lpActive = false;
+
+      function _showPopup(x, y, html, onConfirm) {
+        if (!_popup) return;
+        _popup.innerHTML = html;
+        _popup.style.display = 'block';
+        // Position near tap point, clamped to viewport
+        const pw = 160, ph = 50;
+        const left = Math.min(Math.max(x - pw / 2, 12), window.innerWidth - pw - 12);
+        const top  = Math.max(y - ph - 16, 12);
+        _popup.style.left = left + 'px';
+        _popup.style.top  = top + 'px';
+        _popup.onclick = () => { _hidePopup(); onConfirm && onConfirm(); };
+        _lpActive = true;
+        // Auto-dismiss after 3s
+        clearTimeout(_lpTimer);
+        _lpTimer = setTimeout(_hidePopup, 3000);
+      }
+
+      function _hidePopup() {
+        if (_popup) _popup.style.display = 'none';
+        _lpActive = false;
+      }
+
+      // Close popup on outside tap
+      document.addEventListener('touchstart', e => {
+        if (_lpActive && _popup && !_popup.contains(e.target)) _hidePopup();
+      }, { passive: true });
+      document.addEventListener('mousedown', e => {
+        if (_lpActive && _popup && !_popup.contains(e.target)) _hidePopup();
+      });
+
+      function _attachLongPress(el, getXY, onLongPress) {
+        if (!el) return;
+        let _t = null, _moved = false;
+        function _start(x, y) {
+          _moved = false;
+          _t = setTimeout(() => { if (!_moved) onLongPress(x, y); }, 600);
+        }
+        function _cancel() { clearTimeout(_t); }
+        el.addEventListener('touchstart', e => { const t = e.touches[0]; _start(t.clientX, t.clientY); }, { passive: true });
+        el.addEventListener('touchmove', () => { _moved = true; clearTimeout(_t); }, { passive: true });
+        el.addEventListener('touchend', _cancel, { passive: true });
+        el.addEventListener('mousedown', e => _start(e.clientX, e.clientY));
+        el.addEventListener('mousemove', () => { _moved = true; clearTimeout(_t); });
+        el.addEventListener('mouseup', _cancel);
+      }
+
+      // On load: apply hidden states from storage
+      if (localStorage.getItem('bbFeedbackFabHidden') === '1') {
+        const _fb = document.querySelector('.feedback-fab');
+        if (_fb) _fb.style.display = 'none';
+      }
+      if (localStorage.getItem('bbWaFabHidden') === '1') {
+        const _wa = document.querySelector('.whatsapp-fab');
+        if (_wa) _wa.style.display = 'none';
+      }
+      if (localStorage.getItem('bbFooterHidden') === '1') {
+        const _fl = document.querySelector('.footer-link');
+        if (_fl && _fl.parentElement) _fl.parentElement.style.display = 'none';
+      }
+    })();
+
+    // ── Hide permanently confirmation ──
+    let _hidePermanentlyCb = null;
+    function _showHidePermanently(type) {
+      _hidePermanentlyCb = () => {
+        if (type === 'wa') {
+          document.getElementById('waModal').classList.remove('active');
+          _advanceOnboardingStep(10);
+          document.querySelector('.whatsapp-fab').style.display = 'none';
+          localStorage.setItem('bbWaFabHidden', '1');
+          _suppressFabHover();
+        } else if (type === 'feedback') {
+          closeFeedbackModal();
+          document.querySelector('.feedback-fab').style.display = 'none';
+          localStorage.setItem('bbFeedbackFabHidden', '1');
+        }
+      };
+      document.getElementById('hidePermanentlyModal').style.display = 'flex';
+    }
+    window._showHidePermanently = _showHidePermanently;
+    document.getElementById('hidePermanentlyConfirmBtn').addEventListener('click', () => {
+      document.getElementById('hidePermanentlyModal').style.display = 'none';
+      if (_hidePermanentlyCb) { _hidePermanentlyCb(); _hidePermanentlyCb = null; }
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,4 @@
+RewriteEngine On
+
+# Show beta landing page at the root — index.html served directly
+RewriteRule ^$ beta.html [L]

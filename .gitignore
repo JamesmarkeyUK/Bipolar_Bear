@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+
+# Editor
+.vs/
+*.suo
+*.user
+
+# Claude Code
+.claude/
+
+# Generated / large binaries
+DOCS.pdf
+
+# Temp
+test_write.txt

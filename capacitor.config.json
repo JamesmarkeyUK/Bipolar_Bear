@@ -1,0 +1,19 @@
+{
+  "appId": "com.bipolarbear.app",
+  "appName": "BipolarBear",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#ff9500",
+      "showSpinner": false
+    },
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_icon_config_sample",
+      "iconColor": "#ff9500"
+    }
+  }
+}
