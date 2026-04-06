@@ -141,6 +141,10 @@
       /* WA hint: sits right of the WA FAB */
       #waFabLabel { left: calc(50% - 240px + 62px); }
     }
+    @media (min-width: 768px) {
+      .fab-hint:not(#waFabLabel) { right: 90px; }
+      #waFabLabel { left: 90px; }
+    }
     .fab-hint-label {
       background: rgba(0,0,0,0.58);
       color: white;
@@ -445,6 +449,9 @@
     @media (min-width: 520px) {
       .feedback-fab { right: calc(50% - 240px); }
     }
+    @media (min-width: 768px) {
+      .feedback-fab { right: 28px; }
+    }
 
     /* ── WhatsApp FAB (bottom left) ── */
     .whatsapp-fab {
@@ -472,6 +479,9 @@
     }
     @media (min-width: 520px) {
       .whatsapp-fab { left: calc(50% - 240px); }
+    }
+    @media (min-width: 768px) {
+      .whatsapp-fab { left: 28px; }
     }
     @keyframes waHintSlide {
       0%, 100% { transform: translateX(0); opacity: 0.85; }
@@ -960,6 +970,36 @@
     window._getOnboardingStep = _getOnboardingStep;
     window._advanceOnboardingStep = _advanceOnboardingStep;
 
+    function _resolvePointerPosition(ptr, hintEls) {
+      const vw = window.innerWidth, vh = window.innerHeight;
+      const sz = 72, pad = 16;
+      const candidates = [
+        { left: vw / 2, top: vh / 2 },
+        { left: vw / 2, top: vh * 0.25 },
+        { left: vw / 2, top: vh * 0.75 },
+        { left: vw * 0.25, top: vh / 2 },
+        { left: vw * 0.75, top: vh / 2 },
+      ];
+      function overlaps(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) {
+        return ax1 < bx2 && ax2 > bx1 && ay1 < by2 && ay2 > by1;
+      }
+      for (const c of candidates) {
+        const px1 = c.left - sz / 2 - pad, py1 = c.top - sz / 2 - pad;
+        const px2 = c.left + sz / 2 + pad, py2 = c.top + sz / 2 + pad;
+        const hit = hintEls.some(el => {
+          if (!el) return false;
+          const r = el.getBoundingClientRect();
+          return overlaps(px1, py1, px2, py2, r.left, r.top, r.right, r.bottom);
+        });
+        if (!hit) {
+          ptr.style.left = c.left + 'px';
+          ptr.style.top = c.top + 'px';
+          ptr.style.transform = 'translate(-50%,-50%)';
+          return;
+        }
+      }
+      ptr.style.display = 'none';
+    }
     function _showIndexHintPointer(targetEl) {
       document.getElementById('_bbIdxHintPointer')?.remove();
       const rect = targetEl.getBoundingClientRect();
@@ -973,6 +1013,7 @@
       ptr.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:510;pointer-events:none;animation:hintFade 1.8s ease-in-out infinite;';
       ptr.innerHTML = `<div style="position:relative;width:72px;height:72px;display:flex;align-items:center;justify-content:center;"><svg width="72" height="72" viewBox="0 0 72 72" fill="none" style="position:absolute;inset:0;"><circle cx="36" cy="36" r="34" stroke="rgba(255,255,255,0.55)" stroke-width="2"/></svg><svg width="52" height="52" viewBox="0 0 52 52" fill="none" style="transform:rotate(${angle}deg);filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4));"><line x1="26" y1="44" x2="26" y2="10" stroke="white" stroke-width="4" stroke-linecap="round"/><polyline points="14,22 26,10 38,22" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>`;
       document.body.appendChild(ptr);
+      _resolvePointerPosition(ptr, Array.from(document.querySelectorAll('.bb-hint-elevated')));
     }
     function _hideIndexHintPointer() {
       document.getElementById('_bbIdxHintPointer')?.remove();
@@ -1834,7 +1875,7 @@
       document.getElementById('fbEmailRow').style.display = currentUser ? 'none' : '';
       // Show version + platform
       const _metaEl = document.getElementById('fbMeta');
-      if (_metaEl) _metaEl.textContent = `v0.69 · ${_getFbPlatform()}`;
+      if (_metaEl) _metaEl.textContent = `v0.70 · ${_getFbPlatform()}`;
       document.getElementById('feedbackModal').classList.add('active');
     }
 

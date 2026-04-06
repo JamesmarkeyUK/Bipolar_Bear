@@ -237,10 +237,33 @@
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
       white-space: nowrap;
+      flex: 1;
+      min-width: 0;
     }
     .sticky-nav-row::-webkit-scrollbar { display: none; }
     @media (min-width: 900px) {
       .sticky-nav-row { justify-content: center; overflow-x: visible; }
+    }
+    .sticky-nav-inner {
+      display: flex;
+      align-items: stretch;
+      background: white;
+      width: 100%;
+    }
+    .sticky-nav-help {
+      flex-shrink: 0;
+      background: white;
+      border-left: 1px solid #f0f0f0;
+    }
+    .sticky-nav-help a {
+      display: inline-flex;
+      align-items: center;
+      padding: 14px 18px;
+      text-decoration: none;
+      color: #495057;
+      font-size: 0.82em;
+      font-weight: 600;
+      white-space: nowrap;
     }
 
     .sticky-nav a {
@@ -256,7 +279,7 @@
       flex-shrink: 0;
     }
 
-    .sticky-nav a:first-child {
+    .sticky-nav-row a:first-child {
       position: sticky;
       left: 0;
       background: white;
@@ -264,7 +287,7 @@
       border-right: 1px solid var(--border);
     }
 
-    .sticky-nav a:last-child {
+    .sticky-nav-row a:last-child {
       position: sticky;
       right: 0;
       background: white;
@@ -918,18 +941,22 @@
 
   <!-- STICKY NAV (sticks when you scroll past the header) -->
   <nav class="sticky-nav">
-    <div class="sticky-nav-row">
-      <a href="index.html" onclick="event.preventDefault(); location.replace('/')">🏠 Home</a>
-      <a href="#mood-scale">📊 </a>
-      <a href="#medications">💊 </a>
-      <a href="#goals">🎯 </a>
-      <a href="#mind">🧠 </a>
-      <a href="#books">📚 </a>
-      <a href="#media">🎵 </a>
-      <a href="#memories">😂 </a>
-      <a href="#faq">❓ </a>
-      <a href="#steps">🪬</a>
-      <a href="#help">🆘 Help</a>
+    <div class="sticky-nav-inner">
+      <div class="sticky-nav-row">
+        <a href="index.html" onclick="event.preventDefault(); location.replace('/')">🏠 Home</a>
+        <a href="#mood-scale">📊 </a>
+        <a href="#medications">💊 </a>
+        <a href="#goals">🎯 </a>
+        <a href="#mind">🧠 </a>
+        <a href="#books">📚 </a>
+        <a href="#media">🎵 </a>
+        <a href="#memories">😂 </a>
+        <a href="#faq">❓ </a>
+        <a href="#steps">🪬</a>
+      </div>
+      <div class="sticky-nav-help">
+        <a href="#help">🆘 Help</a>
+      </div>
     </div>
   </nav>
 
@@ -1850,7 +1877,14 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
       if (tip) tip.style.display = 'none';
       if (!_moodScrolled) {
         _moodScrolled = true;
-        document.getElementById('mood-scale').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const _ms = document.getElementById('mood-scale');
+        if (_ms) {
+          const _r = _ms.getBoundingClientRect();
+          // Only scroll if the mood scale panel is not fully visible
+          if (_r.bottom > window.innerHeight) {
+            _ms.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
       }
     }
 
@@ -4166,6 +4200,36 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
 
   <script>
     // ── Onboarding step 7 gating ──
+    function _resolvePointerPosition(ptr, hintEls) {
+      const vw = window.innerWidth, vh = window.innerHeight;
+      const sz = 72, pad = 16;
+      const candidates = [
+        { left: vw / 2, top: vh / 2 },
+        { left: vw / 2, top: vh * 0.25 },
+        { left: vw / 2, top: vh * 0.75 },
+        { left: vw * 0.25, top: vh / 2 },
+        { left: vw * 0.75, top: vh / 2 },
+      ];
+      function overlaps(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) {
+        return ax1 < bx2 && ax2 > bx1 && ay1 < by2 && ay2 > by1;
+      }
+      for (const c of candidates) {
+        const px1 = c.left - sz / 2 - pad, py1 = c.top - sz / 2 - pad;
+        const px2 = c.left + sz / 2 + pad, py2 = c.top + sz / 2 + pad;
+        const hit = hintEls.some(el => {
+          if (!el) return false;
+          const r = el.getBoundingClientRect();
+          return overlaps(px1, py1, px2, py2, r.left, r.top, r.right, r.bottom);
+        });
+        if (!hit) {
+          ptr.style.left = c.left + 'px';
+          ptr.style.top = c.top + 'px';
+          ptr.style.transform = 'translate(-50%,-50%)';
+          return;
+        }
+      }
+      ptr.style.display = 'none';
+    }
     function _showSkHintPointer(targetEl) {
       document.getElementById('_bbSkHintPointer')?.remove();
       const rect = targetEl.getBoundingClientRect();
@@ -4179,6 +4243,7 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
       ptr.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:125;pointer-events:none;animation:hintFade 1.8s ease-in-out infinite;';
       ptr.innerHTML = `<div style="position:relative;width:72px;height:72px;display:flex;align-items:center;justify-content:center;"><svg width="72" height="72" viewBox="0 0 72 72" fill="none" style="position:absolute;inset:0;"><circle cx="36" cy="36" r="34" stroke="rgba(255,255,255,0.55)" stroke-width="2"/></svg><svg width="52" height="52" viewBox="0 0 52 52" fill="none" style="transform:rotate(${angle}deg);filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4));"><line x1="26" y1="44" x2="26" y2="10" stroke="white" stroke-width="4" stroke-linecap="round"/><polyline points="14,22 26,10 38,22" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>`;
       document.body.appendChild(ptr);
+      _resolvePointerPosition(ptr, Array.from(document.querySelectorAll('.sk-hint-elevated')));
     }
     function _hideSkHintPointer() {
       document.getElementById('_bbSkHintPointer')?.remove();

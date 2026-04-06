@@ -2018,7 +2018,15 @@
       <h3 style="margin-bottom:16px;">📋 Changelog</h3>
       <div style="text-align:left; font-size:0.9em; color:#495057; line-height:1.7;">
         <div style="margin-bottom:14px;">
-          <strong style="color:#ff9500;">v0.69</strong><br>
+          <strong style="color:#ff9500;">v0.70</strong><br>
+          • ✨ WhatsApp & Feedback FABs sit at viewport corners on iPad/wide screens<br>
+          • ✨ Compass avoids colliding with hint text — offsets or hides if no clear spot<br>
+          • ✨ Compass recalculates direction after journal opens (close hint now points up correctly)<br>
+          • ✨ Survival kit Help button pinned to far right of nav bar<br>
+          • 🐛 Fix: Survival kit auto-scroll suppressed when mood panel already visible<br>
+        </div>
+        <div style="margin-bottom:14px;">
+          <strong style="color:#adb5bd;">v0.69</strong><br>
           • ✨ Compass-style pulsing arrow added to all blocking onboarding hints<br>
           • ✨ Scroll locked during blocking hints so target can't scroll off screen<br>
           • 🐛 Fix: Tutorial skip now unlocks all features (settings button, mood long-press, etc.)<br>
@@ -2606,7 +2614,7 @@
 
         <div style="margin-top:4px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.69</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.70</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2711,7 +2719,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.69</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.70</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2770,7 +2778,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.69</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.70</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2806,7 +2814,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.69</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.70</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2840,7 +2848,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.69</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.70</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2960,6 +2968,38 @@
 
     let _allEntries = []; // full sorted entry list for personalised feedback
 
+    function _resolvePointerPosition(ptr, hintEls) {
+      const vw = window.innerWidth, vh = window.innerHeight;
+      const sz = 72;
+      const pad = 16;
+      const candidates = [
+        { left: vw / 2, top: vh / 2 },
+        { left: vw / 2, top: vh * 0.25 },
+        { left: vw / 2, top: vh * 0.75 },
+        { left: vw * 0.25, top: vh / 2 },
+        { left: vw * 0.75, top: vh / 2 },
+      ];
+      function overlaps(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) {
+        return ax1 < bx2 && ax2 > bx1 && ay1 < by2 && ay2 > by1;
+      }
+      for (const c of candidates) {
+        const px1 = c.left - sz / 2 - pad, py1 = c.top - sz / 2 - pad;
+        const px2 = c.left + sz / 2 + pad, py2 = c.top + sz / 2 + pad;
+        const hit = hintEls.some(el => {
+          if (!el) return false;
+          const r = el.getBoundingClientRect();
+          return overlaps(px1, py1, px2, py2, r.left, r.top, r.right, r.bottom);
+        });
+        if (!hit) {
+          ptr.style.left = c.left + 'px';
+          ptr.style.top = c.top + 'px';
+          ptr.style.transform = 'translate(-50%,-50%)';
+          return true;
+        }
+      }
+      ptr.style.display = 'none';
+      return false;
+    }
     function _showHintPointer(targetEl) {
       document.getElementById('_bbHintPointer')?.remove();
       const rect = targetEl.getBoundingClientRect();
@@ -2973,6 +3013,8 @@
       ptr.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:510;pointer-events:none;animation:hintFade 1.8s ease-in-out infinite;';
       ptr.innerHTML = `<div style="position:relative;width:72px;height:72px;display:flex;align-items:center;justify-content:center;"><svg width="72" height="72" viewBox="0 0 72 72" fill="none" style="position:absolute;inset:0;"><circle cx="36" cy="36" r="34" stroke="rgba(255,255,255,0.55)" stroke-width="2"/></svg><svg width="52" height="52" viewBox="0 0 52 52" fill="none" style="transform:rotate(${angle}deg);filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4));"><line x1="26" y1="44" x2="26" y2="10" stroke="white" stroke-width="4" stroke-linecap="round"/><polyline points="14,22 26,10 38,22" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>`;
       document.body.appendChild(ptr);
+      const _hintEls = Array.from(document.querySelectorAll('.bb-hint-elevated'));
+      _resolvePointerPosition(ptr, _hintEls);
     }
     function _hideHintPointer() {
       document.getElementById('_bbHintPointer')?.remove();
@@ -3056,7 +3098,9 @@
         document.body.style.overflow = 'hidden';
         const _tgtMap2 = { 1:'journalToggleBtn', 2:'journalToggleBtn', 3:'homeLink', 8:'survivalNavBtn' };
         const _tgt = document.getElementById(_tgtMap2[step]);
-        if (_tgt) setTimeout(() => _showHintPointer(_tgt), 50);
+        // Always recalculate — target may have moved (e.g. journal toggle button shifts after opening)
+        _hideHintPointer();
+        if (_tgt) setTimeout(() => _showHintPointer(_tgt), 80);
       } else {
         document.body.style.overflow = '';
         _hideHintPointer();
