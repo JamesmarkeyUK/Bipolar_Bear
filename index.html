@@ -884,9 +884,8 @@
             const _serverStep = d.onboardingStep || 0;
             const _localStep = _getOnboardingStep();
             let _finalStep = Math.max(_serverStep, _localStep);
-            // Web: skip step 9 (WA hint, native-only) if synced from a native session
-            const _isNatSync = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
-            if (_finalStep === 9 && !_isNatSync) _finalStep = 10;
+            // Step 9 (WA hint) removed from tutorial — skip on all platforms
+            if (_finalStep === 9) _finalStep = 10;
             if (_finalStep !== _localStep) {
               localStorage.setItem('bbOnboardingStep', String(_finalStep));
               db.collection('userSettings').doc(user.uid).set({ onboardingStep: _finalStep }, { merge: true }).catch(() => {});
@@ -951,7 +950,7 @@
       const cur = _getOnboardingStep();
       if (to <= cur) return;
       const _isNat = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
-      if (to === 9 && !_isNat) to = 10; // auto-skip WA hint on web
+      if (to === 9) to = 10; // step 9 (WA hint) removed from tutorial on all platforms
       localStorage.setItem('bbOnboardingStep', String(to));
       if (typeof currentUser !== 'undefined' && currentUser && typeof db !== 'undefined' && db) {
         db.collection('userSettings').doc(currentUser.uid).set({ onboardingStep: to }, { merge: true }).catch(() => {});
@@ -960,6 +959,24 @@
     }
     window._getOnboardingStep = _getOnboardingStep;
     window._advanceOnboardingStep = _advanceOnboardingStep;
+
+    function _showIndexHintPointer(targetEl) {
+      document.getElementById('_bbIdxHintPointer')?.remove();
+      const rect = targetEl.getBoundingClientRect();
+      const tx = rect.left + rect.width / 2;
+      const ty = rect.top + rect.height / 2;
+      const cx = window.innerWidth / 2;
+      const cy = window.innerHeight / 2;
+      const angle = Math.atan2(ty - cy, tx - cx) * 180 / Math.PI + 90;
+      const ptr = document.createElement('div');
+      ptr.id = '_bbIdxHintPointer';
+      ptr.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:510;pointer-events:none;animation:hintFade 1.8s ease-in-out infinite;';
+      ptr.innerHTML = `<div style="position:relative;width:72px;height:72px;display:flex;align-items:center;justify-content:center;"><svg width="72" height="72" viewBox="0 0 72 72" fill="none" style="position:absolute;inset:0;"><circle cx="36" cy="36" r="34" stroke="rgba(255,255,255,0.55)" stroke-width="2"/></svg><svg width="52" height="52" viewBox="0 0 52 52" fill="none" style="transform:rotate(${angle}deg);filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4));"><line x1="26" y1="44" x2="26" y2="10" stroke="white" stroke-width="4" stroke-linecap="round"/><polyline points="14,22 26,10 38,22" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>`;
+      document.body.appendChild(ptr);
+    }
+    function _hideIndexHintPointer() {
+      document.getElementById('_bbIdxHintPointer')?.remove();
+    }
 
     function _showTutorialCompleteModal() {
       if (document.getElementById('tutorialCompleteModal')) return;
@@ -1080,6 +1097,14 @@
           if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
           el.classList.add('bb-hint-elevated');
         });
+        if (step === 4) {
+          const _authBtn = document.getElementById('authFabWrapper');
+          if (_authBtn) setTimeout(() => _showIndexHintPointer(_authBtn), 850);
+        } else {
+          _hideIndexHintPointer();
+        }
+      } else {
+        _hideIndexHintPointer();
       }
 
       // Journal tutorial progress: X/3 entries needed (hidden once advanced tutorial complete)
@@ -1491,11 +1516,16 @@
               setTimeout(_showWelcomePopup, 300);
             });
           } else {
-            // Skip tutorial — jump to step 12
+            // Skip tutorial — jump to step 12 and mark all tutorial flags as done
             localStorage.removeItem('bbOnboardingStep');
             _advanceOnboardingStep(12);
-            localStorage.setItem('bbTutorialToastShown', '1');
-            localStorage.setItem('bbWelcomeShown', '1');
+            [
+              'bbTutorialToastShown', 'bbWelcomeShown', 'bbSurvivalKitVisited',
+              'bb_fmChooseMoodHintDone', 'bb_fmMoodInfoCloseHintDone', 'bb_fmMoodTipShown',
+              'bbSettingsHintDone', 'bbCustomiseFormHintDone', 'bbCustomiseAdditionalHintDone',
+              'bbCloseSettingsHintDone', 'bbAdvancedTutorialToastShown', 'bbMedHintDone',
+              'bbMoodDefHintDone', 'bbPersonalHintDone',
+            ].forEach(k => localStorage.setItem(k, '1'));
             _applyOnboardingGating();
             const _t = document.createElement('div');
             Object.assign(_t.style, { position:'fixed', top:'calc(env(safe-area-inset-top,0px) + 12px)', left:'50%', transform:'translateX(-50%)', background:'#ff9500', color:'white', padding:'10px 20px', borderRadius:'20px', fontWeight:'700', fontSize:'0.9em', zIndex:'9999', whiteSpace:'nowrap', boxShadow:'0 4px 16px rgba(0,0,0,0.2)', pointerEvents:'none' });
@@ -1804,7 +1834,7 @@
       document.getElementById('fbEmailRow').style.display = currentUser ? 'none' : '';
       // Show version + platform
       const _metaEl = document.getElementById('fbMeta');
-      if (_metaEl) _metaEl.textContent = `v0.68 · ${_getFbPlatform()}`;
+      if (_metaEl) _metaEl.textContent = `v0.69 · ${_getFbPlatform()}`;
       document.getElementById('feedbackModal').classList.add('active');
     }
 
@@ -1928,18 +1958,14 @@
       setTimeout(_showWelcomePopup, 600);
     }
 
-    // On web, steps 9 and 10 have no blocking action (WA/feedback FABs are post-tutorial).
-    // Auto-advance through them and show the tutorial complete popup.
+    // Steps 9 and 10 (WA/feedback hints) removed from tutorial — auto-advance to 12 on all platforms.
     (function() {
-      const _isNat = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
-      if (!_isNat) {
-        const _s = _getOnboardingStep();
-        if (_s === 9 || _s === 10) {
-          _advanceOnboardingStep(12);
-          if (localStorage.getItem('bbTutorialToastShown') !== '1') {
-            localStorage.setItem('bbTutorialToastShown', '1');
-            setTimeout(_showTutorialCompleteModal, 400);
-          }
+      const _s = _getOnboardingStep();
+      if (_s === 10) {
+        _advanceOnboardingStep(12);
+        if (localStorage.getItem('bbTutorialToastShown') !== '1') {
+          localStorage.setItem('bbTutorialToastShown', '1');
+          setTimeout(_showTutorialCompleteModal, 400);
         }
       }
     })();

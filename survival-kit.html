@@ -4166,6 +4166,24 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
 
   <script>
     // ── Onboarding step 7 gating ──
+    function _showSkHintPointer(targetEl) {
+      document.getElementById('_bbSkHintPointer')?.remove();
+      const rect = targetEl.getBoundingClientRect();
+      const tx = rect.left + rect.width / 2;
+      const ty = rect.top + rect.height / 2;
+      const cx = window.innerWidth / 2;
+      const cy = window.innerHeight / 2;
+      const angle = Math.atan2(ty - cy, tx - cx) * 180 / Math.PI + 90;
+      const ptr = document.createElement('div');
+      ptr.id = '_bbSkHintPointer';
+      ptr.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:125;pointer-events:none;animation:hintFade 1.8s ease-in-out infinite;';
+      ptr.innerHTML = `<div style="position:relative;width:72px;height:72px;display:flex;align-items:center;justify-content:center;"><svg width="72" height="72" viewBox="0 0 72 72" fill="none" style="position:absolute;inset:0;"><circle cx="36" cy="36" r="34" stroke="rgba(255,255,255,0.55)" stroke-width="2"/></svg><svg width="52" height="52" viewBox="0 0 52 52" fill="none" style="transform:rotate(${angle}deg);filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4));"><line x1="26" y1="44" x2="26" y2="10" stroke="white" stroke-width="4" stroke-linecap="round"/><polyline points="14,22 26,10 38,22" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>`;
+      document.body.appendChild(ptr);
+    }
+    function _hideSkHintPointer() {
+      document.getElementById('_bbSkHintPointer')?.remove();
+    }
+
     function _applySkOnboardingGating() {
       const step = parseInt(localStorage.getItem('bbOnboardingStep') || '0', 10);
       const hint = document.getElementById('skHint7');
@@ -4176,6 +4194,8 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
       const _isBlocking = step === 7 && _visited;
       const overlay = document.getElementById('bbSkOverlay');
       if (overlay) overlay.style.display = _isBlocking ? '' : 'none';
+
+      document.body.style.overflow = _isBlocking ? 'hidden' : '';
 
       document.querySelectorAll('.sk-hint-elevated').forEach(el => {
         el.classList.remove('sk-hint-elevated');
@@ -4189,6 +4209,10 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
           if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
           el.classList.add('sk-hint-elevated');
         });
+        const _tgt = document.getElementById('skJournalNavBtn');
+        if (_tgt) setTimeout(() => _showSkHintPointer(_tgt), 50);
+      } else {
+        _hideSkHintPointer();
       }
     }
     _applySkOnboardingGating();

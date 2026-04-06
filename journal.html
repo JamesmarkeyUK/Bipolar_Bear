@@ -2018,7 +2018,15 @@
       <h3 style="margin-bottom:16px;">📋 Changelog</h3>
       <div style="text-align:left; font-size:0.9em; color:#495057; line-height:1.7;">
         <div style="margin-bottom:14px;">
-          <strong style="color:#ff9500;">v0.68</strong><br>
+          <strong style="color:#ff9500;">v0.69</strong><br>
+          • ✨ Compass-style pulsing arrow added to all blocking onboarding hints<br>
+          • ✨ Scroll locked during blocking hints so target can't scroll off screen<br>
+          • 🐛 Fix: Tutorial skip now unlocks all features (settings button, mood long-press, etc.)<br>
+          • 🐛 Fix: Tutorial complete popup now always fires after survival kit → journal flow<br>
+          • 🐛 Fix: Compass arrow hidden when advancing from sign-in hint to logo hint<br>
+        </div>
+        <div style="margin-bottom:14px;">
+          <strong style="color:#adb5bd;">v0.68</strong><br>
           • 🐻 Bear emoji added to all hint texts<br>
           • ✨ "+ Log today/yesterday" pill now matches the orange style of the missing entries pill<br>
           • 🐛 Fix: Regular form no longer accessible when focused mode is enabled<br>
@@ -2598,7 +2606,7 @@
 
         <div style="margin-top:4px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.68</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.69</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2703,7 +2711,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.68</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.69</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2762,7 +2770,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.68</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.69</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2798,7 +2806,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.68</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.69</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2832,7 +2840,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.68</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.69</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2936,7 +2944,7 @@
       const cur = _getOnboardingStep();
       if (to <= cur) return;
       const _isNat = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
-      if (to === 9 && !_isNat) to = 10; // auto-skip WA hint on web
+      if (to === 9) to = 10; // step 9 (WA hint) removed from tutorial on all platforms
       localStorage.setItem('bbOnboardingStep', String(to));
       if (typeof currentUser !== 'undefined' && currentUser && typeof db !== 'undefined' && db) {
         db.collection('userSettings').doc(currentUser.uid).set({ onboardingStep: to }, { merge: true }).catch(() => {});
@@ -2951,6 +2959,24 @@
     }
 
     let _allEntries = []; // full sorted entry list for personalised feedback
+
+    function _showHintPointer(targetEl) {
+      document.getElementById('_bbHintPointer')?.remove();
+      const rect = targetEl.getBoundingClientRect();
+      const tx = rect.left + rect.width / 2;
+      const ty = rect.top + rect.height / 2;
+      const cx = window.innerWidth / 2;
+      const cy = window.innerHeight / 2;
+      const angle = Math.atan2(ty - cy, tx - cx) * 180 / Math.PI + 90;
+      const ptr = document.createElement('div');
+      ptr.id = '_bbHintPointer';
+      ptr.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:510;pointer-events:none;animation:hintFade 1.8s ease-in-out infinite;';
+      ptr.innerHTML = `<div style="position:relative;width:72px;height:72px;display:flex;align-items:center;justify-content:center;"><svg width="72" height="72" viewBox="0 0 72 72" fill="none" style="position:absolute;inset:0;"><circle cx="36" cy="36" r="34" stroke="rgba(255,255,255,0.55)" stroke-width="2"/></svg><svg width="52" height="52" viewBox="0 0 52 52" fill="none" style="transform:rotate(${angle}deg);filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4));"><line x1="26" y1="44" x2="26" y2="10" stroke="white" stroke-width="4" stroke-linecap="round"/><polyline points="14,22 26,10 38,22" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>`;
+      document.body.appendChild(ptr);
+    }
+    function _hideHintPointer() {
+      document.getElementById('_bbHintPointer')?.remove();
+    }
 
     function _applyJournalOnboardingGating() {
       const step = _getOnboardingStep();
@@ -2988,7 +3014,7 @@
       } catch(e) { /* _fmActive/_fmSteps not yet initialised (TDZ on page load) */ }
       if (_sHint) _sHint.style.display = _showSettings ? 'flex' : 'none';
       const _sBtn = document.getElementById('settingsBtn');
-      if (_sBtn) _sBtn.style.display = (_settingsDone || _showSettings || localStorage.getItem('bbAdvancedBadgeVisible') === '1') ? '' : 'none';
+      if (_sBtn) _sBtn.style.display = (_settingsDone || _showSettings || localStorage.getItem('bbAdvancedBadgeVisible') === '1' || step >= 12) ? '' : 'none';
       if (typeof _updateAdvancedBadge === 'function') _updateAdvancedBadge();
       // Med hint: active when medHintEl is in the DOM (medication step rendered)
       const _medHintEl = document.getElementById('medHintEl');
@@ -3024,6 +3050,16 @@
           if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
           el.classList.add('bb-hint-elevated');
         });
+      }
+      // Scroll lock + center pointer arrow for blocking onboarding steps
+      if (_blockingSteps.has(step)) {
+        document.body.style.overflow = 'hidden';
+        const _tgtMap2 = { 1:'journalToggleBtn', 2:'journalToggleBtn', 3:'homeLink', 8:'survivalNavBtn' };
+        const _tgt = document.getElementById(_tgtMap2[step]);
+        if (_tgt) setTimeout(() => _showHintPointer(_tgt), 50);
+      } else {
+        document.body.style.overflow = '';
+        _hideHintPointer();
       }
     }
     
