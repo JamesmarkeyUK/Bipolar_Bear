@@ -7,7 +7,7 @@
   <title>Mood Journal – Bipolar Bear App</title>
   <!-- Beta gate: must be first — fires before any render -->
   <style>body{background:linear-gradient(135deg,#ff9500 0%,#ff6b00 100%)}</style>
-  <script>if(!window.Capacitor&&localStorage.getItem('bbWebUnlocked')!=='true'){location.replace('beta.html');}</script>
+  <script>if(!window.Capacitor&&location.protocol!=='file:'&&localStorage.getItem('bbWebUnlocked')!=='true'){location.replace('beta.html');}</script>
   <meta name="description" content="Checkin with the Bear. Track your bipolar mood, energy, sleep and medication daily with Bipolar Bear.">
   <meta name="robots" content="noindex, nofollow">
 
@@ -1503,7 +1503,7 @@
     <header>
       <div style="display:flex; justify-content:flex-start; align-items:center; margin-bottom:16px;">
         <div style="display:flex;flex-direction:column;align-items:flex-start;gap:0;">
-          <a id="homeLink" href="/" onclick="event.preventDefault(); _advanceOnboardingStep(4); location.replace('/')" class="home-link-journal">← Home</a>
+          <a id="homeLink" href="/" onclick="event.preventDefault(); _advanceOnboardingStep(4); location.replace(location.protocol==='file:'?'index.html':'/')" class="home-link-journal">← Home</a>
           <!-- Onboarding hint 3: step 2 — points up at home button -->
           <div id="journalHint3" style="display:none;flex-direction:column;align-items:flex-start;gap:2px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-top:2px;">
             <svg width="24" height="22" viewBox="0 0 24 22" fill="none" style="transform:rotate(0deg);">
@@ -3005,16 +3005,20 @@
       const rect = targetEl.getBoundingClientRect();
       const tx = rect.left + rect.width / 2;
       const ty = rect.top + rect.height / 2;
-      const cx = window.innerWidth / 2;
-      const cy = window.innerHeight / 2;
-      const angle = Math.atan2(ty - cy, tx - cx) * 180 / Math.PI + 90;
       const ptr = document.createElement('div');
       ptr.id = '_bbHintPointer';
       ptr.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:510;pointer-events:none;animation:hintFade 1.8s ease-in-out infinite;';
-      ptr.innerHTML = `<div style="position:relative;width:72px;height:72px;display:flex;align-items:center;justify-content:center;"><svg width="72" height="72" viewBox="0 0 72 72" fill="none" style="position:absolute;inset:0;"><circle cx="36" cy="36" r="34" stroke="rgba(255,255,255,0.55)" stroke-width="2"/></svg><svg width="52" height="52" viewBox="0 0 52 52" fill="none" style="transform:rotate(${angle}deg);filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4));"><line x1="26" y1="44" x2="26" y2="10" stroke="white" stroke-width="4" stroke-linecap="round"/><polyline points="14,22 26,10 38,22" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>`;
+      ptr.innerHTML = `<div style="position:relative;width:72px;height:72px;display:flex;align-items:center;justify-content:center;"><svg width="72" height="72" viewBox="0 0 72 72" fill="none" style="position:absolute;inset:0;"><circle cx="36" cy="36" r="34" stroke="rgba(255,255,255,0.55)" stroke-width="2"/></svg><svg width="52" height="52" viewBox="0 0 52 52" fill="none" style="transform:rotate(0deg);filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4));"><line x1="26" y1="44" x2="26" y2="10" stroke="white" stroke-width="4" stroke-linecap="round"/><polyline points="14,22 26,10 38,22" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>`;
       document.body.appendChild(ptr);
       const _hintEls = Array.from(document.querySelectorAll('.bb-hint-elevated'));
       _resolvePointerPosition(ptr, _hintEls);
+      // Recalculate angle from final pointer position (may have moved from centre)
+      const fcx = parseFloat(ptr.style.left);
+      const fcy = parseFloat(ptr.style.top);
+      const _arrowSvg = ptr.querySelectorAll('svg')[1];
+      if (_arrowSvg && !isNaN(fcx) && !isNaN(fcy)) {
+        _arrowSvg.style.transform = `rotate(${Math.atan2(ty - fcy, tx - fcx) * 180 / Math.PI + 90}deg)`;
+      }
     }
     function _hideHintPointer() {
       document.getElementById('_bbHintPointer')?.remove();
@@ -3167,7 +3171,7 @@
     })();
 
     // ── Beta gate (web only) ──
-    if (!window.Capacitor && localStorage.getItem('bbWebUnlocked') !== 'true') {
+    if (!window.Capacitor && location.protocol !== 'file:' && localStorage.getItem('bbWebUnlocked') !== 'true') {
       location.replace('beta.html');
     }
 
@@ -10735,9 +10739,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
 
         alert(`Successfully deleted ${deleted} entries.`);
         if (typeof auth !== 'undefined' && auth && currentUser) {
-          auth.signOut().catch(() => {}).finally(() => location.replace('/'));
+          auth.signOut().catch(() => {}).finally(() => location.replace(location.protocol==='file:'?'index.html':'/'));
         } else {
-          location.replace('/');
+          location.replace(location.protocol==='file:'?'index.html':'/');
         }
       } catch (error) {
         console.error('Error deleting all entries:', error);
@@ -11862,6 +11866,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         const _saveBtnW = document.getElementById('settingsSaveBtn');
         if (_saveBtnW) _saveBtnW.style.display = '';
         document.querySelectorAll('.settings-platform-info').forEach(el => el.textContent = ' · 🌐 Web');
+        const _advHintElW = document.getElementById('advancedSettingsBadgeHint');
+        if (_advHintElW) _advHintElW.style.display = _badgeWasActive ? 'flex' : 'none';
         if (localStorage.getItem('bbSettingsHintDone') === '1' && localStorage.getItem('bbCustomiseFormHintDone') !== '1') {
           _showCustomiseFormHint();
         } else if (localStorage.getItem('bbCustomiseFormHintDone') === '1' && localStorage.getItem('bbCustomiseAdditionalHintDone') !== '1' && localStorage.getItem('customiseFormEnabled') === 'true') {

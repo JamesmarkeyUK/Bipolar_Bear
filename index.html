@@ -7,7 +7,7 @@
   <title>Bipolar Bear – Mood &amp; Mental Health Tracker</title>
   <!-- Beta gate: must be first — fires before any render -->
   <style>body{background:linear-gradient(135deg,#ff9500 0%,#ff6b00 100%)}</style>
-  <script>if(!window.Capacitor&&localStorage.getItem('bbWebUnlocked')!=='true'){location.replace('beta.html');}</script>
+  <script>if(!window.Capacitor&&location.protocol!=='file:'&&localStorage.getItem('bbWebUnlocked')!=='true'){location.replace('beta.html');}</script>
   <meta name="description" content="Checkin with the Bear. Free mood journal and survival kit for people living with bipolar disorder. Track mood, energy, sleep and medication daily.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://www.bipolarbear.app/">
@@ -835,7 +835,7 @@
 
   <script>
     // ── Beta gate (web only) ──
-    if (!window.Capacitor && localStorage.getItem('bbWebUnlocked') !== 'true') {
+    if (!window.Capacitor && location.protocol !== 'file:' && localStorage.getItem('bbWebUnlocked') !== 'true') {
       location.replace('beta.html');
     }
 
@@ -1875,7 +1875,7 @@
       document.getElementById('fbEmailRow').style.display = currentUser ? 'none' : '';
       // Show version + platform
       const _metaEl = document.getElementById('fbMeta');
-      if (_metaEl) _metaEl.textContent = `v0.70 · ${_getFbPlatform()}`;
+      if (_metaEl) _metaEl.textContent = `v0.71 · ${_getFbPlatform()}`;
       document.getElementById('feedbackModal').classList.add('active');
     }
 

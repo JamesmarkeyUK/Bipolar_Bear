@@ -7,7 +7,7 @@
   <title>Bipolar Survival Kit – Bipolar Bear</title>
   <!-- Beta gate: must be first — fires before any render -->
   <style>body{background:linear-gradient(135deg,#ff9500 0%,#ff6b00 100%)}</style>
-  <script>if(!window.Capacitor&&localStorage.getItem('bbWebUnlocked')!=='true'){location.replace('beta.html');}</script>
+  <script>if(!window.Capacitor&&location.protocol!=='file:'&&localStorage.getItem('bbWebUnlocked')!=='true'){location.replace('beta.html');}</script>
   <meta name="description" content="Your personal bipolar survival kit — mood scale, coping strategies, resources and community support.">
   <meta name="robots" content="noindex, nofollow">
 
@@ -227,18 +227,18 @@
       will-change: transform;
     }
 
-    /* White row inside nav so only safe-area-inset padding shows orange */
+    /* Scrolling icon strip in the middle of the nav */
     .sticky-nav-row {
       display: flex;
       align-items: stretch;
       background: white;
-      width: 100%;
+      flex: 1;
+      min-width: 0;
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
       white-space: nowrap;
-      flex: 1;
-      min-width: 0;
+      justify-content: flex-start;
     }
     .sticky-nav-row::-webkit-scrollbar { display: none; }
     @media (min-width: 900px) {
@@ -250,10 +250,25 @@
       background: white;
       width: 100%;
     }
+    .sticky-nav-home {
+      flex-shrink: 0;
+      background: white;
+      border-right: 1px solid var(--border);
+    }
+    .sticky-nav-home a {
+      display: inline-flex;
+      align-items: center;
+      padding: 14px 18px;
+      text-decoration: none;
+      color: #495057;
+      font-size: 0.82em;
+      font-weight: 600;
+      white-space: nowrap;
+    }
     .sticky-nav-help {
       flex-shrink: 0;
       background: white;
-      border-left: 1px solid #f0f0f0;
+      border-left: 1px solid var(--border);
     }
     .sticky-nav-help a {
       display: inline-flex;
@@ -264,6 +279,9 @@
       font-size: 0.82em;
       font-weight: 600;
       white-space: nowrap;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .sticky-nav-home a:hover, .sticky-nav-help a:hover { color: var(--orange); }
     }
 
     .sticky-nav a {
@@ -279,20 +297,11 @@
       flex-shrink: 0;
     }
 
-    .sticky-nav-row a:first-child {
-      position: sticky;
-      left: 0;
-      background: white;
-      z-index: 1;
-      border-right: 1px solid var(--border);
-    }
-
     .sticky-nav-row a:last-child {
       position: sticky;
       right: 0;
       background: white;
       z-index: 1;
-      border-left: 1px solid var(--border);
     }
 
     @media (hover: hover) and (pointer: fine) {
@@ -908,7 +917,7 @@
   <div class="header">
     <div class="header-inner">
     <div style="display:flex; justify-content:flex-start; align-items:center; margin-bottom:12px;">
-      <a href="/index.html" onclick="event.preventDefault(); location.replace('/')" class="home-link-btn">← Home</a>
+      <a href="/index.html" onclick="event.preventDefault(); location.replace(location.protocol==='file:'?'index.html':'/')" class="home-link-btn">← Home</a>
       <div style="margin-left:auto;position:relative;">
         <button id="skJournalNavBtn" onclick="_skGoToJournal()" title="Journal" style="background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.4);border-radius:50%;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;font-size:1.2em;cursor:pointer;line-height:1;-webkit-tap-highlight-color:transparent;flex-shrink:0;">📖</button>
         <!-- Onboarding hint 7: step 7 — appears left of button, arrow points right -->
@@ -942,8 +951,10 @@
   <!-- STICKY NAV (sticks when you scroll past the header) -->
   <nav class="sticky-nav">
     <div class="sticky-nav-inner">
+      <div class="sticky-nav-home">
+        <a href="index.html" onclick="event.preventDefault(); location.replace(location.protocol==='file:'?'index.html':'/')">🏠 Home</a>
+      </div>
       <div class="sticky-nav-row">
-        <a href="index.html" onclick="event.preventDefault(); location.replace('/')">🏠 Home</a>
         <a href="#mood-scale">📊 </a>
         <a href="#medications">💊 </a>
         <a href="#goals">🎯 </a>
@@ -3704,7 +3715,7 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
 
   <script>
     // ── Beta gate (web only) ──
-    if (!window.Capacitor && localStorage.getItem('bbWebUnlocked') !== 'true') {
+    if (!window.Capacitor && location.protocol !== 'file:' && localStorage.getItem('bbWebUnlocked') !== 'true') {
       location.replace('beta.html');
     }
 
@@ -4235,15 +4246,19 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
       const rect = targetEl.getBoundingClientRect();
       const tx = rect.left + rect.width / 2;
       const ty = rect.top + rect.height / 2;
-      const cx = window.innerWidth / 2;
-      const cy = window.innerHeight / 2;
-      const angle = Math.atan2(ty - cy, tx - cx) * 180 / Math.PI + 90;
       const ptr = document.createElement('div');
       ptr.id = '_bbSkHintPointer';
       ptr.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:125;pointer-events:none;animation:hintFade 1.8s ease-in-out infinite;';
-      ptr.innerHTML = `<div style="position:relative;width:72px;height:72px;display:flex;align-items:center;justify-content:center;"><svg width="72" height="72" viewBox="0 0 72 72" fill="none" style="position:absolute;inset:0;"><circle cx="36" cy="36" r="34" stroke="rgba(255,255,255,0.55)" stroke-width="2"/></svg><svg width="52" height="52" viewBox="0 0 52 52" fill="none" style="transform:rotate(${angle}deg);filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4));"><line x1="26" y1="44" x2="26" y2="10" stroke="white" stroke-width="4" stroke-linecap="round"/><polyline points="14,22 26,10 38,22" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>`;
+      ptr.innerHTML = `<div style="position:relative;width:72px;height:72px;display:flex;align-items:center;justify-content:center;"><svg width="72" height="72" viewBox="0 0 72 72" fill="none" style="position:absolute;inset:0;"><circle cx="36" cy="36" r="34" stroke="rgba(255,255,255,0.55)" stroke-width="2"/></svg><svg width="52" height="52" viewBox="0 0 52 52" fill="none" style="transform:rotate(0deg);filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4));"><line x1="26" y1="44" x2="26" y2="10" stroke="white" stroke-width="4" stroke-linecap="round"/><polyline points="14,22 26,10 38,22" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>`;
       document.body.appendChild(ptr);
       _resolvePointerPosition(ptr, Array.from(document.querySelectorAll('.sk-hint-elevated')));
+      // Recalculate angle from final pointer position (may have moved from centre)
+      const fcx = parseFloat(ptr.style.left);
+      const fcy = parseFloat(ptr.style.top);
+      const _arrowSvg = ptr.querySelectorAll('svg')[1];
+      if (_arrowSvg && !isNaN(fcx) && !isNaN(fcy)) {
+        _arrowSvg.style.transform = `rotate(${Math.atan2(ty - fcy, tx - fcx) * 180 / Math.PI + 90}deg)`;
+      }
     }
     function _hideSkHintPointer() {
       document.getElementById('_bbSkHintPointer')?.remove();

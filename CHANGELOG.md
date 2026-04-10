@@ -1,5 +1,11 @@
 # BipolarBear Changelog
 
+## v0.71
+- Beta gate: skip redirect when running from local file (file: protocol) so app works when opened directly from disk
+- Survival kit sticky nav: Home link moved out of scrollable strip into its own fixed left cell; arrow pointer angle recalculated from final rendered position (not screen centre)
+- Journal: Home link and post-delete redirect use file-safe location.replace; arrow pointer angle fix matches survival kit
+- Journal settings: advanced settings badge hint correctly shown/hidden when settings panel closes
+
 ## v0.60
 - Customise form: toggle individual steps on/off (energy, sleep, sleep quality, meds, additional, notes) via Journal Options; master switch; default is all active except sleep quality
 - Reset settings now restores customise form defaults (all active except sleep quality)
