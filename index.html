@@ -658,7 +658,7 @@
   <!-- Auth hint (shown at step 4: save progress) -->
   <div id="signinHint" style="display:none; position:fixed; bottom:76px; left:50%; transform:translateX(-50%); flex-direction:column; align-items:center; gap:4px; pointer-events:none; z-index:51;">
     <div id="signinHintInner" style="animation:signinHintPulse 1.6s ease-in-out infinite; display:flex; flex-direction:column; align-items:center; gap:4px;">
-      <span style="color:white; font-size:0.72em; opacity:0.85;">Stored securely in Europe</span>
+      <span style="color:white; font-size:0.72em; opacity:0.85;">Stored securely in Firebase</span>
       <span id="signinHintLabel" class="fab-hint-label">🐻 Save your progress here</span>
       <svg width="16" height="18" viewBox="0 0 16 18" fill="none"><line x1="8" y1="1" x2="8" y2="14" stroke="rgba(255,255,255,0.85)" stroke-width="2" stroke-linecap="round"/><polyline points="3,9 8,15 13,9" stroke="rgba(255,255,255,0.85)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
     </div>
@@ -1619,16 +1619,6 @@
   </script>
 
   <script>
-    // ── Journal button lock icon ──
-    (function() {
-      const iconEl = document.querySelector('#journalBtn .icon');
-      if (!iconEl) return;
-      const pinEnabled = localStorage.getItem('bbPinEnabled') === '1';
-      iconEl.textContent = pinEnabled ? '🔒' : '📔';
-    })();
-  </script>
-
-  <script>
     // ── Survival Kit setup tick ──
     (function() {
       const tick = document.getElementById('survivalTick');
@@ -2101,6 +2091,164 @@
       document.getElementById('hidePermanentlyModal').style.display = 'none';
       if (_hidePermanentlyCb) { _hidePermanentlyCb(); _hidePermanentlyCb = null; }
     });
+  </script>
+
+  <!-- Guest PIN unlock overlay (shown on index when journal data is encrypted) -->
+  <div id="guestPinOverlay" style="display:none;position:fixed;inset:0;background:linear-gradient(135deg,#ff9500 0%,#ff6b00 100%);z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:24px;">
+    <img src="icons/AppIcon.png" width="72" height="72" style="border-radius:18px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+    <h2 style="color:white;margin-bottom:6px;font-size:1.3em;">Bipolar Bear</h2>
+    <p style="color:rgba(255,255,255,0.85);font-size:0.88em;margin-bottom:28px;">Enter your PIN to continue</p>
+    <div id="idxPinDots" style="display:flex;gap:12px;margin-bottom:24px;">
+      <div style="width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,0.4);border:2px solid rgba(255,255,255,0.8);transition:background 0.15s;" class="idx-pin-dot"></div>
+      <div style="width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,0.4);border:2px solid rgba(255,255,255,0.8);transition:background 0.15s;" class="idx-pin-dot"></div>
+      <div style="width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,0.4);border:2px solid rgba(255,255,255,0.8);transition:background 0.15s;" class="idx-pin-dot"></div>
+      <div style="width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,0.4);border:2px solid rgba(255,255,255,0.8);transition:background 0.15s;" class="idx-pin-dot"></div>
+    </div>
+    <div id="idxPinError" style="color:#ffe0b0;font-size:0.85em;min-height:20px;margin-bottom:8px;"></div>
+    <div style="display:grid;grid-template-columns:repeat(3,72px);gap:10px;margin-bottom:16px;">
+      <button onclick="idxPinKey('1')" style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.2);border:none;color:white;font-size:1.5em;font-weight:600;cursor:pointer;">1</button>
+      <button onclick="idxPinKey('2')" style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.2);border:none;color:white;font-size:1.5em;font-weight:600;cursor:pointer;">2</button>
+      <button onclick="idxPinKey('3')" style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.2);border:none;color:white;font-size:1.5em;font-weight:600;cursor:pointer;">3</button>
+      <button onclick="idxPinKey('4')" style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.2);border:none;color:white;font-size:1.5em;font-weight:600;cursor:pointer;">4</button>
+      <button onclick="idxPinKey('5')" style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.2);border:none;color:white;font-size:1.5em;font-weight:600;cursor:pointer;">5</button>
+      <button onclick="idxPinKey('6')" style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.2);border:none;color:white;font-size:1.5em;font-weight:600;cursor:pointer;">6</button>
+      <button onclick="idxPinKey('7')" style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.2);border:none;color:white;font-size:1.5em;font-weight:600;cursor:pointer;">7</button>
+      <button onclick="idxPinKey('8')" style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.2);border:none;color:white;font-size:1.5em;font-weight:600;cursor:pointer;">8</button>
+      <button onclick="idxPinKey('9')" style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.2);border:none;color:white;font-size:1.5em;font-weight:600;cursor:pointer;">9</button>
+      <div></div>
+      <button onclick="idxPinKey('0')" style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.2);border:none;color:white;font-size:1.5em;font-weight:600;cursor:pointer;">0</button>
+      <button onclick="idxPinDel()" style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.2);border:none;color:white;font-size:1.2em;cursor:pointer;">⌫</button>
+    </div>
+    <button onclick="idxPinForgot()" style="background:none;border:none;color:rgba(255,255,255,0.6);font-size:0.78em;cursor:pointer;margin-top:8px;padding:4px 12px;">Forgot PIN?</button>
+  </div>
+
+  <script>
+    // ── App-wide PIN lock (guest encryption PIN or native logged-in PIN) ──
+    (function() {
+      const _isNat = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
+      const hasGuestPin = !!localStorage.getItem('bbGuestPinSalt');
+      const hasNativePin = _isNat && localStorage.getItem('bbNativePinEnabled') === '1';
+      if (!hasGuestPin && !hasNativePin) return;
+
+      const unlocked = sessionStorage.getItem('bbPinUnlocked') === '1';
+      if (!unlocked) {
+        document.getElementById('guestPinOverlay').style.display = 'flex';
+      }
+
+      // Inactivity relock after 5 minutes
+      let _idleTimer;
+      function _resetIdleTimer() {
+        clearTimeout(_idleTimer);
+        _idleTimer = setTimeout(() => {
+          sessionStorage.removeItem('bbPinUnlocked');
+          sessionStorage.removeItem('bb_guest_key');
+          _idxPinBuf = '';
+          _idxRenderDots(0);
+          document.getElementById('idxPinError').textContent = '';
+          document.getElementById('guestPinOverlay').style.display = 'flex';
+        }, 5 * 60 * 1000);
+      }
+      ['touchstart', 'mousedown', 'keydown', 'scroll'].forEach(ev =>
+        document.addEventListener(ev, _resetIdleTimer, { passive: true })
+      );
+      if (unlocked) _resetIdleTimer(); // only start timer if currently unlocked
+    })();
+
+    let _idxPinBuf = '';
+
+    function _idxRenderDots(filled) {
+      document.querySelectorAll('.idx-pin-dot').forEach((d, i) => {
+        d.style.background = i < filled ? 'white' : 'rgba(255,255,255,0.4)';
+      });
+    }
+
+    async function idxPinKey(digit) {
+      if (_idxPinBuf.length >= 4) return;
+      _idxPinBuf += digit;
+      _idxRenderDots(_idxPinBuf.length);
+      if (_idxPinBuf.length < 4) return;
+
+      // Native logged-in PIN: verify against Keychain
+      const _isNat = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
+      if (_isNat && localStorage.getItem('bbNativePinEnabled') === '1') {
+        try {
+          const stored = await window.Capacitor.Plugins.SecureStorage.getItem('bb_native_pin');
+          if (_idxPinBuf !== stored) {
+            document.getElementById('idxPinError').textContent = 'Incorrect PIN. Try again.';
+            setTimeout(() => { _idxPinBuf = ''; _idxRenderDots(0); document.getElementById('idxPinError').textContent = ''; }, 800);
+            return;
+          }
+          sessionStorage.setItem('bbPinUnlocked', '1');
+          document.getElementById('guestPinOverlay').style.display = 'none';
+          return;
+        } catch(e) {
+          document.getElementById('idxPinError').textContent = 'Verification failed. Try again.';
+          setTimeout(() => { _idxPinBuf = ''; _idxRenderDots(0); document.getElementById('idxPinError').textContent = ''; }, 1200);
+          return;
+        }
+      }
+
+      // Guest PIN: verify against localStorage
+      const saved = localStorage.getItem('bbPinCode');
+      if (_idxPinBuf !== saved) {
+        document.getElementById('idxPinError').textContent = 'Incorrect PIN. Try again.';
+        setTimeout(() => {
+          _idxPinBuf = '';
+          _idxRenderDots(0);
+          document.getElementById('idxPinError').textContent = '';
+        }, 800);
+        return;
+      }
+
+      // Correct — derive key and store in session
+      const salt = localStorage.getItem('bbGuestPinSalt');
+      if (salt) {
+        try {
+          const saltBytes = Uint8Array.from(atob(salt), c => c.charCodeAt(0));
+          const keyMaterial = await crypto.subtle.importKey(
+            'raw', new TextEncoder().encode(_idxPinBuf), { name: 'PBKDF2' }, false, ['deriveKey']
+          );
+          const key = await crypto.subtle.deriveKey(
+            { name: 'PBKDF2', salt: saltBytes, iterations: 100000, hash: 'SHA-256' },
+            keyMaterial, { name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']
+          );
+          const raw = await crypto.subtle.exportKey('raw', key);
+          sessionStorage.setItem('bb_guest_key', btoa(String.fromCharCode(...new Uint8Array(raw))));
+        } catch(e) { console.error('PIN derive failed', e); }
+      }
+      sessionStorage.setItem('bbPinUnlocked', '1');
+      document.getElementById('guestPinOverlay').style.display = 'none';
+    }
+
+    function idxPinDel() {
+      if (_idxPinBuf.length === 0) return;
+      _idxPinBuf = _idxPinBuf.slice(0, -1);
+      _idxRenderDots(_idxPinBuf.length);
+    }
+
+    async function idxPinForgot() {
+      const _isNat = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
+      if (_isNat && localStorage.getItem('bbNativePinEnabled') === '1') {
+        if (!confirm('This will disable the app PIN. Your journal data stays safe.\n\nContinue?')) return;
+        localStorage.removeItem('bbNativePinEnabled');
+        await window.Capacitor.Plugins.SecureStorage.removeItem('bb_native_pin').catch(() => {});
+        sessionStorage.setItem('bbPinUnlocked', '1');
+        document.getElementById('guestPinOverlay').style.display = 'none';
+        return;
+      }
+      // Guest PIN: nuclear delete (PIN is the key — no recovery)
+      if (!confirm('This will permanently delete all your journal entries. There is no way to recover them.\n\nAre you absolutely sure?')) return;
+      if (!confirm('Last chance — all entries will be deleted. Continue?')) return;
+      const toDelete = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && (k.startsWith('entry:') || k === 'bbPinCode' || k === 'bbPinEnabled' || k === 'bbGuestPinSalt')) toDelete.push(k);
+      }
+      toDelete.forEach(k => localStorage.removeItem(k));
+      sessionStorage.removeItem('bb_guest_key');
+      sessionStorage.removeItem('bbPinUnlocked');
+      document.getElementById('guestPinOverlay').style.display = 'none';
+    }
   </script>
 
 </body>

@@ -7,7 +7,8 @@
   <title>Mood Journal – Bipolar Bear App</title>
   <!-- Beta gate: must be first — fires before any render -->
   <style>body{background:linear-gradient(135deg,#ff9500 0%,#ff6b00 100%)}</style>
-  <script>if(!window.Capacitor&&location.protocol!=='file:'&&localStorage.getItem('bbWebUnlocked')!=='true'){location.replace('beta.html');}</script>
+  <script>if(!window.Capacitor&&location.protocol!=='file:'&&localStorage.getItem('bbWebUnlocked')!=='true'){location.replace('beta.html');}
+  {const _np=window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()&&localStorage.getItem('bbNativePinEnabled')==='1';if((localStorage.getItem('bbGuestPinSalt')||_np)&&sessionStorage.getItem('bbPinUnlocked')!=='1'){location.replace('/');}}</script>
   <meta name="description" content="Checkin with the Bear. Track your bipolar mood, energy, sleep and medication daily with Bipolar Bear.">
   <meta name="robots" content="noindex, nofollow">
 
@@ -1477,9 +1478,6 @@
         
         <button class="auth-btn" id="authSubmit">Sign In</button>
 
-        <div id="forgotPasswordLink" style="text-align:center;margin-top:10px;">
-          <button onclick="forgotPassword()" style="background:none;border:none;color:#adb5bd;font-size:0.82em;cursor:pointer;text-decoration:underline;text-underline-offset:2px;padding:4px;">Forgot password?</button>
-        </div>
 
         <div class="auth-toggle" id="authToggle">
           Don't have an account? <span>Sign up</span>
@@ -1615,7 +1613,7 @@
           <span id="healthSleepBtn" style="font-weight:600;color:#495057;font-size:0.9em;">😴 Sleep Hours</span>
         </div>
         <div class="sleep-selector" id="sleepSelector"></div>
-        <div id="sleepQualitySubSection">
+        <div id="sleepQualitySubSection" style="display:none;">
           <label style="display:block;margin-top:10px;margin-bottom:6px;font-size:0.85em;color:#6c757d;">Sleep Quality</label>
           <div style="display:flex;gap:8px;">
             <button type="button" id="sqBad"    onclick="_setSleepQuality('bad')"    style="flex:1;padding:8px 4px;border:1.5px solid #dee2e6;border-radius:10px;background:white;color:#6c757d;font-size:0.82em;cursor:pointer;-webkit-tap-highlight-color:transparent;">😴 Bad</button>
@@ -2018,7 +2016,27 @@
       <h3 style="margin-bottom:16px;">📋 Changelog</h3>
       <div style="text-align:left; font-size:0.9em; color:#495057; line-height:1.7;">
         <div style="margin-bottom:14px;">
-          <strong style="color:#ff9500;">v0.70</strong><br>
+          <strong style="color:#ff9500;">v0.73</strong><br>
+          • 🔒 Journal entries are end-to-end encrypted for logged-in users (AES-256-GCM)<br>
+          • 🔒 Encryption keys stored in device Keychain / Keystore on iOS &amp; Android<br>
+          • 🔒 App-wide PIN lock for native users (Settings → Mobile → App PIN Lock)<br>
+          • 🔒 Password changes automatically re-wrap your encryption key — no data re-encryption needed<br>
+          • 🐛 Removed "Forgot password?" on web — use a new account if password is lost<br>
+        </div>
+        <div style="margin-bottom:14px;">
+          <strong style="color:#adb5bd;">v0.72</strong><br>
+          • 🔒 Guest data is now encrypted with a PIN-derived AES-256 key<br>
+          • 🔒 PIN creation is mandatory before saving your first entry as a guest<br>
+          • 🔒 Forgot PIN deletes all local entries (no recovery possible)<br>
+          • ✨ Sleep quality customise toggle removed — use tap &amp; hold on sleep step instead<br>
+          • ✨ Customise form is now a collapsible section (collapsed by default)<br>
+        </div>
+        <div style="margin-bottom:14px;">
+          <strong style="color:#adb5bd;">v0.71</strong><br>
+          • 🐛 Fix: Sleep quality hint shown inline on sleep step in focused mode<br>
+        </div>
+        <div style="margin-bottom:14px;">
+          <strong style="color:#adb5bd;">v0.70</strong><br>
           • ✨ WhatsApp & Feedback FABs sit at viewport corners on iPad/wide screens<br>
           • ✨ Compass avoids colliding with hint text — offsets or hides if no clear spot<br>
           • ✨ Compass recalculates direction after journal opens (close hint now points up correctly)<br>
@@ -2268,6 +2286,32 @@
         <button id="pinDisableBtn" class="confirm-btn" onclick="disablePin()" style="display:none;background:white;color:#dc3545;border:2px solid #dc3545;">Disable PIN</button>
       </div>
     </div>
+  </div>
+
+  <!-- Guest PIN Setup Overlay (mandatory on first entry save for guests) -->
+  <div id="guestPinSetupOverlay" style="position:fixed;inset:0;background:linear-gradient(135deg,#ff9500 0%,#ff6b00 100%);z-index:9998;flex-direction:column;align-items:center;justify-content:center;padding:24px;display:none;">
+    <img src="icons/AppIcon.png" width="72" height="72" style="border-radius:18px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+    <h2 id="guestPinSetupTitle" style="color:white;margin-bottom:6px;font-size:1.3em;text-align:center;">Protect your data</h2>
+    <p id="guestPinSetupDesc" style="color:rgba(255,255,255,0.85);font-size:0.88em;margin-bottom:28px;text-align:center;max-width:260px;">Choose a 4-digit PIN to lock your journal.</p>
+    <div id="guestPinSetupDots" style="display:flex;gap:12px;margin-bottom:24px;">
+      <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+    </div>
+    <div id="guestPinSetupError" style="color:#ffe0b0;font-size:0.85em;min-height:20px;margin-bottom:8px;text-align:center;"></div>
+    <div style="display:grid;grid-template-columns:repeat(3,72px);gap:10px;margin-bottom:16px;">
+      <button class="pin-key" onclick="guestPinSetupKey('1')">1</button>
+      <button class="pin-key" onclick="guestPinSetupKey('2')">2</button>
+      <button class="pin-key" onclick="guestPinSetupKey('3')">3</button>
+      <button class="pin-key" onclick="guestPinSetupKey('4')">4</button>
+      <button class="pin-key" onclick="guestPinSetupKey('5')">5</button>
+      <button class="pin-key" onclick="guestPinSetupKey('6')">6</button>
+      <button class="pin-key" onclick="guestPinSetupKey('7')">7</button>
+      <button class="pin-key" onclick="guestPinSetupKey('8')">8</button>
+      <button class="pin-key" onclick="guestPinSetupKey('9')">9</button>
+      <div></div>
+      <button class="pin-key" onclick="guestPinSetupKey('0')">0</button>
+      <button class="pin-key pin-key-del" onclick="guestPinSetupDel()">⌫</button>
+    </div>
+    <p style="color:rgba(255,255,255,0.6);font-size:0.75em;text-align:center;max-width:240px;line-height:1.5;">Your PIN encrypts your data on this device. If you forget your PIN, your entries cannot be recovered.</p>
   </div>
 
   <!-- Favourite Anniversary Modal -->
@@ -2577,21 +2621,17 @@
             <span style="font-size:0.72em;font-weight:700;font-style:italic;color:#ff9500;font-family:'Georgia',serif;letter-spacing:0.01em;">🐻 Click here</span>
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><line x1="8" y1="2" x2="8" y2="13" stroke="#ff9500" stroke-width="2" stroke-linecap="round"/><polyline points="3,8 8,13 13,8" stroke="#ff9500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
           </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;">
-            <div>
-              <div style="font-weight:600;color:#495057;font-size:0.95em;">📋 Customise form</div>
-              <div style="color:#adb5bd;font-size:0.82em;margin-top:2px;">Choose which fields appear, including additional tracking</div>
-            </div>
-            <label class="bb-switch"><input type="checkbox" id="customiseFormToggle" onchange="_toggleCustomiseForm()"><span class="bb-slider"></span></label>
-          </div>
-          <div id="stepTogglesRow" style="display:none;flex-wrap:wrap;gap:8px;margin-top:4px;"></div>
+          <details id="customiseFormDetails" ontoggle="if(this.open)_onCustomiseDetailsOpen()">
+            <summary style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;padding:2px 0;">
+              <div>
+                <div style="font-weight:600;color:#495057;font-size:0.95em;">📋 Customise form</div>
+                <div style="color:#adb5bd;font-size:0.82em;margin-top:2px;">Choose which fields appear</div>
+              </div>
+              <span style="color:#adb5bd;font-size:1em;line-height:1;">▸</span>
+            </summary>
+            <div id="stepTogglesRow" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;"></div>
+          </details>
         </div>
-
-        <div style="margin-bottom:16px; margin-top:8px;">
-          <button id="pinLockSettingsBtnMain" onclick="closeSettingsModal(); openPinSettings()" style="width:100%;background:white;color:#495057;border:2px solid #dee2e6;border-radius:8px;padding:10px 20px;cursor:pointer;font-weight:600;font-size:0.9em;-webkit-tap-highlight-color:transparent;"></button>
-        </div>
-
-
 
         <div class="confirm-buttons" style="position:relative;">
           <div id="closeSettingsHintEl" style="display:none;flex-direction:row;align-items:center;gap:4px;margin-bottom:6px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;">
@@ -2614,7 +2654,7 @@
 
         <div style="margin-top:4px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.70</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.73</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2661,6 +2701,14 @@
         </div>
 
         <hr style="border: none; border-top: 1px solid #e9ecef; margin-bottom: 20px;">
+
+        <!-- Native PIN Lock -->
+        <hr style="border: none; border-top: 1px solid #e9ecef; margin-bottom: 20px;">
+        <div style="margin-bottom:20px;">
+          <div style="font-weight:600;margin-bottom:4px;color:#495057;">🔒 App PIN Lock</div>
+          <div style="color:#adb5bd;font-size:0.82em;margin-bottom:10px;line-height:1.4;">Require a 4-digit PIN to open the app.</div>
+          <button id="nativePinSettingsBtn" onclick="openNativePinSettings()" style="width:100%;padding:10px;border:1.5px solid #6c757d;background:white;color:#495057;border-radius:20px;font-size:0.9em;font-weight:600;cursor:pointer;">Enable PIN</button>
+        </div>
 
         <div style="display:flex;gap:10px;">
           <button onclick="closeMobileSettings()" style="flex:1;background:rgba(255,149,0,0.1);border:1.5px solid #ff9500;color:#ff9500;font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">← Back</button>
@@ -2719,7 +2767,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.70</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.73</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2778,7 +2826,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.70</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.73</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2814,7 +2862,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.70</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.73</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2848,7 +2896,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.70</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.73</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -3196,6 +3244,12 @@
         }
         firebase.initializeApp(firebaseConfig);
         auth = firebase.auth();
+        // Web: use session-scoped auth persistence so the browser close = sign-out,
+        // forcing re-login (and therefore key re-derivation) on the next visit.
+        // Native keeps the default LOCAL persistence — PIN handles the unlock UX there.
+        if (!isNative()) {
+          auth.setPersistence(firebase.auth.Auth.Persistence.SESSION).catch(() => {});
+        }
         db = firebase.firestore();
         // Enable offline persistence — queues writes while offline and syncs on reconnect.
         // synchronizeTabs: false = simple exclusive lock, acquired almost instantly.
@@ -3235,9 +3289,8 @@
           _justLoggedIn = true;
           localStorage.removeItem('bb_entryStatus');
           migrateGoodMoodToStable(user);
-          migrateGuestEntriesIfNeeded(user);
-          // Load user settings from Firestore
-          db.collection('userSettings').doc(user.uid).get().then(doc => {
+          // Load user settings from Firestore, then derive key + migrate + load entries
+          db.collection('userSettings').doc(user.uid).get().then(async doc => {
             if (doc.exists) {
               const d = doc.data();
               if (d.logoVariant !== undefined) {
@@ -3289,9 +3342,16 @@
                 sessionStorage.setItem('bbPinUnlocked', '1');
               } else {
                 // No PIN for this user (new account or PIN removed) — clear any leftover
+                // (also clears any guest PIN that was set before account creation)
                 localStorage.removeItem('bbPinEnabled');
                 localStorage.removeItem('bbPinCode');
+                localStorage.removeItem('bbGuestPinSalt');
+                sessionStorage.removeItem('bb_guest_key');
+                _guestCryptoKey = null;
               }
+              // Logged-in users never see the guest PIN overlay — dismiss it if visible
+              const _pinOv = document.getElementById('pinOverlay');
+              if (_pinOv) _pinOv.style.display = 'none';
               _updatePinSettingsBtn();
               // Sync settings from Firestore; only clear local value if Firestore explicitly has it as falsy
               if (d.focusedModeEnabled !== undefined) localStorage.setItem('focusedModeEnabled', d.focusedModeEnabled ? '1' : '0');
@@ -3330,6 +3390,71 @@
               if (_localStep > _serverStep) {
                 db.collection('userSettings').doc(user.uid).set({ onboardingStep: _localStep }, { merge: true }).catch(() => {});
               }
+
+              // ── E2E key derivation (key-wrapping architecture) ──
+              // dataKey   = random key used to encrypt entries (never changes)
+              // wrappingKey = PBKDF2(password, wrapSalt) — changes with password, wraps the dataKey
+              // wrappedKey  = AES-GCM(wrappingKey, dataKey) stored in Firestore
+              const _encSalt  = d.encSalt  || null; // legacy: old arch data key salt
+              const _wrapSalt = d.wrapSalt || null; // new arch: wrapping key salt
+              if (!_userCryptoKey) _userCryptoKey = await _userImportKeyFromSession();
+              if (_pendingAuthPassword) {
+                if (d.wrappedKey && _wrapSalt) {
+                  // ── New architecture: unwrap data key with current password ──
+                  const _wrappingKey = await _userDeriveKey(_pendingAuthPassword, _wrapSalt);
+                  try {
+                    const _dataKey = await _unwrapDataKey(d.wrappedKey, d.wrappedKeyIv, _wrappingKey);
+                    if (!_userCryptoKey) {
+                      _userCryptoKey = _dataKey;
+                      await _userExportKeyToSession(_userCryptoKey);
+                    }
+                    // If Keychain had the key it's the same data key — no action needed
+                  } catch(e) {
+                    // Unwrap failed — password was changed via email reset, Firestore has stale wrap
+                    if (_userCryptoKey) {
+                      // Native: Keychain has the true data key — re-wrap with new password
+                      const _newWrapSaltBytes = crypto.getRandomValues(new Uint8Array(16));
+                      const _newWrapSalt = btoa(String.fromCharCode(..._newWrapSaltBytes));
+                      const _newWrappingKey = await _userDeriveKey(_pendingAuthPassword, _newWrapSalt);
+                      const _rewrapped = await _wrapDataKey(_userCryptoKey, _newWrappingKey);
+                      db.collection('userSettings').doc(user.uid).set(
+                        { wrapSalt: _newWrapSalt, ..._rewrapped }, { merge: true }
+                      ).catch(() => {});
+                    }
+                    // Web + no session + password changed via email reset: data inaccessible (known limitation)
+                  }
+                } else {
+                  // ── Old architecture or first login: migrate to key-wrapping ──
+                  // The data key is either in Keychain, derived from encSalt, or fresh for this user
+                  let _dataKey = _userCryptoKey;
+                  if (!_dataKey && _encSalt) {
+                    // Old arch: data key was PBKDF2(password, encSalt) — re-derive it
+                    _dataKey = await _userDeriveKey(_pendingAuthPassword, _encSalt);
+                    _userCryptoKey = _dataKey;
+                    await _userExportKeyToSession(_userCryptoKey);
+                  } else if (!_dataKey) {
+                    // No key anywhere — generate a fresh random data key
+                    const _rawKey = crypto.getRandomValues(new Uint8Array(32));
+                    _dataKey = await crypto.subtle.importKey('raw', _rawKey, { name: 'AES-GCM' }, true, ['encrypt', 'decrypt']);
+                    _userCryptoKey = _dataKey;
+                    await _userExportKeyToSession(_userCryptoKey);
+                  }
+                  // Wrap the data key with the current password and store in Firestore
+                  const _newWrapSaltBytes = crypto.getRandomValues(new Uint8Array(16));
+                  const _newWrapSalt = btoa(String.fromCharCode(..._newWrapSaltBytes));
+                  const _newWrappingKey = await _userDeriveKey(_pendingAuthPassword, _newWrapSalt);
+                  const _wrapped = await _wrapDataKey(_dataKey, _newWrappingKey);
+                  db.collection('userSettings').doc(user.uid).set(
+                    { wrapSalt: _newWrapSalt, ..._wrapped }, { merge: true }
+                  ).catch(() => {});
+                }
+                _pendingAuthPassword = null;
+              }
+              // One-time migration: encrypt existing plaintext Firestore entries
+              if (_userCryptoKey && _encSalt && !d.encMigrated) {
+                await _encryptExistingEntries(user.uid);
+                db.collection('userSettings').doc(user.uid).set({ encMigrated: true }, { merge: true }).catch(() => {});
+              }
             } else {
               // New user — clear all previous user's settings and hints, enable focused mode by default
               ['bbPinEnabled','bbPinCode','moreDataOpenByDefault','showMoodSuggestion',
@@ -3340,8 +3465,31 @@
               localStorage.setItem('focusedModeEnabled', '1');
               sessionStorage.removeItem('bbPinUnlocked');
               _updatePinSettingsBtn();
+
+              // ── E2E key derivation (new user — no settings doc yet) ──
+              if (!_userCryptoKey) _userCryptoKey = await _userImportKeyFromSession();
+              if (!_userCryptoKey && _pendingAuthPassword) {
+                // Generate a fresh random data key (not derived from password)
+                const _rawKey = crypto.getRandomValues(new Uint8Array(32));
+                const _dataKey = await crypto.subtle.importKey('raw', _rawKey, { name: 'AES-GCM' }, true, ['encrypt', 'decrypt']);
+                // Wrap it with the password
+                const _wrapSaltBytes = crypto.getRandomValues(new Uint8Array(16));
+                const _wrapSalt = btoa(String.fromCharCode(..._wrapSaltBytes));
+                const _wrappingKey = await _userDeriveKey(_pendingAuthPassword, _wrapSalt);
+                const _wrapped = await _wrapDataKey(_dataKey, _wrappingKey);
+                db.collection('userSettings').doc(user.uid).set(
+                  { wrapSalt: _wrapSalt, ..._wrapped, encMigrated: true }, { merge: true }
+                ).catch(() => {});
+                _userCryptoKey = _dataKey;
+                await _userExportKeyToSession(_userCryptoKey);
+                _pendingAuthPassword = null;
+              }
             }
-          }).catch(() => {});
+
+            // Migrate guest entries (decrypt with guest key, re-encrypt with user key), then load
+            await migrateGuestEntriesIfNeeded(user);
+            loadEntries();
+          }).catch(() => { loadEntries(); });
         } else {
           currentUser = null;
           isGuestMode = true;
@@ -3416,27 +3564,6 @@
     window.showAuthModal = showAuthModal;
     window.closeAuthModal = closeAuthModal;
 
-    async function forgotPassword() {
-      const email = document.getElementById('authEmail').value.trim();
-      const authError = document.getElementById('authError');
-      if (!email) {
-        authError.style.color = '#ff6b6b';
-        authError.textContent = 'Enter your email address first.';
-        authError.style.display = 'block';
-        return;
-      }
-      try {
-        await auth.sendPasswordResetEmail(email);
-        authError.style.color = '#28a745';
-        authError.textContent = '✅ Reset email sent — check your inbox.';
-        authError.style.display = 'block';
-      } catch (e) {
-        authError.style.color = '#ff6b6b';
-        authError.textContent = 'Could not send reset email. Check the address and try again.';
-        authError.style.display = 'block';
-      }
-    }
-    window.forgotPassword = forgotPassword;
 
     // Auth UI Logic - wrapped in try-catch
     try {
@@ -3449,17 +3576,14 @@
       if (authToggle && authSubmit) {
         authToggle.addEventListener('click', () => {
           isSignUp = !isSignUp;
-          const forgotLink = document.getElementById('forgotPasswordLink');
           if (isSignUp) {
             authTitle.textContent = 'Create Account';
             authSubmit.textContent = 'Sign Up';
             authToggle.innerHTML = 'Already have an account? <span>Sign in</span>';
-            if (forgotLink) forgotLink.style.display = 'none';
           } else {
             authTitle.textContent = 'My Bipolar Bear';
             authSubmit.textContent = 'Sign In';
             authToggle.innerHTML = 'Don\'t have an account? <span>Sign up</span>';
-            if (forgotLink) forgotLink.style.display = '';
           }
           authError.style.display = 'none';
         });
@@ -3467,15 +3591,18 @@
         authSubmit.addEventListener('click', async () => {
           const email = document.getElementById('authEmail').value;
           const password = document.getElementById('authPassword').value;
-          
+
           try {
             authError.style.display = 'none';
+            // Capture password before Firebase call so onAuthStateChanged can derive the key
+            _pendingAuthPassword = password;
             if (isSignUp) {
               await auth.createUserWithEmailAndPassword(email, password);
             } else {
               await auth.signInWithEmailAndPassword(email, password);
             }
           } catch (error) {
+            _pendingAuthPassword = null; // clear on failure — wrong password shouldn't persist
             authError.textContent = error.message;
             authError.style.display = 'block';
           }
@@ -3512,6 +3639,14 @@
         'moodLinkingEnabled', 'bb_draft',
       ].forEach(k => localStorage.removeItem(k));
       sessionStorage.removeItem('bbPinUnlocked');
+      sessionStorage.removeItem('bb_user_key');
+      _userCryptoKey = null;
+      _pendingAuthPassword = null;
+      localStorage.removeItem('bbNativePinEnabled');
+      if (isNative()) {
+        window.Capacitor.Plugins.SecureStorage.removeItem('bb_user_key').catch(() => {});
+        window.Capacitor.Plugins.SecureStorage.removeItem('bb_native_pin').catch(() => {});
+      }
       // Clear any custom field toggle keys (trackCustom_*) and cached journal entries (entry:*)
       Object.keys(localStorage).filter(k => k.startsWith('trackCustom_') || k.startsWith('entry:')).forEach(k => localStorage.removeItem(k));
       // Reset form fields and re-apply (now-empty) prefs immediately
@@ -3654,16 +3789,46 @@
         btn.dataset.baseLabel = range.label;
         btn.dataset.color = getSleepColor(range.value);
         
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.sleep-btn').forEach(b => {
-            b.classList.remove('selected');
-            b.style.background = '#f8f9fa';
-            b.style.color = '#495057';
+        // Long-press detection: hold to reveal sleep quality; tap to select range only
+        let _sqLpTimer = null, _sqLpFired = false, _sqLpX = 0, _sqLpY = 0;
+        function _sqSelectBtn(b) {
+          document.querySelectorAll('.sleep-btn').forEach(x => {
+            x.classList.remove('selected');
+            x.style.background = '#f8f9fa';
+            x.style.color = '#495057';
           });
-          btn.classList.add('selected');
-          btn.style.background = btn.dataset.color;
-          btn.style.color = 'white';
-          selectedSleep = parseFloat(btn.dataset.sleep);
+          b.classList.add('selected');
+          b.style.background = b.dataset.color;
+          b.style.color = 'white';
+          selectedSleep = parseFloat(b.dataset.sleep);
+        }
+        btn.addEventListener('pointerdown', e => {
+          _sqLpFired = false;
+          _sqLpX = e.clientX; _sqLpY = e.clientY;
+          _sqLpTimer = setTimeout(() => {
+            _sqLpFired = true;
+            _sqSelectBtn(btn);
+            const sq = document.getElementById('sleepQualitySubSection');
+            if (sq) sq.style.display = '';
+            nativeHaptic('medium');
+            scheduleDraftSave();
+          }, 500);
+        });
+        btn.addEventListener('pointermove', e => {
+          if (_sqLpTimer && (Math.abs(e.clientX - _sqLpX) > 8 || Math.abs(e.clientY - _sqLpY) > 8)) {
+            clearTimeout(_sqLpTimer); _sqLpTimer = null;
+          }
+        });
+        btn.addEventListener('pointerup',     () => { clearTimeout(_sqLpTimer); _sqLpTimer = null; });
+        btn.addEventListener('pointercancel', () => { clearTimeout(_sqLpTimer); _sqLpTimer = null; });
+        btn.addEventListener('click', () => {
+          if (_sqLpFired) { _sqLpFired = false; return; } // long-press already handled
+          // Regular tap: select range, clear & hide sleep quality
+          _sqSelectBtn(btn);
+          selectedSleepQuality = null;
+          if (typeof _applySleepQualityBtns === 'function') _applySleepQualityBtns();
+          const sq = document.getElementById('sleepQualitySubSection');
+          if (sq) sq.style.display = 'none';
           scheduleDraftSave();
         });
 
@@ -4043,6 +4208,8 @@
 
       selectedSleepQuality = draft.sleepQuality || null;
       if (typeof _applySleepQualityBtns === 'function') _applySleepQualityBtns();
+      const _draftSqEl = document.getElementById('sleepQualitySubSection');
+      if (_draftSqEl) _draftSqEl.style.display = selectedSleepQuality ? '' : 'none';
       selectedIntention = draft.intention || '';
       selectedStepNotes = (draft.stepNotes && typeof draft.stepNotes === 'object') ? { ...draft.stepNotes } : {};
 
@@ -4483,7 +4650,10 @@
       // Without this, the next journal load races for the lock and hangs.
       window.addEventListener('pagehide', () => {
         try { if (db) db.terminate(); } catch (e) {}
-        sessionStorage.removeItem('bbPinUnlocked');
+        // Only clear PIN unlock for logged-in users — guests keep their session
+        // unlocked across page navigations (the session key in sessionStorage is
+        // the actual security layer; re-prompting PIN on every nav back is just annoying)
+        if (currentUser) sessionStorage.removeItem('bbPinUnlocked');
       });
 
       // When iOS WKWebView restores this page from the back-forward cache (bfcache),
@@ -4573,18 +4743,41 @@
       try {
         if (currentUser) {
           entry.userId = currentUser.uid;
-          if (editingEntry && editingEntry.id) {
-            await db.collection('entries').doc(editingEntry.id).set({ ...editingEntry, ...entry });
+          if (_userCryptoKey) {
+            // Encrypt the full entry; keep userId + timestamp plaintext for Firestore queries
+            const merged = editingEntry ? { ...editingEntry, ...entry } : entry;
+            const enc = await _userEncrypt(_userCryptoKey, merged);
+            const fsEntry = { userId: currentUser.uid, timestamp: entry.timestamp, ...enc };
+            if (editingEntry && editingEntry.id) {
+              await db.collection('entries').doc(editingEntry.id).set(fsEntry);
+            } else {
+              await db.collection('entries').add(fsEntry);
+            }
           } else {
-            await db.collection('entries').add(entry);
+            // No key yet (e.g. session-key missing) — save plaintext as fallback
+            if (editingEntry && editingEntry.id) {
+              await db.collection('entries').doc(editingEntry.id).set({ ...editingEntry, ...entry });
+            } else {
+              await db.collection('entries').add(entry);
+            }
           }
         } else {
           if (editingEntry) {
             const key = editingEntry.id || `entry:${editingEntry.timestamp}`;
-            localStorage.setItem(key, JSON.stringify({ ...editingEntry, ...entry }));
+            if (_guestCryptoKey) {
+              const enc = await _guestEncrypt(_guestCryptoKey, { ...editingEntry, ...entry });
+              localStorage.setItem(key, JSON.stringify(enc));
+            } else {
+              localStorage.setItem(key, JSON.stringify({ ...editingEntry, ...entry }));
+            }
           } else {
             const entryKey = `entry:${entry.timestamp}`;
-            localStorage.setItem(entryKey, JSON.stringify(entry));
+            if (_guestCryptoKey) {
+              const enc = await _guestEncrypt(_guestCryptoKey, entry);
+              localStorage.setItem(entryKey, JSON.stringify(enc));
+            } else {
+              localStorage.setItem(entryKey, JSON.stringify(entry));
+            }
           }
         }
         
@@ -4676,6 +4869,17 @@
         const fmInt = document.getElementById('fmIntentionInput');
         if (fmInt) fmInt.value = selectedIntention;
       }
+      // Guest PIN: require PIN creation before first save.
+      // Also triggers if bbPinEnabled='1' but no salt — stale data from the old optional
+      // PIN feature that has no encryption. Treat it as "no PIN" and set up fresh.
+      if (!currentUser && (localStorage.getItem('bbPinEnabled') !== '1' || !localStorage.getItem('bbGuestPinSalt'))) {
+        _savingEntry = false;
+        _showGuestPinSetup(async () => {
+          _savingEntry = true;
+          try { await saveEntry(); } finally { _savingEntry = false; }
+        });
+        return;
+      }
       try { await saveEntry(); } finally { _savingEntry = false; }
     }
 
@@ -4708,22 +4912,31 @@
     }
 
     async function migrateGuestEntriesIfNeeded(user) {
-      // Collect guest entries from localStorage
+      // Collect and decrypt guest entries from localStorage
       const guestEntries = [];
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (key && key.startsWith('entry:')) {
           try {
             const value = localStorage.getItem(key);
-            if (value) guestEntries.push({ localKey: key, ...JSON.parse(value) });
+            if (!value) continue;
+            const parsed = JSON.parse(value);
+            let entryData;
+            if (parsed._enc) {
+              if (_guestCryptoKey) {
+                entryData = await _guestDecrypt(_guestCryptoKey, parsed);
+              } else {
+                continue; // can't decrypt — leave in localStorage
+              }
+            } else {
+              entryData = parsed;
+            }
+            guestEntries.push({ localKey: key, ...entryData });
           } catch(e) { /* skip corrupted entry */ }
         }
       }
 
-      if (guestEntries.length === 0) {
-        loadEntries();
-        return;
-      }
+      if (guestEntries.length === 0) return; // caller handles loadEntries()
 
       // Check whether the account already has Firestore entries (returning user / re-login)
       try {
@@ -4731,17 +4944,12 @@
           .where('userId', '==', user.uid)
           .limit(1)
           .get({ source: 'server' });
-        if (snap.size > 0) {
-          loadEntries();
-          return;
-        }
+        if (snap.size > 0) return; // returning user — don't overwrite Firestore entries
       } catch(e) {
-        // Can't confirm account is empty — skip migration to be safe
-        loadEntries();
-        return;
+        return; // can't confirm account is empty — skip to be safe
       }
 
-      // New account with local entries — migrate
+      // New account with local entries — migrate with encryption
       const count = guestEntries.length;
       const entriesEl = document.getElementById('entries');
       if (entriesEl) entriesEl.innerHTML = `<div class="no-entries">Migrating ${count} entr${count === 1 ? 'y' : 'ies'} to your account…</div>`;
@@ -4749,24 +4957,32 @@
       if (loader) loader.style.display = 'block';
 
       try {
-        // Batch writes — Firestore limit is 500 per batch, use 400 to be safe
         const BATCH_SIZE = 400;
         for (let i = 0; i < guestEntries.length; i += BATCH_SIZE) {
           const batch = db.batch();
-          guestEntries.slice(i, i + BATCH_SIZE).forEach(entry => {
+          await Promise.all(guestEntries.slice(i, i + BATCH_SIZE).map(async entry => {
             const { localKey, ...data } = entry;
-            batch.set(db.collection('entries').doc(), { ...data, userId: user.uid });
-          });
+            let fsData;
+            if (_userCryptoKey) {
+              const enc = await _userEncrypt(_userCryptoKey, { ...data, userId: user.uid });
+              fsData = { userId: user.uid, timestamp: data.timestamp, ...enc };
+            } else {
+              fsData = { ...data, userId: user.uid };
+            }
+            batch.set(db.collection('entries').doc(), fsData);
+          }));
           await batch.commit();
         }
-        // Remove local copies now they're safely in Firestore
+        // Remove local copies and clean up guest PIN data
         guestEntries.forEach(({ localKey }) => localStorage.removeItem(localKey));
+        localStorage.removeItem('bbGuestPinSalt');
+        localStorage.removeItem('bbPinEnabled');
+        localStorage.removeItem('bbPinCode');
+        sessionStorage.removeItem('bb_guest_key');
+        _guestCryptoKey = null;
       } catch(e) {
         console.error('Guest migration failed:', e);
-        // Non-fatal — entries remain in localStorage and will still be visible on next guest session
       }
-
-      loadEntries();
     }
 
     async function loadEntries() {
@@ -4789,8 +5005,18 @@
       if (isPostFailureReload) sessionStorage.removeItem('bbReload');
       try {
         const entries = [];
+        let _lockedEntryCount = 0;
 
         if (currentUser) {
+          // Restore session key if not in memory (e.g. after page refresh)
+          if (!_userCryptoKey) _userCryptoKey = await _userImportKeyFromSession();
+
+          // Helper: decode a QuerySnapshot into the entries array (handles decryption)
+          async function _pushDecoded(snap) {
+            const decoded = await Promise.all(snap.docs.map(doc => _decodeFirestoreEntry(doc)));
+            decoded.forEach(e => { if (e) entries.push(e); });
+          }
+
           // Try cache first — instant display even when offline/reconnecting
           // Longer timeout on post-failure reload since Firestore may still be re-initialising.
           const cacheTimeout = isPostFailureReload ? 4000 : 1000;
@@ -4800,34 +5026,36 @@
               db.collection('entries').where('userId', '==', currentUser.uid).get({ source: 'cache' }),
               new Promise((_, rej) => setTimeout(() => rej(new Error('cache-timeout')), cacheTimeout))
             ]);
-            cached.forEach(doc => entries.push({ id: doc.id, ...doc.data() }));
+            await _pushDecoded(cached);
             usedCache = entries.length > 0;
           } catch(e) { /* no cache yet, or timed out — fall through to server fetch */ }
 
           if (!usedCache) {
             // No cache — fetch from server with a timeout.
-            // On retry or post-failure reload we allow longer since Firestore leader election
-            // may still be settling after rapid navigation or db.terminate().
             const serverTimeout = _isRetry ? 8000 : isPostFailureReload ? 12000 : 3000;
             const snapshot = await Promise.race([
               db.collection('entries').where('userId', '==', currentUser.uid).get(),
               new Promise((_, rej) => setTimeout(() => rej(new Error('fetch-timeout')), serverTimeout))
             ]);
-            snapshot.forEach(doc => entries.push({ id: doc.id, ...doc.data() }));
+            await _pushDecoded(snapshot);
           } else {
             // Had cache — silently refresh from server in background
             db.collection('entries')
               .where('userId', '==', currentUser.uid)
               .get({ source: 'server' })
               .then(snap => {
-                const fresh = [];
-                snap.forEach(doc => fresh.push({ id: doc.id, ...doc.data() }));
-                if (fresh.length !== entries.length) loadEntries();
+                // Background check: if server has different count, do a full reload
+                if (snap.size !== entries.length) loadEntries();
               })
               .catch(() => {});
           }
         } else {
           // Load from localStorage for guests
+          // Restore session key if available (e.g. after page refresh)
+          if (!_guestCryptoKey) {
+            _guestCryptoKey = await _guestImportKeyFromSession();
+          }
+          let _lockedEntryCount = 0;
           try {
             for (let i = 0; i < localStorage.length; i++) {
               const key = localStorage.key(i);
@@ -4835,11 +5063,22 @@
                 try {
                   const value = localStorage.getItem(key);
                   if (value) {
-                    entries.push({ id: key, ...JSON.parse(value) });
+                    const parsed = JSON.parse(value);
+                    if (parsed._enc) {
+                      // Encrypted entry — only include if we have the key
+                      if (_guestCryptoKey) {
+                        const decrypted = await _guestDecrypt(_guestCryptoKey, parsed);
+                        entries.push({ id: key, ...decrypted });
+                      } else {
+                        _lockedEntryCount++;
+                      }
+                    } else {
+                      entries.push({ id: key, ...parsed });
+                    }
                   }
                 } catch (e) {
                   console.error('Error loading entry:', key, e);
-                  // Skip corrupted entry
+                  // Skip corrupted or undecryptable entry
                 }
               }
             }
@@ -4856,6 +5095,11 @@
 
         if (loader) loader.style.display = 'none';
         if (entries.length === 0) {
+          // Encrypted entries exist but no key — redirect to index where the PIN prompt lives
+          if (_lockedEntryCount > 0) {
+            location.replace('/');
+            return;
+          }
           document.getElementById('entries').innerHTML = '<div class="no-entries">No entries yet. Start tracking your mood today! 🌱</div>';
           document.getElementById('stats').style.display = 'none';
           document.getElementById('chart').style.display = 'none';
@@ -5553,11 +5797,275 @@
     let _pinSetupStep = 'set'; // 'set' | 'confirm'
     let _pinSetupFirst = '';
 
+    // ── User (Firestore) E2E crypto ──
+    let _userCryptoKey = null;         // AES-GCM-256 key derived from login password
+    let _pendingAuthPassword = null;   // held briefly between auth submit and onAuthStateChanged
+
+    async function _userDeriveKey(password, saltB64) {
+      const saltBytes = Uint8Array.from(atob(saltB64), c => c.charCodeAt(0));
+      const keyMaterial = await crypto.subtle.importKey(
+        'raw', new TextEncoder().encode(password), { name: 'PBKDF2' }, false, ['deriveKey']
+      );
+      return crypto.subtle.deriveKey(
+        { name: 'PBKDF2', salt: saltBytes, iterations: 100000, hash: 'SHA-256' },
+        keyMaterial,
+        { name: 'AES-GCM', length: 256 },
+        true, ['encrypt', 'decrypt']
+      );
+    }
+
+    // Encrypt arbitrary data. Keeps userId + timestamp plaintext for Firestore queries.
+    async function _userEncrypt(key, data) {
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const encoded = new TextEncoder().encode(JSON.stringify(data));
+      const cipher = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, encoded);
+      return {
+        _enc: btoa(String.fromCharCode(...new Uint8Array(cipher))),
+        _iv:  btoa(String.fromCharCode(...iv))
+      };
+    }
+
+    async function _userDecrypt(key, encObj) {
+      const iv     = Uint8Array.from(atob(encObj._iv),  c => c.charCodeAt(0));
+      const cipher = Uint8Array.from(atob(encObj._enc), c => c.charCodeAt(0));
+      const plain  = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, cipher);
+      return JSON.parse(new TextDecoder().decode(plain));
+    }
+
+    async function _userExportKeyToSession(key) {
+      const raw = await crypto.subtle.exportKey('raw', key);
+      const b64 = btoa(String.fromCharCode(...new Uint8Array(raw)));
+      sessionStorage.setItem('bb_user_key', b64);
+      if (isNative()) {
+        try {
+          await window.Capacitor.Plugins.SecureStorage.setItem('bb_user_key', b64);
+        } catch (e) { console.warn('SecureStorage setItem failed:', e); }
+      }
+    }
+
+    async function _userImportKeyFromSession() {
+      let b64 = sessionStorage.getItem('bb_user_key');
+      if (!b64 && isNative()) {
+        try {
+          b64 = await window.Capacitor.Plugins.SecureStorage.getItem('bb_user_key');
+          if (b64) sessionStorage.setItem('bb_user_key', b64);
+        } catch (e) { console.warn('SecureStorage getItem failed:', e); }
+      }
+      if (!b64) return null;
+      try {
+        const raw = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+        return await crypto.subtle.importKey('raw', raw, { name: 'AES-GCM' }, true, ['encrypt', 'decrypt']);
+      } catch (e) { return null; }
+    }
+
+    // Wrap a data key with a wrapping key (AES-GCM). Returns { wrappedKey, wrappedKeyIv } as base64.
+    async function _wrapDataKey(dataKey, wrappingKey) {
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const rawDataKey = await crypto.subtle.exportKey('raw', dataKey);
+      const wrapped = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, wrappingKey, rawDataKey);
+      return {
+        wrappedKey:   btoa(String.fromCharCode(...new Uint8Array(wrapped))),
+        wrappedKeyIv: btoa(String.fromCharCode(...iv)),
+      };
+    }
+
+    // Unwrap a data key. Throws if wrappingKey is wrong (password mismatch).
+    async function _unwrapDataKey(wrappedKeyB64, wrappedKeyIvB64, wrappingKey) {
+      const iv      = Uint8Array.from(atob(wrappedKeyIvB64), c => c.charCodeAt(0));
+      const wrapped = Uint8Array.from(atob(wrappedKeyB64),   c => c.charCodeAt(0));
+      const rawDataKey = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, wrappingKey, wrapped);
+      return crypto.subtle.importKey('raw', rawDataKey, { name: 'AES-GCM' }, true, ['encrypt', 'decrypt']);
+    }
+
+    // Decode a single Firestore QueryDocumentSnapshot, decrypting if needed.
+    async function _decodeFirestoreEntry(doc) {
+      const data = doc.data();
+      if (data._enc) {
+        if (_userCryptoKey) {
+          try {
+            const decrypted = await _userDecrypt(_userCryptoKey, data);
+            return { id: doc.id, ...decrypted };
+          } catch (e) {
+            console.error('Failed to decrypt entry', doc.id, e);
+            return null; // skip undecryptable entry
+          }
+        }
+        return null; // key not available — entry locked
+      }
+      return { id: doc.id, ...data }; // plaintext (pre-encryption entry)
+    }
+
+    // One-time migration: encrypt all existing plaintext Firestore entries for this user.
+    async function _encryptExistingEntries(uid) {
+      try {
+        const snap = await db.collection('entries').where('userId', '==', uid).get();
+        const plain = snap.docs.filter(doc => !doc.data()._enc);
+        if (plain.length === 0) return;
+        const BATCH = 400;
+        for (let i = 0; i < plain.length; i += BATCH) {
+          const batch = db.batch();
+          await Promise.all(plain.slice(i, i + BATCH).map(async doc => {
+            const data = doc.data();
+            const enc  = await _userEncrypt(_userCryptoKey, data);
+            batch.set(doc.ref, { userId: data.userId, timestamp: data.timestamp, ...enc });
+          }));
+          await batch.commit();
+        }
+      } catch (e) { console.error('Entry encryption migration failed:', e); }
+    }
+
+    // ── Guest PIN crypto ──
+    let _guestCryptoKey = null;
+    let _guestPinSetupBuffer = '';
+    let _guestPinSetupFirst = '';
+    let _guestPinSetupStep = 'set'; // 'set' | 'confirm'
+    let _guestPinSetupCallback = null;
+
+    async function _guestDeriveKey(pin, saltB64) {
+      const saltBytes = Uint8Array.from(atob(saltB64), c => c.charCodeAt(0));
+      const keyMaterial = await crypto.subtle.importKey(
+        'raw', new TextEncoder().encode(pin), { name: 'PBKDF2' }, false, ['deriveKey']
+      );
+      return crypto.subtle.deriveKey(
+        { name: 'PBKDF2', salt: saltBytes, iterations: 100000, hash: 'SHA-256' },
+        keyMaterial,
+        { name: 'AES-GCM', length: 256 },
+        true, ['encrypt', 'decrypt']
+      );
+    }
+
+    async function _guestEncrypt(key, data) {
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const encoded = new TextEncoder().encode(JSON.stringify(data));
+      const cipher = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, encoded);
+      return {
+        _enc: btoa(String.fromCharCode(...new Uint8Array(cipher))),
+        _iv: btoa(String.fromCharCode(...iv))
+      };
+    }
+
+    async function _guestDecrypt(key, encObj) {
+      const iv = Uint8Array.from(atob(encObj._iv), c => c.charCodeAt(0));
+      const cipher = Uint8Array.from(atob(encObj._enc), c => c.charCodeAt(0));
+      const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, cipher);
+      return JSON.parse(new TextDecoder().decode(plain));
+    }
+
+    async function _guestExportKeyToSession(key) {
+      const raw = await crypto.subtle.exportKey('raw', key);
+      sessionStorage.setItem('bb_guest_key', btoa(String.fromCharCode(...new Uint8Array(raw))));
+    }
+
+    async function _guestImportKeyFromSession() {
+      const b64 = sessionStorage.getItem('bb_guest_key');
+      if (!b64) return null;
+      try {
+        const raw = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+        return await crypto.subtle.importKey('raw', raw, { name: 'AES-GCM' }, true, ['encrypt', 'decrypt']);
+      } catch (e) { return null; }
+    }
+
+    function _showGuestPinSetup(callback) {
+      _guestPinSetupCallback = callback;
+      _guestPinSetupBuffer = '';
+      _guestPinSetupFirst = '';
+      _guestPinSetupStep = 'set';
+      const overlay = document.getElementById('guestPinSetupOverlay');
+      if (overlay) {
+        document.getElementById('guestPinSetupTitle').textContent = 'Protect your data';
+        document.getElementById('guestPinSetupDesc').textContent = 'Choose a 4-digit PIN to lock your journal.';
+        document.getElementById('guestPinSetupError').textContent = '';
+        _renderPinDots('guestPinSetupDots', 0, false);
+        overlay.style.display = 'flex';
+      }
+    }
+
+    function guestPinSetupDel() {
+      if (_guestPinSetupBuffer.length === 0) return;
+      _guestPinSetupBuffer = _guestPinSetupBuffer.slice(0, -1);
+      _renderPinDots('guestPinSetupDots', _guestPinSetupBuffer.length, false);
+    }
+
+    async function guestPinSetupKey(digit) {
+      if (_guestPinSetupBuffer.length >= 4) return;
+      _guestPinSetupBuffer += digit;
+      _renderPinDots('guestPinSetupDots', _guestPinSetupBuffer.length, false);
+      if (_guestPinSetupBuffer.length < 4) return;
+
+      const titleEl = document.getElementById('guestPinSetupTitle');
+      const descEl = document.getElementById('guestPinSetupDesc');
+      const errEl = document.getElementById('guestPinSetupError');
+
+      if (_guestPinSetupStep === 'set') {
+        _guestPinSetupFirst = _guestPinSetupBuffer;
+        _guestPinSetupBuffer = '';
+        _guestPinSetupStep = 'confirm';
+        titleEl.textContent = 'Confirm your PIN';
+        descEl.textContent = 'Re-enter your PIN to confirm.';
+        errEl.textContent = '';
+        _renderPinDots('guestPinSetupDots', 0, false);
+      } else if (_guestPinSetupStep === 'confirm') {
+        if (_guestPinSetupBuffer === _guestPinSetupFirst) {
+          const saltBytes = crypto.getRandomValues(new Uint8Array(16));
+          const saltB64 = btoa(String.fromCharCode(...saltBytes));
+          localStorage.setItem('bbGuestPinSalt', saltB64);
+          localStorage.setItem('bbPinEnabled', '1');
+          localStorage.setItem('bbPinCode', _guestPinSetupFirst);
+          sessionStorage.setItem('bbPinUnlocked', '1');
+          _guestCryptoKey = await _guestDeriveKey(_guestPinSetupFirst, saltB64);
+          await _guestExportKeyToSession(_guestCryptoKey);
+          const overlay = document.getElementById('guestPinSetupOverlay');
+          if (overlay) overlay.style.display = 'none';
+          if (_guestPinSetupCallback) {
+            const cb = _guestPinSetupCallback;
+            _guestPinSetupCallback = null;
+            cb();
+          }
+        } else {
+          errEl.textContent = 'PINs did not match. Try again.';
+          setTimeout(() => {
+            _guestPinSetupBuffer = '';
+            _guestPinSetupFirst = '';
+            _guestPinSetupStep = 'set';
+            titleEl.textContent = 'Protect your data';
+            descEl.textContent = 'Choose a 4-digit PIN to lock your journal.';
+            errEl.textContent = '';
+            _renderPinDots('guestPinSetupDots', 0, false);
+          }, 800);
+        }
+      }
+    }
+
+    async function _guestPinForgotReset() {
+      if (!confirm('This will permanently delete all your journal entries and remove your PIN.\n\nThere is no recovery. Continue?')) return;
+      if (!confirm('Last chance — all entries will be deleted. Are you sure?')) return;
+      const toDelete = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && (k.startsWith('entry:') || k === 'bbPinCode' || k === 'bbPinEnabled' || k === 'bbGuestPinSalt')) toDelete.push(k);
+      }
+      toDelete.forEach(k => localStorage.removeItem(k));
+      sessionStorage.removeItem('bb_guest_key');
+      sessionStorage.removeItem('bbPinUnlocked');
+      _guestCryptoKey = null;
+      const el = document.getElementById('pinOverlay');
+      if (el) el.style.display = 'none';
+      await loadEntries();
+    }
+
+    window.guestPinSetupKey = guestPinSetupKey;
+    window.guestPinSetupDel = guestPinSetupDel;
+    window._guestPinForgotReset = _guestPinForgotReset;
+
     function _initPinLock() {
       const enabled = localStorage.getItem('bbPinEnabled') === '1';
       const unlocked = sessionStorage.getItem('bbPinUnlocked') === '1';
+      const hasSalt  = !!localStorage.getItem('bbGuestPinSalt');
       _updatePinSettingsBtn();
-      if (enabled && !unlocked) {
+      // Guest encryption PINs (identified by bbGuestPinSalt) are handled inline in the
+      // entries area — no full-screen overlay. The overlay is only for logged-in users'
+      // optional PIN feature (no salt). Auth handler dismisses it after resolving.
+      if (enabled && !unlocked && !hasSalt) {
         const el = document.getElementById('pinOverlay');
         if (el) { el.style.display = 'flex'; }
       }
@@ -5590,6 +6098,18 @@
           sessionStorage.setItem('bbPinUnlocked', '1');
           const el = document.getElementById('pinOverlay');
           if (el) el.style.display = 'none';
+          // For guests, derive the encryption key then reload entries
+          if (!currentUser) {
+            const _enteredPin = _pinBuffer;
+            _pinBuffer = '';
+            const salt = localStorage.getItem('bbGuestPinSalt');
+            if (salt) {
+              _guestDeriveKey(_enteredPin, salt).then(key => {
+                _guestCryptoKey = key;
+                return _guestExportKeyToSession(key);
+              }).then(() => loadEntries()).catch(e => console.error('Guest key derive failed', e));
+            }
+          }
         } else {
           document.getElementById('pinError').textContent = 'Incorrect PIN. Try again.';
           setTimeout(() => {
@@ -5608,6 +6128,10 @@
     }
 
     function pinForgot() {
+      if (!currentUser) {
+        _guestPinForgotReset();
+        return;
+      }
       if (confirm('Reset PIN?\n\nThis will disable PIN lock. You can set a new one in Settings → Advanced.')) {
         localStorage.removeItem('bbPinCode');
         localStorage.removeItem('bbPinEnabled');
@@ -5641,9 +6165,12 @@
     function closePinSetup() {
       document.getElementById('pinSetupModal').classList.remove('active');
       _pinSetupBuffer = '';
+      _nativePinSetupMode = false;
+      const disableBtn = document.getElementById('pinDisableBtn');
+      if (disableBtn) disableBtn.onclick = disablePin;
     }
 
-    function pinSetupKey(digit) {
+    async function pinSetupKey(digit) {
       if (_pinSetupBuffer.length >= 4) return;
       _pinSetupBuffer += digit;
       _renderPinDots('pinSetupDots', _pinSetupBuffer.length, true);
@@ -5678,6 +6205,19 @@
         _renderPinDots('pinSetupDots', 0, true);
       } else if (_pinSetupStep === 'confirm') {
         if (_pinSetupBuffer === _pinSetupFirst) {
+          if (_nativePinSetupMode) {
+            try {
+              await window.Capacitor.Plugins.SecureStorage.setItem('bb_native_pin', _pinSetupFirst);
+              localStorage.setItem('bbNativePinEnabled', '1');
+              sessionStorage.setItem('bbPinUnlocked', '1');
+              _nativePinSetupMode = false;
+              closePinSetup();
+              _updateNativePinBtn();
+            } catch(e) {
+              errEl.textContent = 'Failed to save PIN. Try again.';
+              setTimeout(() => { _pinSetupBuffer = ''; _pinSetupFirst = ''; _pinSetupStep = 'set'; desc.textContent = 'Choose a 4-digit PIN.'; _renderPinDots('pinSetupDots', 0, true); errEl.textContent = ''; }, 1200);
+            }
+          } else {
           localStorage.setItem('bbPinCode', _pinSetupFirst);
           localStorage.setItem('bbPinEnabled', '1');
           sessionStorage.setItem('bbPinUnlocked', '1');
@@ -5687,6 +6227,7 @@
           // Hide disable btn if shown
           const disableBtn = document.getElementById('pinDisableBtn');
           if (disableBtn) disableBtn.style.display = 'none';
+          }
         } else {
           errEl.textContent = 'PINs did not match. Try again.';
           setTimeout(() => {
@@ -5717,6 +6258,42 @@
       if (disableBtn) disableBtn.style.display = 'none';
     }
 
+    // ── Native app-wide PIN ──
+    let _nativePinSetupMode = false;
+
+    function openNativePinSettings() {
+      _nativePinSetupMode = true;
+      const enabled = localStorage.getItem('bbNativePinEnabled') === '1';
+      _pinSetupBuffer = '';
+      _pinSetupFirst = '';
+      _pinSetupStep = 'set';
+      document.getElementById('pinSetupTitle').textContent = enabled ? '🔒 Change or Disable PIN' : '🔒 Set App PIN';
+      document.getElementById('pinSetupDesc').textContent = 'Choose a 4-digit PIN to lock the app.';
+      document.getElementById('pinSetupError').textContent = '';
+      _renderPinDots('pinSetupDots', 0, true);
+      const disableBtn = document.getElementById('pinDisableBtn');
+      if (disableBtn) {
+        disableBtn.style.display = enabled ? 'inline-block' : 'none';
+        disableBtn.onclick = disableNativePin;
+      }
+      document.getElementById('pinSetupModal').classList.add('active');
+    }
+
+    async function disableNativePin() {
+      localStorage.removeItem('bbNativePinEnabled');
+      sessionStorage.removeItem('bbPinUnlocked');
+      await window.Capacitor.Plugins.SecureStorage.removeItem('bb_native_pin').catch(() => {});
+      _nativePinSetupMode = false;
+      closePinSetup();
+      _updateNativePinBtn();
+    }
+
+    function _updateNativePinBtn() {
+      const enabled = localStorage.getItem('bbNativePinEnabled') === '1';
+      const btn = document.getElementById('nativePinSettingsBtn');
+      if (btn) btn.textContent = enabled ? '🔒 PIN: On — Change / Disable' : '🔒 Enable PIN';
+    }
+
     function _renderPinDots(containerId, filled, dark) {
       const dots = document.querySelectorAll(`#${containerId} .pin-dot`);
       dots.forEach((d, i) => {
@@ -5732,12 +6309,49 @@
     window.pinSetupKey = pinSetupKey;
     window.pinSetupDel = pinSetupDel;
     window.disablePin = disablePin;
+    window.openNativePinSettings = openNativePinSettings;
+    window.disableNativePin = disableNativePin;
 
     // Call PIN init on load (runs immediately if DOM already ready)
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', _initPinLock);
     } else {
       _initPinLock();
+    }
+
+    // ── Guest inactivity relock (5 min) ──
+    if (localStorage.getItem('bbGuestPinSalt')) {
+      let _idleTimer;
+      function _resetIdleTimer() {
+        clearTimeout(_idleTimer);
+        _idleTimer = setTimeout(() => {
+          sessionStorage.removeItem('bbPinUnlocked');
+          sessionStorage.removeItem('bb_guest_key');
+          _guestCryptoKey = null;
+          location.replace('/');
+        }, 5 * 60 * 1000);
+      }
+      ['touchstart', 'mousedown', 'keydown', 'scroll'].forEach(ev =>
+        document.addEventListener(ev, _resetIdleTimer, { passive: true })
+      );
+      _resetIdleTimer();
+    }
+
+    // ── Native app PIN inactivity relock (5 min) ──
+    if (isNative() && localStorage.getItem('bbNativePinEnabled') === '1') {
+      let _nativeIdleTimer;
+      function _resetNativeIdleTimer() {
+        clearTimeout(_nativeIdleTimer);
+        _nativeIdleTimer = setTimeout(() => {
+          sessionStorage.removeItem('bbPinUnlocked');
+          _userCryptoKey = null;
+          location.replace('/');
+        }, 5 * 60 * 1000);
+      }
+      ['touchstart', 'mousedown', 'keydown', 'scroll'].forEach(ev =>
+        document.addEventListener(ev, _resetNativeIdleTimer, { passive: true })
+      );
+      _resetNativeIdleTimer();
     }
 
     // ── Focused Mode state ──
@@ -5756,6 +6370,7 @@
     let _fmSteps = [];
     let _fmEnergyClear = false;
     let _fmSleepClear  = false;
+    let _fmWantsSleepQuality = false; // true only when user long-pressed a sleep range
     let _fmHighWater   = 0; // furthest step index reached this session
     let _fmStepsResult      = null; // step count synced from health (e.g. Apple Health)
     let _fmEnergySuggestion = null; // auto-suggested energy level from health data
@@ -5820,8 +6435,8 @@
         steps.push({ id:'energy', title:'Energy level?', subtitle:'How much energy did you have?', auto:true });
       if (!_disSteps.includes('sleep'))
         steps.push({ id:'sleep', title:'How did you sleep?', subtitle:'Tap a range or sync from Health', auto:true });
-      if (!_disSteps.includes('sleepQuality'))
-        steps.push({ id:'sleepQuality', title:'Sleep quality?', subtitle:'', auto:true });
+      // sleepQuality step is always included — only shown when user long-presses a sleep range
+      steps.push({ id:'sleepQuality', title:'Sleep quality?', subtitle:'', auto:true });
       if (!_disSteps.includes('medication'))
         steps.push({ id:'medication', title:'Did you take your medication?', subtitle:'', auto:true });
       // More data step — all activated tracking fields shown together (order mirrors field picker)
@@ -5918,6 +6533,7 @@
       _fmActive = true;
       _fmEnergyClear = true;
       _fmSleepClear  = true;
+      _fmWantsSleepQuality = false;
       _fmHighWater   = 0;
       selectedSleepQuality = null;
       _fmStepsResult       = null;
@@ -6097,6 +6713,9 @@
 
     function _maybeFocusedModeAfterFormShown() {
       if (!_fmEnabled || editingEntry) return;
+      // Don't restart focus mode if it's already active — e.g. a background Firestore refresh
+      // calling loadEntries() → updateDatePickerStatus() must not reset the user's current step.
+      if (typeof _fmActive !== 'undefined' && _fmActive) return;
       // Always open focus mode — hide the regular form immediately to prevent any flash
       document.getElementById('entryFormCard').style.display = 'none';
       _openFocusedMode();
@@ -6420,9 +7039,12 @@
             // When this bucket is selected via sync, show actual hours instead of range label
             const text = (isSel && _sleepHealthSynced && !_fmSleepClear) ? `${selectedSleep}h` : _rawText;
             const _slOnclick = (_sleepHealthSynced && isSel)
-              ? `_fmSleepClear=false;_fmAdvance();`
-              : `selectedSleep=${r.val};_sleepHealthSynced=false;_fmSleepClear=false;_fmAdvance();`;
+              ? `if(!_fmSlLpFired){_fmSleepClear=false;_fmAdvance();}`
+              : `if(!_fmSlLpFired){selectedSleep=${r.val};_sleepHealthSynced=false;_fmSleepClear=false;_fmAdvance();}`;
             return `<button class="fm-card-btn ${isSel?'sel':''}" onclick="${_slOnclick}"
+              onpointerdown="_fmSleepPtrDown(${r.val})"
+              onpointerup="_fmSleepPtrUp()"
+              onpointercancel="_fmSleepPtrCancel()"
               onmouseenter="if(window.matchMedia('(pointer:fine)').matches && !this.classList.contains('sel')){this.style.borderColor='${r.color}';this.style.background='${r.color}18';this.style.color='${r.color}';}"
               onmouseleave="if(window.matchMedia('(pointer:fine)').matches && !this.classList.contains('sel')){this.style.borderColor='';this.style.background='';this.style.color='';}"
               style="${isSel ? `border-color:${r.color};background:${r.color};color:white;font-weight:700;` : ''}">
@@ -6430,7 +7052,8 @@
               <span class="fm-card-label">${text}${isSugg && !isSel ? '<br><span style="font-size:0.72em;opacity:0.65;">✓ sugg.</span>' : ''}</span>
             </button>`;
           }).join('')}</div>`;
-          return syncBtn + _syncedBanner + _sleepCards;
+          const _sqHint = `<p style="text-align:center;font-size:0.78em;color:#adb5bd;margin-top:8px;margin-bottom:0;">Hold a response to log sleep quality</p>`;
+          return syncBtn + _syncedBanner + _sleepCards + _sqHint;
         }
 
         case 'sleepQuality': {
@@ -6938,8 +7561,8 @@
       const _doneIdx = _fmSteps.length - 1;
       if (_fmReturnToDone && _fmStepIndex < _doneIdx) {
         const _curStep = _fmSteps[_fmStepIndex];
-        // When editing sleep from summary bar, always visit sleepQuality before returning to done
-        if (_curStep && _curStep.id === 'sleep') {
+        // When editing sleep from summary bar, visit sleepQuality only if user long-pressed
+        if (_curStep && _curStep.id === 'sleep' && _fmWantsSleepQuality) {
           const _sqIdx = _fmSteps.findIndex(s => s.id === 'sleepQuality');
           if (_sqIdx > _fmStepIndex) {
             // Leave _fmReturnToDone=true so after sleepQuality, _fmNextTarget returns to done
@@ -6951,10 +7574,24 @@
         setTimeout(() => _fmGoTo(_fmNextTarget(_fmStepIndex)), 180);
         return;
       }
-      setTimeout(() => _fmGoTo(_fmStepIndex + 1), 180);
+      // Skip sleepQuality step unless user long-pressed a sleep range
+      const _nextIdx = _fmStepIndex + 1;
+      if (_fmSteps[_nextIdx] && _fmSteps[_nextIdx].id === 'sleepQuality' && !_fmWantsSleepQuality) {
+        setTimeout(() => _fmGoTo(_nextIdx + 1), 180);
+        return;
+      }
+      setTimeout(() => _fmGoTo(_nextIdx), 180);
     }
     function _fmBack()    { _fmReturnToDone = false; if (_fmStepIndex > 0) _fmGoTo(_fmStepIndex - 1); }
-    function _fmSkip()    { _fmReturnToDone = false; _fmGoTo(_fmStepIndex + 1); }
+    function _fmSkip() {
+      _fmReturnToDone = false;
+      const _skipNext = _fmStepIndex + 1;
+      if (_fmSteps[_skipNext] && _fmSteps[_skipNext].id === 'sleepQuality' && !_fmWantsSleepQuality) {
+        _fmGoTo(_skipNext + 1);
+      } else {
+        _fmGoTo(_skipNext);
+      }
+    }
     function _fmGoToDone() { _fmReturnToDone = false; _fmGoTo(_fmSteps.length - 1); }
 
     // Rebuild _fmSteps to reflect current _fmExtraSelected (removes old extras, inserts fresh ones)
@@ -7165,6 +7802,8 @@
 
     function _fmGoTo(index) {
       if (index < 0 || index >= _fmSteps.length) return;
+      // Reset sleep quality intent when revisiting the sleep step so user must long-press again
+      if (_fmSteps[index] && _fmSteps[index].id === 'sleep') _fmWantsSleepQuality = false;
       _fmStepIndex = index;
       if (index > _fmHighWater) _fmHighWater = index;
       _renderFocusedStep();
@@ -11151,6 +11790,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       _sleepHealthSynced = !!entry.sleepSynced;
       selectedSleepQuality = entry.sleepQuality || null;
       if (typeof _applySleepQualityBtns === 'function') _applySleepQualityBtns();
+      const _editSqEl = document.getElementById('sleepQualitySubSection');
+      if (_editSqEl) _editSqEl.style.display = selectedSleepQuality ? '' : 'none';
       document.querySelectorAll('.sleep-btn').forEach(b => {
         const sel = parseFloat(b.dataset.sleep) === entry.sleep;
         b.classList.toggle('selected', sel);
@@ -11858,6 +12499,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       document.getElementById('fmConfirmStepToggle').checked = localStorage.getItem('fmConfirmStep') === 'true';
       document.getElementById('elaborateResponsesToggle').checked = localStorage.getItem('elaborateResponsesEnabled') === 'true';
       _renderStepToggles();
+      const _cfDetails = document.getElementById('customiseFormDetails');
+      if (_cfDetails) _cfDetails.open = false;
 
       // If not native, show download prompt instead of native settings
       if (!isNative()) {
@@ -11870,8 +12513,6 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         if (_advHintElW) _advHintElW.style.display = _badgeWasActive ? 'flex' : 'none';
         if (localStorage.getItem('bbSettingsHintDone') === '1' && localStorage.getItem('bbCustomiseFormHintDone') !== '1') {
           _showCustomiseFormHint();
-        } else if (localStorage.getItem('bbCustomiseFormHintDone') === '1' && localStorage.getItem('bbCustomiseAdditionalHintDone') !== '1' && localStorage.getItem('customiseFormEnabled') === 'true') {
-          _showCustomiseAdditionalHint();
         } else if (localStorage.getItem('bbCustomiseAdditionalHintDone') === '1' && localStorage.getItem('bbCloseSettingsHintDone') !== '1') {
           _showCloseSettingsHint();
         }
@@ -11942,8 +12583,6 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       if (_advHintEl) _advHintEl.style.display = _badgeWasActive ? 'flex' : 'none';
       if (localStorage.getItem('bbSettingsHintDone') === '1' && localStorage.getItem('bbCustomiseFormHintDone') !== '1') {
         _showCustomiseFormHint();
-      } else if (localStorage.getItem('bbCustomiseFormHintDone') === '1' && localStorage.getItem('bbCustomiseAdditionalHintDone') !== '1' && localStorage.getItem('customiseFormEnabled') === 'true') {
-        _showCustomiseAdditionalHint();
       } else if (localStorage.getItem('bbCustomiseAdditionalHintDone') === '1' && localStorage.getItem('bbCloseSettingsHintDone') !== '1') {
         _showCloseSettingsHint();
       }
@@ -12096,53 +12735,30 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     }
 
     const _CORE_STEP_TOGGLES = [
-      { id:'energy',       icon:'⚡', label:'Energy' },
-      { id:'sleep',        icon:'🛌', label:'Sleep' },
-      { id:'sleepQuality', icon:'💤', label:'Quality' },
-      { id:'medication',   icon:'💊', label:'Meds' },
-      { id:'more_data',    icon:'➕', label:'Additional' },
-      { id:'notes',        icon:'📝', label:'Notes' },
+      { id:'energy',     icon:'⚡', label:'Energy' },
+      { id:'sleep',      icon:'🛌', label:'Sleep' },
+      { id:'medication', icon:'💊', label:'Meds' },
+      { id:'more_data',  icon:'➕', label:'Additional' },
+      { id:'notes',      icon:'📝', label:'Notes' },
     ];
 
     function _getDisabledSteps() {
-      if (localStorage.getItem('customiseFormEnabled') !== 'true') {
-        return ['sleepQuality', 'more_data'];
-      }
-      try { return JSON.parse(localStorage.getItem('disabledSteps') || '["sleepQuality"]'); } catch(e) { return ['sleepQuality']; }
+      try { return JSON.parse(localStorage.getItem('disabledSteps') || '["more_data"]'); } catch(e) { return ['more_data']; }
     }
 
-    function _toggleCustomiseForm() {
-      const chk = document.getElementById('customiseFormToggle');
-      const on = chk ? chk.checked : false;
-      localStorage.setItem('customiseFormEnabled', on ? 'true' : 'false');
-      // On first enable, seed disabledSteps with defaults (more_data always off until user enables it)
-      if (on && localStorage.getItem('disabledSteps') === null) {
-        localStorage.setItem('disabledSteps', JSON.stringify(['sleepQuality', 'more_data']));
-      }
-      if (window.db && window.currentUser) {
-        const _ds = localStorage.getItem('disabledSteps');
-        const _fsUpdate = { customiseFormEnabled: on };
-        try { _fsUpdate.disabledSteps = JSON.parse(_ds || '[]'); } catch(e) {}
-        window.db.collection('userSettings').doc(window.currentUser.uid).set(_fsUpdate, { merge: true }).catch(() => {});
+    function _onCustomiseDetailsOpen() {
+      // Seed disabledSteps on first open if not set
+      if (localStorage.getItem('disabledSteps') === null) {
+        localStorage.setItem('disabledSteps', JSON.stringify(['more_data']));
       }
       _renderStepToggles();
-      _applyStepVisibility();
-      // Dismiss customise form hint and show additional hint when user turns on customise
-      if (on && localStorage.getItem('bbCustomiseFormHintDone') !== '1') {
+      // Hint progression: dismiss customise form hint and show additional hint
+      if (localStorage.getItem('bbCustomiseFormHintDone') !== '1') {
         _dismissCustomiseFormHint();
         _showCustomiseAdditionalHint();
-        return;
-      }
-      if (typeof _fmActive !== 'undefined' && _fmActive) {
-        const _ci = _fmSteps[_fmStepIndex] ? _fmSteps[_fmStepIndex].id : null;
-        _fmSteps = _buildFocusedSteps();
-        const _ni = _ci ? _fmSteps.findIndex(s => s.id === _ci) : -1;
-        _fmStepIndex = _ni >= 0 ? _ni : Math.min(_fmStepIndex, _fmSteps.length - 1);
-        _fmHighWater = Math.max(_fmHighWater, _fmStepIndex);
-        _renderFocusedStep();
       }
     }
-    window._toggleCustomiseForm = _toggleCustomiseForm;
+    window._onCustomiseDetailsOpen = _onCustomiseDetailsOpen;
 
     function _toggleStep(id) {
       // Check before mutating so we know whether to trigger dismissal chain
@@ -12173,14 +12789,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     window._toggleStep = _toggleStep;
 
     function _renderStepToggles() {
-      const chk = document.getElementById('customiseFormToggle');
       const row = document.getElementById('stepTogglesRow');
-      const customise = localStorage.getItem('customiseFormEnabled') === 'true';
-      if (chk) chk.checked = customise;
       if (!row) return;
-      row.style.display = customise ? 'flex' : 'none';
-      if (!customise) return;
-      // Use raw storage for button states (master toggle doesn't affect individual selections)
       let _rawDis = [];
       try { _rawDis = JSON.parse(localStorage.getItem('disabledSteps') || '[]'); } catch(e) {}
       const _hintActive = localStorage.getItem('bbCustomiseAdditionalHintDone') !== '1' && localStorage.getItem('bbCustomiseFormHintDone') === '1';
@@ -12204,7 +12814,6 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       [
         { id: 'energy',       el: 'energySection' },
         { id: 'sleep',        el: 'sleepSection' },
-        { id: 'sleepQuality', el: 'sleepQualitySubSection' },
         { id: 'medication',   el: 'medicationSection' },
         { id: 'more_data',    el: 'moreDataArea' },
         { id: 'notes',        el: 'notesSection' },
@@ -12667,6 +13276,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       if (isNative()) {
         document.getElementById('settingsMainPanel').style.display = 'none';
         document.getElementById('settingsMobilePanel').style.display = '';
+        _updateNativePinBtn();
       } else {
         document.getElementById('settingsMainPanel').style.display = 'none';
         document.getElementById('settingsAdvancedPanel').style.display = '';
@@ -12694,8 +13304,6 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         document.getElementById('settingsMainPanel').style.display = '';
         if (localStorage.getItem('bbSettingsHintDone') === '1' && localStorage.getItem('bbCustomiseFormHintDone') !== '1') {
           _showCustomiseFormHint();
-        } else if (localStorage.getItem('bbCustomiseFormHintDone') === '1' && localStorage.getItem('bbCustomiseAdditionalHintDone') !== '1' && localStorage.getItem('customiseFormEnabled') === 'true') {
-          _showCustomiseAdditionalHint();
         } else if (localStorage.getItem('bbCustomiseAdditionalHintDone') === '1' && localStorage.getItem('bbCloseSettingsHintDone') !== '1') {
           _showCloseSettingsHint();
         }
@@ -13617,7 +14225,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         });
         if (!result || result.value == null) { showNoData(); return; }
 
-        // Use wall-clock duration — value is unreliable when multiple sources log sleep
+        // Use wall-clock duration — value sums all source segments and double-counts when multiple sources (e.g. Watch + iPhone) log the same sleep
         const hours = (result.endTimestamp - result.timestamp) / (1000 * 60 * 60);
 
         // Guard against invalid/zero timestamps returning nonsense duration
@@ -13675,6 +14283,31 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       }
     }
     window.importSleepFromHealth = importSleepFromHealth;
+
+    // Focus mode sleep card long-press — hold to reveal sleep quality step
+    // window._fmSlLpFired must be on window so inline onclick handlers can read it
+    window._fmSlLpFired = false;
+    let _fmSlLpTimer = null;
+    window._fmSleepPtrDown = function(val) {
+      window._fmSlLpFired = false;
+      _fmSlLpTimer = setTimeout(() => {
+        window._fmSlLpFired = true;
+        _fmWantsSleepQuality = true;
+        selectedSleep = val;
+        _sleepHealthSynced = false;
+        _fmSleepClear = false;
+        nativeHaptic('medium');
+        // Navigate directly to sleepQuality rather than relying on _fmAdvance path logic
+        const _sqIdx = _fmSteps.findIndex(s => s.id === 'sleepQuality');
+        if (_sqIdx > _fmStepIndex) {
+          setTimeout(() => _fmGoTo(_sqIdx), 180);
+        } else {
+          _fmAdvance();
+        }
+      }, 500);
+    };
+    window._fmSleepPtrUp     = function() { clearTimeout(_fmSlLpTimer); _fmSlLpTimer = null; };
+    window._fmSleepPtrCancel = function() { clearTimeout(_fmSlLpTimer); _fmSlLpTimer = null; };
 
     function _nearestBucket(h) {
       const buckets = [5, 6.5, 7.5, 8.5, 10];

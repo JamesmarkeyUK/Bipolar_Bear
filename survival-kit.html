@@ -7,7 +7,8 @@
   <title>Bipolar Survival Kit – Bipolar Bear</title>
   <!-- Beta gate: must be first — fires before any render -->
   <style>body{background:linear-gradient(135deg,#ff9500 0%,#ff6b00 100%)}</style>
-  <script>if(!window.Capacitor&&location.protocol!=='file:'&&localStorage.getItem('bbWebUnlocked')!=='true'){location.replace('beta.html');}</script>
+  <script>if(!window.Capacitor&&location.protocol!=='file:'&&localStorage.getItem('bbWebUnlocked')!=='true'){location.replace('beta.html');}
+  {const _np=window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()&&localStorage.getItem('bbNativePinEnabled')==='1';if((localStorage.getItem('bbGuestPinSalt')||_np)&&sessionStorage.getItem('bbPinUnlocked')!=='1'){location.replace('/');}}</script>
   <meta name="description" content="Your personal bipolar survival kit — mood scale, coping strategies, resources and community support.">
   <meta name="robots" content="noindex, nofollow">
 
@@ -3752,7 +3753,7 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
       // Native app uses a separate counter starting at 1; web keeps the shared counter
       const isNative = () => window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
       const counterDocId = () => isNative() ? 'peopleHelpedApp' : 'peopleHelped';
-      const counterSeed  = () => isNative() ? 1 : 12352;
+      const counterSeed  = () => isNative() ? 1 : 1;
 
       // Adjust counter using FieldValue.increment (atomic, no transaction needed)
       async function adjustCounter(delta) {
@@ -4354,6 +4355,25 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
         }
       } catch (e) { /* ignore */ }
     });
+  </script>
+
+  <script>
+    // ── Guest inactivity relock (5 min) ──
+    if (localStorage.getItem('bbGuestPinSalt')) {
+      let _idleTimer;
+      function _resetIdleTimer() {
+        clearTimeout(_idleTimer);
+        _idleTimer = setTimeout(() => {
+          sessionStorage.removeItem('bbPinUnlocked');
+          sessionStorage.removeItem('bb_guest_key');
+          location.replace('/');
+        }, 5 * 60 * 1000);
+      }
+      ['touchstart', 'mousedown', 'keydown', 'scroll'].forEach(ev =>
+        document.addEventListener(ev, _resetIdleTimer, { passive: true })
+      );
+      _resetIdleTimer();
+    }
   </script>
 </body>
 </html>
