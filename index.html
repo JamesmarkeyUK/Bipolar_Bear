@@ -2172,7 +2172,11 @@
       const _isNat = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
       if (_isNat && localStorage.getItem('bbNativePinEnabled') === '1') {
         try {
-          const stored = await window.Capacitor.Plugins.SecureStorage.getItem('bb_native_pin');
+          const _ss = window.Capacitor?.Plugins?.SecureStorage;
+          const stored = _ss ? await Promise.race([
+            _ss.getItem('bb_native_pin'),
+            new Promise(r => setTimeout(() => r(null), 3000)),
+          ]) : null;
           if (_idxPinBuf !== stored) {
             document.getElementById('idxPinError').textContent = 'Incorrect PIN. Try again.';
             setTimeout(() => { _idxPinBuf = ''; _idxRenderDots(0); document.getElementById('idxPinError').textContent = ''; }, 800);
@@ -2231,7 +2235,7 @@
       if (_isNat && localStorage.getItem('bbNativePinEnabled') === '1') {
         if (!confirm('This will disable the app PIN. Your journal data stays safe.\n\nContinue?')) return;
         localStorage.removeItem('bbNativePinEnabled');
-        await window.Capacitor.Plugins.SecureStorage.removeItem('bb_native_pin').catch(() => {});
+        await (window.Capacitor?.Plugins?.SecureStorage?.removeItem('bb_native_pin') ?? Promise.resolve()).catch(() => {});
         sessionStorage.setItem('bbPinUnlocked', '1');
         document.getElementById('guestPinOverlay').style.display = 'none';
         return;

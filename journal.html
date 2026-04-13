@@ -3644,8 +3644,11 @@
       _pendingAuthPassword = null;
       localStorage.removeItem('bbNativePinEnabled');
       if (isNative()) {
-        window.Capacitor.Plugins.SecureStorage.removeItem('bb_user_key').catch(() => {});
-        window.Capacitor.Plugins.SecureStorage.removeItem('bb_native_pin').catch(() => {});
+        const _ss = window.Capacitor?.Plugins?.SecureStorage;
+        if (_ss) {
+          _ss.removeItem('bb_user_key').catch(() => {});
+          _ss.removeItem('bb_native_pin').catch(() => {});
+        }
       }
       // Clear any custom field toggle keys (trackCustom_*) and cached journal entries (entry:*)
       Object.keys(localStorage).filter(k => k.startsWith('trackCustom_') || k.startsWith('entry:')).forEach(k => localStorage.removeItem(k));
@@ -5838,7 +5841,13 @@
       sessionStorage.setItem('bb_user_key', b64);
       if (isNative()) {
         try {
-          await window.Capacitor.Plugins.SecureStorage.setItem('bb_user_key', b64);
+          const _ss = window.Capacitor?.Plugins?.SecureStorage;
+          if (_ss) {
+            await Promise.race([
+              _ss.setItem('bb_user_key', b64),
+              new Promise(r => setTimeout(() => r(), 3000)),
+            ]);
+          }
         } catch (e) { console.warn('SecureStorage setItem failed:', e); }
       }
     }
@@ -5847,8 +5856,15 @@
       let b64 = sessionStorage.getItem('bb_user_key');
       if (!b64 && isNative()) {
         try {
-          b64 = await window.Capacitor.Plugins.SecureStorage.getItem('bb_user_key');
-          if (b64) sessionStorage.setItem('bb_user_key', b64);
+          const _ss = window.Capacitor?.Plugins?.SecureStorage;
+          if (_ss) {
+            // Race against 3 s — a hung native call must not stall the whole load path
+            b64 = await Promise.race([
+              _ss.getItem('bb_user_key'),
+              new Promise(r => setTimeout(() => r(null), 3000)),
+            ]);
+            if (b64) sessionStorage.setItem('bb_user_key', b64);
+          }
         } catch (e) { console.warn('SecureStorage getItem failed:', e); }
       }
       if (!b64) return null;
@@ -6207,7 +6223,12 @@
         if (_pinSetupBuffer === _pinSetupFirst) {
           if (_nativePinSetupMode) {
             try {
-              await window.Capacitor.Plugins.SecureStorage.setItem('bb_native_pin', _pinSetupFirst);
+              const _ss = window.Capacitor?.Plugins?.SecureStorage;
+              if (!_ss) throw new Error('SecureStorage unavailable');
+              await Promise.race([
+                _ss.setItem('bb_native_pin', _pinSetupFirst),
+                new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 3000)),
+              ]);
               localStorage.setItem('bbNativePinEnabled', '1');
               sessionStorage.setItem('bbPinUnlocked', '1');
               _nativePinSetupMode = false;
@@ -6282,7 +6303,7 @@
     async function disableNativePin() {
       localStorage.removeItem('bbNativePinEnabled');
       sessionStorage.removeItem('bbPinUnlocked');
-      await window.Capacitor.Plugins.SecureStorage.removeItem('bb_native_pin').catch(() => {});
+      await (window.Capacitor?.Plugins?.SecureStorage?.removeItem('bb_native_pin') ?? Promise.resolve()).catch(() => {});
       _nativePinSetupMode = false;
       closePinSetup();
       _updateNativePinBtn();
