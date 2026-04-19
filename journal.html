@@ -2035,7 +2035,12 @@
       <h3 style="margin-bottom:16px;">📋 Changelog</h3>
       <div style="text-align:left; font-size:0.9em; color:#495057; line-height:1.7;">
         <div style="margin-bottom:14px;">
-          <strong style="color:#ff9500;">v0.78</strong><br>
+          <strong style="color:#ff9500;">v0.79</strong><br>
+          • 🐛 Fix: "No missing entries ✓" now always matches the missing-entries modal (both use the same loaded data, no stale Firestore re-query)<br>
+          • 🐛 Fix: Streak counter now correctly shows plural "days" for streaks longer than 1<br>
+        </div>
+        <div style="margin-bottom:14px;">
+          <strong style="color:#adb5bd;">v0.78</strong><br>
           • ✨ FABs in a straight line: 5 evenly spaced positions (Chat | 🔐 | Auth | Coffee | Feedback)<br>
           • ✨ Security FAB (🔐) at position 2 — tap for E2EE explainer, tap 5× to restore all hidden FABs<br>
           • 🐛 Fix: Feedback hint positioning updated to match new FAB layout<br>
@@ -2717,7 +2722,7 @@
 
         <div style="margin-top:4px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.78</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.79</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2822,7 +2827,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.78</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.79</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2873,7 +2878,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.78</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.79</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2909,7 +2914,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.78</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.79</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2943,7 +2948,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.78</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.79</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -8838,7 +8843,7 @@
           if (!useToday) {
             // Yesterday mode: show streak in place of "Log today" button
             const _streak = window._currentStreak || 0;
-            otherBtn.textContent = `🔥 ${_streak} day${_streak === 1 ? '' : ''} streak`;
+            otherBtn.textContent = `🔥 ${_streak} day${_streak === 1 ? '' : 's'} streak`;
             otherBtn.style.background = 'rgba(255,255,255,0.1)';
             otherBtn.style.color = 'rgba(255,255,255,0.75)';
             otherBtn.style.border = '1.5px solid rgba(255,255,255,0.2)';
@@ -12370,30 +12375,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
 
     async function showMissingDates() {
       try {
-        const entries = [];
-        
-        if (currentUser) {
-          const snapshot = await db.collection('entries')
-            .where('userId', '==', currentUser.uid)
-            .get();
-          snapshot.forEach(doc => {
-            entries.push(doc.data());
-          });
-        } else {
-          for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key && key.startsWith('entry:')) {
-              try {
-                const value = localStorage.getItem(key);
-                if (value) {
-                  entries.push(JSON.parse(value));
-                }
-              } catch (e) {
-                console.error('Error loading entry:', e);
-              }
-            }
-          }
-        }
+        // Use the already-loaded entries (same data source as the stats pill that labels the button).
+        // This guarantees the modal result is always consistent with the "X missing entries" count.
+        const entries = (_allEntries && _allEntries.length > 0) ? _allEntries : [];
 
         if (entries.length === 0) {
           alert('No entries yet! Start tracking your mood to see missing dates.');
@@ -12403,14 +12387,15 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        // When logging yesterday, exclude today from missing dates
         const useToday = localStorage.getItem('journalDefaultToday') === 'true';
-        const upperBound = new Date(today);
-        if (!useToday) upperBound.setDate(upperBound.getDate() - 1);
+
+        // Mirror the stats-pill window exactly: exclude the current target day (user may be about to log it).
+        const missingCutoff = new Date(today);
+        if (!useToday) missingCutoff.setDate(missingCutoff.getDate() - 1); // yesterday
 
         // Go back 30 days from today
         const thirtyDaysAgo = new Date(today);
-        thirtyDaysAgo.setDate(today.getDate() - 29); // 30 days including today
+        thirtyDaysAgo.setDate(today.getDate() - 29);
         thirtyDaysAgo.setHours(0, 0, 0, 0);
 
         // Find the first entry date
@@ -12421,28 +12406,28 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         // Start counting from whichever is more recent: 30 days ago OR first entry
         const startDate = firstEntryDate > thirtyDaysAgo ? firstEntryDate : thirtyDaysAgo;
 
-        // Create a set of dates that have entries
+        // Create a set of dates that have entries (within the window)
         const entryDates = new Set();
         entries.forEach(entry => {
           const date = new Date(entry.date);
           date.setHours(0, 0, 0, 0);
-          if (date >= startDate && date <= upperBound) {
+          if (date >= startDate && date < missingCutoff) {
             const dateKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
             entryDates.add(dateKey);
           }
         });
 
-        // Find missing dates from start date to upper bound
+        // Find missing dates from start date up to (but not including) the current target day
         const missingDates = [];
         let checkDate = new Date(startDate);
 
-        while (checkDate <= upperBound) {
+        while (checkDate < missingCutoff) {
           const dateKey = `${checkDate.getFullYear()}-${String(checkDate.getMonth() + 1).padStart(2, '0')}-${String(checkDate.getDate()).padStart(2, '0')}`;
-          
+
           if (!entryDates.has(dateKey)) {
             missingDates.push(new Date(checkDate));
           }
-          
+
           checkDate.setDate(checkDate.getDate() + 1);
         }
 
