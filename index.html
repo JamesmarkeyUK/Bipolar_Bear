@@ -65,6 +65,12 @@
       padding: 0;
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    input, textarea, [contenteditable] {
+      user-select: text;
+      -webkit-user-select: text;
     }
 
     body {
@@ -75,7 +81,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      padding: max(20px, calc(50vh - 280px)) 20px 130px;
+      padding: max(20px, calc(50vh - 300px)) 20px 80px;
       color: white;
     }
     body.is-new-user {
@@ -96,9 +102,9 @@
     }
 
     .logo-img {
-      max-width: 200px;
-      border-radius: 20px;
-      padding: 15px;
+      max-width: 160px;
+      border-radius: 18px;
+      padding: 10px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.2);
       cursor: pointer;
       touch-action: manipulation;
@@ -422,18 +428,49 @@
       pointer-events: none;
     }
 
+    /* ── Coffee FAB (to the left of feedback) ── */
+    .coffee-fab {
+      position: fixed;
+      bottom: 32px;
+      right: 74px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #ff9500;
+      color: white;
+      border: none;
+      font-size: 1.15em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(255,149,0,0.45);
+      z-index: 50;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.18s, transform 0.15s;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .coffee-fab:hover { background: #e08600; transform: scale(1.08); }
+    }
+    @media (min-width: 520px) {
+      .coffee-fab { right: calc(50% - 240px + 54px); }
+    }
+    @media (min-width: 768px) {
+      .coffee-fab { right: 82px; }
+    }
+
     /* ── Feedback button ── */
     .feedback-fab {
       position: fixed;
-      bottom: 24px;
+      bottom: 26px;
       right: 20px;
-      width: 52px;
-      height: 52px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
       background: #ff9500;
       border: none;
       color: white;
-      font-size: 1.4em;
+      font-size: 1.15em;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -453,29 +490,27 @@
       .feedback-fab { right: 28px; }
     }
 
-    /* ── WhatsApp FAB (bottom left) ── */
+    /* ── Chat FAB (bottom left — in-app chat, coming soon) ── */
     .whatsapp-fab {
       position: fixed;
-      bottom: 24px;
+      bottom: 32px;
       left: 20px;
-      width: 52px;
-      height: 52px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
-      background: #25D366;
+      background: #adb5bd;
       border: none;
       color: white;
-      font-size: 1.5em;
-      cursor: pointer;
+      font-size: 1.2em;
+      cursor: default;
+      pointer-events: none;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 16px rgba(37,211,102,0.35);
-      transition: transform 0.2s ease, background 0.2s ease;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
       -webkit-tap-highlight-color: transparent;
       z-index: 50;
-    }
-    @media (hover: hover) and (pointer: fine) {
-      .whatsapp-fab:hover { background: #1fad55; transform: scale(1.08); }
+      opacity: 0.75;
     }
     @media (min-width: 520px) {
       .whatsapp-fab { left: calc(50% - 240px); }
@@ -557,7 +592,7 @@
 </head>
 <body>
   <!-- Hide permanently confirmation modal -->
-  <div id="hidePermanentlyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1100;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)document.getElementById('hidePermanentlyModal').style.display='none';">
+  <div id="hidePermanentlyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10000;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)document.getElementById('hidePermanentlyModal').style.display='none';">
     <div style="background:white;border-radius:20px;padding:24px;max-width:300px;width:100%;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,0.25);">
       <div style="font-size:1.6em;margin-bottom:10px;">🙈</div>
       <div style="font-weight:700;font-size:1em;color:#333;margin-bottom:8px;">Hide permanently?</div>
@@ -608,7 +643,7 @@
         🔒 Don't worry – all of your data is private and stored locally right now.
       </div>
       <div class="btn-container" id="survivalContainer">
-        <a href="survival-kit.html" onclick="event.preventDefault(); _advanceOnboardingStep(7); location.replace('survival-kit.html');" class="btn btn-survival" id="survivalBtn" style="position:relative;">
+        <a href="survival-kit.html" onclick="event.preventDefault(); _advanceOnboardingStep(12); location.replace('survival-kit.html');" class="btn btn-survival" id="survivalBtn" style="position:relative;">
           <span class="icon">🆘</span>
           <span>Survival Kit</span>
           <span id="survivalTick" class="entry-tick" data-done="false">
@@ -647,7 +682,7 @@
 
     <div style="text-align:center; margin-top: 14px; padding-bottom: 20px;">
       <a href="https://www.jamesmarkey.co.uk/" target="_blank" rel="noopener noreferrer" class="footer-link">
-        Being built by James
+        Being built by James Markey
       </a>
     </div>
   </div>
@@ -673,11 +708,7 @@
     <span class="fab-hint-arrow">←</span>
     <span class="fab-hint-label">🐻 WhatsApp Group</span>
   </div>
-  <button class="whatsapp-fab" onclick="openWhatsAppModal()" title="Join our WhatsApp group">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1.1em" height="1.1em" fill="currentColor">
-      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-    </svg>
-  </button>
+  <button class="whatsapp-fab" title="Bipolar Bear Chat (coming soon)" aria-disabled="true">💬</button>
 
   <!-- WhatsApp confirmation modal -->
   <div class="wa-modal" id="waModal" onclick="if(event.target===this){_closeWaModal();_suppressFabHover();}">
@@ -710,6 +741,30 @@
   <div class="fab-hint" id="feedbackHint" style="display:none;">
     <span class="fab-hint-label">🐻 Feedback</span>
     <span class="fab-hint-arrow">→</span>
+  </div>
+
+  <!-- Coffee FAB (left of feedback) -->
+  <button class="coffee-fab" id="coffeeFab" onclick="openCoffeeModal()" title="Support Bipolar Bear" style="display:none;">☕</button>
+
+  <!-- Coffee modal -->
+  <div id="coffeeModal2" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeCoffeeModal();">
+    <div style="background:white;border-radius:20px;padding:24px 24px 20px;text-align:center;max-width:300px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);">
+      <div style="font-size:2em;margin-bottom:8px;">☕</div>
+      <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:8px;">Keep Bipolar Bear Going</div>
+      <p style="font-size:0.88em;color:#6c757d;line-height:1.55;margin-bottom:6px;">Running BipolarBear costs around <strong>£25/month</strong> for servers, hosting and services.</p>
+      <p id="coffeeFundedText" style="font-size:0.82em;color:#ff9500;font-weight:600;margin-bottom:16px;display:none;"></p>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <a href="https://buymeacoffee.com/jamesmarkey" target="_blank" rel="noopener noreferrer"
+          onclick="closeCoffeeModal();"
+          style="display:block;padding:13px;background:#ff9500;color:white;border-radius:12px;text-decoration:none;font-weight:700;font-size:0.95em;text-align:center;">
+          ☕ Send me a coffee
+        </a>
+        <button onclick="_showHidePermanently('coffee')"
+          style="padding:10px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+          🙈 Hide this button permanently
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Feedback FAB -->
@@ -949,23 +1004,41 @@
     } catch(e) { console.warn('Firebase init failed on index.html', e); }
 
     // ── Onboarding step helpers ──
+    let _hintMigrationDone = false;
     function _getOnboardingStep() {
       // Migration: existing users with entries but no step → mark as complete
       if (!localStorage.getItem('bbOnboardingStep') && localStorage.getItem('bbHasEntries') === '1') {
         localStorage.setItem('bbOnboardingStep', '12');
       }
-      return parseInt(localStorage.getItem('bbOnboardingStep') || '0', 10);
+      const step = parseInt(localStorage.getItem('bbOnboardingStep') || '0', 10);
+      // Tutorial complete — auto-mark any focused-mode entry hints as done so newly-added
+      // hints never appear for users who have already finished the onboarding tutorial.
+      if (step >= 12 && !_hintMigrationDone) {
+        _hintMigrationDone = true;
+        ['bb_fmChooseMoodHintDone','bb_fmMoodInfoCloseHintDone','bbSettingsHintDone',
+         'bbCustomiseFormHintDone','bbCustomiseAdditionalHintDone','bbCloseSettingsHintDone',
+         'bb_fmMoodTipShown'].forEach(f => { if (!localStorage.getItem(f)) localStorage.setItem(f, '1'); });
+        localStorage.removeItem('bb_fmTapHoldHintPending');
+        localStorage.removeItem('bb_fmTapHoldHintReady');
+        localStorage.removeItem('bbAdvancedBadgePending');
+        localStorage.removeItem('bbAdvancedBadgeVisible');
+      }
+      return step;
     }
     function _advanceOnboardingStep(to) {
       const cur = _getOnboardingStep();
       if (to <= cur) return;
-      const _isNat = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
       if (to === 9) to = 10; // step 9 (WA hint) removed from tutorial on all platforms
       localStorage.setItem('bbOnboardingStep', String(to));
       if (typeof currentUser !== 'undefined' && currentUser && typeof db !== 'undefined' && db) {
         db.collection('userSettings').doc(currentUser.uid).set({ onboardingStep: to }, { merge: true }).catch(() => {});
       }
       _applyOnboardingGating();
+      // Show tutorial complete popup the first time step reaches 12
+      if (to >= 12 && localStorage.getItem('bbTutorialToastShown') !== '1') {
+        localStorage.setItem('bbTutorialToastShown', '1');
+        setTimeout(_showTutorialCompleteModal, 400);
+      }
     }
     window._getOnboardingStep = _getOnboardingStep;
     window._advanceOnboardingStep = _advanceOnboardingStep;
@@ -1035,12 +1108,9 @@
       });
       overlay.addEventListener('click', () => {
         overlay.remove();
-        // Show feedback hint non-blockingly after popup dismissed
+        // Show feedback hint after tutorial complete dismissed
         const _fbHint = document.getElementById('feedbackHint');
-        const _fbFab = document.querySelector('.feedback-fab');
-        if (_fbHint && _fbFab && localStorage.getItem('bbFeedbackFabHidden') !== '1') {
-          _fbHint.style.display = 'flex';
-        }
+        if (_fbHint && localStorage.getItem('bbFeedbackFabHidden') !== '1') _fbHint.style.display = 'flex';
       });
       document.body.appendChild(overlay);
       overlay.style.opacity = '0';
@@ -1064,13 +1134,19 @@
       const _survival = document.getElementById('survivalContainer');
       if (_survival) _survival.style.display = step < 6 ? 'none' : '';
 
-      // WA FAB: native only, visible after tutorial complete (step 12)
+      const _coffeePermaHidden = localStorage.getItem('bbCoffeeFabHidden') === '1';
+
+      // Chat FAB: visible after tutorial complete (step 12) on all platforms
       const _waFab = document.querySelector('.whatsapp-fab');
-      if (_waFab) _waFab.style.display = (step >= 12 && _isNat && !_waPermaHidden) ? '' : 'none';
+      if (_waFab) _waFab.style.display = step >= 12 ? '' : 'none';
 
       // Feedback FAB: visible after tutorial complete (step 12)
       const _fbFab = document.querySelector('.feedback-fab');
       if (_fbFab) _fbFab.style.display = (step >= 12 && !_fbPermaHidden) ? '' : 'none';
+
+      // Coffee FAB: visible after tutorial complete (step 12)
+      const _coffeeFab = document.getElementById('coffeeFab');
+      if (_coffeeFab) _coffeeFab.style.display = (step >= 12 && !_coffeePermaHidden) ? '' : 'none';
 
       // Footer: visible from step 12
       const _footer = document.querySelector('.footer-link');
@@ -1254,7 +1330,7 @@
         // Misc hints
         'bbPersonalHintDone',
         'bbFavouriteHintSeen', 'bbPrivateHintSeen', 'bbFavAnniShown',
-        'bbFeedbackFabHidden', 'bbWaFabHidden', 'bbFooterHidden',
+        'bbFeedbackFabHidden', 'bbWaFabHidden', 'bbCoffeeFabHidden', 'bbFooterHidden',
         'bbLogoEasterEggFound',
         'bbTutorialToastShown',
         'bbPinEnabled', 'bbPinCode',
@@ -1559,6 +1635,8 @@
           } else {
             // Skip tutorial — jump to step 12 and mark all tutorial flags as done
             localStorage.removeItem('bbOnboardingStep');
+            // Pre-set bbTutorialToastShown so _advanceOnboardingStep doesn't show the popup
+            localStorage.setItem('bbTutorialToastShown', '1');
             _advanceOnboardingStep(12);
             [
               'bbTutorialToastShown', 'bbWelcomeShown', 'bbSurvivalKitVisited',
@@ -1865,13 +1943,13 @@
       document.getElementById('fbEmailRow').style.display = currentUser ? 'none' : '';
       // Show version + platform
       const _metaEl = document.getElementById('fbMeta');
-      if (_metaEl) _metaEl.textContent = `v0.71 · ${_getFbPlatform()}`;
+      if (_metaEl) _metaEl.textContent = `v0.77 · ${_getFbPlatform()}`;
       document.getElementById('feedbackModal').classList.add('active');
     }
 
     // Brief pointer-events suppression on FABs to prevent sticky hover after modal close
     function _suppressFabHover() {
-      document.querySelectorAll('.whatsapp-fab, .feedback-fab').forEach(el => {
+      document.querySelectorAll('.whatsapp-fab, .feedback-fab, .coffee-fab').forEach(el => {
         el.style.pointerEvents = 'none';
         setTimeout(() => { el.style.pointerEvents = ''; }, 400);
       });
@@ -1891,14 +1969,10 @@
     function closeFeedbackModal() {
       document.getElementById('feedbackModal').classList.remove('active');
       _suppressFabHover();
-      _advanceOnboardingStep(12);
       // Ensure focus mode is on when tutorial completes (in case user exited it during onboarding)
       localStorage.setItem('focusedModeEnabled', '1');
-      // Show tutorial complete toast after feedback modal closes (step 10→12)
-      if (localStorage.getItem('bbTutorialToastShown') !== '1') {
-        localStorage.setItem('bbTutorialToastShown', '1');
-        setTimeout(_showTutorialCompleteModal, 400);
-      }
+      // _advanceOnboardingStep(12) also triggers _showTutorialCompleteModal on first reach
+      _advanceOnboardingStep(12);
     }
 
     function selectFeedbackType(type) {
@@ -2058,13 +2132,14 @@
         const _fb = document.querySelector('.feedback-fab');
         if (_fb) _fb.style.display = 'none';
       }
-      if (localStorage.getItem('bbWaFabHidden') === '1') {
-        const _wa = document.querySelector('.whatsapp-fab');
-        if (_wa) _wa.style.display = 'none';
-      }
+
       if (localStorage.getItem('bbFooterHidden') === '1') {
         const _fl = document.querySelector('.footer-link');
         if (_fl && _fl.parentElement) _fl.parentElement.style.display = 'none';
+      }
+      if (localStorage.getItem('bbCoffeeFabHidden') === '1') {
+        const _cf = document.getElementById('coffeeFab');
+        if (_cf) _cf.style.display = 'none';
       }
     })();
 
@@ -2082,6 +2157,10 @@
           closeFeedbackModal();
           document.querySelector('.feedback-fab').style.display = 'none';
           localStorage.setItem('bbFeedbackFabHidden', '1');
+        } else if (type === 'coffee') {
+          closeCoffeeModal();
+          document.getElementById('coffeeFab').style.display = 'none';
+          localStorage.setItem('bbCoffeeFabHidden', '1');
         }
       };
       document.getElementById('hidePermanentlyModal').style.display = 'flex';
@@ -2091,13 +2170,52 @@
       document.getElementById('hidePermanentlyModal').style.display = 'none';
       if (_hidePermanentlyCb) { _hidePermanentlyCb(); _hidePermanentlyCb = null; }
     });
+
+    // ── Coffee FAB: fetch funded % and show modal ──
+    function openCoffeeModal() {
+      const _modal = document.getElementById('coffeeModal2');
+      if (!_modal) return;
+      _modal.style.display = 'flex';
+      // Fetch funded amount from Firestore and update text
+      (async function() {
+        try {
+          const _doc = await db.collection('counters').doc('appCosts').get();
+          const _fundedEl = document.getElementById('coffeeFundedText');
+          if (_doc.exists && _fundedEl) {
+            const _funded = parseFloat(_doc.data().fundedGBP || 0);
+            const _perc = Math.min(100, Math.round(_funded / 25 * 100));
+            if (_perc > 0) {
+              _fundedEl.textContent = `Currently ${_perc}% funded — thank you! ☕`;
+              _fundedEl.style.display = '';
+            }
+          }
+        } catch(e) {}
+      })();
+    }
+    function closeCoffeeModal() {
+      const _modal = document.getElementById('coffeeModal2');
+      if (_modal) _modal.style.display = 'none';
+    }
+    window.openCoffeeModal = openCoffeeModal;
+    window.closeCoffeeModal = closeCoffeeModal;
   </script>
 
   <!-- Guest PIN unlock overlay (shown on index when journal data is encrypted) -->
   <div id="guestPinOverlay" style="display:none;position:fixed;inset:0;background:linear-gradient(135deg,#ff9500 0%,#ff6b00 100%);z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:24px;">
     <img src="icons/AppIcon.png" width="72" height="72" style="border-radius:18px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
     <h2 style="color:white;margin-bottom:6px;font-size:1.3em;">Bipolar Bear</h2>
-    <p style="color:rgba(255,255,255,0.85);font-size:0.88em;margin-bottom:28px;">Enter your PIN to continue</p>
+    <p style="color:rgba(255,255,255,0.85);font-size:0.88em;margin-bottom:12px;">Enter your PIN to continue</p>
+    <button onclick="document.getElementById('pinE2eeModal').style.display='flex'" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:white;border-radius:20px;padding:5px 14px;font-size:0.78em;cursor:pointer;margin-bottom:22px;-webkit-tap-highlight-color:transparent;">🔐 More info</button>
+    <!-- E2EE info sub-modal (inside overlay so z-index works automatically) -->
+    <div id="pinE2eeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:10001;align-items:center;justify-content:center;padding:24px;" onclick="if(event.target===this)this.style.display='none'">
+      <div style="background:white;border-radius:20px;padding:24px;max-width:300px;width:100%;text-align:left;box-shadow:0 10px 40px rgba(0,0,0,0.25);">
+        <div style="font-weight:700;color:#212529;margin-bottom:12px;font-size:1em;text-align:center;">🔐 Why is there a PIN?</div>
+        <p style="font-size:0.85em;color:#495057;line-height:1.6;margin-bottom:10px;">Your journal entries are <strong>end-to-end encrypted</strong> — scrambled before they leave your device. Only you can read them. Not even we can.</p>
+        <p style="font-size:0.85em;color:#495057;line-height:1.6;margin-bottom:10px;">Think of it like a locked diary that only unlocks with your combination — your <strong>password + PIN together</strong> form that key.</p>
+        <p style="font-size:0.85em;color:#495057;line-height:1.6;margin-bottom:16px;">For personal and mental health data, this level of privacy really matters. Your entries stay private, always.</p>
+        <button onclick="document.getElementById('pinE2eeModal').style.display='none'" style="width:100%;padding:11px;background:#ff9500;color:white;border:none;border-radius:12px;font-weight:700;cursor:pointer;font-size:0.9em;">Got it</button>
+      </div>
+    </div>
     <div id="idxPinDots" style="display:flex;gap:12px;margin-bottom:24px;">
       <div style="width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,0.4);border:2px solid rgba(255,255,255,0.8);transition:background 0.15s;" class="idx-pin-dot"></div>
       <div style="width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,0.4);border:2px solid rgba(255,255,255,0.8);transition:background 0.15s;" class="idx-pin-dot"></div>

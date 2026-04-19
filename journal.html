@@ -65,10 +65,15 @@
       padding: 0;
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    input, textarea, [contenteditable] {
+      user-select: text;
+      -webkit-user-select: text;
     }
     img {
       -webkit-touch-callout: none;
-      user-select: none;
     }
 
     .cal-cell {
@@ -1513,14 +1518,6 @@
         </div>
         <div style="margin-left:auto;position:relative;">
           <button id="survivalNavBtn" onclick="_survivalNavClick()" title="Survival Kit" style="background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.4);border-radius:50%;width:38px;height:38px;min-width:38px;min-height:38px;padding:0;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;font-size:1.2em;cursor:pointer;line-height:1;-webkit-tap-highlight-color:transparent;flex-shrink:0;">🧰</button>
-          <!-- Onboarding hint 8b: step 8 — appears left of button, arrow points right -->
-          <div id="journalHintSurvival" style="display:none;flex-direction:row;align-items:center;gap:6px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;position:absolute;right:calc(100% + 8px);top:50%;transform:translateY(-50%);white-space:nowrap;">
-            <span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,255,255,0.9);font-family:'Georgia',serif;letter-spacing:0.01em;">🐻 Go back to survival kit here</span>
-            <svg width="20" height="12" viewBox="0 0 20 12" fill="none">
-              <line x1="2" y1="6" x2="15" y2="6" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round"/>
-              <polyline points="9,2 15,6 9,10" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-            </svg>
-          </div>
         </div>
       </div>
         <div class="empty-space"></div>
@@ -1555,6 +1552,28 @@
     <div id="entryLoadingPlaceholder" style="text-align:center; padding:40px 0;">
       <div style="display:inline-block; width:32px; height:32px; border:4px solid rgba(255,255,255,0.3); border-top-color:white; border-radius:50%; animation:spin 0.8s linear infinite;"></div>
     </div>
+    <!-- Isolated safety net: separate <script> tag, immune to errors in the main block. -->
+    <script>
+    (function() {
+      var ph = document.getElementById('entryLoadingPlaceholder');
+      // Safety net: if the spinner is still visible after 8s, force-hide it and show a
+      // tap-to-reload prompt so the page is never permanently stuck.
+      var _t = setTimeout(function() {
+        if (!ph || ph.style.display === 'none') return;
+        console.warn('[BB] Isolated safety net fired — forcing journal usable');
+        ph.innerHTML = '<div onclick="window.location.reload()" style="color:white;font-size:0.9em;padding:12px 20px;background:rgba(0,0,0,0.25);border-radius:12px;cursor:pointer;">Taking too long — tap to reload</div>';
+        if (typeof loadEntries === 'function') {
+          ph.style.display = 'none';
+          var fc = document.getElementById('entryFormCard');
+          if (fc) fc.style.display = '';
+          var tc = document.getElementById('todayCompleteSection');
+          if (tc) tc.style.display = 'none';
+          loadEntries();
+        }
+      }, 8000);
+      window._gJournalSafetyTimer = _t;
+    })();
+    </script>
 
     <!-- Today complete banner (shown when today's entry exists) -->
     <div id="todayCompleteSection" style="display:none; text-align:center; margin-bottom:16px;">
@@ -2016,7 +2035,45 @@
       <h3 style="margin-bottom:16px;">📋 Changelog</h3>
       <div style="text-align:left; font-size:0.9em; color:#495057; line-height:1.7;">
         <div style="margin-bottom:14px;">
-          <strong style="color:#ff9500;">v0.73</strong><br>
+          <strong style="color:#ff9500;">v0.77</strong><br>
+          • ✨ Chat FAB replaces WhatsApp button (greyed out, coming soon — Bipolar Bear in-app chat)<br>
+          • ✨ PIN screen "🔐 More info" chip opens plain-language E2EE explainer<br>
+          • ✨ All FABs resized to 44×44px with a soft U-curve layout<br>
+          • ✨ "Hide permanently" popup now correctly appears in front of coffee modal<br>
+          • 🐛 Fix: Account deletion no longer crashes with SecureStorage error<br>
+          • 🐛 Fix: Sleep health sync no longer returns data outside the query window (wrong night)<br>
+        </div>
+        <div style="margin-bottom:14px;">
+          <strong style="color:#adb5bd;">v0.76</strong><br>
+          • ✨ Tutorial complete popup now shows for all paths to step 12 (survival kit, feedback, etc.)<br>
+          • ✨ WhatsApp &amp; Feedback hints appear after tutorial complete popup is dismissed<br>
+          • ✨ Buy Me a Coffee moved to FAB (left of Feedback), click to open with Send/Hide options<br>
+          • ✨ Footer chip updated to "Being built by James Markey"<br>
+          • ✨ PIN screen now explains E2EE reinforced by password and PIN<br>
+          • 🐛 Fix: PIN no longer appears after account deletion (SecureStorage also cleared)<br>
+          • 🎨 Home screen vertical spacing reduced for iPhone 15 Pro single-page fit<br>
+        </div>
+        <div style="margin-bottom:14px;">
+          <strong style="color:#adb5bd;">v0.75</strong><br>
+          • ✨ Survival kit onboarding steps removed — explore freely, tutorial complete shows on next visit<br>
+          • ✨ Focused-mode questions now use date-aware wording (last night vs specific date)<br>
+          • ✨ People helped counter unified across web and native; reset to 1<br>
+          • ✨ Buy Me a Coffee link now shows % of monthly costs funded; tap &amp; hold for explainer<br>
+          • ✨ Text selection disabled across all UI elements (allowed in text inputs)<br>
+          • 🐛 Fix: Compass pointer re-aims after journal auto-scroll during tutorial<br>
+          • 🐛 Fix: Settings close button no longer shifts on second open<br>
+          • 🐛 Fix: Health auth status refreshes in settings after granting permissions<br>
+          • 🐛 Fix: PIN lock screen no longer visible after account deletion<br>
+          • 🗑️ Removed: Log Today toggle (always logs last 24hrs), PIN lock option from settings, duplicate divider in mobile settings<br>
+        </div>
+        <div style="margin-bottom:14px;">
+          <strong style="color:#adb5bd;">v0.74</strong><br>
+          • 🐛 Fix: Focused mode mood selector now auto-advances correctly after selection<br>
+          • 🐛 Fix: All focused-mode steps (energy, sleep, etc.) now visible during onboarding tutorial<br>
+          • 🐛 Fix: Journal page no longer crashes on load due to script initialisation ordering<br>
+        </div>
+        <div style="margin-bottom:14px;">
+          <strong style="color:#adb5bd;">v0.73</strong><br>
           • 🔒 Journal entries are end-to-end encrypted for logged-in users (AES-256-GCM)<br>
           • 🔒 Encryption keys stored in device Keychain / Keystore on iOS &amp; Android<br>
           • 🔒 App-wide PIN lock for native users (Settings → Mobile → App PIN Lock)<br>
@@ -2654,7 +2711,7 @@
 
         <div style="margin-top:4px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.73</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.77</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2677,11 +2734,11 @@
           <div style="font-weight: 600; margin-bottom: 8px; color: #495057;">🔔 Daily Mood Reminder</div>
           <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
             <label style="flex: 1; color: #6c757d; font-size: 0.95em;">Remind me at:</label>
-            <input type="time" id="reminderTime" value="20:00" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1em; color: #495057;">
+            <input type="time" id="reminderTime" value="07:00" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1em; color: #495057;">
           </div>
           <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
             <label for="reminderEnabled" style="flex: 1; color: #6c757d; font-size: 0.95em; cursor: pointer;">Reminders on:</label>
-            <label class="bb-switch"><input type="checkbox" id="reminderEnabled" checked><span class="bb-slider"></span></label>
+            <label class="bb-switch"><input type="checkbox" id="reminderEnabled"><span class="bb-slider"></span></label>
           </div>
           <div style="display: flex; align-items: center; gap: 12px;">
             <label for="weeklySummaryEnabled" style="flex: 1; color: #6c757d; font-size: 0.95em; cursor: pointer;">Weekly summary (Sundays):</label>
@@ -2701,14 +2758,6 @@
         </div>
 
         <hr style="border: none; border-top: 1px solid #e9ecef; margin-bottom: 20px;">
-
-        <!-- Native PIN Lock -->
-        <hr style="border: none; border-top: 1px solid #e9ecef; margin-bottom: 20px;">
-        <div style="margin-bottom:20px;">
-          <div style="font-weight:600;margin-bottom:4px;color:#495057;">🔒 App PIN Lock</div>
-          <div style="color:#adb5bd;font-size:0.82em;margin-bottom:10px;line-height:1.4;">Require a 4-digit PIN to open the app.</div>
-          <button id="nativePinSettingsBtn" onclick="openNativePinSettings()" style="width:100%;padding:10px;border:1.5px solid #6c757d;background:white;color:#495057;border-radius:20px;font-size:0.9em;font-weight:600;cursor:pointer;">Enable PIN</button>
-        </div>
 
         <div style="display:flex;gap:10px;">
           <button onclick="closeMobileSettings()" style="flex:1;background:rgba(255,149,0,0.1);border:1.5px solid #ff9500;color:#ff9500;font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">← Back</button>
@@ -2767,7 +2816,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.73</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.77</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2803,14 +2852,6 @@
 
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
           <div>
-            <div style="font-weight: 600; color: #495057; font-size: 0.95em;">🗓️ Log today by default</div>
-            <div style="color: #adb5bd; font-size: 0.82em; margin-top: 2px;">Off = log yesterday by default</div>
-          </div>
-          <label class="bb-switch"><input type="checkbox" id="journalDefaultToggleBtn" onchange="toggleJournalDefault()"><span class="bb-slider"></span></label>
-        </div>
-
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-          <div>
             <div style="font-weight: 600; color: #495057; font-size: 0.95em;">🕵️ Incognito Mode</div>
             <div style="color: #adb5bd; font-size: 0.82em; margin-top: 2px;">Hide entries from PDF export by default</div>
           </div>
@@ -2826,7 +2867,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.73</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.77</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2862,7 +2903,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.73</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.77</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2896,7 +2937,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.73</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.77</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2986,15 +3027,39 @@
   </div> <!-- Close app-content -->
 
   <script>
+    // ── Capacitor detection helpers (hoisted function declarations) ──
+    // These are needed by top-level code in this script block (e.g. PIN idle relock at
+    // line ~6427) that runs before the separate Capacitor <script> block can execute.
+    // Function declarations are hoisted, so they're safe to call anywhere in this block.
+    // The Capacitor block later assigns the same logic to window.isNative/isIOS/isAndroid
+    // for cross-block access — these two definitions coexist without conflict.
+    function isNative()  { return !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()); }
+    function isIOS()     { return isNative() && window.Capacitor.getPlatform() === 'ios'; }
+    function isAndroid() { return isNative() && window.Capacitor.getPlatform() === 'android'; }
+
     // Declare Firebase variables globally
     let auth, db, currentUser = null, isGuestMode = true;
 
     // ── Onboarding step helpers ──
+    let _hintMigrationDone = false;
     function _getOnboardingStep() {
       if (!localStorage.getItem('bbOnboardingStep') && localStorage.getItem('bbHasEntries') === '1') {
         localStorage.setItem('bbOnboardingStep', '12');
       }
-      return parseInt(localStorage.getItem('bbOnboardingStep') || '0', 10);
+      const step = parseInt(localStorage.getItem('bbOnboardingStep') || '0', 10);
+      // Tutorial complete — auto-mark any focused-mode entry hints as done so newly-added
+      // hints never appear for users who have already finished the onboarding tutorial.
+      if (step >= 12 && !_hintMigrationDone) {
+        _hintMigrationDone = true;
+        ['bb_fmChooseMoodHintDone','bb_fmMoodInfoCloseHintDone','bbSettingsHintDone',
+         'bbCustomiseFormHintDone','bbCustomiseAdditionalHintDone','bbCloseSettingsHintDone',
+         'bb_fmMoodTipShown'].forEach(f => { if (!localStorage.getItem(f)) localStorage.setItem(f, '1'); });
+        localStorage.removeItem('bb_fmTapHoldHintPending');
+        localStorage.removeItem('bb_fmTapHoldHintReady');
+        localStorage.removeItem('bbAdvancedBadgePending');
+        localStorage.removeItem('bbAdvancedBadgeVisible');
+      }
+      return step;
     }
     function _advanceOnboardingStep(to) {
       const cur = _getOnboardingStep();
@@ -3009,9 +3074,7 @@
     }
 
     function _survivalNavClick() {
-      const _s = _getOnboardingStep();
-      _advanceOnboardingStep(9);
-      location.replace(_s === 8 ? '/' : 'survival-kit.html');
+      location.replace('survival-kit.html');
     }
 
     let _allEntries = []; // full sorted entry list for personalised feedback
@@ -3050,9 +3113,6 @@
     }
     function _showHintPointer(targetEl) {
       document.getElementById('_bbHintPointer')?.remove();
-      const rect = targetEl.getBoundingClientRect();
-      const tx = rect.left + rect.width / 2;
-      const ty = rect.top + rect.height / 2;
       const ptr = document.createElement('div');
       ptr.id = '_bbHintPointer';
       ptr.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:510;pointer-events:none;animation:hintFade 1.8s ease-in-out infinite;';
@@ -3060,13 +3120,22 @@
       document.body.appendChild(ptr);
       const _hintEls = Array.from(document.querySelectorAll('.bb-hint-elevated'));
       _resolvePointerPosition(ptr, _hintEls);
-      // Recalculate angle from final pointer position (may have moved from centre)
-      const fcx = parseFloat(ptr.style.left);
-      const fcy = parseFloat(ptr.style.top);
-      const _arrowSvg = ptr.querySelectorAll('svg')[1];
-      if (_arrowSvg && !isNaN(fcx) && !isNaN(fcy)) {
-        _arrowSvg.style.transform = `rotate(${Math.atan2(ty - fcy, tx - fcx) * 180 / Math.PI + 90}deg)`;
+      // Aim the arrow at the target — callable after scroll settles
+      function _aim() {
+        if (!document.getElementById('_bbHintPointer')) return;
+        const r = targetEl.getBoundingClientRect();
+        const _tx = r.left + r.width / 2;
+        const _ty = r.top + r.height / 2;
+        const fcx = parseFloat(ptr.style.left);
+        const fcy = parseFloat(ptr.style.top);
+        const _arrowSvg = ptr.querySelectorAll('svg')[1];
+        if (_arrowSvg && !isNaN(fcx) && !isNaN(fcy)) {
+          _arrowSvg.style.transform = `rotate(${Math.atan2(_ty - fcy, _tx - fcx) * 180 / Math.PI + 90}deg)`;
+        }
       }
+      _aim();
+      // Re-aim after smooth scroll animation settles (~400ms)
+      setTimeout(_aim, 400);
     }
     function _hideHintPointer() {
       document.getElementById('_bbHintPointer')?.remove();
@@ -3077,9 +3146,9 @@
       // Home button: visible from step 3
       const _home = document.getElementById('homeLink');
       if (_home) _home.style.display = step < 3 ? 'none' : '';
-      // Survival kit nav button: visible from step 8
+      // Survival kit nav button: visible from step 6 (survival kit unlocked)
       const _skit = document.getElementById('survivalNavBtn');
-      if (_skit) _skit.style.display = step < 8 ? 'none' : '';
+      if (_skit) _skit.style.display = step < 6 ? 'none' : '';
       // Hint 2 (open journal): step 1 only
       const _h2 = document.getElementById('journalHint2');
       if (_h2) _h2.style.display = step === 1 ? 'flex' : 'none';
@@ -3089,12 +3158,8 @@
       // Hint 3 (go back here): step 3 only
       const _h3 = document.getElementById('journalHint3');
       if (_h3) _h3.style.display = step === 3 ? 'flex' : 'none';
-      // Hint 8b (go back to survival kit): step 8 only
-      const _h8b = document.getElementById('journalHintSurvival');
-      if (_h8b) _h8b.style.display = step === 8 ? 'flex' : 'none';
-
       // Overlay: show for blocking onboarding steps or settings hint
-      const _blockingSteps = new Set([1, 2, 3, 8]);
+      const _blockingSteps = new Set([1, 2, 3]);
 
       // Settings hint: show only during focused-mode mood step on 3rd entry (before tutorial done)
       const _sHint = document.getElementById('settingsHint');
@@ -3126,8 +3191,8 @@
       if (_isBlocking) {
         const _elev = [];
         if (_blockingSteps.has(step)) {
-          const _hintMap = { 1:'journalHint2', 2:'journalHintClose', 3:'journalHint3', 8:'journalHintSurvival' };
-          const _tgtMap  = { 1:'journalToggleBtn', 2:'journalToggleBtn', 3:'homeLink', 8:'survivalNavBtn' };
+          const _hintMap = { 1:'journalHint2', 2:'journalHintClose', 3:'journalHint3' };
+          const _tgtMap  = { 1:'journalToggleBtn', 2:'journalToggleBtn', 3:'homeLink' };
           _elev.push(document.getElementById(_hintMap[step]), document.getElementById(_tgtMap[step]));
         }
         if (_showSettings) {
@@ -3148,7 +3213,7 @@
       // Scroll lock + center pointer arrow for blocking onboarding steps
       if (_blockingSteps.has(step)) {
         document.body.style.overflow = 'hidden';
-        const _tgtMap2 = { 1:'journalToggleBtn', 2:'journalToggleBtn', 3:'homeLink', 8:'survivalNavBtn' };
+        const _tgtMap2 = { 1:'journalToggleBtn', 2:'journalToggleBtn', 3:'homeLink' };
         const _tgt = document.getElementById(_tgtMap2[step]);
         // Always recalculate — target may have moved (e.g. journal toggle button shifts after opening)
         _hideHintPointer();
@@ -3174,8 +3239,8 @@
 
     // ── Onboarding page lock ──
     (function() {
-      const _targets = { 1:'journalToggleBtn', 2:'journalToggleBtn', 3:'homeLink', 8:'survivalNavBtn' };
-      const _hints   = { 1:'journalHint2', 2:'journalHintClose', 3:'journalHint3', 8:'journalHintSurvival' };
+      const _targets = { 1:'journalToggleBtn', 2:'journalToggleBtn', 3:'homeLink' };
+      const _hints   = { 1:'journalHint2', 2:'journalHintClose', 3:'journalHint3' };
       function _nudge() {
         const s = _getOnboardingStep();
         [document.getElementById(_hints[s]), document.getElementById(_targets[s])].forEach(el => {
@@ -3195,6 +3260,10 @@
         if (tid) {
           const t = document.getElementById(tid);
           if (!t || t === e.target || t.contains(e.target)) return;
+          // Never block clicks inside the focused-mode card — users can still create entries
+          // during blocking onboarding steps (e.g. tapping a mood at step 1).
+          const _fmCard = document.getElementById('focusedModeCard');
+          if (_fmCard && _fmCard.contains(e.target)) return;
           e.stopPropagation(); e.preventDefault();
           _nudge();
           return;
@@ -3290,7 +3359,12 @@
           localStorage.removeItem('bb_entryStatus');
           migrateGoodMoodToStable(user);
           // Load user settings from Firestore, then derive key + migrate + load entries
-          db.collection('userSettings').doc(user.uid).get().then(async doc => {
+          // Race against 5 s — if Firestore hangs here _authResolved is already true so
+          // the 4 s auth fallback won't help; the catch() handler ensures loadEntries() fires.
+          Promise.race([
+            db.collection('userSettings').doc(user.uid).get(),
+            new Promise((_, rej) => setTimeout(() => rej(new Error('settings-timeout')), 5000))
+          ]).then(async doc => {
             if (doc.exists) {
               const d = doc.data();
               if (d.logoVariant !== undefined) {
@@ -3330,9 +3404,6 @@
                   if (val) localStorage.setItem('_labelOverride_' + key, val);
                   else localStorage.removeItem('_labelOverride_' + key);
                 });
-              }
-              if (d.journalDefaultToday !== undefined) {
-                localStorage.setItem('journalDefaultToday', d.journalDefaultToday ? 'true' : 'false');
               }
               if (d.pinEnabled && d.pinCode) {
                 localStorage.setItem('bbPinEnabled', '1');
@@ -3495,17 +3566,22 @@
           isGuestMode = true;
           document.getElementById('signinBtn').style.display = '';
           document.getElementById('userInfo').style.display = 'none';
-          // Load from localStorage for guest mode
-          loadEntries();
+          // Defer past script initialization — onAuthStateChanged can fire synchronously
+          // for a cached guest state, before all `let` declarations further down the script
+          // have been initialized. Calling loadEntries() directly from here causes a TDZ
+          // ReferenceError in the finally block (_isRetry, _guestCryptoKey, etc.), which
+          // silently aborts the finally block and leaves the loading spinner stuck forever.
+          setTimeout(() => loadEntries(), 0);
         }
       });
 
     } catch (error) {
       console.error('Firebase initialization error:', error);
-      // Continue in guest mode even if Firebase fails
+      // Continue in guest mode even if Firebase fails.
+      // Defer for the same TDZ reason as the guest onAuthStateChanged branch above.
       isGuestMode = true;
       currentUser = null;
-      loadEntries(); // Load entries even if Firebase fails
+      setTimeout(() => loadEntries(), 0);
     }
   }
   
@@ -3619,7 +3695,7 @@
         'trackGoals', 'trackBudget', 'trackExercise', 'trackOutside',
         'trackAnxiety', 'trackAlcohol', 'trackEmotions',
         'customTrackingFields', 'currentMedList', 'dailyGoals', 'dailyBudget',
-        'statsStartDate', 'journalDefaultToday', 'unlockedAchievements',
+        'statsStartDate', 'unlockedAchievements',
         'bbOnboardingStep',
         'bbFavAnniShown',
         // Mood step tutorial hints
@@ -3987,9 +4063,6 @@
       _fmLongPressed = false;
       // Prevent tap-and-hold during "Choose a mood" hint
       if (localStorage.getItem('bb_fmChooseMoodHintDone') !== '1') return;
-      // Suppress text selection while the long-press is being evaluated
-      document.body.style.userSelect = 'none';
-      document.body.style.webkitUserSelect = 'none';
       _fmLongPressTimer = setTimeout(() => {
         _fmLongPressed = true;
         nativeHaptic && nativeHaptic('medium');
@@ -3999,17 +4072,11 @@
           _renderFocusedStep();
         }
         showMoodInfo(mood);
-        // Restore selection after popup opens
-        document.body.style.userSelect = '';
-        document.body.style.webkitUserSelect = '';
       }, 600);
     }
     function _fmLongPressCancel() {
       clearTimeout(_fmLongPressTimer);
       _fmLongPressTimer = null;
-      // Always restore selection on cancel
-      document.body.style.userSelect = '';
-      document.body.style.webkitUserSelect = '';
     }
     function _fmMoodTap(mood) {
       if (_fmLongPressed) { _fmLongPressed = false; return; }
@@ -4330,7 +4397,11 @@
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initializeButtons);
     } else {
-      initializeButtons();
+      // Defer past script initialization — initializeButtons() references let/const variables
+      // declared later in the script (e.g. editingEntry, _FM_MOOD_COLORS, isNative).
+      // Calling it synchronously causes TDZ ReferenceErrors on Capacitor/WKWebView where
+      // document.readyState is already 'complete' before the script finishes executing.
+      setTimeout(initializeButtons, 0);
     }
 
     const moodValues = {
@@ -4943,13 +5014,13 @@
 
       // Check whether the account already has Firestore entries (returning user / re-login)
       try {
-        const snap = await db.collection('entries')
-          .where('userId', '==', user.uid)
-          .limit(1)
-          .get({ source: 'server' });
+        const snap = await Promise.race([
+          db.collection('entries').where('userId', '==', user.uid).limit(1).get({ source: 'server' }),
+          new Promise((_, rej) => setTimeout(() => rej(new Error('check-timeout')), 4000))
+        ]);
         if (snap.size > 0) return; // returning user — don't overwrite Firestore entries
       } catch(e) {
-        return; // can't confirm account is empty — skip to be safe
+        return; // can't confirm account is empty (or timed out) — skip to be safe
       }
 
       // New account with local entries — migrate with encryption
@@ -4989,6 +5060,8 @@
     }
 
     async function loadEntries() {
+      // Cancel the global safety net — normal load path has started
+      if (window._gJournalSafetyTimer) { clearTimeout(window._gJournalSafetyTimer); window._gJournalSafetyTimer = null; }
       const loader = document.getElementById('entriesLoading');
       if (loader) loader.style.display = 'block';
       // Hard safety net: if loadEntries hangs for any reason (e.g. Firestore SDK bug,
@@ -5302,8 +5375,6 @@
       } finally {
         clearTimeout(_loadSafetyTimer);
         _isRetry = false;
-        // Always hide spinners — prevents getting stuck if Firestore hangs.
-        // Only reveal the journal toggle if there are entries (no button needed when empty).
         const loader = document.getElementById('entriesLoading');
         if (loader) loader.style.display = 'none';
         const placeholder = document.getElementById('entryLoadingPlaceholder');
@@ -5855,17 +5926,25 @@
     async function _userImportKeyFromSession() {
       let b64 = sessionStorage.getItem('bb_user_key');
       if (!b64 && isNative()) {
-        try {
-          const _ss = window.Capacitor?.Plugins?.SecureStorage;
-          if (_ss) {
-            // Race against 3 s — a hung native call must not stall the whole load path
-            b64 = await Promise.race([
-              _ss.getItem('bb_user_key'),
-              new Promise(r => setTimeout(() => r(null), 3000)),
-            ]);
-            if (b64) sessionStorage.setItem('bb_user_key', b64);
-          }
-        } catch (e) { console.warn('SecureStorage getItem failed:', e); }
+        // Only attempt SecureStorage (Keychain) once per app session.
+        // A second concurrent call can deadlock iOS Keychain when the first call
+        // is still in-flight (timed out on the JS side but still pending natively).
+        // If the first attempt returned null, subsequent calls skip Keychain entirely.
+        if (sessionStorage.getItem('_bbSSAttempted') !== '1') {
+          // Only attempt Keychain once per session — concurrent calls can deadlock iOS Keychain.
+          sessionStorage.setItem('_bbSSAttempted', '1');
+          try {
+            const _ss = window.Capacitor?.Plugins?.SecureStorage;
+            if (_ss) {
+              // Race against 3 s — a hung native call must not stall the whole load path
+              b64 = await Promise.race([
+                _ss.getItem('bb_user_key'),
+                new Promise(r => setTimeout(() => r(null), 3000)),
+              ]);
+              if (b64) sessionStorage.setItem('bb_user_key', b64);
+            }
+          } catch (e) { console.warn('SecureStorage getItem failed:', e); }
+        }
       }
       if (!b64) return null;
       try {
@@ -5914,7 +5993,10 @@
     // One-time migration: encrypt all existing plaintext Firestore entries for this user.
     async function _encryptExistingEntries(uid) {
       try {
-        const snap = await db.collection('entries').where('userId', '==', uid).get();
+        const snap = await Promise.race([
+          db.collection('entries').where('userId', '==', uid).get(),
+          new Promise((_, rej) => setTimeout(() => rej(new Error('enc-timeout')), 8000))
+        ]);
         const plain = snap.docs.filter(doc => !doc.data()._enc);
         if (plain.length === 0) return;
         const BATCH = 400;
@@ -6443,23 +6525,39 @@
       return key === 'trackBudget'; // trackBudget on by default
     }
 
+    function _fmDateHelper() {
+      const val = document.getElementById('entryDate')?.value;
+      const now = new Date(); now.setHours(0,0,0,0);
+      const toKey = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      const yesterday = new Date(now); yesterday.setDate(now.getDate() - 1);
+      const isYest = !val || val === toKey(yesterday);
+      if (isYest) return { isYest: true, dayPhrase: 'yesterday', nightPhrase: 'last night' };
+      const d = new Date(val + 'T00:00:00');
+      const day = d.getDate();
+      const ord = day % 10 === 1 && day !== 11 ? 'st' : day % 10 === 2 && day !== 12 ? 'nd' : day % 10 === 3 && day !== 13 ? 'rd' : 'th';
+      const month = d.toLocaleDateString('en-GB', { month: 'long' });
+      return { isYest: false, dayPhrase: `on ${day}${ord} ${month}`, nightPhrase: `the night of ${day}${ord} ${month}` };
+    }
+
     function _buildFocusedSteps() {
       const _delBuiltinSteps = JSON.parse(localStorage.getItem('deletedBuiltinFields') || '[]');
       const _disSteps = _getDisabledSteps();
       let _medListLen = 0;
       try { const _ml = JSON.parse(localStorage.getItem('currentMedList') || '[]'); _medListLen = Array.isArray(_ml) ? _ml.length : 0; } catch(e) {}
       const hasMeds = _medListLen > 0 || !!selectedMedication;
+      const _dh = _fmDateHelper();
       const steps = [
         { id:'mood', title:_fmMoodTitle(), subtitle:'', auto:true },
       ];
       if (!_disSteps.includes('energy'))
-        steps.push({ id:'energy', title:'Energy level?', subtitle:'How much energy did you have?', auto:true });
-      if (!_disSteps.includes('sleep'))
-        steps.push({ id:'sleep', title:'How did you sleep?', subtitle:'Tap a range or sync from Health', auto:true });
+        steps.push({ id:'energy', title:'Energy level?', subtitle:`How much energy did you have ${_dh.dayPhrase}?`, auto:true });
+      if (!_disSteps.includes('sleep')) {
+        steps.push({ id:'sleep', title: _dh.isYest ? 'How was last night\'s sleep?' : `How did you sleep ${_dh.nightPhrase}?`, subtitle:'Tap a range or sync from Health', auto:true });
+      }
       // sleepQuality step is always included — only shown when user long-presses a sleep range
       steps.push({ id:'sleepQuality', title:'Sleep quality?', subtitle:'', auto:true });
       if (!_disSteps.includes('medication'))
-        steps.push({ id:'medication', title:'Did you take your medication?', subtitle:'', auto:true });
+        steps.push({ id:'medication', title:`Did you take your medication ${_dh.nightPhrase}?`, subtitle:'', auto:true });
       // More data step — all activated tracking fields shown together (order mirrors field picker)
       const _extras = [];
       if (_fmIsTracking('trackGoals'))
@@ -6685,11 +6783,16 @@
       const _fmIntParts = _fmRawInt.split(/\n?_{3,}\n/);
       selectedIntention = _fmIntParts[0].trim();
       if (_fmIntParts[1] && localStorage.getItem('elaborateResponsesEnabled') === 'true') {
+        // Build a label→id map that includes both static step labels AND custom field labels.
+        // Custom fields add their labels to _STEP_NOTE_LABELS lazily when the more_data step
+        // renders — they're not present here yet, so we build the map manually.
+        const _labelToId = Object.fromEntries(Object.entries(_STEP_NOTE_LABELS).map(([k,v]) => [v, k]));
+        getCustomFields().forEach(f => { _labelToId[`${f.emoji||''} ${f.label}`.trim()] = f.id; });
         _fmIntParts[1].split('\n').forEach(line => {
           const _m = line.match(/^([^:]+):\s*([\s\S]+)$/);
           if (!_m) return;
-          const _lk = Object.entries(_STEP_NOTE_LABELS).find(([,v]) => v === _m[1].trim());
-          if (_lk) selectedStepNotes[_lk[0]] = _m[2].trim();
+          const _id = _labelToId[_m[1].trim()];
+          if (_id) selectedStepNotes[_id] = _m[2].trim();
         });
       }
       // Set date so _fmMoodTitle() shows the right date
@@ -6856,7 +6959,9 @@
       const nextBtn = document.getElementById('fmNextBtn');
       const delBtn  = document.getElementById('fmDeleteBtn');
       const _confirmStep = localStorage.getItem('fmConfirmStep') === 'true';
-      if (!_confirmStep && (step.auto || !['done','more_data','notes'].includes(step.id))) {
+      // Auto steps always auto-advance (no Next button needed, even in confirm-step mode).
+      // Non-auto steps show Next always; confirm-step mode is handled in _fmAdvance().
+      if (step.auto) {
         nextRow.style.display = 'none';
       } else {
         nextRow.style.display = 'flex';
@@ -6891,21 +6996,25 @@
       // Re-evaluate overlay state (handles med hint and settings hint)
       _applyJournalOnboardingGating();
       // Mood step blocking hints: show overlay + elevate card
+      // During blocking onboarding steps the overlay (z-index:500) covers the page.
+      // Keep the focused-mode card above it (z-index:501) on every step so the user
+      // can still interact with focused mode while the tutorial hint is visible.
+      const _fmCardEl = document.getElementById('focusedModeCard');
+      const _obStep = _getOnboardingStep();
+      const _fmNeedsElevation = (typeof _fmActive !== 'undefined' && _fmActive) && [1,2,3,8].includes(_obStep);
       if (step.id === 'mood') {
         const _chooseDone = localStorage.getItem('bb_fmChooseMoodHintDone') === '1';
         const _tapDone = localStorage.getItem('bb_fmMoodTipShown') === '1';
         const _moodHintActive = (!_chooseDone && !editingEntry) || (!_tapDone && _chooseDone && localStorage.getItem('bb_fmTapHoldHintReady') === '1');
         const _overlay = document.getElementById('bbHintOverlay');
-        const _card = document.getElementById('focusedModeCard');
         if (_moodHintActive) {
           if (_overlay) _overlay.style.display = '';
-          if (_card) { _card.style.position = 'relative'; _card.style.zIndex = '501'; }
+          if (_fmCardEl) { _fmCardEl.style.position = 'relative'; _fmCardEl.style.zIndex = '501'; }
         } else {
-          if (_card) { _card.style.position = ''; _card.style.zIndex = ''; }
+          if (_fmCardEl) { _fmCardEl.style.position = ''; _fmCardEl.style.zIndex = _fmNeedsElevation ? '501' : ''; }
         }
       } else {
-        const _card = document.getElementById('focusedModeCard');
-        if (_card) _card.style.zIndex = '';
+        if (_fmCardEl) _fmCardEl.style.zIndex = _fmNeedsElevation ? '501' : '';
       }
     }
 
@@ -7389,9 +7498,15 @@
           const _doneStepsStr = _doneStepsVal != null ? ` · 🏃 ${_doneStepsVal >= 1000 ? Math.round(_doneStepsVal/1000)+'k' : _doneStepsVal}` : '';
           const rows = [
             { text:`<img src="images/moods/${selectedMood}.png" width="20" style="vertical-align:middle;margin-right:6px;"> <b>${cap(selectedMood)}</b>${selectedLinkedMood ? ` <span style="color:#adb5bd;font-weight:400;margin:0 4px;">/</span> <img src="images/moods/${selectedLinkedMood}.png" width="20" style="vertical-align:middle;margin-right:4px;opacity:0.85;"><b>${cap(selectedLinkedMood)}</b>` : ''}`, step:'mood' },
-            (!_fmEnergyClear ? { text:`Energy: ${eLabel}${_doneStepsStr}`, step:'energy', note:_sn('energy') } : null),
-            { text:`🛌 Sleep: ${sLabel}${selectedSleepQuality ? ` · ${selectedSleepQuality === 'good' ? '😊 Good' : selectedSleepQuality === 'unsure' ? '😐 OK' : '😴 Bad'}` : ''}`, step:'sleep', note:_sn('sleep') },
-            selectedMedication ? { text:selectedMedication==='taken'?'✅ Medication taken':'❌ Medication not taken', step:'medication', note:_sn('medication') } : null,
+            _fmEnergyClear
+              ? { text:`<span style="color:#adb5bd;">Energy: —</span>`, step:'energy' }
+              : { text:`Energy: ${eLabel}${_doneStepsStr}`, step:'energy', note:_sn('energy') },
+            selectedSleep != null
+              ? { text:`🛌 Sleep: ${sLabel}${selectedSleepQuality ? ` · ${selectedSleepQuality === 'good' ? '😊 Good' : selectedSleepQuality === 'unsure' ? '😐 OK' : '😴 Bad'}` : ''}`, step:'sleep', note:_sn('sleep') }
+              : { text:`<span style="color:#adb5bd;">🛌 Sleep: —</span>`, step:'sleep' },
+            selectedMedication
+              ? { text:selectedMedication==='taken'?'✅ Medication taken':'❌ Medication not taken', step:'medication', note:_sn('medication') }
+              : { text:`<span style="color:#adb5bd;">💊 Medication: —</span>`, step:'medication' },
             (()=>{
               const _G='#2ECC40',_R='#FF4136',_N='#adb5bd';
               const _chips=[];
@@ -7520,11 +7635,18 @@
           const words = notes.trim().split(/\s+/).filter(Boolean).length;
           html = words > 0 ? `📝 ${words}w` : '📝'; borderColor = '#adb5bd';
         }
+        // For steps that were visited but not answered, show a blank dashed chip
+        // so the user can see the gap and tap back to fill it in.
+        const _canBeBlank = ['mood','energy','sleep','medication'].includes(s.id);
+        const _isBlank = html === null && _canBeBlank;
+        if (_isBlank) { html = '—'; borderColor = '#dee2e6'; }
         if (html !== null) {
+          const _chipBorder = _isBlank ? `1.5px dashed ${borderColor}` : (isCurrent ? `2px solid ${borderColor}` : `1.5px solid ${borderColor}`);
+          const _chipColor = _isBlank ? '#adb5bd' : '#495057';
           if (isCurrent) {
-            chips.push(`<span style="border:2px solid ${borderColor};border-radius:20px;padding:3px 9px;font-size:0.72em;background:white;color:#495057;display:inline-flex;align-items:center;opacity:1;">${html}</span>`);
+            chips.push(`<span style="border:${_chipBorder};border-radius:20px;padding:3px 9px;font-size:0.72em;background:white;color:${_chipColor};display:inline-flex;align-items:center;opacity:1;">${html}</span>`);
           } else {
-            chips.push(`<button onclick="_fmReturnToDone=true;_fmGoTo(${i})" style="border:1.5px solid ${borderColor};border-radius:20px;padding:3px 9px;font-size:0.72em;cursor:pointer;background:white;color:#495057;display:inline-flex;align-items:center;-webkit-tap-highlight-color:transparent;">${html}</button>`);
+            chips.push(`<button onclick="_fmReturnToDone=true;_fmGoTo(${i})" style="border:${_chipBorder};border-radius:20px;padding:3px 9px;font-size:0.72em;cursor:pointer;background:white;color:${_chipColor};display:inline-flex;align-items:center;-webkit-tap-highlight-color:transparent;">${html}</button>`);
           }
         }
       }
@@ -7568,16 +7690,20 @@
 
     function _fmAdvance() {
       scheduleDraftSave();
+      // Confirm-step mode: for non-auto steps (notes, more_data, done), re-render to show
+      // the current selection and wait for the explicit "Next →" button tap instead of
+      // auto-advancing. Auto steps (mood, energy, sleep, etc.) always advance immediately —
+      // tapping an option IS the user's confirmation on those steps.
       if (localStorage.getItem('fmConfirmStep') === 'true') {
-        // Only refresh the content area to show the selection — do NOT call the full _renderFocusedStep()
-        // which would rebuild summary bar chips and other elements, causing navigation side-effects.
         const _step = _fmSteps[_fmStepIndex];
-        if (_step) {
+        if (_step && !_step.auto) {
+          // Only refresh the content area to show the selection — do NOT call the full _renderFocusedStep()
+          // which would rebuild summary bar chips and other elements, causing navigation side-effects.
           const _el = document.getElementById('fmContent');
           if (_el) _el.innerHTML = _fmRenderContent(_step);
           _fmAppendStepNotes(_step);
+          return;
         }
-        return;
       }
       const _doneIdx = _fmSteps.length - 1;
       if (_fmReturnToDone && _fmStepIndex < _doneIdx) {
@@ -8703,19 +8829,31 @@
           missingAction.style.display = '';
         }
         if (otherBtn) {
-          if (otherDone) {
-            otherBtn.textContent = useToday ? 'Yesterday ✓' : 'Today ✓';
+          if (!useToday) {
+            // Yesterday mode: show streak in place of "Log today" button
+            const _streak = window._currentStreak || 0;
+            otherBtn.textContent = `🔥 ${_streak} day${_streak === 1 ? '' : ''} streak`;
+            otherBtn.style.background = 'rgba(255,255,255,0.1)';
+            otherBtn.style.color = 'rgba(255,255,255,0.75)';
+            otherBtn.style.border = '1.5px solid rgba(255,255,255,0.2)';
+            otherBtn.style.boxShadow = 'none';
+            otherBtn.style.cursor = 'default';
+            otherBtn.onclick = null;
+          } else if (otherDone) {
+            otherBtn.textContent = '📅 Last 24hrs ✓';
             otherBtn.style.background = 'rgba(255,255,255,0.1)';
             otherBtn.style.color = 'rgba(255,255,255,0.6)';
             otherBtn.style.border = '1.5px solid rgba(255,255,255,0.2)';
             otherBtn.style.boxShadow = 'none';
+            otherBtn.style.cursor = 'pointer';
             otherBtn.onclick = reviewOtherEntry;
           } else {
-            otherBtn.textContent = useToday ? '+ Log yesterday' : '+ Log today';
+            otherBtn.textContent = '+ 📅 Log last 24hrs';
             otherBtn.style.background = 'rgba(255,149,0,0.9)';
             otherBtn.style.color = 'white';
             otherBtn.style.border = 'none';
             otherBtn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+            otherBtn.style.cursor = 'pointer';
             otherBtn.onclick = startOtherDateEntry;
           }
           otherBtn.style.display = '';
@@ -8733,7 +8871,7 @@
     function newEntryBtnLabel() {
       return localStorage.getItem('journalDefaultToday') === 'true'
         ? "Save Today's Entry ✨"
-        : "Log Yesterday's Entry ✨";
+        : "📅 Log last 24hrs ✨";
     }
 
     function showDatePickerForNew() {
@@ -11352,10 +11490,18 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
           'achievementToastsEnabled', 'statsStartDate', 'weeklySummaryEnabled',
           'customiseFormEnabled', 'disabledSteps', 'moodLinkingEnabled',
           'customTrackingFields', 'deletedDefaultCustomFields', 'deletedBuiltinFields',
-          'bbPinEnabled', 'bbPinCode',
+          'bbPinEnabled', 'bbPinCode', 'bbNativePinEnabled',
           'bbHealthSyncEnabled', 'reminderEnabled', 'reminderTime',
+          'journalDefaultToday', 'bbCoffeeFabHidden',
         ].forEach(k => localStorage.removeItem(k));
         sessionStorage.removeItem('bbPinUnlocked');
+        // Cancel any scheduled notifications (reminder + weekly summary)
+        try {
+          const _delNotifPlugin = getPlugin('LocalNotifications');
+          if (_delNotifPlugin) {
+            _delNotifPlugin.cancel({ notifications: [{ id: 1 }, { id: 2 }] }).catch(() => {});
+          }
+        } catch(_) {}
         // Clear dynamic tracking/label keys
         Object.keys(localStorage).filter(k =>
           k.startsWith('trackCustom_') || k.startsWith('_labelOverride_') ||
@@ -11396,6 +11542,16 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         }
         // Reset logo to default immediately
         if (typeof applyLogoVariant === 'function') applyLogoVariant(0);
+
+        // Final explicit PIN clear before redirect — guards against any WKWebView localStorage
+        // flush race where earlier removes might not have persisted across the navigation boundary.
+        localStorage.removeItem('bbNativePinEnabled');
+        localStorage.removeItem('bbPinEnabled');
+        localStorage.removeItem('bbPinCode');
+        localStorage.removeItem('bbGuestPinSalt');
+        sessionStorage.removeItem('bbPinUnlocked');
+        // Also clear the native Keychain PIN so it can't be reused after account reset
+        try { window.Capacitor?.Plugins?.SecureStorage?.removeItem?.('bb_native_pin')?.catch?.(() => {}); } catch(e) {}
 
         alert(`Successfully deleted ${deleted} entries.`);
         if (typeof auth !== 'undefined' && auth && currentUser) {
@@ -11840,11 +11996,13 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       const _intParts = _rawInt.split(/\n?_{3,}\n/);
       selectedIntention = _intParts[0].trim();
       if (_intParts[1] && localStorage.getItem('elaborateResponsesEnabled') === 'true') {
+        const _labelToId2 = Object.fromEntries(Object.entries(_STEP_NOTE_LABELS).map(([k,v]) => [v, k]));
+        getCustomFields().forEach(f => { _labelToId2[`${f.emoji||''} ${f.label}`.trim()] = f.id; });
         _intParts[1].split('\n').forEach(line => {
           const _m = line.match(/^([^:]+):\s*([\s\S]+)$/);
           if (!_m) return;
-          const _labelKey = Object.entries(_STEP_NOTE_LABELS).find(([,v]) => v === _m[1].trim());
-          if (_labelKey) selectedStepNotes[_labelKey[0]] = _m[2].trim();
+          const _id2 = _labelToId2[_m[1].trim()];
+          if (_id2) selectedStepNotes[_id2] = _m[2].trim();
         });
       }
 
@@ -12488,6 +12646,29 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     // ────────────────────────────────────────────
     // SETTINGS MODAL
     // ────────────────────────────────────────────
+    async function _refreshHealthAuthDisplay() {
+      const _setHealthInfo = t => document.querySelectorAll('.settings-health-info').forEach(el => el.textContent = t);
+      const Health = getPlugin('HealthPlugin');
+      if (Health) {
+        try {
+          const { available } = await Health.isHealthAvailable();
+          if (!available) {
+            _setHealthInfo('Health data: ❌ Unavailable');
+          } else {
+            const result = await Health.checkHealthPermissions({ permissions: ['READ_SLEEP', 'READ_STEPS'] });
+            const sleepOk = result?.permissions?.READ_SLEEP === true;
+            const stepsOk = result?.permissions?.READ_STEPS === true;
+            const granted = sleepOk && stepsOk;
+            _setHealthInfo(`Health data: ${granted ? '✅ Authorised' : sleepOk || stepsOk ? '⚠️ Partially authorised' : '⚠️ Not yet authorised'}`);
+          }
+        } catch(e) {
+          _setHealthInfo('Health data: ❓ Unknown');
+        }
+      } else {
+        _setHealthInfo('Health data: ❌ Unavailable');
+      }
+    }
+
     async function showSettingsModal() {
       // Clear advanced badge when settings is opened; show in-modal hint pointing to Advanced
       const _badgeWasActive = localStorage.getItem('bbAdvancedBadgeVisible') === '1';
@@ -12546,7 +12727,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       if (_saveBtnN) _saveBtnN.style.display = '';
 
       // Restore saved values
-      const savedTime = localStorage.getItem('reminderTime') || '20:00';
+      const savedTime = localStorage.getItem('reminderTime') || '07:00';
       const enabled = localStorage.getItem('reminderEnabled') === 'true';
       const weeklyEnabled = localStorage.getItem('weeklySummaryEnabled') === 'true';
       document.getElementById('reminderTime').value = savedTime;
@@ -12571,26 +12752,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         }
 
         // Check health data authorisation
-        const _setHealthInfo = t => document.querySelectorAll('.settings-health-info').forEach(el => el.textContent = t);
-        const Health = getPlugin('HealthPlugin');
-        if (Health) {
-          try {
-            const { available } = await Health.isHealthAvailable();
-            if (!available) {
-              _setHealthInfo('Health data: ❌ Unavailable');
-            } else {
-              const result = await Health.checkHealthPermissions({ permissions: ['READ_SLEEP', 'READ_STEPS'] });
-              const sleepOk = result?.permissions?.READ_SLEEP === true;
-              const stepsOk = result?.permissions?.READ_STEPS === true;
-              const granted = sleepOk && stepsOk;
-              _setHealthInfo(`Health data: ${granted ? '✅ Authorised' : sleepOk || stepsOk ? '⚠️ Partially authorised' : '⚠️ Not yet authorised'}`);
-            }
-          } catch (e) {
-            _setHealthInfo('Health data: ❓ Unknown');
-          }
-        } else {
-          _setHealthInfo('Health data: ❌ Unavailable');
-        }
+        await _refreshHealthAuthDisplay();
       } else {
         // (no reminderStatus element)
         document.getElementById('reminderEnabled').disabled = true;
@@ -12623,7 +12785,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       const _cbReset = document.getElementById('settingsCloseBtn');
       if (_cbReset) _cbReset.style.zIndex = '';
       const _cw = document.getElementById('customiseFormWrap');
-      if (_cw) { _cw.style.zIndex = ''; _cw.style.background = ''; _cw.style.borderRadius = ''; _cw.style.padding = ''; _cw.style.paddingBottom = ''; _cw.style.margin = ''; }
+      if (_cw) { _cw.style.zIndex = ''; _cw.style.background = ''; _cw.style.borderRadius = ''; _cw.style.padding = ''; _cw.style.paddingBottom = ''; _cw.style.margin = ''; _cw.style.marginBottom = '16px'; }
       _applyJournalOnboardingGating(); // re-evaluate page overlay (hides bbHintOverlay if no longer blocking)
       // Always reset to main panel so sub-panels don't persist on next open
       document.getElementById('settingsMainPanel').style.display = '';
@@ -13293,7 +13455,6 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       const _advH = document.getElementById('advancedSettingsBadgeHint');
       if (_advH) _advH.style.display = 'none';
       applyTrackingPrefs();
-      _updateJournalDefaultBtn();
       if (isNative()) {
         document.getElementById('settingsMainPanel').style.display = 'none';
         document.getElementById('settingsMobilePanel').style.display = '';
@@ -13311,7 +13472,6 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     }
     function _openFocusModeSettings() {
       applyTrackingPrefs();
-      _updateJournalDefaultBtn();
       document.getElementById('settingsMobilePanel').style.display = 'none';
       document.getElementById('settingsAdvancedPanel').style.display = '';
       const modal = document.querySelector('#settingsModal .confirm-content');
@@ -13330,27 +13490,10 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         }
       }
     }
-    function _updateJournalDefaultBtn() {
-      const todayMode = localStorage.getItem('journalDefaultToday') === 'true';
-      const chk = document.getElementById('journalDefaultToggleBtn');
-      if (chk) chk.checked = todayMode;
-    }
-    function toggleJournalDefault() {
-      const chk = document.getElementById('journalDefaultToggleBtn');
-      const newVal = chk && chk.checked ? 'true' : 'false';
-      localStorage.setItem('journalDefaultToday', newVal);
-      if (currentUser && db) {
-        db.collection('userSettings').doc(currentUser.uid).set(
-          { journalDefaultToday: newVal === 'true' }, { merge: true }
-        ).catch(() => {});
-      }
-      updateDatePickerStatus(_allEntries);
-    }
     window.openAdvancedSettings = openAdvancedSettings;
     window.closeMobileSettings = closeMobileSettings;
     window._openFocusModeSettings = _openFocusModeSettings;
     window.closeAdvancedSettings = closeAdvancedSettings;
-    window.toggleJournalDefault = toggleJournalDefault;
 
     async function saveStatsStartDate() {
       const val = document.getElementById('statsStartDateInput').value;
@@ -13431,7 +13574,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       }
       // Save reminder settings (if native)
       if (isNative()) {
-        const prevTime = localStorage.getItem('reminderTime') || '20:00';
+        const prevTime = localStorage.getItem('reminderTime') || '07:00';
         const prevEnabled = localStorage.getItem('reminderEnabled') === 'true';
         const prevWeekly = localStorage.getItem('weeklySummaryEnabled') === 'true';
 
@@ -13569,7 +13712,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       const _sm = document.getElementById('settingsModal');
       if (_sm) delete _sm.dataset.customiseHintActive;
       const _cw = document.getElementById('customiseFormWrap');
-      if (_cw) { _cw.style.zIndex = ''; _cw.style.background = ''; _cw.style.borderRadius = ''; _cw.style.padding = ''; _cw.style.margin = ''; }
+      if (_cw) { _cw.style.zIndex = ''; _cw.style.background = ''; _cw.style.borderRadius = ''; _cw.style.padding = ''; _cw.style.margin = ''; _cw.style.marginBottom = '16px'; }
     }
     function _showCustomiseAdditionalHint() {
       const _ao = document.getElementById('bbHintOverlay');
@@ -13592,7 +13735,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       const _sm = document.getElementById('settingsModal');
       if (_sm) delete _sm.dataset.customiseAdditionalHintActive;
       const _cw = document.getElementById('customiseFormWrap');
-      if (_cw) { _cw.style.zIndex = ''; _cw.style.background = ''; _cw.style.borderRadius = ''; _cw.style.padding = ''; _cw.style.margin = ''; }
+      if (_cw) { _cw.style.zIndex = ''; _cw.style.background = ''; _cw.style.borderRadius = ''; _cw.style.padding = ''; _cw.style.margin = ''; _cw.style.marginBottom = '16px'; }
       // Re-render toggles to remove pulse/dim
       _renderStepToggles();
       // Show close settings hint next
@@ -13754,9 +13897,11 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
   ============================================================ -->
   <script>
     // ── Detect whether we're running inside a Capacitor native app ──
-    const isNative = () => window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
-    const isIOS    = () => isNative() && window.Capacitor.getPlatform() === 'ios';
-    const isAndroid= () => isNative() && window.Capacitor.getPlatform() === 'android';
+    // Assigned to window.* (not const) so all other <script> blocks can call them.
+    // const/let are scoped to their own <script> tag and are invisible to other blocks.
+    window.isNative  = () => window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
+    window.isIOS     = () => window.isNative() && window.Capacitor.getPlatform() === 'ios';
+    window.isAndroid = () => window.isNative() && window.Capacitor.getPlatform() === 'android';
 
     // ── Helper: safe plugin getter ──
     function getPlugin(name) {
@@ -13849,15 +13994,15 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
           await LocalNotifications.cancel({ notifications: toCancel });
         }
 
-        // Check if reminders are enabled
-        const enabled = localStorage.getItem('reminderEnabled') !== 'false';
+        // Check if reminders are enabled — default is OFF (must opt in)
+        const enabled = localStorage.getItem('reminderEnabled') === 'true';
         if (!enabled) {
           console.log('Reminders disabled by user');
           return;
         }
 
         // Get saved time or default to 20:00
-        const savedTime = localStorage.getItem('reminderTime') || '20:00';
+        const savedTime = localStorage.getItem('reminderTime') || '07:00';
         const [hour, minute] = savedTime.split(':').map(Number);
 
         await LocalNotifications.schedule({
@@ -14117,6 +14262,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         skipNextResume = true;
         await Health.requestHealthPermissions({ permissions: ['READ_STEPS'] });
         skipNextResume = false;
+        if (document.getElementById('settingsModal')?.classList.contains('active')) {
+          _refreshHealthAuthDisplay().catch(() => {});
+        }
 
         const _dateVal = document.getElementById('entryDate')?.value;
         if (!_dateVal) { showFail(); return; }
@@ -14227,6 +14375,10 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         skipNextResume = true; // health permission dialog may background the app
         await Health.requestHealthPermissions({ permissions: ['READ_SLEEP', 'READ_STEPS'] });
         skipNextResume = false;
+        // Refresh auth display in settings if modal is still open
+        if (document.getElementById('settingsModal')?.classList.contains('active')) {
+          _refreshHealthAuthDisplay().catch(() => {});
+        }
 
         // Determine target date — use the actual date in the form picker
         const _dateVal = document.getElementById('entryDate')?.value;
@@ -14245,6 +14397,13 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
           endDate:   _sleepEnd.toISOString()
         });
         if (!result || result.value == null) { showNoData(); return; }
+
+        // Guard: reject samples that fall entirely outside the query window.
+        // The plugin sometimes ignores date filters and returns the most recent sample
+        // regardless — e.g. returning last night's sleep when querying for the night before.
+        if (result.endTimestamp <= _sleepStart.getTime() || result.timestamp >= _sleepEnd.getTime()) {
+          showNoData(); return;
+        }
 
         // Use wall-clock duration — value sums all source segments and double-counts when multiple sources (e.g. Watch + iPhone) log the same sleep
         const hours = (result.endTimestamp - result.timestamp) / (1000 * 60 * 60);
