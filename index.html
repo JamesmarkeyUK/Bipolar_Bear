@@ -133,7 +133,7 @@
     .fab-hint {
       position: fixed;
       bottom: 38px;
-      right: 82px;
+      right: calc(10% + 22px);
       display: flex;
       align-items: center;
       gap: 6px;
@@ -142,14 +142,14 @@
       animation: fabHintSlide 1.6s ease-in-out infinite;
     }
     @media (min-width: 520px) {
-      /* feedback hint: sits left of the feedback FAB */
-      .fab-hint:not(#waFabLabel) { right: calc(50% - 240px + 62px); }
-      /* WA hint: sits right of the WA FAB */
-      #waFabLabel { left: calc(50% - 240px + 62px); }
+      /* feedback hint: sits left of feedback FAB (position 5) */
+      .fab-hint:not(#waFabLabel) { right: calc(50% - 170px); }
+      /* Chat hint (unused but kept): sits right of chat FAB (position 1) */
+      #waFabLabel { left: calc(50% - 214px + 44px); }
     }
     @media (min-width: 768px) {
-      .fab-hint:not(#waFabLabel) { right: 90px; }
-      #waFabLabel { left: 90px; }
+      .fab-hint:not(#waFabLabel) { right: calc(50% - 170px); }
+      #waFabLabel { left: calc(50% - 170px); }
     }
     .fab-hint-label {
       background: rgba(0,0,0,0.58);
@@ -428,11 +428,66 @@
       pointer-events: none;
     }
 
-    /* ── Coffee FAB (to the left of feedback) ── */
+    /* ── FAB row: 5 evenly spaced positions (10/30/50/70/90% centers) ── */
+
+    /* Position 1 — Chat FAB (coming soon) */
+    .whatsapp-fab {
+      position: fixed;
+      bottom: 24px;
+      left: calc(10% - 22px);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #adb5bd;
+      border: none;
+      color: white;
+      font-size: 1.2em;
+      cursor: default;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+      z-index: 50;
+      opacity: 0.75;
+    }
+    @media (min-width: 520px) {
+      .whatsapp-fab { left: calc(50% - 214px); }
+    }
+
+    /* Position 2 — Security info FAB (E2EE) */
+    .placeholder-fab {
+      position: fixed;
+      bottom: 24px;
+      left: calc(30% - 22px);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #6c757d;
+      border: none;
+      color: white;
+      font-size: 1.1em;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+      z-index: 50;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.18s, transform 0.15s;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .placeholder-fab:hover { background: #5a6268; transform: scale(1.08); }
+    }
+    @media (min-width: 520px) {
+      .placeholder-fab { left: calc(50% - 118px); }
+    }
+
+    /* Position 4 — Coffee FAB */
     .coffee-fab {
       position: fixed;
-      bottom: 32px;
-      right: 74px;
+      bottom: 24px;
+      left: calc(70% - 22px);
       width: 44px;
       height: 44px;
       border-radius: 50%;
@@ -453,17 +508,14 @@
       .coffee-fab:hover { background: #e08600; transform: scale(1.08); }
     }
     @media (min-width: 520px) {
-      .coffee-fab { right: calc(50% - 240px + 54px); }
-    }
-    @media (min-width: 768px) {
-      .coffee-fab { right: 82px; }
+      .coffee-fab { left: calc(50% + 74px); }
     }
 
-    /* ── Feedback button ── */
+    /* Position 5 — Feedback FAB */
     .feedback-fab {
       position: fixed;
-      bottom: 26px;
-      right: 20px;
+      bottom: 24px;
+      left: calc(90% - 22px);
       width: 44px;
       height: 44px;
       border-radius: 50%;
@@ -484,39 +536,7 @@
       .feedback-fab:hover { background: #ff6b00; transform: scale(1.08); }
     }
     @media (min-width: 520px) {
-      .feedback-fab { right: calc(50% - 240px); }
-    }
-    @media (min-width: 768px) {
-      .feedback-fab { right: 28px; }
-    }
-
-    /* ── Chat FAB (bottom left — in-app chat, coming soon) ── */
-    .whatsapp-fab {
-      position: fixed;
-      bottom: 32px;
-      left: 20px;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: #adb5bd;
-      border: none;
-      color: white;
-      font-size: 1.2em;
-      cursor: default;
-      pointer-events: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
-      -webkit-tap-highlight-color: transparent;
-      z-index: 50;
-      opacity: 0.75;
-    }
-    @media (min-width: 520px) {
-      .whatsapp-fab { left: calc(50% - 240px); }
-    }
-    @media (min-width: 768px) {
-      .whatsapp-fab { left: 28px; }
+      .feedback-fab { left: calc(50% + 170px); }
     }
     @keyframes waHintSlide {
       0%, 100% { transform: translateX(0); opacity: 0.85; }
@@ -605,7 +625,7 @@
   </div>
 
   <!-- Auth FAB: centred over white notch -->
-  <div id="authFabWrapper" style="position:fixed; bottom:18px; left:50%; transform:translateX(-50%); z-index:50; pointer-events:none; display:flex; align-items:center; justify-content:center;">
+  <div id="authFabWrapper" style="position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:50; pointer-events:none; display:flex; align-items:center; justify-content:center;">
     <button id="signinBtn" onclick="showAuthModal()" style="width:44px;height:44px;min-width:44px;background:white;color:#ff9500;border:2px solid #ff9500;border-radius:50%;cursor:pointer;font-size:1.15em;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 10px rgba(255,149,0,0.25);pointer-events:auto;">👤</button>
     <div id="userInfo" style="display:none; flex-direction:row; align-items:center; pointer-events:auto;">
       <button onclick="showAccountModal()" style="width:44px;height:44px;min-width:44px;background:#ff9500;color:white;border:none;border-radius:50%;cursor:pointer;font-size:1.15em;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 10px rgba(255,149,0,0.35);">👤</button>
@@ -709,6 +729,27 @@
     <span class="fab-hint-label">🐻 WhatsApp Group</span>
   </div>
   <button class="whatsapp-fab" title="Bipolar Bear Chat (coming soon)" aria-disabled="true">💬</button>
+
+  <!-- Position 2 — Security info FAB -->
+  <button class="placeholder-fab" id="placeholderFab" onclick="_onPlaceholderTap()" title="Your data security">🔐</button>
+
+  <!-- Security info modal (placeholder FAB) -->
+  <div id="securityModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeSecurityModal();">
+    <div style="background:white;border-radius:20px;padding:24px 24px 20px;text-align:center;max-width:300px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);">
+      <div style="font-size:2em;margin-bottom:8px;">🔐</div>
+      <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:12px;">How your data stays safe</div>
+      <div style="text-align:left;font-size:0.84em;color:#495057;line-height:1.65;margin-bottom:16px;">
+        <p style="margin-bottom:8px;"><strong>🔑 Your PIN</strong> locks the app locally on your device. Without it, nobody can open Bipolar Bear — even if they have your phone.</p>
+        <p style="margin-bottom:8px;"><strong>🔒 Your password</strong> encrypts your journal entries before they ever leave your device. The data is scrambled using a key only you hold.</p>
+        <p style="margin-bottom:8px;"><strong>☁️ Firebase (our database)</strong> stores only the encrypted version. Even we can't read your entries — they're meaningless without your password.</p>
+        <p style="margin-bottom:0;"><strong>🛡️ End-to-end encryption</strong> means your data is protected at every step — on your device, in transit, and in storage.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <button onclick="closeSecurityModal()" style="padding:12px;background:#ff9500;color:white;border:none;border-radius:12px;font-weight:700;font-size:0.95em;cursor:pointer;">Got it</button>
+        <button onclick="_showHidePermanently('placeholder')" style="padding:10px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;">🙈 Hide this button permanently</button>
+      </div>
+    </div>
+  </div>
 
   <!-- WhatsApp confirmation modal -->
   <div class="wa-modal" id="waModal" onclick="if(event.target===this){_closeWaModal();_suppressFabHover();}">
@@ -1136,9 +1177,13 @@
 
       const _coffeePermaHidden = localStorage.getItem('bbCoffeeFabHidden') === '1';
 
-      // Chat FAB: visible after tutorial complete (step 12) on all platforms
+      // Chat FAB: visible after tutorial complete (step 12)
       const _waFab = document.querySelector('.whatsapp-fab');
       if (_waFab) _waFab.style.display = step >= 12 ? '' : 'none';
+      // Security/placeholder FAB: visible after step 12, respects hide flag
+      const _phPermaHidden = localStorage.getItem('bbPlaceholderFabHidden') === '1';
+      const _phFab = document.getElementById('placeholderFab');
+      if (_phFab) _phFab.style.display = (step >= 12 && !_phPermaHidden) ? '' : 'none';
 
       // Feedback FAB: visible after tutorial complete (step 12)
       const _fbFab = document.querySelector('.feedback-fab');
@@ -1330,7 +1375,7 @@
         // Misc hints
         'bbPersonalHintDone',
         'bbFavouriteHintSeen', 'bbPrivateHintSeen', 'bbFavAnniShown',
-        'bbFeedbackFabHidden', 'bbWaFabHidden', 'bbCoffeeFabHidden', 'bbFooterHidden',
+        'bbFeedbackFabHidden', 'bbWaFabHidden', 'bbCoffeeFabHidden', 'bbPlaceholderFabHidden', 'bbFooterHidden',
         'bbLogoEasterEggFound',
         'bbTutorialToastShown',
         'bbPinEnabled', 'bbPinCode',
@@ -1943,7 +1988,7 @@
       document.getElementById('fbEmailRow').style.display = currentUser ? 'none' : '';
       // Show version + platform
       const _metaEl = document.getElementById('fbMeta');
-      if (_metaEl) _metaEl.textContent = `v0.77 · ${_getFbPlatform()}`;
+      if (_metaEl) _metaEl.textContent = `v0.78 · ${_getFbPlatform()}`;
       document.getElementById('feedbackModal').classList.add('active');
     }
 
@@ -2141,6 +2186,10 @@
         const _cf = document.getElementById('coffeeFab');
         if (_cf) _cf.style.display = 'none';
       }
+      if (localStorage.getItem('bbPlaceholderFabHidden') === '1') {
+        const _pf = document.getElementById('placeholderFab');
+        if (_pf) _pf.style.display = 'none';
+      }
     })();
 
     // ── Hide permanently confirmation ──
@@ -2161,6 +2210,10 @@
           closeCoffeeModal();
           document.getElementById('coffeeFab').style.display = 'none';
           localStorage.setItem('bbCoffeeFabHidden', '1');
+        } else if (type === 'placeholder') {
+          closeSecurityModal();
+          document.getElementById('placeholderFab').style.display = 'none';
+          localStorage.setItem('bbPlaceholderFabHidden', '1');
         }
       };
       document.getElementById('hidePermanentlyModal').style.display = 'flex';
@@ -2198,6 +2251,44 @@
     }
     window.openCoffeeModal = openCoffeeModal;
     window.closeCoffeeModal = closeCoffeeModal;
+
+    // ── Security info FAB (placeholder) ──
+    function openSecurityModal() {
+      const _m = document.getElementById('securityModal');
+      if (_m) _m.style.display = 'flex';
+    }
+    function closeSecurityModal() {
+      const _m = document.getElementById('securityModal');
+      if (_m) _m.style.display = 'none';
+    }
+    window.closeSecurityModal = closeSecurityModal;
+
+    // Tap handler: 1 tap → security popup; 5 rapid taps → FAB reset easter egg
+    let _phTapCount = 0, _phTapTimer;
+    function _onPlaceholderTap() {
+      _phTapCount++;
+      clearTimeout(_phTapTimer);
+      if (_phTapCount >= 5) {
+        _phTapCount = 0;
+        // Easter egg: restore all hidden FABs
+        ['bbWaFabHidden','bbFeedbackFabHidden','bbCoffeeFabHidden','bbPlaceholderFabHidden'].forEach(k => localStorage.removeItem(k));
+        _applyOnboardingGating();
+        // Brief toast
+        const _t = document.createElement('div');
+        _t.textContent = '🎉 All buttons restored!';
+        Object.assign(_t.style, { position:'fixed', bottom:'80px', left:'50%', transform:'translateX(-50%)',
+          background:'rgba(0,0,0,0.72)', color:'white', padding:'9px 18px', borderRadius:'20px',
+          fontSize:'0.85em', fontWeight:'600', zIndex:'9999', pointerEvents:'none', whiteSpace:'nowrap' });
+        document.body.appendChild(_t);
+        setTimeout(() => _t.remove(), 2000);
+        return;
+      }
+      _phTapTimer = setTimeout(() => {
+        if (_phTapCount === 1) openSecurityModal();
+        _phTapCount = 0;
+      }, 500);
+    }
+    window._onPlaceholderTap = _onPlaceholderTap;
   </script>
 
   <!-- Guest PIN unlock overlay (shown on index when journal data is encrypted) -->

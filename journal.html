@@ -2035,7 +2035,13 @@
       <h3 style="margin-bottom:16px;">📋 Changelog</h3>
       <div style="text-align:left; font-size:0.9em; color:#495057; line-height:1.7;">
         <div style="margin-bottom:14px;">
-          <strong style="color:#ff9500;">v0.77</strong><br>
+          <strong style="color:#ff9500;">v0.78</strong><br>
+          • ✨ FABs in a straight line: 5 evenly spaced positions (Chat | 🔐 | Auth | Coffee | Feedback)<br>
+          • ✨ Security FAB (🔐) at position 2 — tap for E2EE explainer, tap 5× to restore all hidden FABs<br>
+          • 🐛 Fix: Feedback hint positioning updated to match new FAB layout<br>
+        </div>
+        <div style="margin-bottom:14px;">
+          <strong style="color:#adb5bd;">v0.77</strong><br>
           • ✨ Chat FAB replaces WhatsApp button (greyed out, coming soon — Bipolar Bear in-app chat)<br>
           • ✨ PIN screen "🔐 More info" chip opens plain-language E2EE explainer<br>
           • ✨ All FABs resized to 44×44px with a soft U-curve layout<br>
@@ -2711,7 +2717,7 @@
 
         <div style="margin-top:4px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.77</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.78</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2816,7 +2822,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.77</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.78</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2867,7 +2873,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.77</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.78</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2903,7 +2909,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.77</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.78</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2937,7 +2943,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.77</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.78</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -11492,7 +11498,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
           'customTrackingFields', 'deletedDefaultCustomFields', 'deletedBuiltinFields',
           'bbPinEnabled', 'bbPinCode', 'bbNativePinEnabled',
           'bbHealthSyncEnabled', 'reminderEnabled', 'reminderTime',
-          'journalDefaultToday', 'bbCoffeeFabHidden',
+          'journalDefaultToday', 'bbCoffeeFabHidden', 'bbPlaceholderFabHidden',
         ].forEach(k => localStorage.removeItem(k));
         sessionStorage.removeItem('bbPinUnlocked');
         // Cancel any scheduled notifications (reminder + weekly summary)
