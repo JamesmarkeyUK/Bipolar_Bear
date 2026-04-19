@@ -2035,7 +2035,11 @@
       <h3 style="margin-bottom:16px;">📋 Changelog</h3>
       <div style="text-align:left; font-size:0.9em; color:#495057; line-height:1.7;">
         <div style="margin-bottom:14px;">
-          <strong style="color:#ff9500;">v0.80</strong><br>
+          <strong style="color:#ff9500;">v0.81</strong><br>
+          • 🎨 Settings: Achievements and 🛠️ Advanced now appear above the Close button<br>
+        </div>
+        <div style="margin-bottom:14px;">
+          <strong style="color:#adb5bd;">v0.80</strong><br>
           • ✨ PIN screen now dims to black after 3 minutes of inactivity (saves battery, especially OLED) — tap anywhere to wake<br>
         </div>
         <div style="margin-bottom:14px;">
@@ -2705,6 +2709,17 @@
           </details>
         </div>
 
+        <div style="text-align: center; display: flex; justify-content: center; gap: 16px; margin-bottom: 14px;">
+          <button onclick="showAchievementsPanel()" style="background: none; border: none; color: #adb5bd; font-size: 0.82em; cursor: pointer; padding: 4px 8px; letter-spacing: 0.02em;">🏅 Achievements</button>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
+            <div id="advancedSettingsBadgeHint" style="display:none;flex-direction:row;align-items:center;gap:3px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-bottom:2px;">
+              <span style="font-size:0.78em;font-weight:700;font-style:italic;color:#ff9500;font-family:'Georgia',serif;">🐻 Click here</span>
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><line x1="8" y1="2" x2="8" y2="13" stroke="#ff9500" stroke-width="2.5" stroke-linecap="round"/><polyline points="3,8 8,13 13,8" stroke="#ff9500" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+            </div>
+            <button id="advancedSettingsBtn" onclick="openAdvancedSettings()" style="background: none; border: none; color: #adb5bd; font-size: 0.82em; cursor: pointer; padding: 4px 8px; letter-spacing: 0.02em;">🛠️ Advanced ▸</button>
+          </div>
+        </div>
+
         <div class="confirm-buttons" style="position:relative;">
           <div id="closeSettingsHintEl" style="display:none;flex-direction:row;align-items:center;gap:4px;margin-bottom:6px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;">
             <span style="font-size:0.72em;font-weight:700;font-style:italic;color:#ff9500;font-family:'Georgia',serif;letter-spacing:0.01em;">🐻 Close settings</span>
@@ -2713,20 +2728,9 @@
           <button id="settingsCloseBtn" class="confirm-btn" onclick="saveSettings()" style="background: white; color: #ff9500; border: 2px solid #ff9500;">Close</button>
         </div>
 
-        <div style="margin-top:20px;text-align: center; display: flex; justify-content: center; gap: 16px;">
-          <button onclick="showAchievementsPanel()" style="background: none; border: none; color: #adb5bd; font-size: 0.82em; cursor: pointer; padding: 4px 8px; letter-spacing: 0.02em;">🏅 Achievements</button>
-          <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
-            <div id="advancedSettingsBadgeHint" style="display:none;flex-direction:row;align-items:center;gap:3px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-bottom:2px;">
-              <span style="font-size:0.78em;font-weight:700;font-style:italic;color:#ff9500;font-family:'Georgia',serif;">🐻 Click here</span>
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><line x1="8" y1="2" x2="8" y2="13" stroke="#ff9500" stroke-width="2.5" stroke-linecap="round"/><polyline points="3,8 8,13 13,8" stroke="#ff9500" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-            </div>
-            <button id="advancedSettingsBtn" onclick="openAdvancedSettings()" style="background: none; border: none; color: #adb5bd; font-size: 0.82em; cursor: pointer; padding: 4px 8px; letter-spacing: 0.02em;">Advanced ▸</button>
-          </div>
-        </div>
-
         <div style="margin-top:4px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.80</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.81</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2831,7 +2835,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.80</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.81</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2882,7 +2886,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.80</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.81</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2918,7 +2922,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.80</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.81</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2952,7 +2956,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.80</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.81</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
