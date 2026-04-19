@@ -2035,7 +2035,13 @@
       <h3 style="margin-bottom:16px;">📋 Changelog</h3>
       <div style="text-align:left; font-size:0.9em; color:#495057; line-height:1.7;">
         <div style="margin-bottom:14px;">
-          <strong style="color:#ff9500;">v0.82</strong><br>
+          <strong style="color:#ff9500;">v0.83</strong><br>
+          • ✨ Chat FAB now opens crisis support popup (Samaritans 116 123) + "in-app chat coming soon"<br>
+          • ✨ Quick Note FAB (📝) — jot a note from home screen, appears on your next journal entry<br>
+          • ✨ 🔐 E2EE FAB now appears automatically in place of the first permanently-hidden button<br>
+        </div>
+        <div style="margin-bottom:14px;">
+          <strong style="color:#adb5bd;">v0.82</strong><br>
           • 🐛 Fix: Tutorial complete popup now triggers after saving your first journal entry<br>
           • 🎨 Welcome popup: removed "skip tutorial" hint copy for a cleaner message<br>
         </div>
@@ -2735,7 +2741,7 @@
 
         <div style="margin-top:4px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.82</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.83</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2840,7 +2846,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.82</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.83</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2891,7 +2897,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.82</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.83</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2927,7 +2933,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.82</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.83</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2961,7 +2967,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.82</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.83</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -7071,6 +7077,26 @@
           const _chooseMoodHintDone = localStorage.getItem('bb_fmChooseMoodHintDone') === '1';
           const _showChooseMoodHint = !_chooseMoodHintDone && !editingEntry;
           const _showFmTip = !localStorage.getItem('bb_fmMoodTipShown') && _chooseMoodHintDone && localStorage.getItem('bb_fmTapHoldHintReady') === '1';
+          // Quick notes from index.html — show accumulated notes above mood selector
+          let _quickNotesHtml = '';
+          try {
+            const _qn = JSON.parse(localStorage.getItem('bbQuickNotes') || '[]');
+            if (_qn.length > 0) {
+              const _noteRows = _qn.map((n, i) => {
+                const _esc = n.text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+                const _border = i > 0 ? 'margin-top:7px;padding-top:7px;border-top:1px solid rgba(74,158,255,0.2);' : '';
+                return `<div style="display:flex;align-items:flex-start;gap:8px;${_border}">
+                  <p style="flex:1;font-size:0.85em;color:#495057;margin:0;line-height:1.45;">${_esc}</p>
+                  <button onclick="_dismissQuickNote('${n.id}')" style="background:none;border:none;color:#adb5bd;font-size:1em;cursor:pointer;padding:0;line-height:1;flex-shrink:0;-webkit-tap-highlight-color:transparent;" title="Dismiss">✕</button>
+                </div>`;
+              }).join('');
+              _quickNotesHtml = `<div style="background:#f0f7ff;border-radius:10px;padding:10px 14px;margin-bottom:14px;border-left:3px solid #5b8dee;">
+                <p style="font-size:0.75em;font-weight:700;color:#5b8dee;margin:0 0 7px;text-transform:uppercase;letter-spacing:0.3px;">📝 Your notes</p>
+                ${_noteRows}
+              </div>`;
+            }
+          } catch(_) {}
+
           // Check for yesterday's intention to display under heading
           let _prevIntentionHtml = '';
           if (!editingEntry && localStorage.getItem('intentionEnabled') === 'true') {
@@ -7099,7 +7125,7 @@
           } else if (selectedMood && localStorage.getItem('moodLinkingEnabled') === '1') {
             _linkedChip = `<p style="text-align:center;font-size:0.72em;color:#adb5bd;margin-top:8px;margin-bottom:0;">Hold to link a secondary mood</p>`;
           }
-          return `${_prevIntentionHtml}<div class="mood-selector" style="margin-bottom:0;">
+          return `${_quickNotesHtml}${_prevIntentionHtml}<div class="mood-selector" style="margin-bottom:0;">
             ${['manic','elevated','stable','low','depressed'].map(m =>
               `<button class="mood-btn mood-${m} ${selectedMood===m?'selected':''} ${selectedLinkedMood===m?'linked':(_fmLinkMoodPickerOpen&&m!==selectedMood?'linked':'')}"
                 onclick="_fmMoodTap('${m}')"
@@ -11516,7 +11542,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
           'customTrackingFields', 'deletedDefaultCustomFields', 'deletedBuiltinFields',
           'bbPinEnabled', 'bbPinCode', 'bbNativePinEnabled',
           'bbHealthSyncEnabled', 'reminderEnabled', 'reminderTime',
-          'journalDefaultToday', 'bbCoffeeFabHidden', 'bbPlaceholderFabHidden',
+          'journalDefaultToday', 'bbCoffeeFabHidden', 'bbQuickNoteFabHidden', 'bbSecurityFabHidden', 'bbQuickNotes',
         ].forEach(k => localStorage.removeItem(k));
         sessionStorage.removeItem('bbPinUnlocked');
         // Cancel any scheduled notifications (reminder + weekly summary)
@@ -13651,6 +13677,17 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     window.confirmDeleteAll = confirmDeleteAll;
     window.deleteAllEntries = deleteAllEntries;
     window.showMissingDates = showMissingDates;
+
+    // ── Quick notes: dismiss a single note by id ──
+    function _dismissQuickNote(id) {
+      try {
+        const _notes = JSON.parse(localStorage.getItem('bbQuickNotes') || '[]');
+        const _filtered = _notes.filter(n => n.id !== id);
+        localStorage.setItem('bbQuickNotes', JSON.stringify(_filtered));
+      } catch(_) {}
+      _renderFocusedStep();
+    }
+    window._dismissQuickNote = _dismissQuickNote;
     window.closeMissingDatesModal = closeMissingDatesModal;
     window.setDateAndClose = setDateAndClose;
     window.showSettingsModal = showSettingsModal;
