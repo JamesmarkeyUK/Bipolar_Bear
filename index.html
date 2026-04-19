@@ -1988,7 +1988,7 @@
       document.getElementById('fbEmailRow').style.display = currentUser ? 'none' : '';
       // Show version + platform
       const _metaEl = document.getElementById('fbMeta');
-      if (_metaEl) _metaEl.textContent = `v0.81 · ${_getFbPlatform()}`;
+      if (_metaEl) _metaEl.textContent = `v0.82 · ${_getFbPlatform()}`;
       document.getElementById('feedbackModal').classList.add('active');
     }
 
@@ -2085,8 +2085,7 @@
       overlay.innerHTML = `<div style="background:linear-gradient(135deg,#ff6b00,#ff9500);border-radius:20px;padding:28px 28px 24px;text-align:center;max-width:300px;width:calc(100vw - 64px);box-shadow:0 12px 48px rgba(255,107,0,0.55);">
         <div style="font-size:2.4em;margin-bottom:10px;">🐻</div>
         <div style="font-weight:800;font-size:1.05em;color:white;margin-bottom:10px;line-height:1.4;">Welcome to your BipolarBear.app!</div>
-        <div style="font-size:0.88em;color:rgba(255,255,255,0.92);line-height:1.55;margin-bottom:14px;">This will be your mood journal and personalised survival kit going forward.<br><br>I'm here to help you get started. Let's go!</div>
-        <div style="font-size:0.72em;color:rgba(255,255,255,0.7);line-height:1.5;margin-bottom:18px;font-style:italic;">If you want to skip the tutorial, tap &amp; hold the logo for 5+ seconds after dismissing this.</div>
+        <div style="font-size:0.88em;color:rgba(255,255,255,0.92);line-height:1.55;margin-bottom:18px;">This will be your mood journal and personalised survival kit going forward.<br><br>I'm here to help you get started. Let's go!</div>
         <div style="font-size:0.78em;color:rgba(255,255,255,0.65);">Tap to dismiss</div>
       </div>`;
       Object.assign(overlay.style, {
@@ -2109,6 +2108,7 @@
     }
 
     // Steps 9 and 10 (WA/feedback hints) removed from tutorial — auto-advance to 12 on all platforms.
+    // Also: complete tutorial automatically once the user has saved their first journal entry.
     (function() {
       const _s = _getOnboardingStep();
       if (_s === 10) {
@@ -2117,6 +2117,9 @@
           localStorage.setItem('bbTutorialToastShown', '1');
           setTimeout(_showTutorialCompleteModal, 400);
         }
+      } else if (_s >= 4 && _s < 12 && localStorage.getItem('bbHasEntries') === '1') {
+        // User has logged their first entry and returned to home — mark tutorial complete
+        _advanceOnboardingStep(12);
       }
     })();
 
