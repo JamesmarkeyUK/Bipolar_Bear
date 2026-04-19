@@ -1193,7 +1193,10 @@
       });
       overlay.addEventListener('click', () => {
         overlay.remove();
-        // Show feedback hint after tutorial complete dismissed
+        // Unlock FABs now that tutorial popup is dismissed
+        localStorage.setItem('bbFabsUnlocked', '1');
+        _applyOnboardingGating();
+        // Show feedback hint
         const _fbHint = document.getElementById('feedbackHint');
         if (_fbHint && localStorage.getItem('bbFeedbackFabHidden') !== '1') _fbHint.style.display = 'flex';
       });
@@ -1255,9 +1258,15 @@
         }
       }
 
-      // Feedback FAB: visible after tutorial complete (step 12)
+      // Feedback FAB: visible after tutorial popup is dismissed (bbFabsUnlocked)
+      // Backward compat: auto-unlock for existing users who already completed tutorial
+      let _fabsUnlocked = localStorage.getItem('bbFabsUnlocked') === '1';
+      if (!_fabsUnlocked && step >= 12 && localStorage.getItem('bbTutorialToastShown') === '1' && !document.getElementById('tutorialCompleteModal')) {
+        _fabsUnlocked = true;
+        localStorage.setItem('bbFabsUnlocked', '1');
+      }
       const _fbFab = document.querySelector('.feedback-fab');
-      if (_fbFab) _fbFab.style.display = (step >= 12 && !_fbPermaHidden) ? '' : 'none';
+      if (_fbFab) _fbFab.style.display = (step >= 12 && !_fbPermaHidden && _fabsUnlocked) ? '' : 'none';
 
       // Coffee FAB: visible after tutorial complete (step 12)
       const _coffeeFab = document.getElementById('coffeeFab');
@@ -1284,9 +1293,9 @@
       const _logoHint = document.getElementById('logoHint');
       if (_logoHint) _logoHint.style.display = step === 5 ? '' : 'none';
 
-      // Hint 6 (survivalKitHint): step 6 only
+      // Survival kit hint removed — user finds it freely
       const _h6 = document.getElementById('survivalKitHint');
-      if (_h6) _h6.style.display = step === 6 ? 'flex' : 'none';
+      if (_h6) _h6.style.display = 'none';
 
       // WA hint: permanently hidden (native-only, post-tutorial)
       const _waLbl = document.getElementById('waFabLabel');
@@ -1306,7 +1315,7 @@
       }
 
       // ── Hint overlay ──
-      const _blockingSteps = new Set([4, 5, 6]);
+      const _blockingSteps = new Set([4, 5]);
       const _isBlocking = _blockingSteps.has(step);
       const _overlay = document.getElementById('bbHintOverlay');
       if (_overlay) _overlay.style.display = _isBlocking ? '' : 'none';
@@ -1321,7 +1330,6 @@
         const _elevMap = {
           4:  [document.getElementById('signinHint'), document.getElementById('authFabWrapper')],
           5:  [document.getElementById('logoHint'),   document.querySelector('.logo-bounce-wrapper')],
-          6:  [document.getElementById('survivalKitHint'), document.getElementById('survivalBtn')],
         };
         (_elevMap[step] || []).filter(Boolean).forEach(el => {
           el.dataset.prevZIndex = el.style.zIndex;
@@ -1367,7 +1375,6 @@
       const _map = {
         4:  ['authFabWrapper', 'signinHintInner'],
         5:  ['.logo-img',       'logoHint'],
-        6:  ['survivalBtn',    'survivalKitHint'],
       };
       function _getTarget(s) { const e = _map[s]; if (!e) return null; const id = e[0]; return id.startsWith('.') ? document.querySelector(id) : document.getElementById(id); }
       function _getHint(s)   { const e = _map[s]; if (!e) return null; return document.getElementById(e[1]); }
@@ -1445,7 +1452,7 @@
         // Misc hints
         'bbPersonalHintDone',
         'bbFavouriteHintSeen', 'bbPrivateHintSeen', 'bbFavAnniShown',
-        'bbFeedbackFabHidden', 'bbWaFabHidden', 'bbCoffeeFabHidden', 'bbQuickNoteFabHidden', 'bbSecurityFabHidden', 'bbFooterHidden',
+        'bbFeedbackFabHidden', 'bbWaFabHidden', 'bbCoffeeFabHidden', 'bbQuickNoteFabHidden', 'bbSecurityFabHidden', 'bbFooterHidden', 'bbFabsUnlocked',
         'bbLogoEasterEggFound',
         'bbTutorialToastShown',
         'bbPinEnabled', 'bbPinCode',
@@ -1750,8 +1757,9 @@
           } else {
             // Skip tutorial — jump to step 12 and mark all tutorial flags as done
             localStorage.removeItem('bbOnboardingStep');
-            // Pre-set bbTutorialToastShown so _advanceOnboardingStep doesn't show the popup
+            // Pre-set flags so _advanceOnboardingStep doesn't show the popup
             localStorage.setItem('bbTutorialToastShown', '1');
+            localStorage.setItem('bbFabsUnlocked', '1');
             _advanceOnboardingStep(12);
             [
               'bbTutorialToastShown', 'bbWelcomeShown', 'bbSurvivalKitVisited',
@@ -2058,7 +2066,7 @@
       document.getElementById('fbEmailRow').style.display = currentUser ? 'none' : '';
       // Show version + platform
       const _metaEl = document.getElementById('fbMeta');
-      if (_metaEl) _metaEl.textContent = `v0.83 · ${_getFbPlatform()}`;
+      if (_metaEl) _metaEl.textContent = `v0.84 · ${_getFbPlatform()}`;
       document.getElementById('feedbackModal').classList.add('active');
     }
 
