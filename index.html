@@ -1988,7 +1988,7 @@
       document.getElementById('fbEmailRow').style.display = currentUser ? 'none' : '';
       // Show version + platform
       const _metaEl = document.getElementById('fbMeta');
-      if (_metaEl) _metaEl.textContent = `v0.79 · ${_getFbPlatform()}`;
+      if (_metaEl) _metaEl.textContent = `v0.80 · ${_getFbPlatform()}`;
       document.getElementById('feedbackModal').classList.add('active');
     }
 
@@ -2331,6 +2331,11 @@
     <button onclick="idxPinForgot()" style="background:none;border:none;color:rgba(255,255,255,0.6);font-size:0.78em;cursor:pointer;margin-top:8px;padding:4px 12px;">Forgot PIN?</button>
   </div>
 
+  <!-- Screen dimmer: fades in after 3 min idle on PIN page to save battery -->
+  <div id="pinSleepOverlay" style="display:none;position:fixed;inset:0;background:#000;z-index:10002;align-items:center;justify-content:center;cursor:pointer;" onclick="_wakePinDimmer()">
+    <span style="color:rgba(255,255,255,0.2);font-size:0.85em;user-select:none;">Tap to wake</span>
+  </div>
+
   <script>
     // ── App-wide PIN lock (guest encryption PIN or native logged-in PIN) ──
     (function() {
@@ -2438,6 +2443,67 @@
       _idxPinBuf = _idxPinBuf.slice(0, -1);
       _idxRenderDots(_idxPinBuf.length);
     }
+
+    // ── PIN screen dimmer — saves battery when device left on lock screen ──
+    (function() {
+      const SLEEP_MS = 3 * 60 * 1000; // 3 minutes
+      let _dimTimer = null;
+      let _sleeping = false;
+
+      function _startDimTimer() {
+        clearTimeout(_dimTimer);
+        const ov = document.getElementById('guestPinOverlay');
+        if (!ov || ov.style.display === 'none') return;
+        _dimTimer = setTimeout(_sleep, SLEEP_MS);
+      }
+
+      function _sleep() {
+        if (_sleeping) return;
+        _sleeping = true;
+        const el = document.getElementById('pinSleepOverlay');
+        if (!el) return;
+        el.style.opacity = '0';
+        el.style.transition = 'opacity 1.5s';
+        el.style.display = 'flex';
+        requestAnimationFrame(() => requestAnimationFrame(() => { el.style.opacity = '1'; }));
+      }
+
+      window._wakePinDimmer = function() {
+        clearTimeout(_dimTimer);
+        if (_sleeping) {
+          _sleeping = false;
+          const el = document.getElementById('pinSleepOverlay');
+          if (el) {
+            el.style.opacity = '0';
+            setTimeout(() => { el.style.display = 'none'; }, 1500);
+          }
+        }
+        _startDimTimer();
+      };
+
+      // Watch the PIN overlay for show/hide to start/stop the timer
+      const _ov = document.getElementById('guestPinOverlay');
+      if (_ov) {
+        new MutationObserver(() => {
+          if (_ov.style.display !== 'none') {
+            _startDimTimer();
+          } else {
+            clearTimeout(_dimTimer);
+            if (_sleeping) window._wakePinDimmer();
+          }
+        }).observe(_ov, { attributes: true, attributeFilter: ['style'] });
+        // Start immediately if overlay is already visible on page load
+        if (_ov.style.display === 'flex') _startDimTimer();
+      }
+
+      // Any tap/key while PIN overlay is active resets the sleep timer
+      ['touchstart', 'mousedown', 'keydown'].forEach(ev =>
+        document.addEventListener(ev, () => {
+          if (!_ov || _ov.style.display === 'none') return;
+          window._wakePinDimmer();
+        }, { passive: true })
+      );
+    })();
 
     async function idxPinForgot() {
       const _isNat = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
