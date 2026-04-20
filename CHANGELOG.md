@@ -1,5 +1,8 @@
 # BipolarBear Changelog
 
+## v0.87
+- ✨ "What's New" popup: shown once per version update to tutorial-complete users — headline feature + "Full changelog" link that opens the changelog in the journal
+
 ## v0.86
 - ✨ FAB picker now lists hidden default buttons (Chat, E2EE, Coffee, Feedback) so they can be re-added to the dock
 - ✨ All FABs — including extra ones (Stats, Celebrity, Goals, Quick Note) — have a "Hide this button" option; hidden buttons return to the picker

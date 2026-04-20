@@ -2113,7 +2113,11 @@
       <h3 style="margin-bottom:16px;">📋 Changelog</h3>
       <div style="text-align:left; font-size:0.9em; color:#495057; line-height:1.7;">
         <div style="margin-bottom:14px;">
-          <strong style="color:#ff9500;">v0.86</strong><br>
+          <strong style="color:#ff9500;">v0.87</strong><br>
+          • ✨ "What's New" popup on every update — headline feature + full changelog link<br>
+        </div>
+        <div style="margin-bottom:14px;">
+          <strong style="color:#adb5bd;">v0.86</strong><br>
           • ✨ FAB picker now shows hidden default buttons so you can add them back<br>
           • ✨ All FABs have "Hide this button" — removed from dock, returns to picker<br>
           • ✨ Celebrity FAB now loads real Wikipedia photos<br>
@@ -2833,7 +2837,7 @@
 
         <div style="margin-top:4px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.86</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.87</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2939,7 +2943,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.86</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.87</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2990,7 +2994,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.86</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.87</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -3026,7 +3030,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.86</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.87</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -3060,7 +3064,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.86</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.87</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -15212,6 +15216,16 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     window._applyJournalFabDock = _applyJournalFabDock;
     document.addEventListener('DOMContentLoaded', _applyJournalFabDock);
     window.addEventListener('resize', _applyJournalFabDock);
+
+    // Auto-open changelog if navigated from What's New popup
+    if (new URLSearchParams(window.location.search).get('openChangelog') === '1') {
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          const cm = document.getElementById('changelogModal');
+          if (cm) cm.classList.add('active');
+        }, 600);
+      });
+    }
 
     // Auto-open stats if navigated from Stats FAB
     if (new URLSearchParams(window.location.search).get('openStats') === '1') {

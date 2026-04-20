@@ -589,6 +589,10 @@
       .dock-extra-fab:hover { background: #e08600; transform: scale(1.08); }
     }
 
+    @keyframes wnSlideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
     @keyframes waHintSlide {
       0%, 100% { transform: translateX(0); opacity: 0.85; }
       50% { transform: translateX(-5px); opacity: 1; }
@@ -770,6 +774,23 @@
     </div>
   </div>
 
+
+  <!-- What's New popup (shown once per version to tutorial-complete users) -->
+  <div id="whatsNewPopup" style="display:none;position:fixed;bottom:96px;left:16px;right:16px;z-index:200;max-width:420px;margin:0 auto;animation:wnSlideUp 0.3s ease;">
+    <div style="background:white;border-radius:18px;padding:18px 20px 16px;box-shadow:0 6px 32px rgba(0,0,0,0.16);border:1.5px solid #ffe0b2;">
+      <div style="display:flex;align-items:flex-start;gap:12px;">
+        <span style="font-size:1.5em;line-height:1;flex-shrink:0;margin-top:1px;">🎉</span>
+        <div style="flex:1;min-width:0;">
+          <div id="whatsNewVersion" style="font-size:0.7em;font-weight:700;color:#ff9500;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:5px;"></div>
+          <div id="whatsNewHeadline" style="font-size:0.9em;color:#212529;line-height:1.45;font-weight:600;"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:14px;">
+        <button onclick="_dismissWhatsNew()" style="flex:1;padding:10px;background:#f8f9fa;color:#6c757d;border:none;border-radius:10px;font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Got it</button>
+        <button onclick="_openFullChangelog()" style="flex:1;padding:10px;background:#ff9500;color:white;border:none;border-radius:10px;font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Full changelog ↗</button>
+      </div>
+    </div>
+  </div>
 
   <!-- White footer behind all FABs -->
   <div class="fab-footer" aria-hidden="true"></div>
@@ -2142,7 +2163,7 @@
       document.getElementById('fbEmailRow').style.display = currentUser ? 'none' : '';
       // Show version + platform
       const _metaEl = document.getElementById('fbMeta');
-      if (_metaEl) _metaEl.textContent = `v0.86 · ${_getFbPlatform()}`;
+      if (_metaEl) _metaEl.textContent = `v0.87 · ${_getFbPlatform()}`;
       document.getElementById('feedbackModal').classList.add('active');
     }
 
@@ -2475,6 +2496,46 @@
       if (_m) _m.style.display = 'none';
     }
     window.closeSecurityModal = closeSecurityModal;
+
+    // ── What's New popup ──
+    const _APP_VERSION = '0.87';
+    const _WHATS_NEW_HEADLINES = {
+      '0.87': "What's new popup — see new features at a glance every update",
+      '0.86': 'Dock buttons can now be hidden and re-added — tap + to customise your dock',
+      '0.85': 'Full dock synced across all pages — same buttons everywhere',
+      '0.84': 'Survival kit compass removed from tutorial for a smoother experience',
+      '0.83': 'Crisis support added to Chat FAB — Samaritans 116 123 in one tap',
+    };
+    function _checkWhatsNew() {
+      const lastSeen = localStorage.getItem('bbLastSeenVersion');
+      if (lastSeen === _APP_VERSION) return;
+      const step = _getOnboardingStep();
+      if (step < 12 || localStorage.getItem('bbTutorialToastShown') !== '1') return;
+      // Don't show if tutorial complete popup is still on screen
+      if (document.getElementById('tutorialCompleteModal')) return;
+      const headline = _WHATS_NEW_HEADLINES[_APP_VERSION];
+      if (!headline) return;
+      const popup = document.getElementById('whatsNewPopup');
+      const vEl = document.getElementById('whatsNewVersion');
+      const hEl = document.getElementById('whatsNewHeadline');
+      if (!popup) return;
+      if (vEl) vEl.textContent = "What's new · v" + _APP_VERSION;
+      if (hEl) hEl.textContent = headline;
+      popup.style.display = 'block';
+    }
+    function _dismissWhatsNew() {
+      localStorage.setItem('bbLastSeenVersion', _APP_VERSION);
+      const popup = document.getElementById('whatsNewPopup');
+      if (popup) popup.style.display = 'none';
+    }
+    function _openFullChangelog() {
+      _dismissWhatsNew();
+      window.location.href = 'journal.html?openChangelog=1';
+    }
+    window._dismissWhatsNew = _dismissWhatsNew;
+    window._openFullChangelog = _openFullChangelog;
+    // Fire after a short delay so the page renders first
+    setTimeout(_checkWhatsNew, 800);
 
     // ── FAB Picker ──
     let _fabPickerSlot = null;
