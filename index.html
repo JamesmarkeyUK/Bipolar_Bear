@@ -667,17 +667,6 @@
 </head>
 <body>
   <!-- Hide button confirmation modal -->
-  <div id="hidePermanentlyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10000;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)document.getElementById('hidePermanentlyModal').style.display='none';">
-    <div style="background:white;border-radius:20px;padding:24px;max-width:300px;width:100%;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,0.25);">
-      <div style="font-size:1.6em;margin-bottom:10px;">🙈</div>
-      <div style="font-weight:700;font-size:1em;color:#333;margin-bottom:8px;">Hide this button?</div>
-      <div style="font-size:0.85em;color:#6c757d;margin-bottom:20px;line-height:1.4;">You can add it back using the + button in the dock.</div>
-      <div style="display:flex;gap:10px;">
-        <button onclick="document.getElementById('hidePermanentlyModal').style.display='none';" style="flex:1;padding:10px;background:white;color:#495057;border:2px solid #dee2e6;border-radius:10px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Cancel</button>
-        <button id="hidePermanentlyConfirmBtn" style="flex:1;padding:10px;background:#dc3545;color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Hide</button>
-      </div>
-    </div>
-  </div>
 
   <!-- Auth FAB: centred over white notch -->
   <div id="authFabWrapper" style="position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:50; pointer-events:none; display:flex; align-items:center; justify-content:center;">
@@ -1087,6 +1076,7 @@
       <button class="modal-btn modal-btn-primary" id="authSubmit">Sign In</button>
       <button class="modal-btn modal-btn-secondary" onclick="closeAuthModal()">Continue as Guest</button>
       <div class="modal-toggle" id="authToggle">Don't have an account? <span>Sign up</span></div>
+      <button onclick="_confirmDeleteGuestData()" style="margin-top:10px;background:none;border:none;color:#adb5bd;font-size:0.78em;cursor:pointer;padding:4px 8px;-webkit-tap-highlight-color:transparent;">🗑 Delete all guest data</button>
     </div>
   </div>
 
@@ -1357,12 +1347,7 @@
       const _coffeeVis   = step >= 12 && !_coffeePermaHidden;
       const _feedbackVis = step >= 12 && !_fbPermaHidden && _fabsUnlocked;
 
-      if (_waFab)     _waFab.style.display     = _chatVis     ? 'flex' : 'none';
-      if (_qnFab)     _qnFab.style.display     = _qnVis       ? 'flex' : 'none';
-      if (_coffeeFab) _coffeeFab.style.display  = _coffeeVis   ? 'flex' : 'none';
-      if (_fbFab)     _fbFab.style.display      = _feedbackVis ? ''     : 'none';
-
-      // ── Fixed FAB slot positions ──
+      // ── Dynamic FAB slot positions ──
       const _wide = window.matchMedia('(min-width: 520px)').matches;
       const _slotPos = {
         1: _wide ? 'calc(50% - 214px)' : 'calc(10% - 22px)',
@@ -1370,19 +1355,40 @@
         3: _wide ? 'calc(50% + 74px)'  : 'calc(70% - 22px)',
         4: _wide ? 'calc(50% + 170px)' : 'calc(90% - 22px)',
       };
-      if (_waFab)     _waFab.style.left     = _slotPos[1];
-      if (_qnFab)     _qnFab.style.left     = _slotPos[2];
-      if (_coffeeFab) _coffeeFab.style.left  = _slotPos[3];
-      if (_fbFab)     _fbFab.style.left      = _slotPos[4];
+
+      const _extraMap = { stats: 'statsExtraFab', celeb: 'celebExtraFab', goals: 'goalsExtraFab', quicknote: 'quicknoteExtraFab' };
+      const _defVis   = { chat: _chatVis, e2ee: _qnVis, coffee: _coffeeVis, feedback: _feedbackVis };
+      const _defEl    = { chat: _waFab, e2ee: _qnFab, coffee: _coffeeFab, feedback: _fbFab };
+
+      // Find which slot each default FAB is currently assigned to (may differ from its natural slot)
+      const _defaultSlotMap = {};
+      for (const _def of _FAB_DEFAULTS) {
+        let _found = null;
+        for (let s = 1; s <= 4; s++) {
+          if (localStorage.getItem('bbFabSlot_' + s) === _def.id) { _found = s; break; }
+        }
+        _defaultSlotMap[_def.id] = _found !== null ? _found : _def.slotNum;
+      }
+
+      // Position and show/hide default FABs at their assigned slots
+      for (const _def of _FAB_DEFAULTS) {
+        const _el = _defEl[_def.id];
+        if (!_el) continue;
+        const _vis = _defVis[_def.id];
+        _el.style.display = _vis ? (_def.id === 'feedback' ? '' : 'flex') : 'none';
+        _el.style.left = _slotPos[_defaultSlotMap[_def.id]];
+      }
+
+      // Track which slots are occupied by a visible default
+      const _slotOccupied = {};
+      for (const _def of _FAB_DEFAULTS) {
+        if (_defVis[_def.id]) _slotOccupied[_defaultSlotMap[_def.id]] = true;
+      }
 
       // ── Extra assigned FABs ──
-      const _slotVis = { 1: _chatVis, 2: _qnVis, 3: _coffeeVis, 4: _feedbackVis };
-      const _extraMap = { stats: 'statsExtraFab', celeb: 'celebExtraFab', goals: 'goalsExtraFab', quicknote: 'quicknoteExtraFab' };
-      // Hide all extras first
       Object.values(_extraMap).forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
-      // Show extras assigned to hidden slots
       for (let s = 1; s <= 4; s++) {
-        if (!_slotVis[s]) {
+        if (!_slotOccupied[s]) {
           const _assigned = localStorage.getItem('bbFabSlot_' + s);
           if (_assigned && _extraMap[_assigned]) {
             const _ef = document.getElementById(_extraMap[_assigned]);
@@ -1396,8 +1402,8 @@
         const _ph = document.getElementById('fabPh' + s);
         if (!_ph) continue;
         const _assigned = localStorage.getItem('bbFabSlot_' + s);
-        const _hasExtra = _assigned && _extraMap[_assigned] && !_slotVis[s];
-        _ph.style.display = (!_slotVis[s] && !_hasExtra) ? 'flex' : 'none';
+        const _hasExtra = _assigned && _extraMap[_assigned] && !_slotOccupied[s];
+        _ph.style.display = (!_slotOccupied[s] && !_hasExtra) ? 'flex' : 'none';
         _ph.style.left = _slotPos[s];
       }
 
@@ -1525,8 +1531,7 @@
         });
       }
       function _isModalOpen() {
-        return !!(document.querySelector('.overlay-modal.active, .wa-modal.active, .feedback-modal.active') ||
-          document.getElementById('hidePermanentlyModal')?.style.display === 'flex');
+        return !!(document.querySelector('.overlay-modal.active, .wa-modal.active, .feedback-modal.active'));
       }
       document.addEventListener('click', function(e) {
         const s = _getOnboardingStep();
@@ -2134,6 +2139,20 @@
   </script>
 
   <script>
+    // ── FAB config (must be defined before _applyOnboardingGating is called) ──
+    const _FAB_DEFAULTS = [
+      { id: 'chat',     icon: '💬', label: 'Crisis Support',  desc: 'Samaritans & community chat', hiddenKey: 'bbWaFabHidden',       slotNum: 1 },
+      { id: 'e2ee',     icon: '🔐', label: 'Data Security',   desc: 'How your data is kept safe',  hiddenKey: 'bbQuickNoteFabHidden', slotNum: 2 },
+      { id: 'coffee',   icon: '☕', label: 'Buy Us a Coffee', desc: 'Support Bipolar Bear',         hiddenKey: 'bbCoffeeFabHidden',    slotNum: 3 },
+      { id: 'feedback', icon: '📣', label: 'Send Feedback',   desc: 'Help us make it better',      hiddenKey: 'bbFeedbackFabHidden',  slotNum: 4 },
+    ];
+    const _FAB_EXTRAS = [
+      { id: 'quicknote', icon: '📝', label: 'Quick Note', desc: 'Reminder for your next journal entry' },
+      { id: 'stats',     icon: '📊', label: 'Statistics',  desc: 'Open your mood journal stats' },
+      { id: 'celeb',     icon: '⭐', label: 'Celebrity',   desc: 'Famous people with bipolar disorder' },
+      { id: 'goals',     icon: '🎯', label: 'Goals',       desc: 'View your survival kit goals' },
+    ];
+
     // ── Feedback ──
     let _fbType = null;
 
@@ -2371,17 +2390,8 @@
     })();
 
     // ── Hide permanently confirmation ──
-    let _hidePermanentlyCb = null;
     function _showHidePermanently(type) {
-      _hidePermanentlyCb = () => {
-        if (type === 'chat') {
-          closeChatModal();
-          const _cf = document.getElementById('chatFab');
-          if (_cf) _cf.style.display = 'none';
-          localStorage.setItem('bbWaFabHidden', '1');
-          _applyOnboardingGating();
-        } else if (type === 'wa') {
-          // legacy alias for chat
+        if (type === 'chat' || type === 'wa') {
           closeChatModal();
           const _cf = document.getElementById('chatFab');
           if (_cf) _cf.style.display = 'none';
@@ -2404,14 +2414,8 @@
           localStorage.setItem('bbCoffeeFabHidden', '1');
           _applyOnboardingGating();
         }
-      };
-      document.getElementById('hidePermanentlyModal').style.display = 'flex';
     }
     window._showHidePermanently = _showHidePermanently;
-    document.getElementById('hidePermanentlyConfirmBtn').addEventListener('click', () => {
-      document.getElementById('hidePermanentlyModal').style.display = 'none';
-      if (_hidePermanentlyCb) { _hidePermanentlyCb(); _hidePermanentlyCb = null; }
-    });
 
     // ── Coffee FAB: fetch funded % and show modal ──
     function openCoffeeModal() {
@@ -2498,7 +2502,7 @@
     window.closeSecurityModal = closeSecurityModal;
 
     // ── What's New popup ──
-    const _APP_VERSION = '0.87';
+    const _APP_VERSION = '0.88';
     const _WHATS_NEW_HEADLINES = {
       '0.87': "What's new popup — see new features at a glance every update",
       '0.86': 'Dock buttons can now be hidden and re-added — tap + to customise your dock',
@@ -2539,18 +2543,6 @@
 
     // ── FAB Picker ──
     let _fabPickerSlot = null;
-    const _FAB_DEFAULTS = [
-      { id: 'chat',     icon: '💬', label: 'Crisis Support',  desc: 'Samaritans & community chat', hiddenKey: 'bbWaFabHidden',       slotNum: 1 },
-      { id: 'e2ee',     icon: '🔐', label: 'Data Security',   desc: 'How your data is kept safe',  hiddenKey: 'bbQuickNoteFabHidden', slotNum: 2 },
-      { id: 'coffee',   icon: '☕', label: 'Buy Us a Coffee', desc: 'Support Bipolar Bear',         hiddenKey: 'bbCoffeeFabHidden',    slotNum: 3 },
-      { id: 'feedback', icon: '📣', label: 'Send Feedback',   desc: 'Help us make it better',      hiddenKey: 'bbFeedbackFabHidden',  slotNum: 4 },
-    ];
-    const _FAB_EXTRAS = [
-      { id: 'quicknote', icon: '📝', label: 'Quick Note', desc: 'Reminder for your next journal entry' },
-      { id: 'stats',     icon: '📊', label: 'Statistics',  desc: 'Open your mood journal stats' },
-      { id: 'celeb',     icon: '⭐', label: 'Celebrity',   desc: 'Famous people with bipolar disorder' },
-      { id: 'goals',     icon: '🎯', label: 'Goals',       desc: 'View your survival kit goals' },
-    ];
     function _openFabPicker(slot) {
       _fabPickerSlot = slot;
       const optContainer = document.getElementById('fabPickerOptions');
@@ -2564,7 +2556,11 @@
           btn.innerHTML = `<span style="font-size:1.6em;line-height:1;">${def.icon}</span><div><div style="font-weight:700;font-size:0.95em;color:#212529;">${def.label}</div><div style="font-size:0.8em;color:#adb5bd;margin-top:2px;">${def.desc}</div></div>`;
           btn.addEventListener('click', () => {
             localStorage.removeItem(def.hiddenKey);
-            localStorage.removeItem('bbFabSlot_' + def.slotNum);
+            // Remove any previous slot assignment for this default, then place at chosen slot
+            for (let s = 1; s <= 4; s++) {
+              if (localStorage.getItem('bbFabSlot_' + s) === def.id) localStorage.removeItem('bbFabSlot_' + s);
+            }
+            localStorage.setItem('bbFabSlot_' + _fabPickerSlot, def.id);
             closeFabPicker();
             _applyOnboardingGating();
           });
@@ -2925,6 +2921,22 @@
       );
     })();
 
+    function _nukeGuestData() {
+      // Preserve web beta unlock so user isn't redirected to beta.html after wipe
+      const _webUnlocked = localStorage.getItem('bbWebUnlocked');
+      localStorage.clear();
+      if (_webUnlocked) localStorage.setItem('bbWebUnlocked', _webUnlocked);
+      sessionStorage.clear();
+      location.replace(location.pathname);
+    }
+
+    function _confirmDeleteGuestData() {
+      if (!confirm('This will permanently delete all your guest data — journal entries, settings, and preferences. There is no way to recover them.\n\nAre you absolutely sure?')) return;
+      if (!confirm('Last chance — everything will be deleted and you will start fresh. Continue?')) return;
+      _nukeGuestData();
+    }
+    window._confirmDeleteGuestData = _confirmDeleteGuestData;
+
     async function idxPinForgot() {
       const _isNat = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
       if (_isNat && localStorage.getItem('bbNativePinEnabled') === '1') {
@@ -2935,18 +2947,10 @@
         document.getElementById('guestPinOverlay').style.display = 'none';
         return;
       }
-      // Guest PIN: nuclear delete (PIN is the key — no recovery)
-      if (!confirm('This will permanently delete all your journal entries. There is no way to recover them.\n\nAre you absolutely sure?')) return;
-      if (!confirm('Last chance — all entries will be deleted. Continue?')) return;
-      const toDelete = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const k = localStorage.key(i);
-        if (k && (k.startsWith('entry:') || k === 'bbPinCode' || k === 'bbPinEnabled' || k === 'bbGuestPinSalt')) toDelete.push(k);
-      }
-      toDelete.forEach(k => localStorage.removeItem(k));
-      sessionStorage.removeItem('bb_guest_key');
-      sessionStorage.removeItem('bbPinUnlocked');
-      document.getElementById('guestPinOverlay').style.display = 'none';
+      // Guest PIN: full wipe (PIN is the encryption key — no recovery possible)
+      if (!confirm('Your PIN is the encryption key for your journal. Without it, your entries cannot be recovered.\n\nThis will permanently delete all your data and start fresh.\n\nAre you absolutely sure?')) return;
+      if (!confirm('Last chance — all entries and data will be deleted. Continue?')) return;
+      _nukeGuestData();
     }
   </script>
 

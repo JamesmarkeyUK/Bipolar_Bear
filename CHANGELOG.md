@@ -1,5 +1,14 @@
 # BipolarBear Changelog
 
+## v0.88
+- ✨ FAB dock buttons now consistent across all three pages — Chat, Coffee, E2EE, and Feedback all open modals on index, journal, and survival kit
+- ✨ Guest data deletion added to sign-in screen — wipes all data and restarts as new user
+- 🐛 Fix: "Forgot PIN?" on guest PIN screen now performs a full data wipe and restart (previously only removed the PIN lock, leaving data in place — a data risk)
+- 🐛 Fix: FAB hide confirmation modal removed — tapping "Hide this button" now hides immediately; buttons can always be re-added via the + dock picker
+- 🐛 Fix: FABs introduced in v0.87 now render correctly on page load (TDZ bug where `_FAB_DEFAULTS` was referenced before definition)
+- 🐛 Fix: Re-adding a hidden default FAB via the picker now places it in the chosen slot, not its original hardcoded position
+- 🎨 Survival kit dock footer changed to white with orange top border
+
 ## v0.87
 - ✨ "What's New" popup: shown once per version update to tutorial-complete users — headline feature + "Full changelog" link that opens the changelog in the journal
 
