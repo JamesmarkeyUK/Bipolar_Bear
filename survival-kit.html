@@ -55,7 +55,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-user-select: none; }
+    input, textarea, [contenteditable] { user-select: text; -webkit-user-select: text; }
     img { -webkit-touch-callout: none; user-select: none; }
 
     :root {
@@ -322,7 +323,7 @@
     .container {
       max-width: 480px;
       margin: 0 auto;
-      padding: 30px 20px;
+      padding: 30px 20px 100px;
     }
 
     /* ── SECTION ── */
@@ -910,6 +911,67 @@
     .modal-error { color: #ff6b6b; font-size: 0.9em; margin-bottom: 10px; display: none; }
     @keyframes hintFade { 0%,100%{opacity:0.55;transform:translateY(0)} 50%{opacity:1;transform:translateY(-4px)} }
     @keyframes bbHintNudge { 0%,100%{transform:scale(1)} 25%{transform:scale(1.18) rotate(-4deg)} 75%{transform:scale(1.12) rotate(3deg)} }
+
+    /* ── Survival kit FAB footer ── */
+    .fab-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 80px;
+      background: white;
+      border-radius: 28px 28px 0 0;
+      z-index: 120;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.10);
+      pointer-events: none;
+    }
+    .sk-auth-fab {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15em;
+      z-index: 121;
+      background: white;
+      color: #ff9500;
+      border: 2px solid #ff9500;
+      box-shadow: 0 2px 10px rgba(255,149,0,0.25);
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.15s;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .sk-auth-fab:hover { transform: translateX(-50%) scale(1.08); }
+    }
+    .sk-dock-fab {
+      position: fixed;
+      bottom: 18px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #ff9500;
+      border: none;
+      color: white;
+      font-size: 1.15em;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(255,149,0,0.45);
+      z-index: 121;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.18s, transform 0.15s;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .sk-dock-fab:hover { background: #e08600; transform: scale(1.08); }
+    }
   </style>
 </head>
 <body>
@@ -921,14 +983,6 @@
       <a href="/index.html" onclick="event.preventDefault(); location.replace(location.protocol==='file:'?'index.html':'/')" class="home-link-btn">← Home</a>
       <div style="margin-left:auto;position:relative;">
         <button id="skJournalNavBtn" onclick="_skGoToJournal()" title="Journal" style="background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.4);border-radius:50%;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;font-size:1.2em;cursor:pointer;line-height:1;-webkit-tap-highlight-color:transparent;flex-shrink:0;">📖</button>
-        <!-- Onboarding hint 7: step 7 — appears left of button, arrow points right -->
-        <div id="skHint7" style="display:none;flex-direction:row;align-items:center;gap:6px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;position:absolute;right:calc(100% + 8px);top:50%;transform:translateY(-50%);white-space:nowrap;">
-          <span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,255,255,0.9);font-family:'Georgia',serif;letter-spacing:0.01em;">🐻 Shortcut to journal</span>
-          <svg width="20" height="12" viewBox="0 0 20 12" fill="none">
-            <line x1="2" y1="6" x2="15" y2="6" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round"/>
-            <polyline points="9,2 15,6 9,10" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-          </svg>
-        </div>
       </div>
     </div>
     <!-- Auth elements kept hidden here so JS can still reference them -->
@@ -1670,15 +1724,6 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
         <a href="tel:999" class="crisis-btn">🚨 999 Emergency</a>
         <div id="emergencyContactArea" style="margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.25);"></div>
       </div>
-    </div>
-
-    <!-- Auth bar at bottom -->
-    <div style="background:white;border-radius:14px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
-      <span id="skAuthLabel" style="font-size:0.82em;color:#adb5bd;font-style:italic;">Login to backup data online</span>
-      <button id="skAuthBtn" type="button" onclick="showAuthModal()" style="flex-shrink:0;padding:7px 14px;background:#ff9500;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.85em;-webkit-tap-highlight-color:transparent;">Sign In / Up</button>
-    </div>
-    <div style="text-align:center;margin-top:8px;margin-bottom:16px;">
-      <button onclick="showPersonalDetailsModal()" style="background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;padding:4px 8px;text-decoration:underline;text-underline-offset:2px;-webkit-tap-highlight-color:transparent;">👤 Your personal details</button>
     </div>
 
   </div><!-- /container -->
@@ -3750,10 +3795,9 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
         }
       }
 
-      // Native app uses a separate counter starting at 1; web keeps the shared counter
-      const isNative = () => window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
-      const counterDocId = () => isNative() ? 'peopleHelpedApp' : 'peopleHelped';
-      const counterSeed  = () => isNative() ? 1 : 1;
+      // Single unified counter for all platforms, seeded at 1
+      const counterDocId = () => 'helpedCount';
+      const counterSeed  = () => 1;
 
       // Adjust counter using FieldValue.increment (atomic, no transaction needed)
       async function adjustCounter(delta) {
@@ -3962,35 +4006,9 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
           if (signinBtn) signinBtn.style.display = '';
           if (userInfo) userInfo.style.display = 'none';
         }
-        _updateSkAuthBar();
         renderEmergencyContact();
       });
     } catch(e) { console.warn('Firebase init failed on survival-kit.html', e); }
-
-    function _updateSkAuthBar() {
-      const label = document.getElementById('skAuthLabel');
-      const btn = document.getElementById('skAuthBtn');
-      if (!label || !btn) return;
-      if (currentUser) {
-        label.textContent = currentUser.email || '';
-        label.style.fontStyle = 'normal';
-        label.style.color = '#6c757d';
-        btn.textContent = 'Logout';
-        btn.style.background = 'white';
-        btn.style.color = '#adb5bd';
-        btn.style.border = '1.5px solid #dee2e6';
-        btn.onclick = logout;
-      } else {
-        label.textContent = 'Login to backup data online';
-        label.style.fontStyle = 'italic';
-        label.style.color = '#adb5bd';
-        btn.textContent = 'Sign In / Up';
-        btn.style.background = '#ff9500';
-        btn.style.color = 'white';
-        btn.style.border = 'none';
-        btn.onclick = showAuthModal;
-      }
-    }
 
     function logout() {
       [
@@ -4266,52 +4284,11 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
     }
 
     function _applySkOnboardingGating() {
-      const step = parseInt(localStorage.getItem('bbOnboardingStep') || '0', 10);
-      const hint = document.getElementById('skHint7');
-      if (hint) hint.style.display = step === 7 ? 'flex' : 'none';
-
-      // Step 7 blocking overlay: fires as soon as the welcome popup has been dismissed
-      const _visited = localStorage.getItem('bbSurvivalKitVisited') === '1';
-      const _isBlocking = step === 7 && _visited;
-      const overlay = document.getElementById('bbSkOverlay');
-      if (overlay) overlay.style.display = _isBlocking ? '' : 'none';
-
-      document.body.style.overflow = _isBlocking ? 'hidden' : '';
-
-      document.querySelectorAll('.sk-hint-elevated').forEach(el => {
-        el.classList.remove('sk-hint-elevated');
-        el.style.zIndex = el.dataset.prevZIndex !== undefined ? el.dataset.prevZIndex : '';
-        delete el.dataset.prevZIndex;
-      });
-      if (_isBlocking) {
-        [document.getElementById('skHint7'), document.getElementById('skJournalNavBtn')].filter(Boolean).forEach(el => {
-          el.dataset.prevZIndex = el.style.zIndex;
-          el.style.zIndex = '120';
-          if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
-          el.classList.add('sk-hint-elevated');
-        });
-        const _tgt = document.getElementById('skJournalNavBtn');
-        if (_tgt) setTimeout(() => _showSkHintPointer(_tgt), 50);
-      } else {
-        _hideSkHintPointer();
-      }
+      // No blocking onboarding steps on survival kit — users explore freely
     }
     _applySkOnboardingGating();
 
     function _skGoToJournal() {
-      // Advance step 7→8 (journal nav clicked on survival kit page)
-      const step = parseInt(localStorage.getItem('bbOnboardingStep') || '0', 10);
-      if (step === 7) {
-        localStorage.setItem('bbOnboardingStep', '8');
-        // Sync to Firestore if signed in (best-effort)
-        try {
-          const _db = firebase && firebase.apps.length && firebase.firestore();
-          const _auth = firebase && firebase.apps.length && firebase.auth();
-          if (_db && _auth && _auth.currentUser) {
-            _db.collection('userSettings').doc(_auth.currentUser.uid).set({ onboardingStep: 8 }, { merge: true }).catch(() => {});
-          }
-        } catch(e) {}
-      }
       location.replace('journal.html');
     }
     window._skGoToJournal = _skGoToJournal;
@@ -4320,28 +4297,6 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
 
   <!-- First-visit overlay (z-index 99, below sticky-nav at 100) -->
   <div id="bbSkOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:110;pointer-events:none;transition:opacity 0.2s ease;"></div>
-
-  <script>
-    // ── Step 7 (go to journal) lock ──
-    (function() {
-      document.addEventListener('click', function(e) {
-        const step = parseInt(localStorage.getItem('bbOnboardingStep') || '0', 10);
-        if (step !== 7) return;
-        if (localStorage.getItem('bbSurvivalKitVisited') !== '1') return;
-        if (localStorage.getItem('bbMoodDefHintDone') !== '1') return;
-        const _btn = document.getElementById('skJournalNavBtn');
-        if (!_btn || _btn === e.target || _btn.contains(e.target)) return;
-        e.stopPropagation(); e.preventDefault();
-        [_btn, document.getElementById('skHint7')].forEach(el => {
-          if (!el) return;
-          const _prev = el.style.animation;
-          el.style.animation = 'none'; el.offsetHeight;
-          el.style.animation = 'bbHintNudge 0.5s ease';
-          setTimeout(() => { el.style.animation = _prev; }, 520);
-        });
-      }, true);
-    })();
-  </script>
 
   <script>
     // ── Native status bar (orange, light text) ──
@@ -4375,6 +4330,109 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
       _resetIdleTimer();
     }
   </script>
+
+  <!-- Survival kit dock -->
+  <div class="fab-footer" aria-hidden="true"></div>
+  <button class="sk-auth-fab" onclick="showAuthModal()">👤</button>
+  <button class="sk-dock-fab" id="skdockChat" onclick="window.open('https://chat.whatsapp.com/Crsfo0x9u887tnTiQUpAvy','_blank')" title="Bipolar Anonymous WhatsApp">💬</button>
+  <button class="sk-dock-fab" id="skdockE2ee" onclick="document.getElementById('skSecModal').style.display='flex'" title="Your data security">🔐</button>
+  <button class="sk-dock-fab" id="skdockCoffee" onclick="window.open('https://buymeacoffee.com/jamesmarkey','_blank')" title="Buy us a coffee">☕</button>
+  <button class="sk-dock-fab" id="skdockFeedback" onclick="document.getElementById('skFeedbackModal').style.display='flex'" title="Send feedback">📣</button>
+
+  <!-- SK Security modal -->
+  <div id="skSecModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)this.style.display='none';">
+    <div style="background:white;border-radius:20px;padding:24px;max-width:300px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);">
+      <div style="font-size:2em;text-align:center;margin-bottom:8px;">🔐</div>
+      <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:12px;text-align:center;">How your data stays safe</div>
+      <div style="font-size:0.84em;color:#495057;line-height:1.65;margin-bottom:16px;">
+        <p style="margin-bottom:8px;"><strong>🔑 Your PIN</strong> locks the app locally. Without it, nobody can open Bipolar Bear.</p>
+        <p style="margin-bottom:8px;"><strong>🔒 Your password</strong> encrypts journal entries before they leave your device.</p>
+        <p style="margin-bottom:0;"><strong>🛡️ End-to-end encryption</strong> — your data is protected at every step.</p>
+      </div>
+      <button onclick="document.getElementById('skSecModal').style.display='none'" style="display:block;width:100%;padding:12px;background:#ff9500;color:white;border:none;border-radius:12px;font-weight:700;cursor:pointer;">Got it</button>
+    </div>
+  </div>
+
+  <!-- SK Feedback modal -->
+  <div id="skFeedbackModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)this.style.display='none';">
+    <div style="background:white;border-radius:20px;padding:24px;max-width:320px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);">
+      <div style="font-size:2em;text-align:center;margin-bottom:8px;">📣</div>
+      <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:6px;text-align:center;">Share Feedback</div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <button id="skfbTypeBug" onclick="skfbSelect('bug')" style="flex:1;padding:8px;border:1.5px solid #e9ecef;border-radius:10px;font-size:0.82em;cursor:pointer;background:white;color:#495057;">🐛 Bug</button>
+        <button id="skfbTypeComment" onclick="skfbSelect('comment')" style="flex:1;padding:8px;border:1.5px solid #e9ecef;border-radius:10px;font-size:0.82em;cursor:pointer;background:#fff3e0;border-color:#ff9500;color:#ff9500;">💬 Comment</button>
+        <button id="skfbTypeIdea" onclick="skfbSelect('idea')" style="flex:1;padding:8px;border:1.5px solid #e9ecef;border-radius:10px;font-size:0.82em;cursor:pointer;background:white;color:#495057;">💡 Idea</button>
+      </div>
+      <textarea id="skfbMessage" placeholder="Tell us what's on your mind…" rows="3" style="width:100%;padding:10px;border:1.5px solid #e9ecef;border-radius:10px;font-size:0.9em;box-sizing:border-box;resize:none;font-family:inherit;margin-bottom:12px;outline:none;"></textarea>
+      <div id="skfbError" style="color:#dc3545;font-size:0.82em;margin-bottom:8px;display:none;"></div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="skfbSubmit()" style="flex:1;padding:11px;background:#ff9500;color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-size:0.9em;">Send</button>
+        <button onclick="document.getElementById('skFeedbackModal').style.display='none'" style="flex:1;padding:11px;background:white;color:#6c757d;border:1.5px solid #e9ecef;border-radius:10px;font-weight:600;cursor:pointer;font-size:0.9em;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── SK Dock functions ──
+    let _skfbType = 'comment';
+    function skfbSelect(type) {
+      _skfbType = type;
+      const map = { bug: 'skfbTypeBug', comment: 'skfbTypeComment', idea: 'skfbTypeIdea' };
+      Object.keys(map).forEach(k => {
+        const btn = document.getElementById(map[k]);
+        if (!btn) return;
+        if (k === type) { btn.style.background = '#fff3e0'; btn.style.borderColor = '#ff9500'; btn.style.color = '#ff9500'; }
+        else { btn.style.background = 'white'; btn.style.borderColor = '#e9ecef'; btn.style.color = '#495057'; }
+      });
+    }
+    async function skfbSubmit() {
+      const msgEl = document.getElementById('skfbMessage');
+      const errEl = document.getElementById('skfbError');
+      const msg = msgEl ? msgEl.value.trim() : '';
+      if (!msg) { if (errEl) { errEl.textContent = 'Please enter a message.'; errEl.style.display = ''; } return; }
+      if (errEl) errEl.style.display = 'none';
+      try {
+        await window.db.collection('feedback').add({
+          type: _skfbType, message: msg, page: 'survival-kit',
+          uid: window.currentUser ? window.currentUser.uid : null,
+          ts: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        document.getElementById('skFeedbackModal').style.display = 'none';
+        const _t = document.createElement('div');
+        _t.textContent = '✅ Feedback sent — thank you!';
+        Object.assign(_t.style, { position:'fixed', top:'calc(env(safe-area-inset-top,0px) + 12px)', left:'50%', transform:'translateX(-50%)', background:'#ff9500', color:'white', padding:'10px 20px', borderRadius:'20px', fontWeight:'700', fontSize:'0.9em', zIndex:'9999', whiteSpace:'nowrap', boxShadow:'0 4px 16px rgba(0,0,0,0.2)', pointerEvents:'none' });
+        document.body.appendChild(_t);
+        setTimeout(() => _t.remove(), 3000);
+      } catch(e) { if (errEl) { errEl.textContent = 'Failed to send. Please try again.'; errEl.style.display = ''; } }
+    }
+
+    // Apply SK dock visibility (synced with index flags)
+    function _applySkDock() {
+      const step = parseInt(localStorage.getItem('bbOnboardingStep') || '0', 10);
+      const _wide = window.matchMedia('(min-width: 520px)').matches;
+      const _slotPos = {
+        1: _wide ? 'calc(50% - 214px)' : 'calc(10% - 22px)',
+        2: _wide ? 'calc(50% - 118px)' : 'calc(30% - 22px)',
+        3: _wide ? 'calc(50% + 74px)'  : 'calc(70% - 22px)',
+        4: _wide ? 'calc(50% + 170px)' : 'calc(90% - 22px)',
+      };
+      const _show = step >= 12;
+      const _slotVis = {
+        1: _show && localStorage.getItem('bbWaFabHidden') !== '1',
+        2: localStorage.getItem('bbQuickNoteFabHidden') !== '1',
+        3: _show && localStorage.getItem('bbCoffeeFabHidden') !== '1',
+        4: _show && localStorage.getItem('bbFeedbackFabHidden') !== '1',
+      };
+      const _slotFabs = { 1: 'skdockChat', 2: 'skdockE2ee', 3: 'skdockCoffee', 4: 'skdockFeedback' };
+      for (let s = 1; s <= 4; s++) {
+        const fab = document.getElementById(_slotFabs[s]);
+        if (fab) { fab.style.display = _slotVis[s] ? 'flex' : 'none'; fab.style.left = _slotPos[s]; }
+      }
+    }
+    document.addEventListener('DOMContentLoaded', _applySkDock);
+    window.addEventListener('resize', _applySkDock);
+  </script>
+
 </body>
 </html>
 

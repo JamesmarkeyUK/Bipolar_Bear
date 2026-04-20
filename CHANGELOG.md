@@ -1,5 +1,13 @@
 # BipolarBear Changelog
 
+## v0.85
+- ✨ Full dock (Chat, E2EE, Coffee, Feedback) now synced across index, journal, and survival kit — hiding a button on one page hides it everywhere
+- ✨ Empty dock slots show a dotted `+` placeholder; tapping opens a picker to assign Stats 📊, Celebrity ⭐, Goals 🎯, or Quick Note 📝
+- ✨ Journal and survival-kit FAB footer changed to white background, matching index
+- ✨ Settings FAB (⚙️) replaces profile icon in journal dock when logged in; tapping it opens the settings modal
+- 🐛 Fix: Duplicate 🔐 E2EE FAB no longer appears when Feedback is permanently hidden (removed securityFab fallback)
+- 🐛 Fix: Settings-button tutorial hints auto-skipped since settings button moved to dock FAB
+
 ## v0.71
 - Beta gate: skip redirect when running from local file (file: protocol) so app works when opened directly from disk
 - Survival kit sticky nav: Home link moved out of scrollable strip into its own fixed left cell; arrow pointer angle recalculated from final rendered position (not screen centre)
