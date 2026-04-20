@@ -1,5 +1,13 @@
 # BipolarBear Changelog
 
+## v0.86
+- ✨ FAB picker now lists hidden default buttons (Chat, E2EE, Coffee, Feedback) so they can be re-added to the dock
+- ✨ All FABs — including extra ones (Stats, Celebrity, Goals, Quick Note) — have a "Hide this button" option; hidden buttons return to the picker
+- ✨ Celebrity popup loads real Wikipedia photos
+- 🐛 Fix: Quick Note hide button now removes the extra FAB from its slot (previously it accidentally hid the E2EE button)
+- 🎨 Survival Kit dock footer reverted to orange gradient
+- 🎨 Hide button text no longer says "permanently" since all buttons can be re-added via the + placeholder
+
 ## v0.85
 - ✨ Full dock (Chat, E2EE, Coffee, Feedback) now synced across index, journal, and survival kit — hiding a button on one page hides it everywhere
 - ✨ Empty dock slots show a dotted `+` placeholder; tapping opens a picker to assign Stats 📊, Celebrity ⭐, Goals 🎯, or Quick Note 📝
