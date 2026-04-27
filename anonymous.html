@@ -747,7 +747,7 @@ function initFirebase() {
     db = firebase.firestore();
     db.enablePersistence({ synchronizeTabs: true }).catch(() => {});
     // Expose callable functions for email verification
-    const _fns = firebase.functions();
+    const _fns = firebase.app().functions('europe-west1');
     window._anonSendCode   = _fns.httpsCallable('sendAnonCode');
     window._anonVerifyCode = _fns.httpsCallable('verifyAnonCode');
   } catch (e) {

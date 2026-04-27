@@ -6265,6 +6265,7 @@
           localStorage.setItem('bbGuestPinSalt', saltB64);
           localStorage.setItem('bbPinEnabled', '1');
           localStorage.setItem('bbPinCode', _guestPinSetupFirst);
+          localStorage.setItem('bbPinLinkedUID', currentUser ? currentUser.uid : 'guest');
           sessionStorage.setItem('bbPinUnlocked', '1');
           _guestCryptoKey = await _guestDeriveKey(_guestPinSetupFirst, saltB64);
           await _guestExportKeyToSession(_guestCryptoKey);

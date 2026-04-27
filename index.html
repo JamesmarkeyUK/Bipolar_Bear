@@ -779,6 +779,22 @@
       auth.onAuthStateChanged(user => {
         currentUser = user && !user.isAnonymous ? user : null;
 
+        // Clear stale guest PIN if it was set by a different account.
+        // Guest PINs (bbGuestPinSalt) are only valid for the account that created them.
+        if (user && !user.isAnonymous) {
+          const _hasGuestPin = !!localStorage.getItem('bbGuestPinSalt');
+          const _pinUID      = localStorage.getItem('bbPinLinkedUID');
+          if (_hasGuestPin && _pinUID !== user.uid) {
+            localStorage.removeItem('bbGuestPinSalt');
+            localStorage.removeItem('bbPinCode');
+            localStorage.removeItem('bbPinEnabled');
+            localStorage.removeItem('bbPinLinkedUID');
+            sessionStorage.setItem('bbPinUnlocked', '1');
+            const _pinOv = document.getElementById('guestPinOverlay');
+            if (_pinOv && _pinOv.style.display !== 'none') _pinOv.style.display = 'none';
+          }
+        }
+
         // Bipolar Anonymous button — unlocked only when signed in
         const anonBtn  = document.getElementById('anonymousBtn');
         const anonNote = document.getElementById('anonymousSignInNote');
