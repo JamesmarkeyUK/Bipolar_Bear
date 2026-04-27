@@ -403,13 +403,16 @@
       <div class="card-title">Welcome 👋</div>
       <div class="card-sub">Verify your email to join the community. Your identity stays private — we'll never share it.</div>
 
+      <!-- Shared error display for both steps -->
+      <div id="verify-error" style="display:none;margin-bottom:12px;padding:10px 14px;background:rgba(220,53,69,0.08);border:1.5px solid rgba(220,53,69,0.25);border-radius:10px;font-size:13px;color:#dc3545;line-height:1.45;"></div>
+
       <div id="step-email">
         <input id="email-input" type="email" class="bb-input" placeholder="your@email.com" autocomplete="email">
         <button id="send-code-btn" class="btn-primary" disabled>Send Verification Code</button>
       </div>
 
       <div id="step-code" style="display:none">
-        <div id="code-sent-label" style="font-size:13px;color:var(--muted);margin-bottom:12px;"></div>
+        <div id="code-sent-label" style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.45;"></div>
         <div class="code-boxes">
           <input class="code-box" type="tel" maxlength="1" inputmode="numeric">
           <input class="code-box" type="tel" maxlength="1" inputmode="numeric">
@@ -417,6 +420,10 @@
           <input class="code-box" type="tel" maxlength="1" inputmode="numeric">
         </div>
         <button id="verify-btn" class="btn-primary" disabled>Verify →</button>
+        <div style="display:flex;justify-content:space-between;margin-top:14px;">
+          <button id="back-to-email-btn" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;">← Change email</button>
+          <button id="resend-btn" style="background:none;border:none;color:var(--orange);font-size:13px;font-weight:600;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;">Resend code</button>
+        </div>
       </div>
     </div>
   </div>
@@ -661,6 +668,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-functions-compat.js"></script>
 
 <script>
 // ─────────────────────────────────────────────────────────────────
@@ -738,6 +746,10 @@ function initFirebase() {
     }
     db = firebase.firestore();
     db.enablePersistence({ synchronizeTabs: true }).catch(() => {});
+    // Expose callable functions for email verification
+    const _fns = firebase.functions();
+    window._anonSendCode   = _fns.httpsCallable('sendAnonCode');
+    window._anonVerifyCode = _fns.httpsCallable('verifyAnonCode');
   } catch (e) {
     console.warn('[Anonymous] Firebase init failed — running offline', e);
   }
@@ -833,15 +845,27 @@ function setupVerify() {
   const sendBtn   = document.getElementById('send-code-btn');
   const verifyBtn = document.getElementById('verify-btn');
   const boxes     = document.querySelectorAll('.code-box');
+  const errDiv    = document.getElementById('verify-error');
   let   _pendingEmail = '';
+  let   _sessionId    = null;
+
+  function showError(msg) {
+    errDiv.textContent   = msg;
+    errDiv.style.display = 'block';
+  }
+  function clearError() {
+    errDiv.style.display = 'none';
+    errDiv.textContent   = '';
+  }
 
   function _validateEmail() {
-    const ok = emailIn.value.includes('@') && emailIn.value.includes('.');
+    const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailIn.value.trim());
     sendBtn.disabled = !ok;
     emailIn.classList.toggle('valid', ok);
   }
 
   emailIn.addEventListener('input', _validateEmail);
+  emailIn.addEventListener('keydown', e => { if (e.key === 'Enter' && !sendBtn.disabled) sendBtn.click(); });
 
   // Prefill from the user's Bipolar Bear account (same Firebase project)
   function _prefillFromAccount(user) {
@@ -858,24 +882,65 @@ function setupVerify() {
     });
   }
 
-  sendBtn.addEventListener('click', () => {
-    _pendingEmail = emailIn.value.trim();
-    document.getElementById('step-email').style.display = 'none';
-    document.getElementById('step-code').style.display  = 'block';
-    document.getElementById('code-sent-label').innerHTML =
-      `Code sent to <strong>${esc(_pendingEmail)}</strong>`;
-    boxes[0].focus();
-  });
-
   function getCode() { return Array.from(boxes).map(b => b.value).join(''); }
 
+  function resetBoxes() {
+    boxes.forEach(b => { b.value = ''; b.classList.remove('filled'); });
+    verifyBtn.disabled = true;
+  }
+
+  function goToEmailStep() {
+    clearError();
+    resetBoxes();
+    _sessionId = null;
+    document.getElementById('step-code').style.display  = 'none';
+    document.getElementById('step-email').style.display = 'block';
+    emailIn.focus();
+  }
+
+  async function doSend(email) {
+    clearError();
+    sendBtn.disabled = true;
+    const origText = sendBtn.textContent;
+    sendBtn.textContent = 'Sending…';
+    try {
+      if (!window._anonSendCode) {
+        throw new Error('Verification service unavailable — please try again in a moment.');
+      }
+      const result = await window._anonSendCode({ email });
+      _sessionId    = result.data.sessionId;
+      _pendingEmail = email;
+      document.getElementById('step-email').style.display = 'none';
+      document.getElementById('step-code').style.display  = 'block';
+      document.getElementById('code-sent-label').innerHTML =
+        `Code sent to <strong>${esc(email)}</strong>. Check your inbox (and spam folder).`;
+      resetBoxes();
+      boxes[0].focus();
+    } catch (err) {
+      sendBtn.disabled    = false;
+      sendBtn.textContent = origText;
+      const errCode = err.code || '';
+      if (errCode === 'functions/resource-exhausted') {
+        showError('Too many code requests. Please wait 10 minutes and try again.');
+      } else if (errCode === 'functions/invalid-argument') {
+        showError('Please enter a valid email address.');
+      } else {
+        showError(err.message || 'Could not send verification code. Please try again.');
+      }
+    }
+  }
+
+  sendBtn.addEventListener('click', () => doSend(emailIn.value.trim()));
+
+  // Code box navigation + input
   boxes.forEach((box, i) => {
     box.addEventListener('input', e => {
       const v = e.target.value.replace(/\D/g, '');
-      box.value = v;
-      box.classList.toggle('filled', !!v);
-      if (v && boxes[i + 1]) boxes[i + 1].focus();
+      box.value = v ? v[0] : '';
+      box.classList.toggle('filled', !!box.value);
+      if (box.value && boxes[i + 1]) boxes[i + 1].focus();
       verifyBtn.disabled = getCode().length < 4;
+      clearError();
     });
     box.addEventListener('keydown', e => {
       if (e.key === 'Backspace' && !box.value && boxes[i - 1]) {
@@ -885,16 +950,75 @@ function setupVerify() {
         verifyBtn.disabled = true;
       }
     });
+    // Paste 4 digits at once
+    box.addEventListener('paste', e => {
+      e.preventDefault();
+      const digits = (e.clipboardData || window.clipboardData)
+        .getData('text').replace(/\D/g, '').slice(0, 4);
+      if (!digits) return;
+      boxes.forEach((b, j) => {
+        b.value = digits[j] || '';
+        b.classList.toggle('filled', !!b.value);
+      });
+      const nextIdx = Math.min(digits.length, boxes.length - 1);
+      boxes[nextIdx].focus();
+      verifyBtn.disabled = getCode().length < 4;
+    });
   });
 
-  verifyBtn.addEventListener('click', () => {
-    if (_pendingEmail.toLowerCase() === ADMIN_EMAIL) {
-      localStorage.setItem('bbAnon_isAdmin', 'true');
+  verifyBtn.addEventListener('click', async () => {
+    const code = getCode();
+    if (code.length < 4 || !_sessionId) return;
+    clearError();
+    verifyBtn.disabled  = true;
+    const origText = verifyBtn.textContent;
+    verifyBtn.textContent = 'Verifying…';
+    try {
+      await window._anonVerifyCode({ sessionId: _sessionId, code });
+      // ✅ Verified
+      if (_pendingEmail.toLowerCase() === ADMIN_EMAIL) {
+        localStorage.setItem('bbAnon_isAdmin', 'true');
+      }
+      localStorage.setItem('bbAnon_verified', 'true');
+      showScreen('monika');
+      setupMonika();
+    } catch (err) {
+      verifyBtn.disabled  = false;
+      verifyBtn.textContent = origText;
+      const errCode = err.code || '';
+      if (errCode === 'functions/unauthenticated') {
+        // Wrong code — message already includes "X attempts remaining"
+        showError(err.message || 'Incorrect code. Please try again.');
+        resetBoxes();
+        boxes[0].focus();
+      } else if (errCode === 'functions/deadline-exceeded') {
+        showError('This code has expired. Sending a new one…');
+        resetBoxes();
+        setTimeout(() => doSend(_pendingEmail), 1200);
+      } else if (errCode === 'functions/resource-exhausted') {
+        showError('Too many incorrect attempts. Please request a new code.');
+        goToEmailStep();
+      } else if (errCode === 'functions/not-found') {
+        showError('Verification session not found. Please start again.');
+        goToEmailStep();
+      } else {
+        showError(err.message || 'Verification failed. Please try again.');
+        resetBoxes();
+        boxes[0].focus();
+      }
     }
-    localStorage.setItem('bbAnon_verified', 'true');
-    showScreen('monika');
-    setupMonika();
   });
+
+  // Resend code
+  document.getElementById('resend-btn').addEventListener('click', () => {
+    if (!_pendingEmail) { goToEmailStep(); return; }
+    resetBoxes();
+    clearError();
+    doSend(_pendingEmail);
+  });
+
+  // Back to email step
+  document.getElementById('back-to-email-btn').addEventListener('click', goToEmailStep);
 }
 
 // ─────────────────────────────────────────────────────────────────
