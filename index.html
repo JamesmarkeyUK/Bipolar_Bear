@@ -54,10 +54,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <!-- Firebase SDK loaded inline in body, just before first use -->
 
   <style>
     * {
@@ -255,6 +252,21 @@
       border: 3px solid rgba(255, 255, 255, 0.5);
     }
 
+    .btn-anonymous {
+      background: rgba(255, 255, 255, 0.22);
+      color: white;
+      border: 3px solid rgba(255, 255, 255, 0.5);
+      transition: opacity 0.2s, border-color 0.2s, background 0.2s;
+    }
+    .btn-anonymous.locked {
+      background: rgba(255, 255, 255, 0.07);
+      color: rgba(255, 255, 255, 0.45);
+      border: 3px dashed rgba(255, 255, 255, 0.3);
+      box-shadow: none;
+      cursor: default;
+      pointer-events: none;
+    }
+
     .btn.btn-whatsapp {
       background: rgba(37, 211, 102, 0.2);
       max-width: 250px;
@@ -415,179 +427,7 @@
       background: white;
       color: #ff9500;
     }
-    /* ── White footer covering all FABs ── */
-    .fab-footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 80px;
-      background: white;
-      border-radius: 28px 28px 0 0;
-      z-index: 45;
-      box-shadow: 0 -4px 20px rgba(0,0,0,0.10);
-      pointer-events: none;
-    }
-
-    /* ── FAB row: 5 evenly spaced positions (10/30/50/70/90% centers) ── */
-
-    /* Position 1 — Chat FAB (coming soon) */
-    /* Position 1 — Chat / Crisis FAB */
-    .whatsapp-fab {
-      position: fixed;
-      bottom: 24px;
-      left: calc(10% - 22px);
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: #ff9500;
-      border: none;
-      color: white;
-      font-size: 1.2em;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 14px rgba(255,149,0,0.45);
-      z-index: 50;
-      -webkit-tap-highlight-color: transparent;
-      transition: background 0.18s, transform 0.15s;
-    }
-    @media (hover: hover) and (pointer: fine) {
-      .whatsapp-fab:hover { background: #e08600; transform: scale(1.08); }
-    }
-    @media (min-width: 520px) {
-      .whatsapp-fab { left: calc(50% - 214px); }
-    }
-
-    /* Position 2 — E2EE Security FAB */
-    .placeholder-fab {
-      position: fixed;
-      bottom: 24px;
-      left: calc(30% - 22px);
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: #ff9500;
-      border: none;
-      color: white;
-      font-size: 1.1em;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 14px rgba(255,149,0,0.45);
-      z-index: 50;
-      -webkit-tap-highlight-color: transparent;
-      transition: background 0.18s, transform 0.15s;
-    }
-    @media (hover: hover) and (pointer: fine) {
-      .placeholder-fab:hover { background: #e08600; transform: scale(1.08); }
-    }
-    @media (min-width: 520px) {
-      .placeholder-fab { left: calc(50% - 118px); }
-    }
-
-    /* Position 4 — Coffee FAB */
-    .coffee-fab {
-      position: fixed;
-      bottom: 24px;
-      left: calc(70% - 22px);
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: #ff9500;
-      color: white;
-      border: none;
-      font-size: 1.15em;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(255,149,0,0.45);
-      z-index: 50;
-      -webkit-tap-highlight-color: transparent;
-      transition: background 0.18s, transform 0.15s;
-    }
-    @media (hover: hover) and (pointer: fine) {
-      .coffee-fab:hover { background: #e08600; transform: scale(1.08); }
-    }
-    @media (min-width: 520px) {
-      .coffee-fab { left: calc(50% + 74px); }
-    }
-
-    /* Position 5 — Feedback FAB */
-    .feedback-fab {
-      position: fixed;
-      bottom: 24px;
-      left: calc(90% - 22px);
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: #ff9500;
-      border: none;
-      color: white;
-      font-size: 1.15em;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 16px rgba(255,149,0,0.35);
-      transition: transform 0.2s ease, background 0.2s ease;
-      -webkit-tap-highlight-color: transparent;
-      z-index: 50;
-    }
-    @media (hover: hover) and (pointer: fine) {
-      .feedback-fab:hover { background: #ff6b00; transform: scale(1.08); }
-    }
-    @media (min-width: 520px) {
-      .feedback-fab { left: calc(50% + 170px); }
-    }
     /* Dotted placeholder for hidden FAB slot */
-    .fab-dot-placeholder {
-      position: fixed;
-      bottom: 24px;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: transparent;
-      border: 2px dashed rgba(255,149,0,0.45);
-      color: rgba(255,149,0,0.6);
-      font-size: 1.3em;
-      cursor: pointer;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 50;
-      -webkit-tap-highlight-color: transparent;
-      transition: border-color 0.18s, color 0.18s;
-    }
-    @media (hover: hover) and (pointer: fine) {
-      .fab-dot-placeholder:hover { border-color: rgba(255,149,0,0.75); color: rgba(255,149,0,0.85); }
-    }
-    /* Extra assignable FABs share dock-fab base style */
-    .dock-extra-fab {
-      position: fixed;
-      bottom: 24px;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: #ff9500;
-      border: none;
-      color: white;
-      font-size: 1.15em;
-      cursor: pointer;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 14px rgba(255,149,0,0.45);
-      z-index: 50;
-      -webkit-tap-highlight-color: transparent;
-      transition: background 0.18s, transform 0.15s;
-    }
-    @media (hover: hover) and (pointer: fine) {
-      .dock-extra-fab:hover { background: #e08600; transform: scale(1.08); }
-    }
 
     @keyframes wnSlideUp {
       from { opacity: 0; transform: translateY(12px); }
@@ -620,59 +460,112 @@
       box-shadow: 0 10px 40px rgba(0,0,0,0.2);
     }
 
-    /* ── Feedback modal ── */
-    .feedback-modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.5);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-      padding: 20px;
-      box-sizing: border-box;
+
+    /* ─── iPad simulator (≥ 920px) ─── */
+    @media (min-width: 920px) {
+      body {
+        background: #eaeaea !important;
+        padding: 0 !important;
+        min-height: 100dvh;
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: center !important;
+        align-items: center !important;
+        overflow: auto;
+      }
+      #iphone-frame {
+        width: 768px;
+        height: min(1024px, 96dvh);
+        background: linear-gradient(160deg, #2a2a2a 0%, #111 60%, #1a1a1a 100%);
+        border-radius: 40px;
+        padding: 20px 16px 28px;
+        position: relative;
+        flex-shrink: 0;
+        margin: 20px 0;
+        box-shadow:
+          inset 0 0 0 1px rgba(255,255,255,0.12),
+          inset 0 0 0 3px #000,
+          0 40px 120px rgba(0,0,0,0.95),
+          0 8px 40px rgba(0,0,0,0.7);
+      }
+      #iphone-frame::before {
+        content: '';
+        position: absolute;
+        left: -4px; top: 200px;
+        width: 4px; height: 36px;
+        background: #2a2a2a;
+        border-radius: 2px 0 0 2px;
+        box-shadow: 0 60px 0 #2a2a2a;
+        pointer-events: none;
+      }
+      #iphone-frame::after {
+        content: '';
+        position: absolute;
+        right: -4px; top: 260px;
+        width: 4px; height: 80px;
+        background: #2a2a2a;
+        border-radius: 0 2px 2px 0;
+        pointer-events: none;
+      }
+      #iphone-frame .dynamic-island {
+        position: absolute;
+        top: 12px; left: 50%;
+        transform: translateX(-50%);
+        width: 12px; height: 12px;
+        background: #000;
+        border-radius: 50%;
+        z-index: 9999;
+        pointer-events: none;
+      }
+      #iphone-frame .home-indicator {
+        position: absolute;
+        bottom: 8px; left: 50%;
+        transform: translateX(-50%);
+        width: 220px; height: 5px;
+        background: rgba(255,255,255,0.28);
+        border-radius: 3px;
+        z-index: 9999;
+        pointer-events: none;
+      }
+      #app-shell {
+        width: 100%;
+        height: 100%;
+        border-radius: 30px;
+        background: linear-gradient(135deg, #ff9500 0%, #ff6b00 100%);
+        transform: translateZ(0);
+      }
+      #scroll-view {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        overflow: hidden;
+        overflow-y: auto;
+        height: 100%;
+        border-radius: 30px;
+        scrollbar-width: none;
+        padding: 48px 28px 80px;
+        box-sizing: border-box;
+      }
+      #scroll-view::-webkit-scrollbar { display: none; }
     }
-    .feedback-modal.active { display: flex; }
-    .feedback-content {
-      background: white;
-      padding: 28px;
-      border-radius: 20px;
-      max-width: 420px;
-      width: 100%;
-      max-height: 85dvh;
-      overflow-y: auto;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-      box-sizing: border-box;
-    }
-    .feedback-type-btn {
-      flex: 1;
-      padding: 10px 8px;
-      border: 2px solid #e9ecef;
-      border-radius: 10px;
-      background: #f8f9fa;
-      color: #495057;
-      font-weight: 600;
-      font-size: 0.9em;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .feedback-type-btn.selected {
-      border-color: #ff9500;
-      background: rgba(255,149,0,0.08);
-      color: #ff9500;
+    @media (min-width: 920px) and (prefers-color-scheme: dark) {
+      body { background: #111 !important; }
     }
   </style>
 </head>
 <body>
+<div id="iphone-frame">
+  <div class="dynamic-island"></div>
+  <div id="app-shell">
+  <div id="scroll-view">
   <!-- Hide button confirmation modal -->
 
   <!-- Auth FAB: centred over white notch -->
   <div id="authFabWrapper" style="position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:50; pointer-events:none; display:flex; align-items:center; justify-content:center;">
-    <button id="signinBtn" onclick="showAuthModal()" style="width:44px;height:44px;min-width:44px;background:white;color:#ff9500;border:2px solid #ff9500;border-radius:50%;cursor:pointer;font-size:1.15em;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 10px rgba(255,149,0,0.25);pointer-events:auto;">👤</button>
+    <button id="signinBtn" onclick="window.showAuthModal()" style="width:44px;height:44px;min-width:44px;background:white;color:#ff9500;border:2px solid #ff9500;border-radius:50%;cursor:pointer;font-size:1.15em;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 10px rgba(255,149,0,0.25);pointer-events:auto;">👤</button>
     <div id="userInfo" style="display:none; flex-direction:row; align-items:center; pointer-events:auto;">
-      <button onclick="showAccountModal()" style="width:44px;height:44px;min-width:44px;background:#ff9500;color:white;border:none;border-radius:50%;cursor:pointer;font-size:1.15em;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 10px rgba(255,149,0,0.35);">👤</button>
+      <button onclick="window.showAccountModal()" style="width:44px;height:44px;min-width:44px;background:#ff9500;color:white;border:none;border-radius:50%;cursor:pointer;font-size:1.15em;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 10px rgba(255,149,0,0.35);">👤</button>
     </div>
   </div>
   <div class="container">
@@ -703,13 +596,11 @@
         </svg>
         <span style="font-size:0.78em;font-weight:700;font-style:italic;color:rgba(255,255,255,0.9);white-space:nowrap;font-family:'Georgia',serif;letter-spacing:0.01em;">🐻 Click here to get started!</span>
       </div>
-      <div id="privacyNote" style="position:fixed; bottom:16px; left:0; right:0; text-align:center; font-size:0.75em; color:rgba(255,255,255,0.7); font-style:italic; padding:0 16px; line-height:1.5; pointer-events:none;">
-        🔒 Don't worry – all of your data is private and stored locally right now.
-      </div>
+
       <div class="btn-container" id="survivalContainer">
         <a href="survival-kit.html" onclick="event.preventDefault(); _advanceOnboardingStep(12); location.replace('survival-kit.html');" class="btn btn-survival" id="survivalBtn" style="position:relative;">
           <span class="icon">🆘</span>
-          <span>Survival Kit</span>
+          <span>Your Survival Kit</span>
           <span id="survivalTick" class="entry-tick" data-done="false">
             <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </span>
@@ -722,6 +613,16 @@
           <polyline points="7,6 12,1 17,6" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         </svg>
         <span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,255,255,0.9);font-family:'Georgia',serif;letter-spacing:0.01em;text-align:center;max-width:200px;line-height:1.4;">🐻 Click here to learn and share more about your bipolar</span>
+      </div>
+
+      <div class="btn-container" id="anonymousContainer">
+        <a href="anonymous.html" class="btn btn-anonymous locked" id="anonymousBtn">
+          <span class="icon">💬</span>
+          <span>Bipolar Anonymous</span>
+        </a>
+        <div id="anonymousSignInNote" style="text-align:center;font-size:0.72em;color:rgba(255,255,255,0.55);margin-top:5px;font-style:italic;">
+          Sign in to join the community
+        </div>
       </div>
     </div>
 
@@ -781,82 +682,19 @@
     </div>
   </div>
 
-  <!-- White footer behind all FABs -->
-  <div class="fab-footer" aria-hidden="true"></div>
-
-  <!-- Position 1 — Chat / Crisis FAB -->
-  <button class="whatsapp-fab" id="chatFab" onclick="openChatModal()" title="Crisis support">💬</button>
-
-  <!-- Crisis support + chat coming soon modal -->
-  <div id="chatModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeChatModal();">
-    <div style="background:white;border-radius:20px;padding:24px 24px 20px;text-align:center;max-width:300px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);">
-      <div style="font-size:2em;margin-bottom:8px;">🆘</div>
-      <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:6px;">Crisis Support</div>
-      <p style="font-size:0.84em;color:#6c757d;margin-bottom:14px;">If you're struggling and need to talk to someone:</p>
-      <a href="tel:116123" style="display:flex;align-items:center;gap:12px;padding:13px 14px;background:#f8f9fa;border-radius:12px;text-decoration:none;color:#212529;margin-bottom:14px;text-align:left;">
-        <span style="font-size:1.6em;line-height:1;">📞</span>
-        <div>
-          <div style="font-weight:700;font-size:0.95em;">Samaritans</div>
-          <div style="color:#6c757d;font-size:0.82em;margin-top:1px;">116 123 · Free · 24/7</div>
-        </div>
-      </a>
-      <div style="font-size:0.78em;color:#adb5bd;font-style:italic;margin-bottom:16px;">💬 Bipolar Bear in-app chat — coming soon</div>
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        <button onclick="closeChatModal()" style="padding:12px;background:#ff9500;color:white;border:none;border-radius:12px;font-weight:700;font-size:0.95em;cursor:pointer;">Close</button>
-        <button onclick="_showHidePermanently('chat')" style="padding:8px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;">🙈 Hide this button</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Position 2 — E2EE Security FAB -->
-  <button class="placeholder-fab" id="quickNoteFab" onclick="openSecurityModal()" title="Your data security">🔐</button>
-
-  <!-- Quick note modal -->
-  <div id="quickNoteModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeQuickNoteModal();">
-    <div style="background:white;border-radius:20px;padding:24px;max-width:300px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);">
-      <div style="font-size:2em;text-align:center;margin-bottom:6px;">📝</div>
-      <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:4px;text-align:center;">Quick Note</div>
-      <p style="font-size:0.82em;color:#adb5bd;margin-bottom:12px;text-align:center;">Shows on your next journal entry</p>
-      <textarea id="quickNoteInput" placeholder="Something to remember..." style="width:100%;min-height:90px;border:1.5px solid #e9ecef;border-radius:10px;padding:10px 12px;font-size:0.9em;color:#495057;resize:vertical;box-sizing:border-box;font-family:inherit;line-height:1.5;outline:none;"></textarea>
-      <div style="display:flex;gap:10px;margin-top:12px;">
-        <button onclick="closeQuickNoteModal()" style="flex:1;padding:11px;background:white;color:#adb5bd;border:1.5px solid #e9ecef;border-radius:12px;font-weight:600;font-size:0.9em;cursor:pointer;">Cancel</button>
-        <button onclick="saveQuickNote()" style="flex:1;padding:11px;background:#ff9500;color:white;border:none;border-radius:12px;font-weight:700;font-size:0.9em;cursor:pointer;">Save ✓</button>
-      </div>
-      <button onclick="closeQuickNoteModal();_hideExtraFab('quicknote')" style="display:block;margin:10px auto 0;padding:6px 10px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;">🙈 Hide this button</button>
-    </div>
-  </div>
-
-  <!-- Security info modal -->
-  <div id="securityModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeSecurityModal();">
-    <div style="background:white;border-radius:20px;padding:24px 24px 20px;text-align:center;max-width:300px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);">
-      <div style="font-size:2em;margin-bottom:8px;">🔐</div>
-      <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:12px;">How your data stays safe</div>
-      <div style="text-align:left;font-size:0.84em;color:#495057;line-height:1.65;margin-bottom:16px;">
-        <p style="margin-bottom:8px;"><strong>🔑 Your PIN</strong> locks the app locally on your device. Without it, nobody can open Bipolar Bear — even if they have your phone.</p>
-        <p style="margin-bottom:8px;"><strong>🔒 Your password</strong> encrypts your journal entries before they ever leave your device. The data is scrambled using a key only you hold.</p>
-        <p style="margin-bottom:8px;"><strong>☁️ Firebase (our database)</strong> stores only the encrypted version. Even we can't read your entries — they're meaningless without your password.</p>
-        <p style="margin-bottom:0;"><strong>🛡️ End-to-end encryption</strong> means your data is protected at every step — on your device, in transit, and in storage.</p>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        <button onclick="closeSecurityModal()" style="padding:12px;background:#ff9500;color:white;border:none;border-radius:12px;font-weight:700;font-size:0.95em;cursor:pointer;">Got it</button>
-        <button onclick="closeSecurityModal();_showHidePermanently('quicknote')" style="padding:10px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;">🙈 Hide this button</button>
-      </div>
-    </div>
-  </div>
-
   <!-- WhatsApp confirmation modal -->
-  <div class="wa-modal" id="waModal" onclick="if(event.target===this){_closeWaModal();_suppressFabHover();}">
+  <div class="wa-modal" id="waModal" onclick="if(event.target===this)_closeWaModal();">
     <div class="wa-modal-box">
       <div style="font-size:2em;margin-bottom:12px;">💬</div>
       <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:8px;">Join Bipolar Anonymous</div>
       <p style="font-size:0.9em;color:#6c757d;line-height:1.5;margin-bottom:20px;">Would you like to join our WhatsApp group Bipolar Anonymous?</p>
       <div style="display:flex;flex-direction:column;gap:10px;">
         <a href="https://chat.whatsapp.com/Crsfo0x9u887tnTiQUpAvy" target="_blank" rel="noopener noreferrer"
-          onclick="_closeWaModal(); _suppressFabHover(); localStorage.setItem('bbWaJoined','1');"
+          onclick="_closeWaModal(); localStorage.setItem('bbWaJoined','1');"
           style="display:block;padding:13px;background:#25D366;color:white;border-radius:12px;text-decoration:none;font-weight:700;font-size:0.95em;text-align:center;">
           ✅ Join Group
         </a>
-        <button onclick="_closeWaModal(); _suppressFabHover(); document.activeElement && document.activeElement.blur();"
+        <button onclick="_closeWaModal(); document.activeElement && document.activeElement.blur();"
           style="padding:12px;background:white;color:#495057;border:2px solid #e9ecef;border-radius:12px;font-weight:600;font-size:0.95em;cursor:pointer;">
           Cancel
         </button>
@@ -865,139 +703,6 @@
           🙈 Hide this button
         </button>
       </div>
-    </div>
-  </div>
-
-  <!-- Dotted placeholder FABs (shown when a slot's default FAB is hidden) -->
-  <button class="fab-dot-placeholder" id="fabPh1" onclick="_openFabPicker(1)" title="Add to dock">+</button>
-  <button class="fab-dot-placeholder" id="fabPh2" onclick="_openFabPicker(2)" title="Add to dock">+</button>
-  <button class="fab-dot-placeholder" id="fabPh3" onclick="_openFabPicker(3)" title="Add to dock">+</button>
-  <button class="fab-dot-placeholder" id="fabPh4" onclick="_openFabPicker(4)" title="Add to dock">+</button>
-
-  <!-- Extra assignable FABs -->
-  <button class="dock-extra-fab" id="statsExtraFab" onclick="document.getElementById('indexStatsModal').style.display='flex'" title="Statistics">📊</button>
-  <button class="dock-extra-fab" id="celebExtraFab" onclick="openIndexCelebModal()" title="Famous people with bipolar">⭐</button>
-  <button class="dock-extra-fab" id="goalsExtraFab" onclick="openIndexGoalsModal()" title="My goals">🎯</button>
-  <button class="dock-extra-fab" id="quicknoteExtraFab" onclick="openQuickNoteModal()" title="Quick note">📝</button>
-
-  <!-- Celebrity popup (index) -->
-  <div id="indexCelebModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeIndexCelebModal();">
-    <div style="background:white;border-radius:20px;padding:24px;max-width:300px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);text-align:center;">
-      <div style="font-size:0.78em;color:#adb5bd;margin-bottom:12px;font-style:italic;">Famous people with bipolar disorder</div>
-      <div id="indexCelebPhotoWrap" style="width:80px;height:80px;border-radius:50%;margin:0 auto 12px;overflow:hidden;background:#fff3e0;display:flex;align-items:center;justify-content:center;font-size:2.2em;">⭐</div>
-      <div id="indexCelebName" style="font-weight:700;font-size:1.1em;color:#212529;margin-bottom:4px;"></div>
-      <div id="indexCelebField" style="color:#6c757d;font-size:0.85em;margin-bottom:16px;"></div>
-      <div style="display:flex;gap:8px;margin-bottom:12px;">
-        <button onclick="nextIndexCeleb()" style="flex:1;padding:10px;background:#f8f9fa;color:#495057;border:1.5px solid #e9ecef;border-radius:12px;font-weight:600;font-size:0.9em;cursor:pointer;">Next ›</button>
-        <a id="indexCelebWiki" href="#" target="_blank" rel="noopener noreferrer" style="flex:1;padding:10px;background:#ff9500;color:white;border-radius:12px;font-weight:700;font-size:0.9em;text-decoration:none;display:flex;align-items:center;justify-content:center;">Wikipedia ↗</a>
-      </div>
-      <div style="display:flex;gap:8px;">
-        <button onclick="closeIndexCelebModal()" style="flex:1;padding:10px;background:#f8f9fa;color:#6c757d;border:none;border-radius:12px;font-size:0.85em;cursor:pointer;">Close</button>
-        <button onclick="closeIndexCelebModal();_hideExtraFab('celeb')" style="flex:1;padding:10px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;">🙈 Hide this button</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Goals popup (index) -->
-  <div id="indexGoalsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeIndexGoalsModal();">
-    <div style="background:white;border-radius:20px;padding:24px;max-width:320px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);max-height:80dvh;overflow-y:auto;">
-      <div style="font-size:1.8em;text-align:center;margin-bottom:8px;">🎯</div>
-      <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:16px;text-align:center;">My Goals</div>
-      <div id="indexGoalsList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;"></div>
-      <a href="survival-kit.html#goals" style="display:block;text-align:center;color:#ff9500;font-size:0.88em;text-decoration:none;margin-bottom:14px;padding:10px;border:1.5px solid #ffe0b2;border-radius:10px;">Manage goals in Survival Kit ↗</a>
-      <button onclick="closeIndexGoalsModal()" style="display:block;width:100%;padding:12px;background:#ff9500;color:white;border:none;border-radius:12px;font-weight:700;cursor:pointer;margin-bottom:8px;">Close</button>
-      <button onclick="closeIndexGoalsModal();_hideExtraFab('goals')" style="display:block;width:100%;padding:8px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;">🙈 Hide this button</button>
-    </div>
-  </div>
-
-  <!-- Stats popup (index) -->
-  <div id="indexStatsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)this.style.display='none';">
-    <div style="background:white;border-radius:20px;padding:24px;max-width:300px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);text-align:center;">
-      <div style="font-size:2em;margin-bottom:8px;">📊</div>
-      <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:8px;">Mood Statistics</div>
-      <p style="font-size:0.85em;color:#6c757d;margin-bottom:18px;">View your mood patterns, streaks, and trends in the journal.</p>
-      <button onclick="document.getElementById('indexStatsModal').style.display='none';window.location.href='journal.html?openStats=1'" style="display:block;width:100%;padding:12px;background:#ff9500;color:white;border:none;border-radius:12px;font-weight:700;cursor:pointer;margin-bottom:8px;">Open Statistics ↗</button>
-      <button onclick="document.getElementById('indexStatsModal').style.display='none'" style="display:block;width:100%;padding:10px;background:#f8f9fa;color:#6c757d;border:none;border-radius:12px;font-size:0.9em;cursor:pointer;margin-bottom:8px;">Cancel</button>
-      <button onclick="document.getElementById('indexStatsModal').style.display='none';_hideExtraFab('stats')" style="display:block;width:100%;padding:8px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;">🙈 Hide this button</button>
-    </div>
-  </div>
-
-  <!-- FAB picker sheet -->
-  <div id="fabPickerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:flex-end;justify-content:center;" onclick="if(event.target===this)closeFabPicker();">
-    <div style="background:white;border-radius:20px 20px 0 0;padding:24px;max-width:420px;width:100%;box-shadow:0 -4px 32px rgba(0,0,0,0.18);">
-      <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:16px;text-align:center;">Add to dock</div>
-      <div id="fabPickerOptions" style="display:flex;flex-direction:column;gap:10px;"></div>
-      <button onclick="closeFabPicker()" style="display:block;width:100%;margin-top:14px;padding:12px;background:#f8f9fa;color:#6c757d;border:none;border-radius:12px;font-weight:600;font-size:0.95em;cursor:pointer;">Cancel</button>
-    </div>
-  </div>
-
-  <!-- Long-press context popup (hide button / reset page) -->
-  <div id="lpPopup" style="display:none;position:fixed;background:white;border-radius:14px;padding:14px 18px;box-shadow:0 8px 32px rgba(0,0,0,0.18);z-index:200;font-size:0.88em;font-weight:600;color:#495057;min-width:140px;text-align:center;pointer-events:auto;border:1.5px solid #e9ecef;"></div>
-
-  <!-- Coffee FAB (left of feedback) -->
-  <button class="coffee-fab" id="coffeeFab" onclick="openCoffeeModal()" title="Support Bipolar Bear" style="display:none;">☕</button>
-
-  <!-- Coffee modal -->
-  <div id="coffeeModal2" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeCoffeeModal();">
-    <div style="background:white;border-radius:20px;padding:24px 24px 20px;text-align:center;max-width:300px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);">
-      <div style="font-size:2em;margin-bottom:8px;">☕</div>
-      <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:8px;">Keep Bipolar Bear Going</div>
-      <p style="font-size:0.88em;color:#6c757d;line-height:1.55;margin-bottom:6px;">Running BipolarBear costs around <strong>£25/month</strong> for servers, hosting and services.</p>
-      <p id="coffeeFundedText" style="font-size:0.82em;color:#ff9500;font-weight:600;margin-bottom:16px;display:none;"></p>
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        <a href="https://buymeacoffee.com/jamesmarkey" target="_blank" rel="noopener noreferrer"
-          onclick="closeCoffeeModal();"
-          style="display:block;padding:13px;background:#ff9500;color:white;border-radius:12px;text-decoration:none;font-weight:700;font-size:0.95em;text-align:center;">
-          ☕ Send me a coffee
-        </a>
-        <button onclick="_showHidePermanently('coffee')"
-          style="padding:10px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;">
-          🙈 Hide this button
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Feedback FAB -->
-  <button class="feedback-fab" onclick="openFeedbackModal()" title="Send feedback">📣</button>
-
-  <!-- Feedback Modal -->
-  <div class="feedback-modal" id="feedbackModal" onclick="if(event.target===this)closeFeedbackModal()">
-    <div class="feedback-content">
-      <h3 style="margin-bottom:4px;color:#333;">Share Feedback</h3>
-      <p id="fbMeta" style="font-size:0.78em;color:#adb5bd;margin-bottom:4px;"></p>
-      <p style="font-size:0.85em;color:#6c757d;margin-bottom:16px;">Help us make Bipolar Bear better.</p>
-
-      <div style="display:flex;gap:8px;margin-bottom:16px;">
-        <button class="feedback-type-btn" id="fbTypeBug" onclick="selectFeedbackType('bug')">🐛 Bug</button>
-        <button class="feedback-type-btn" id="fbTypeComment" onclick="selectFeedbackType('comment')">💬 Comment</button>
-        <button class="feedback-type-btn" id="fbTypeIdea" onclick="selectFeedbackType('idea')">💡 Idea</button>
-      </div>
-
-      <textarea id="fbMessage" placeholder="Tell us what's on your mind…" rows="4"
-        style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;box-sizing:border-box;resize:none;font-family:inherit;margin-bottom:12px;"></textarea>
-
-      <div id="fbEmailRow" style="margin-bottom:12px;display:none;">
-        <input type="email" id="fbEmail" placeholder="Your email (optional)"
-          style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;box-sizing:border-box;font-family:inherit;">
-      </div>
-
-      <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:0.88em;color:#495057;margin-bottom:18px;user-select:none;">
-        Keep me informed about my submission
-        <span style="position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;" onclick="var cb=document.getElementById('fbNotify');cb.checked=!cb.checked;document.getElementById('fbNotifyTrack').style.background=cb.checked?'#ff9500':'#ccc';document.getElementById('fbNotifyThumb').style.transform=cb.checked?'translateX(20px)':'translateX(0)';">
-          <input type="checkbox" id="fbNotify" checked style="opacity:0;width:0;height:0;position:absolute;pointer-events:none;">
-          <span id="fbNotifyTrack" style="position:absolute;inset:0;border-radius:24px;background:#ff9500;transition:background 0.2s;"></span>
-          <span id="fbNotifyThumb" style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:white;box-shadow:0 1px 3px rgba(0,0,0,0.3);transition:transform 0.2s;transform:translateX(20px);"></span>
-        </span>
-      </label>
-
-      <div id="fbError" style="color:#dc3545;font-size:0.85em;margin-bottom:10px;display:none;"></div>
-
-      <div style="display:flex;gap:10px;justify-content:center;">
-        <button onclick="submitFeedback()" style="padding:11px 24px;background:#ff9500;color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-size:0.95em;">Send</button>
-        <button onclick="closeFeedbackModal()" style="padding:11px 24px;background:white;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-weight:600;cursor:pointer;font-size:0.95em;">Cancel</button>
-      </div>
-      <button onclick="_showHidePermanently('feedback')" style="display:block;width:100%;margin-top:12px;padding:8px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;">🙈 Hide this button</button>
     </div>
   </div>
 
@@ -1041,44 +746,15 @@
     </div>
   </div>
 
-  <!-- Account Modal -->
-  <div class="wa-modal" id="accountModal" onclick="if(event.target===this)closeAccountModal()">
-    <div class="wa-modal-box">
-      <div style="font-size:1.6em;margin-bottom:4px;">👤</div>
-      <div id="accountEmailDisplay" style="font-size:0.85em;color:#6c757d;margin-bottom:16px;word-break:break-all;"></div>
+  </div><!-- /#scroll-view -->
+  </div><!-- /#app-shell -->
+  <div class="home-indicator"></div>
+</div><!-- /#iphone-frame -->
 
-      <div id="accountMsg" style="font-size:0.85em;margin-bottom:12px;display:none;padding:8px 12px;border-radius:8px;"></div>
-      <button onclick="logoutFromAccount()" style="width:100%;padding:12px;background:white;color:#dc3545;border:2px solid #dc3545;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;margin-bottom:10px;-webkit-tap-highlight-color:transparent;">Sign out</button>
-      <!-- Change password section -->
-      <div id="accountChangePassSection" style="margin-bottom:10px;">
-        <div id="accountPassFields" style="display:none;margin-bottom:8px;">
-          <input type="password" id="accountCurrentPass" placeholder="Current password" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;box-sizing:border-box;margin-bottom:6px;outline:none;">
-          <input type="password" id="accountNewPass" placeholder="New password" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;box-sizing:border-box;margin-bottom:8px;outline:none;">
-          <div style="display:flex;gap:8px;">
-            <button onclick="submitPasswordChange()" style="flex:1;padding:10px;background:#ff9500;color:white;border:none;border-radius:8px;font-size:0.9em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Save</button>
-            <button onclick="document.getElementById('accountPassFields').style.display='none';document.getElementById('accountPassToggleBtn').style.display='';" style="padding:10px 14px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Cancel</button>
-          </div>
-        </div>
-        <button id="accountPassToggleBtn" onclick="document.getElementById('accountPassFields').style.display='';document.getElementById('accountPassToggleBtn').style.display='none';document.getElementById('accountCurrentPass').focus();" style="width:100%;padding:12px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Change password</button>
-      </div>
-      <button onclick="openPersonalInfoFromAccount()" style="width:100%;padding:12px;background:white;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;margin-bottom:10px;-webkit-tap-highlight-color:transparent;">👤 Personal information</button>
-      <button onclick="closeAccountModal()" style="width:100%;padding:10px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:10px;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Cancel</button>
-    </div>
-  </div>
-
-  <!-- Auth Modal -->
-  <div class="overlay-modal" id="authModal">
-    <div class="modal-box">
-      <h3 id="authTitle">My Bipolar Bear</h3>
-      <div class="modal-error" id="authError"></div>
-      <input type="email" id="authEmail" class="modal-input" placeholder="Email" autocomplete="email">
-      <input type="password" id="authPassword" class="modal-input" placeholder="Password" autocomplete="current-password">
-      <button class="modal-btn modal-btn-primary" id="authSubmit">Sign In</button>
-      <button class="modal-btn modal-btn-secondary" onclick="closeAuthModal()">Continue as Guest</button>
-      <div class="modal-toggle" id="authToggle">Don't have an account? <span>Sign up</span></div>
-      <button onclick="_confirmDeleteGuestData()" style="margin-top:10px;background:none;border:none;color:#adb5bd;font-size:0.78em;cursor:pointer;padding:4px 8px;-webkit-tap-highlight-color:transparent;">🗑 Delete all guest data</button>
-    </div>
-  </div>
+  <!-- Firebase SDK: loaded here so the page renders before these blocking scripts download -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
   <script>
     // ── Beta gate (web only) ──
@@ -1102,6 +778,20 @@
       db = firebase.firestore();
       auth.onAuthStateChanged(user => {
         currentUser = user && !user.isAnonymous ? user : null;
+
+        // Bipolar Anonymous button — unlocked only when signed in
+        const anonBtn  = document.getElementById('anonymousBtn');
+        const anonNote = document.getElementById('anonymousSignInNote');
+        if (anonBtn) {
+          if (currentUser) {
+            anonBtn.classList.remove('locked');
+            if (anonNote) anonNote.style.display = 'none';
+          } else {
+            anonBtn.classList.add('locked');
+            if (anonNote) anonNote.style.display = 'block';
+          }
+        }
+
         const signinBtn = document.getElementById('signinBtn');
         const userInfo = document.getElementById('userInfo');
         const userEmail = document.getElementById('userEmail');
@@ -1109,6 +799,7 @@
           if (signinBtn) signinBtn.style.display = 'none';
           if (userInfo) { userInfo.style.display = 'flex'; }
           if (userEmail) userEmail.textContent = user.email;
+          window._fabOpenAuth = window.showAccountModal;
           // Load user settings from Firestore (logo variant + survival kit data for ticks)
           db.collection('userSettings').doc(user.uid).get().then(doc => {
             if (!doc.exists) return;
@@ -1191,6 +882,8 @@
           if (userInfo) userInfo.style.display = 'none';
           const _pdHint = document.getElementById('personalDetailsHint');
           if (_pdHint) _pdHint.style.display = 'none';
+          window._fabOpenAuth = window.showAuthModal;
+          if (typeof window._applyFabDock === 'function') window._applyFabDock();
         }
       });
     } catch(e) { console.warn('Firebase init failed on index.html', e); }
@@ -1312,100 +1005,21 @@
 
     function _applyOnboardingGating() {
       const step = _getOnboardingStep();
-      const _isNat = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
-      const _fbPermaHidden = localStorage.getItem('bbFeedbackFabHidden') === '1';
 
-      // Auth FAB wrapper + footer: visible from step 4
+      // Auth FAB wrapper: visible from step 4
       const _authWrap = document.getElementById('authFabWrapper');
-      const _footer = document.querySelector('.fab-footer');
       if (_authWrap) _authWrap.style.display = step < 4 ? 'none' : '';
-      if (_footer) _footer.style.display = step < 4 ? 'none' : '';
+
+      // Auto-set bbFabsUnlocked when tutorial completes
+      if (localStorage.getItem('bbFabsUnlocked') !== '1' &&
+          step >= 12 && localStorage.getItem('bbTutorialToastShown') === '1' &&
+          !document.getElementById('tutorialCompleteModal')) {
+        localStorage.setItem('bbFabsUnlocked', '1');
+      }
 
       // Survival kit: visible from step 6
       const _survival = document.getElementById('survivalContainer');
       if (_survival) _survival.style.display = step < 6 ? 'none' : '';
-
-      // ── FAB visibility ──
-      const _chatPermaHidden   = localStorage.getItem('bbWaFabHidden') === '1';
-      const _qnPermaHidden     = localStorage.getItem('bbQuickNoteFabHidden') === '1';
-      const _coffeePermaHidden = localStorage.getItem('bbCoffeeFabHidden') === '1';
-
-      let _fabsUnlocked = localStorage.getItem('bbFabsUnlocked') === '1';
-      if (!_fabsUnlocked && step >= 12 && localStorage.getItem('bbTutorialToastShown') === '1' && !document.getElementById('tutorialCompleteModal')) {
-        _fabsUnlocked = true;
-        localStorage.setItem('bbFabsUnlocked', '1');
-      }
-
-      const _waFab    = document.getElementById('chatFab');
-      const _qnFab    = document.getElementById('quickNoteFab');
-      const _coffeeFab = document.getElementById('coffeeFab');
-      const _fbFab    = document.querySelector('.feedback-fab');
-
-      // E2EE always visible (no step gate); others require step 12
-      const _chatVis     = step >= 12 && !_chatPermaHidden;
-      const _qnVis       = !_qnPermaHidden;
-      const _coffeeVis   = step >= 12 && !_coffeePermaHidden;
-      const _feedbackVis = step >= 12 && !_fbPermaHidden && _fabsUnlocked;
-
-      // ── Dynamic FAB slot positions ──
-      const _wide = window.matchMedia('(min-width: 520px)').matches;
-      const _slotPos = {
-        1: _wide ? 'calc(50% - 214px)' : 'calc(10% - 22px)',
-        2: _wide ? 'calc(50% - 118px)' : 'calc(30% - 22px)',
-        3: _wide ? 'calc(50% + 74px)'  : 'calc(70% - 22px)',
-        4: _wide ? 'calc(50% + 170px)' : 'calc(90% - 22px)',
-      };
-
-      const _extraMap = { stats: 'statsExtraFab', celeb: 'celebExtraFab', goals: 'goalsExtraFab', quicknote: 'quicknoteExtraFab' };
-      const _defVis   = { chat: _chatVis, e2ee: _qnVis, coffee: _coffeeVis, feedback: _feedbackVis };
-      const _defEl    = { chat: _waFab, e2ee: _qnFab, coffee: _coffeeFab, feedback: _fbFab };
-
-      // Find which slot each default FAB is currently assigned to (may differ from its natural slot)
-      const _defaultSlotMap = {};
-      for (const _def of _FAB_DEFAULTS) {
-        let _found = null;
-        for (let s = 1; s <= 4; s++) {
-          if (localStorage.getItem('bbFabSlot_' + s) === _def.id) { _found = s; break; }
-        }
-        _defaultSlotMap[_def.id] = _found !== null ? _found : _def.slotNum;
-      }
-
-      // Position and show/hide default FABs at their assigned slots
-      for (const _def of _FAB_DEFAULTS) {
-        const _el = _defEl[_def.id];
-        if (!_el) continue;
-        const _vis = _defVis[_def.id];
-        _el.style.display = _vis ? (_def.id === 'feedback' ? '' : 'flex') : 'none';
-        _el.style.left = _slotPos[_defaultSlotMap[_def.id]];
-      }
-
-      // Track which slots are occupied by a visible default
-      const _slotOccupied = {};
-      for (const _def of _FAB_DEFAULTS) {
-        if (_defVis[_def.id]) _slotOccupied[_defaultSlotMap[_def.id]] = true;
-      }
-
-      // ── Extra assigned FABs ──
-      Object.values(_extraMap).forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
-      for (let s = 1; s <= 4; s++) {
-        if (!_slotOccupied[s]) {
-          const _assigned = localStorage.getItem('bbFabSlot_' + s);
-          if (_assigned && _extraMap[_assigned]) {
-            const _ef = document.getElementById(_extraMap[_assigned]);
-            if (_ef) { _ef.style.display = 'flex'; _ef.style.left = _slotPos[s]; }
-          }
-        }
-      }
-
-      // ── Dotted placeholders ──
-      for (let s = 1; s <= 4; s++) {
-        const _ph = document.getElementById('fabPh' + s);
-        if (!_ph) continue;
-        const _assigned = localStorage.getItem('bbFabSlot_' + s);
-        const _hasExtra = _assigned && _extraMap[_assigned] && !_slotOccupied[s];
-        _ph.style.display = (!_slotOccupied[s] && !_hasExtra) ? 'flex' : 'none';
-        _ph.style.left = _slotPos[s];
-      }
 
       // Footer link: visible from step 12
       const _footerLink = document.querySelector('.footer-link');
@@ -1500,6 +1114,8 @@
           _prog.style.display = '';
         }
       }
+
+      if (typeof window._applyFabDock === 'function') window._applyFabDock();
     }
     window._applyOnboardingGating = _applyOnboardingGating;
 
@@ -1531,7 +1147,7 @@
         });
       }
       function _isModalOpen() {
-        return !!(document.querySelector('.overlay-modal.active, .wa-modal.active, .feedback-modal.active'));
+        return !!(document.querySelector('.overlay-modal.active, .wa-modal.active, .feedback-modal.active, .bb-auth-overlay.active, .bb-account-overlay.active'));
       }
       document.addEventListener('click', function(e) {
         const s = _getOnboardingStep();
@@ -1555,7 +1171,7 @@
       } else {
         btn.disabled = false;
         btn.style.opacity = '';
-        btn.onclick = showAuthModal;
+        btn.onclick = () => window.showAuthModal();
       }
     }
     window.addEventListener('online', updateOnlineStatus);
@@ -1605,59 +1221,24 @@
       if (auth) auth.signOut();
     }
 
-    // ── Account Modal ──
-    function showAccountModal() {
+    // ── Auth hooks (modals now live in fab.js) ──
+    window._fabOnShowAuth = function () {
       const _step = _getOnboardingStep();
       if (_step === 4) _advanceOnboardingStep(5);
-      const el = document.getElementById('accountEmailDisplay');
-      if (el && currentUser) el.textContent = currentUser.email;
-      const msg = document.getElementById('accountMsg');
-      if (msg) { msg.style.display = 'none'; msg.textContent = ''; }
-      const passFields = document.getElementById('accountPassFields');
-      if (passFields) passFields.style.display = 'none';
-      const passToggle = document.getElementById('accountPassToggleBtn');
-      if (passToggle) passToggle.style.display = '';
-      const cp = document.getElementById('accountCurrentPass');
-      const np = document.getElementById('accountNewPass');
-      if (cp) cp.value = '';
-      if (np) np.value = '';
-      document.getElementById('accountModal').classList.add('active');
-    }
-    function closeAccountModal() {
-      document.getElementById('accountModal').classList.remove('active');
-    }
-    function _accountShowMsg(text, ok) {
-      const msg = document.getElementById('accountMsg');
-      if (!msg) return;
-      msg.textContent = text;
-      msg.style.color = ok ? '#2ECC40' : '#dc3545';
-      msg.style.background = ok ? 'rgba(46,204,64,0.08)' : 'rgba(220,53,69,0.08)';
-      msg.style.display = 'block';
-    }
-    function submitPasswordChange() {
-      if (!currentUser || !auth) return;
-      const currentPass = (document.getElementById('accountCurrentPass').value || '').trim();
-      const newPass = (document.getElementById('accountNewPass').value || '').trim();
-      if (!currentPass || !newPass) { _accountShowMsg('⚠️ Please fill in both fields.', false); return; }
-      if (newPass.length < 6) { _accountShowMsg('⚠️ New password must be at least 6 characters.', false); return; }
-      const credential = firebase.auth.EmailAuthProvider.credential(currentUser.email, currentPass);
-      currentUser.reauthenticateWithCredential(credential).then(() => {
-        return currentUser.updatePassword(newPass);
-      }).then(() => {
-        _accountShowMsg('✅ Password updated successfully.', true);
-        document.getElementById('accountPassFields').style.display = 'none';
-        document.getElementById('accountPassToggleBtn').style.display = '';
-        document.getElementById('accountCurrentPass').value = '';
-        document.getElementById('accountNewPass').value = '';
-      }).catch(err => {
-        const wrongPass = err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential';
-        _accountShowMsg('⚠️ ' + (wrongPass ? 'Current password is incorrect.' : (err.message || 'Could not update password.')), false);
-      });
-    }
-    function openPersonalInfoFromAccount() {
-      closeAccountModal();
+    };
+    window._fabOnCloseAuth = function () {
+      // Briefly block pointer events to prevent tap-through after modal close
+      const _container = document.querySelector('.container');
+      if (_container) {
+        _container.style.pointerEvents = 'none';
+        setTimeout(() => { _container.style.pointerEvents = ''; }, 400);
+      }
+    };
+    window._fabOnSignOut = logout;
+    window._fabOpenPersonalInfo = function () {
+      window.closeAccountModal();
       showPersonalDetailsModal();
-    }
+    };
 
     const _pdFields = [
       ['pdName','personalName'], ['pdDOB','personalDOB'], ['pdMedNum','personalMedicalNum'],
@@ -1705,57 +1286,6 @@
       }
       closePersonalDetailsModal();
     }
-    function logoutFromAccount() {
-      closeAccountModal();
-      logout();
-    }
-
-    // ── Auth Modal ──
-    function showAuthModal() {
-      const _step = _getOnboardingStep();
-      if (_step === 4) _advanceOnboardingStep(5);
-      document.getElementById('authModal').classList.add('active');
-    }
-    function closeAuthModal() {
-      document.getElementById('authModal').classList.remove('active');
-      // Briefly block pointer events on page content to prevent tap-through to buttons below modal
-      const _container = document.querySelector('.container');
-      if (_container) {
-        _container.style.pointerEvents = 'none';
-        setTimeout(() => { _container.style.pointerEvents = ''; }, 400);
-      }
-    }
-
-    let isSignUp = false;
-    document.getElementById('authToggle').addEventListener('click', () => {
-      isSignUp = !isSignUp;
-      document.getElementById('authTitle').textContent = isSignUp ? 'Create Account' : 'Welcome to Bipolar Bear 🐻';
-      document.getElementById('authSubmit').textContent = isSignUp ? 'Sign Up' : 'Sign In';
-      document.getElementById('authToggle').innerHTML = isSignUp
-        ? 'Already have an account? <span>Sign in</span>'
-        : 'Don\'t have an account? <span>Sign up</span>';
-      document.getElementById('authError').style.display = 'none';
-    });
-
-    document.getElementById('authSubmit').addEventListener('click', async () => {
-      if (!auth) return;
-      const email = document.getElementById('authEmail').value;
-      const password = document.getElementById('authPassword').value;
-      const errEl = document.getElementById('authError');
-      errEl.style.display = 'none';
-      try {
-        if (isSignUp) {
-          await auth.createUserWithEmailAndPassword(email, password);
-        } else {
-          await auth.signInWithEmailAndPassword(email, password);
-        }
-        closeAuthModal();
-      } catch(e) {
-        errEl.textContent = e.message;
-        errEl.style.display = 'block';
-      }
-    });
-
     // ── Logo easter egg with persistence ──
     const logoImg = document.querySelector('.logo-img');
     const srcs = ['images/logos/good_logo.png', 'images/logos/elevated_logo.png', 'images/logos/sad_logo.png'];
@@ -2139,23 +1669,6 @@
   </script>
 
   <script>
-    // ── FAB config (must be defined before _applyOnboardingGating is called) ──
-    const _FAB_DEFAULTS = [
-      { id: 'chat',     icon: '💬', label: 'Crisis Support',  desc: 'Samaritans & community chat', hiddenKey: 'bbWaFabHidden',       slotNum: 1 },
-      { id: 'e2ee',     icon: '🔐', label: 'Data Security',   desc: 'How your data is kept safe',  hiddenKey: 'bbQuickNoteFabHidden', slotNum: 2 },
-      { id: 'coffee',   icon: '☕', label: 'Buy Us a Coffee', desc: 'Support Bipolar Bear',         hiddenKey: 'bbCoffeeFabHidden',    slotNum: 3 },
-      { id: 'feedback', icon: '📣', label: 'Send Feedback',   desc: 'Help us make it better',      hiddenKey: 'bbFeedbackFabHidden',  slotNum: 4 },
-    ];
-    const _FAB_EXTRAS = [
-      { id: 'quicknote', icon: '📝', label: 'Quick Note', desc: 'Reminder for your next journal entry' },
-      { id: 'stats',     icon: '📊', label: 'Statistics',  desc: 'Open your mood journal stats' },
-      { id: 'celeb',     icon: '⭐', label: 'Celebrity',   desc: 'Famous people with bipolar disorder' },
-      { id: 'goals',     icon: '🎯', label: 'Goals',       desc: 'View your survival kit goals' },
-    ];
-
-    // ── Feedback ──
-    let _fbType = null;
-
     function _handleIndexJournalNav() {
       _advanceOnboardingStep(8);
       location.replace('journal.html');
@@ -2169,31 +1682,6 @@
       return 'Web';
     }
 
-    function openFeedbackModal() {
-      _fbType = null;
-      document.getElementById('fbMessage').value = '';
-      document.getElementById('fbEmail').value = '';
-      document.getElementById('fbNotify').checked = true;
-      document.getElementById('fbNotifyTrack').style.background = '#ff9500';
-      document.getElementById('fbNotifyThumb').style.transform = 'translateX(20px)';
-      document.getElementById('fbError').style.display = 'none';
-      document.querySelectorAll('.feedback-type-btn').forEach(b => b.classList.remove('selected'));
-      // Show email field only when not logged in
-      document.getElementById('fbEmailRow').style.display = currentUser ? 'none' : '';
-      // Show version + platform
-      const _metaEl = document.getElementById('fbMeta');
-      if (_metaEl) _metaEl.textContent = `v0.87 · ${_getFbPlatform()}`;
-      document.getElementById('feedbackModal').classList.add('active');
-    }
-
-    // Brief pointer-events suppression on FABs to prevent sticky hover after modal close
-    function _suppressFabHover() {
-      document.querySelectorAll('.whatsapp-fab, .feedback-fab, .coffee-fab').forEach(el => {
-        el.style.pointerEvents = 'none';
-        setTimeout(() => { el.style.pointerEvents = ''; }, 400);
-      });
-    }
-
     function openWhatsAppModal() {
       document.getElementById('waModal').classList.add('active');
       const _ov = document.getElementById('bbHintOverlay');
@@ -2205,67 +1693,16 @@
     }
     window.openWhatsAppModal = openWhatsAppModal;
 
-    function closeFeedbackModal() {
-      document.getElementById('feedbackModal').classList.remove('active');
-      _suppressFabHover();
-      // Ensure focus mode is on when tutorial completes (in case user exited it during onboarding)
+    // Hook called by fab.js closeFabFeedback — advance onboarding and enable focus mode
+    window._onFabFeedbackClose = function () {
       localStorage.setItem('focusedModeEnabled', '1');
-      // _advanceOnboardingStep(12) also triggers _showTutorialCompleteModal on first reach
       _advanceOnboardingStep(12);
-    }
-
-    function selectFeedbackType(type) {
-      _fbType = type;
-      document.querySelectorAll('.feedback-type-btn').forEach(b => b.classList.remove('selected'));
-      const map = { bug: 'fbTypeBug', comment: 'fbTypeComment', idea: 'fbTypeIdea' };
-      const btn = document.getElementById(map[type]);
-      if (btn) btn.classList.add('selected');
-    }
-
-    async function submitFeedback() {
-      const errEl = document.getElementById('fbError');
-      errEl.style.display = 'none';
-
-      if (!_fbType) { errEl.textContent = 'Please select a type.'; errEl.style.display = ''; return; }
-      const message = document.getElementById('fbMessage').value.trim();
-      if (!message) { errEl.textContent = 'Please enter a message.'; errEl.style.display = ''; return; }
-
-      const notify = document.getElementById('fbNotify').checked;
-      const emailInput = document.getElementById('fbEmail').value.trim();
-      const userEmail = currentUser ? currentUser.email : (emailInput || null);
-
-      const payload = {
-        type: _fbType,
-        message,
-        notify,
-        email: notify ? userEmail : null,
-        userId: currentUser ? currentUser.uid : null,
-        timestamp: Date.now(),
-        createdAt: new Date().toISOString(),
-        appVersion: '0.67',
-        platform: _getFbPlatform(),
-      };
-
-      try {
-        if (db) {
-          // Ensure auth for anonymous users so Firestore rules pass
-          if (!currentUser && auth) {
-            try { await auth.signInAnonymously(); } catch(e) {}
-          }
-          await db.collection('feedback').add(payload);
-        }
-        closeFeedbackModal();
-        alert('Thanks for your feedback! 🐻');
-      } catch(e) {
-        errEl.textContent = 'Could not send — please try again.';
-        errEl.style.display = '';
-      }
-    }
+    };
 
     // Auto-open feedback modal if navigated here with #feedback hash
     if (window.location.hash === '#feedback') {
       history.replaceState(null, '', window.location.pathname);
-      window.addEventListener('load', () => setTimeout(openFeedbackModal, 300));
+      window.addEventListener('load', () => setTimeout(openFabFeedback, 300));
     }
 
     // ── Apply onboarding gating on page load ──
@@ -2317,198 +1754,16 @@
       }
     })();
 
-    // ── Long-press popup (hide button / reset page) ──
-    (function() {
-      const _popup = document.getElementById('lpPopup');
-      let _lpTimer = null;
-      let _lpActive = false;
-
-      function _showPopup(x, y, html, onConfirm) {
-        if (!_popup) return;
-        _popup.innerHTML = html;
-        _popup.style.display = 'block';
-        // Position near tap point, clamped to viewport
-        const pw = 160, ph = 50;
-        const left = Math.min(Math.max(x - pw / 2, 12), window.innerWidth - pw - 12);
-        const top  = Math.max(y - ph - 16, 12);
-        _popup.style.left = left + 'px';
-        _popup.style.top  = top + 'px';
-        _popup.onclick = () => { _hidePopup(); onConfirm && onConfirm(); };
-        _lpActive = true;
-        // Auto-dismiss after 3s
-        clearTimeout(_lpTimer);
-        _lpTimer = setTimeout(_hidePopup, 3000);
-      }
-
-      function _hidePopup() {
-        if (_popup) _popup.style.display = 'none';
-        _lpActive = false;
-      }
-
-      // Close popup on outside tap
-      document.addEventListener('touchstart', e => {
-        if (_lpActive && _popup && !_popup.contains(e.target)) _hidePopup();
-      }, { passive: true });
-      document.addEventListener('mousedown', e => {
-        if (_lpActive && _popup && !_popup.contains(e.target)) _hidePopup();
-      });
-
-      function _attachLongPress(el, getXY, onLongPress) {
-        if (!el) return;
-        let _t = null, _moved = false;
-        function _start(x, y) {
-          _moved = false;
-          _t = setTimeout(() => { if (!_moved) onLongPress(x, y); }, 600);
-        }
-        function _cancel() { clearTimeout(_t); }
-        el.addEventListener('touchstart', e => { const t = e.touches[0]; _start(t.clientX, t.clientY); }, { passive: true });
-        el.addEventListener('touchmove', () => { _moved = true; clearTimeout(_t); }, { passive: true });
-        el.addEventListener('touchend', _cancel, { passive: true });
-        el.addEventListener('mousedown', e => _start(e.clientX, e.clientY));
-        el.addEventListener('mousemove', () => { _moved = true; clearTimeout(_t); });
-        el.addEventListener('mouseup', _cancel);
-      }
-
-      // On load: apply hidden states from storage
-      if (localStorage.getItem('bbFeedbackFabHidden') === '1') {
-        const _fb = document.querySelector('.feedback-fab');
-        if (_fb) _fb.style.display = 'none';
-      }
-
-      if (localStorage.getItem('bbFooterHidden') === '1') {
-        const _fl = document.querySelector('.footer-link');
-        if (_fl && _fl.parentElement) _fl.parentElement.style.display = 'none';
-      }
-      if (localStorage.getItem('bbCoffeeFabHidden') === '1') {
-        const _cf = document.getElementById('coffeeFab');
-        if (_cf) _cf.style.display = 'none';
-      }
-      if (localStorage.getItem('bbQuickNoteFabHidden') === '1') {
-        const _qf = document.getElementById('quickNoteFab');
-        if (_qf) _qf.style.display = 'none';
-      }
-    })();
-
-    // ── Hide permanently confirmation ──
-    function _showHidePermanently(type) {
-        if (type === 'chat' || type === 'wa') {
-          closeChatModal();
-          const _cf = document.getElementById('chatFab');
-          if (_cf) _cf.style.display = 'none';
-          localStorage.setItem('bbWaFabHidden', '1');
-          _applyOnboardingGating();
-        } else if (type === 'quicknote') {
-          closeQuickNoteModal();
-          const _qf = document.getElementById('quickNoteFab');
-          if (_qf) _qf.style.display = 'none';
-          localStorage.setItem('bbQuickNoteFabHidden', '1');
-          _applyOnboardingGating();
-        } else if (type === 'feedback') {
-          closeFeedbackModal();
-          document.querySelector('.feedback-fab').style.display = 'none';
-          localStorage.setItem('bbFeedbackFabHidden', '1');
-          _applyOnboardingGating();
-        } else if (type === 'coffee') {
-          closeCoffeeModal();
-          document.getElementById('coffeeFab').style.display = 'none';
-          localStorage.setItem('bbCoffeeFabHidden', '1');
-          _applyOnboardingGating();
-        }
-    }
-    window._showHidePermanently = _showHidePermanently;
-
-    // ── Coffee FAB: fetch funded % and show modal ──
-    function openCoffeeModal() {
-      const _modal = document.getElementById('coffeeModal2');
-      if (!_modal) return;
-      _modal.style.display = 'flex';
-      // Fetch funded amount from Firestore and update text
-      (async function() {
-        try {
-          const _doc = await db.collection('counters').doc('appCosts').get();
-          const _fundedEl = document.getElementById('coffeeFundedText');
-          if (_doc.exists && _fundedEl) {
-            const _funded = parseFloat(_doc.data().fundedGBP || 0);
-            const _perc = Math.min(100, Math.round(_funded / 25 * 100));
-            if (_perc > 0) {
-              _fundedEl.textContent = `Currently ${_perc}% funded — thank you! ☕`;
-              _fundedEl.style.display = '';
-            }
-          }
-        } catch(e) {}
-      })();
-    }
-    function closeCoffeeModal() {
-      const _modal = document.getElementById('coffeeModal2');
-      if (_modal) _modal.style.display = 'none';
-    }
-    window.openCoffeeModal = openCoffeeModal;
-    window.closeCoffeeModal = closeCoffeeModal;
-
-    // ── Chat / Crisis FAB ──
-    function openChatModal() {
-      const _m = document.getElementById('chatModal');
-      if (_m) _m.style.display = 'flex';
-    }
-    function closeChatModal() {
-      const _m = document.getElementById('chatModal');
-      if (_m) _m.style.display = 'none';
-    }
-    window.openChatModal = openChatModal;
-    window.closeChatModal = closeChatModal;
-
-    // ── Quick Note FAB ──
-    function openQuickNoteModal() {
-      const _m = document.getElementById('quickNoteModal');
-      const _inp = document.getElementById('quickNoteInput');
-      if (_inp) _inp.value = '';
-      if (_m) _m.style.display = 'flex';
-      setTimeout(() => { if (_inp) _inp.focus(); }, 120);
-    }
-    function closeQuickNoteModal() {
-      const _m = document.getElementById('quickNoteModal');
-      if (_m) _m.style.display = 'none';
-    }
-    function saveQuickNote() {
-      const _inp = document.getElementById('quickNoteInput');
-      const _text = _inp ? _inp.value.trim() : '';
-      closeQuickNoteModal();
-      if (!_text) return;
-      const _notes = JSON.parse(localStorage.getItem('bbQuickNotes') || '[]');
-      _notes.push({ text: _text, ts: Date.now(), id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5) });
-      localStorage.setItem('bbQuickNotes', JSON.stringify(_notes));
-      // Brief confirmation toast
-      const _t = document.createElement('div');
-      _t.textContent = '📝 Note saved!';
-      Object.assign(_t.style, { position:'fixed', bottom:'80px', left:'50%', transform:'translateX(-50%)',
-        background:'rgba(0,0,0,0.72)', color:'white', padding:'9px 18px', borderRadius:'20px',
-        fontSize:'0.85em', fontWeight:'600', zIndex:'9999', pointerEvents:'none', whiteSpace:'nowrap' });
-      document.body.appendChild(_t);
-      setTimeout(() => _t.remove(), 2000);
-    }
-    window.openQuickNoteModal = openQuickNoteModal;
-    window.closeQuickNoteModal = closeQuickNoteModal;
-    window.saveQuickNote = saveQuickNote;
-
-    // ── E2EE Security modal ──
-    function openSecurityModal() {
-      const _m = document.getElementById('securityModal');
-      if (_m) _m.style.display = 'flex';
-    }
-    function closeSecurityModal() {
-      const _m = document.getElementById('securityModal');
-      if (_m) _m.style.display = 'none';
-    }
-    window.closeSecurityModal = closeSecurityModal;
-
     // ── What's New popup ──
-    const _APP_VERSION = '0.88';
+    const _APP_VERSION = '0.89';
+    window._APP_VERSION = _APP_VERSION;
     const _WHATS_NEW_HEADLINES = {
+      '0.89': 'Sign in & account management now shared across all pages — one place for everything',
+      '0.88': 'FAB dock buttons updated to a softer look',
       '0.87': "What's new popup — see new features at a glance every update",
       '0.86': 'Dock buttons can now be hidden and re-added — tap + to customise your dock',
       '0.85': 'Full dock synced across all pages — same buttons everywhere',
       '0.84': 'Survival kit compass removed from tutorial for a smoother experience',
-      '0.83': 'Crisis support added to Chat FAB — Samaritans 116 123 in one tap',
     };
     function _checkWhatsNew() {
       const lastSeen = localStorage.getItem('bbLastSeenVersion');
@@ -2541,170 +1796,6 @@
     // Fire after a short delay so the page renders first
     setTimeout(_checkWhatsNew, 800);
 
-    // ── FAB Picker ──
-    let _fabPickerSlot = null;
-    function _openFabPicker(slot) {
-      _fabPickerSlot = slot;
-      const optContainer = document.getElementById('fabPickerOptions');
-      if (!optContainer) return;
-      optContainer.innerHTML = '';
-      // Default FABs that are hidden — show them as "add back" options
-      _FAB_DEFAULTS.forEach(def => {
-        if (localStorage.getItem(def.hiddenKey) === '1') {
-          const btn = document.createElement('button');
-          btn.style.cssText = 'display:flex;align-items:center;gap:14px;width:100%;padding:13px 14px;background:#f8f9fa;border:1.5px solid #e9ecef;border-radius:14px;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;';
-          btn.innerHTML = `<span style="font-size:1.6em;line-height:1;">${def.icon}</span><div><div style="font-weight:700;font-size:0.95em;color:#212529;">${def.label}</div><div style="font-size:0.8em;color:#adb5bd;margin-top:2px;">${def.desc}</div></div>`;
-          btn.addEventListener('click', () => {
-            localStorage.removeItem(def.hiddenKey);
-            // Remove any previous slot assignment for this default, then place at chosen slot
-            for (let s = 1; s <= 4; s++) {
-              if (localStorage.getItem('bbFabSlot_' + s) === def.id) localStorage.removeItem('bbFabSlot_' + s);
-            }
-            localStorage.setItem('bbFabSlot_' + _fabPickerSlot, def.id);
-            closeFabPicker();
-            _applyOnboardingGating();
-          });
-          optContainer.appendChild(btn);
-        }
-      });
-      // Extra FABs not currently in any slot
-      const _assignedExtras = new Set();
-      for (let s = 1; s <= 4; s++) {
-        const v = localStorage.getItem('bbFabSlot_' + s);
-        if (v) _assignedExtras.add(v);
-      }
-      _FAB_EXTRAS.forEach(extra => {
-        if (!_assignedExtras.has(extra.id)) {
-          const btn = document.createElement('button');
-          btn.style.cssText = 'display:flex;align-items:center;gap:14px;width:100%;padding:13px 14px;background:#f8f9fa;border:1.5px solid #e9ecef;border-radius:14px;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;';
-          btn.innerHTML = `<span style="font-size:1.6em;line-height:1;">${extra.icon}</span><div><div style="font-weight:700;font-size:0.95em;color:#212529;">${extra.label}</div><div style="font-size:0.8em;color:#adb5bd;margin-top:2px;">${extra.desc}</div></div>`;
-          btn.addEventListener('click', () => { _assignFabToSlot(_fabPickerSlot, extra.id); closeFabPicker(); });
-          optContainer.appendChild(btn);
-        }
-      });
-      if (!optContainer.firstChild) {
-        optContainer.innerHTML = '<div style="text-align:center;color:#adb5bd;font-size:0.9em;padding:16px 0;">No buttons available to add.</div>';
-      }
-      const _m = document.getElementById('fabPickerModal');
-      if (_m) _m.style.display = 'flex';
-    }
-    function closeFabPicker() {
-      const _m = document.getElementById('fabPickerModal');
-      if (_m) _m.style.display = 'none';
-    }
-    function _assignFabToSlot(slot, extraId) {
-      for (let s = 1; s <= 4; s++) {
-        if (localStorage.getItem('bbFabSlot_' + s) === extraId) localStorage.removeItem('bbFabSlot_' + s);
-      }
-      localStorage.setItem('bbFabSlot_' + slot, extraId);
-      _applyOnboardingGating();
-    }
-    function _hideExtraFab(extraId) {
-      for (let s = 1; s <= 4; s++) {
-        if (localStorage.getItem('bbFabSlot_' + s) === extraId) localStorage.removeItem('bbFabSlot_' + s);
-      }
-      _applyOnboardingGating();
-    }
-    window._openFabPicker = _openFabPicker;
-    window.closeFabPicker = closeFabPicker;
-    window._hideExtraFab = _hideExtraFab;
-
-    // ── Celebrity modal (index) ──
-    const _INDEX_CELEBS = [
-      { name: 'Mariah Carey', field: 'Singer', wiki: 'Mariah_Carey' },
-      { name: 'Kanye West', field: 'Musician & Artist', wiki: 'Kanye_West' },
-      { name: 'Demi Lovato', field: 'Singer & Actress', wiki: 'Demi_Lovato' },
-      { name: 'Stephen Fry', field: 'Actor & Author', wiki: 'Stephen_Fry' },
-      { name: 'Carrie Fisher', field: 'Actress & Author', wiki: 'Carrie_Fisher' },
-      { name: 'Catherine Zeta-Jones', field: 'Actress', wiki: 'Catherine_Zeta-Jones' },
-      { name: 'Pete Davidson', field: 'Comedian & Actor', wiki: 'Pete_Davidson' },
-      { name: 'Brian Wilson', field: 'Musician — The Beach Boys', wiki: 'Brian_Wilson_(musician)' },
-      { name: 'Ted Turner', field: 'Media Mogul, Founder of CNN', wiki: 'Ted_Turner' },
-      { name: 'Mike Tyson', field: 'Professional Boxer', wiki: 'Mike_Tyson' },
-      { name: 'Mel Gibson', field: 'Actor & Director', wiki: 'Mel_Gibson' },
-      { name: 'Robbie Williams', field: 'Singer', wiki: 'Robbie_Williams' },
-      { name: 'Ben Stiller', field: 'Actor & Director', wiki: 'Ben_Stiller' },
-      { name: 'Bebe Rexha', field: 'Singer', wiki: 'Bebe_Rexha' },
-      { name: 'Halsey', field: 'Singer', wiki: 'Halsey_(singer)' },
-      { name: 'Patty Duke', field: 'Actress & Bipolar Advocate', wiki: 'Patty_Duke' },
-      { name: 'Vincent van Gogh', field: 'Artist', wiki: 'Vincent_van_Gogh' },
-      { name: 'Ernest Hemingway', field: 'Author', wiki: 'Ernest_Hemingway' },
-      { name: 'Buzz Aldrin', field: 'Astronaut', wiki: 'Buzz_Aldrin' },
-      { name: 'Lil Wayne', field: 'Rapper', wiki: 'Lil_Wayne' },
-      { name: 'Taylor Tomlinson', field: 'Comedian', wiki: 'Taylor_Tomlinson' },
-      { name: 'Virginia Woolf', field: 'Author', wiki: 'Virginia_Woolf' },
-      { name: 'Syd Barrett', field: 'Musician — Pink Floyd', wiki: 'Syd_Barrett' },
-      { name: "Axl Rose", field: "Musician — Guns N' Roses", wiki: 'Axl_Rose' },
-    ];
-    let _indexCelebIdx = Math.floor(Math.random() * _INDEX_CELEBS.length);
-    const _indexCelebImgCache = {};
-    function openIndexCelebModal() {
-      _renderIndexCeleb();
-      const _m = document.getElementById('indexCelebModal');
-      if (_m) _m.style.display = 'flex';
-    }
-    function closeIndexCelebModal() {
-      const _m = document.getElementById('indexCelebModal');
-      if (_m) _m.style.display = 'none';
-    }
-    function nextIndexCeleb() {
-      _indexCelebIdx = (_indexCelebIdx + 1) % _INDEX_CELEBS.length;
-      _renderIndexCeleb();
-    }
-    async function _renderIndexCeleb() {
-      const c = _INDEX_CELEBS[_indexCelebIdx];
-      const nameEl = document.getElementById('indexCelebName');
-      const fieldEl = document.getElementById('indexCelebField');
-      const wikiEl  = document.getElementById('indexCelebWiki');
-      const photoWrap = document.getElementById('indexCelebPhotoWrap');
-      if (nameEl) nameEl.textContent = c.name;
-      if (fieldEl) fieldEl.textContent = c.field;
-      if (wikiEl) wikiEl.href = 'https://en.wikipedia.org/wiki/' + c.wiki;
-      if (photoWrap) {
-        photoWrap.textContent = '⭐';
-        if (!_indexCelebImgCache.hasOwnProperty(c.wiki)) {
-          try {
-            const title = c.wiki.replace(/_/g, ' ');
-            const res = await fetch('https://en.wikipedia.org/w/api.php?action=query&titles=' + encodeURIComponent(title) + '&prop=pageimages&format=json&pithumbsize=120&origin=*');
-            const data = await res.json();
-            const pages = data.query.pages;
-            const page = pages[Object.keys(pages)[0]];
-            _indexCelebImgCache[c.wiki] = (page && page.thumbnail) ? page.thumbnail.source : null;
-          } catch(e) { _indexCelebImgCache[c.wiki] = null; }
-        }
-        const src = _indexCelebImgCache[c.wiki];
-        if (src) {
-          photoWrap.innerHTML = `<img src="${src}" alt="${c.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
-        } else {
-          photoWrap.textContent = '⭐';
-        }
-      }
-    }
-    window.openIndexCelebModal = openIndexCelebModal;
-    window.closeIndexCelebModal = closeIndexCelebModal;
-    window.nextIndexCeleb = nextIndexCeleb;
-
-    // ── Goals modal (index) ──
-    function openIndexGoalsModal() {
-      const list = document.getElementById('indexGoalsList');
-      if (list) {
-        let goals = [];
-        try { goals = JSON.parse(localStorage.getItem('dailyGoals') || '[]'); } catch(e) {}
-        if (goals.length === 0) {
-          list.innerHTML = '<div style="text-align:center;color:#adb5bd;font-size:0.9em;padding:16px 0;">No goals added yet.<br>Add goals in the Survival Kit.</div>';
-        } else {
-          list.innerHTML = goals.map(g => `<div style="padding:12px 14px;background:#fff3e0;border-radius:12px;font-size:0.9em;color:#333;border-left:3px solid #ff9500;">${g.text || g.title || String(g)}</div>`).join('');
-        }
-      }
-      const _m = document.getElementById('indexGoalsModal');
-      if (_m) _m.style.display = 'flex';
-    }
-    function closeIndexGoalsModal() {
-      const _m = document.getElementById('indexGoalsModal');
-      if (_m) _m.style.display = 'none';
-    }
-    window.openIndexGoalsModal = openIndexGoalsModal;
-    window.closeIndexGoalsModal = closeIndexGoalsModal;
   </script>
 
   <!-- Guest PIN unlock overlay (shown on index when journal data is encrypted) -->
@@ -2954,5 +2045,6 @@
     }
   </script>
 
+  <script src="fab.js"></script>
 </body>
 </html>

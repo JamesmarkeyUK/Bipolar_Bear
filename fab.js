@@ -1,0 +1,890 @@
+/* fab.js — Shared FAB dock for BipolarBear
+   Used by: index.html, journal.html, survival-kit.html
+   NOT for: anonymous.html
+*/
+(function () {
+  'use strict';
+
+  // ── Config ────────────────────────────────────────────────────────────────
+  const _FAB_DEFAULTS = [
+    { id: 'chat',     icon: '🆘', label: 'Crisis Support',  desc: 'Samaritans & community chat', hiddenKey: 'bbWaFabHidden',        slotNum: 1 },
+    { id: 'e2ee',     icon: '🔐', label: 'Data Security',   desc: 'How your data is kept safe',  hiddenKey: 'bbQuickNoteFabHidden',  slotNum: 2 },
+    { id: 'coffee',   icon: '☕', label: 'Buy Us a Coffee', desc: 'Support Bipolar Bear',         hiddenKey: 'bbCoffeeFabHidden',     slotNum: 3 },
+    { id: 'feedback', icon: '📣', label: 'Send Feedback',   desc: 'Help us make it better',      hiddenKey: 'bbFeedbackFabHidden',   slotNum: 4 },
+  ];
+  const _FAB_EXTRAS = [
+    { id: 'quicknote', icon: '📝', label: 'Quick Note', desc: 'Reminder for your next journal entry' },
+    { id: 'stats',     icon: '📊', label: 'Statistics',  desc: 'Open your mood journal stats' },
+    { id: 'celeb',     icon: '⭐', label: 'Celebrity',   desc: 'Famous people with bipolar disorder' },
+    { id: 'goals',     icon: '🎯', label: 'Goals',       desc: 'View your survival kit goals' },
+  ];
+  const _CELEBS = [
+    { name: 'Mariah Carey',        field: 'Singer',                        wiki: 'Mariah_Carey' },
+    { name: 'Kanye West',          field: 'Musician & Artist',              wiki: 'Kanye_West' },
+    { name: 'Demi Lovato',         field: 'Singer & Actress',               wiki: 'Demi_Lovato' },
+    { name: 'Stephen Fry',         field: 'Actor & Author',                 wiki: 'Stephen_Fry' },
+    { name: 'Carrie Fisher',       field: 'Actress & Author',               wiki: 'Carrie_Fisher' },
+    { name: 'Catherine Zeta-Jones',field: 'Actress',                        wiki: 'Catherine_Zeta-Jones' },
+    { name: 'Pete Davidson',       field: 'Comedian & Actor',               wiki: 'Pete_Davidson' },
+    { name: 'Brian Wilson',        field: 'Musician — The Beach Boys',      wiki: 'Brian_Wilson_(musician)' },
+    { name: 'Ted Turner',          field: 'Media Mogul, Founder of CNN',    wiki: 'Ted_Turner' },
+    { name: 'Mike Tyson',          field: 'Professional Boxer',             wiki: 'Mike_Tyson' },
+    { name: 'Mel Gibson',          field: 'Actor & Director',               wiki: 'Mel_Gibson' },
+    { name: 'Robbie Williams',     field: 'Singer',                         wiki: 'Robbie_Williams' },
+    { name: 'Ben Stiller',         field: 'Actor & Director',               wiki: 'Ben_Stiller' },
+    { name: 'Bebe Rexha',          field: 'Singer',                         wiki: 'Bebe_Rexha' },
+    { name: 'Halsey',              field: 'Singer',                         wiki: 'Halsey_(singer)' },
+    { name: 'Patty Duke',          field: 'Actress & Bipolar Advocate',     wiki: 'Patty_Duke' },
+    { name: 'Vincent van Gogh',    field: 'Artist',                         wiki: 'Vincent_van_Gogh' },
+    { name: 'Ernest Hemingway',    field: 'Author',                         wiki: 'Ernest_Hemingway' },
+    { name: 'Buzz Aldrin',         field: 'Astronaut',                      wiki: 'Buzz_Aldrin' },
+    { name: 'Lil Wayne',           field: 'Rapper',                         wiki: 'Lil_Wayne' },
+    { name: 'Taylor Tomlinson',    field: 'Comedian',                       wiki: 'Taylor_Tomlinson' },
+    { name: 'Virginia Woolf',      field: 'Author',                         wiki: 'Virginia_Woolf' },
+    { name: 'Syd Barrett',         field: 'Musician — Pink Floyd',          wiki: 'Syd_Barrett' },
+    { name: 'Axl Rose',            field: "Musician — Guns N' Roses",       wiki: 'Axl_Rose' },
+  ];
+  const _extraMap = { stats: 'statsExtraFab', celeb: 'celebExtraFab', goals: 'goalsExtraFab', quicknote: 'quicknoteExtraFab' };
+
+  // ── CSS ───────────────────────────────────────────────────────────────────
+  const _styleEl = document.createElement('style');
+  _styleEl.textContent = `
+    .fab-footer {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: 80px; background: white;
+      border-radius: 28px 28px 0 0; z-index: 45;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.10); pointer-events: none;
+    }
+    .whatsapp-fab, .placeholder-fab, .coffee-fab, .feedback-fab, .bb-extra-fab {
+      position: fixed; bottom: 24px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(255,149,0,0.13); border: none; color: #ff9500; font-size: 1.2em;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10); z-index: 50;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.18s, transform 0.15s;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .whatsapp-fab:hover, .placeholder-fab:hover, .coffee-fab:hover,
+      .feedback-fab:hover, .bb-extra-fab:hover { background: rgba(255,149,0,0.22); transform: scale(1.08); }
+    }
+    .fab-dot-placeholder {
+      position: fixed; bottom: 24px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: transparent; border: 2px dashed rgba(255,149,0,0.45);
+      color: rgba(255,149,0,0.6); font-size: 1.3em;
+      cursor: pointer; display: none; align-items: center; justify-content: center;
+      z-index: 50; -webkit-tap-highlight-color: transparent;
+      transition: border-color 0.18s, color 0.18s;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .fab-dot-placeholder:hover { border-color: rgba(255,149,0,0.75); color: rgba(255,149,0,0.85); }
+    }
+    .bb-auth-fab {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      width: 44px; height: 44px; border-radius: 50%;
+      background: white; border: 2px solid #ff9500; color: #ff9500; font-size: 1.15em;
+      cursor: pointer; display: none; align-items: center; justify-content: center;
+      box-shadow: 0 2px 10px rgba(255,149,0,0.25); z-index: 50;
+      -webkit-tap-highlight-color: transparent; transition: transform 0.15s;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .bb-auth-fab:hover { transform: translateX(-50%) scale(1.08); }
+    }
+    @media (min-width: 520px) {
+      .fab-footer { border-bottom-left-radius: 42px; border-bottom-right-radius: 42px; }
+    }
+    .bb-fab-modal {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5); z-index: 9998;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .bb-fab-modal.open { display: flex; }
+    .bb-feedback-modal {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5); z-index: 1000;
+      justify-content: center; align-items: center;
+      overflow: hidden; padding: 20px; box-sizing: border-box;
+    }
+    .bb-feedback-modal.open { display: flex; }
+    .bb-feedback-content {
+      background: white; padding: 28px; border-radius: 20px;
+      max-width: 420px; width: 100%; max-height: 85dvh;
+      overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      box-sizing: border-box;
+    }
+    .bb-fb-type-btn {
+      flex: 1; padding: 10px 8px; border: 2px solid #e9ecef;
+      border-radius: 10px; background: #f8f9fa; color: #495057;
+      font-weight: 600; font-size: 0.9em; cursor: pointer;
+      transition: all 0.2s ease; -webkit-tap-highlight-color: transparent;
+    }
+    .bb-fb-type-btn.selected { border-color: #ff9500; background: rgba(255,149,0,0.08); color: #ff9500; }
+    /* ── Auth modal ── */
+    .bb-auth-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5); z-index: 9990;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .bb-auth-overlay.active { display: flex; }
+    .bb-auth-box {
+      background: white; border-radius: 20px; padding: 24px 24px 20px;
+      max-width: 320px; width: 100%; box-sizing: border-box;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.22);
+    }
+    .bb-auth-input {
+      width: 100%; padding: 12px 14px; border: 2px solid #e9ecef;
+      border-radius: 10px; font-size: 0.95em; box-sizing: border-box;
+      margin-bottom: 10px; outline: none; font-family: inherit; display: block;
+    }
+    .bb-auth-input:focus { border-color: #ff9500; }
+    /* ── Account modal ── */
+    .bb-account-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5); z-index: 9990;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .bb-account-overlay.active { display: flex; }
+    .bb-account-box {
+      background: white; border-radius: 20px; padding: 24px 24px 20px;
+      max-width: 300px; width: 100%; box-sizing: border-box;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.22);
+    }
+  `;
+  document.head.appendChild(_styleEl);
+
+  // ── HTML injection ────────────────────────────────────────────────────────
+  function _injectHTML() {
+    const _wrap = document.createElement('div');
+    _wrap.innerHTML = `
+      <div class="fab-footer" aria-hidden="true"></div>
+
+      <!-- Core default FABs -->
+      <button class="whatsapp-fab" id="chatFab" onclick="openChatModal()" title="Crisis support">🆘</button>
+      <div id="chatModal" class="bb-fab-modal" onclick="if(event.target===this)closeChatModal()">
+        <div style="background:white;border-radius:20px;padding:24px 24px 20px;text-align:center;max-width:300px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);">
+          <div style="font-size:2em;margin-bottom:8px;">🆘</div>
+          <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:6px;">Crisis Support</div>
+          <p style="font-size:0.84em;color:#6c757d;margin-bottom:14px;">If you're struggling and need to talk to someone:</p>
+          <a href="tel:116123" style="display:flex;align-items:center;gap:12px;padding:13px 14px;background:#f8f9fa;border-radius:12px;text-decoration:none;color:#212529;margin-bottom:14px;text-align:left;">
+            <span style="font-size:1.6em;line-height:1;">📞</span>
+            <div>
+              <div style="font-weight:700;font-size:0.95em;">Samaritans</div>
+              <div style="color:#6c757d;font-size:0.82em;margin-top:1px;">116 123 · Free · 24/7</div>
+            </div>
+          </a>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <button onclick="closeChatModal()" style="padding:12px;background:#ff9500;color:white;border:none;border-radius:12px;font-weight:700;font-size:0.95em;cursor:pointer;">Close</button>
+            <button onclick="closeChatModal();window._showHidePermanently('chat')" style="padding:8px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;">🙈 Hide this button</button>
+          </div>
+        </div>
+      </div>
+
+      <button class="placeholder-fab" id="quickNoteFab" onclick="openSecurityModal()" title="Your data security">🔐</button>
+      <div id="securityModal" class="bb-fab-modal" onclick="if(event.target===this)closeSecurityModal()">
+        <div style="background:white;border-radius:20px;padding:24px 24px 20px;text-align:center;max-width:300px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);">
+          <div style="font-size:2em;margin-bottom:8px;">🔐</div>
+          <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:12px;">How your data stays safe</div>
+          <div style="text-align:left;font-size:0.84em;color:#495057;line-height:1.65;margin-bottom:16px;">
+            <p style="margin-bottom:8px;"><strong>🔑 Your PIN</strong> locks the app locally on your device. Without it, nobody can open Bipolar Bear — even if they have your phone.</p>
+            <p style="margin-bottom:8px;"><strong>🔒 Your password</strong> encrypts your journal entries before they ever leave your device. The data is scrambled using a key only you hold.</p>
+            <p style="margin-bottom:8px;"><strong>☁️ Firebase (our database)</strong> stores only the encrypted version. Even we can't read your entries — they're meaningless without your password.</p>
+            <p style="margin-bottom:0;"><strong>🛡️ End-to-end encryption</strong> means your data is protected at every step — on your device, in transit, and in storage.</p>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <button onclick="closeSecurityModal()" style="padding:12px;background:#ff9500;color:white;border:none;border-radius:12px;font-weight:700;font-size:0.95em;cursor:pointer;">Got it</button>
+            <button onclick="closeSecurityModal();window._showHidePermanently('quicknote')" style="padding:10px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;">🙈 Hide this button</button>
+          </div>
+        </div>
+      </div>
+
+      <button class="coffee-fab" id="coffeeFab" onclick="openCoffeeModal()" title="Support Bipolar Bear">☕</button>
+      <div id="coffeeModal2" class="bb-fab-modal" onclick="if(event.target===this)closeCoffeeModal()">
+        <div style="background:white;border-radius:20px;padding:24px 24px 20px;text-align:center;max-width:300px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);">
+          <div style="font-size:2em;margin-bottom:8px;">☕</div>
+          <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:8px;">Keep Bipolar Bear Going</div>
+          <p style="font-size:0.88em;color:#6c757d;line-height:1.55;margin-bottom:6px;">Running BipolarBear costs around <strong>£25/month</strong> for servers, hosting and services.</p>
+          <p id="bbCoffeeFundedText" style="font-size:0.82em;color:#ff9500;font-weight:600;margin-bottom:16px;display:none;"></p>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <a href="https://buymeacoffee.com/jamesmarkey" target="_blank" rel="noopener noreferrer" onclick="closeCoffeeModal()"
+              style="display:block;padding:13px;background:#ff9500;color:white;border-radius:12px;text-decoration:none;font-weight:700;font-size:0.95em;text-align:center;">
+              ☕ Send me a coffee
+            </a>
+            <button onclick="window._showHidePermanently('coffee')"
+              style="padding:10px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+              🙈 Hide this button
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <button class="feedback-fab" onclick="openFabFeedback()" title="Send feedback">📣</button>
+      <div class="bb-feedback-modal" id="bbFabFeedbackModal" onclick="if(event.target===this)closeFabFeedback()">
+        <div class="bb-feedback-content">
+          <h3 style="margin-bottom:4px;color:#333;">Share Feedback</h3>
+          <p id="bbFbMeta" style="font-size:0.78em;color:#adb5bd;margin-bottom:4px;"></p>
+          <p style="font-size:0.85em;color:#6c757d;margin-bottom:16px;">Help us make Bipolar Bear better.</p>
+          <div style="display:flex;gap:8px;margin-bottom:16px;">
+            <button class="bb-fb-type-btn" id="bbFbTypeBug" onclick="selectFabFeedbackType('bug')">🐛 Bug</button>
+            <button class="bb-fb-type-btn" id="bbFbTypeComment" onclick="selectFabFeedbackType('comment')">💬 Comment</button>
+            <button class="bb-fb-type-btn" id="bbFbTypeIdea" onclick="selectFabFeedbackType('idea')">💡 Idea</button>
+          </div>
+          <textarea id="bbFbMessage" placeholder="Tell us what's on your mind…" rows="4"
+            style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;box-sizing:border-box;resize:none;font-family:inherit;margin-bottom:12px;"></textarea>
+          <div id="bbFbEmailRow" style="margin-bottom:12px;display:none;">
+            <input type="email" id="bbFbEmail" placeholder="Your email (optional)"
+              style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;box-sizing:border-box;font-family:inherit;">
+          </div>
+          <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:0.88em;color:#495057;margin-bottom:18px;user-select:none;">
+            Keep me informed about my submission
+            <span style="position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;"
+              onclick="var cb=document.getElementById('bbFbNotify');cb.checked=!cb.checked;document.getElementById('bbFbNotifyTrack').style.background=cb.checked?'#ff9500':'#ccc';document.getElementById('bbFbNotifyThumb').style.transform=cb.checked?'translateX(20px)':'translateX(0)';">
+              <input type="checkbox" id="bbFbNotify" checked style="opacity:0;width:0;height:0;position:absolute;pointer-events:none;">
+              <span id="bbFbNotifyTrack" style="position:absolute;inset:0;border-radius:24px;background:#ff9500;transition:background 0.2s;"></span>
+              <span id="bbFbNotifyThumb" style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:white;box-shadow:0 1px 3px rgba(0,0,0,0.3);transition:transform 0.2s;transform:translateX(20px);"></span>
+            </span>
+          </label>
+          <div id="bbFbError" style="color:#dc3545;font-size:0.85em;margin-bottom:10px;display:none;"></div>
+          <div style="display:flex;gap:10px;justify-content:center;">
+            <button onclick="submitFabFeedback()" style="padding:11px 24px;background:#ff9500;color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-size:0.95em;">Send</button>
+            <button onclick="closeFabFeedback()" style="padding:11px 24px;background:white;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-weight:600;cursor:pointer;font-size:0.95em;">Cancel</button>
+          </div>
+          <button onclick="window._showHidePermanently('feedback')"
+            style="display:block;width:100%;margin-top:12px;padding:8px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+            🙈 Hide this button
+          </button>
+        </div>
+      </div>
+
+      <!-- Center auth FAB (always at 50%, not part of slot system) -->
+      <button id="bbAuthFab" class="bb-auth-fab" onclick="(window._fabOpenAuth||function(){})()" title="Profile / Sign in">👤</button>
+
+      <!-- Placeholder dots -->
+      <button class="fab-dot-placeholder" id="fabPh1" onclick="window._openFabPicker(1)" title="Add to dock">+</button>
+      <button class="fab-dot-placeholder" id="fabPh2" onclick="window._openFabPicker(2)" title="Add to dock">+</button>
+      <button class="fab-dot-placeholder" id="fabPh3" onclick="window._openFabPicker(3)" title="Add to dock">+</button>
+      <button class="fab-dot-placeholder" id="fabPh4" onclick="window._openFabPicker(4)" title="Add to dock">+</button>
+
+      <!-- Extra assignable FABs (hidden until assigned) -->
+      <button class="bb-extra-fab" id="statsExtraFab" onclick="openStatsModal()" title="Statistics" style="display:none;">📊</button>
+      <button class="bb-extra-fab" id="celebExtraFab" onclick="openCelebModal()" title="Famous people with bipolar" style="display:none;">⭐</button>
+      <button class="bb-extra-fab" id="goalsExtraFab" onclick="openGoalsModal()" title="My goals" style="display:none;">🎯</button>
+      <button class="bb-extra-fab" id="quicknoteExtraFab" onclick="openQuickNoteModal()" title="Quick note" style="display:none;">📝</button>
+
+      <!-- FAB picker sheet -->
+      <div id="bbFabPickerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:flex-end;justify-content:center;" onclick="if(event.target===this)closeFabPicker();">
+        <div style="background:white;border-radius:20px 20px 0 0;padding:24px;max-width:420px;width:100%;box-shadow:0 -4px 32px rgba(0,0,0,0.18);">
+          <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:16px;text-align:center;">Add to dock</div>
+          <div id="bbFabPickerOptions" style="display:flex;flex-direction:column;gap:10px;"></div>
+          <button onclick="closeFabPicker()" style="display:block;width:100%;margin-top:14px;padding:12px;background:#f8f9fa;color:#6c757d;border:none;border-radius:12px;font-weight:600;font-size:0.95em;cursor:pointer;">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Quick Note modal -->
+      <div id="bbQuickNoteModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeQuickNoteModal();">
+        <div style="background:white;border-radius:20px;padding:24px;max-width:300px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);">
+          <div style="font-size:2em;text-align:center;margin-bottom:6px;">📝</div>
+          <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:4px;text-align:center;">Quick Note</div>
+          <p style="font-size:0.82em;color:#adb5bd;margin-bottom:12px;text-align:center;">Shows on your next journal entry</p>
+          <textarea id="bbQuickNoteInput" placeholder="Something to remember..." style="width:100%;min-height:90px;border:1.5px solid #e9ecef;border-radius:10px;padding:10px 12px;font-size:0.9em;color:#495057;resize:vertical;box-sizing:border-box;font-family:inherit;line-height:1.5;outline:none;"></textarea>
+          <div style="display:flex;gap:10px;margin-top:12px;">
+            <button onclick="closeQuickNoteModal()" style="flex:1;padding:11px;background:white;color:#adb5bd;border:1.5px solid #e9ecef;border-radius:12px;font-weight:600;font-size:0.9em;cursor:pointer;">Cancel</button>
+            <button onclick="saveQuickNote()" style="flex:1;padding:11px;background:#ff9500;color:white;border:none;border-radius:12px;font-weight:700;font-size:0.9em;cursor:pointer;">Save ✓</button>
+          </div>
+          <button onclick="closeQuickNoteModal();window._hideExtraFab('quicknote')" style="display:block;margin:10px auto 0;padding:6px 10px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;">🙈 Hide this button</button>
+        </div>
+      </div>
+
+      <!-- Celebrity modal -->
+      <div id="bbCelebModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeCelebModal();">
+        <div style="background:white;border-radius:20px;padding:24px;max-width:300px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);text-align:center;">
+          <div style="font-size:0.78em;color:#adb5bd;margin-bottom:12px;font-style:italic;">Famous people with bipolar disorder</div>
+          <div id="bbCelebPhotoWrap" style="width:80px;height:80px;border-radius:50%;margin:0 auto 12px;overflow:hidden;background:#fff3e0;display:flex;align-items:center;justify-content:center;font-size:2.2em;">⭐</div>
+          <div id="bbCelebName" style="font-weight:700;font-size:1.1em;color:#212529;margin-bottom:4px;"></div>
+          <div id="bbCelebField" style="color:#6c757d;font-size:0.85em;margin-bottom:16px;"></div>
+          <div style="display:flex;gap:8px;margin-bottom:12px;">
+            <button onclick="nextCeleb()" style="flex:1;padding:10px;background:#f8f9fa;color:#495057;border:1.5px solid #e9ecef;border-radius:12px;font-weight:600;font-size:0.9em;cursor:pointer;">Next ›</button>
+            <a id="bbCelebWiki" href="#" target="_blank" rel="noopener noreferrer" style="flex:1;padding:10px;background:#ff9500;color:white;border-radius:12px;font-weight:700;font-size:0.9em;text-decoration:none;display:flex;align-items:center;justify-content:center;">Wikipedia ↗</a>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button onclick="closeCelebModal()" style="flex:1;padding:10px;background:#f8f9fa;color:#6c757d;border:none;border-radius:12px;font-size:0.85em;cursor:pointer;">Close</button>
+            <button onclick="closeCelebModal();window._hideExtraFab('celeb')" style="flex:1;padding:10px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;">🙈 Hide this button</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Goals modal -->
+      <div id="bbGoalsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeGoalsModal();">
+        <div style="background:white;border-radius:20px;padding:24px;max-width:320px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);max-height:80dvh;overflow-y:auto;">
+          <div style="font-size:1.8em;text-align:center;margin-bottom:8px;">🎯</div>
+          <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:16px;text-align:center;">My Goals</div>
+          <div id="bbGoalsList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;"></div>
+          <a href="survival-kit.html#goals" style="display:block;text-align:center;color:#ff9500;font-size:0.88em;text-decoration:none;margin-bottom:14px;padding:10px;border:1.5px solid #ffe0b2;border-radius:10px;">Manage goals in Survival Kit ↗</a>
+          <button onclick="closeGoalsModal()" style="display:block;width:100%;padding:12px;background:#ff9500;color:white;border:none;border-radius:12px;font-weight:700;cursor:pointer;margin-bottom:8px;">Close</button>
+          <button onclick="closeGoalsModal();window._hideExtraFab('goals')" style="display:block;width:100%;padding:8px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;">🙈 Hide this button</button>
+        </div>
+      </div>
+
+      <!-- Stats modal -->
+      <div id="bbStatsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)this.style.display='none';">
+        <div style="background:white;border-radius:20px;padding:24px;max-width:300px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);text-align:center;">
+          <div style="font-size:2em;margin-bottom:8px;">📊</div>
+          <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:8px;">Mood Statistics</div>
+          <p style="font-size:0.85em;color:#6c757d;margin-bottom:18px;">View your mood patterns, streaks, and trends in the journal.</p>
+          <button onclick="document.getElementById('bbStatsModal').style.display='none';window.location.href='journal.html?openStats=1'" style="display:block;width:100%;padding:12px;background:#ff9500;color:white;border:none;border-radius:12px;font-weight:700;cursor:pointer;margin-bottom:8px;">Open Statistics ↗</button>
+          <button onclick="document.getElementById('bbStatsModal').style.display='none'" style="display:block;width:100%;padding:10px;background:#f8f9fa;color:#6c757d;border:none;border-radius:12px;font-size:0.9em;cursor:pointer;margin-bottom:8px;">Cancel</button>
+          <button onclick="document.getElementById('bbStatsModal').style.display='none';window._hideExtraFab('stats')" style="display:block;width:100%;padding:8px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;">🙈 Hide this button</button>
+        </div>
+      </div>
+
+      <!-- Shared auth modal (sign in / sign up) -->
+      <div class="bb-auth-overlay" id="bbAuthModal" onclick="if(event.target===this)window.closeAuthModal()">
+        <div class="bb-auth-box">
+          <h3 id="bbAuthTitle" style="margin:0 0 14px;font-size:1.1em;color:#212529;text-align:center;">Welcome to Bipolar Bear 🐻</h3>
+          <div id="bbAuthError" style="display:none;color:#dc3545;font-size:0.85em;padding:8px 12px;background:rgba(220,53,69,0.08);border-radius:8px;margin-bottom:10px;"></div>
+          <input type="email" id="bbAuthEmail" class="bb-auth-input" placeholder="Email" autocomplete="email">
+          <input type="password" id="bbAuthPassword" class="bb-auth-input" placeholder="Password" autocomplete="current-password">
+          <button id="bbAuthSubmit" style="width:100%;padding:13px;background:#ff9500;color:white;border:none;border-radius:10px;font-weight:700;font-size:0.95em;cursor:pointer;margin-bottom:8px;">Sign In</button>
+          <button onclick="window.closeAuthModal()" style="width:100%;padding:11px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:10px;font-size:0.9em;font-weight:600;cursor:pointer;margin-bottom:10px;-webkit-tap-highlight-color:transparent;">Continue as Guest</button>
+          <div id="bbAuthToggle" style="text-align:center;font-size:0.85em;color:#6c757d;cursor:pointer;padding:4px;">Don't have an account? <span style="color:#ff9500;font-weight:600;">Sign up</span></div>
+          <button onclick="(window._confirmDeleteGuestData||function(){})()" style="display:block;width:100%;margin-top:10px;background:none;border:none;color:#adb5bd;font-size:0.78em;cursor:pointer;padding:4px 8px;-webkit-tap-highlight-color:transparent;text-align:center;">🗑 Delete all guest data</button>
+        </div>
+      </div>
+
+      <!-- Shared account modal (profile management) -->
+      <div class="bb-account-overlay" id="bbAccountModal" onclick="if(event.target===this)window.closeAccountModal()">
+        <div class="bb-account-box">
+          <div style="font-size:1.6em;margin-bottom:4px;text-align:center;">👤</div>
+          <div id="bbAccountEmail" style="font-size:0.85em;color:#6c757d;margin-bottom:16px;word-break:break-all;text-align:center;"></div>
+          <div id="bbAccountMsg" style="font-size:0.85em;margin-bottom:12px;display:none;padding:8px 12px;border-radius:8px;"></div>
+          <button onclick="window._bbAccountLogout()" style="width:100%;padding:12px;background:white;color:#dc3545;border:2px solid #dc3545;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;margin-bottom:10px;-webkit-tap-highlight-color:transparent;">Sign out</button>
+          <div id="bbAccountPassSection" style="margin-bottom:10px;">
+            <div id="bbAccountPassFields" style="display:none;margin-bottom:8px;">
+              <input type="password" id="bbAccountCurrentPass" placeholder="Current password" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;box-sizing:border-box;margin-bottom:6px;outline:none;font-family:inherit;">
+              <input type="password" id="bbAccountNewPass" placeholder="New password" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;box-sizing:border-box;margin-bottom:8px;outline:none;font-family:inherit;">
+              <div style="display:flex;gap:8px;">
+                <button onclick="window._bbSubmitPasswordChange()" style="flex:1;padding:10px;background:#ff9500;color:white;border:none;border-radius:8px;font-size:0.9em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Save</button>
+                <button onclick="document.getElementById('bbAccountPassFields').style.display='none';document.getElementById('bbAccountPassToggleBtn').style.display='';" style="padding:10px 14px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Cancel</button>
+              </div>
+            </div>
+            <button id="bbAccountPassToggleBtn" onclick="document.getElementById('bbAccountPassFields').style.display='';document.getElementById('bbAccountPassToggleBtn').style.display='none';document.getElementById('bbAccountCurrentPass').focus();" style="width:100%;padding:12px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Change password</button>
+          </div>
+          <button onclick="(window._fabOpenPersonalInfo||function(){})()" style="width:100%;padding:12px;background:white;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;margin-bottom:10px;-webkit-tap-highlight-color:transparent;">👤 Personal information</button>
+          <button onclick="window.closeAccountModal()" style="width:100%;padding:10px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:10px;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Cancel</button>
+        </div>
+      </div>
+    `;
+    const _target = document.getElementById('app-shell') || document.body;
+    while (_wrap.firstChild) _target.appendChild(_wrap.firstChild);
+    // Defer until after layout so #app-shell.offsetWidth is valid
+    requestAnimationFrame(() => requestAnimationFrame(() => _applyFabDock()));
+    // Wire auth modal listeners now that elements are in the DOM
+    _bbWireAuthListeners();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _injectHTML);
+  } else {
+    _injectHTML();
+  }
+
+  // ── FAB dock: visibility + slot positioning ───────────────────────────────
+  function _applyFabDock() {
+    const _fabsUnlocked = localStorage.getItem('bbFabsUnlocked') === '1';
+    const _footer = document.querySelector('.fab-footer');
+
+    // Center auth FAB: show when dock unlocked
+    const _authFab = document.getElementById('bbAuthFab');
+    if (_authFab) _authFab.style.display = _fabsUnlocked ? 'flex' : 'none';
+
+    // index.html pre-dock auth wrapper: hide when dock is unlocked (bbAuthFab takes over)
+    const _authWrap = document.getElementById('authFabWrapper');
+    if (_authWrap) _authWrap.style.display = _fabsUnlocked ? 'none' : '';
+
+    if (!_fabsUnlocked) {
+      if (_footer) _footer.style.display = 'none';
+      [document.getElementById('chatFab'), document.getElementById('quickNoteFab'),
+       document.getElementById('coffeeFab'), document.querySelector('.feedback-fab')].forEach(el => { if (el) el.style.display = 'none'; });
+      Object.values(_extraMap).forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+      for (let s = 1; s <= 4; s++) { const ph = document.getElementById('fabPh' + s); if (ph) ph.style.display = 'none'; }
+      return;
+    }
+
+    if (_footer) _footer.style.display = '';
+
+    // Slot positions relative to the fixed-positioning containing block.
+    // At ≥920px, #app-shell has transform:translateZ(0) so position:fixed is relative to it → use offsetWidth.
+    // At <920px, position:fixed is viewport-relative regardless of app-shell width → use innerWidth.
+    const _appShell = document.getElementById('app-shell');
+    const _shellW = window.innerWidth >= 920
+      ? ((_appShell && _appShell.offsetWidth) || window.innerWidth)
+      : window.innerWidth;
+    const _slotPos = {
+      1: Math.round(_shellW * 0.10 - 22) + 'px',
+      2: Math.round(_shellW * 0.30 - 22) + 'px',
+      3: Math.round(_shellW * 0.70 - 22) + 'px',
+      4: Math.round(_shellW * 0.90 - 22) + 'px',
+    };
+
+    const _defVis = {
+      chat:     localStorage.getItem('bbWaFabHidden')        !== '1',
+      e2ee:     localStorage.getItem('bbQuickNoteFabHidden') !== '1',
+      coffee:   localStorage.getItem('bbCoffeeFabHidden')    !== '1',
+      feedback: localStorage.getItem('bbFeedbackFabHidden')  !== '1',
+    };
+    const _defEl = {
+      chat:     document.getElementById('chatFab'),
+      e2ee:     document.getElementById('quickNoteFab'),
+      coffee:   document.getElementById('coffeeFab'),
+      feedback: document.querySelector('.feedback-fab'),
+    };
+
+    // Resolve which slot each default FAB lives in (can be reassigned via picker)
+    const _defaultSlotMap = {};
+    _FAB_DEFAULTS.forEach(_def => {
+      let _found = null;
+      for (let s = 1; s <= 4; s++) {
+        if (localStorage.getItem('bbFabSlot_' + s) === _def.id) { _found = s; break; }
+      }
+      _defaultSlotMap[_def.id] = _found !== null ? _found : _def.slotNum;
+    });
+
+    _FAB_DEFAULTS.forEach(_def => {
+      const _el = _defEl[_def.id];
+      if (!_el) return;
+      _el.style.display = _defVis[_def.id] ? (_def.id === 'feedback' ? '' : 'flex') : 'none';
+      _el.style.left = _slotPos[_defaultSlotMap[_def.id]];
+    });
+
+    const _slotOccupied = {};
+    _FAB_DEFAULTS.forEach(_def => { if (_defVis[_def.id]) _slotOccupied[_defaultSlotMap[_def.id]] = true; });
+
+    // Hide all extras first, then show the assigned ones
+    Object.values(_extraMap).forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+    for (let s = 1; s <= 4; s++) {
+      if (!_slotOccupied[s]) {
+        const _assigned = localStorage.getItem('bbFabSlot_' + s);
+        if (_assigned && _extraMap[_assigned]) {
+          const _ef = document.getElementById(_extraMap[_assigned]);
+          if (_ef) { _ef.style.display = 'flex'; _ef.style.left = _slotPos[s]; }
+        }
+      }
+    }
+
+    // Placeholder dots for truly empty slots
+    for (let s = 1; s <= 4; s++) {
+      const _ph = document.getElementById('fabPh' + s);
+      if (!_ph) continue;
+      const _assigned = localStorage.getItem('bbFabSlot_' + s);
+      const _hasExtra = _assigned && _extraMap[_assigned] && !_slotOccupied[s];
+      _ph.style.display = (!_slotOccupied[s] && !_hasExtra) ? 'flex' : 'none';
+      _ph.style.left = _slotPos[s];
+    }
+  }
+  window._applyFabDock = _applyFabDock;
+  window.addEventListener('resize', _applyFabDock);
+
+  // ── FAB picker ────────────────────────────────────────────────────────────
+  let _fabPickerSlot = null;
+  window._openFabPicker = function (slot) {
+    _fabPickerSlot = slot;
+    const _opts = document.getElementById('bbFabPickerOptions');
+    if (!_opts) return;
+    _opts.innerHTML = '';
+    _FAB_DEFAULTS.forEach(_def => {
+      if (localStorage.getItem(_def.hiddenKey) === '1') {
+        const _btn = document.createElement('button');
+        _btn.style.cssText = 'display:flex;align-items:center;gap:14px;width:100%;padding:13px 14px;background:#f8f9fa;border:1.5px solid #e9ecef;border-radius:14px;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;';
+        _btn.innerHTML = `<span style="font-size:1.6em;line-height:1;">${_def.icon}</span><div><div style="font-weight:700;font-size:0.95em;color:#212529;">${_def.label}</div><div style="font-size:0.8em;color:#adb5bd;margin-top:2px;">${_def.desc}</div></div>`;
+        _btn.addEventListener('click', () => {
+          localStorage.removeItem(_def.hiddenKey);
+          for (let s = 1; s <= 4; s++) {
+            if (localStorage.getItem('bbFabSlot_' + s) === _def.id) localStorage.removeItem('bbFabSlot_' + s);
+          }
+          localStorage.setItem('bbFabSlot_' + _fabPickerSlot, _def.id);
+          closeFabPicker();
+          _applyFabDock();
+        });
+        _opts.appendChild(_btn);
+      }
+    });
+    const _assignedExtras = new Set();
+    for (let s = 1; s <= 4; s++) {
+      const v = localStorage.getItem('bbFabSlot_' + s);
+      if (v && _extraMap[v]) _assignedExtras.add(v);
+    }
+    _FAB_EXTRAS.forEach(_extra => {
+      if (!_assignedExtras.has(_extra.id)) {
+        const _btn = document.createElement('button');
+        _btn.style.cssText = 'display:flex;align-items:center;gap:14px;width:100%;padding:13px 14px;background:#f8f9fa;border:1.5px solid #e9ecef;border-radius:14px;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;';
+        _btn.innerHTML = `<span style="font-size:1.6em;line-height:1;">${_extra.icon}</span><div><div style="font-weight:700;font-size:0.95em;color:#212529;">${_extra.label}</div><div style="font-size:0.8em;color:#adb5bd;margin-top:2px;">${_extra.desc}</div></div>`;
+        _btn.addEventListener('click', () => {
+          for (let s = 1; s <= 4; s++) {
+            if (localStorage.getItem('bbFabSlot_' + s) === _extra.id) localStorage.removeItem('bbFabSlot_' + s);
+          }
+          localStorage.setItem('bbFabSlot_' + _fabPickerSlot, _extra.id);
+          closeFabPicker();
+          _applyFabDock();
+        });
+        _opts.appendChild(_btn);
+      }
+    });
+    if (!_opts.firstChild) {
+      _opts.innerHTML = '<div style="text-align:center;color:#adb5bd;font-size:0.9em;padding:16px 0;">No buttons available to add.</div>';
+    }
+    const _m = document.getElementById('bbFabPickerModal');
+    if (_m) _m.style.display = 'flex';
+  };
+  window.closeFabPicker = function () {
+    const _m = document.getElementById('bbFabPickerModal');
+    if (_m) _m.style.display = 'none';
+  };
+  window._hideExtraFab = function (extraId) {
+    for (let s = 1; s <= 4; s++) {
+      if (localStorage.getItem('bbFabSlot_' + s) === extraId) localStorage.removeItem('bbFabSlot_' + s);
+    }
+    _applyFabDock();
+  };
+
+  // ── Core FAB modal open/close ─────────────────────────────────────────────
+  window.openChatModal = function () { document.getElementById('chatModal').classList.add('open'); };
+  window.closeChatModal = function () { document.getElementById('chatModal').classList.remove('open'); };
+  window.openSecurityModal = function () { document.getElementById('securityModal').classList.add('open'); };
+  window.closeSecurityModal = function () { document.getElementById('securityModal').classList.remove('open'); };
+
+  window.openCoffeeModal = async function () {
+    document.getElementById('coffeeModal2').classList.add('open');
+    const _db = window.db || (window.firebase && window.firebase.firestore ? window.firebase.firestore() : null);
+    if (_db) {
+      try {
+        const _snap = await _db.collection('counters').doc('appCosts').get();
+        if (_snap.exists) {
+          const d = _snap.data();
+          const pct = d.totalFunded && d.monthlyTarget ? Math.round((d.totalFunded / d.monthlyTarget) * 100) : null;
+          const _el = document.getElementById('bbCoffeeFundedText');
+          if (_el && pct !== null) { _el.textContent = pct + '% of this month funded — thank you!'; _el.style.display = ''; }
+        }
+      } catch (e) {}
+    }
+  };
+  window.closeCoffeeModal = function () { document.getElementById('coffeeModal2').classList.remove('open'); };
+
+  // ── Feedback FAB ──────────────────────────────────────────────────────────
+  let _fbType = null;
+  window.openFabFeedback = function () {
+    _fbType = null;
+    const _modal = document.getElementById('bbFabFeedbackModal');
+    const _meta = document.getElementById('bbFbMeta');
+    const _msg = document.getElementById('bbFbMessage');
+    const _err = document.getElementById('bbFbError');
+    document.querySelectorAll('.bb-fb-type-btn').forEach(b => b.classList.remove('selected'));
+    if (_msg) _msg.value = '';
+    if (_err) { _err.style.display = 'none'; _err.textContent = ''; }
+    if (_meta) {
+      const _page = document.title || window.location.pathname;
+      const _ver = window._APP_VERSION ? ' · v' + window._APP_VERSION : '';
+      _meta.textContent = _page + _ver;
+    }
+    if (_modal) _modal.classList.add('open');
+  };
+  window.closeFabFeedback = function () {
+    const _modal = document.getElementById('bbFabFeedbackModal');
+    if (_modal) _modal.classList.remove('open');
+    if (typeof window._onFabFeedbackClose === 'function') window._onFabFeedbackClose();
+  };
+  window.selectFabFeedbackType = function (type) {
+    _fbType = type;
+    document.querySelectorAll('.bb-fb-type-btn').forEach(b => b.classList.remove('selected'));
+    const _map = { bug: 'bbFbTypeBug', comment: 'bbFbTypeComment', idea: 'bbFbTypeIdea' };
+    const _el = document.getElementById(_map[type]);
+    if (_el) _el.classList.add('selected');
+    const _emailRow = document.getElementById('bbFbEmailRow');
+    if (_emailRow) _emailRow.style.display = type === 'bug' ? '' : 'none';
+  };
+  window.submitFabFeedback = async function () {
+    const _errEl = document.getElementById('bbFbError');
+    const _msgEl = document.getElementById('bbFbMessage');
+    const _msg = _msgEl ? _msgEl.value.trim() : '';
+    if (!_fbType) { if (_errEl) { _errEl.textContent = 'Please pick a type.'; _errEl.style.display = ''; } return; }
+    if (!_msg)    { if (_errEl) { _errEl.textContent = 'Please write something first.'; _errEl.style.display = ''; } return; }
+    const _notifyEl = document.getElementById('bbFbNotify');
+    const _emailEl  = document.getElementById('bbFbEmail');
+    const payload = {
+      type: _fbType, message: _msg, page: window.location.pathname,
+      version: window._APP_VERSION || null,
+      platform: _getFbPlatform(),
+      notify: _notifyEl ? _notifyEl.checked : false,
+      email: (_emailEl && _emailEl.value.trim()) ? _emailEl.value.trim() : (window.currentUser ? window.currentUser.email || null : null),
+      uid: window.currentUser ? window.currentUser.uid : null,
+      ts: Date.now(),
+    };
+    try {
+      const _db = window.db || (window.firebase && window.firebase.firestore ? window.firebase.firestore() : null);
+      if (_db) {
+        if (!window.currentUser && window.auth) { try { await window.auth.signInAnonymously(); } catch (e) {} }
+        await _db.collection('feedback').add(payload);
+      }
+      window.closeFabFeedback();
+      alert('Thanks for your feedback! 🐻');
+    } catch (e) {
+      if (_errEl) { _errEl.textContent = 'Could not send — please try again.'; _errEl.style.display = ''; }
+    }
+  };
+
+  function _getFbPlatform() {
+    if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) return 'native';
+    if (window.matchMedia('(display-mode: standalone)').matches) return 'pwa';
+    return 'web';
+  }
+
+  // ── Extra FAB modals ──────────────────────────────────────────────────────
+  window.openStatsModal = function () {
+    const _m = document.getElementById('bbStatsModal');
+    if (_m) _m.style.display = 'flex';
+  };
+
+  window.openGoalsModal = function () {
+    const _list = document.getElementById('bbGoalsList');
+    if (_list) {
+      let _goals = [];
+      try { _goals = JSON.parse(localStorage.getItem('dailyGoals') || '[]'); } catch (e) {}
+      if (_goals.length === 0) {
+        _list.innerHTML = '<div style="text-align:center;color:#adb5bd;font-size:0.9em;padding:16px 0;">No goals added yet.<br>Add goals in the Survival Kit.</div>';
+      } else {
+        _list.innerHTML = _goals.map(g => `<div style="padding:12px 14px;background:#fff3e0;border-radius:12px;font-size:0.9em;color:#333;border-left:3px solid #ff9500;">${g.text || g.title || String(g)}</div>`).join('');
+      }
+    }
+    const _m = document.getElementById('bbGoalsModal');
+    if (_m) _m.style.display = 'flex';
+  };
+  window.closeGoalsModal = function () {
+    const _m = document.getElementById('bbGoalsModal');
+    if (_m) _m.style.display = 'none';
+  };
+
+  let _celebIdx = Math.floor(Math.random() * _CELEBS.length);
+  const _celebImgCache = {};
+  window.openCelebModal = function () {
+    _renderCeleb();
+    const _m = document.getElementById('bbCelebModal');
+    if (_m) _m.style.display = 'flex';
+  };
+  window.closeCelebModal = function () {
+    const _m = document.getElementById('bbCelebModal');
+    if (_m) _m.style.display = 'none';
+  };
+  window.nextCeleb = function () {
+    _celebIdx = (_celebIdx + 1) % _CELEBS.length;
+    _renderCeleb();
+  };
+  async function _renderCeleb() {
+    const c = _CELEBS[_celebIdx];
+    const _nameEl  = document.getElementById('bbCelebName');
+    const _fieldEl = document.getElementById('bbCelebField');
+    const _wikiEl  = document.getElementById('bbCelebWiki');
+    const _photoWrap = document.getElementById('bbCelebPhotoWrap');
+    if (_nameEl)  _nameEl.textContent  = c.name;
+    if (_fieldEl) _fieldEl.textContent = c.field;
+    if (_wikiEl)  _wikiEl.href = 'https://en.wikipedia.org/wiki/' + c.wiki;
+    if (_photoWrap) {
+      _photoWrap.textContent = '⭐';
+      if (!_celebImgCache.hasOwnProperty(c.wiki)) {
+        try {
+          const _res = await fetch('https://en.wikipedia.org/w/api.php?action=query&titles=' + encodeURIComponent(c.wiki.replace(/_/g, ' ')) + '&prop=pageimages&format=json&pithumbsize=120&origin=*');
+          const _data = await _res.json();
+          const _pages = _data.query.pages;
+          const _page = _pages[Object.keys(_pages)[0]];
+          _celebImgCache[c.wiki] = (_page && _page.thumbnail) ? _page.thumbnail.source : null;
+        } catch (e) { _celebImgCache[c.wiki] = null; }
+      }
+      const _src = _celebImgCache[c.wiki];
+      if (_src) {
+        _photoWrap.innerHTML = `<img src="${_src}" alt="${c.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+      }
+    }
+  }
+
+  window.openQuickNoteModal = function () {
+    const _m   = document.getElementById('bbQuickNoteModal');
+    const _inp = document.getElementById('bbQuickNoteInput');
+    if (_inp) _inp.value = '';
+    if (_m) _m.style.display = 'flex';
+    setTimeout(() => { if (_inp) _inp.focus(); }, 120);
+  };
+  window.closeQuickNoteModal = function () {
+    const _m = document.getElementById('bbQuickNoteModal');
+    if (_m) _m.style.display = 'none';
+  };
+  window.saveQuickNote = function () {
+    const _inp  = document.getElementById('bbQuickNoteInput');
+    const _text = _inp ? _inp.value.trim() : '';
+    window.closeQuickNoteModal();
+    if (!_text) return;
+    const _notes = JSON.parse(localStorage.getItem('bbQuickNotes') || '[]');
+    _notes.push({ text: _text, ts: Date.now(), id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5) });
+    localStorage.setItem('bbQuickNotes', JSON.stringify(_notes));
+    const _t = document.createElement('div');
+    _t.textContent = '📝 Note saved!';
+    Object.assign(_t.style, { position: 'fixed', bottom: '80px', left: '50%', transform: 'translateX(-50%)',
+      background: 'rgba(0,0,0,0.72)', color: 'white', padding: '9px 18px', borderRadius: '20px',
+      fontSize: '0.85em', fontWeight: '600', zIndex: '9999', pointerEvents: 'none', whiteSpace: 'nowrap' });
+    (document.getElementById('app-shell') || document.body).appendChild(_t);
+    setTimeout(() => _t.remove(), 2000);
+  };
+
+  // ── Shared auth modal ────────────────────────────────────────────────────
+  let _bbIsSignUp = false;
+
+  window.showAuthModal = function () {
+    _bbIsSignUp = false;
+    const title  = document.getElementById('bbAuthTitle');
+    const submit = document.getElementById('bbAuthSubmit');
+    const toggle = document.getElementById('bbAuthToggle');
+    const err    = document.getElementById('bbAuthError');
+    const email  = document.getElementById('bbAuthEmail');
+    const pw     = document.getElementById('bbAuthPassword');
+    if (title)  title.textContent = 'Welcome to Bipolar Bear 🐻';
+    if (submit) submit.textContent = 'Sign In';
+    if (toggle) toggle.innerHTML = 'Don\'t have an account? <span style="color:#ff9500;font-weight:600;">Sign up</span>';
+    if (err)    { err.style.display = 'none'; err.textContent = ''; }
+    if (email)  email.value = '';
+    if (pw)     pw.value = '';
+    const modal = document.getElementById('bbAuthModal');
+    if (modal) modal.classList.add('active');
+    if (typeof window._fabOnShowAuth === 'function') window._fabOnShowAuth();
+  };
+
+  window.closeAuthModal = function () {
+    const modal = document.getElementById('bbAuthModal');
+    if (modal) modal.classList.remove('active');
+    if (typeof window._fabOnCloseAuth === 'function') window._fabOnCloseAuth();
+  };
+
+  window.showAccountModal = function () {
+    const _fb  = window.firebase;
+    const user = _fb && _fb.auth ? _fb.auth().currentUser : null;
+    const emailEl    = document.getElementById('bbAccountEmail');
+    const msg        = document.getElementById('bbAccountMsg');
+    const passFields = document.getElementById('bbAccountPassFields');
+    const passToggle = document.getElementById('bbAccountPassToggleBtn');
+    const cp         = document.getElementById('bbAccountCurrentPass');
+    const np         = document.getElementById('bbAccountNewPass');
+    if (emailEl && user) emailEl.textContent = user.email || '';
+    if (msg)        { msg.style.display = 'none'; msg.textContent = ''; }
+    if (passFields) passFields.style.display = 'none';
+    if (passToggle) passToggle.style.display = '';
+    if (cp) cp.value = '';
+    if (np) np.value = '';
+    const modal = document.getElementById('bbAccountModal');
+    if (modal) modal.classList.add('active');
+    if (typeof window._fabOnShowAuth === 'function') window._fabOnShowAuth();
+  };
+
+  window.closeAccountModal = function () {
+    const modal = document.getElementById('bbAccountModal');
+    if (modal) modal.classList.remove('active');
+  };
+
+  window._bbAccountLogout = function () {
+    window.closeAccountModal();
+    if (typeof window._fabOnSignOut === 'function') {
+      window._fabOnSignOut();
+    } else {
+      const _fb = window.firebase;
+      if (_fb && _fb.auth) _fb.auth().signOut();
+    }
+  };
+
+  function _bbAccountShowMsg(text, ok) {
+    const msg = document.getElementById('bbAccountMsg');
+    if (!msg) return;
+    msg.textContent      = text;
+    msg.style.color      = ok ? '#2ECC40'                  : '#dc3545';
+    msg.style.background = ok ? 'rgba(46,204,64,0.08)'    : 'rgba(220,53,69,0.08)';
+    msg.style.display    = 'block';
+  }
+
+  window._bbSubmitPasswordChange = function () {
+    const _fb  = window.firebase;
+    const user = _fb && _fb.auth ? _fb.auth().currentUser : null;
+    if (!user) return;
+    const currentPass = (document.getElementById('bbAccountCurrentPass').value || '').trim();
+    const newPass     = (document.getElementById('bbAccountNewPass').value     || '').trim();
+    if (!currentPass || !newPass) { _bbAccountShowMsg('⚠️ Please fill in both fields.', false); return; }
+    if (newPass.length < 6)       { _bbAccountShowMsg('⚠️ New password must be at least 6 characters.', false); return; }
+    const credential = _fb.auth.EmailAuthProvider.credential(user.email, currentPass);
+    user.reauthenticateWithCredential(credential)
+      .then(() => user.updatePassword(newPass))
+      .then(() => {
+        _bbAccountShowMsg('✅ Password updated successfully.', true);
+        document.getElementById('bbAccountPassFields').style.display  = 'none';
+        document.getElementById('bbAccountPassToggleBtn').style.display = '';
+        document.getElementById('bbAccountCurrentPass').value = '';
+        document.getElementById('bbAccountNewPass').value     = '';
+      })
+      .catch(err => {
+        const wrongPass = err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential';
+        _bbAccountShowMsg('⚠️ ' + (wrongPass ? 'Current password is incorrect.' : (err.message || 'Could not update password.')), false);
+      });
+  };
+
+  function _bbWireAuthListeners() {
+    const toggle = document.getElementById('bbAuthToggle');
+    const submit = document.getElementById('bbAuthSubmit');
+    if (toggle) {
+      toggle.addEventListener('click', function () {
+        _bbIsSignUp = !_bbIsSignUp;
+        const titleEl  = document.getElementById('bbAuthTitle');
+        const submitEl = document.getElementById('bbAuthSubmit');
+        const errEl    = document.getElementById('bbAuthError');
+        if (titleEl)  titleEl.textContent  = _bbIsSignUp ? 'Create Account' : 'Welcome to Bipolar Bear 🐻';
+        if (submitEl) submitEl.textContent = _bbIsSignUp ? 'Sign Up' : 'Sign In';
+        toggle.innerHTML = _bbIsSignUp
+          ? 'Already have an account? <span style="color:#ff9500;font-weight:600;">Sign in</span>'
+          : 'Don\'t have an account? <span style="color:#ff9500;font-weight:600;">Sign up</span>';
+        if (errEl) errEl.style.display = 'none';
+      });
+    }
+    if (submit) {
+      submit.addEventListener('click', async function () {
+        const _fb = window.firebase;
+        if (!_fb || !_fb.auth) return;
+        const auth     = _fb.auth();
+        const email    = (document.getElementById('bbAuthEmail').value    || '').trim();
+        const password =  document.getElementById('bbAuthPassword').value || '';
+        const errEl    =  document.getElementById('bbAuthError');
+        if (errEl) errEl.style.display = 'none';
+        if (typeof window._fabBeforeSignIn === 'function') window._fabBeforeSignIn();
+        try {
+          if (_bbIsSignUp) {
+            await auth.createUserWithEmailAndPassword(email, password);
+          } else {
+            await auth.signInWithEmailAndPassword(email, password);
+          }
+          window.closeAuthModal();
+        } catch (e) {
+          if (errEl) { errEl.textContent = e.message; errEl.style.display = 'block'; }
+        }
+      });
+    }
+  }
+
+  // ── Hide permanently ──────────────────────────────────────────────────────
+  window._showHidePermanently = function (type) {
+    if (type === 'chat' || type === 'wa') {
+      window.closeChatModal();
+      localStorage.setItem('bbWaFabHidden', '1');
+    } else if (type === 'quicknote') {
+      window.closeSecurityModal();
+      localStorage.setItem('bbQuickNoteFabHidden', '1');
+    } else if (type === 'feedback') {
+      window.closeFabFeedback();
+      localStorage.setItem('bbFeedbackFabHidden', '1');
+    } else if (type === 'coffee') {
+      window.closeCoffeeModal();
+      localStorage.setItem('bbCoffeeFabHidden', '1');
+    }
+    _applyFabDock();
+  };
+
+})();

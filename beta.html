@@ -10,10 +10,7 @@
   <link rel="apple-touch-icon" href="/icons/favicons/apple-touch-icon.png">
   <meta name="theme-color" content="#ff9500">
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <!-- Firebase SDK loaded inline in body, just before first use -->
 
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -313,9 +310,126 @@
     @media (hover: none) and (pointer: coarse) {
       .whatsapp-btn { display: flex; }
     }
+
+    /* ─── iPhone 15 Pro frame (desktop ≥ 520 px) ─── */
+    #iphone-frame { width: 100%; }
+    #app-shell    { width: 100%; }
+
+    @media (min-width: 520px) {
+      body {
+        background: #eaeaea !important;
+        padding: 0 !important;
+        min-height: 100dvh;
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: center !important;
+        align-items: center !important;
+        overflow: auto;
+      }
+      #iphone-frame {
+        width: 393px;
+        height: min(852px, 96dvh);
+        background: linear-gradient(160deg, #2a2a2a 0%, #111 60%, #1a1a1a 100%);
+        border-radius: 54px;
+        padding: 16px 12px 22px;
+        position: relative;
+        flex-shrink: 0;
+        margin: 20px 0;
+        box-shadow:
+          inset 0 0 0 1px rgba(255,255,255,0.12),
+          inset 0 0 0 3px #000,
+          0 40px 120px rgba(0,0,0,0.95),
+          0 8px 40px rgba(0,0,0,0.7);
+      }
+      #iphone-frame::before {
+        content: '';
+        position: absolute;
+        left: -4px; top: 130px;
+        width: 4px; height: 36px;
+        background: #2a2a2a;
+        border-radius: 2px 0 0 2px;
+        box-shadow: 0 50px 0 #2a2a2a, 0 96px 0 #2a2a2a;
+        pointer-events: none;
+      }
+      #iphone-frame::after {
+        content: '';
+        position: absolute;
+        right: -4px; top: 168px;
+        width: 4px; height: 72px;
+        background: #2a2a2a;
+        border-radius: 0 2px 2px 0;
+        pointer-events: none;
+      }
+      #iphone-frame .dynamic-island {
+        position: absolute;
+        top: 16px; left: 50%;
+        transform: translateX(-50%);
+        width: 120px; height: 34px;
+        background: #000;
+        border-radius: 20px;
+        z-index: 9999;
+        pointer-events: none;
+      }
+      #iphone-frame .home-indicator {
+        position: absolute;
+        bottom: 8px; left: 50%;
+        transform: translateX(-50%);
+        width: 130px; height: 5px;
+        background: rgba(255,255,255,0.28);
+        border-radius: 3px;
+        z-index: 9999;
+        pointer-events: none;
+      }
+      #app-shell {
+        width: 100%;
+        height: 100%;
+        border-radius: 42px;
+        background: linear-gradient(135deg, #ff9500 0%, #ff6b00 100%);
+        transform: translateZ(0);
+      }
+      #scroll-view {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        overflow: hidden;
+        overflow-y: auto;
+        height: 100%;
+        border-radius: 42px;
+        scrollbar-width: none;
+        padding: 72px 20px 60px;
+        box-sizing: border-box;
+      }
+      #scroll-view::-webkit-scrollbar { display: none; }
+    }
+    @media (min-width: 520px) and (prefers-color-scheme: dark) {
+      body { background: #111 !important; }
+    }
+    @media (min-width: 920px) {
+      #iphone-frame {
+        width: 768px;
+        height: min(1024px, 96dvh);
+        border-radius: 40px;
+        padding: 20px 16px 28px;
+      }
+      #iphone-frame::before { top: 200px; box-shadow: 0 60px 0 #2a2a2a; }
+      #iphone-frame::after  { top: 260px; height: 80px; }
+      #iphone-frame .dynamic-island {
+        width: 12px; height: 12px;
+        border-radius: 50%;
+        top: 12px;
+      }
+      #iphone-frame .home-indicator { width: 220px; }
+      #app-shell { border-radius: 30px; }
+      #scroll-view { border-radius: 30px; padding: 48px 28px 60px; }
+    }
   </style>
 </head>
 <body>
+<div id="iphone-frame">
+  <div class="dynamic-island"></div>
+  <div id="app-shell">
+  <div id="scroll-view">
   <div class="container">
     <div class="logo-wrapper">
       <img src="images/logos/good_logo.png" alt="Bipolar Bear" class="logo-img">
@@ -388,6 +502,16 @@
     </div>
 
   </div>
+
+  </div><!-- /#scroll-view -->
+  </div><!-- /#app-shell -->
+  <div class="home-indicator"></div>
+</div><!-- /#iphone-frame -->
+
+  <!-- Firebase SDK: loaded here so the page renders before these blocking scripts download -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
   <script>
     // ── Firebase init ──

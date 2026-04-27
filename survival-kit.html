@@ -49,10 +49,7 @@
   <!-- jsPDF for wall tracker PDF generation -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <!-- Firebase SDK loaded inline in body, just before first use -->
 
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-user-select: none; }
@@ -912,70 +909,99 @@
     @keyframes hintFade { 0%,100%{opacity:0.55;transform:translateY(0)} 50%{opacity:1;transform:translateY(-4px)} }
     @keyframes bbHintNudge { 0%,100%{transform:scale(1)} 25%{transform:scale(1.18) rotate(-4deg)} 75%{transform:scale(1.12) rotate(3deg)} }
 
-    /* ── Survival kit FAB footer ── */
-    .fab-footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 80px;
-      background: #ffffff;
-      border-radius: 28px 28px 0 0;
-      border-top: 4px solid #ff9500;
-      z-index: 120;
-      box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
-      pointer-events: none;
+    /* ─── iPad simulator (≥ 920px) ─── */
+    @media (min-width: 920px) {
+      body {
+        background: #eaeaea !important;
+        padding: 0 !important;
+        min-height: 100dvh;
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: center !important;
+        align-items: center !important;
+        overflow: auto;
+      }
+      #iphone-frame {
+        width: 768px;
+        height: min(1024px, 96dvh);
+        background: linear-gradient(160deg, #2a2a2a 0%, #111 60%, #1a1a1a 100%);
+        border-radius: 40px;
+        padding: 20px 16px 28px;
+        position: relative;
+        flex-shrink: 0;
+        margin: 20px 0;
+        box-shadow:
+          inset 0 0 0 1px rgba(255,255,255,0.12),
+          inset 0 0 0 3px #000,
+          0 40px 120px rgba(0,0,0,0.95),
+          0 8px 40px rgba(0,0,0,0.7);
+      }
+      #iphone-frame::before {
+        content: '';
+        position: absolute;
+        left: -4px; top: 200px;
+        width: 4px; height: 36px;
+        background: #2a2a2a;
+        border-radius: 2px 0 0 2px;
+        box-shadow: 0 60px 0 #2a2a2a;
+        pointer-events: none;
+      }
+      #iphone-frame::after {
+        content: '';
+        position: absolute;
+        right: -4px; top: 260px;
+        width: 4px; height: 80px;
+        background: #2a2a2a;
+        border-radius: 0 2px 2px 0;
+        pointer-events: none;
+      }
+      #iphone-frame .dynamic-island {
+        position: absolute;
+        top: 12px; left: 50%;
+        transform: translateX(-50%);
+        width: 12px; height: 12px;
+        background: #000;
+        border-radius: 50%;
+        z-index: 9999;
+        pointer-events: none;
+      }
+      #iphone-frame .home-indicator {
+        position: absolute;
+        bottom: 8px; left: 50%;
+        transform: translateX(-50%);
+        width: 220px; height: 5px;
+        background: rgba(255,255,255,0.28);
+        border-radius: 3px;
+        z-index: 9999;
+        pointer-events: none;
+      }
+      #app-shell {
+        width: 100%;
+        height: 100%;
+        border-radius: 30px;
+        background: #FFFBF5;
+        transform: translateZ(0);
+      }
+      #scroll-view {
+        overflow: hidden;
+        overflow-y: auto;
+        height: 100%;
+        border-radius: 30px;
+        scrollbar-width: none;
+        box-sizing: border-box;
+      }
+      #scroll-view::-webkit-scrollbar { display: none; }
     }
-    .sk-auth-fab {
-      position: fixed;
-      bottom: 18px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 44px;
-      height: 44px;
-      min-width: 44px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.15em;
-      z-index: 121;
-      background: white;
-      color: #ff9500;
-      border: 2px solid #ff9500;
-      box-shadow: 0 2px 10px rgba(255,149,0,0.25);
-      -webkit-tap-highlight-color: transparent;
-      transition: transform 0.15s;
-    }
-    @media (hover: hover) and (pointer: fine) {
-      .sk-auth-fab:hover { transform: translateX(-50%) scale(1.08); }
-    }
-    .sk-dock-fab {
-      position: fixed;
-      bottom: 18px;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: #ff9500;
-      border: none;
-      color: white;
-      font-size: 1.15em;
-      cursor: pointer;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 14px rgba(255,149,0,0.45);
-      z-index: 121;
-      -webkit-tap-highlight-color: transparent;
-      transition: background 0.18s, transform 0.15s;
-    }
-    @media (hover: hover) and (pointer: fine) {
-      .sk-dock-fab:hover { background: #e08600; transform: scale(1.08); }
+    @media (min-width: 920px) and (prefers-color-scheme: dark) {
+      body { background: #111 !important; }
     }
   </style>
 </head>
 <body>
+<div id="iphone-frame">
+  <div class="dynamic-island"></div>
+  <div id="app-shell">
+  <div id="scroll-view">
 
   <!-- HEADER -->
   <div class="header">
@@ -988,7 +1014,7 @@
     </div>
     <!-- Auth elements kept hidden here so JS can still reference them -->
     <div id="authSection" style="display:none;">
-      <button id="signinBtn" type="button" onclick="showAuthModal()"></button>
+      <button id="signinBtn" type="button" onclick="window.showAuthModal()"></button>
       <div id="userInfo"><span id="userEmail"></span></div>
     </div>
     <img src="images/logos/good_logo.png" alt="Bipolar Bear Logo" id="survivalLogo">
@@ -3748,17 +3774,15 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
     </div>
   </div>
 
-  <div class="overlay-modal" id="authModal">
-    <div class="modal-box">
-      <h3 id="authTitle">My Bipolar Bear</h3>
-      <div class="modal-error" id="authError"></div>
-      <input type="email" id="authEmail" class="modal-input" placeholder="Email" autocomplete="email">
-      <input type="password" id="authPassword" class="modal-input" placeholder="Password" autocomplete="current-password">
-      <button class="modal-btn modal-btn-primary" id="authSubmit">Sign In</button>
-      <button class="modal-btn modal-btn-secondary" onclick="closeAuthModal()">Continue as Guest</button>
-      <div class="modal-toggle" id="authToggle">Don't have an account? <span>Sign up</span></div>
-    </div>
-  </div>
+  </div><!-- /#scroll-view -->
+  </div><!-- /#app-shell -->
+  <div class="home-indicator"></div>
+</div><!-- /#iphone-frame -->
+
+  <!-- Firebase SDK: loaded here so the page renders before these blocking scripts download -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
   <script>
     // ── Beta gate (web only) ──
@@ -4003,11 +4027,14 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
               _applyGuideTitle(name);
             }
           }).catch(() => {});
+          window._fabOpenAuth = window.showAccountModal;
         } else {
           if (signinBtn) signinBtn.style.display = '';
           if (userInfo) userInfo.style.display = 'none';
+          window._fabOpenAuth = window.showAuthModal;
         }
         renderEmergencyContact();
+        if (typeof window._applyFabDock === 'function') window._applyFabDock();
       });
     } catch(e) { console.warn('Firebase init failed on survival-kit.html', e); }
 
@@ -4123,45 +4150,9 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
     window.savePersonalDetails = savePersonalDetails;
     window.renderEmergencyContact = renderEmergencyContact;
 
-    // ── Auth Modal ──
-    function showAuthModal() {
-      document.getElementById('authModal').classList.add('active');
-    }
-    function closeAuthModal() {
-      document.getElementById('authModal').classList.remove('active');
-    }
-    window.showAuthModal = showAuthModal;
-    window.closeAuthModal = closeAuthModal;
-
-    let isSignUp = false;
-    document.getElementById('authToggle').addEventListener('click', () => {
-      isSignUp = !isSignUp;
-      document.getElementById('authTitle').textContent = isSignUp ? 'Create Account' : 'My Bipolar Bear App';
-      document.getElementById('authSubmit').textContent = isSignUp ? 'Sign Up' : 'Sign In';
-      document.getElementById('authToggle').innerHTML = isSignUp
-        ? 'Already have an account? <span>Sign in</span>'
-        : 'Don\'t have an account? <span>Sign up</span>';
-      document.getElementById('authError').style.display = 'none';
-    });
-
-    document.getElementById('authSubmit').addEventListener('click', async () => {
-      if (!auth) return;
-      const email = document.getElementById('authEmail').value;
-      const password = document.getElementById('authPassword').value;
-      const errEl = document.getElementById('authError');
-      errEl.style.display = 'none';
-      try {
-        if (isSignUp) {
-          await auth.createUserWithEmailAndPassword(email, password);
-        } else {
-          await auth.signInWithEmailAndPassword(email, password);
-        }
-        closeAuthModal();
-      } catch(e) {
-        errEl.textContent = e.message;
-        errEl.style.display = 'block';
-      }
-    });
+    // ── Auth hooks (modals now in shared fab.js) ──
+    window._fabOnSignOut = logout;
+    // _fabOpenAuth is set dynamically by onAuthStateChanged below
 
     // ── Logo easter egg with persistence ──
     const logoImg = document.getElementById('survivalLogo');
@@ -4332,137 +4323,7 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
     }
   </script>
 
-  <!-- Survival kit dock -->
-  <div class="fab-footer" aria-hidden="true"></div>
-  <button class="sk-auth-fab" onclick="showAuthModal()">👤</button>
-  <button class="sk-dock-fab" id="skdockChat" onclick="document.getElementById('skChatModal').style.display='flex'" title="Crisis Support">💬</button>
-  <button class="sk-dock-fab" id="skdockE2ee" onclick="document.getElementById('skSecModal').style.display='flex'" title="Your data security">🔐</button>
-  <button class="sk-dock-fab" id="skdockCoffee" onclick="document.getElementById('skCoffeeModal').style.display='flex'" title="Buy us a coffee">☕</button>
-  <button class="sk-dock-fab" id="skdockFeedback" onclick="document.getElementById('skFeedbackModal').style.display='flex'" title="Send feedback">📣</button>
-
-  <!-- SK Coffee modal -->
-  <div id="skCoffeeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)this.style.display='none';">
-    <div style="background:white;border-radius:20px;padding:24px 24px 20px;text-align:center;max-width:300px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);">
-      <div style="font-size:2em;margin-bottom:8px;">☕</div>
-      <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:8px;">Keep Bipolar Bear Going</div>
-      <p style="font-size:0.88em;color:#6c757d;line-height:1.55;margin-bottom:16px;">Running BipolarBear costs around <strong>£25/month</strong> for servers, hosting and services.</p>
-      <a href="https://buymeacoffee.com/jamesmarkey" target="_blank" rel="noopener noreferrer" onclick="document.getElementById('skCoffeeModal').style.display='none';" style="display:block;padding:13px;background:#ff9500;color:white;border-radius:12px;text-decoration:none;font-weight:700;font-size:0.95em;margin-bottom:8px;">☕ Send me a coffee</a>
-      <button onclick="document.getElementById('skCoffeeModal').style.display='none'" style="display:block;width:100%;padding:9px;background:none;border:none;color:#adb5bd;font-size:0.85em;cursor:pointer;">Close</button>
-    </div>
-  </div>
-
-  <!-- SK Chat modal -->
-  <div id="skChatModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)this.style.display='none';">
-    <div style="background:white;border-radius:20px;padding:24px 24px 20px;text-align:center;max-width:300px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);">
-      <div style="font-size:2em;margin-bottom:8px;">🆘</div>
-      <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:6px;">Crisis Support</div>
-      <p style="font-size:0.84em;color:#6c757d;margin-bottom:14px;">If you're struggling and need to talk to someone:</p>
-      <a href="tel:116123" style="display:flex;align-items:center;gap:12px;padding:13px 14px;background:#f8f9fa;border-radius:12px;text-decoration:none;color:#212529;margin-bottom:14px;text-align:left;">
-        <span style="font-size:1.6em;line-height:1;">📞</span>
-        <div>
-          <div style="font-weight:700;font-size:0.95em;">Samaritans</div>
-          <div style="color:#6c757d;font-size:0.82em;margin-top:1px;">116 123 · Free · 24/7</div>
-        </div>
-      </a>
-      <div style="font-size:0.78em;color:#adb5bd;font-style:italic;margin-bottom:16px;">💬 Bipolar Bear in-app chat — coming soon</div>
-      <button onclick="document.getElementById('skChatModal').style.display='none'" style="width:100%;padding:12px;background:#ff9500;color:white;border:none;border-radius:12px;font-weight:700;font-size:0.95em;cursor:pointer;">Close</button>
-    </div>
-  </div>
-
-  <!-- SK Security modal -->
-  <div id="skSecModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)this.style.display='none';">
-    <div style="background:white;border-radius:20px;padding:24px;max-width:300px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);">
-      <div style="font-size:2em;text-align:center;margin-bottom:8px;">🔐</div>
-      <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:12px;text-align:center;">How your data stays safe</div>
-      <div style="font-size:0.84em;color:#495057;line-height:1.65;margin-bottom:16px;">
-        <p style="margin-bottom:8px;"><strong>🔑 Your PIN</strong> locks the app locally. Without it, nobody can open Bipolar Bear.</p>
-        <p style="margin-bottom:8px;"><strong>🔒 Your password</strong> encrypts journal entries before they leave your device.</p>
-        <p style="margin-bottom:0;"><strong>🛡️ End-to-end encryption</strong> — your data is protected at every step.</p>
-      </div>
-      <button onclick="document.getElementById('skSecModal').style.display='none'" style="display:block;width:100%;padding:12px;background:#ff9500;color:white;border:none;border-radius:12px;font-weight:700;cursor:pointer;">Got it</button>
-    </div>
-  </div>
-
-  <!-- SK Feedback modal -->
-  <div id="skFeedbackModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)this.style.display='none';">
-    <div style="background:white;border-radius:20px;padding:24px;max-width:320px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);">
-      <div style="font-size:2em;text-align:center;margin-bottom:8px;">📣</div>
-      <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:6px;text-align:center;">Share Feedback</div>
-      <div style="display:flex;gap:8px;margin-bottom:12px;">
-        <button id="skfbTypeBug" onclick="skfbSelect('bug')" style="flex:1;padding:8px;border:1.5px solid #e9ecef;border-radius:10px;font-size:0.82em;cursor:pointer;background:white;color:#495057;">🐛 Bug</button>
-        <button id="skfbTypeComment" onclick="skfbSelect('comment')" style="flex:1;padding:8px;border:1.5px solid #e9ecef;border-radius:10px;font-size:0.82em;cursor:pointer;background:#fff3e0;border-color:#ff9500;color:#ff9500;">💬 Comment</button>
-        <button id="skfbTypeIdea" onclick="skfbSelect('idea')" style="flex:1;padding:8px;border:1.5px solid #e9ecef;border-radius:10px;font-size:0.82em;cursor:pointer;background:white;color:#495057;">💡 Idea</button>
-      </div>
-      <textarea id="skfbMessage" placeholder="Tell us what's on your mind…" rows="3" style="width:100%;padding:10px;border:1.5px solid #e9ecef;border-radius:10px;font-size:0.9em;box-sizing:border-box;resize:none;font-family:inherit;margin-bottom:12px;outline:none;"></textarea>
-      <div id="skfbError" style="color:#dc3545;font-size:0.82em;margin-bottom:8px;display:none;"></div>
-      <div style="display:flex;gap:8px;">
-        <button onclick="skfbSubmit()" style="flex:1;padding:11px;background:#ff9500;color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-size:0.9em;">Send</button>
-        <button onclick="document.getElementById('skFeedbackModal').style.display='none'" style="flex:1;padding:11px;background:white;color:#6c757d;border:1.5px solid #e9ecef;border-radius:10px;font-weight:600;cursor:pointer;font-size:0.9em;">Cancel</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // ── SK Dock functions ──
-    let _skfbType = 'comment';
-    function skfbSelect(type) {
-      _skfbType = type;
-      const map = { bug: 'skfbTypeBug', comment: 'skfbTypeComment', idea: 'skfbTypeIdea' };
-      Object.keys(map).forEach(k => {
-        const btn = document.getElementById(map[k]);
-        if (!btn) return;
-        if (k === type) { btn.style.background = '#fff3e0'; btn.style.borderColor = '#ff9500'; btn.style.color = '#ff9500'; }
-        else { btn.style.background = 'white'; btn.style.borderColor = '#e9ecef'; btn.style.color = '#495057'; }
-      });
-    }
-    async function skfbSubmit() {
-      const msgEl = document.getElementById('skfbMessage');
-      const errEl = document.getElementById('skfbError');
-      const msg = msgEl ? msgEl.value.trim() : '';
-      if (!msg) { if (errEl) { errEl.textContent = 'Please enter a message.'; errEl.style.display = ''; } return; }
-      if (errEl) errEl.style.display = 'none';
-      try {
-        await window.db.collection('feedback').add({
-          type: _skfbType, message: msg, page: 'survival-kit',
-          uid: window.currentUser ? window.currentUser.uid : null,
-          ts: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        document.getElementById('skFeedbackModal').style.display = 'none';
-        const _t = document.createElement('div');
-        _t.textContent = '✅ Feedback sent — thank you!';
-        Object.assign(_t.style, { position:'fixed', top:'calc(env(safe-area-inset-top,0px) + 12px)', left:'50%', transform:'translateX(-50%)', background:'#ff9500', color:'white', padding:'10px 20px', borderRadius:'20px', fontWeight:'700', fontSize:'0.9em', zIndex:'9999', whiteSpace:'nowrap', boxShadow:'0 4px 16px rgba(0,0,0,0.2)', pointerEvents:'none' });
-        document.body.appendChild(_t);
-        setTimeout(() => _t.remove(), 3000);
-      } catch(e) { if (errEl) { errEl.textContent = 'Failed to send. Please try again.'; errEl.style.display = ''; } }
-    }
-
-    // Apply SK dock visibility (synced with index flags)
-    function _applySkDock() {
-      const step = parseInt(localStorage.getItem('bbOnboardingStep') || '0', 10);
-      const _wide = window.matchMedia('(min-width: 520px)').matches;
-      const _slotPos = {
-        1: _wide ? 'calc(50% - 214px)' : 'calc(10% - 22px)',
-        2: _wide ? 'calc(50% - 118px)' : 'calc(30% - 22px)',
-        3: _wide ? 'calc(50% + 74px)'  : 'calc(70% - 22px)',
-        4: _wide ? 'calc(50% + 170px)' : 'calc(90% - 22px)',
-      };
-      const _show = step >= 12;
-      const _slotVis = {
-        1: _show && localStorage.getItem('bbWaFabHidden') !== '1',
-        2: localStorage.getItem('bbQuickNoteFabHidden') !== '1',
-        3: _show && localStorage.getItem('bbCoffeeFabHidden') !== '1',
-        4: _show && localStorage.getItem('bbFeedbackFabHidden') !== '1',
-      };
-      const _slotFabs = { 1: 'skdockChat', 2: 'skdockE2ee', 3: 'skdockCoffee', 4: 'skdockFeedback' };
-      for (let s = 1; s <= 4; s++) {
-        const fab = document.getElementById(_slotFabs[s]);
-        if (fab) { fab.style.display = _slotVis[s] ? 'flex' : 'none'; fab.style.left = _slotPos[s]; }
-      }
-    }
-    document.addEventListener('DOMContentLoaded', _applySkDock);
-    window.addEventListener('resize', _applySkDock);
-  </script>
-
+  <script src="fab.js"></script>
 </body>
 </html>
 

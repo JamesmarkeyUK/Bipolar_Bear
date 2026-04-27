@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+  <title>BipolarBear Anonymous</title>
+  <meta name="theme-color" content="#ff9500">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <style>
+    :root {
+      --orange:      #ff9500;
+      --orange-dark: #e07800;
+      --orange-light:#ffb340;
+      --orange-bg:   #fff3e0;
+      --cream:       #FFFBF5;
+      --dark:        #1C1004;
+      --muted:       #8B6B4A;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+    input, textarea { user-select: text; -webkit-user-select: text; }
+
+    body {
+      font-family: -apple-system, 'Segoe UI', Tahoma, sans-serif;
+      background: #000;
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* ── Mobile: iphone-frame is a plain passthrough ── */
+    #iphone-frame {
+      width: 100%;
+      height: 100vh; height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    #app-shell {
+      width: 100%;
+      max-width: 430px;
+      height: 100vh; height: 100dvh;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: var(--orange);
+    }
+
+    /* ── Desktop: iPhone 15 Pro style frame ── */
+    @media (min-width: 520px) {
+      body { background: #eaeaea; }
+
+      #iphone-frame {
+        width: 393px;
+        height: min(852px, 96dvh);
+        background: linear-gradient(160deg, #2a2a2a 0%, #111 60%, #1a1a1a 100%);
+        border-radius: 54px;
+        padding: 16px 12px 22px;
+        position: relative;
+        flex-shrink: 0;
+        box-shadow:
+          /* outer rim highlight */
+          inset 0 0 0 1px rgba(255,255,255,0.12),
+          /* inner black bevel */
+          inset 0 0 0 3px #000,
+          /* depth shadow */
+          0 40px 120px rgba(0,0,0,0.95),
+          0 8px 40px rgba(0,0,0,0.7);
+      }
+
+      /* Side volume buttons (left) */
+      #iphone-frame::before {
+        content: '';
+        position: absolute;
+        left: -4px;
+        top: 130px;
+        width: 4px;
+        height: 36px;
+        background: #2a2a2a;
+        border-radius: 2px 0 0 2px;
+        box-shadow: 0 50px 0 #2a2a2a, 0 96px 0 #2a2a2a;
+        pointer-events: none;
+      }
+
+      /* Power button (right) */
+      #iphone-frame::after {
+        content: '';
+        position: absolute;
+        right: -4px;
+        top: 168px;
+        width: 4px;
+        height: 72px;
+        background: #2a2a2a;
+        border-radius: 0 2px 2px 0;
+        pointer-events: none;
+      }
+
+      /* Dynamic island */
+      #iphone-frame .dynamic-island {
+        position: absolute;
+        top: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 120px;
+        height: 34px;
+        background: #000;
+        border-radius: 20px;
+        z-index: 9999;
+        pointer-events: none;
+      }
+
+      /* Home indicator */
+      #iphone-frame .home-indicator {
+        position: absolute;
+        bottom: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 130px;
+        height: 5px;
+        background: rgba(255,255,255,0.28);
+        border-radius: 3px;
+        z-index: 9999;
+        pointer-events: none;
+      }
+
+      #app-shell {
+        border-radius: 42px;
+        max-width: 100%;
+        width: 100%;
+        height: 100%;
+        box-shadow: none;
+      }
+
+      /* Push content below the dynamic island */
+      .board-header {
+        padding-top: 62px !important;
+      }
+      .onboard-bg {
+        padding-top: 72px !important;
+      }
+    }
+    @media (min-width: 520px) and (prefers-color-scheme: dark) {
+      body { background: #111; }
+    }
+    @media (min-width: 920px) {
+      #iphone-frame {
+        width: 768px;
+        height: min(1024px, 96dvh);
+        border-radius: 40px;
+        padding: 20px 16px 28px;
+      }
+      #iphone-frame::before { top: 200px; box-shadow: 0 60px 0 #2a2a2a; }
+      #iphone-frame::after  { top: 260px; height: 80px; }
+      #iphone-frame .dynamic-island {
+        width: 12px; height: 12px;
+        border-radius: 50%;
+        top: 12px;
+      }
+      #iphone-frame .home-indicator { width: 220px; }
+      #app-shell { border-radius: 30px; }
+    }
+
+    /* ── Admin badge ── */
+    .admin-badge {
+      display: inline-block;
+      background: var(--orange);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 800;
+      border-radius: 4px;
+      padding: 1px 5px;
+      letter-spacing: 0.4px;
+      vertical-align: middle;
+      margin-left: 3px;
+    }
+
+    /* ── Deleted post ── */
+    .post-deleted {
+      opacity: 0.5;
+      text-align: center;
+      padding: 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* ── Color swatches ── */
+    .color-swatch {
+      width: 36px; height: 36px; border-radius: 50%; border: 3px solid transparent;
+      cursor: pointer; flex-shrink: 0; transition: border-color 0.15s, transform 0.15s;
+    }
+    .color-swatch.selected { border-color: var(--dark); transform: scale(1.15); }
+
+    /* ── Section label in sheet ── */
+    .sheet-label {
+      font-size: 11px; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block;
+    }
+
+    /* ── Screens ── */
+    .screen { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+    .screen.active { display: flex; }
+
+    /* Onboarding screens share an orange bg + centred card */
+    .onboard-bg {
+      flex: 1; display: flex; flex-direction: column;
+      justify-content: center;
+      background: var(--orange);
+      padding: max(60px, env(safe-area-inset-top, 0px)) 24px 40px;
+      overflow-y: auto;
+    }
+    .onboard-logo { text-align: center; margin-bottom: 28px; }
+    .onboard-logo img { width: 80px; height: 80px; border-radius: 18px; box-shadow: 0 8px 24px rgba(0,0,0,0.25); margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto; }
+    .onboard-logo h1 { font-size: 24px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+    .onboard-logo p  { font-size: 12px; color: rgba(255,255,255,0.75); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; }
+
+    .card { background: #fff; border-radius: 24px; padding: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
+    .card-icon  { font-size: 36px; text-align: center; margin-bottom: 10px; }
+    .card-title { font-size: 20px; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
+    .card-sub   { font-size: 14px; color: var(--muted); line-height: 1.5; margin-bottom: 20px; }
+    .card-title.center, .card-sub.center { text-align: center; }
+
+    /* ── Inputs ── */
+    .bb-input {
+      width: 100%; border: 1.5px solid #ddd; border-radius: 12px;
+      padding: 12px 14px; font-size: 15px; outline: none; color: var(--dark);
+      font-family: inherit; background: #fff; transition: border-color 0.2s; margin-bottom: 12px;
+    }
+    .bb-input:focus, .bb-input.valid { border-color: var(--orange); }
+    .input-wrap { position: relative; margin-bottom: 12px; }
+    .input-wrap .bb-input { margin-bottom: 0; padding-right: 48px; }
+    .input-counter { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--muted); pointer-events: none; }
+
+    /* 4-digit code boxes */
+    .code-boxes { display: flex; gap: 8px; margin-bottom: 12px; }
+    .code-box {
+      flex: 1; min-width: 0; height: 52px; border-radius: 12px;
+      background: #f5f5f5; border: 2px solid #eee;
+      text-align: center; font-size: 22px; font-weight: 800; color: var(--orange);
+      outline: none; transition: all 0.15s; font-family: inherit;
+    }
+    .code-box.filled { background: var(--orange-bg); border-color: var(--orange); }
+
+    /* ── Buttons ── */
+    .btn-primary {
+      width: 100%; background: var(--orange); color: #fff;
+      border: none; border-radius: 12px; padding: 14px;
+      font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit;
+      transition: opacity 0.15s;
+    }
+    .btn-primary:disabled { background: #eee; color: #aaa; cursor: default; }
+    .btn-secondary {
+      background: #f0f0f0; color: var(--muted); border: none;
+      border-radius: 10px; padding: 11px; font-size: 14px; cursor: pointer; font-family: inherit;
+    }
+
+    /* Monika preview row */
+    .monika-preview {
+      display: none; align-items: center; gap: 10px;
+      background: var(--orange-bg); border-radius: 12px;
+      padding: 12px 14px; margin-bottom: 14px;
+    }
+    .monika-preview.show { display: flex; }
+    .avatar { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 14px; background: linear-gradient(135deg, var(--orange-light), var(--orange-dark)); }
+
+    /* Meds options */
+    .med-opt {
+      display: flex; align-items: center; gap: 14px; width: 100%;
+      background: var(--orange-bg); border: 2px solid transparent; border-radius: 14px;
+      padding: 14px 16px; cursor: pointer; text-align: left; margin-bottom: 10px;
+      font-family: inherit; transition: border-color 0.15s;
+    }
+    .med-opt:hover { border-color: var(--orange); }
+    .med-opt-icon { font-size: 24px; }
+    .med-opt-label { font-size: 14px; font-weight: 700; color: var(--dark); }
+    .med-opt-sub   { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    /* ── Board ── */
+    #screen-board { background: var(--cream); position: relative; height: 100%; }
+
+    .board-header {
+      background: var(--orange);
+      padding: max(52px, env(safe-area-inset-top, 16px)) 16px 0;
+      flex-shrink: 0;
+    }
+    .board-header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .board-back-btn {
+      color: white; text-decoration: none; background: rgba(255,255,255,0.2);
+      padding: 8px 14px; border-radius: 20px; font-size: 0.9em; font-weight: 600;
+      transition: background 0.2s; border: none; cursor: pointer; font-family: inherit;
+    }
+    @media (hover: hover) and (pointer: fine) { .board-back-btn:hover { background: rgba(255,255,255,0.35); } }
+    .board-logo { display: flex; align-items: center; gap: 10px; }
+    .board-logo img { width: 36px; height: 36px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+    .board-logo-name { font-size: 18px; font-weight: 800; color: #fff; letter-spacing: -0.3px; }
+    .board-logo-sub  { font-size: 10px; color: rgba(255,255,255,0.75); letter-spacing: 0.6px; text-transform: uppercase; }
+
+    .board-tabs { display: flex; gap: 4px; }
+    .board-tab {
+      flex: 1; padding: 10px 0; border-radius: 12px 12px 0 0; border: none;
+      cursor: pointer; font-weight: 700; font-size: 13px; font-family: inherit;
+      background: rgba(255,255,255,0.2); color: rgba(255,255,255,0.85);
+      transition: all 0.15s;
+    }
+    .board-tab.active { background: var(--cream); color: var(--orange); }
+
+    /* Posts */
+    #post-list { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 12px 12px 110px; }
+
+    .post-card { background: #fff; border-radius: 16px; padding: 14px 16px; margin-bottom: 10px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+    .post-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .post-avatar { display: flex; align-items: center; gap: 8px; }
+    .post-av-circle { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--orange-light), var(--orange-dark)); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px; flex-shrink: 0; box-shadow: 0 2px 6px rgba(255,149,0,0.3); }
+    .post-name { font-size: 13px; font-weight: 700; color: var(--dark); }
+    .post-med  { font-size: 10px; color: var(--muted); background: var(--orange-bg); border-radius: 4px; padding: 1px 5px; display: inline-block; margin-top: 2px; }
+    .post-time { font-size: 11px; color: var(--muted); white-space: nowrap; }
+    .post-text { font-size: 14px; color: var(--dark); line-height: 1.6; margin-bottom: 12px; }
+    .post-actions { display: flex; align-items: center; gap: 8px; }
+    .like-btn {
+      display: flex; align-items: center; gap: 5px;
+      background: #f5f5f5; border: 1px solid transparent; border-radius: 20px;
+      padding: 6px 12px; cursor: pointer; font-size: 13px; color: var(--muted);
+      font-family: inherit; transition: all 0.15s;
+    }
+    .like-btn.liked { background: var(--orange-bg); border-color: var(--orange); color: var(--orange); font-weight: 700; }
+    .icon-btn { background: none; border: none; cursor: pointer; font-size: 18px; opacity: 0.5; padding: 4px; line-height: 1; }
+
+    /* System message */
+    .sys-card { background: linear-gradient(135deg, var(--orange), var(--orange-dark)); border-radius: 16px; padding: 16px; margin-bottom: 10px; text-align: center; }
+    .sys-card .sys-emoji { font-size: 22px; margin-bottom: 4px; }
+    .sys-card .sys-text  { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+    .sys-card .sys-meta  { font-size: 11px; color: rgba(255,255,255,0.75); }
+
+    /* Announcement card */
+    .ann-card { background: rgba(255,149,0,0.08); border: 1px solid rgba(255,149,0,0.2); border-radius: 16px; padding: 14px 16px; margin-bottom: 10px; }
+
+    /* ── FAB Footer ── */
+    .fab-footer {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 0 12px calc(20px + env(safe-area-inset-bottom, 0px));
+      z-index: 40; pointer-events: none;
+    }
+    .fab-hint {
+      background: rgba(28,16,4,0.85); color: #fff; font-size: 12px; font-weight: 600;
+      border-radius: 20px; padding: 7px 16px; margin-bottom: 8px;
+      opacity: 0; transition: opacity 0.2s; pointer-events: none;
+    }
+    .fab-hint.show { opacity: 1; }
+    .fab-bar { background: #fff; border-radius: 40px; box-shadow: 0 4px 24px rgba(0,0,0,0.14); display: flex; align-items: center; gap: 6px; padding: 8px 14px; pointer-events: all; }
+    .fab-btn { width: 44px; height: 44px; border-radius: 50%; border: none; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: rgba(255,149,0,0.13); transition: all 0.15s; }
+    .fab-btn.active { background: var(--orange); box-shadow: 0 2px 8px rgba(255,149,0,0.4); }
+    .fab-btn-compose { width: 52px; height: 52px; border-radius: 50%; border: none; cursor: pointer; font-size: 22px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: linear-gradient(135deg, var(--orange-light), var(--orange-dark)); box-shadow: 0 4px 12px rgba(255,149,0,0.5); }
+
+    /* ── Overlays ── */
+    .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: flex-end; z-index: 100; }
+    .overlay.hidden { display: none; }
+    .sheet { background: #fff; border-radius: 24px 24px 0 0; padding: 24px 24px calc(40px + env(safe-area-inset-bottom, 0px)); width: 100%; }
+    .sheet-icon  { font-size: 36px; text-align: center; margin-bottom: 12px; }
+    .sheet-title { font-size: 18px; font-weight: 700; color: var(--dark); text-align: center; margin-bottom: 8px; }
+    .sheet-sub   { font-size: 13px; color: var(--muted); text-align: center; line-height: 1.6; margin-bottom: 20px; }
+    .btn-row { display: flex; gap: 10px; }
+    .btn-danger { flex: 1; background: #e53935; color: #fff; border: none; border-radius: 10px; padding: 12px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
+
+    .report-opt { display: block; width: 100%; background: var(--orange-bg); border: none; border-radius: 10px; padding: 12px 14px; font-size: 14px; text-align: left; cursor: pointer; margin-bottom: 8px; color: var(--dark); font-family: inherit; }
+    .sheet-note { font-size: 11px; color: var(--muted); text-align: center; margin-top: 6px; }
+
+    .compose-ta { width: 100%; border: 1.5px solid var(--orange); border-radius: 14px; padding: 10px 12px; font-size: 14px; resize: none; outline: none; font-family: inherit; min-height: 100px; margin-bottom: 10px; }
+
+    .notif-box { background: var(--orange-bg); border-radius: 14px; padding: 16px; margin-bottom: 16px; }
+    .notif-box-title { font-size: 14px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+    .notif-box-sub   { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+
+    .e2ee-row { display: flex; gap: 12px; margin-bottom: 14px; align-items: flex-start; }
+    .e2ee-row-icon  { font-size: 22px; flex-shrink: 0; }
+    .e2ee-row-title { font-size: 13px; font-weight: 700; color: var(--dark); }
+    .e2ee-row-sub   { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    .empty-state { text-align: center; padding: 48px 20px; color: var(--muted); font-size: 14px; line-height: 1.7; }
+  </style>
+</head>
+<body>
+<div id="iphone-frame">
+  <div class="dynamic-island"></div>
+  <div id="app-shell">
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SCREEN: Verify email                                           -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="screen-verify" class="screen active">
+  <div class="onboard-bg">
+    <button class="board-back-btn" onclick="location.replace(location.protocol==='file:'?'index.html':'/')" style="align-self:flex-start;margin-bottom:20px;">← Home</button>
+    <div class="onboard-logo">
+      <img src="icons/AppIcon.png" alt="Bipolar Bear">
+      <h1>BipolarBear</h1>
+      <p>Anonymous</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Welcome 👋</div>
+      <div class="card-sub">Verify your email to join the community. Your identity stays private — we'll never share it.</div>
+
+      <div id="step-email">
+        <input id="email-input" type="email" class="bb-input" placeholder="your@email.com" autocomplete="email">
+        <button id="send-code-btn" class="btn-primary" disabled>Send Verification Code</button>
+      </div>
+
+      <div id="step-code" style="display:none">
+        <div id="code-sent-label" style="font-size:13px;color:var(--muted);margin-bottom:12px;"></div>
+        <div class="code-boxes">
+          <input class="code-box" type="tel" maxlength="1" inputmode="numeric">
+          <input class="code-box" type="tel" maxlength="1" inputmode="numeric">
+          <input class="code-box" type="tel" maxlength="1" inputmode="numeric">
+          <input class="code-box" type="tel" maxlength="1" inputmode="numeric">
+        </div>
+        <button id="verify-btn" class="btn-primary" disabled>Verify →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SCREEN: Choose Monika                                          -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="screen-monika" class="screen">
+  <div class="onboard-bg">
+    <div class="card">
+      <div class="card-icon">✅</div>
+      <div class="card-title center">Email Verified!</div>
+      <div class="card-sub center">Now choose your <strong>Monika</strong> — your anonymous community name. Max 10 characters.</div>
+      <div class="input-wrap">
+        <input id="monika-input" type="text" class="bb-input" placeholder="e.g. SunnyDaze" maxlength="10">
+        <span class="input-counter" id="monika-counter">0/10</span>
+      </div>
+      <div class="monika-preview" id="monika-preview">
+        <div class="avatar" id="monika-av"></div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--dark);" id="monika-preview-name"></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">Your posts will look like this</div>
+        </div>
+      </div>
+      <button id="monika-btn" class="btn-primary" disabled>That's me →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SCREEN: Medication visibility                                  -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="screen-meds" class="screen">
+  <div class="onboard-bg">
+    <div class="card">
+      <div class="card-icon">💊</div>
+      <div class="card-title center">Medication Visibility</div>
+      <div class="card-sub center">Would you like to show your current medication alongside your posts? You can change this anytime in settings.</div>
+      <button class="med-opt" id="meds-yes">
+        <span class="med-opt-icon">✅</span>
+        <div>
+          <div class="med-opt-label">Yes, show my medication</div>
+          <div class="med-opt-sub">Others can see your current med — helps people feel less alone</div>
+        </div>
+      </button>
+      <button class="med-opt" id="meds-no">
+        <span class="med-opt-icon">🔒</span>
+        <div>
+          <div class="med-opt-label">No, keep it private</div>
+          <div class="med-opt-sub">Only your Monika &amp; streak will show</div>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SCREEN: Board                                                  -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="screen-board" class="screen">
+
+  <div class="board-header">
+    <div class="board-header-top">
+      <button class="board-logo" onclick="location.replace(location.protocol==='file:'?'index.html':'/')" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:12px;display:flex;align-items:center;gap:10px;transition:background 0.15s;" onmouseenter="this.style.background='rgba(255,255,255,0.15)'" onmouseleave="this.style.background='none'" title="Back to Bipolar Bear">
+        <img src="icons/AppIcon.png" alt="">
+        <div>
+          <div class="board-logo-name">Anonymous</div>
+          <div class="board-logo-sub">BipolarBear</div>
+        </div>
+      </button>
+      <button id="board-user-pill" onclick="openMonikaSettings()" title="Your monika settings" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:20px;transition:background 0.15s;" onmouseenter="this.style.background='rgba(255,255,255,0.15)'" onmouseleave="this.style.background='none'"></button>
+    </div>
+    <div class="board-tabs">
+      <button class="board-tab" id="tab-ann" data-tab="announcements">📢 Announcements</button>
+      <button class="board-tab active" id="tab-gen" data-tab="general">💬 General</button>
+    </div>
+  </div>
+
+  <div id="post-list">
+    <div class="empty-state">Loading posts…</div>
+  </div>
+
+  <!-- FAB Footer -->
+  <div class="fab-footer">
+    <div class="fab-hint" id="fab-hint"></div>
+    <div class="fab-bar">
+      <button class="fab-btn" id="fab-home"    title="Back to BipolarBear">🏠</button>
+      <button class="fab-btn" id="fab-ann"     title="Announcements">📢</button>
+      <button class="fab-btn-compose" id="fab-compose" title="Write a post">✏️</button>
+      <button class="fab-btn active" id="fab-gen" title="General Chat">💬</button>
+      <button class="fab-btn" id="fab-e2ee"    title="Privacy info">🔒</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- OVERLAY: Compose                                               -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="ov-compose" class="overlay hidden">
+  <div class="sheet">
+    <textarea id="compose-ta" class="compose-ta" placeholder="Share with the community…" rows="4"></textarea>
+    <div class="btn-row">
+      <button class="btn-secondary" id="compose-cancel" style="flex:1">Cancel</button>
+      <button class="btn-primary"   id="compose-post"   style="flex:2" disabled>Post 🐻</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- OVERLAY: First post                                            -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="ov-firstpost" class="overlay hidden">
+  <div class="sheet">
+    <div class="sheet-icon">🎉</div>
+    <div class="sheet-title" style="font-size:20px;font-weight:800;">Thanks for posting!</div>
+    <div class="sheet-sub">Your post is now live for the community. Keep being you 💛</div>
+    <button class="btn-primary" id="fp-yes" style="margin-bottom:8px;">Awesome 🐻</button>
+    <button class="btn-secondary" id="fp-no" style="width:100%;">Close</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- OVERLAY: SOS                                                   -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="ov-sos" class="overlay hidden">
+  <div class="sheet">
+    <div class="sheet-icon">🆘</div>
+    <div class="sheet-title">Send SOS Flag</div>
+    <div class="sheet-sub" id="sos-body">Are you worried about this user? A moderator will be notified to check in. Only use this if genuinely concerned.</div>
+    <div class="btn-row">
+      <button class="btn-secondary" id="sos-cancel"  style="flex:1">Cancel</button>
+      <button class="btn-danger"    id="sos-confirm">Send SOS 🆘</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- OVERLAY: Report                                                -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="ov-report" class="overlay hidden">
+  <div class="sheet">
+    <div class="sheet-icon">🚨</div>
+    <div class="sheet-title">Report this post?</div>
+    <div class="sheet-sub">Why are you reporting this?</div>
+    <button class="report-opt" data-reason="Unkind or rude">Unkind or rude</button>
+    <button class="report-opt" data-reason="Misinformation">Misinformation</button>
+    <button class="report-opt" data-reason="Spam">Spam</button>
+    <button class="report-opt" data-reason="Other">Other concern</button>
+    <div class="sheet-note">Bans are temporary — everyone deserves another chance 💛</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- OVERLAY: E2EE info                                             -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="ov-e2ee" class="overlay hidden">
+  <div class="sheet">
+    <div class="sheet-icon">🔒</div>
+    <div class="sheet-title" style="font-size:20px;font-weight:800;">End-to-End Encrypted</div>
+    <div class="sheet-sub">BipolarBear Anonymous is built with your privacy at its core:</div>
+    <div class="e2ee-row"><span class="e2ee-row-icon">🔐</span><div><div class="e2ee-row-title">Messages are encrypted</div><div class="e2ee-row-sub">Only community members can read posts — no third parties, ever.</div></div></div>
+    <div class="e2ee-row"><span class="e2ee-row-icon">👤</span><div><div class="e2ee-row-title">No identity stored</div><div class="e2ee-row-sub">Your email is verified then discarded. Your Monika is all we hold.</div></div></div>
+    <div class="e2ee-row"><span class="e2ee-row-icon">🚫</span><div><div class="e2ee-row-title">Zero data selling</div><div class="e2ee-row-sub">We will never sell, share or monetise your data.</div></div></div>
+    <div class="e2ee-row"><span class="e2ee-row-icon">🛡️</span><div><div class="e2ee-row-title">Secure by design</div><div class="e2ee-row-sub">Built on industry-standard encryption protocols from the ground up.</div></div></div>
+    <button class="btn-primary" onclick="closeOv('ov-e2ee')" style="margin-top:6px;">Got it 👍</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- OVERLAY: Monika Settings                                       -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="ov-monika" class="overlay hidden">
+  <div class="sheet">
+    <div class="sheet-icon">🐻</div>
+    <div class="sheet-title">Your Monika</div>
+
+    <span class="sheet-label">Monika Name</span>
+    <div class="input-wrap" style="margin-bottom:16px;">
+      <input id="ms-monika" type="text" class="bb-input" maxlength="10" style="margin-bottom:0;">
+      <span class="input-counter" id="ms-monika-counter">0/10</span>
+    </div>
+
+    <span class="sheet-label">Initials (2 letters, leave blank for auto)</span>
+    <input id="ms-initials" type="text" class="bb-input" maxlength="2" placeholder="Auto" style="text-transform:uppercase;">
+
+    <span class="sheet-label">Avatar Colour</span>
+    <div id="ms-colors" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;"></div>
+
+    <div id="ms-preview" style="display:flex;align-items:center;gap:10px;background:var(--orange-bg);border-radius:12px;padding:12px 14px;margin-bottom:16px;">
+      <div id="ms-av" class="avatar"></div>
+      <div>
+        <div id="ms-av-name" style="font-size:13px;font-weight:700;color:var(--dark);"></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">Preview</div>
+      </div>
+    </div>
+
+    <div class="btn-row" style="margin-bottom:10px;">
+      <button class="btn-secondary" id="ms-cancel" style="flex:1;">Cancel</button>
+      <button class="btn-primary"   id="ms-save"   style="flex:2;">Save Changes ✓</button>
+    </div>
+    <button class="btn-secondary" id="ms-home" style="width:100%;text-align:center;">← Back to Bipolar Bear</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- OVERLAY: Self delete confirm                                    -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="ov-self-delete" class="overlay hidden">
+  <div class="sheet">
+    <div class="sheet-icon">🗑️</div>
+    <div class="sheet-title">Remove your post?</div>
+    <div class="sheet-sub">This will permanently delete your post. This can't be undone.</div>
+    <div class="btn-row">
+      <button class="btn-secondary" id="sdel-cancel" style="flex:1;">Keep it</button>
+      <button class="btn-danger"    id="sdel-confirm">Remove post</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- OVERLAY: Admin delete confirm                                   -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="ov-admin-delete" class="overlay hidden">
+  <div class="sheet">
+    <div class="sheet-icon">🛡️</div>
+    <div class="sheet-title">Delete Post?</div>
+    <div class="sheet-sub">This post will be replaced with "deleted by admin" and can't be undone.</div>
+    <div class="btn-row">
+      <button class="btn-secondary" id="adel-cancel" style="flex:1;">Cancel</button>
+      <button class="btn-danger"    id="adel-confirm">Delete 🗑️</button>
+    </div>
+  </div>
+</div>
+
+  </div><!-- /#app-shell -->
+  <div class="home-indicator"></div>
+</div><!-- /#iphone-frame -->
+
+<!-- Firebase SDK: loaded here so the page renders before these blocking scripts download -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<script>
+// ─────────────────────────────────────────────────────────────────
+// Beta gate (web only) — keep in sync with other pages
+// ─────────────────────────────────────────────────────────────────
+if (!window.Capacitor && location.protocol !== 'file:' && localStorage.getItem('bbWebUnlocked') !== 'true') {
+  location.replace('beta.html');
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Constants & state
+// ─────────────────────────────────────────────────────────────────
+const ORANGE      = '#ff9500';
+const ORANGE_DARK = '#e07800';
+const ORANGE_LT   = '#ffb340';
+const ADMIN_EMAIL = 'inbox@jamesmarkey.co.uk';
+
+const COLOR_PRESETS = [
+  { key: 'orange', g1: '#ffb340', g2: '#e07800' },
+  { key: 'blue',   g1: '#64b5f6', g2: '#1565c0' },
+  { key: 'purple', g1: '#ce93d8', g2: '#7b1fa2' },
+  { key: 'green',  g1: '#81c784', g2: '#2e7d32' },
+  { key: 'pink',   g1: '#f48fb1', g2: '#c2185b' },
+  { key: 'teal',   g1: '#4dd0e1', g2: '#00838f' },
+];
+
+let db = null;
+let currentTab      = 'general';
+let unsubPosts      = null;
+let localPosts      = [];
+let sosTargetName   = '';
+let reportTargetId  = '';
+let adminDeleteId   = '';
+let selfDeleteId    = '';
+
+// Persisted user profile (localStorage)
+const profile = {
+  get monika()      { return localStorage.getItem('bbAnon_monika')    || ''; },
+  get verified()    { return localStorage.getItem('bbAnon_verified')  === 'true'; },
+  get showMeds()    { return localStorage.getItem('bbAnon_showMeds')  === 'true'; },
+  get med()         { return localStorage.getItem('bbAnon_med')       || ''; },
+  get hasPosted()   { return localStorage.getItem('bbAnon_hasPosted') === 'true'; },
+  get isAdmin()     { return localStorage.getItem('bbAnon_isAdmin')   === 'true'; },
+  get colorKey()    { return localStorage.getItem('bbAnon_colorKey')  || 'orange'; },
+  get grad1()       { const p = COLOR_PRESETS.find(c => c.key === this.colorKey); return p ? p.g1 : ORANGE_LT; },
+  get grad2()       { const p = COLOR_PRESETS.find(c => c.key === this.colorKey); return p ? p.g2 : ORANGE_DARK; },
+  get customInit()  { return localStorage.getItem('bbAnon_initials')  || ''; },
+  avatarInitials()  { return this.customInit || initials(this.monika); },
+  // Pull streak from journal if available, else default to 1
+  get streak()      { return parseInt(localStorage.getItem('bbAnon_streak') || '1', 10); },
+};
+
+// Liked posts set (persisted)
+const likedPosts = new Set(
+  JSON.parse(localStorage.getItem('bbAnon_liked') || '[]')
+);
+function saveLiked() {
+  localStorage.setItem('bbAnon_liked', JSON.stringify([...likedPosts]));
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Firebase
+// ─────────────────────────────────────────────────────────────────
+function initFirebase() {
+  try {
+    if (!firebase.apps.length) {
+      firebase.initializeApp({
+        apiKey:            'AIzaSyBlF7DjbOvU4xgM47kAd6Ttx42_W1BPVUY',
+        authDomain:        'bipolarbear-app.firebaseapp.com',
+        projectId:         'bipolarbear-app',
+        storageBucket:     'bipolarbear-app.firebasestorage.app',
+        messagingSenderId: '566288727451',
+        appId:             '1:566288727451:web:8921f3242193df115df53e',
+      });
+    }
+    db = firebase.firestore();
+    db.enablePersistence({ synchronizeTabs: true }).catch(() => {});
+  } catch (e) {
+    console.warn('[Anonymous] Firebase init failed — running offline', e);
+  }
+}
+if (typeof firebase !== 'undefined') {
+  initFirebase();
+} else {
+  window.addEventListener('load', () => { if (typeof firebase !== 'undefined') initFirebase(); });
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Screen routing
+// ─────────────────────────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+}
+
+function boot() {
+  if (profile.verified && profile.monika) {
+    showScreen('board');
+    initBoard();
+  } else {
+    showScreen('verify');
+    setupVerify();
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Overlay helpers
+// ─────────────────────────────────────────────────────────────────
+function openOv(id)  { document.getElementById(id).classList.remove('hidden'); }
+function closeOv(id) { document.getElementById(id).classList.add('hidden'); }
+
+// Close on backdrop tap
+['ov-compose','ov-firstpost','ov-sos','ov-report','ov-e2ee','ov-monika','ov-self-delete','ov-admin-delete'].forEach(id => {
+  document.getElementById(id).addEventListener('click', e => {
+    if (e.target === document.getElementById(id)) closeOv(id);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────
+// Utilities
+// ─────────────────────────────────────────────────────────────────
+function initials(name) { return (name || '??').slice(0, 2).toUpperCase(); }
+
+function esc(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function timeAgo(ts) {
+  if (!ts) return 'now';
+  const ms = ts.toMillis ? ts.toMillis() : (ts instanceof Date ? ts.getTime() : ts);
+  const s = Math.floor((Date.now() - ms) / 1000);
+  if (s < 60)   return 'now';
+  if (s < 3600)  return Math.floor(s / 60) + 'm';
+  if (s < 86400) return Math.floor(s / 3600) + 'h';
+  return Math.floor(s / 86400) + 'd';
+}
+
+function getLatestRealPost(tab) {
+  const real = localPosts.filter(p => p.tab === tab && !p.deleted);
+  if (!real.length) return null;
+  return real.reduce((a, b) => {
+    const ta = a.timestamp?.toMillis?.() ?? 0;
+    const tb = b.timestamp?.toMillis?.() ?? 0;
+    return tb > ta ? b : a;
+  });
+}
+
+function isSelfDeleteEligible(post) {
+  if ((post.likes || 0) > 0) return true;
+  const ts = post.timestamp?.toMillis?.() ?? 0;
+  return !localPosts.some(p =>
+    p.id !== post.id && p.tab === post.tab && !p.deleted &&
+    (p.timestamp?.toMillis?.() ?? 0) > ts
+  );
+}
+
+function showHint(msg) {
+  const h = document.getElementById('fab-hint');
+  h.textContent = msg;
+  h.classList.add('show');
+  clearTimeout(h._t);
+  h._t = setTimeout(() => h.classList.remove('show'), 2200);
+}
+
+// ─────────────────────────────────────────────────────────────────
+// SCREEN: Verify
+// ─────────────────────────────────────────────────────────────────
+function setupVerify() {
+  const emailIn   = document.getElementById('email-input');
+  const sendBtn   = document.getElementById('send-code-btn');
+  const verifyBtn = document.getElementById('verify-btn');
+  const boxes     = document.querySelectorAll('.code-box');
+  let   _pendingEmail = '';
+
+  function _validateEmail() {
+    const ok = emailIn.value.includes('@') && emailIn.value.includes('.');
+    sendBtn.disabled = !ok;
+    emailIn.classList.toggle('valid', ok);
+  }
+
+  emailIn.addEventListener('input', _validateEmail);
+
+  // Prefill from the user's Bipolar Bear account (same Firebase project)
+  function _prefillFromAccount(user) {
+    if (user && !user.isAnonymous && user.email && !emailIn.value) {
+      emailIn.value = user.email;
+      _validateEmail();
+    }
+  }
+  if (typeof firebase !== 'undefined' && firebase.auth) {
+    _prefillFromAccount(firebase.auth().currentUser);
+    const _unsub = firebase.auth().onAuthStateChanged(user => {
+      _unsub();
+      _prefillFromAccount(user);
+    });
+  }
+
+  sendBtn.addEventListener('click', () => {
+    _pendingEmail = emailIn.value.trim();
+    document.getElementById('step-email').style.display = 'none';
+    document.getElementById('step-code').style.display  = 'block';
+    document.getElementById('code-sent-label').innerHTML =
+      `Code sent to <strong>${esc(_pendingEmail)}</strong>`;
+    boxes[0].focus();
+  });
+
+  function getCode() { return Array.from(boxes).map(b => b.value).join(''); }
+
+  boxes.forEach((box, i) => {
+    box.addEventListener('input', e => {
+      const v = e.target.value.replace(/\D/g, '');
+      box.value = v;
+      box.classList.toggle('filled', !!v);
+      if (v && boxes[i + 1]) boxes[i + 1].focus();
+      verifyBtn.disabled = getCode().length < 4;
+    });
+    box.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !box.value && boxes[i - 1]) {
+        boxes[i - 1].focus();
+        boxes[i - 1].value = '';
+        boxes[i - 1].classList.remove('filled');
+        verifyBtn.disabled = true;
+      }
+    });
+  });
+
+  verifyBtn.addEventListener('click', () => {
+    if (_pendingEmail.toLowerCase() === ADMIN_EMAIL) {
+      localStorage.setItem('bbAnon_isAdmin', 'true');
+    }
+    localStorage.setItem('bbAnon_verified', 'true');
+    showScreen('monika');
+    setupMonika();
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────
+// SCREEN: Monika
+// ─────────────────────────────────────────────────────────────────
+function setupMonika() {
+  const input   = document.getElementById('monika-input');
+  const counter = document.getElementById('monika-counter');
+  const preview = document.getElementById('monika-preview');
+  const av      = document.getElementById('monika-av');
+  const pvName  = document.getElementById('monika-preview-name');
+  const btn     = document.getElementById('monika-btn');
+  const streak  = profile.streak;
+
+  input.addEventListener('input', () => {
+    const v = input.value.slice(0, 10);
+    input.value = v;
+    counter.textContent  = `${v.length}/10`;
+    counter.style.color  = v.length >= 8 ? '#e55' : 'var(--muted)';
+    input.classList.toggle('valid', v.length >= 2);
+    btn.disabled = v.length < 2;
+    if (v.length >= 2) {
+      av.textContent    = initials(v);
+      pvName.textContent = `[${v}] 🔥 ${streak}d`;
+      preview.classList.add('show');
+    } else {
+      preview.classList.remove('show');
+    }
+  });
+
+  btn.addEventListener('click', () => {
+    const monika = input.value.trim();
+    if (monika.length < 2) return;
+    localStorage.setItem('bbAnon_monika', monika);
+    showScreen('meds');
+    setupMeds();
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────
+// SCREEN: Medication visibility
+// ─────────────────────────────────────────────────────────────────
+function setupMeds() {
+  function choose(show) {
+    localStorage.setItem('bbAnon_showMeds', show ? 'true' : 'false');
+    showScreen('board');
+    initBoard();
+  }
+  document.getElementById('meds-yes').addEventListener('click', () => choose(true));
+  document.getElementById('meds-no').addEventListener('click',  () => choose(false));
+}
+
+// ─────────────────────────────────────────────────────────────────
+// SCREEN: Board
+// ─────────────────────────────────────────────────────────────────
+function initBoard() {
+  renderUserPill();
+  setupTabs();
+  setupFAB();
+  setupCompose();
+  setupOverlayActions();
+  setTab('general');
+  cleanOldPosts();
+}
+
+function renderUserPill() {
+  const m  = profile.monika;
+  const s  = profile.streak;
+  const g1 = profile.grad1;
+  const g2 = profile.grad2;
+  const av = profile.avatarInitials();
+  document.getElementById('board-user-pill').innerHTML = `
+    <div style="display:flex;align-items:center;gap:5px;">
+      <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,${g1},${g2});display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:11px;flex-shrink:0;">${esc(av)}</div>
+      <span style="font-size:12px;color:rgba(255,255,255,0.9);font-weight:600;">[${esc(m)}]</span>
+      ${profile.isAdmin ? '<span style="background:rgba(255,255,255,0.3);color:#fff;font-size:9px;font-weight:800;border-radius:4px;padding:1px 5px;">ADMIN</span>' : ''}
+      <span>🔥</span>
+      <span style="font-size:11px;color:rgba(255,255,255,0.8);">${s}d</span>
+    </div>`;
+}
+
+function setupTabs() {
+  document.querySelectorAll('.board-tab').forEach(btn => {
+    btn.addEventListener('click', () => setTab(btn.dataset.tab));
+  });
+}
+
+function setTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.board-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.getElementById('fab-ann').classList.toggle('active', tab === 'announcements');
+  document.getElementById('fab-gen').classList.toggle('active', tab === 'general');
+  listenPosts();
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Posts — Firestore real-time listener
+// ─────────────────────────────────────────────────────────────────
+function sortPosts(posts) {
+  return [...posts].sort((a, b) => {
+    const ta = a.timestamp?.toMillis?.() ?? (a.timestamp instanceof Date ? a.timestamp.getTime() : 0);
+    const tb = b.timestamp?.toMillis?.() ?? (b.timestamp instanceof Date ? b.timestamp.getTime() : 0);
+    return tb - ta;
+  });
+}
+
+function todaySystemPost() {
+  const h = new Date().getHours();
+  let icon, text;
+  if      (h >= 5  && h < 12) { icon = '☀️';  text = 'Good morning. You are loved. Have a good day. 💛'; }
+  else if (h >= 12 && h < 17) { icon = '🌤️'; text = 'Hope your afternoon is going well. You\'re doing great. 💛'; }
+  else if (h >= 17 && h < 21) { icon = '🌙';  text = 'Good evening. Be kind to yourself tonight. 💛'; }
+  else                         { icon = '⭐';  text = 'Still awake? Take care of yourself — you matter. 💛'; }
+  return { id: 'sys_daily', isSystem: true, icon, text };
+}
+
+function seedPosts() {
+  return [
+    { id: 'seed_1', isSeed: true, tab: 'general', name: 'SunnyDaze', streak: 42, text: 'Today was really hard but I made it through. Small wins 💛', timestamp: null, likes: 5, med: 'Lithium', grad1: ORANGE_LT, grad2: ORANGE_DARK, initials: 'SD' },
+    { id: 'seed_2', isSeed: true, tab: 'general', name: 'NightOwl',  streak: 7,  text: 'Anyone else struggle with mornings? Takes me until noon to feel human 😅', timestamp: null, likes: 3, med: '', grad1: '#64b5f6', grad2: '#1565c0', initials: 'NO' },
+  ];
+}
+
+function assembleGeneralPosts(realPosts) {
+  return [todaySystemPost(), ...sortPosts(realPosts), ...seedPosts()];
+}
+
+function listenPosts() {
+  if (unsubPosts) { unsubPosts(); unsubPosts = null; }
+  localPosts = [];
+
+  if (!db) {
+    renderPosts(currentTab === 'general' ? assembleGeneralPosts([]) : announcementPosts());
+    return;
+  }
+
+  document.getElementById('post-list').innerHTML =
+    '<div class="empty-state">Loading…</div>';
+
+  unsubPosts = db.collection('bbAnonPosts')
+    .where('tab', '==', currentTab)
+    .limit(60)
+    .onSnapshot(snap => {
+      localPosts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderPosts(currentTab === 'general'
+        ? assembleGeneralPosts(localPosts)
+        : sortPosts(localPosts));
+    }, err => {
+      console.error('[Anonymous] posts error', err);
+      // Keep whatever we had; only reset if truly empty
+      renderPosts(currentTab === 'general'
+        ? assembleGeneralPosts(localPosts)
+        : (localPosts.length ? sortPosts(localPosts) : announcementPosts()));
+    });
+}
+
+function announcementPosts() {
+  return [
+    { id: 'ann1', isAnnouncement: true, text: '📢 Welcome to BipolarBear Anonymous! Be kind, be you, be safe. 💛', timestamp: null },
+    { id: 'ann2', isAnnouncement: true, text: '📢 You can now show your medication on your profile — helping others feel less alone.', timestamp: null },
+  ];
+}
+
+function demoData() {
+  return currentTab === 'announcements' ? announcementPosts() : assembleGeneralPosts([]);
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Auto-delete posts older than 7 days (skip reported ones)
+// ─────────────────────────────────────────────────────────────────
+async function cleanOldPosts() {
+  if (!db) return;
+  const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  try {
+    const snap = await db.collection('bbAnonPosts')
+      .where('timestamp', '<', cutoff)
+      .get();
+    if (snap.empty) return;
+    const batch = db.batch();
+    snap.docs.forEach(doc => {
+      if (!doc.data().reported) batch.delete(doc.ref);
+    });
+    await batch.commit();
+  } catch (e) {
+    console.warn('[Anonymous] cleanOldPosts:', e);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Render
+// ─────────────────────────────────────────────────────────────────
+function renderPosts(posts) {
+  const list = document.getElementById('post-list');
+  if (!posts.length) {
+    list.innerHTML = '<div class="empty-state">No posts yet — be the first! 🌱</div>';
+    return;
+  }
+  list.innerHTML = posts.map(p => {
+    if (p.isSystem)       return renderSystem(p);
+    if (p.isAnnouncement) return renderAnnouncement(p);
+    return renderPost(p);
+  }).join('');
+
+  // Like buttons
+  list.querySelectorAll('.like-btn').forEach(btn => {
+    btn.addEventListener('click', () => handleLike(btn));
+  });
+  // SOS buttons
+  list.querySelectorAll('[data-sos]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      sosTargetName = btn.dataset.sos;
+      document.getElementById('sos-body').innerHTML =
+        `Are you worried about <strong>[${esc(sosTargetName)}]</strong>? A moderator will be notified to check in. Only use this if genuinely concerned.`;
+      openOv('ov-sos');
+    });
+  });
+  // Report buttons
+  list.querySelectorAll('[data-report]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      reportTargetId = btn.dataset.report;
+      openOv('ov-report');
+    });
+  });
+  // Self-delete buttons
+  list.querySelectorAll('[data-selfdelete]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selfDeleteId = btn.dataset.selfdelete;
+      openOv('ov-self-delete');
+    });
+  });
+  // Admin delete buttons
+  list.querySelectorAll('[data-delete]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      adminDeleteId = btn.dataset.delete;
+      openOv('ov-admin-delete');
+    });
+  });
+}
+
+function renderSystem(p) {
+  return `<div class="sys-card">
+    <div class="sys-emoji">${p.icon || '☀️'}</div>
+    <div class="sys-text">${esc(p.text)}</div>
+    <div class="sys-meta">BipolarBear${p.time ? ' · ' + p.time : (p.timestamp ? ' · ' + timeAgo(p.timestamp) : '')}</div>
+  </div>`;
+}
+
+function renderAnnouncement(p) {
+  return `<div class="ann-card">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,${ORANGE_LT},${ORANGE_DARK});display:flex;align-items:center;justify-content:center;font-size:16px;">🐻</div>
+      <div style="font-size:13px;font-weight:700;color:var(--dark);">BipolarBear</div>
+    </div>
+    <div class="post-text">${esc(p.text)}</div>
+  </div>`;
+}
+
+function renderPost(p) {
+  if (p.deleted) {
+    return `<div class="post-card"><div class="post-deleted">🛡️ This post was deleted by an admin</div></div>`;
+  }
+  const liked   = likedPosts.has(p.id);
+  const likes   = p.likes || 0;
+  const showMed = profile.showMeds && p.med;
+  const g1      = p.grad1 || ORANGE_LT;
+  const g2      = p.grad2 || ORANGE_DARK;
+  const av      = p.initials || initials(p.name);
+  const adminBadge   = p.isAdmin ? '<span class="admin-badge">ADMIN</span>' : '';
+  const deleteBtn    = profile.isAdmin && !p.isSeed
+    ? `<button class="icon-btn" data-delete="${esc(p.id)}" title="Delete post (admin)">🗑️</button>` : '';
+  const selfDeleteBtn = !p.isSeed && p.name === profile.monika && isSelfDeleteEligible(p)
+    ? `<button class="icon-btn" data-selfdelete="${esc(p.id)}" title="Remove your post" style="opacity:0.4;">🗑️</button>` : '';
+  return `<div class="post-card">
+    <div class="post-header">
+      <div class="post-avatar">
+        <div class="post-av-circle" style="background:linear-gradient(135deg,${g1},${g2});">${esc(av)}</div>
+        <div>
+          <div class="post-name">[${esc(p.name)}]${adminBadge} 🔥 ${p.streak || 1}d</div>
+          ${showMed ? `<div class="post-med">💊 ${esc(p.med)}</div>` : ''}
+        </div>
+      </div>
+      <span class="post-time">${p.timestamp ? timeAgo(p.timestamp) : 'now'}</span>
+    </div>
+    <div class="post-text">${esc(p.text)}</div>
+    <div class="post-actions">
+      <button class="like-btn ${liked ? 'liked' : ''}" data-id="${esc(p.id)}" data-likes="${likes}">
+        💛 <span>${likes}</span>
+      </button>
+      <div style="flex:1"></div>
+      ${selfDeleteBtn}
+      ${deleteBtn}
+      ${p.name !== profile.monika ? `<button class="icon-btn" data-sos="${esc(p.name)}" title="Send SOS flag">🆘</button>` : ''}
+      ${p.name !== profile.monika ? `<button class="icon-btn" data-report="${esc(p.id)}" title="Report post">🚨</button>` : ''}
+    </div>
+  </div>`;
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Likes
+// ─────────────────────────────────────────────────────────────────
+function handleLike(btn) {
+  const id     = btn.dataset.id;
+  const span   = btn.querySelector('span');
+  const liked  = likedPosts.has(id);
+  const count  = parseInt(btn.dataset.likes, 10) || 0;
+
+  if (liked) {
+    likedPosts.delete(id);
+    btn.classList.remove('liked');
+    btn.dataset.likes = count - 1;
+    span.textContent  = count - 1;
+    if (db) db.collection('bbAnonPosts').doc(id).update({ likes: firebase.firestore.FieldValue.increment(-1) }).catch(() => {});
+  } else {
+    likedPosts.add(id);
+    btn.classList.add('liked');
+    btn.dataset.likes = count + 1;
+    span.textContent  = count + 1;
+    if (db) db.collection('bbAnonPosts').doc(id).update({ likes: firebase.firestore.FieldValue.increment(1) }).catch(() => {});
+  }
+  saveLiked();
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Post gate — check if first post has a like yet
+// ─────────────────────────────────────────────────────────────────
+function pollCanPost() {
+  if (profile.canPost || !profile.hasPosted) return;
+  const firstId = localStorage.getItem('bbAnon_firstPostId');
+  if (!firstId || !db) return;
+  db.collection('bbAnonPosts').doc(firstId).get().then(doc => {
+    if (doc.exists && (doc.data().likes || 0) > 0) {
+      localStorage.setItem('bbAnon_canPost', 'true');
+    }
+  }).catch(() => {});
+}
+
+// ─────────────────────────────────────────────────────────────────
+// FAB
+// ─────────────────────────────────────────────────────────────────
+function setupFAB() {
+  document.getElementById('fab-ann').addEventListener('click', () => {
+    if (currentTab === 'announcements') { showHint('Announcements already open'); return; }
+    setTab('announcements');
+  });
+  document.getElementById('fab-gen').addEventListener('click', () => {
+    if (currentTab === 'general') { showHint('General chat already open'); return; }
+    setTab('general');
+  });
+  document.getElementById('fab-compose').addEventListener('click', () => {
+    const latest = getLatestRealPost(currentTab);
+    if (latest && latest.name === profile.monika && (latest.likes || 0) === 0) {
+      showHint('Please wait until someone else reacts to your message or posts another one.');
+      return;
+    }
+    document.getElementById('compose-ta').value = '';
+    document.getElementById('compose-post').disabled = true;
+    openOv('ov-compose');
+    setTimeout(() => document.getElementById('compose-ta').focus(), 50);
+  });
+  document.getElementById('fab-e2ee').addEventListener('click', () => openOv('ov-e2ee'));
+  document.getElementById('fab-home').addEventListener('click', () => { location.href = 'index.html'; });
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Compose
+// ─────────────────────────────────────────────────────────────────
+function setupCompose() {
+  const ta   = document.getElementById('compose-ta');
+  const post = document.getElementById('compose-post');
+
+  ta.addEventListener('input', () => { post.disabled = !ta.value.trim(); });
+
+  document.getElementById('compose-cancel').addEventListener('click', () => closeOv('ov-compose'));
+
+  post.addEventListener('click', async () => {
+    const text = ta.value.trim();
+    if (!text) return;
+    closeOv('ov-compose');
+
+    const now = new Date();
+    const optimisticId = 'local-' + now.getTime();
+    const entry = {
+      name:     profile.monika,
+      streak:   profile.streak,
+      initials: profile.avatarInitials(),
+      grad1:    profile.grad1,
+      grad2:    profile.grad2,
+      isAdmin:  profile.isAdmin,
+      text,
+      med:      profile.showMeds ? profile.med : '',
+      tab:      currentTab,
+      likes:    0,
+      isSystem: false,
+      timestamp: now,
+    };
+
+    // Show post immediately (optimistic update)
+    localPosts.unshift({ id: optimisticId, ...entry });
+    renderPosts(sortPosts(localPosts));
+
+    let docId = null;
+    if (db) {
+      try {
+        const ref = await db.collection('bbAnonPosts').add({
+          ...entry,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+        docId = ref.id;
+        // Replace optimistic entry with the real one from the snapshot (happens automatically)
+      } catch (e) { console.error('[Anonymous] post failed', e); }
+    }
+
+    if (!profile.hasPosted) {
+      if (docId) localStorage.setItem('bbAnon_firstPostId', docId);
+      localStorage.setItem('bbAnon_hasPosted', 'true');
+      openOv('ov-firstpost');
+    }
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Overlay button wiring
+// ─────────────────────────────────────────────────────────────────
+function setupOverlayActions() {
+  // First post
+  document.getElementById('fp-yes').addEventListener('click', () => closeOv('ov-firstpost'));
+  document.getElementById('fp-no').addEventListener('click',  () => closeOv('ov-firstpost'));
+
+  // SOS
+  document.getElementById('sos-cancel').addEventListener('click',  () => closeOv('ov-sos'));
+  document.getElementById('sos-confirm').addEventListener('click', () => {
+    closeOv('ov-sos');
+    // Production: write SOS report to Firestore for moderator review
+    if (db && sosTargetName) {
+      db.collection('bbAnonReports').add({
+        type: 'sos', targetName: sosTargetName,
+        reportedBy: profile.monika, timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      }).catch(() => {});
+    }
+    showHint('SOS sent to moderators 🆘');
+  });
+
+  // Report
+  document.querySelectorAll('.report-opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      closeOv('ov-report');
+      if (db && reportTargetId) {
+        const post = localPosts.find(p => p.id === reportTargetId);
+        db.collection('bbAnonReports').add({
+          type: 'report', postId: reportTargetId, reason: btn.dataset.reason,
+          postText: post ? post.text : '',
+          postName: post ? post.name : '',
+          reportedBy: profile.monika,
+          adminEmail: ADMIN_EMAIL,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        }).catch(() => {});
+        // Flag post so 7-day auto-delete skips it
+        db.collection('bbAnonPosts').doc(reportTargetId)
+          .update({ reported: true }).catch(() => {});
+      }
+      showHint('Report submitted — thank you 🙏');
+    });
+  });
+
+  // Self delete
+  document.getElementById('sdel-cancel').addEventListener('click', () => closeOv('ov-self-delete'));
+  document.getElementById('sdel-confirm').addEventListener('click', () => {
+    closeOv('ov-self-delete');
+    if (db && selfDeleteId) {
+      db.collection('bbAnonPosts').doc(selfDeleteId).delete().catch(() => {});
+      localPosts = localPosts.filter(p => p.id !== selfDeleteId);
+      renderPosts(currentTab === 'general' ? assembleGeneralPosts(localPosts) : sortPosts(localPosts));
+    }
+    showHint('Post removed ✓');
+  });
+
+  // Admin delete
+  document.getElementById('adel-cancel').addEventListener('click', () => closeOv('ov-admin-delete'));
+  document.getElementById('adel-confirm').addEventListener('click', () => {
+    closeOv('ov-admin-delete');
+    adminDeletePost(adminDeleteId);
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Admin: delete post
+// ─────────────────────────────────────────────────────────────────
+function adminDeletePost(id) {
+  if (!db || !id) return;
+  db.collection('bbAnonPosts').doc(id).update({
+    deleted: true,
+    deletedByAdmin: true,
+    deletedAt: firebase.firestore.FieldValue.serverTimestamp(),
+  }).catch(err => console.error('[Admin] delete failed', err));
+  showHint('Post deleted 🛡️');
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Monika settings
+// ─────────────────────────────────────────────────────────────────
+function openMonikaSettings() {
+  const msMonika   = document.getElementById('ms-monika');
+  const msCounter  = document.getElementById('ms-monika-counter');
+  const msInitials = document.getElementById('ms-initials');
+  const msColors   = document.getElementById('ms-colors');
+  const msAv       = document.getElementById('ms-av');
+  const msAvName   = document.getElementById('ms-av-name');
+
+  msMonika.value   = profile.monika;
+  msCounter.textContent = `${profile.monika.length}/10`;
+  msInitials.value = profile.customInit;
+
+  // Build colour swatches
+  msColors.innerHTML = COLOR_PRESETS.map(c =>
+    `<div class="color-swatch ${c.key === profile.colorKey ? 'selected' : ''}"
+       data-key="${c.key}"
+       style="background:linear-gradient(135deg,${c.g1},${c.g2});"
+       title="${c.key}"></div>`
+  ).join('');
+
+  function updatePreview() {
+    const name = msMonika.value || profile.monika;
+    const init = msInitials.value.toUpperCase() || initials(name);
+    const key  = msColors.querySelector('.color-swatch.selected')?.dataset.key || profile.colorKey;
+    const col  = COLOR_PRESETS.find(c => c.key === key) || COLOR_PRESETS[0];
+    msAv.textContent = init;
+    msAv.style.background = `linear-gradient(135deg,${col.g1},${col.g2})`;
+    msAvName.textContent = `[${name}] 🔥 ${profile.streak}d`;
+  }
+  updatePreview();
+
+  msMonika.oninput = () => {
+    msCounter.textContent = `${msMonika.value.length}/10`;
+    updatePreview();
+  };
+  msInitials.oninput = () => {
+    msInitials.value = msInitials.value.toUpperCase().slice(0, 2);
+    updatePreview();
+  };
+  msColors.onclick = e => {
+    const sw = e.target.closest('.color-swatch');
+    if (!sw) return;
+    msColors.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+    sw.classList.add('selected');
+    updatePreview();
+  };
+
+  openOv('ov-monika');
+}
+
+document.getElementById('ms-cancel').addEventListener('click', () => closeOv('ov-monika'));
+document.getElementById('ms-home').addEventListener('click', () => { location.href = 'index.html'; });
+
+document.getElementById('ms-save').addEventListener('click', async () => {
+  const newMonika = document.getElementById('ms-monika').value.trim();
+  if (newMonika.length < 2) { showHint('Monika must be at least 2 characters'); return; }
+
+  const newInit  = document.getElementById('ms-initials').value.toUpperCase().slice(0, 2);
+  const selKey   = document.querySelector('#ms-colors .color-swatch.selected')?.dataset.key || profile.colorKey;
+  const oldMonika = profile.monika;
+
+  localStorage.setItem('bbAnon_monika',   newMonika);
+  localStorage.setItem('bbAnon_initials', newInit);
+  localStorage.setItem('bbAnon_colorKey', selKey);
+
+  closeOv('ov-monika');
+  renderUserPill();
+  showHint('Monika updated ✓');
+
+  // Update past Firestore posts authored by this user
+  if (db && oldMonika) {
+    const col = COLOR_PRESETS.find(c => c.key === selKey) || COLOR_PRESETS[0];
+    try {
+      const snap  = await db.collection('bbAnonPosts').where('name', '==', oldMonika).get();
+      const batch = db.batch();
+      snap.docs.forEach(doc => batch.update(doc.ref, {
+        name:     newMonika,
+        initials: newInit || initials(newMonika),
+        grad1:    col.g1,
+        grad2:    col.g2,
+      }));
+      await batch.commit();
+    } catch (e) { console.warn('[Monika] update posts failed', e); }
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────
+// Boot
+// ─────────────────────────────────────────────────────────────────
+boot();
+</script>
+</body>
+</html>
