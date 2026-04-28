@@ -858,10 +858,13 @@
             }
             // Restore personal details hint dismissal state from Firestore
             if (d.personalHintDone) localStorage.setItem('bbPersonalHintDone', '1');
+            // Restore tutorial-shown flag from Firestore so it survives logout + device switches
+            if (d.tutorialToastShown) localStorage.setItem('bbTutorialToastShown', '1');
             _applyOnboardingGating();
-            // If step reached 12 (via Firestore sync) but tutorial popup was never shown locally, show it now
+            // If step reached 12 but tutorial popup was never shown, show it once then persist to Firestore
             if (_finalStep >= 12 && localStorage.getItem('bbTutorialToastShown') !== '1') {
               localStorage.setItem('bbTutorialToastShown', '1');
+              db.collection('userSettings').doc(user.uid).set({ tutorialToastShown: true }, { merge: true }).catch(() => {});
               setTimeout(_showTutorialCompleteModal, 600);
             }
           }).catch(() => {});
@@ -1221,7 +1224,6 @@
         'bbFeedbackFabHidden', 'bbWaFabHidden', 'bbCoffeeFabHidden', 'bbQuickNoteFabHidden', 'bbFooterHidden', 'bbFabsUnlocked',
         'bbFabSlot_1', 'bbFabSlot_2', 'bbFabSlot_3', 'bbFabSlot_4',
         'bbLogoEasterEggFound',
-        'bbTutorialToastShown',
         'bbPinEnabled', 'bbPinCode',
         'bbWelcomeShown',
       ];
