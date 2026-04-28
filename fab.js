@@ -369,6 +369,17 @@
             </div>
             <button id="bbAccountPassToggleBtn" onclick="document.getElementById('bbAccountPassFields').style.display='';document.getElementById('bbAccountPassToggleBtn').style.display='none';document.getElementById('bbAccountCurrentPass').focus();" style="width:100%;padding:12px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Change password</button>
           </div>
+          <div id="bbAccountEmailSection" style="margin-bottom:10px;">
+            <div id="bbAccountEmailFields" style="display:none;margin-bottom:8px;">
+              <input type="email" id="bbAccountNewEmail" placeholder="New email address" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;box-sizing:border-box;margin-bottom:6px;outline:none;font-family:inherit;">
+              <input type="password" id="bbAccountEmailPass" placeholder="Current password" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;box-sizing:border-box;margin-bottom:8px;outline:none;font-family:inherit;">
+              <div style="display:flex;gap:8px;">
+                <button onclick="window._bbSubmitEmailChange()" style="flex:1;padding:10px;background:#ff9500;color:white;border:none;border-radius:8px;font-size:0.9em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Save</button>
+                <button onclick="document.getElementById('bbAccountEmailFields').style.display='none';document.getElementById('bbAccountEmailToggleBtn').style.display='';" style="padding:10px 14px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Cancel</button>
+              </div>
+            </div>
+            <button id="bbAccountEmailToggleBtn" onclick="document.getElementById('bbAccountEmailFields').style.display='';document.getElementById('bbAccountEmailToggleBtn').style.display='none';document.getElementById('bbAccountNewEmail').focus();" style="width:100%;padding:12px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Change email</button>
+          </div>
           <button onclick="(window._fabOpenPersonalInfo||function(){})()" style="width:100%;padding:12px;background:white;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;margin-bottom:10px;-webkit-tap-highlight-color:transparent;">👤 Personal information</button>
           <button onclick="window.closeAccountModal()" style="width:100%;padding:10px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:10px;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Cancel</button>
         </div>
@@ -775,6 +786,14 @@
     if (passToggle) passToggle.style.display = '';
     if (cp) cp.value = '';
     if (np) np.value = '';
+    const emailFields  = document.getElementById('bbAccountEmailFields');
+    const emailToggle  = document.getElementById('bbAccountEmailToggleBtn');
+    const newEmailEl   = document.getElementById('bbAccountNewEmail');
+    const emailPassEl  = document.getElementById('bbAccountEmailPass');
+    if (emailFields) emailFields.style.display = 'none';
+    if (emailToggle) emailToggle.style.display = '';
+    if (newEmailEl)  newEmailEl.value  = '';
+    if (emailPassEl) emailPassEl.value = '';
     const modal = document.getElementById('bbAccountModal');
     if (modal) modal.classList.add('active');
     if (typeof window._fabOnShowAuth === 'function') window._fabOnShowAuth();
@@ -825,6 +844,32 @@
       .catch(err => {
         const wrongPass = err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential';
         _bbAccountShowMsg('⚠️ ' + (wrongPass ? 'Current password is incorrect.' : (err.message || 'Could not update password.')), false);
+      });
+  };
+
+  window._bbSubmitEmailChange = function () {
+    const _fb  = window.firebase;
+    const user = _fb && _fb.auth ? _fb.auth().currentUser : null;
+    if (!user) return;
+    const newEmail  = (document.getElementById('bbAccountNewEmail').value  || '').trim();
+    const pass      = (document.getElementById('bbAccountEmailPass').value || '').trim();
+    if (!newEmail || !pass) { _bbAccountShowMsg('⚠️ Please fill in both fields.', false); return; }
+    if (!newEmail.includes('@') || !newEmail.includes('.')) { _bbAccountShowMsg('⚠️ Please enter a valid email address.', false); return; }
+    const credential = _fb.auth.EmailAuthProvider.credential(user.email, pass);
+    user.reauthenticateWithCredential(credential)
+      .then(() => user.updateEmail(newEmail))
+      .then(() => {
+        _bbAccountShowMsg('✅ Email updated to ' + newEmail, true);
+        document.getElementById('bbAccountEmail').textContent = newEmail;
+        document.getElementById('bbAccountEmailFields').style.display   = 'none';
+        document.getElementById('bbAccountEmailToggleBtn').style.display = '';
+        document.getElementById('bbAccountNewEmail').value = '';
+        document.getElementById('bbAccountEmailPass').value = '';
+      })
+      .catch(err => {
+        const wrongPass = err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential';
+        const inUse     = err.code === 'auth/email-already-in-use';
+        _bbAccountShowMsg('⚠️ ' + (wrongPass ? 'Current password is incorrect.' : inUse ? 'That email is already in use.' : (err.message || 'Could not update email.')), false);
       });
   };
 
