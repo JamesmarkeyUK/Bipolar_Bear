@@ -750,6 +750,47 @@ function initFirebase() {
     const _fns = firebase.app().functions('europe-west1');
     window._anonSendCode   = _fns.httpsCallable('sendAnonCode');
     window._anonVerifyCode = _fns.httpsCallable('verifyAnonCode');
+
+    // Tie anonymous access to BipolarBear account
+    firebase.auth().onAuthStateChanged(function(user) {
+      const isReal = user && !user.isAnonymous;
+
+      // Update email field on verify screen
+      const emailIn = document.getElementById('email-input');
+      const sendBtn = document.getElementById('send-code-btn');
+      const errDiv  = document.getElementById('verify-error');
+      if (emailIn) {
+        if (isReal) {
+          emailIn.value       = user.email;
+          emailIn.readOnly    = true;
+          emailIn.style.background = '#f8f9fa';
+          emailIn.style.color      = '#495057';
+          emailIn.style.cursor     = 'default';
+          if (sendBtn) sendBtn.disabled = false;
+          if (errDiv)  { errDiv.style.display = 'none'; errDiv.textContent = ''; }
+        } else {
+          emailIn.value       = '';
+          emailIn.readOnly    = true;
+          emailIn.placeholder = 'Sign in to BipolarBear first';
+          emailIn.style.background = '#f8f9fa';
+          emailIn.style.color      = '#adb5bd';
+          emailIn.style.cursor     = 'default';
+          if (sendBtn) sendBtn.disabled = true;
+          if (errDiv) {
+            errDiv.innerHTML     = '👋 You need to be signed in to BipolarBear to join Anonymous. <a href="/" style="color:#dc3545;font-weight:600;">Sign in →</a>';
+            errDiv.style.display = 'block';
+          }
+        }
+      }
+
+      // Sign out of Anonymous if BipolarBear account is signed out
+      if (!isReal && localStorage.getItem('bbAnon_verified') === 'true') {
+        localStorage.removeItem('bbAnon_verified');
+        localStorage.removeItem('bbAnon_isAdmin');
+        if (unsubPosts) { unsubPosts(); unsubPosts = null; }
+        boot();
+      }
+    });
   } catch (e) {
     console.warn('[Anonymous] Firebase init failed — running offline', e);
   }
@@ -864,23 +905,7 @@ function setupVerify() {
     emailIn.classList.toggle('valid', ok);
   }
 
-  emailIn.addEventListener('input', _validateEmail);
   emailIn.addEventListener('keydown', e => { if (e.key === 'Enter' && !sendBtn.disabled) sendBtn.click(); });
-
-  // Prefill from the user's Bipolar Bear account (same Firebase project)
-  function _prefillFromAccount(user) {
-    if (user && !user.isAnonymous && user.email && !emailIn.value) {
-      emailIn.value = user.email;
-      _validateEmail();
-    }
-  }
-  if (typeof firebase !== 'undefined' && firebase.auth) {
-    _prefillFromAccount(firebase.auth().currentUser);
-    const _unsub = firebase.auth().onAuthStateChanged(user => {
-      _unsub();
-      _prefillFromAccount(user);
-    });
-  }
 
   function getCode() { return Array.from(boxes).map(b => b.value).join(''); }
 
@@ -1289,7 +1314,7 @@ function renderPost(p) {
   const adminBadge   = p.isAdmin ? '<span class="admin-badge">ADMIN</span>' : '';
   const deleteBtn    = profile.isAdmin && !p.isSeed
     ? `<button class="icon-btn" data-delete="${esc(p.id)}" title="Delete post (admin)">🗑️</button>` : '';
-  const selfDeleteBtn = !p.isSeed && p.name === profile.monika && isSelfDeleteEligible(p)
+  const selfDeleteBtn = !p.isSeed && !profile.isAdmin && p.name === profile.monika && isSelfDeleteEligible(p)
     ? `<button class="icon-btn" data-selfdelete="${esc(p.id)}" title="Remove your post" style="opacity:0.4;">🗑️</button>` : '';
   return `<div class="post-card">
     <div class="post-header">
