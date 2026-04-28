@@ -5556,6 +5556,7 @@
           }
         }
         window._currentStreak = currentStreak;
+        localStorage.setItem('bbCurrentStreak', currentStreak);
       }
 
       if (entries.length <= 1) {
@@ -5625,6 +5626,7 @@
           }
         }
         window._currentStreak = currentStreak;
+        localStorage.setItem('bbCurrentStreak', currentStreak);
       }
 
       // Calculate missing entries in the last 30 days (or since first entry if more recent)

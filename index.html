@@ -588,6 +588,7 @@
           </span>
         </a>
         <div id="journalTutorialProgress" style="text-align:center;font-size:0.7em;color:rgba(255,255,255,0.75);margin-top:4px;font-style:italic;display:none;"></div>
+        <div id="journalStreakBadge" style="display:none;text-align:center;font-size:0.78em;font-weight:600;color:rgba(255,255,255,0.9);margin-top:4px;letter-spacing:0.1px;"></div>
       </div>
       <div id="journalStartHint" style="display:none; flex-direction:column; align-items:center; gap:2px; pointer-events:none; animation:hintFade 2.4s ease-in-out infinite; margin-top:-4px;">
         <svg width="24" height="22" viewBox="0 0 24 22" fill="none">
@@ -1196,6 +1197,16 @@
     window.addEventListener('online', updateOnlineStatus);
     window.addEventListener('offline', updateOnlineStatus);
     updateOnlineStatus();
+
+    // Streak badge under journal button
+    (function() {
+      const streak = parseInt(localStorage.getItem('bbCurrentStreak') || '0', 10);
+      const badge  = document.getElementById('journalStreakBadge');
+      if (badge && streak > 0) {
+        badge.textContent  = '🔥 ' + streak + ' day' + (streak === 1 ? '' : 's');
+        badge.style.display = 'block';
+      }
+    })();
 
     function logout() {
       // Clear all user-specific cached data before signing out.
