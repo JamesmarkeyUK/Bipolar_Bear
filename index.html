@@ -624,6 +624,7 @@
         <div id="anonymousSignInNote" style="text-align:center;font-size:0.72em;color:rgba(255,255,255,0.55);margin-top:5px;font-style:italic;">
           Sign in to join the community
         </div>
+        <div id="anonMessagesBadge" style="display:none;text-align:center;font-size:0.78em;font-weight:600;color:rgba(255,255,255,0.9);margin-top:4px;letter-spacing:0.1px;"></div>
       </div>
     </div>
 
@@ -803,6 +804,30 @@
           if (currentUser) {
             anonBtn.classList.remove('locked');
             if (anonNote) anonNote.style.display = 'none';
+            // New messages badge — only if they've verified for Anonymous
+            if (localStorage.getItem('bbAnon_verified') === 'true') {
+              const _badge     = document.getElementById('anonMessagesBadge');
+              const _lastVisit = parseInt(localStorage.getItem('bbAnonLastVisit') || '0', 10);
+              if (_badge) {
+                if (!_lastVisit) {
+                  _badge.textContent  = '💬 Tap to join the community';
+                  _badge.style.display = 'block';
+                } else {
+                  db.collection('bbAnonPosts')
+                    .where('timestamp', '>', firebase.firestore.Timestamp.fromMillis(_lastVisit))
+                    .limit(5)
+                    .get()
+                    .then(snap => {
+                      const _newCount = snap.docs.filter(d => !d.data().deleted).length;
+                      _badge.textContent   = _newCount > 0
+                        ? '💬 ' + _newCount + ' new message' + (_newCount === 1 ? '' : 's')
+                        : '✓ No new messages';
+                      _badge.style.display = 'block';
+                    })
+                    .catch(() => {});
+                }
+              }
+            }
           } else {
             anonBtn.classList.add('locked');
             if (anonNote) anonNote.style.display = 'block';
