@@ -266,6 +266,25 @@
       cursor: default;
       pointer-events: none;
     }
+    .btn-subnote {
+      display: none;
+      text-align: center;
+      font-size: 0.78em;
+      font-weight: 600;
+      color: rgba(255,255,255,0.9);
+      margin-top: 4px;
+      letter-spacing: 0.1px;
+    }
+    .btn-subnote-muted {
+      display: block;
+      text-align: center;
+      font-size: 0.78em;
+      font-weight: 600;
+      color: rgba(255,255,255,0.55);
+      margin-top: 4px;
+      letter-spacing: 0.1px;
+      font-style: italic;
+    }
 
     .btn.btn-whatsapp {
       background: rgba(37, 211, 102, 0.2);
@@ -588,7 +607,7 @@
           </span>
         </a>
         <div id="journalTutorialProgress" style="text-align:center;font-size:0.7em;color:rgba(255,255,255,0.75);margin-top:4px;font-style:italic;display:none;"></div>
-        <div id="journalStreakBadge" style="display:none;text-align:center;font-size:0.78em;font-weight:600;color:rgba(255,255,255,0.9);margin-top:4px;letter-spacing:0.1px;"></div>
+        <div id="journalStreakBadge" class="btn-subnote"></div>
       </div>
       <div id="journalStartHint" style="display:none; flex-direction:column; align-items:center; gap:2px; pointer-events:none; animation:hintFade 2.4s ease-in-out infinite; margin-top:-4px;">
         <svg width="24" height="22" viewBox="0 0 24 22" fill="none">
@@ -606,7 +625,7 @@
             <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </span>
         </a>
-        <div id="survivalProgress" style="text-align:center;font-size:0.7em;color:rgba(255,255,255,0.75);margin-top:4px;font-style:italic;display:none;"></div>
+        <div id="survivalProgress" class="btn-subnote"></div>
       </div>
       <div id="survivalKitHint" style="display:none; flex-direction:column; align-items:center; gap:2px; pointer-events:none; animation:hintFade 2.4s ease-in-out infinite; margin-top:-4px;">
         <svg width="24" height="22" viewBox="0 0 24 22" fill="none">
@@ -621,10 +640,8 @@
           <span class="icon">💬</span>
           <span>Bipolar Anonymous</span>
         </a>
-        <div id="anonymousSignInNote" style="text-align:center;font-size:0.72em;color:rgba(255,255,255,0.55);margin-top:5px;font-style:italic;">
-          Sign in to join the community
-        </div>
-        <div id="anonMessagesBadge" style="display:none;text-align:center;font-size:0.78em;font-weight:600;color:rgba(255,255,255,0.9);margin-top:4px;letter-spacing:0.1px;"></div>
+        <div id="anonymousSignInNote" class="btn-subnote-muted">Sign in to join the community</div>
+        <div id="anonMessagesBadge" class="btn-subnote"></div>
       </div>
     </div>
 
@@ -1555,7 +1572,7 @@
           _prog.style.display = 'none';
         } else {
           _prog.textContent = _c + ' / 13 sections complete';
-          _prog.style.display = '';
+          _prog.style.display = 'block';
         }
       }
     })();
