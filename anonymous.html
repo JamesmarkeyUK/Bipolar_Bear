@@ -393,7 +393,7 @@
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <div id="screen-verify" class="screen active">
   <div class="onboard-bg">
-    <button class="board-back-btn" onclick="location.replace(location.protocol==='file:'?'index.html':'/')" style="align-self:flex-start;margin-bottom:20px;">← Home</button>
+    <button class="board-back-btn" onclick="location.replace('index.html')" style="align-self:flex-start;margin-bottom:20px;">← Home</button>
     <div class="onboard-logo">
       <img src="icons/AppIcon.png" alt="Bipolar Bear">
       <h1>BipolarBear</h1>
@@ -488,7 +488,7 @@
 
   <div class="board-header">
     <div class="board-header-top">
-      <button class="board-logo" onclick="location.replace(location.protocol==='file:'?'index.html':'/')" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:12px;display:flex;align-items:center;gap:10px;transition:background 0.15s;" onmouseenter="this.style.background='rgba(255,255,255,0.15)'" onmouseleave="this.style.background='none'" title="Back to Bipolar Bear">
+      <button class="board-logo" onclick="location.replace('index.html')" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:12px;display:flex;align-items:center;gap:10px;transition:background 0.15s;" onmouseenter="this.style.background='rgba(255,255,255,0.15)'" onmouseleave="this.style.background='none'" title="Back to Bipolar Bear">
         <img src="icons/AppIcon.png" alt="">
         <div>
           <div class="board-logo-name">Anonymous</div>
@@ -777,7 +777,7 @@ function initFirebase() {
           emailIn.style.cursor     = 'default';
           if (sendBtn) sendBtn.disabled = true;
           if (errDiv) {
-            errDiv.innerHTML     = '👋 You need to be signed in to BipolarBear to join Anonymous. <a href="/" style="color:#dc3545;font-weight:600;">Sign in →</a>';
+            errDiv.innerHTML     = '👋 You need to be signed in to BipolarBear to join Anonymous. <a href="index.html" style="color:#dc3545;font-weight:600;">Sign in →</a>';
             errDiv.style.display = 'block';
           }
         }

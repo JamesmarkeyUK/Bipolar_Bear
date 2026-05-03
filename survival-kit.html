@@ -8,7 +8,7 @@
   <!-- Beta gate: must be first — fires before any render -->
   <style>body{background:linear-gradient(135deg,#ff9500 0%,#ff6b00 100%)}</style>
   <script>if(!window.Capacitor&&location.protocol!=='file:'&&localStorage.getItem('bbWebUnlocked')!=='true'){location.replace('beta.html');}
-  {const _np=window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()&&localStorage.getItem('bbNativePinEnabled')==='1';if((localStorage.getItem('bbGuestPinSalt')||_np)&&sessionStorage.getItem('bbPinUnlocked')!=='1'){location.replace('/');}}</script>
+  {const _np=window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()&&localStorage.getItem('bbNativePinEnabled')==='1';if((localStorage.getItem('bbGuestPinSalt')||_np)&&sessionStorage.getItem('bbPinUnlocked')!=='1'){location.replace('index.html');}}</script>
   <meta name="description" content="Your personal bipolar survival kit — mood scale, coping strategies, resources and community support.">
   <meta name="robots" content="noindex, nofollow">
 
@@ -1003,7 +1003,7 @@
   <div class="header">
     <div class="header-inner">
     <div style="display:flex; justify-content:flex-start; align-items:center; margin-bottom:12px;">
-      <a href="/index.html" onclick="event.preventDefault(); location.replace(location.protocol==='file:'?'index.html':'/')" class="home-link-btn">← Home</a>
+      <a href="index.html" onclick="event.preventDefault(); location.replace('index.html')" class="home-link-btn">← Home</a>
       <div style="margin-left:auto;position:relative;">
         <button id="skJournalNavBtn" onclick="_skGoToJournal()" title="Journal" style="background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.4);border-radius:50%;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;font-size:1.2em;cursor:pointer;line-height:1;-webkit-tap-highlight-color:transparent;flex-shrink:0;">📖</button>
       </div>
@@ -1030,7 +1030,7 @@
   <nav class="sticky-nav">
     <div class="sticky-nav-inner">
       <div class="sticky-nav-home">
-        <a href="index.html" onclick="event.preventDefault(); location.replace(location.protocol==='file:'?'index.html':'/')">🏠 Home</a>
+        <a href="index.html" onclick="event.preventDefault(); location.replace('index.html')">🏠 Home</a>
       </div>
       <div class="sticky-nav-row">
         <a href="#mood-scale">📊 </a>
@@ -4309,7 +4309,7 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
         _idleTimer = setTimeout(() => {
           sessionStorage.removeItem('bbPinUnlocked');
           sessionStorage.removeItem('bb_guest_key');
-          location.replace('/');
+          location.replace('index.html');
         }, 5 * 60 * 1000);
       }
       ['touchstart', 'mousedown', 'keydown', 'scroll'].forEach(ev =>
