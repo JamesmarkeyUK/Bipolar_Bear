@@ -449,6 +449,7 @@
           <div style="font-size:11px;color:var(--muted);margin-top:2px;">Your posts will look like this</div>
         </div>
       </div>
+      <div id="monika-error" style="display:none;margin-bottom:12px;padding:10px 14px;background:rgba(220,53,69,0.08);border:1.5px solid rgba(220,53,69,0.25);border-radius:10px;font-size:13px;color:#dc3545;line-height:1.45;"></div>
       <button id="monika-btn" class="btn-primary" disabled>That's me →</button>
     </div>
   </div>
@@ -1053,6 +1054,16 @@ function setupVerify() {
 // ─────────────────────────────────────────────────────────────────
 // SCREEN: Monika
 // ─────────────────────────────────────────────────────────────────
+async function isMonikaInUse(monika, ownMonika) {
+  if (!db) return false;
+  if (ownMonika && monika.toLowerCase() === ownMonika.toLowerCase()) return false;
+  const snap = await db.collection('bbAnonPosts')
+    .where('name', '==', monika)
+    .limit(1)
+    .get();
+  return !snap.empty;
+}
+
 function setupMonika() {
   const input   = document.getElementById('monika-input');
   const counter = document.getElementById('monika-counter');
@@ -1078,9 +1089,22 @@ function setupMonika() {
     }
   });
 
-  btn.addEventListener('click', () => {
+  btn.addEventListener('click', async () => {
     const monika = input.value.trim();
     if (monika.length < 2) return;
+    const errEl = document.getElementById('monika-error');
+    btn.disabled = true;
+    btn.textContent = 'Checking…';
+    try {
+      if (await isMonikaInUse(monika, null)) {
+        errEl.textContent  = 'That name is already taken — please choose another.';
+        errEl.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'That\'s me →';
+        return;
+      }
+    } catch (e) { /* network error — allow through */ }
+    errEl.style.display = 'none';
     localStorage.setItem('bbAnon_monika', monika);
     showScreen('meds');
     setupMeds();
@@ -1606,9 +1630,16 @@ document.getElementById('ms-save').addEventListener('click', async () => {
   const newMonika = document.getElementById('ms-monika').value.trim();
   if (newMonika.length < 2) { showHint('Monika must be at least 2 characters'); return; }
 
+  const oldMonika = profile.monika;
+  try {
+    if (await isMonikaInUse(newMonika, oldMonika)) {
+      showHint('That name is already taken');
+      return;
+    }
+  } catch (e) { /* network error — allow through */ }
+
   const newInit  = document.getElementById('ms-initials').value.toUpperCase().slice(0, 2);
   const selKey   = document.querySelector('#ms-colors .color-swatch.selected')?.dataset.key || profile.colorKey;
-  const oldMonika = profile.monika;
 
   localStorage.setItem('bbAnon_monika',   newMonika);
   localStorage.setItem('bbAnon_initials', newInit);
