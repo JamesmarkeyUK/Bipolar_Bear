@@ -1057,11 +1057,8 @@ function setupVerify() {
 async function isMonikaInUse(monika, ownMonika) {
   if (!db) return false;
   if (ownMonika && monika.toLowerCase() === ownMonika.toLowerCase()) return false;
-  const snap = await db.collection('bbAnonPosts')
-    .where('name', '==', monika)
-    .limit(1)
-    .get();
-  return !snap.empty;
+  const doc = await db.collection('bbAnonMonikas').doc(monika.toLowerCase()).get();
+  return doc.exists;
 }
 
 function setupMonika() {
@@ -1106,6 +1103,7 @@ function setupMonika() {
     } catch (e) { /* network error — allow through */ }
     errEl.style.display = 'none';
     localStorage.setItem('bbAnon_monika', monika);
+    if (db) db.collection('bbAnonMonikas').doc(monika.toLowerCase()).set({ monika, createdAt: firebase.firestore.FieldValue.serverTimestamp() }).catch(() => {});
     showScreen('meds');
     setupMeds();
   });
@@ -1661,6 +1659,10 @@ document.getElementById('ms-save').addEventListener('click', async () => {
         grad1:    col.g1,
         grad2:    col.g2,
       }));
+      if (oldMonika.toLowerCase() !== newMonika.toLowerCase()) {
+        batch.delete(db.collection('bbAnonMonikas').doc(oldMonika.toLowerCase()));
+        batch.set(db.collection('bbAnonMonikas').doc(newMonika.toLowerCase()), { monika: newMonika, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+      }
       await batch.commit();
     } catch (e) { console.warn('[Monika] update posts failed', e); }
   }
