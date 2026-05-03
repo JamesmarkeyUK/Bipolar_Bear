@@ -2,7 +2,7 @@
   "name": "BipolarBear Mood Tracker",
   "short_name": "BipolarBear",
   "description": "Track your bipolar mood, energy, sleep, and medication daily",
-  "start_url": "/index.html",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#ff9500",
   "theme_color": "#ff9500",

@@ -8,7 +8,7 @@
   <!-- Beta gate: must be first — fires before any render -->
   <style>body{background:linear-gradient(135deg,#ff9500 0%,#ff6b00 100%)}</style>
   <script>if(!window.Capacitor&&location.protocol!=='file:'&&localStorage.getItem('bbWebUnlocked')!=='true'){location.replace('beta.html');}
-  {const _np=window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()&&localStorage.getItem('bbNativePinEnabled')==='1';if((localStorage.getItem('bbGuestPinSalt')||_np)&&sessionStorage.getItem('bbPinUnlocked')!=='1'){location.replace('/');}}</script>
+  {const _np=window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()&&localStorage.getItem('bbNativePinEnabled')==='1';if((localStorage.getItem('bbGuestPinSalt')||_np)&&sessionStorage.getItem('bbPinUnlocked')!=='1'){location.replace('index.html');}}</script>
   <meta name="description" content="Checkin with the Bear. Track your bipolar mood, energy, sleep and medication daily with Bipolar Bear.">
   <meta name="robots" content="noindex, nofollow">
 
@@ -1601,7 +1601,7 @@
     <header>
       <div style="display:flex; justify-content:flex-start; align-items:center; margin-bottom:16px;">
         <div style="display:flex;flex-direction:column;align-items:flex-start;gap:0;">
-          <a id="homeLink" href="/" onclick="event.preventDefault(); _advanceOnboardingStep(4); location.replace(location.protocol==='file:'?'index.html':'/')" class="home-link-journal">← Home</a>
+          <a id="homeLink" href="index.html" onclick="event.preventDefault(); _advanceOnboardingStep(4); location.replace('index.html')" class="home-link-journal">← Home</a>
           <!-- Onboarding hint 3: step 2 — points up at home button -->
           <div id="journalHint3" style="display:none;flex-direction:column;align-items:flex-start;gap:2px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-top:2px;">
             <svg width="24" height="22" viewBox="0 0 24 22" fill="none" style="transform:rotate(0deg);">
@@ -5299,7 +5299,7 @@
         if (entries.length === 0) {
           // Encrypted entries exist but no key — redirect to index where the PIN prompt lives
           if (_lockedEntryCount > 0) {
-            location.replace('/');
+            location.replace('index.html');
             return;
           }
           document.getElementById('entries').innerHTML = '<div class="no-entries">No entries yet. Start tracking your mood today! 🌱</div>';
@@ -6590,7 +6590,7 @@
           sessionStorage.removeItem('bbPinUnlocked');
           sessionStorage.removeItem('bb_guest_key');
           _guestCryptoKey = null;
-          location.replace('/');
+          location.replace('index.html');
         }, 5 * 60 * 1000);
       }
       ['touchstart', 'mousedown', 'keydown', 'scroll'].forEach(ev =>
@@ -6607,7 +6607,7 @@
         _nativeIdleTimer = setTimeout(() => {
           sessionStorage.removeItem('bbPinUnlocked');
           _userCryptoKey = null;
-          location.replace('/');
+          location.replace('index.html');
         }, 5 * 60 * 1000);
       }
       ['touchstart', 'mousedown', 'keydown', 'scroll'].forEach(ev =>
@@ -11738,9 +11738,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
 
         alert(`Successfully deleted ${deleted} entries.`);
         if (typeof auth !== 'undefined' && auth && currentUser) {
-          auth.signOut().catch(() => {}).finally(() => location.replace(location.protocol==='file:'?'index.html':'/'));
+          auth.signOut().catch(() => {}).finally(() => location.replace('index.html'));
         } else {
-          location.replace(location.protocol==='file:'?'index.html':'/');
+          location.replace('index.html');
         }
       } catch (error) {
         console.error('Error deleting all entries:', error);
