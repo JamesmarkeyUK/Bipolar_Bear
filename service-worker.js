@@ -1,9 +1,9 @@
 const CACHE_NAME = 'bipolarbear-v2';
 const STATIC_ASSETS = [
-  '/index.html',
-  '/journal.html',
-  '/survival-kit.html',
-  '/icons/bipolarbear.png',
+  './index.html',
+  './journal.html',
+  './survival-kit.html',
+  './icons/bipolarbear.png',
 ];
 
 self.addEventListener('install', event => {
