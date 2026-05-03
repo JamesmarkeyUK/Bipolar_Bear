@@ -835,7 +835,8 @@
                     .limit(5)
                     .get()
                     .then(snap => {
-                      const _newCount = snap.docs.filter(d => !d.data().deleted).length;
+                      const _myMonika  = localStorage.getItem('bbAnon_monika') || '';
+                  const _newCount = snap.docs.filter(d => !d.data().deleted && (_myMonika ? d.data().name !== _myMonika : true)).length;
                       _badge.textContent   = _newCount > 0
                         ? '💬 ' + _newCount + ' new message' + (_newCount === 1 ? '' : 's')
                         : '✓ No new messages';

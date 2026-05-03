@@ -813,6 +813,9 @@ function boot() {
   if (profile.verified && profile.monika) {
     showScreen('board');
     initBoard();
+  } else if (profile.verified) {
+    showScreen('monika');
+    setupMonika();
   } else {
     showScreen('verify');
     setupVerify();
@@ -924,6 +927,7 @@ function setupVerify() {
   }
 
   async function doSend(email) {
+    if (profile.verified) return;
     clearError();
     sendBtn.disabled = true;
     const origText = sendBtn.textContent;
