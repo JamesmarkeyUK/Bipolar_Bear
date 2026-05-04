@@ -14,3 +14,10 @@ DOCS.pdf
 
 # Temp
 test_write.txt
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
