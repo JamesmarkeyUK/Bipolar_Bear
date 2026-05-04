@@ -975,7 +975,7 @@ function showScreen(id) {
   document.getElementById('screen-' + id).classList.add('active');
 }
 
-function boot(user) {
+async function boot(user) {
   const isReal = user && !user.isAnonymous;
   _bbUser = (isReal && user.emailVerified) ? user : null;
   _updateLogoCursor();
@@ -993,17 +993,8 @@ function boot(user) {
     } else {
       localStorage.removeItem('bbAnon_isAdmin');
     }
-    // Pull stable streak from BB App userSettings (computed by journal.html)
-    if (db) {
-      db.collection('userSettings').doc(user.uid).get().then(doc => {
-        if (doc.exists) {
-          const s = doc.data().stableStreak;
-          if (typeof s === 'number') {
-            localStorage.setItem('bbAnon_stableStreak', String(s));
-          }
-        }
-      }).catch(() => {});
-    }
+    // Restore full anon profile (monika, meds, stable, etc.) from userSettings
+    await _bbRestoreProfile(user.uid);
     if (profile.monika) {
       showScreen('board');
       initBoard();
@@ -1420,6 +1411,7 @@ function setupMonika() {
     errEl.style.display = 'none';
     localStorage.setItem('bbAnon_monika', monika);
     if (db) db.collection('bbAnonMonikas').doc(monika.toLowerCase()).set({ monika, createdAt: firebase.firestore.FieldValue.serverTimestamp() }).catch(() => {});
+    _bbSaveProfile(); // persist monika to userSettings for cross-device recovery
     showScreen('meds');
     setupMeds();
   });
@@ -1543,6 +1535,53 @@ async function _anonRestoreProfile(email) {
 }
 
 // ─────────────────────────────────────────────────────────────────
+// BB App user profile persistence (userSettings/{uid}.anonProfile)
+// ─────────────────────────────────────────────────────────────────
+
+// Restore monika + settings from userSettings into localStorage. Called on boot before screen routing.
+async function _bbRestoreProfile(uid) {
+  if (!db || !uid) return;
+  try {
+    const doc = await db.collection('userSettings').doc(uid).get();
+    if (!doc.exists) return;
+    const d = doc.data();
+    // Stable streak is computed by journal.html and stored flat
+    if (typeof d.stableStreak === 'number') {
+      localStorage.setItem('bbAnon_stableStreak', String(d.stableStreak));
+    }
+    // Anon board profile is nested under anonProfile
+    const ap = d.anonProfile || {};
+    if (ap.monika)                   localStorage.setItem('bbAnon_monika',      ap.monika);
+    if (ap.colorKey)                 localStorage.setItem('bbAnon_colorKey',    ap.colorKey);
+    if (ap.customInit !== undefined) localStorage.setItem('bbAnon_initials',    ap.customInit || '');
+    if (ap.showMeds   !== undefined) localStorage.setItem('bbAnon_showMeds',    ap.showMeds   ? 'true' : 'false');
+    if (ap.showStable !== undefined) localStorage.setItem('bbAnon_showStable',  ap.showStable ? 'true' : 'false');
+    if (ap.stableSince)              localStorage.setItem('bbAnon_stableSince', ap.stableSince);
+    const medList = ap.medList && ap.medList.length ? ap.medList : (d.currentMedList || []);
+    if (medList.length) {
+      localStorage.setItem('bbAnon_medList', JSON.stringify(medList));
+      localStorage.setItem('bbAnon_med', medList.map(m => m.name).filter(Boolean).join(', '));
+    }
+  } catch(e) { console.warn('[BB] _bbRestoreProfile failed', e); }
+}
+
+// Save current anon board profile into userSettings/{uid}.anonProfile
+function _bbSaveProfile() {
+  if (!_bbUser || !db) return;
+  db.collection('userSettings').doc(_bbUser.uid).set({
+    anonProfile: {
+      monika:     profile.monika     || null,
+      colorKey:   profile.colorKey   || 'orange',
+      customInit: profile.customInit || '',
+      showMeds:   profile.showMeds,
+      medList:    _anonGetMedList(),
+      showStable: profile.showStable,
+      stableSince: profile.stableSince || null,
+    }
+  }, { merge: true }).catch(e => console.warn('[BB] _bbSaveProfile failed', e));
+}
+
+// ─────────────────────────────────────────────────────────────────
 // SCREEN: Medication entry (onboarding + editing from settings)
 // ─────────────────────────────────────────────────────────────────
 function setupMedDefine(onDone) {
@@ -1656,7 +1695,7 @@ function openMedSettings() {
   document.getElementById('med-ov-save').onclick = async () => {
     localStorage.setItem('bbAnon_showMeds', showMeds ? 'true' : 'false');
     await _anonSaveMedList(medList);
-    _anonSaveProfile();
+    _anonSaveProfile(); _bbSaveProfile();
     closeOv('ov-med');
     showHint('Medication updated ✓');
   };
@@ -1676,7 +1715,7 @@ function initBoard() {
   setupOverlayActions();
   setTab('general');
   cleanOldPosts();
-  _anonSaveProfile(); // persist standalone profile to Firestore (no-op for BB users)
+  _anonSaveProfile(); _bbSaveProfile(); // persist profile to Firestore
 }
 
 function renderUserPill() {
@@ -2094,7 +2133,7 @@ function openStableSettings() {
       }
     }
 
-    _anonSaveProfile();
+    _anonSaveProfile(); _bbSaveProfile();
     closeOv('ov-stable');
     renderUserPill();
   };
@@ -2308,7 +2347,7 @@ document.getElementById('ms-save').addEventListener('click', async () => {
       await batch.commit();
     } catch (e) { console.warn('[Monika] update posts failed', e); }
   }
-  _anonSaveProfile();
+  _anonSaveProfile(); _bbSaveProfile();
 });
 
 // ─────────────────────────────────────────────────────────────────
