@@ -1727,7 +1727,7 @@ function renderPost(p) {
     </div>
     <div class="post-text">${esc(p.text)}</div>
     <div class="post-actions">
-      <button class="like-btn ${liked ? 'liked' : ''}" data-id="${esc(p.id)}" data-likes="${likes}">
+      <button class="like-btn ${liked ? 'liked' : ''}" data-id="${esc(p.id)}" data-likes="${likes}" data-author="${esc(p.name)}"${p.name === profile.monika ? ' data-self="true" style="opacity:0.35;cursor:default;" title="You cannot like your own post"' : ''}>
         💛 <span>${likes}</span>
       </button>
       <div style="flex:1"></div>
@@ -1747,6 +1747,12 @@ function handleLike(btn) {
   const span   = btn.querySelector('span');
   const liked  = likedPosts.has(id);
   const count  = parseInt(btn.dataset.likes, 10) || 0;
+
+  // Block self-likes (allow un-liking if somehow previously liked, to clean up)
+  if (!liked && btn.dataset.author === profile.monika) {
+    showHint("You can't like your own post 😊");
+    return;
+  }
 
   if (liked) {
     likedPosts.delete(id);
