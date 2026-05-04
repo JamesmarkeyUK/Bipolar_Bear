@@ -955,6 +955,10 @@
             if (d.copingStrategies !== undefined) localStorage.setItem('copingStrategies', JSON.stringify(d.copingStrategies));
             if (d.currentMedList  !== undefined) localStorage.setItem('currentMedList',  JSON.stringify(d.currentMedList));
             if (d.dailyGoals      !== undefined) localStorage.setItem('dailyGoals',      JSON.stringify(d.dailyGoals));
+            if (d.stableStreak    !== undefined) {
+              localStorage.setItem('bbStableStreak', String(d.stableStreak || 0));
+              _updateStreakBadge(); // refresh badge now that we have the latest value
+            }
             // Re-run the survival tick check now that localStorage is populated
             const sTick = document.getElementById('survivalTick');
             if (sTick) {
@@ -1302,13 +1306,52 @@
     updateOnlineStatus();
 
     // Streak badge under journal button
-    (function() {
-      const streak = parseInt(localStorage.getItem('bbCurrentStreak') || '0', 10);
+    function _updateStreakBadge() {
+      const streak = parseInt(localStorage.getItem('bbCurrentStreak')  || '0', 10);
+      const stable = parseInt(localStorage.getItem('bbStableStreak')   || '0', 10);
       const badge  = document.getElementById('journalStreakBadge');
-      if (badge && streak > 0) {
-        badge.textContent  = '🔥 ' + streak + ' day' + (streak === 1 ? '' : 's');
-        badge.style.display = 'block';
+      if (!badge) return;
+      if (streak > 0) {
+        const streakPart  = `🔥 ${streak} day${streak === 1 ? '' : 's'}`;
+        const stablePart  = stable > 0 ? ` &nbsp;🧘 ${stable}d` : '';
+        badge.innerHTML   = streakPart + stablePart;
+        badge.style.display  = 'block';
+        badge.style.cursor   = streak > 0 ? 'pointer' : '';
       }
+    }
+    _updateStreakBadge();
+
+    // Tap badge → explain both counters
+    (function() {
+      const badge = document.getElementById('journalStreakBadge');
+      if (!badge) return;
+
+      // Build tooltip card once
+      const tip = document.createElement('div');
+      tip.id = 'streakTooltip';
+      Object.assign(tip.style, {
+        display: 'none', position: 'absolute', zIndex: '999',
+        background: '#fff', borderRadius: '14px', padding: '14px 16px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.18)', fontSize: '13px',
+        lineHeight: '1.6', color: '#1C1004', maxWidth: '260px',
+        left: '50%', transform: 'translateX(-50%)', marginTop: '8px',
+        textAlign: 'left',
+      });
+      tip.innerHTML =
+        '<div style="font-weight:800;margin-bottom:8px;">Your counters</div>' +
+        '<div style="margin-bottom:8px;">🔥 <strong>Streak</strong> — consecutive days you\'ve logged your mood. Resets if you miss a day.</div>' +
+        '<div>🧘 <strong>Stability</strong> — consecutive days you\'ve logged your mood as <em>Stable</em>, counted back from your most recent entry. Resets when any other mood is logged.</div>';
+
+      // Insert after badge
+      badge.style.position = 'relative';
+      badge.parentNode.insertBefore(tip, badge.nextSibling);
+
+      badge.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const show = tip.style.display === 'none';
+        tip.style.display = show ? 'block' : 'none';
+      });
+      document.addEventListener('click', function() { tip.style.display = 'none'; });
     })();
 
     function logout() {
