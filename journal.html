@@ -14629,11 +14629,13 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         const _targetDate = _dateVal ? new Date(_dateVal + 'T12:00:00') : new Date();
         _targetDate.setHours(0, 0, 0, 0);
 
-        // Query window: noon the day before target → noon of target day.
-        // The plugin now respects these dates via the patched Swift code, so
-        // last night's sleep (starts ~11pm target day) is excluded by .strictEndDate.
+        // Query window: noon the day before target → noon the day AFTER target.
+        // The extra day on the upper end means the plugin's "latest sample" behaviour
+        // works correctly for both "log today" and "log yesterday": in both cases the
+        // most recent sleep (last night) starts after entry-date noon but before
+        // (entry-date + 1) noon, so the guard below accepts it.
         const _sleepStart = new Date(_targetDate.getTime()); _sleepStart.setHours(-12, 0, 0, 0);
-        const _sleepEnd   = new Date(_targetDate.getTime()); _sleepEnd.setHours(12, 0, 0, 0);
+        const _sleepEnd   = new Date(_targetDate.getTime()); _sleepEnd.setHours(36, 0, 0, 0); // noon next day
 
         const result = await Health.queryLatestSample({
           dataType: 'sleep',
@@ -14643,8 +14645,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         if (!result || result.value == null) { showNoData(); return; }
 
         // Guard: reject samples that fall entirely outside the query window.
-        // The plugin sometimes ignores date filters and returns the most recent sample
-        // regardless — e.g. returning last night's sleep when querying for the night before.
+        // Only fires for entries more than ~2 days old where the plugin still returns
+        // the most recent sleep rather than one matching the requested window.
         if (result.endTimestamp <= _sleepStart.getTime() || result.timestamp >= _sleepEnd.getTime()) {
           showNoData(); return;
         }
