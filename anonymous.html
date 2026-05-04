@@ -415,7 +415,7 @@
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <div id="screen-verify" class="screen active">
   <div class="onboard-bg">
-    <button class="board-back-btn" onclick="_goHome()" style="align-self:flex-start;margin-bottom:20px;">← Home</button>
+    <button id="verify-back-btn" class="board-back-btn" onclick="_goHome()" style="display:none;align-self:flex-start;margin-bottom:20px;">← Home</button>
     <div class="onboard-logo">
       <img src="icons/AppIcon.png" alt="Bipolar Bear">
       <h1>BipolarBear</h1>
@@ -532,7 +532,7 @@
 
   <div class="board-header">
     <div class="board-header-top">
-      <button class="board-logo" onclick="_goHome()" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:12px;display:flex;align-items:center;gap:10px;transition:background 0.15s;" onmouseenter="this.style.background='rgba(255,255,255,0.15)'" onmouseleave="this.style.background='none'" title="Back to Bipolar Bear">
+      <button class="board-logo" onclick="_bbUser && _goHome()" style="background:none;border:none;padding:4px;border-radius:12px;display:flex;align-items:center;gap:10px;transition:background 0.15s;" onmouseenter="if(_bbUser)this.style.background='rgba(255,255,255,0.15)'" onmouseleave="this.style.background='none'" title="" id="board-logo-btn">
         <img src="icons/AppIcon.png" alt="">
         <div>
           <div class="board-logo-name">Anonymous</div>
@@ -977,6 +977,10 @@ function showScreen(id) {
 function boot(user) {
   const isReal = user && !user.isAnonymous;
   _bbUser = (isReal && user.emailVerified) ? user : null;
+  _updateLogoCursor();
+  // Show "← Home" on verify screen only for BB App users (Firebase Auth)
+  const backBtn = document.getElementById('verify-back-btn');
+  if (backBtn) backBtn.style.display = isReal ? '' : 'none';
 
   if (isReal && user.emailVerified) {
     // Signed in to BipolarBear with verified email — skip code verification
@@ -1102,8 +1106,21 @@ document.getElementById('about-close').addEventListener('click', () => closeOv('
 // _goHome() is called from inline onclick attributes on onboarding screens
 // and the board logo. Navigates appropriately for the current domain.
 function _goHome() {
-  if (_isAnonDomain) { location.href = 'https://bipolarbear.app'; }
-  else               { location.replace('index.html'); }
+  if (_bbUser) { location.href = 'https://bipolarbear.app'; }
+  else if (!_isAnonDomain) { location.replace('index.html'); }
+  // standalone users on anon domain: do nothing
+}
+
+function _updateLogoCursor() {
+  const btn = document.getElementById('board-logo-btn');
+  if (!btn) return;
+  if (_bbUser) {
+    btn.style.cursor = 'pointer';
+    btn.title = 'Back to Bipolar Bear';
+  } else {
+    btn.style.cursor = 'default';
+    btn.title = '';
+  }
 }
 
 // Close on backdrop tap
