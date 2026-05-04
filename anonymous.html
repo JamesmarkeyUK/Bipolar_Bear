@@ -415,7 +415,7 @@
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <div id="screen-verify" class="screen active">
   <div class="onboard-bg">
-    <button class="board-back-btn" onclick="location.replace('index.html')" style="align-self:flex-start;margin-bottom:20px;">← Home</button>
+    <button class="board-back-btn" onclick="_goHome()" style="align-self:flex-start;margin-bottom:20px;">← Home</button>
     <div class="onboard-logo">
       <img src="icons/AppIcon.png" alt="Bipolar Bear">
       <h1>BipolarBear</h1>
@@ -532,7 +532,7 @@
 
   <div class="board-header">
     <div class="board-header-top">
-      <button class="board-logo" onclick="location.replace('index.html')" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:12px;display:flex;align-items:center;gap:10px;transition:background 0.15s;" onmouseenter="this.style.background='rgba(255,255,255,0.15)'" onmouseleave="this.style.background='none'" title="Back to Bipolar Bear">
+      <button class="board-logo" onclick="_goHome()" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:12px;display:flex;align-items:center;gap:10px;transition:background 0.15s;" onmouseenter="this.style.background='rgba(255,255,255,0.15)'" onmouseleave="this.style.background='none'" title="Back to Bipolar Bear">
         <img src="icons/AppIcon.png" alt="">
         <div>
           <div class="board-logo-name">Anonymous</div>
@@ -748,6 +748,43 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- OVERLAY: About Bipolar Anonymous                               -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="ov-about" class="overlay hidden">
+  <div class="sheet" style="text-align:left;">
+    <div style="text-align:center;margin-bottom:18px;">
+      <img src="icons/AppIcon.png" alt="BipolarBear" style="width:60px;height:60px;border-radius:14px;box-shadow:0 4px 16px rgba(0,0,0,0.15);margin-bottom:10px;">
+      <div style="font-size:18px;font-weight:800;color:var(--dark);">Bipolar Anonymous</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:3px;">A safe space for people living with bipolar</div>
+    </div>
+
+    <p style="font-size:13px;color:var(--dark);line-height:1.65;margin-bottom:16px;">
+      This is an anonymous peer community for people living with bipolar disorder. You join with a chosen name — your real identity is never stored or shared.
+    </p>
+
+    <div style="background:var(--orange-bg);border-radius:12px;padding:14px 16px;margin-bottom:18px;">
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Community guidelines</div>
+      <div style="font-size:13px;color:var(--dark);line-height:1.8;">
+        💛 &nbsp;Be kind — everyone here is doing their best<br>
+        🔒 &nbsp;Respect others' privacy — don't share personal details<br>
+        🆘 &nbsp;Use the SOS flag if you're genuinely worried about someone<br>
+        🚨 &nbsp;Report posts that break the rules — we review everything
+      </div>
+    </div>
+
+    <div style="border-top:1px solid #f0f0f0;padding-top:16px;margin-bottom:16px;">
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Powered by BipolarBear</div>
+      <p style="font-size:13px;color:var(--dark);line-height:1.6;margin-bottom:12px;">
+        BipolarBear is a free mood journal and survival kit for people with bipolar disorder — track mood, energy, sleep and medication daily.
+      </p>
+      <a href="https://bipolarbear.app" target="_blank" rel="noopener" style="display:block;background:var(--orange);color:#fff;font-weight:700;font-size:13px;border-radius:10px;padding:11px;text-align:center;text-decoration:none;text-shadow:0 1px 2px rgba(0,0,0,0.2);">🐻 Discover BipolarBear →</a>
+    </div>
+
+    <button id="about-close" class="btn-secondary" style="width:100%;">Close</button>
+  </div>
+</div>
+
   </div><!-- /#app-shell -->
   <div class="home-indicator"></div>
 </div><!-- /#iphone-frame -->
@@ -773,6 +810,7 @@ const ORANGE      = '#ff9500';
 const ORANGE_DARK = '#e07800';
 const ORANGE_LT   = '#ffb340';
 const ADMIN_EMAIL = 'inbox@jamesmarkey.co.uk';
+const _isAnonDomain = ['bipolaranonymous.app','www.bipolaranonymous.app'].includes(location.hostname);
 
 const COLOR_PRESETS = [
   { key: 'orange', g1: '#ffb340', g2: '#e07800' },
@@ -974,8 +1012,21 @@ function showEmailVerificationRequired(user) {
 function openOv(id)  { document.getElementById(id).classList.remove('hidden'); }
 function closeOv(id) { document.getElementById(id).classList.add('hidden'); }
 
+// ─────────────────────────────────────────────────────────────────
+// About overlay + home navigation helper
+// ─────────────────────────────────────────────────────────────────
+function openAbout() { openOv('ov-about'); }
+document.getElementById('about-close').addEventListener('click', () => closeOv('ov-about'));
+
+// _goHome() is called from inline onclick attributes on onboarding screens
+// and the board logo. Navigates appropriately for the current domain.
+function _goHome() {
+  if (_isAnonDomain) { location.href = 'https://bipolarbear.app'; }
+  else               { location.replace('index.html'); }
+}
+
 // Close on backdrop tap
-['ov-compose','ov-firstpost','ov-sos','ov-report','ov-e2ee','ov-monika','ov-self-delete','ov-admin-delete','ov-med'].forEach(id => {
+['ov-compose','ov-firstpost','ov-sos','ov-report','ov-e2ee','ov-monika','ov-self-delete','ov-admin-delete','ov-med','ov-about'].forEach(id => {
   document.getElementById(id).addEventListener('click', e => {
     if (e.target === document.getElementById(id)) closeOv(id);
   });
@@ -1751,7 +1802,15 @@ function setupFAB() {
     setTimeout(() => document.getElementById('compose-ta').focus(), 50);
   });
   document.getElementById('fab-e2ee').addEventListener('click', () => openOv('ov-e2ee'));
-  document.getElementById('fab-home').addEventListener('click', () => { location.href = 'index.html'; });
+
+  const fabHome = document.getElementById('fab-home');
+  if (_isAnonDomain) {
+    fabHome.textContent = 'ℹ️';
+    fabHome.title = 'About Bipolar Anonymous';
+    fabHome.addEventListener('click', openAbout);
+  } else {
+    fabHome.addEventListener('click', () => { location.href = 'index.html'; });
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -1954,7 +2013,11 @@ function openMonikaSettings() {
 }
 
 document.getElementById('ms-cancel').addEventListener('click', () => closeOv('ov-monika'));
-document.getElementById('ms-home').addEventListener('click', () => { location.href = 'index.html'; });
+const _msHomeBtn = document.getElementById('ms-home');
+_msHomeBtn.textContent = _isAnonDomain ? '🐻 Discover BipolarBear →' : '← Back to Bipolar Bear';
+_msHomeBtn.addEventListener('click', () => {
+  location.href = _isAnonDomain ? 'https://bipolarbear.app' : 'index.html';
+});
 document.getElementById('ms-med-btn').addEventListener('click', openMedSettings);
 
 document.getElementById('ms-save').addEventListener('click', async () => {
