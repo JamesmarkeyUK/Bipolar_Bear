@@ -1819,7 +1819,7 @@ function setupFAB() {
   });
   document.getElementById('fab-compose').addEventListener('click', () => {
     const latest = getLatestRealPost(currentTab);
-    if (latest && latest.name === profile.monika && (latest.likes || 0) === 0) {
+    if (!profile.isAdmin && latest && latest.name === profile.monika && (latest.likes || 0) === 0) {
       showHint('Please wait until someone else reacts to your message or posts another one.');
       return;
     }
