@@ -931,6 +931,12 @@ function boot(user) {
 
   if (isReal && user.emailVerified) {
     // Signed in to BipolarBear with verified email — skip code verification
+    // Set/clear admin flag based on Firebase Auth email
+    if (user.email && user.email.toLowerCase() === ADMIN_EMAIL) {
+      localStorage.setItem('bbAnon_isAdmin', 'true');
+    } else {
+      localStorage.removeItem('bbAnon_isAdmin');
+    }
     if (profile.monika) {
       showScreen('board');
       initBoard();
