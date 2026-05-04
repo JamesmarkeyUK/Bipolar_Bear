@@ -29,11 +29,24 @@
 | **PDF export** | jsPDF (client-side, no server) |
 | **Notifications** | Capacitor Local Notifications |
 | **PWA** | Web App Manifest + service worker (offline-capable) |
-| **Hosting** | Static files served from repository (GitHub Pages / ProtonDrive) |
+| **Hosting** | **Cloudflare Pages** — auto-deploys from GitHub on every push to `main` |
+| **Domains** | `bipolarbear.app` (main app) · `bipolaranonymous.app` (alias — serves identical content) |
 
 ### Why no framework?
 
 The app runs inside a Capacitor WebView where bundle size, cold start time and network access matter. A single self-contained HTML file loads instantly from disk, requires no bundler, and avoids the complexity of a SPA router operating inside a native shell.
+
+### Hosting — Cloudflare Pages
+
+The app is hosted on **Cloudflare Pages**, connected directly to the GitHub repository. Every push to `main` triggers an automatic deployment — no manual upload needed.
+
+Both custom domains are configured in the Cloudflare Pages project:
+- `bipolarbear.app` — main app
+- `bipolaranonymous.app` — alias domain serving identical content (URL bar stays as-is)
+
+Both domains have their nameservers pointed at Cloudflare (configured in Namecheap). Both are listed as **Authorised Domains** in Firebase Console → Authentication → Settings, which is required for Firebase Auth sign-in to work from either domain.
+
+The native iOS/Android app (Capacitor) is unaffected by domains — it loads all files locally from the device.
 
 ### Local development
 

@@ -1,5 +1,10 @@
 # BipolarBear Changelog
 
+## v0.96
+- 🌐 Hosting migrated from GitHub Pages to **Cloudflare Pages** — auto-deploys from GitHub on every push to `main`
+- 🌐 `bipolaranonymous.app` added as alias domain — serves identical content to `bipolarbear.app`, URL bar stays as the visited domain; nameservers managed via Namecheap → Cloudflare
+- 🔐 `bipolaranonymous.app` added to Firebase Auth authorised domains so sign-in works from both domains
+
 ## v0.95
 - 🎨 App background gradient softened from saturated orange (`#ff9500 → #ff6b00`) to a warmer amber (`#ffaa33 → #ff8833`) across all pages — easier on the eyes
 
