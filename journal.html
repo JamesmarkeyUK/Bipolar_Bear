@@ -3900,6 +3900,7 @@
     let _monthCalOffset = 0; // 0 = current month, -1 = previous month, etc.
     let _monthCalEntries = []; // cached entries for month calendar navigation
     let _isRetry = false; // true when loadEntries is being retried after a timeout
+    let _loadInProgress = false; // guard against concurrent loadEntries() calls
     let _justLoggedIn = false; // true on first loadEntries after account login — used to set/suppress hints
     let statsStartDate = localStorage.getItem('statsStartDate') || null; // null = from first entry
 
@@ -5186,6 +5187,10 @@
     }
 
     async function loadEntries() {
+      // Guard: prevent concurrent calls (e.g. background refresh triggering a second
+      // load while the first is still decrypting entries, or onAuthStateChanged firing twice)
+      if (_loadInProgress) return;
+      _loadInProgress = true;
       // Cancel the global safety net — normal load path has started
       if (window._gJournalSafetyTimer) { clearTimeout(window._gJournalSafetyTimer); window._gJournalSafetyTimer = null; }
       const loader = document.getElementById('entriesLoading');
@@ -5223,11 +5228,13 @@
           // Longer timeout on post-failure reload since Firestore may still be re-initialising.
           const cacheTimeout = isPostFailureReload ? 4000 : 1000;
           let usedCache = false;
+          let _cacheDocCount = 0; // raw Firestore doc count from cache (before decryption)
           try {
             const cached = await Promise.race([
               db.collection('entries').where('userId', '==', currentUser.uid).get({ source: 'cache' }),
               new Promise((_, rej) => setTimeout(() => rej(new Error('cache-timeout')), cacheTimeout))
             ]);
+            _cacheDocCount = cached.size; // save before decoding — decoded count may be lower if any entry fails
             await _pushDecoded(cached);
             usedCache = entries.length > 0;
           } catch(e) { /* no cache yet, or timed out — fall through to server fetch */ }
@@ -5241,13 +5248,14 @@
             ]);
             await _pushDecoded(snapshot);
           } else {
-            // Had cache — silently refresh from server in background
+            // Had cache — silently refresh from server in background.
+            // Compare raw doc counts (not decoded entry counts) to avoid a false-mismatch
+            // when some entries fail decryption — which would cause an infinite reload loop.
             db.collection('entries')
               .where('userId', '==', currentUser.uid)
               .get({ source: 'server' })
               .then(snap => {
-                // Background check: if server has different count, do a full reload
-                if (snap.size !== entries.length) loadEntries();
+                if (snap.size !== _cacheDocCount) loadEntries();
               })
               .catch(() => {});
           }
@@ -5501,6 +5509,7 @@
       } finally {
         clearTimeout(_loadSafetyTimer);
         _isRetry = false;
+        _loadInProgress = false;
         const loader = document.getElementById('entriesLoading');
         if (loader) loader.style.display = 'none';
         const placeholder = document.getElementById('entryLoadingPlaceholder');
