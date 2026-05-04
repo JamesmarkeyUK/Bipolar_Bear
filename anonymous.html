@@ -51,6 +51,8 @@
       display: flex;
       flex-direction: column;
       background: var(--yellow);
+      opacity: 0;
+      transition: opacity 0.15s;
     }
 
     /* ── Desktop: iPhone 15 Pro style frame ── */
@@ -414,7 +416,7 @@
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <!-- SCREEN: Verify email                                           -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
-<div id="screen-verify" class="screen active">
+<div id="screen-verify" class="screen">
   <div class="onboard-bg">
     <button id="verify-back-btn" class="board-back-btn" onclick="_goHome()" style="display:none;align-self:flex-start;margin-bottom:20px;">← Home</button>
     <div class="onboard-logo">
@@ -974,6 +976,7 @@ if (typeof firebase !== 'undefined') {
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
+  document.getElementById('app-shell').style.opacity = '1';
 }
 
 async function boot(user) {
@@ -2405,9 +2408,9 @@ document.getElementById('ms-save').addEventListener('click', async () => {
 });
 
 // ─────────────────────────────────────────────────────────────────
-// Boot
+// Boot — driven by onAuthStateChanged; fallback if Firebase blocked
 // ─────────────────────────────────────────────────────────────────
-boot();
+setTimeout(() => { if (!_anonInitialBoot) boot(null); }, 2500);
 </script>
 </body>
 </html>
