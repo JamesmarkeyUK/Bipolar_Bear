@@ -5331,6 +5331,7 @@
         entries.sort((a, b) => b.timestamp - a.timestamp);
         _allEntries = entries;
         _updateMedBtn();
+        _syncStableStreak(entries);
 
         // On first load after login: returning users with entries get step migrated to 10 (all done)
         if (_justLoggedIn) {
@@ -11961,6 +11962,46 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
           { currentMedList: list }, { merge: true }
         ).catch(() => {});
       }
+    }
+
+    // Compute consecutive stable days from the most recent entry backwards
+    // and persist to userSettings so the Anonymous board can read it.
+    function _syncStableStreak(entries) {
+      if (!currentUser || !db || !entries.length) return;
+
+      // Build date → mood map (normalise date to YYYY-MM-DD)
+      const moodByDate = {};
+      entries.forEach(e => {
+        if (!e.date || !e.mood) return;
+        const key = String(e.date).slice(0, 10); // handles both "2026-05-04" and timestamp strings
+        moodByDate[key] = e.mood;
+      });
+
+      // Walk back from the most recent entry date
+      const sorted = [...entries]
+        .filter(e => e.date)
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
+      if (!sorted.length) return;
+
+      let streak = 0;
+      let startDate = null;
+      const cur = new Date(sorted[0].date);
+      cur.setHours(0, 0, 0, 0);
+
+      while (true) {
+        const key = cur.toISOString().slice(0, 10);
+        const mood = moodByDate[key];
+        // 'good' is the legacy value for Stable
+        if (!mood || (mood !== 'stable' && mood !== 'good')) break;
+        streak++;
+        startDate = key;
+        cur.setDate(cur.getDate() - 1);
+      }
+
+      // Fire-and-forget write — only update if value changed to avoid unnecessary writes
+      db.collection('userSettings').doc(currentUser.uid)
+        .set({ stableStreak: streak, stableStreakStart: startDate }, { merge: true })
+        .catch(e => console.warn('[BB] stableStreak sync failed', e));
     }
 
     function addMedication() {

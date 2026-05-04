@@ -667,11 +667,21 @@
     </div>
 
     <!-- Medication quick-access -->
-    <button id="ms-med-btn" style="width:100%;text-align:left;background:var(--orange-bg);border:1.5px solid rgba(255,149,0,0.18);border-radius:12px;padding:11px 14px;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-family:inherit;">
+    <button id="ms-med-btn" style="width:100%;text-align:left;background:var(--orange-bg);border:1.5px solid rgba(255,149,0,0.18);border-radius:12px;padding:11px 14px;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;gap:10px;font-family:inherit;">
       <span style="font-size:20px;">💊</span>
       <div style="flex:1;">
         <div style="font-size:13px;font-weight:700;color:var(--dark);">Medication</div>
         <div id="ms-med-status" style="font-size:11px;color:var(--muted);margin-top:1px;">Loading…</div>
+      </div>
+      <span style="color:var(--muted);font-size:16px;font-weight:300;">›</span>
+    </button>
+
+    <!-- Stability counter quick-access -->
+    <button id="ms-stable-btn" style="width:100%;text-align:left;background:var(--orange-bg);border:1.5px solid rgba(255,149,0,0.18);border-radius:12px;padding:11px 14px;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-family:inherit;">
+      <span style="font-size:20px;">🧘</span>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:700;color:var(--dark);">Stability Counter</div>
+        <div id="ms-stable-status" style="font-size:11px;color:var(--muted);margin-top:1px;">Loading…</div>
       </div>
       <span style="color:var(--muted);font-size:16px;font-weight:300;">›</span>
     </button>
@@ -714,6 +724,42 @@
     <div class="btn-row">
       <button class="btn-secondary" id="med-ov-cancel" style="flex:1;">Cancel</button>
       <button class="btn-primary"   id="med-ov-save"   style="flex:2;">Save ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- OVERLAY: Stability counter settings                             -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="ov-stable" class="overlay hidden">
+  <div class="sheet">
+    <div class="sheet-icon">🧘</div>
+    <div class="sheet-title">Stability Counter</div>
+
+    <span class="sheet-label">Visibility on posts</span>
+    <div style="display:flex;gap:8px;margin-bottom:18px;">
+      <button id="stable-ov-show" class="med-toggle-btn">✅ Show on posts</button>
+      <button id="stable-ov-hide" class="med-toggle-btn">🔒 Private</button>
+    </div>
+
+    <!-- BB App users: streak computed automatically from journal -->
+    <div id="stable-ov-bb-section" style="display:none;">
+      <div style="background:var(--orange-bg);border-radius:10px;padding:12px 14px;margin-bottom:14px;line-height:1.6;">
+        <div style="font-size:13px;font-weight:700;color:var(--dark);margin-bottom:4px;">🧘 <span id="stable-ov-bb-count">0</span> consecutive stable days</div>
+        <div style="font-size:12px;color:var(--muted);">Automatically calculated from your BipolarBear journal — consecutive days where you logged Stable mood up to your most recent entry.</div>
+      </div>
+    </div>
+
+    <!-- Standalone users: manual "stable since" date -->
+    <div id="stable-ov-manual-section" style="display:none;">
+      <span class="sheet-label">Stable since</span>
+      <input id="stable-ov-date" type="date" class="bb-input" style="margin-bottom:6px;">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">Enter the date your current stable period started. Your counter will show days since that date.</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-secondary" id="stable-ov-cancel" style="flex:1;">Cancel</button>
+      <button class="btn-primary"   id="stable-ov-save"   style="flex:2;">Save ✓</button>
     </div>
   </div>
 </div>
@@ -835,7 +881,10 @@ let _bbUser         = null; // Firebase-auth verified user (BB App path)
 const profile = {
   get monika()      { return localStorage.getItem('bbAnon_monika')    || ''; },
   get verified()    { return localStorage.getItem('bbAnon_verified')  === 'true'; },
-  get showMeds()    { return localStorage.getItem('bbAnon_showMeds')  === 'true'; },
+  get showMeds()    { return localStorage.getItem('bbAnon_showMeds')    === 'true'; },
+  get showStable()  { return localStorage.getItem('bbAnon_showStable') === 'true'; },
+  get stableStreak(){ return parseInt(localStorage.getItem('bbAnon_stableStreak') || '0', 10); },
+  get stableSince() { return localStorage.getItem('bbAnon_stableSince') || ''; }, // standalone: YYYY-MM-DD
   get med()         { return localStorage.getItem('bbAnon_med')       || ''; },
   get medList()     {
     try {
@@ -936,6 +985,17 @@ function boot(user) {
       localStorage.setItem('bbAnon_isAdmin', 'true');
     } else {
       localStorage.removeItem('bbAnon_isAdmin');
+    }
+    // Pull stable streak from BB App userSettings (computed by journal.html)
+    if (db) {
+      db.collection('userSettings').doc(user.uid).get().then(doc => {
+        if (doc.exists) {
+          const s = doc.data().stableStreak;
+          if (typeof s === 'number') {
+            localStorage.setItem('bbAnon_stableStreak', String(s));
+          }
+        }
+      }).catch(() => {});
     }
     if (profile.monika) {
       showScreen('board');
@@ -1047,7 +1107,7 @@ function _goHome() {
 }
 
 // Close on backdrop tap
-['ov-compose','ov-firstpost','ov-sos','ov-report','ov-e2ee','ov-monika','ov-self-delete','ov-admin-delete','ov-med','ov-about'].forEach(id => {
+['ov-compose','ov-firstpost','ov-sos','ov-report','ov-e2ee','ov-monika','ov-self-delete','ov-admin-delete','ov-med','ov-stable','ov-about'].forEach(id => {
   document.getElementById(id).addEventListener('click', e => {
     if (e.target === document.getElementById(id)) closeOv(id);
   });
@@ -1541,6 +1601,7 @@ function renderUserPill() {
       ${profile.isAdmin ? '<span style="background:rgba(0,0,0,0.55);color:#fff;font-size:9px;font-weight:800;border-radius:4px;padding:1px 5px;">ADMIN</span>' : ''}
       <span>🔥</span>
       <span style="font-size:11px;color:rgba(255,255,255,0.8);">${s}d</span>
+      ${profile.showStable && profile.stableStreak > 0 ? `<span>🧘</span><span style="font-size:11px;color:rgba(255,255,255,0.8);">${profile.stableStreak}d</span>` : ''}
     </div>`;
 }
 
@@ -1724,9 +1785,10 @@ function renderPost(p) {
   if (p.deleted) {
     return `<div class="post-card"><div class="post-deleted">🛡️ This post was deleted by an admin</div></div>`;
   }
-  const liked   = likedPosts.has(p.id);
-  const likes   = p.likes || 0;
-  const showMed = profile.showMeds && p.med;
+  const liked      = likedPosts.has(p.id);
+  const likes      = p.likes || 0;
+  const showMed    = profile.showMeds && p.med;
+  const showStable = (p.stable || 0) > 0;
   const g1      = p.grad1 || ORANGE_LT;
   const g2      = p.grad2 || ORANGE_DARK;
   const av      = p.initials || initials(p.name);
@@ -1740,7 +1802,7 @@ function renderPost(p) {
       <div class="post-avatar">
         <div class="post-av-circle" style="background:linear-gradient(135deg,${g1},${g2});">${esc(av)}</div>
         <div>
-          <div class="post-name">[${esc(p.name)}]${adminBadge} 🔥 ${p.streak || 1}d</div>
+          <div class="post-name">[${esc(p.name)}]${adminBadge} 🔥 ${p.streak || 1}d${showStable ? ` 🧘 ${p.stable}d` : ''}</div>
           ${showMed ? `<div class="post-med">💊 ${esc(p.med)}</div>` : ''}
         </div>
       </div>
@@ -1866,7 +1928,8 @@ function setupCompose() {
       grad2:    profile.grad2,
       isAdmin:  profile.isAdmin,
       text,
-      med:      profile.showMeds ? profile.med : '',
+      med:      profile.showMeds   ? profile.med          : '',
+      stable:   profile.showStable ? profile.stableStreak : 0,
       tab:      currentTab,
       likes:    0,
       isSystem: false,
@@ -1895,6 +1958,63 @@ function setupCompose() {
       openOv('ov-firstpost');
     }
   });
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Stability settings overlay
+// ─────────────────────────────────────────────────────────────────
+function openStableSettings() {
+  closeOv('ov-monika');
+
+  const isBB     = !!_bbUser;
+  const streak   = profile.stableStreak;
+  let   showStable = profile.showStable;
+
+  // Show/hide the appropriate section
+  document.getElementById('stable-ov-bb-section').style.display     = isBB ? '' : 'none';
+  document.getElementById('stable-ov-manual-section').style.display  = isBB ? 'none' : '';
+
+  if (isBB) {
+    document.getElementById('stable-ov-bb-count').textContent = streak;
+  } else {
+    // Pre-fill date if already set
+    const el = document.getElementById('stable-ov-date');
+    el.value = profile.stableSince || '';
+    el.max   = new Date().toISOString().slice(0, 10); // can't be future
+  }
+
+  function updateToggle() {
+    document.getElementById('stable-ov-show').classList.toggle('active', showStable);
+    document.getElementById('stable-ov-hide').classList.toggle('active', !showStable);
+  }
+  updateToggle();
+
+  document.getElementById('stable-ov-show').onclick = () => { showStable = true;  updateToggle(); };
+  document.getElementById('stable-ov-hide').onclick = () => { showStable = false; updateToggle(); };
+
+  document.getElementById('stable-ov-cancel').onclick = () => closeOv('ov-stable');
+
+  document.getElementById('stable-ov-save').onclick = () => {
+    localStorage.setItem('bbAnon_showStable', showStable ? 'true' : 'false');
+
+    if (!isBB) {
+      // Compute days from entered date
+      const since = document.getElementById('stable-ov-date').value; // YYYY-MM-DD
+      if (since) {
+        localStorage.setItem('bbAnon_stableSince', since);
+        const days = Math.max(0, Math.floor((Date.now() - new Date(since).getTime()) / 86400000));
+        localStorage.setItem('bbAnon_stableStreak', String(days));
+      } else {
+        localStorage.removeItem('bbAnon_stableSince');
+        localStorage.setItem('bbAnon_stableStreak', '0');
+      }
+    }
+
+    closeOv('ov-stable');
+    renderUserPill();
+  };
+
+  openOv('ov-stable');
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -2001,6 +2121,19 @@ function openMonikaSettings() {
     }
   }
 
+  // Stability status row
+  const msStableStatus = document.getElementById('ms-stable-status');
+  if (msStableStatus) {
+    const streak = profile.stableStreak;
+    if (!streak && !profile.stableSince) {
+      msStableStatus.textContent = _bbUser ? 'Not set up yet' : 'No stable date set';
+    } else {
+      msStableStatus.textContent = streak > 0
+        ? (profile.showStable ? `${streak}d · Visible on posts` : `${streak}d · Private`)
+        : (profile.showStable ? 'Visible on posts' : 'Private');
+    }
+  }
+
   // Build colour swatches
   msColors.innerHTML = COLOR_PRESETS.map(c =>
     `<div class="color-swatch ${c.key === profile.colorKey ? 'selected' : ''}"
@@ -2046,6 +2179,7 @@ _msHomeBtn.addEventListener('click', () => {
   location.href = _isAnonDomain ? 'https://bipolarbear.app' : 'index.html';
 });
 document.getElementById('ms-med-btn').addEventListener('click', openMedSettings);
+document.getElementById('ms-stable-btn').addEventListener('click', openStableSettings);
 
 document.getElementById('ms-save').addEventListener('click', async () => {
   const newMonika = document.getElementById('ms-monika').value.trim();
