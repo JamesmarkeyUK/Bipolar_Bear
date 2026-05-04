@@ -957,8 +957,12 @@
             if (d.dailyGoals      !== undefined) localStorage.setItem('dailyGoals',      JSON.stringify(d.dailyGoals));
             if (d.stableStreak    !== undefined) {
               localStorage.setItem('bbStableStreak', String(d.stableStreak || 0));
-              _updateStreakBadge(); // refresh badge now that we have the latest value
             }
+            const _ap = d.anonProfile || {};
+            if (typeof _ap.visitStreak === 'number') {
+              localStorage.setItem('bbAnon_streak', String(_ap.visitStreak));
+            }
+            _updateStreakBadge(); // refresh badge now that we have the latest values
             // Re-run the survival tick check now that localStorage is populated
             const sTick = document.getElementById('survivalTick');
             if (sTick) {
@@ -1309,14 +1313,17 @@
     function _updateStreakBadge() {
       const streak = parseInt(localStorage.getItem('bbCurrentStreak')  || '0', 10);
       const stable = parseInt(localStorage.getItem('bbStableStreak')   || '0', 10);
+      const anon   = parseInt(localStorage.getItem('bbAnon_streak')    || '0', 10);
+      const hasAnon = !!localStorage.getItem('bbAnon_monika');
       const badge  = document.getElementById('journalStreakBadge');
       if (!badge) return;
       if (streak > 0) {
-        const streakPart  = `🔥 ${streak} day${streak === 1 ? '' : 's'}`;
-        const stablePart  = stable > 0 ? ` &nbsp;🧘 ${stable}d` : '';
-        badge.innerHTML   = streakPart + stablePart;
+        const streakPart = `🔥 ${streak} day${streak === 1 ? '' : 's'}`;
+        const stablePart = stable > 0 ? ` &nbsp;🧘 ${stable}d` : '';
+        const anonPart   = hasAnon && anon > 0 ? ` &nbsp;💬 ${anon}d` : '';
+        badge.innerHTML      = streakPart + stablePart + anonPart;
         badge.style.display  = 'block';
-        badge.style.cursor   = streak > 0 ? 'pointer' : '';
+        badge.style.cursor   = 'pointer';
       }
     }
     _updateStreakBadge();
@@ -1340,7 +1347,8 @@
       tip.innerHTML =
         '<div style="font-weight:800;margin-bottom:8px;">Your counters</div>' +
         '<div style="margin-bottom:8px;">🔥 <strong>Streak</strong> — consecutive days you\'ve logged your mood. Resets if you miss a day.</div>' +
-        '<div>🧘 <strong>Stability</strong> — consecutive days you\'ve logged your mood as <em>Stable</em>, counted back from your most recent entry. Resets when any other mood is logged.</div>';
+        '<div style="margin-bottom:8px;">🧘 <strong>Stability</strong> — consecutive days you\'ve logged your mood as <em>Stable</em>, counted back from your most recent entry. Resets when any other mood is logged.</div>' +
+        '<div>💬 <strong>Community</strong> — consecutive days you\'ve visited Bipolar Anonymous. Resets if you miss a day.</div>';
 
       // Insert after badge
       badge.style.position = 'relative';

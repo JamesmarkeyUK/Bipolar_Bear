@@ -1499,6 +1499,8 @@ async function _anonSaveProfile() {
       showStable:   profile.showStable,
       stableSince:  profile.stableSince || null,
       stableStreak: profile.stableStreak,
+      visitStreak:  parseInt(localStorage.getItem('bbAnon_streak') || '0', 10),
+      visitDate:    localStorage.getItem('bbAnonVisitDate') || null,
       updatedAt:    firebase.firestore.FieldValue.serverTimestamp(),
     }, { merge: true });
   } catch(e) { console.warn('[Anonymous] profile save failed', e); }
@@ -1527,6 +1529,8 @@ async function _anonRestoreProfile(email) {
       const days = Math.max(0, Math.floor((Date.now() - new Date(d.stableSince).getTime()) / 86400000));
       localStorage.setItem('bbAnon_stableStreak', String(days));
     }
+    if (typeof d.visitStreak === 'number') localStorage.setItem('bbAnon_streak',  String(d.visitStreak));
+    if (d.visitDate)                       localStorage.setItem('bbAnonVisitDate', d.visitDate);
     return !!d.monika;
   } catch(e) {
     console.warn('[Anonymous] profile restore failed', e);
@@ -1562,6 +1566,8 @@ async function _bbRestoreProfile(uid) {
       localStorage.setItem('bbAnon_medList', JSON.stringify(medList));
       localStorage.setItem('bbAnon_med', medList.map(m => m.name).filter(Boolean).join(', '));
     }
+    if (typeof ap.visitStreak === 'number') localStorage.setItem('bbAnon_streak',     String(ap.visitStreak));
+    if (ap.visitDate)                       localStorage.setItem('bbAnonVisitDate',    ap.visitDate);
   } catch(e) { console.warn('[BB] _bbRestoreProfile failed', e); }
 }
 
@@ -1570,13 +1576,15 @@ function _bbSaveProfile() {
   if (!_bbUser || !db) return;
   db.collection('userSettings').doc(_bbUser.uid).set({
     anonProfile: {
-      monika:     profile.monika     || null,
-      colorKey:   profile.colorKey   || 'orange',
-      customInit: profile.customInit || '',
-      showMeds:   profile.showMeds,
-      medList:    _anonGetMedList(),
-      showStable: profile.showStable,
+      monika:      profile.monika     || null,
+      colorKey:    profile.colorKey   || 'orange',
+      customInit:  profile.customInit || '',
+      showMeds:    profile.showMeds,
+      medList:     _anonGetMedList(),
+      showStable:  profile.showStable,
       stableSince: profile.stableSince || null,
+      visitStreak: parseInt(localStorage.getItem('bbAnon_streak') || '0', 10),
+      visitDate:   localStorage.getItem('bbAnonVisitDate') || null,
     }
   }, { merge: true }).catch(e => console.warn('[BB] _bbSaveProfile failed', e));
 }
@@ -1706,8 +1714,20 @@ function openMedSettings() {
 // ─────────────────────────────────────────────────────────────────
 // SCREEN: Board
 // ─────────────────────────────────────────────────────────────────
+function _updateAnonStreak() {
+  const today     = new Date().toISOString().slice(0, 10);
+  const lastDate  = localStorage.getItem('bbAnonVisitDate') || '';
+  if (lastDate === today) return; // already counted today
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  const prev      = parseInt(localStorage.getItem('bbAnon_streak') || '0', 10);
+  const streak    = lastDate === yesterday ? prev + 1 : 1;
+  localStorage.setItem('bbAnon_streak',  String(streak));
+  localStorage.setItem('bbAnonVisitDate', today);
+}
+
 function initBoard() {
   localStorage.setItem('bbAnonLastVisit', Date.now());
+  _updateAnonStreak();
   renderUserPill();
   setupTabs();
   setupFAB();
