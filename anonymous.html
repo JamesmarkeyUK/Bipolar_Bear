@@ -456,6 +456,7 @@
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <div id="screen-monika" class="screen">
   <div class="onboard-bg">
+    <button id="monika-back-btn" class="board-back-btn" onclick="_goHome()" style="display:none;align-self:flex-start;margin-bottom:20px;">← Home</button>
     <div class="card">
       <div class="card-icon">✅</div>
       <div class="card-title center">Email Verified!</div>
@@ -978,9 +979,11 @@ function boot(user) {
   const isReal = user && !user.isAnonymous;
   _bbUser = (isReal && user.emailVerified) ? user : null;
   _updateLogoCursor();
-  // Show "← Home" on verify screen only for BB App users (Firebase Auth)
-  const backBtn = document.getElementById('verify-back-btn');
-  if (backBtn) backBtn.style.display = isReal ? '' : 'none';
+  // Show "← Home" on verify/monika screens only for BB App users (Firebase Auth)
+  ['verify-back-btn', 'monika-back-btn'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.style.display = isReal ? '' : 'none';
+  });
 
   if (isReal && user.emailVerified) {
     // Signed in to BipolarBear with verified email — skip code verification
