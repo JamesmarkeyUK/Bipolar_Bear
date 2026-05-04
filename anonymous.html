@@ -279,6 +279,27 @@
     .med-opt-label { font-size: 14px; font-weight: 700; color: var(--dark); }
     .med-opt-sub   { font-size: 12px; color: var(--muted); margin-top: 2px; }
 
+    /* Med entry tags */
+    .anon-med-tag {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--orange-bg); border: 1.5px solid rgba(255,149,0,0.2);
+      border-radius: 9px; padding: 8px 10px; margin-bottom: 6px; font-size: 13px;
+    }
+    .anon-med-tag-del {
+      background: none; border: none; color: #dc3545; cursor: pointer;
+      font-size: 14px; font-weight: 700; padding: 0 0 0 4px; line-height: 1; flex-shrink: 0;
+    }
+    .med-input-row { display: flex; gap: 8px; margin-bottom: 8px; }
+    .med-input-row .bb-input { flex: 1; margin: 0; }
+    .med-toggle-btn {
+      flex: 1; padding: 9px; border-radius: 10px; font-size: 13px; font-weight: 700;
+      border: 2px solid #e9ecef; background: #f8f9fa; color: #868e96; cursor: pointer;
+      font-family: inherit; transition: border-color 0.15s, background 0.15s, color 0.15s;
+    }
+    .med-toggle-btn.active {
+      border-color: var(--orange); background: var(--orange-bg); color: var(--orange);
+    }
+
     /* ── Board ── */
     #screen-board { background: var(--cream); position: relative; height: 100%; }
 
@@ -483,6 +504,27 @@
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SCREEN: Medication entry / edit                                -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="screen-med-define" class="screen">
+  <div class="onboard-bg">
+    <div class="card">
+      <div class="card-icon">💊</div>
+      <div class="card-title center">Your Medication</div>
+      <div id="med-define-sub" class="card-sub center">Add your current medications. Only the name will be visible on posts — dosage stays private.</div>
+      <div id="anon-med-list-wrap" style="min-height:36px;margin-bottom:10px;"></div>
+      <div class="med-input-row">
+        <input id="anon-med-name" type="text" class="bb-input" placeholder="Medication name" autocomplete="off">
+        <input id="anon-med-dose" type="text" class="bb-input" placeholder="Dosage (optional)" autocomplete="off">
+      </div>
+      <button id="anon-med-add" class="btn-outline" style="width:100%;margin-bottom:20px;">+ Add</button>
+      <button id="anon-med-continue" class="btn-primary">Continue →</button>
+      <button id="anon-med-skip" style="background:none;border:none;color:var(--muted);font-size:13px;margin-top:12px;cursor:pointer;width:100%;padding:8px;font-family:inherit;">Skip for now</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
 <!-- SCREEN: Board                                                  -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <div id="screen-board" class="screen">
@@ -623,11 +665,55 @@
       </div>
     </div>
 
+    <!-- Medication quick-access -->
+    <button id="ms-med-btn" style="width:100%;text-align:left;background:var(--orange-bg);border:1.5px solid rgba(255,149,0,0.18);border-radius:12px;padding:11px 14px;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-family:inherit;">
+      <span style="font-size:20px;">💊</span>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:700;color:var(--dark);">Medication</div>
+        <div id="ms-med-status" style="font-size:11px;color:var(--muted);margin-top:1px;">Loading…</div>
+      </div>
+      <span style="color:var(--muted);font-size:16px;font-weight:300;">›</span>
+    </button>
+
     <div class="btn-row" style="margin-bottom:10px;">
       <button class="btn-secondary" id="ms-cancel" style="flex:1;">Cancel</button>
       <button class="btn-primary"   id="ms-save"   style="flex:2;">Save Changes ✓</button>
     </div>
     <button class="btn-secondary" id="ms-home" style="width:100%;text-align:center;">← Back to Bipolar Bear</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- OVERLAY: Medication settings                                   -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="ov-med" class="overlay hidden">
+  <div class="sheet">
+    <div class="sheet-icon">💊</div>
+    <div class="sheet-title">Your Medication</div>
+
+    <span class="sheet-label">Visibility on posts</span>
+    <div style="display:flex;gap:8px;margin-bottom:18px;">
+      <button id="med-ov-show" class="med-toggle-btn">✅ Show on posts</button>
+      <button id="med-ov-hide" class="med-toggle-btn">🔒 Private</button>
+    </div>
+
+    <span class="sheet-label">Your Medications</span>
+    <div id="med-ov-list" style="min-height:32px;margin-bottom:10px;"></div>
+
+    <div class="med-input-row">
+      <input id="med-ov-name" type="text" class="bb-input" placeholder="Medication name" autocomplete="off">
+      <input id="med-ov-dose" type="text" class="bb-input" placeholder="Dosage (optional)" autocomplete="off">
+    </div>
+    <button id="med-ov-add" class="btn-outline" style="width:100%;margin-bottom:18px;">+ Add</button>
+
+    <div id="med-ov-bb-note" style="display:none;font-size:12px;color:var(--muted);background:var(--orange-bg);border-radius:8px;padding:8px 10px;margin-bottom:14px;line-height:1.5;">
+      💡 You're signed in to BipolarBear — saving will also update your medication in the main app.
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-secondary" id="med-ov-cancel" style="flex:1;">Cancel</button>
+      <button class="btn-primary"   id="med-ov-save"   style="flex:2;">Save ✓</button>
+    </div>
   </div>
 </div>
 
@@ -704,6 +790,7 @@ let sosTargetName   = '';
 let reportTargetId  = '';
 let adminDeleteId   = '';
 let selfDeleteId    = '';
+let _bbUser         = null; // Firebase-auth verified user (BB App path)
 
 // Persisted user profile (localStorage)
 const profile = {
@@ -711,6 +798,14 @@ const profile = {
   get verified()    { return localStorage.getItem('bbAnon_verified')  === 'true'; },
   get showMeds()    { return localStorage.getItem('bbAnon_showMeds')  === 'true'; },
   get med()         { return localStorage.getItem('bbAnon_med')       || ''; },
+  get medList()     {
+    try {
+      const s = localStorage.getItem('bbAnon_medList');
+      if (s) return JSON.parse(s);
+      const m = localStorage.getItem('bbAnon_med');
+      return m ? [{ name: m, dosage: '' }] : [];
+    } catch(e) { return []; }
+  },
   get hasPosted()   { return localStorage.getItem('bbAnon_hasPosted') === 'true'; },
   get isAdmin()     { return localStorage.getItem('bbAnon_isAdmin')   === 'true'; },
   get colorKey()    { return localStorage.getItem('bbAnon_colorKey')  || 'orange'; },
@@ -793,6 +888,7 @@ function showScreen(id) {
 
 function boot(user) {
   const isReal = user && !user.isAnonymous;
+  _bbUser = (isReal && user.emailVerified) ? user : null;
 
   if (isReal && user.emailVerified) {
     // Signed in to BipolarBear with verified email — skip code verification
@@ -878,7 +974,7 @@ function openOv(id)  { document.getElementById(id).classList.remove('hidden'); }
 function closeOv(id) { document.getElementById(id).classList.add('hidden'); }
 
 // Close on backdrop tap
-['ov-compose','ov-firstpost','ov-sos','ov-report','ov-e2ee','ov-monika','ov-self-delete','ov-admin-delete'].forEach(id => {
+['ov-compose','ov-firstpost','ov-sos','ov-report','ov-e2ee','ov-monika','ov-self-delete','ov-admin-delete','ov-med'].forEach(id => {
   document.getElementById(id).addEventListener('click', e => {
     if (e.target === document.getElementById(id)) closeOv(id);
   });
@@ -1173,13 +1269,176 @@ function setupMonika() {
 // SCREEN: Medication visibility
 // ─────────────────────────────────────────────────────────────────
 function setupMeds() {
-  function choose(show) {
-    localStorage.setItem('bbAnon_showMeds', show ? 'true' : 'false');
+  document.getElementById('meds-yes').onclick = async () => {
+    localStorage.setItem('bbAnon_showMeds', 'true');
+    // For BB App users, pre-populate med list from their Firestore data
+    if (_bbUser && db) {
+      try {
+        const snap = await db.collection('userSettings').doc(_bbUser.uid).get();
+        if (snap.exists) {
+          const list = snap.data().currentMedList || [];
+          if (list.length > 0) {
+            localStorage.setItem('bbAnon_medList', JSON.stringify(list));
+            localStorage.setItem('bbAnon_med', list.map(m => m.name).filter(Boolean).join(', '));
+          }
+        }
+      } catch(e) { /* silently fail — user can add manually */ }
+    }
+    showScreen('med-define');
+    setupMedDefine(() => { showScreen('board'); initBoard(); });
+  };
+  document.getElementById('meds-no').onclick = () => {
+    localStorage.setItem('bbAnon_showMeds', 'false');
     showScreen('board');
     initBoard();
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Med helpers
+// ─────────────────────────────────────────────────────────────────
+function _anonGetMedList() {
+  try {
+    const s = localStorage.getItem('bbAnon_medList');
+    if (s) return JSON.parse(s);
+    const m = localStorage.getItem('bbAnon_med');
+    return m ? [{ name: m, dosage: '' }] : [];
+  } catch(e) { return []; }
+}
+
+async function _anonSaveMedList(list) {
+  localStorage.setItem('bbAnon_medList', JSON.stringify(list));
+  const medStr = list.map(m => m.name).filter(Boolean).join(', ');
+  localStorage.setItem('bbAnon_med', medStr);
+  // Sync back to BB App if the user is signed into BipolarBear
+  if (_bbUser && db) {
+    try {
+      await db.collection('userSettings').doc(_bbUser.uid).set(
+        { currentMedList: list }, { merge: true }
+      );
+    } catch(e) { console.warn('[Anonymous] medList sync failed', e); }
   }
-  document.getElementById('meds-yes').addEventListener('click', () => choose(true));
-  document.getElementById('meds-no').addEventListener('click',  () => choose(false));
+}
+
+// ─────────────────────────────────────────────────────────────────
+// SCREEN: Medication entry (onboarding + editing from settings)
+// ─────────────────────────────────────────────────────────────────
+function setupMedDefine(onDone) {
+  let medList = _anonGetMedList();
+
+  // Contextual subtitle
+  const sub = document.getElementById('med-define-sub');
+  if (sub) {
+    if (_bbUser && medList.length > 0) {
+      sub.textContent = 'These are your current medications from BipolarBear. Edit or add more, then continue.';
+    } else if (_bbUser) {
+      sub.textContent = 'Add your current medications. Changes will also update your BipolarBear app.';
+    } else {
+      sub.textContent = 'Add your current medications. Only the name is visible on posts — dosage stays private.';
+    }
+  }
+
+  function renderList() {
+    const el = document.getElementById('anon-med-list-wrap');
+    if (!el) return;
+    if (!medList.length) {
+      el.innerHTML = '<p style="color:var(--muted);font-size:13px;text-align:center;margin:4px 0 10px;">No medications added yet</p>';
+      return;
+    }
+    el.innerHTML = medList.map((m, i) => `
+      <div class="anon-med-tag">
+        <span style="flex:1;">💊 <strong>${esc(m.name)}</strong>${m.dosage ? ` <span style="color:var(--muted);font-size:12px;">${esc(m.dosage)}</span>` : ''}</span>
+        <button class="anon-med-tag-del" data-idx="${i}">✕</button>
+      </div>`).join('');
+    el.querySelectorAll('.anon-med-tag-del').forEach(btn => {
+      btn.onclick = () => { medList.splice(parseInt(btn.dataset.idx), 1); renderList(); };
+    });
+  }
+  renderList();
+
+  const nameIn = document.getElementById('anon-med-name');
+  const doseIn = document.getElementById('anon-med-dose');
+  nameIn.value = ''; doseIn.value = '';
+
+  document.getElementById('anon-med-add').onclick = () => {
+    const name = nameIn.value.trim();
+    if (!name) { nameIn.focus(); return; }
+    medList.push({ name, dosage: doseIn.value.trim() });
+    nameIn.value = ''; doseIn.value = '';
+    nameIn.focus();
+    renderList();
+  };
+  nameIn.onkeydown = e => { if (e.key === 'Enter') document.getElementById('anon-med-add').click(); };
+
+  document.getElementById('anon-med-continue').onclick = async () => {
+    await _anonSaveMedList(medList);
+    if (onDone) onDone();
+  };
+  document.getElementById('anon-med-skip').onclick = () => { if (onDone) onDone(); };
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Medication settings overlay
+// ─────────────────────────────────────────────────────────────────
+function openMedSettings() {
+  closeOv('ov-monika');
+  let medList  = _anonGetMedList().map(m => ({ ...m })); // working copy
+  let showMeds = profile.showMeds;
+
+  // Show BB sync note if signed in
+  const bbNote = document.getElementById('med-ov-bb-note');
+  if (bbNote) bbNote.style.display = _bbUser ? 'block' : 'none';
+
+  function renderList() {
+    const el = document.getElementById('med-ov-list');
+    if (!el) return;
+    if (!medList.length) {
+      el.innerHTML = '<p style="color:var(--muted);font-size:13px;margin:4px 0 8px;">No medications added yet</p>';
+      return;
+    }
+    el.innerHTML = medList.map((m, i) => `
+      <div class="anon-med-tag">
+        <span style="flex:1;">💊 <strong>${esc(m.name)}</strong>${m.dosage ? ` <span style="color:var(--muted);font-size:12px;">${esc(m.dosage)}</span>` : ''}</span>
+        <button class="anon-med-tag-del" data-idx="${i}">✕</button>
+      </div>`).join('');
+    el.querySelectorAll('.anon-med-tag-del').forEach(btn => {
+      btn.onclick = () => { medList.splice(parseInt(btn.dataset.idx), 1); renderList(); };
+    });
+  }
+
+  function updateToggle() {
+    document.getElementById('med-ov-show').classList.toggle('active', showMeds);
+    document.getElementById('med-ov-hide').classList.toggle('active', !showMeds);
+  }
+
+  renderList();
+  updateToggle();
+
+  document.getElementById('med-ov-show').onclick = () => { showMeds = true;  updateToggle(); };
+  document.getElementById('med-ov-hide').onclick = () => { showMeds = false; updateToggle(); };
+
+  const nameIn = document.getElementById('med-ov-name');
+  const doseIn = document.getElementById('med-ov-dose');
+  nameIn.value = ''; doseIn.value = '';
+
+  document.getElementById('med-ov-add').onclick = () => {
+    const name = nameIn.value.trim();
+    if (!name) { nameIn.focus(); return; }
+    medList.push({ name, dosage: doseIn.value.trim() });
+    nameIn.value = ''; doseIn.value = '';
+    renderList();
+  };
+  nameIn.onkeydown = e => { if (e.key === 'Enter') document.getElementById('med-ov-add').click(); };
+
+  document.getElementById('med-ov-cancel').onclick = () => closeOv('ov-med');
+  document.getElementById('med-ov-save').onclick = async () => {
+    localStorage.setItem('bbAnon_showMeds', showMeds ? 'true' : 'false');
+    await _anonSaveMedList(medList);
+    closeOv('ov-med');
+    showHint('Medication updated ✓');
+  };
+
+  openOv('ov-med');
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -1643,6 +1902,18 @@ function openMonikaSettings() {
   msCounter.textContent = `${profile.monika.length}/10`;
   msInitials.value = profile.customInit;
 
+  // Medication status row
+  const msStatus = document.getElementById('ms-med-status');
+  if (msStatus) {
+    const list = _anonGetMedList();
+    if (!list.length) {
+      msStatus.textContent = 'No medications added';
+    } else {
+      const names = list.map(m => m.name).join(', ');
+      msStatus.textContent = profile.showMeds ? `${names} · Visible on posts` : `${names} · Private`;
+    }
+  }
+
   // Build colour swatches
   msColors.innerHTML = COLOR_PRESETS.map(c =>
     `<div class="color-swatch ${c.key === profile.colorKey ? 'selected' : ''}"
@@ -1683,6 +1954,7 @@ function openMonikaSettings() {
 
 document.getElementById('ms-cancel').addEventListener('click', () => closeOv('ov-monika'));
 document.getElementById('ms-home').addEventListener('click', () => { location.href = 'index.html'; });
+document.getElementById('ms-med-btn').addEventListener('click', openMedSettings);
 
 document.getElementById('ms-save').addEventListener('click', async () => {
   const newMonika = document.getElementById('ms-monika').value.trim();
