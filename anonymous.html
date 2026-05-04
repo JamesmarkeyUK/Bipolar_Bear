@@ -1019,7 +1019,7 @@ function setupVerify() {
     }
   }
 
-  sendBtn.addEventListener('click', () => doSend(emailIn.value.trim()));
+  sendBtn.onclick = () => doSend(emailIn.value.trim());
 
   // Code box navigation + input
   boxes.forEach((box, i) => {
