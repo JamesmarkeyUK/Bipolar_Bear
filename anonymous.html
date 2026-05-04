@@ -752,44 +752,25 @@ function initFirebase() {
     window._anonSendCode   = _fns.httpsCallable('sendAnonCode');
     window._anonVerifyCode = _fns.httpsCallable('verifyAnonCode');
 
-    // Tie anonymous access to BipolarBear account
-    firebase.auth().onAuthStateChanged(function(user) {
+    // Auth state handler — routes on first load, handles sign-out while on board
+    let _anonInitialBoot = false;
+    firebase.auth().onAuthStateChanged(async function(user) {
       const isReal = user && !user.isAnonymous;
 
-      // Update email field on verify screen
-      const emailIn = document.getElementById('email-input');
-      const sendBtn = document.getElementById('send-code-btn');
-      const errDiv  = document.getElementById('verify-error');
-      if (emailIn) {
-        if (isReal) {
-          emailIn.value       = user.email;
-          emailIn.readOnly    = true;
-          emailIn.style.background = '#f8f9fa';
-          emailIn.style.color      = '#495057';
-          emailIn.style.cursor     = 'default';
-          if (sendBtn) sendBtn.disabled = false;
-          if (errDiv)  { errDiv.style.display = 'none'; errDiv.textContent = ''; }
-        } else {
-          emailIn.value       = '';
-          emailIn.readOnly    = true;
-          emailIn.placeholder = 'Sign in to BipolarBear first';
-          emailIn.style.background = '#f8f9fa';
-          emailIn.style.color      = '#adb5bd';
-          emailIn.style.cursor     = 'default';
-          if (sendBtn) sendBtn.disabled = true;
-          if (errDiv) {
-            errDiv.innerHTML     = '👋 You need to be signed in to BipolarBear to join Anonymous. <a href="index.html" style="color:#dc3545;font-weight:600;">Sign in →</a>';
-            errDiv.style.display = 'block';
-          }
-        }
+      if (!_anonInitialBoot) {
+        _anonInitialBoot = true;
+        // Reload to get fresh emailVerified status
+        if (isReal) await user.reload().catch(() => {});
+        boot(isReal ? firebase.auth().currentUser : null);
+        return;
       }
 
-      // Sign out of Anonymous if BipolarBear account is signed out
-      if (!isReal && localStorage.getItem('bbAnon_verified') === 'true') {
+      // Subsequent auth changes — sign-out while on board (Firebase-auth path only)
+      if (!isReal && localStorage.getItem('bbAnon_verified') === 'true' && !localStorage.getItem('bbAnon_email')) {
         localStorage.removeItem('bbAnon_verified');
         localStorage.removeItem('bbAnon_isAdmin');
         if (unsubPosts) { unsubPosts(); unsubPosts = null; }
-        boot();
+        boot(null);
       }
     });
   } catch (e) {
@@ -810,16 +791,83 @@ function showScreen(id) {
   document.getElementById('screen-' + id).classList.add('active');
 }
 
-function boot() {
-  if (profile.verified && profile.monika) {
+function boot(user) {
+  const isReal = user && !user.isAnonymous;
+
+  if (isReal && user.emailVerified) {
+    // Signed in to BipolarBear with verified email — skip code verification
+    if (profile.monika) {
+      showScreen('board');
+      initBoard();
+    } else {
+      showScreen('monika');
+      setupMonika();
+    }
+  } else if (isReal && !user.emailVerified) {
+    // Signed in but email not yet verified in main app
+    showScreen('verify');
+    showEmailVerificationRequired(user);
+  } else if (profile.verified && profile.monika) {
+    // Standalone verified (email code path, not signed in to main app)
     showScreen('board');
     initBoard();
   } else if (profile.verified) {
     showScreen('monika');
     setupMonika();
   } else {
+    // Not verified — show email+code verify screen
     showScreen('verify');
     setupVerify();
+  }
+}
+
+function showEmailVerificationRequired(user) {
+  // Show a tailored message on the verify screen asking them to verify their BipolarBear email
+  const emailStep = document.getElementById('step-email');
+  const codeStep  = document.getElementById('step-code');
+  const errDiv    = document.getElementById('verify-error');
+  const cardTitle = document.querySelector('#screen-verify .card-title');
+  const cardSub   = document.querySelector('#screen-verify .card-sub');
+  if (emailStep) emailStep.style.display = 'none';
+  if (codeStep)  codeStep.style.display  = 'none';
+  if (cardTitle) cardTitle.textContent = 'Verify your email ✉️';
+  if (cardSub)   cardSub.textContent   = 'Before joining the community, please verify your BipolarBear account email.';
+  if (errDiv) {
+    errDiv.innerHTML =
+      'We sent a verification link to <strong>' + (user ? user.email : 'your email') + '</strong>.' +
+      ' Click it in your inbox, then tap the button below.' +
+      '<div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">' +
+        '<button id="bbAnonCheckVerified" style="background:var(--orange);border:none;border-radius:10px;color:white;font-weight:700;padding:11px;font-size:0.95em;cursor:pointer;">I\'ve verified — continue →</button>' +
+        '<button id="bbAnonResendVerify" style="background:none;border:1.5px solid var(--orange);border-radius:10px;color:var(--orange);font-weight:600;padding:10px;font-size:0.88em;cursor:pointer;">Resend verification email</button>' +
+      '</div>';
+    errDiv.style.cssText = 'display:block;padding:14px;background:rgba(255,107,0,0.07);border:1.5px solid rgba(255,107,0,0.25);border-radius:12px;font-size:13px;color:#495057;line-height:1.5;';
+
+    document.getElementById('bbAnonCheckVerified').onclick = async function() {
+      const u = firebase.auth().currentUser;
+      if (!u) return;
+      this.textContent = 'Checking…';
+      await u.reload().catch(() => {});
+      const fresh = firebase.auth().currentUser;
+      if (fresh && fresh.emailVerified) {
+        boot(fresh);
+      } else {
+        this.textContent = 'I\'ve verified — continue →';
+        errDiv.querySelector && (errDiv.insertAdjacentHTML('beforeend',
+          '<div style="margin-top:8px;color:#dc3545;font-size:12px;">Still not verified — please check your inbox and click the link first.</div>'));
+      }
+    };
+
+    document.getElementById('bbAnonResendVerify').onclick = async function() {
+      const u = firebase.auth().currentUser;
+      if (!u) return;
+      try {
+        await u.sendEmailVerification();
+        this.textContent = '✅ Sent!';
+        setTimeout(() => { this.textContent = 'Resend verification email'; }, 3000);
+      } catch(e) {
+        this.textContent = 'Failed — try again shortly';
+      }
+    };
   }
 }
 
@@ -909,7 +957,18 @@ function setupVerify() {
     emailIn.classList.toggle('valid', ok);
   }
 
+  // Ensure email field is editable and wired for validation
+  emailIn.readOnly    = false;
+  emailIn.placeholder = 'your@email.com';
+  emailIn.style.background = '';
+  emailIn.style.color      = '';
+  emailIn.style.cursor     = '';
+
+  emailIn.addEventListener('input',   _validateEmail);
   emailIn.addEventListener('keydown', e => { if (e.key === 'Enter' && !sendBtn.disabled) sendBtn.click(); });
+
+  // Run once so button state matches whatever is already in the field
+  _validateEmail();
 
   function getCode() { return Array.from(boxes).map(b => b.value).join(''); }
 
@@ -1010,6 +1069,7 @@ function setupVerify() {
         localStorage.setItem('bbAnon_isAdmin', 'true');
       }
       localStorage.setItem('bbAnon_verified', 'true');
+      localStorage.setItem('bbAnon_email', _pendingEmail); // marks standalone path (not Firebase auth)
       showScreen('monika');
       setupMonika();
     } catch (err) {

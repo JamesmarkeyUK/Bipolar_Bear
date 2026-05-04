@@ -902,7 +902,16 @@
         if (typeof window._fabBeforeSignIn === 'function') window._fabBeforeSignIn();
         try {
           if (_bbIsSignUp) {
-            await auth.createUserWithEmailAndPassword(email, password);
+            const _cred = await auth.createUserWithEmailAndPassword(email, password);
+            await _cred.user.sendEmailVerification();
+            // Show confirmation — don't close the modal yet
+            if (errEl) {
+              errEl.innerHTML = '✉️ Account created! We\'ve sent a verification link to <strong>' + email + '</strong>. Click it to activate your account, then sign in.';
+              errEl.style.cssText = 'display:block;color:#2f9e44;background:rgba(81,207,102,0.08);border:1.5px solid rgba(81,207,102,0.3);border-radius:8px;padding:10px 14px;font-size:13px;line-height:1.5;margin-bottom:8px;';
+            }
+            // Sign back out — they must verify before using the app
+            await auth.signOut();
+            return;
           } else {
             await auth.signInWithEmailAndPassword(email, password);
           }
