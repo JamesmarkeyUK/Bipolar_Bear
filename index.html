@@ -881,11 +881,30 @@
               if (_btns) _btns.parentNode.insertBefore(_vBanner, _btns);
             }
             document.getElementById('bbResendVerifyBtn').onclick = async function() {
+              if (this.disabled) return;
+              this.disabled = true;
+              this.textContent = 'Sending…';
               try {
-                await user.sendEmailVerification();
-                this.textContent = '✅ Sent!';
-                setTimeout(() => { this.textContent = 'Resend verification email'; }, 3000);
-              } catch(e) { this.textContent = 'Failed — try again'; }
+                const fresh = firebase.auth().currentUser;
+                if (!fresh) throw new Error('Not signed in');
+                await fresh.sendEmailVerification();
+                this.textContent = '✅ Sent! Check your inbox';
+                setTimeout(() => {
+                  this.textContent = 'Resend verification email';
+                  this.disabled = false;
+                }, 30000); // 30s cooldown to avoid rate-limit
+              } catch(e) {
+                console.error('[bbResendVerify]', e.code, e.message);
+                if (e.code === 'auth/too-many-requests') {
+                  this.textContent = 'Too many attempts — wait a minute';
+                } else {
+                  this.textContent = 'Failed — try again shortly';
+                }
+                setTimeout(() => {
+                  this.textContent = 'Resend verification email';
+                  this.disabled = false;
+                }, 10000);
+              }
             };
           } else {
             const _vBanner = document.getElementById('bbEmailVerifyBanner');
