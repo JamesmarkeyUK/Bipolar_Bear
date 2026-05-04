@@ -4,18 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
   <title>BipolarBear Anonymous</title>
-  <meta name="theme-color" content="#ff9500">
+  <meta name="theme-color" content="#f5c800">
+  <link rel="manifest" href="manifest-anonymous.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Bipolar Anonymous">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <style>
     :root {
-      --orange:      #ff9500;
-      --orange-dark: #e07800;
-      --orange-light:#ffb340;
-      --orange-bg:   #fff3e0;
+      --yellow:      #f5c800;
+      --yellow-dark: #c49e00;
+      --yellow-light:#ffe566;
+      --yellow-bg:   #fffde7;
       --cream:       #FFFBF5;
-      --dark:        #1C1004;
-      --muted:       #8B6B4A;
+      --dark:        #1a1500;
+      --muted:       #7a6a20;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
     input, textarea { user-select: text; -webkit-user-select: text; }
@@ -48,7 +50,7 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      background: var(--orange);
+      background: var(--yellow);
     }
 
     /* ── Desktop: iPhone 15 Pro style frame ── */
@@ -168,7 +170,7 @@
     /* ── Admin badge ── */
     .admin-badge {
       display: inline-block;
-      background: #7c4400; /* dark amber — white on this = ~8.5:1 */
+      background: var(--dark);
       color: #fff;
       font-size: 9px;
       font-weight: 800;
@@ -205,18 +207,18 @@
     .screen { display: none; flex-direction: column; flex: 1; overflow: hidden; }
     .screen.active { display: flex; }
 
-    /* Onboarding screens share an orange bg + centred card */
+    /* Onboarding screens share a yellow bg + centred card */
     .onboard-bg {
       flex: 1; display: flex; flex-direction: column;
       justify-content: center;
-      background: var(--orange);
+      background: var(--yellow);
       padding: max(60px, env(safe-area-inset-top, 0px)) 24px 40px;
       overflow-y: auto;
     }
     .onboard-logo { text-align: center; margin-bottom: 28px; }
     .onboard-logo img { width: 80px; height: 80px; border-radius: 18px; box-shadow: 0 8px 24px rgba(0,0,0,0.25); margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto; }
-    .onboard-logo h1 { font-size: 24px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
-    .onboard-logo p  { font-size: 12px; color: #fff; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; text-shadow: 0 1px 3px rgba(0,0,0,0.45); }
+    .onboard-logo h1 { font-size: 24px; font-weight: 800; color: var(--dark); letter-spacing: -0.5px; }
+    .onboard-logo p  { font-size: 12px; color: var(--dark); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; }
 
     .card { background: #fff; border-radius: 24px; padding: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
     .card-icon  { font-size: 36px; text-align: center; margin-bottom: 10px; }
@@ -230,7 +232,7 @@
       padding: 12px 14px; font-size: 15px; outline: none; color: var(--dark);
       font-family: inherit; background: #fff; transition: border-color 0.2s; margin-bottom: 12px;
     }
-    .bb-input:focus, .bb-input.valid { border-color: var(--orange); }
+    .bb-input:focus, .bb-input.valid { border-color: var(--yellow); }
     .input-wrap { position: relative; margin-bottom: 12px; }
     .input-wrap .bb-input { margin-bottom: 0; padding-right: 48px; }
     .input-counter { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--muted); pointer-events: none; }
@@ -240,14 +242,14 @@
     .code-box {
       flex: 1; min-width: 0; height: 52px; border-radius: 12px;
       background: #f5f5f5; border: 2px solid #eee;
-      text-align: center; font-size: 22px; font-weight: 800; color: var(--orange);
+      text-align: center; font-size: 22px; font-weight: 800; color: var(--yellow);
       outline: none; transition: all 0.15s; font-family: inherit;
     }
-    .code-box.filled { background: var(--orange-bg); border-color: var(--orange); }
+    .code-box.filled { background: var(--yellow-bg); border-color: var(--yellow); }
 
     /* ── Buttons ── */
     .btn-primary {
-      width: 100%; background: var(--orange); color: #fff;
+      width: 100%; background: var(--yellow); color: var(--dark);
       border: none; border-radius: 12px; padding: 14px;
       font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit;
       transition: opacity 0.15s;
@@ -261,20 +263,20 @@
     /* Monika preview row */
     .monika-preview {
       display: none; align-items: center; gap: 10px;
-      background: var(--orange-bg); border-radius: 12px;
+      background: var(--yellow-bg); border-radius: 12px;
       padding: 12px 14px; margin-bottom: 14px;
     }
     .monika-preview.show { display: flex; }
-    .avatar { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 14px; background: linear-gradient(135deg, var(--orange-light), var(--orange-dark)); }
+    .avatar { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 14px; background: linear-gradient(135deg, var(--yellow-light), var(--yellow-dark)); }
 
     /* Meds options */
     .med-opt {
       display: flex; align-items: center; gap: 14px; width: 100%;
-      background: var(--orange-bg); border: 2px solid transparent; border-radius: 14px;
+      background: var(--yellow-bg); border: 2px solid transparent; border-radius: 14px;
       padding: 14px 16px; cursor: pointer; text-align: left; margin-bottom: 10px;
       font-family: inherit; transition: border-color 0.15s;
     }
-    .med-opt:hover { border-color: var(--orange); }
+    .med-opt:hover { border-color: var(--yellow); }
     .med-opt-icon { font-size: 24px; }
     .med-opt-label { font-size: 14px; font-weight: 700; color: var(--dark); }
     .med-opt-sub   { font-size: 12px; color: var(--muted); margin-top: 2px; }
@@ -282,7 +284,7 @@
     /* Med entry tags */
     .anon-med-tag {
       display: flex; align-items: center; gap: 6px;
-      background: var(--orange-bg); border: 1.5px solid rgba(255,149,0,0.2);
+      background: var(--yellow-bg); border: 1.5px solid rgba(245,200,0,0.2);
       border-radius: 9px; padding: 8px 10px; margin-bottom: 6px; font-size: 13px;
     }
     .anon-med-tag-del {
@@ -297,38 +299,37 @@
       font-family: inherit; transition: border-color 0.15s, background 0.15s, color 0.15s;
     }
     .med-toggle-btn.active {
-      border-color: var(--orange); background: var(--orange-bg); color: var(--orange);
+      border-color: var(--yellow); background: var(--yellow-bg); color: var(--yellow);
     }
 
     /* ── Board ── */
     #screen-board { background: var(--cream); position: relative; height: 100%; }
 
     .board-header {
-      background: var(--orange);
+      background: var(--yellow);
       padding: max(52px, env(safe-area-inset-top, 16px)) 16px 0;
       flex-shrink: 0;
     }
     .board-header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
     .board-back-btn {
-      color: #fff; text-decoration: none; background: rgba(0,0,0,0.35);
+      color: var(--dark); text-decoration: none; background: rgba(0,0,0,0.1);
       padding: 8px 14px; border-radius: 20px; font-size: 0.9em; font-weight: 600;
       transition: background 0.2s; border: none; cursor: pointer; font-family: inherit;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.25);
     }
     @media (hover: hover) and (pointer: fine) { .board-back-btn:hover { background: rgba(0,0,0,0.48); } }
     .board-logo { display: flex; align-items: center; gap: 10px; }
     .board-logo img { width: 36px; height: 36px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-    .board-logo-name { font-size: 18px; font-weight: 800; color: #fff; letter-spacing: -0.3px; text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
-    .board-logo-sub  { font-size: 10px; color: #fff; letter-spacing: 0.6px; text-transform: uppercase; text-shadow: 0 1px 2px rgba(0,0,0,0.4); }
+    .board-logo-name { font-size: 18px; font-weight: 800; color: var(--dark); letter-spacing: -0.3px; }
+    .board-logo-sub  { font-size: 10px; color: var(--dark); letter-spacing: 0.6px; text-transform: uppercase; }
 
     .board-tabs { display: flex; gap: 4px; }
     .board-tab {
       flex: 1; padding: 10px 0; border-radius: 12px 12px 0 0; border: none;
       cursor: pointer; font-weight: 700; font-size: 13px; font-family: inherit;
-      background: rgba(0,0,0,0.35); color: #fff;
+      background: rgba(0,0,0,0.1); color: var(--dark);
       transition: all 0.15s;
     }
-    .board-tab.active { background: var(--cream); color: #7c4400; }
+    .board-tab.active { background: var(--cream); color: var(--dark); }
 
     /* Posts */
     #post-list { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 12px 12px 110px; }
@@ -336,9 +337,9 @@
     .post-card { background: #fff; border-radius: 16px; padding: 14px 16px; margin-bottom: 10px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
     .post-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
     .post-avatar { display: flex; align-items: center; gap: 8px; }
-    .post-av-circle { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--orange-light), var(--orange-dark)); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px; flex-shrink: 0; box-shadow: 0 2px 6px rgba(255,149,0,0.3); }
+    .post-av-circle { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--yellow-light), var(--yellow-dark)); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px; flex-shrink: 0; box-shadow: 0 2px 6px rgba(245,200,0,0.3); }
     .post-name { font-size: 13px; font-weight: 700; color: var(--dark); }
-    .post-med  { font-size: 10px; color: var(--muted); background: var(--orange-bg); border-radius: 4px; padding: 1px 5px; display: inline-block; margin-top: 2px; }
+    .post-med  { font-size: 10px; color: var(--muted); background: var(--yellow-bg); border-radius: 4px; padding: 1px 5px; display: inline-block; margin-top: 2px; }
     .post-time { font-size: 11px; color: var(--muted); white-space: nowrap; }
     .post-text { font-size: 14px; color: var(--dark); line-height: 1.6; margin-bottom: 12px; }
     .post-actions { display: flex; align-items: center; gap: 8px; }
@@ -348,17 +349,17 @@
       padding: 6px 12px; cursor: pointer; font-size: 13px; color: var(--muted);
       font-family: inherit; transition: all 0.15s;
     }
-    .like-btn.liked { background: var(--orange-bg); border-color: var(--orange); color: var(--orange); font-weight: 700; }
+    .like-btn.liked { background: var(--yellow-bg); border-color: var(--yellow); color: var(--yellow); font-weight: 700; }
     .icon-btn { background: none; border: none; cursor: pointer; font-size: 18px; opacity: 0.5; padding: 4px; line-height: 1; }
 
     /* System message */
-    .sys-card { background: linear-gradient(135deg, var(--orange), var(--orange-dark)); border-radius: 16px; padding: 16px; margin-bottom: 10px; text-align: center; }
+    .sys-card { background: linear-gradient(135deg, var(--yellow), var(--yellow-dark)); border-radius: 16px; padding: 16px; margin-bottom: 10px; text-align: center; }
     .sys-card .sys-emoji { font-size: 22px; margin-bottom: 4px; }
-    .sys-card .sys-text  { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 2px; text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
-    .sys-card .sys-meta  { font-size: 11px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.4); }
+    .sys-card .sys-text  { font-size: 14px; font-weight: 700; color: var(--dark); margin-bottom: 2px; }
+    .sys-card .sys-meta  { font-size: 11px; color: var(--dark); }
 
     /* Announcement card */
-    .ann-card { background: rgba(255,149,0,0.08); border: 1px solid rgba(255,149,0,0.2); border-radius: 16px; padding: 14px 16px; margin-bottom: 10px; }
+    .ann-card { background: rgba(245,200,0,0.08); border: 1px solid rgba(245,200,0,0.2); border-radius: 16px; padding: 14px 16px; margin-bottom: 10px; }
 
     /* ── FAB Footer ── */
     .fab-footer {
@@ -374,9 +375,9 @@
     }
     .fab-hint.show { opacity: 1; }
     .fab-bar { background: #fff; border-radius: 40px; box-shadow: 0 4px 24px rgba(0,0,0,0.14); display: flex; align-items: center; gap: 6px; padding: 8px 14px; pointer-events: all; }
-    .fab-btn { width: 44px; height: 44px; border-radius: 50%; border: none; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: rgba(255,149,0,0.13); transition: all 0.15s; }
-    .fab-btn.active { background: var(--orange); box-shadow: 0 2px 8px rgba(255,149,0,0.4); }
-    .fab-btn-compose { width: 52px; height: 52px; border-radius: 50%; border: none; cursor: pointer; font-size: 22px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: linear-gradient(135deg, var(--orange-light), var(--orange-dark)); box-shadow: 0 4px 12px rgba(255,149,0,0.5); }
+    .fab-btn { width: 44px; height: 44px; border-radius: 50%; border: none; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: rgba(245,200,0,0.13); transition: all 0.15s; }
+    .fab-btn.active { background: var(--yellow); box-shadow: 0 2px 8px rgba(245,200,0,0.4); }
+    .fab-btn-compose { width: 52px; height: 52px; border-radius: 50%; border: none; cursor: pointer; font-size: 22px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: linear-gradient(135deg, var(--yellow-light), var(--yellow-dark)); box-shadow: 0 4px 12px rgba(245,200,0,0.5); }
 
     /* ── Overlays ── */
     .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: flex-end; z-index: 100; }
@@ -388,12 +389,12 @@
     .btn-row { display: flex; gap: 10px; }
     .btn-danger { flex: 1; background: #e53935; color: #fff; border: none; border-radius: 10px; padding: 12px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
 
-    .report-opt { display: block; width: 100%; background: var(--orange-bg); border: none; border-radius: 10px; padding: 12px 14px; font-size: 14px; text-align: left; cursor: pointer; margin-bottom: 8px; color: var(--dark); font-family: inherit; }
+    .report-opt { display: block; width: 100%; background: var(--yellow-bg); border: none; border-radius: 10px; padding: 12px 14px; font-size: 14px; text-align: left; cursor: pointer; margin-bottom: 8px; color: var(--dark); font-family: inherit; }
     .sheet-note { font-size: 11px; color: var(--muted); text-align: center; margin-top: 6px; }
 
-    .compose-ta { width: 100%; border: 1.5px solid var(--orange); border-radius: 14px; padding: 10px 12px; font-size: 14px; resize: none; outline: none; font-family: inherit; min-height: 100px; margin-bottom: 10px; }
+    .compose-ta { width: 100%; border: 1.5px solid var(--yellow); border-radius: 14px; padding: 10px 12px; font-size: 14px; resize: none; outline: none; font-family: inherit; min-height: 100px; margin-bottom: 10px; }
 
-    .notif-box { background: var(--orange-bg); border-radius: 14px; padding: 16px; margin-bottom: 16px; }
+    .notif-box { background: var(--yellow-bg); border-radius: 14px; padding: 16px; margin-bottom: 16px; }
     .notif-box-title { font-size: 14px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
     .notif-box-sub   { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
 
@@ -444,7 +445,7 @@
         <button id="verify-btn" class="btn-primary" disabled>Verify →</button>
         <div style="display:flex;justify-content:space-between;margin-top:14px;">
           <button id="back-to-email-btn" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;">← Change email</button>
-          <button id="resend-btn" style="background:none;border:none;color:var(--orange);font-size:13px;font-weight:600;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;">Resend code</button>
+          <button id="resend-btn" style="background:none;border:none;color:var(--yellow);font-size:13px;font-weight:600;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;">Resend code</button>
         </div>
       </div>
     </div>
@@ -659,7 +660,7 @@
     <span class="sheet-label">Avatar Colour</span>
     <div id="ms-colors" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;"></div>
 
-    <div id="ms-preview" style="display:flex;align-items:center;gap:10px;background:var(--orange-bg);border-radius:12px;padding:12px 14px;margin-bottom:16px;">
+    <div id="ms-preview" style="display:flex;align-items:center;gap:10px;background:var(--yellow-bg);border-radius:12px;padding:12px 14px;margin-bottom:16px;">
       <div id="ms-av" class="avatar"></div>
       <div>
         <div id="ms-av-name" style="font-size:13px;font-weight:700;color:var(--dark);"></div>
@@ -668,7 +669,7 @@
     </div>
 
     <!-- Medication quick-access -->
-    <button id="ms-med-btn" style="width:100%;text-align:left;background:var(--orange-bg);border:1.5px solid rgba(255,149,0,0.18);border-radius:12px;padding:11px 14px;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;gap:10px;font-family:inherit;">
+    <button id="ms-med-btn" style="width:100%;text-align:left;background:var(--yellow-bg);border:1.5px solid rgba(245,200,0,0.18);border-radius:12px;padding:11px 14px;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;gap:10px;font-family:inherit;">
       <span style="font-size:20px;">💊</span>
       <div style="flex:1;">
         <div style="font-size:13px;font-weight:700;color:var(--dark);">Medication</div>
@@ -678,7 +679,7 @@
     </button>
 
     <!-- Stability counter quick-access -->
-    <button id="ms-stable-btn" style="width:100%;text-align:left;background:var(--orange-bg);border:1.5px solid rgba(255,149,0,0.18);border-radius:12px;padding:11px 14px;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-family:inherit;">
+    <button id="ms-stable-btn" style="width:100%;text-align:left;background:var(--yellow-bg);border:1.5px solid rgba(245,200,0,0.18);border-radius:12px;padding:11px 14px;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-family:inherit;">
       <span style="font-size:20px;">🧘</span>
       <div style="flex:1;">
         <div style="font-size:13px;font-weight:700;color:var(--dark);">Stability Counter</div>
@@ -718,7 +719,7 @@
     </div>
     <button id="med-ov-add" class="btn-outline" style="width:100%;margin-bottom:18px;">+ Add</button>
 
-    <div id="med-ov-bb-note" style="display:none;font-size:12px;color:var(--muted);background:var(--orange-bg);border-radius:8px;padding:8px 10px;margin-bottom:14px;line-height:1.5;">
+    <div id="med-ov-bb-note" style="display:none;font-size:12px;color:var(--muted);background:var(--yellow-bg);border-radius:8px;padding:8px 10px;margin-bottom:14px;line-height:1.5;">
       💡 You're signed in to BipolarBear — saving will also update your medication in the main app.
     </div>
 
@@ -745,7 +746,7 @@
 
     <!-- BB App users: streak computed automatically from journal -->
     <div id="stable-ov-bb-section" style="display:none;">
-      <div style="background:var(--orange-bg);border-radius:10px;padding:12px 14px;margin-bottom:14px;line-height:1.6;">
+      <div style="background:var(--yellow-bg);border-radius:10px;padding:12px 14px;margin-bottom:14px;line-height:1.6;">
         <div style="font-size:13px;font-weight:700;color:var(--dark);margin-bottom:4px;">🧘 <span id="stable-ov-bb-count">0</span> consecutive stable days</div>
         <div style="font-size:12px;color:var(--muted);">Automatically calculated from your BipolarBear journal — consecutive days where you logged Stable mood up to your most recent entry.</div>
       </div>
@@ -810,7 +811,7 @@
       This is an anonymous peer community for people living with bipolar disorder. You join with a chosen name — your real identity is never stored or shared.
     </p>
 
-    <div style="background:var(--orange-bg);border-radius:12px;padding:14px 16px;margin-bottom:18px;">
+    <div style="background:var(--yellow-bg);border-radius:12px;padding:14px 16px;margin-bottom:18px;">
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Community guidelines</div>
       <div style="font-size:13px;color:var(--dark);line-height:1.8;">
         💛 &nbsp;Be kind — everyone here is doing their best<br>
@@ -825,7 +826,7 @@
       <p style="font-size:13px;color:var(--dark);line-height:1.6;margin-bottom:12px;">
         BipolarBear is a free mood journal and survival kit for people with bipolar disorder — track mood, energy, sleep and medication daily.
       </p>
-      <a href="https://bipolarbear.app" target="_blank" rel="noopener" style="display:block;background:var(--orange);color:#fff;font-weight:700;font-size:13px;border-radius:10px;padding:11px;text-align:center;text-decoration:none;text-shadow:0 1px 2px rgba(0,0,0,0.2);">🐻 Discover BipolarBear →</a>
+      <a href="https://bipolarbear.app" target="_blank" rel="noopener" style="display:block;background:var(--yellow);color:var(--dark);font-weight:700;font-size:13px;border-radius:10px;padding:11px;text-align:center;text-decoration:none;">🐻 Discover BipolarBear →</a>
     </div>
 
     <button id="about-close" class="btn-secondary" style="width:100%;">Close</button>
@@ -853,9 +854,9 @@ if (!window.Capacitor && location.protocol !== 'file:' && localStorage.getItem('
 // ─────────────────────────────────────────────────────────────────
 // Constants & state
 // ─────────────────────────────────────────────────────────────────
-const ORANGE      = '#ff9500';
-const ORANGE_DARK = '#e07800';
-const ORANGE_LT   = '#ffb340';
+const YELLOW      = '#f5c800';
+const YELLOW_DARK = '#c49e00';
+const YELLOW_LT   = '#ffe566';
 const ADMIN_EMAIL = 'inbox@jamesmarkey.co.uk';
 const _isAnonDomain = ['bipolaranonymous.app','www.bipolaranonymous.app'].includes(location.hostname);
 
@@ -898,8 +899,8 @@ const profile = {
   get hasPosted()   { return localStorage.getItem('bbAnon_hasPosted') === 'true'; },
   get isAdmin()     { return localStorage.getItem('bbAnon_isAdmin')   === 'true'; },
   get colorKey()    { return localStorage.getItem('bbAnon_colorKey')  || 'orange'; },
-  get grad1()       { const p = COLOR_PRESETS.find(c => c.key === this.colorKey); return p ? p.g1 : ORANGE_LT; },
-  get grad2()       { const p = COLOR_PRESETS.find(c => c.key === this.colorKey); return p ? p.g2 : ORANGE_DARK; },
+  get grad1()       { const p = COLOR_PRESETS.find(c => c.key === this.colorKey); return p ? p.g1 : YELLOW_LT; },
+  get grad2()       { const p = COLOR_PRESETS.find(c => c.key === this.colorKey); return p ? p.g2 : YELLOW_DARK; },
   get customInit()  { return localStorage.getItem('bbAnon_initials')  || ''; },
   avatarInitials()  { return this.customInit || initials(this.monika); },
   // Pull streak from journal if available, else default to 1
@@ -1036,10 +1037,10 @@ function showEmailVerificationRequired(user) {
       'We sent a verification link to <strong>' + (user ? user.email : 'your email') + '</strong>.' +
       ' Click it in your inbox, then tap the button below.' +
       '<div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">' +
-        '<button id="bbAnonCheckVerified" style="background:var(--orange);border:none;border-radius:10px;color:white;font-weight:700;padding:11px;font-size:0.95em;cursor:pointer;">I\'ve verified — continue →</button>' +
-        '<button id="bbAnonResendVerify" style="background:none;border:1.5px solid #935200;border-radius:10px;color:#935200;font-weight:600;padding:10px;font-size:0.88em;cursor:pointer;">Resend verification email</button>' +
+        '<button id="bbAnonCheckVerified" style="background:var(--yellow);border:none;border-radius:10px;color:var(--dark);font-weight:700;padding:11px;font-size:0.95em;cursor:pointer;">I\'ve verified — continue →</button>' +
+        '<button id="bbAnonResendVerify" style="background:none;border:1.5px solid #7a6a20;border-radius:10px;color:#7a6a20;font-weight:600;padding:10px;font-size:0.88em;cursor:pointer;">Resend verification email</button>' +
       '</div>';
-    errDiv.style.cssText = 'display:block;padding:14px;background:rgba(255,107,0,0.07);border:1.5px solid rgba(255,107,0,0.25);border-radius:12px;font-size:13px;color:#495057;line-height:1.5;';
+    errDiv.style.cssText = 'display:block;padding:14px;background:rgba(245,200,0,0.07);border:1.5px solid rgba(245,200,0,0.25);border-radius:12px;font-size:13px;color:#495057;line-height:1.5;';
 
     document.getElementById('bbAnonCheckVerified').onclick = async function() {
       const u = firebase.auth().currentUser;
@@ -1795,7 +1796,7 @@ function todaySystemPost() {
 
 function seedPosts() {
   return [
-    { id: 'seed_1', isSeed: true, tab: 'general', name: 'SunnyDaze', streak: 42, text: 'Today was really hard but I made it through. Small wins 💛', timestamp: null, likes: 5, med: 'Lithium', grad1: ORANGE_LT, grad2: ORANGE_DARK, initials: 'SD' },
+    { id: 'seed_1', isSeed: true, tab: 'general', name: 'SunnyDaze', streak: 42, text: 'Today was really hard but I made it through. Small wins 💛', timestamp: null, likes: 5, med: 'Lithium', grad1: YELLOW_LT, grad2: YELLOW_DARK, initials: 'SD' },
     { id: 'seed_2', isSeed: true, tab: 'general', name: 'NightOwl',  streak: 7,  text: 'Anyone else struggle with mornings? Takes me until noon to feel human 😅', timestamp: null, likes: 3, med: '', grad1: '#64b5f6', grad2: '#1565c0', initials: 'NO' },
   ];
 }
@@ -1927,7 +1928,7 @@ function renderSystem(p) {
 function renderAnnouncement(p) {
   return `<div class="ann-card">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-      <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,${ORANGE_LT},${ORANGE_DARK});display:flex;align-items:center;justify-content:center;font-size:16px;">🐻</div>
+      <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,${YELLOW_LT},${YELLOW_DARK});display:flex;align-items:center;justify-content:center;font-size:16px;">🐻</div>
       <div style="font-size:13px;font-weight:700;color:var(--dark);">BipolarBear</div>
     </div>
     <div class="post-text">${esc(p.text)}</div>
@@ -1942,8 +1943,8 @@ function renderPost(p) {
   const likes      = p.likes || 0;
   const showMed    = profile.showMeds && p.med;
   const showStable = (p.stable || 0) > 0;
-  const g1      = p.grad1 || ORANGE_LT;
-  const g2      = p.grad2 || ORANGE_DARK;
+  const g1      = p.grad1 || YELLOW_LT;
+  const g2      = p.grad2 || YELLOW_DARK;
   const av      = p.initials || initials(p.name);
   const adminBadge   = p.isAdmin ? '<span class="admin-badge">ADMIN</span>' : '';
   const deleteBtn    = profile.isAdmin && !p.isSeed

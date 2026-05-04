@@ -1,0 +1,10 @@
+{
+  "name": "Bipolar Anonymous",
+  "short_name": "BipolarAnon",
+  "description": "An anonymous peer community for people living with bipolar disorder",
+  "start_url": "anonymous.html",
+  "display": "standalone",
+  "background_color": "#f5c800",
+  "theme_color": "#f5c800",
+  "orientation": "portrait"
+}

@@ -1,0 +1,19 @@
+{
+  "appId": "com.bipolaranonymous.app",
+  "appName": "Bipolar Anonymous",
+  "webDir": "www-anonymous",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#f5c800",
+      "showSpinner": false
+    },
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_icon_config_sample",
+      "iconColor": "#f5c800"
+    }
+  }
+}
