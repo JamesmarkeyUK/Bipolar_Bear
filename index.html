@@ -867,7 +867,38 @@
               localStorage.setItem('logoVariant', d.logoVariant);
               applyLogoVariant(d.logoVariant);
             }
-            // Populate survival kit keys so the tick check works without visiting the page first
+            // Sync onboarding step from Firestore FIRST (needed to set completion flags before tick update)
+            const _serverStep = d.onboardingStep || 0;
+            const _localStep = _getOnboardingStep();
+            let _finalStep = Math.max(_serverStep, _localStep);
+            // Step 9 (WA hint) removed from tutorial — skip on all platforms
+            if (_finalStep === 9) _finalStep = 10;
+            if (_finalStep !== _localStep) {
+              localStorage.setItem('bbOnboardingStep', String(_finalStep));
+              db.collection('userSettings').doc(user.uid).set({ onboardingStep: _finalStep }, { merge: true }).catch(() => {});
+            } else if (_localStep > _serverStep) {
+              db.collection('userSettings').doc(user.uid).set({ onboardingStep: _localStep }, { merge: true }).catch(() => {});
+            }
+            // Restore hint flags from Firestore
+            if (d.personalHintDone) localStorage.setItem('bbPersonalHintDone', '1');
+            if (d.tutorialToastShown) localStorage.setItem('bbTutorialToastShown', '1');
+            // If tutorial is complete, silently ensure all completion flags are set on login.
+            // Never show the tutorial-complete popup here — it only fires via _advanceOnboardingStep.
+            if (_finalStep >= 12) {
+              localStorage.setItem('bbTutorialToastShown', '1');
+              localStorage.setItem('bbFabsUnlocked', '1');
+              // Prevent survival-kit celebration toast from re-firing on a new device/browser
+              localStorage.setItem('bbSurvivalCelebDone', '1');
+              ['bbWelcomeShown','bbSurvivalKitVisited','bbMedHintDone','bbMoodDefHintDone',
+               'bb_fmChooseMoodHintDone','bb_fmMoodInfoCloseHintDone','bbSettingsHintDone',
+               'bbCustomiseFormHintDone','bbCustomiseAdditionalHintDone','bbCloseSettingsHintDone',
+               'bb_fmMoodTipShown'].forEach(f => { if (!localStorage.getItem(f)) localStorage.setItem(f, '1'); });
+              if (!d.tutorialToastShown) {
+                db.collection('userSettings').doc(user.uid).set({ tutorialToastShown: true }, { merge: true }).catch(() => {});
+              }
+            }
+            // Populate survival kit keys so the tick check works without visiting the page first.
+            // Must happen AFTER completion flags are set so MutationObserver doesn't fire celebration toast.
             if (d.moodDefinitions !== undefined) localStorage.setItem('moodDefinitions', JSON.stringify(d.moodDefinitions));
             if (d.copingStrategies !== undefined) localStorage.setItem('copingStrategies', JSON.stringify(d.copingStrategies));
             if (d.currentMedList  !== undefined) localStorage.setItem('currentMedList',  JSON.stringify(d.currentMedList));
@@ -887,29 +918,7 @@
                 sTick.setAttribute('data-done', done ? 'true' : 'false');
               } catch(e) {}
             }
-            // Sync onboarding step from Firestore (take max of local and server)
-            const _serverStep = d.onboardingStep || 0;
-            const _localStep = _getOnboardingStep();
-            let _finalStep = Math.max(_serverStep, _localStep);
-            // Step 9 (WA hint) removed from tutorial — skip on all platforms
-            if (_finalStep === 9) _finalStep = 10;
-            if (_finalStep !== _localStep) {
-              localStorage.setItem('bbOnboardingStep', String(_finalStep));
-              db.collection('userSettings').doc(user.uid).set({ onboardingStep: _finalStep }, { merge: true }).catch(() => {});
-            } else if (_localStep > _serverStep) {
-              db.collection('userSettings').doc(user.uid).set({ onboardingStep: _localStep }, { merge: true }).catch(() => {});
-            }
-            // Restore personal details hint dismissal state from Firestore
-            if (d.personalHintDone) localStorage.setItem('bbPersonalHintDone', '1');
-            // Restore tutorial-shown flag from Firestore so it survives logout + device switches
-            if (d.tutorialToastShown) localStorage.setItem('bbTutorialToastShown', '1');
             _applyOnboardingGating();
-            // If step reached 12 but tutorial popup was never shown, show it once then persist to Firestore
-            if (_finalStep >= 12 && localStorage.getItem('bbTutorialToastShown') !== '1') {
-              localStorage.setItem('bbTutorialToastShown', '1');
-              db.collection('userSettings').doc(user.uid).set({ tutorialToastShown: true }, { merge: true }).catch(() => {});
-              setTimeout(_showTutorialCompleteModal, 600);
-            }
           }).catch(() => {});
           // Check Firestore for the current entry if the local cache is missing or stale
           (function() {
