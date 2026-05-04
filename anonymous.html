@@ -1299,8 +1299,15 @@ function setupVerify() {
       }
       localStorage.setItem('bbAnon_verified', 'true');
       localStorage.setItem('bbAnon_email', _pendingEmail); // marks standalone path (not Firebase auth)
-      showScreen('monika');
-      setupMonika();
+      // Returning user on a new device — try to restore their profile from Firestore
+      const _restored = await _anonRestoreProfile(_pendingEmail);
+      if (_restored) {
+        showScreen('board');
+        initBoard();
+      } else {
+        showScreen('monika');
+        setupMonika();
+      }
     } catch (err) {
       verifyBtn.disabled  = false;
       verifyBtn.textContent = origText;
@@ -1454,6 +1461,68 @@ async function _anonSaveMedList(list) {
 }
 
 // ─────────────────────────────────────────────────────────────────
+// Standalone profile persistence (Firestore, keyed by email hash)
+// ─────────────────────────────────────────────────────────────────
+
+// SHA-256 of email — never the raw address, so it's not directly linkable
+async function _anonEmailHash(email) {
+  const enc = new TextEncoder();
+  const buf = await crypto.subtle.digest('SHA-256', enc.encode(email.toLowerCase().trim()));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Write current profile to anonProfiles/{hash}. No-op for BB users (they use userSettings).
+async function _anonSaveProfile() {
+  if (!db || _bbUser) return;
+  const email = localStorage.getItem('bbAnon_email');
+  if (!email) return;
+  try {
+    const hash = await _anonEmailHash(email);
+    await db.collection('anonProfiles').doc(hash).set({
+      monika:       profile.monika      || null,
+      colorKey:     profile.colorKey    || 'orange',
+      customInit:   profile.customInit  || '',
+      showMeds:     profile.showMeds,
+      medList:      _anonGetMedList(),
+      showStable:   profile.showStable,
+      stableSince:  profile.stableSince || null,
+      stableStreak: profile.stableStreak,
+      updatedAt:    firebase.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
+  } catch(e) { console.warn('[Anonymous] profile save failed', e); }
+}
+
+// Read profile from Firestore and restore localStorage. Returns true if a monika was found.
+async function _anonRestoreProfile(email) {
+  if (!db) return false;
+  try {
+    const hash = await _anonEmailHash(email);
+    const doc  = await db.collection('anonProfiles').doc(hash).get();
+    if (!doc.exists) return false;
+    const d = doc.data();
+    if (d.monika)              localStorage.setItem('bbAnon_monika',   d.monika);
+    if (d.colorKey)            localStorage.setItem('bbAnon_colorKey', d.colorKey);
+    if (d.customInit !== undefined) localStorage.setItem('bbAnon_initials', d.customInit || '');
+    if (d.showMeds   !== undefined) localStorage.setItem('bbAnon_showMeds', d.showMeds ? 'true' : 'false');
+    if (d.medList && d.medList.length > 0) {
+      localStorage.setItem('bbAnon_medList', JSON.stringify(d.medList));
+      localStorage.setItem('bbAnon_med', d.medList.map(m => m.name).filter(Boolean).join(', '));
+    }
+    if (d.showStable !== undefined) localStorage.setItem('bbAnon_showStable', d.showStable ? 'true' : 'false');
+    if (d.stableSince) {
+      localStorage.setItem('bbAnon_stableSince', d.stableSince);
+      // Recompute days since (it grows each day automatically)
+      const days = Math.max(0, Math.floor((Date.now() - new Date(d.stableSince).getTime()) / 86400000));
+      localStorage.setItem('bbAnon_stableStreak', String(days));
+    }
+    return !!d.monika;
+  } catch(e) {
+    console.warn('[Anonymous] profile restore failed', e);
+    return false;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────
 // SCREEN: Medication entry (onboarding + editing from settings)
 // ─────────────────────────────────────────────────────────────────
 function setupMedDefine(onDone) {
@@ -1567,6 +1636,7 @@ function openMedSettings() {
   document.getElementById('med-ov-save').onclick = async () => {
     localStorage.setItem('bbAnon_showMeds', showMeds ? 'true' : 'false');
     await _anonSaveMedList(medList);
+    _anonSaveProfile();
     closeOv('ov-med');
     showHint('Medication updated ✓');
   };
@@ -1586,6 +1656,7 @@ function initBoard() {
   setupOverlayActions();
   setTab('general');
   cleanOldPosts();
+  _anonSaveProfile(); // persist standalone profile to Firestore (no-op for BB users)
 }
 
 function renderUserPill() {
@@ -2003,6 +2074,7 @@ function openStableSettings() {
       }
     }
 
+    _anonSaveProfile();
     closeOv('ov-stable');
     renderUserPill();
   };
@@ -2216,6 +2288,7 @@ document.getElementById('ms-save').addEventListener('click', async () => {
       await batch.commit();
     } catch (e) { console.warn('[Monika] update posts failed', e); }
   }
+  _anonSaveProfile();
 });
 
 // ─────────────────────────────────────────────────────────────────
