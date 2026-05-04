@@ -555,7 +555,7 @@
   <div class="fab-footer">
     <div class="fab-hint" id="fab-hint"></div>
     <div class="fab-bar">
-      <button class="fab-btn" id="fab-home"    title="Back to BipolarBear">🏠</button>
+      <button class="fab-btn" id="fab-home"    title="About Bipolar Anonymous">ℹ️</button>
       <button class="fab-btn" id="fab-ann"     title="Announcements">📢</button>
       <button class="fab-btn-compose" id="fab-compose" title="Write a post">✏️</button>
       <button class="fab-btn active" id="fab-gen" title="General Chat">💬</button>
@@ -1892,14 +1892,7 @@ function setupFAB() {
   });
   document.getElementById('fab-e2ee').addEventListener('click', () => openOv('ov-e2ee'));
 
-  const fabHome = document.getElementById('fab-home');
-  if (_isAnonDomain) {
-    fabHome.textContent = 'ℹ️';
-    fabHome.title = 'About Bipolar Anonymous';
-    fabHome.addEventListener('click', openAbout);
-  } else {
-    fabHome.addEventListener('click', () => { location.href = 'index.html'; });
-  }
+  document.getElementById('fab-home').addEventListener('click', openAbout);
 }
 
 // ─────────────────────────────────────────────────────────────────
