@@ -1100,8 +1100,11 @@ document.getElementById('about-close').addEventListener('click', () => closeOv('
 // _goHome() is called from inline onclick attributes on onboarding screens
 // and the board logo. Navigates appropriately for the current domain.
 function _goHome() {
-  if (_bbUser) { location.href = 'https://bipolarbear.app'; }
-  else if (!_isAnonDomain) { location.replace('index.html'); }
+  if (_bbUser) {
+    // In the native app navigate within the app; on the web go to the public homepage
+    if (window.Capacitor || location.protocol === 'file:') { location.replace('index.html'); }
+    else { location.href = 'https://bipolarbear.app'; }
+  } else if (!_isAnonDomain) { location.replace('index.html'); }
   // standalone users on anon domain: do nothing
 }
 

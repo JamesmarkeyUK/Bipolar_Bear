@@ -365,6 +365,44 @@
       }
     }
 
+    /* ── Short screens (iPhone 15 Pro and similar) — tighten spacing to avoid scroll ── */
+    @media (max-height: 860px) {
+      body {
+        padding-top: max(12px, calc(50vh - 340px));
+        padding-bottom: 60px;
+      }
+      .logo-img {
+        max-width: 120px;
+        width: 120px;
+      }
+      .logo-bounce-wrapper {
+        margin-bottom: 2px;
+      }
+      .logo-hint {
+        margin-bottom: 16px;
+      }
+      h1 {
+        font-size: 2.2em;
+        margin-bottom: 8px;
+      }
+      .tagline {
+        font-size: 1em;
+        margin-bottom: 24px;
+      }
+      .buttons {
+        gap: 8px;
+        margin-top: 12px;
+        margin-bottom: 20px;
+      }
+      .btn {
+        padding: 14px 48px 14px 24px;
+        font-size: 1.05em;
+      }
+      .btn-container {
+        padding: 3px 5px;
+      }
+    }
+
     /* ── Prevent double-tap zoom on iOS ── */
     * { touch-action: manipulation; }
 
@@ -1326,12 +1364,22 @@
         badge.style.cursor  = 'pointer';
       }
 
-      // Anonymous badge: 💬
+      // Anonymous badge: 👋 monika + 💬 streak
       const anonBadge = document.getElementById('anonStreakBadge');
       if (anonBadge) {
         if (hasAnon && anon > 0) {
-          anonBadge.textContent   = `💬 ${anon} day${anon === 1 ? '' : 's'} streak`;
+          const _monika = localStorage.getItem('bbAnon_monika') || '';
+          const _monikaStr = _monika ? `👋 ${_monika} &nbsp;·&nbsp; ` : '';
+          anonBadge.innerHTML     = `${_monikaStr}💬 ${anon} day${anon === 1 ? '' : 's'} streak`;
           anonBadge.style.display = 'block';
+        } else if (hasAnon) {
+          const _monika = localStorage.getItem('bbAnon_monika') || '';
+          if (_monika) {
+            anonBadge.innerHTML     = `👋 ${_monika}`;
+            anonBadge.style.display = 'block';
+          } else {
+            anonBadge.style.display = 'none';
+          }
         } else {
           anonBadge.style.display = 'none';
         }
