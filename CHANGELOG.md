@@ -1,5 +1,50 @@
 # BipolarBear Changelog
 
+## v0.95
+- 🎨 App background gradient softened from saturated orange (`#ff9500 → #ff6b00`) to a warmer amber (`#ffaa33 → #ff8833`) across all pages — easier on the eyes
+
+## v0.94
+- 🐛 Fix: Tutorial-complete popup no longer appears on every login for users who completed the tutorial before cloud persistence was added
+- 🐛 Fix: FAB dock (settings access) was sometimes locked in journal after login — `bbFabsUnlocked` now set before `_applyOnboardingGating()` runs
+- 🐛 Fix: "Survival kit filled in" celebration toast no longer re-fires on a new device/browser — `bbSurvivalCelebDone` now silently set on login when tutorial is complete
+- 🐛 Fix: Tutorial flags are now all set before the survival tick is updated, so the MutationObserver cannot trigger stale celebration toasts
+- ✨ All tutorial completion flags are silently reconciled on login — no popups, hints, or toasts fire for users who have already finished the tutorial
+
+## v0.93
+- ✨ Button sub-labels on the home screen (🔥 streak, survival progress, anonymous badge) now share a consistent style via `.btn-subnote` and `.btn-subnote-muted` CSS classes
+- 🐛 Fix: Survival kit progress label now correctly shows when sections are incomplete (was using `style.display = ''` which resolved to the class default of `none`)
+
+## v0.92
+- ✨ "New messages" badge under Bipolar Anonymous button on home screen — shows count of posts since last visit, or "✓ No new messages" if up to date; first-time visitors see "💬 Tap to join the community"
+- `bbAnonLastVisit` timestamp written to localStorage when the board is entered
+
+## v0.91
+- ✨ Day streak badge under Mood Journal button on home screen — shows 🔥 N days based on `bbCurrentStreak` (calculated in journal.html and cached to localStorage)
+
+## v0.90
+- ✨ **Bipolar Anonymous** — new `anonymous.html` page: email-verified anonymous community board
+  - Email field locked to BipolarBear account email (read-only); page blocked if not signed in
+  - 4-digit verification code sent via Resend API (Cloud Function `sendAnonCode`)
+  - Paste-to-fill across code boxes; resend and back-to-email buttons
+  - Error handling for wrong code, expired session, rate limit, and session not found
+  - Board auto-unlocked (`bbAnon_verified`) after successful verification
+  - Signed out of board if Firebase Auth session ends
+- ✨ **Cloud Functions** (`functions/index.js`) — Firebase Functions v2, deployed to `europe-west1`
+  - `sendAnonCode` — rate-limited (3 per 10 min), generates code, writes to `anonVerify` collection, sends email via Resend; `invoker: 'public'`
+  - `verifyAnonCode` — validates code, checks TTL, marks session verified; `invoker: 'public'`
+  - From address: `BipolarBear <verify@bipolarbear.app>` (domain verified in Resend)
+  - Secret: `RESEND_API_KEY` stored in Firebase Secret Manager
+- ✨ Node runtime upgraded from 20 → 22 in `functions/package.json`
+- ✨ Firebase project upgraded to **Blaze plan** (required for Cloud Functions + Secret Manager)
+- ✨ Admin accounts (`profile.isAdmin`) no longer see double delete button on their own posts
+- 🐛 Fix: `firebase.app().functions('europe-west1')` used instead of `firebase.functions('europe-west1')` — the latter treated the region string as an app name in the compat SDK
+- 🐛 Fix: Compound Firestore query (`email` + `createdAt`) replaced with single-field query + JS filter to avoid requiring a composite index
+
+## v0.89
+- ✨ "Change email" added to account modal (fab.js) — re-auth required, then `user.updateEmail()`
+- 🐛 Fix: Guest PIN (`bbGuestPinSalt`) was not tied to a specific account UID, causing lock-out when switching accounts — `bbPinLinkedUID` now stores the owning UID; mismatched PIN cleared on sign-in
+- 🐛 Fix: `bbTutorialToastShown` removed from logout `keysToRemove` array and instead persisted to Firestore (`tutorialToastShown: true`) so "tutorial complete" popup never repeats across devices
+
 ## v0.88
 - ✨ FAB dock buttons now consistent across all three pages — Chat, Coffee, E2EE, and Feedback all open modals on index, journal, and survival kit
 - ✨ Guest data deletion added to sign-in screen — wipes all data and restarts as new user
