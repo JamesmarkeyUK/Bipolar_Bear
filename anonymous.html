@@ -1572,25 +1572,55 @@ async function _bbRestoreProfile(uid) {
     }
     if (typeof ap.visitStreak === 'number') localStorage.setItem('bbAnon_streak',     String(ap.visitStreak));
     if (ap.visitDate)                       localStorage.setItem('bbAnonVisitDate',    ap.visitDate);
+    // Mirror restored profile to anonProfiles so standalone email-code path
+    // can restore it on a fresh browser/device without needing Firebase Auth.
+    if (ap.monika && _bbUser && _bbUser.email) {
+      _anonEmailHash(_bbUser.email).then(hash =>
+        db.collection('anonProfiles').doc(hash).set({
+          monika:      ap.monika,
+          colorKey:    ap.colorKey    || 'orange',
+          customInit:  ap.customInit  || '',
+          showMeds:    !!ap.showMeds,
+          medList:     medList,
+          showStable:  !!ap.showStable,
+          stableSince: ap.stableSince || null,
+          visitStreak: ap.visitStreak || 0,
+          visitDate:   ap.visitDate   || null,
+          updatedAt:   firebase.firestore.FieldValue.serverTimestamp(),
+        }, { merge: true })
+      ).catch(() => {});
+    }
   } catch(e) { console.warn('[BB] _bbRestoreProfile failed', e); }
 }
 
 // Save current anon board profile into userSettings/{uid}.anonProfile
+// and mirror to anonProfiles/{hash} so the standalone email-code path
+// can restore the same profile on a fresh browser/device.
 function _bbSaveProfile() {
   if (!_bbUser || !db) return;
-  db.collection('userSettings').doc(_bbUser.uid).set({
-    anonProfile: {
-      monika:      profile.monika     || null,
-      colorKey:    profile.colorKey   || 'orange',
-      customInit:  profile.customInit || '',
-      showMeds:    profile.showMeds,
-      medList:     _anonGetMedList(),
-      showStable:  profile.showStable,
-      stableSince: profile.stableSince || null,
-      visitStreak: parseInt(localStorage.getItem('bbAnon_streak') || '0', 10),
-      visitDate:   localStorage.getItem('bbAnonVisitDate') || null,
-    }
-  }, { merge: true }).catch(e => console.warn('[BB] _bbSaveProfile failed', e));
+  const data = {
+    monika:      profile.monika     || null,
+    colorKey:    profile.colorKey   || 'orange',
+    customInit:  profile.customInit || '',
+    showMeds:    profile.showMeds,
+    medList:     _anonGetMedList(),
+    showStable:  profile.showStable,
+    stableSince: profile.stableSince || null,
+    visitStreak: parseInt(localStorage.getItem('bbAnon_streak') || '0', 10),
+    visitDate:   localStorage.getItem('bbAnonVisitDate') || null,
+  };
+  db.collection('userSettings').doc(_bbUser.uid).set(
+    { anonProfile: data }, { merge: true }
+  ).catch(e => console.warn('[BB] _bbSaveProfile failed', e));
+  // Mirror to anonProfiles so standalone email-code path finds the profile
+  if (_bbUser.email) {
+    _anonEmailHash(_bbUser.email).then(hash =>
+      db.collection('anonProfiles').doc(hash).set(
+        { ...data, updatedAt: firebase.firestore.FieldValue.serverTimestamp() },
+        { merge: true }
+      )
+    ).catch(e => console.warn('[BB] _bbSaveProfile mirror failed', e));
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────
