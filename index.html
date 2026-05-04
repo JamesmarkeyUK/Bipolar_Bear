@@ -1956,6 +1956,8 @@
       if (vEl) vEl.textContent = "What's new · v" + _APP_VERSION;
       if (hEl) hEl.textContent = headline;
       popup.style.display = 'block';
+      // Mark as seen immediately so navigating away doesn't re-show it
+      localStorage.setItem('bbLastSeenVersion', _APP_VERSION);
     }
     function _dismissWhatsNew() {
       localStorage.setItem('bbLastSeenVersion', _APP_VERSION);
