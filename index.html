@@ -645,6 +645,7 @@
         </a>
         <div id="anonymousSignInNote" class="btn-subnote-muted">Sign in to join the community</div>
         <div id="anonMessagesBadge" class="btn-subnote"></div>
+        <div id="anonStreakBadge" class="btn-subnote"></div>
       </div>
     </div>
 
@@ -1309,21 +1310,31 @@
     window.addEventListener('offline', updateOnlineStatus);
     updateOnlineStatus();
 
-    // Streak badge under journal button
+    // Streak badges under journal + anonymous buttons
     function _updateStreakBadge() {
-      const streak = parseInt(localStorage.getItem('bbCurrentStreak')  || '0', 10);
-      const stable = parseInt(localStorage.getItem('bbStableStreak')   || '0', 10);
-      const anon   = parseInt(localStorage.getItem('bbAnon_streak')    || '0', 10);
+      const streak = parseInt(localStorage.getItem('bbCurrentStreak') || '0', 10);
+      const stable = parseInt(localStorage.getItem('bbStableStreak')  || '0', 10);
+      const anon   = parseInt(localStorage.getItem('bbAnon_streak')   || '0', 10);
       const hasAnon = !!localStorage.getItem('bbAnon_monika');
-      const badge  = document.getElementById('journalStreakBadge');
-      if (!badge) return;
-      if (streak > 0) {
-        const streakPart = `🔥 ${streak} day${streak === 1 ? '' : 's'}`;
+
+      // Journal badge: 🔥 + 🧘
+      const badge = document.getElementById('journalStreakBadge');
+      if (badge && streak > 0) {
         const stablePart = stable > 0 ? ` &nbsp;🧘 ${stable}d` : '';
-        const anonPart   = hasAnon && anon > 0 ? ` &nbsp;💬 ${anon}d` : '';
-        badge.innerHTML      = streakPart + stablePart + anonPart;
-        badge.style.display  = 'block';
-        badge.style.cursor   = 'pointer';
+        badge.innerHTML     = `🔥 ${streak} day${streak === 1 ? '' : 's'}` + stablePart;
+        badge.style.display = 'block';
+        badge.style.cursor  = 'pointer';
+      }
+
+      // Anonymous badge: 💬
+      const anonBadge = document.getElementById('anonStreakBadge');
+      if (anonBadge) {
+        if (hasAnon && anon > 0) {
+          anonBadge.textContent   = `💬 ${anon} day${anon === 1 ? '' : 's'} streak`;
+          anonBadge.style.display = 'block';
+        } else {
+          anonBadge.style.display = 'none';
+        }
       }
     }
     _updateStreakBadge();
@@ -1347,8 +1358,7 @@
       tip.innerHTML =
         '<div style="font-weight:800;margin-bottom:8px;">Your counters</div>' +
         '<div style="margin-bottom:8px;">🔥 <strong>Streak</strong> — consecutive days you\'ve logged your mood. Resets if you miss a day.</div>' +
-        '<div style="margin-bottom:8px;">🧘 <strong>Stability</strong> — consecutive days you\'ve logged your mood as <em>Stable</em>, counted back from your most recent entry. Resets when any other mood is logged.</div>' +
-        '<div>💬 <strong>Community</strong> — consecutive days you\'ve visited Bipolar Anonymous. Resets if you miss a day.</div>';
+        '<div>🧘 <strong>Stability</strong> — consecutive days you\'ve logged your mood as <em>Stable</em>, counted back from your most recent entry. Resets when any other mood is logged.</div>';
 
       // Insert after badge
       badge.style.position = 'relative';
