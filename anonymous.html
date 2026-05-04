@@ -168,7 +168,7 @@
     /* ── Admin badge ── */
     .admin-badge {
       display: inline-block;
-      background: var(--orange);
+      background: #7c4400; /* dark amber — white on this = ~8.5:1 */
       color: #fff;
       font-size: 9px;
       font-weight: 800;
@@ -216,7 +216,7 @@
     .onboard-logo { text-align: center; margin-bottom: 28px; }
     .onboard-logo img { width: 80px; height: 80px; border-radius: 18px; box-shadow: 0 8px 24px rgba(0,0,0,0.25); margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto; }
     .onboard-logo h1 { font-size: 24px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
-    .onboard-logo p  { font-size: 12px; color: rgba(255,255,255,0.75); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; }
+    .onboard-logo p  { font-size: 12px; color: #fff; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; text-shadow: 0 1px 3px rgba(0,0,0,0.45); }
 
     .card { background: #fff; border-radius: 24px; padding: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
     .card-icon  { font-size: 36px; text-align: center; margin-bottom: 10px; }
@@ -310,24 +310,25 @@
     }
     .board-header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
     .board-back-btn {
-      color: white; text-decoration: none; background: rgba(255,255,255,0.2);
+      color: #fff; text-decoration: none; background: rgba(0,0,0,0.35);
       padding: 8px 14px; border-radius: 20px; font-size: 0.9em; font-weight: 600;
       transition: background 0.2s; border: none; cursor: pointer; font-family: inherit;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.25);
     }
-    @media (hover: hover) and (pointer: fine) { .board-back-btn:hover { background: rgba(255,255,255,0.35); } }
+    @media (hover: hover) and (pointer: fine) { .board-back-btn:hover { background: rgba(0,0,0,0.48); } }
     .board-logo { display: flex; align-items: center; gap: 10px; }
     .board-logo img { width: 36px; height: 36px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-    .board-logo-name { font-size: 18px; font-weight: 800; color: #fff; letter-spacing: -0.3px; }
-    .board-logo-sub  { font-size: 10px; color: rgba(255,255,255,0.75); letter-spacing: 0.6px; text-transform: uppercase; }
+    .board-logo-name { font-size: 18px; font-weight: 800; color: #fff; letter-spacing: -0.3px; text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+    .board-logo-sub  { font-size: 10px; color: #fff; letter-spacing: 0.6px; text-transform: uppercase; text-shadow: 0 1px 2px rgba(0,0,0,0.4); }
 
     .board-tabs { display: flex; gap: 4px; }
     .board-tab {
       flex: 1; padding: 10px 0; border-radius: 12px 12px 0 0; border: none;
       cursor: pointer; font-weight: 700; font-size: 13px; font-family: inherit;
-      background: rgba(255,255,255,0.2); color: rgba(255,255,255,0.85);
+      background: rgba(0,0,0,0.35); color: #fff;
       transition: all 0.15s;
     }
-    .board-tab.active { background: var(--cream); color: var(--orange); }
+    .board-tab.active { background: var(--cream); color: #7c4400; }
 
     /* Posts */
     #post-list { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 12px 12px 110px; }
@@ -353,8 +354,8 @@
     /* System message */
     .sys-card { background: linear-gradient(135deg, var(--orange), var(--orange-dark)); border-radius: 16px; padding: 16px; margin-bottom: 10px; text-align: center; }
     .sys-card .sys-emoji { font-size: 22px; margin-bottom: 4px; }
-    .sys-card .sys-text  { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 2px; }
-    .sys-card .sys-meta  { font-size: 11px; color: rgba(255,255,255,0.75); }
+    .sys-card .sys-text  { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 2px; text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+    .sys-card .sys-meta  { font-size: 11px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.4); }
 
     /* Announcement card */
     .ann-card { background: rgba(255,149,0,0.08); border: 1px solid rgba(255,149,0,0.2); border-radius: 16px; padding: 14px 16px; margin-bottom: 10px; }
@@ -934,7 +935,7 @@ function showEmailVerificationRequired(user) {
       ' Click it in your inbox, then tap the button below.' +
       '<div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">' +
         '<button id="bbAnonCheckVerified" style="background:var(--orange);border:none;border-radius:10px;color:white;font-weight:700;padding:11px;font-size:0.95em;cursor:pointer;">I\'ve verified — continue →</button>' +
-        '<button id="bbAnonResendVerify" style="background:none;border:1.5px solid var(--orange);border-radius:10px;color:var(--orange);font-weight:600;padding:10px;font-size:0.88em;cursor:pointer;">Resend verification email</button>' +
+        '<button id="bbAnonResendVerify" style="background:none;border:1.5px solid #935200;border-radius:10px;color:#935200;font-weight:600;padding:10px;font-size:0.88em;cursor:pointer;">Resend verification email</button>' +
       '</div>';
     errDiv.style.cssText = 'display:block;padding:14px;background:rgba(255,107,0,0.07);border:1.5px solid rgba(255,107,0,0.25);border-radius:12px;font-size:13px;color:#495057;line-height:1.5;';
 
@@ -1465,7 +1466,7 @@ function renderUserPill() {
     <div style="display:flex;align-items:center;gap:5px;">
       <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,${g1},${g2});display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:11px;flex-shrink:0;">${esc(av)}</div>
       <span style="font-size:12px;color:rgba(255,255,255,0.9);font-weight:600;">[${esc(m)}]</span>
-      ${profile.isAdmin ? '<span style="background:rgba(255,255,255,0.3);color:#fff;font-size:9px;font-weight:800;border-radius:4px;padding:1px 5px;">ADMIN</span>' : ''}
+      ${profile.isAdmin ? '<span style="background:rgba(0,0,0,0.55);color:#fff;font-size:9px;font-weight:800;border-radius:4px;padding:1px 5px;">ADMIN</span>' : ''}
       <span>🔥</span>
       <span style="font-size:11px;color:rgba(255,255,255,0.8);">${s}d</span>
     </div>`;
