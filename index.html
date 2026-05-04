@@ -777,6 +777,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-functions-compat.js"></script>
 
   <script>
     // ── Beta gate (web only) ──
@@ -885,25 +886,25 @@
               this.disabled = true;
               this.textContent = 'Sending…';
               try {
-                const fresh = firebase.auth().currentUser;
-                if (!fresh) throw new Error('Not signed in');
-                await fresh.sendEmailVerification();
+                const _fns = firebase.app().functions('europe-west1');
+                await _fns.httpsCallable('sendVerificationEmail')({});
                 this.textContent = '✅ Sent! Check your inbox';
                 setTimeout(() => {
                   this.textContent = 'Resend verification email';
                   this.disabled = false;
-                }, 30000); // 30s cooldown to avoid rate-limit
+                }, 30000);
               } catch(e) {
                 console.error('[bbResendVerify]', e.code, e.message);
-                if (e.code === 'auth/too-many-requests') {
-                  this.textContent = 'Too many attempts — wait a minute';
-                } else {
-                  this.textContent = 'Failed — try again shortly';
+                // Fall back to Firebase native send
+                try {
+                  const fresh = firebase.auth().currentUser;
+                  if (fresh) await fresh.sendEmailVerification();
+                  this.textContent = '✅ Sent! Check your inbox';
+                  setTimeout(() => { this.textContent = 'Resend verification email'; this.disabled = false; }, 30000);
+                } catch(e2) {
+                  this.textContent = e2.code === 'auth/too-many-requests' ? 'Too many attempts — wait a minute' : 'Failed — try again shortly';
+                  setTimeout(() => { this.textContent = 'Resend verification email'; this.disabled = false; }, 10000);
                 }
-                setTimeout(() => {
-                  this.textContent = 'Resend verification email';
-                  this.disabled = false;
-                }, 10000);
               }
             };
           } else {

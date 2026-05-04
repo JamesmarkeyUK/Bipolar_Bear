@@ -903,7 +903,14 @@
         try {
           if (_bbIsSignUp) {
             const _cred = await auth.createUserWithEmailAndPassword(email, password);
-            await _cred.user.sendEmailVerification();
+            // Send styled verification email via Cloud Function (falls back to Firebase default)
+            try {
+              const _fns = window.firebase.app().functions('europe-west1');
+              await _fns.httpsCallable('sendVerificationEmail')({});
+            } catch (_verErr) {
+              console.warn('[fab] sendVerificationEmail CF failed, falling back:', _verErr);
+              await _cred.user.sendEmailVerification().catch(() => {});
+            }
             // Show confirmation — don't close the modal yet
             if (errEl) {
               errEl.innerHTML = '✉️ Account created! We\'ve sent a verification link to <strong>' + email + '</strong>. Click it to activate your account, then sign in.';
