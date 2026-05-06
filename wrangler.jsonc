@@ -1,5 +1,4 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
   "name": "bipolarbear",
   "compatibility_date": "2026-05-04",
   "main": "worker.js",
