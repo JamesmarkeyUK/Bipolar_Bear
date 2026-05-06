@@ -5,6 +5,24 @@
 (function () {
   'use strict';
 
+  // ── Cross-device persistence ──────────────────────────────────────────────
+  // Save current FAB customisation (slot assignments + hidden flags) to Firestore.
+  // Restored on sign-in from index.html so the user's layout follows them across devices.
+  function _syncFabsToFirestore() {
+    if (!window.db || !window.currentUser) return;
+    const fabState = {};
+    for (let s = 1; s <= 4; s++) {
+      const v = localStorage.getItem('bbFabSlot_' + s);
+      if (v) fabState['slot' + s] = v;
+    }
+    ['bbWaFabHidden','bbQuickNoteFabHidden','bbCoffeeFabHidden','bbFeedbackFabHidden','bbFooterHidden'].forEach(k => {
+      if (localStorage.getItem(k) === '1') fabState[k] = '1';
+    });
+    window.db.collection('userSettings').doc(window.currentUser.uid)
+      .set({ fabState: fabState }, { merge: true }).catch(() => {});
+  }
+  window._syncFabsToFirestore = _syncFabsToFirestore;
+
   // ── Config ────────────────────────────────────────────────────────────────
   const _FAB_DEFAULTS = [
     { id: 'chat',     icon: '🆘', label: 'Crisis Support',  desc: 'Samaritans & community chat', hiddenKey: 'bbWaFabHidden',        slotNum: 1 },
@@ -515,6 +533,7 @@
           localStorage.setItem('bbFabSlot_' + _fabPickerSlot, _def.id);
           closeFabPicker();
           _applyFabDock();
+          _syncFabsToFirestore();
         });
         _opts.appendChild(_btn);
       }
@@ -536,6 +555,7 @@
           localStorage.setItem('bbFabSlot_' + _fabPickerSlot, _extra.id);
           closeFabPicker();
           _applyFabDock();
+          _syncFabsToFirestore();
         });
         _opts.appendChild(_btn);
       }
@@ -555,6 +575,7 @@
       if (localStorage.getItem('bbFabSlot_' + s) === extraId) localStorage.removeItem('bbFabSlot_' + s);
     }
     _applyFabDock();
+    _syncFabsToFirestore();
   };
 
   // ── Core FAB modal open/close ─────────────────────────────────────────────
@@ -946,6 +967,7 @@
       localStorage.setItem('bbCoffeeFabHidden', '1');
     }
     _applyFabDock();
+    _syncFabsToFirestore();
   };
 
 })();

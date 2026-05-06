@@ -839,6 +839,25 @@
   <div class="home-indicator"></div>
 </div><!-- /#iphone-frame -->
 
+<script>
+  // Pre-activate the most likely starting screen synchronously, before Firebase
+  // auth state and Firestore profile resolve. Otherwise users with a cached
+  // monika + verified flag would see the verify screen flash before boot()
+  // swaps to the board. boot() will still override if the cached state is wrong.
+  (function() {
+    try {
+      var hasMonika   = !!localStorage.getItem('bbAnon_monika');
+      var isVerified  = localStorage.getItem('bbAnon_verified') === 'true';
+      var initialId   = (hasMonika && isVerified) ? 'screen-board' : 'screen-verify';
+      var el = document.getElementById(initialId);
+      if (el) el.classList.add('active');
+    } catch (_) {
+      var fallback = document.getElementById('screen-verify');
+      if (fallback) fallback.classList.add('active');
+    }
+  })();
+</script>
+
 <!-- Firebase SDK: loaded here so the page renders before these blocking scripts download -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -997,6 +1016,9 @@ async function boot(user) {
     } else {
       localStorage.removeItem('bbAnon_isAdmin');
     }
+    // Mark as verified for the synchronous pre-activation hint on next visit.
+    // Cleared on sign-out by the auth-change handler above.
+    localStorage.setItem('bbAnon_verified', 'true');
     // Restore full anon profile (monika, meds, stable, etc.) from userSettings
     await _bbRestoreProfile(user.uid);
     if (profile.monika) {
@@ -1611,6 +1633,7 @@ function _bbSaveProfile() {
     stableSince: profile.stableSince || null,
     visitStreak: parseInt(localStorage.getItem('bbAnon_streak') || '0', 10),
     visitDate:   localStorage.getItem('bbAnonVisitDate') || null,
+    verified:    localStorage.getItem('bbAnon_verified') === 'true',
   };
   db.collection('userSettings').doc(_bbUser.uid).set(
     { anonProfile: data }, { merge: true }
@@ -1908,6 +1931,17 @@ function renderPosts(posts) {
     list.innerHTML = '<div class="empty-state">No posts yet — be the first! 🌱</div>';
     return;
   }
+  // Collapse runs of deleted posts: keep only the most recent tombstone, drop the rest.
+  // Posts are sorted newest-first (sortPosts), so the first deleted in iteration is
+  // the most recent. Prevents a wall of "post was deleted" entries when an admin
+  // removes several spam posts in a row.
+  let _keptDeletedTombstone = false;
+  posts = posts.filter(p => {
+    if (!p.deleted) return true;
+    if (_keptDeletedTombstone) return false;
+    _keptDeletedTombstone = true;
+    return true;
+  });
   list.innerHTML = posts.map(p => {
     if (p.isSystem)       return renderSystem(p);
     if (p.isAnnouncement) return renderAnnouncement(p);

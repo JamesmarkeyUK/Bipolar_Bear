@@ -2131,7 +2131,24 @@
       <h3 style="margin-bottom:16px;">📋 Changelog</h3>
       <div style="text-align:left; font-size:0.9em; color:#495057; line-height:1.7;">
         <div style="margin-bottom:14px;">
-          <strong style="color:#ff9500;">v0.87</strong><br>
+          <strong style="color:#ff9500;">v0.98</strong><br>
+          • 🐛 Fix: Journal streak &amp; stability counters now load on home page immediately after sign-in (no need to visit Journal first)<br>
+          • 🐛 Fix: Achievement toasts no longer re-fire on a new device — unlocked achievements now sync across devices<br>
+          • 🐛 Fix: Sign-out now clears streak, stability, and Bipolar Anonymous stats so the next account starts fresh<br>
+          • 🐛 Fix: Bipolar Anonymous monika, verified state &amp; "new messages" badge restore instantly on sign-in<br>
+          • ✨ FAB dock customisation (slot order &amp; hidden buttons) now syncs across your devices via your account<br>
+        </div>
+        <div style="margin-bottom:14px;">
+          <strong style="color:#adb5bd;">v0.97</strong><br>
+          • 🐛 Fix: Reminder &amp; weekly summary toggles now save instantly when changed (no need to tap Save)<br>
+          • ✨ Reminder/weekly toggles now request iOS notification permission inline — clear "Blocked in iOS Settings" alert if denied<br>
+          • ✨ Reminder time, reminders on/off, and weekly summary now sync across devices via your account<br>
+          • ✨ Bipolar Anonymous: signed-in users with a saved monika now go straight to the chat — no flash of the verify screen<br>
+          • 🎨 Bipolar Anonymous: a run of deleted posts now collapses to a single "this post was deleted" tombstone instead of a stack<br>
+          • ✨ Bipolar Anonymous button and sign-in button hidden during tutorial — revealed once tutorial is complete<br>
+        </div>
+        <div style="margin-bottom:14px;">
+          <strong style="color:#adb5bd;">v0.87</strong><br>
           • ✨ "What's New" popup on every update — headline feature + full changelog link<br>
         </div>
         <div style="margin-bottom:14px;">
@@ -2140,214 +2157,11 @@
           • ✨ All FABs have "Hide this button" — removed from dock, returns to picker<br>
           • ✨ Celebrity FAB now loads real Wikipedia photos<br>
           • 🐛 Fix: Quick Note hide button now works correctly<br>
-          • 🎨 Survival Kit dock footer reverted to orange gradient<br>
-          • 🎨 "Hide this button" no longer says "permanently" — they can always be re-added<br>
         </div>
         <div style="margin-bottom:14px;">
           <strong style="color:#adb5bd;">v0.85</strong><br>
           • ✨ Dock synced across all 3 pages — hide a button on one page, it's hidden everywhere<br>
           • ✨ Empty dock slots show a + placeholder; tap to add Stats, Celebrity, Goals, or Quick Note<br>
-          • ✨ Journal &amp; Survival Kit now show the full 4-button dock with white footer<br>
-          • 🐛 Fix: Duplicate 🔐 FAB when Feedback was hidden<br>
-          • 🎨 Settings FAB (⚙️) replaces profile in journal dock when logged in<br>
-        </div>
-        <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.84</strong><br>
-          • 🐛 Fix: Survival kit compass removed — user finds it freely after tutorial<br>
-          • 🐛 Fix: Feedback FAB now only appears after tutorial complete popup is dismissed<br>
-        </div>
-        <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.83</strong><br>
-          • ✨ Chat FAB now opens crisis support popup (Samaritans 116 123) + "in-app chat coming soon"<br>
-          • ✨ Quick Note FAB (📝) — jot a note from home screen, appears on your next journal entry<br>
-          • ✨ 🔐 E2EE FAB now appears automatically in place of the first permanently-hidden button<br>
-        </div>
-        <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.82</strong><br>
-          • 🐛 Fix: Tutorial complete popup now triggers after saving your first journal entry<br>
-          • 🎨 Welcome popup: removed "skip tutorial" hint copy for a cleaner message<br>
-        </div>
-        <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.81</strong><br>
-          • 🎨 Settings: Achievements and 🛠️ Advanced now appear above the Close button<br>
-        </div>
-        <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.80</strong><br>
-          • ✨ PIN screen now dims to black after 3 minutes of inactivity (saves battery, especially OLED) — tap anywhere to wake<br>
-        </div>
-        <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.79</strong><br>
-          • 🐛 Fix: "No missing entries ✓" now always matches the missing-entries modal (both use the same loaded data, no stale Firestore re-query)<br>
-          • 🐛 Fix: Streak counter now correctly shows plural "days" for streaks longer than 1<br>
-        </div>
-        <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.78</strong><br>
-          • ✨ FABs in a straight line: 5 evenly spaced positions (Chat | 🔐 | Auth | Coffee | Feedback)<br>
-          • ✨ Security FAB (🔐) at position 2 — tap for E2EE explainer, tap 5× to restore all hidden FABs<br>
-          • 🐛 Fix: Feedback hint positioning updated to match new FAB layout<br>
-        </div>
-        <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.77</strong><br>
-          • ✨ Chat FAB replaces WhatsApp button (greyed out, coming soon — Bipolar Bear in-app chat)<br>
-          • ✨ PIN screen "🔐 More info" chip opens plain-language E2EE explainer<br>
-          • ✨ All FABs resized to 44×44px with a soft U-curve layout<br>
-          • ✨ "Hide permanently" popup now correctly appears in front of coffee modal<br>
-          • 🐛 Fix: Account deletion no longer crashes with SecureStorage error<br>
-          • 🐛 Fix: Sleep health sync no longer returns data outside the query window (wrong night)<br>
-        </div>
-        <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.76</strong><br>
-          • ✨ Tutorial complete popup now shows for all paths to step 12 (survival kit, feedback, etc.)<br>
-          • ✨ WhatsApp &amp; Feedback hints appear after tutorial complete popup is dismissed<br>
-          • ✨ Buy Me a Coffee moved to FAB (left of Feedback), click to open with Send/Hide options<br>
-          • ✨ Footer chip updated to "Being built by James Markey"<br>
-          • ✨ PIN screen now explains E2EE reinforced by password and PIN<br>
-          • 🐛 Fix: PIN no longer appears after account deletion (SecureStorage also cleared)<br>
-          • 🎨 Home screen vertical spacing reduced for iPhone 15 Pro single-page fit<br>
-        </div>
-        <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.75</strong><br>
-          • ✨ Survival kit onboarding steps removed — explore freely, tutorial complete shows on next visit<br>
-          • ✨ Focused-mode questions now use date-aware wording (last night vs specific date)<br>
-          • ✨ People helped counter unified across web and native; reset to 1<br>
-          • ✨ Buy Me a Coffee link now shows % of monthly costs funded; tap &amp; hold for explainer<br>
-          • ✨ Text selection disabled across all UI elements (allowed in text inputs)<br>
-          • 🐛 Fix: Compass pointer re-aims after journal auto-scroll during tutorial<br>
-          • 🐛 Fix: Settings close button no longer shifts on second open<br>
-          • 🐛 Fix: Health auth status refreshes in settings after granting permissions<br>
-          • 🐛 Fix: PIN lock screen no longer visible after account deletion<br>
-          • 🗑️ Removed: Log Today toggle (always logs last 24hrs), PIN lock option from settings, duplicate divider in mobile settings<br>
-        </div>
-        <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.74</strong><br>
-          • 🐛 Fix: Focused mode mood selector now auto-advances correctly after selection<br>
-          • 🐛 Fix: All focused-mode steps (energy, sleep, etc.) now visible during onboarding tutorial<br>
-          • 🐛 Fix: Journal page no longer crashes on load due to script initialisation ordering<br>
-        </div>
-        <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.73</strong><br>
-          • 🔒 Journal entries are end-to-end encrypted for logged-in users (AES-256-GCM)<br>
-          • 🔒 Encryption keys stored in device Keychain / Keystore on iOS &amp; Android<br>
-          • 🔒 App-wide PIN lock for native users (Settings → Mobile → App PIN Lock)<br>
-          • 🔒 Password changes automatically re-wrap your encryption key — no data re-encryption needed<br>
-          • 🐛 Removed "Forgot password?" on web — use a new account if password is lost<br>
-        </div>
-        <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.72</strong><br>
-          • 🔒 Guest data is now encrypted with a PIN-derived AES-256 key<br>
-          • 🔒 PIN creation is mandatory before saving your first entry as a guest<br>
-          • 🔒 Forgot PIN deletes all local entries (no recovery possible)<br>
-          • ✨ Sleep quality customise toggle removed — use tap &amp; hold on sleep step instead<br>
-          • ✨ Customise form is now a collapsible section (collapsed by default)<br>
-        </div>
-        <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.71</strong><br>
-          • 🐛 Fix: Sleep quality hint shown inline on sleep step in focused mode<br>
-        </div>
-        <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.70</strong><br>
-          • ✨ WhatsApp & Feedback FABs sit at viewport corners on iPad/wide screens<br>
-          • ✨ Compass avoids colliding with hint text — offsets or hides if no clear spot<br>
-          • ✨ Compass recalculates direction after journal opens (close hint now points up correctly)<br>
-          • ✨ Survival kit Help button pinned to far right of nav bar<br>
-          • 🐛 Fix: Survival kit auto-scroll suppressed when mood panel already visible<br>
-        </div>
-        <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.69</strong><br>
-          • ✨ Compass-style pulsing arrow added to all blocking onboarding hints<br>
-          • ✨ Scroll locked during blocking hints so target can't scroll off screen<br>
-          • 🐛 Fix: Tutorial skip now unlocks all features (settings button, mood long-press, etc.)<br>
-          • 🐛 Fix: Tutorial complete popup now always fires after survival kit → journal flow<br>
-          • 🐛 Fix: Compass arrow hidden when advancing from sign-in hint to logo hint<br>
-        </div>
-        <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.68</strong><br>
-          • 🐻 Bear emoji added to all hint texts<br>
-          • ✨ "+ Log today/yesterday" pill now matches the orange style of the missing entries pill<br>
-          • 🐛 Fix: Regular form no longer accessible when focused mode is enabled<br>
-          • 🔗 Project added to GitHub<br>
-        </div>
-        <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.67</strong><br>
-          • 🐛 Fix: Bear mood suggestion was ignoring goals (Yes was silently scoring zero due to a value mismatch)<br>
-          • 🐛 Fix: Bear mood suggestion now shows correct secondary mood (was showing "or Low" when it should have been "or Elevated")<br>
-          • 💰 Bear mood suggestion: budget overspending now counts as an elevated/manic signal<br>
-          • 💊 Bear mood suggestion: taking medication is now neutral; only skipping meds counts as a signal<br>
-          • 🎓 Tutorial complete toast now appears before WhatsApp and feedback hints unlock<br>
-          • 🔓 WhatsApp and feedback hints are now non-blocking (no dark overlay)<br>
-        </div>
-        <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.66</strong><br>
-          • 🧭 Complete onboarding hint redesign — 10-step cascade, one hint at a time<br>
-          • 🔒 Elements hidden until revealed by onboarding (home btn, survival kit, FABs, nav buttons)<br>
-          • 📱 Hint progress syncs across devices via cloud when signed in<br>
-          • ✏️ No drafts until first real entry is saved<br>
-          • 📜 No autoscroll after saving an entry<br>
-        </div>
-        <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.65</strong><br>
-          • 🔄 Steps re-sync during review now correctly updates the saved entry<br>
-          • 🤖 AI personalised feedback available for all timeframes (30d, 60d etc.), not just all-time<br>
-          • 🗑️ Delete all data clears survival kit data (mood definitions &amp; coping strategies) from cloud<br>
-          • 💤 Sleep sync bar colour now matches the selected sleep range<br>
-          • 🎨 Selected sleep button shows white text for better contrast<br>
-          • 💊 Medication step always shown by default (not dependent on existing meds)<br>
-          • 🧩 Customise form: sleep quality &amp; additional data off by default on first enable<br>
-          • 🎯 Goal tracking defaults to off; hint shown near Customise data fields (+)<br>
-          • 💬 Hints only shown when corresponding button/FAB is visible<br>
-          • 🔒 Protected account: full reset hidden for admin account<br>
-        </div>
-        <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.64</strong><br>
-          • 🐛 Fix 5-click logo easter egg (was inaccessible after refactor)<br>
-          • 🪄 Logo tap-and-hold removed; 5 taps is the only easter egg trigger<br>
-          • 🧭 Nav icons (journal ↔ survival kit) now display as rounded circles<br>
-          • 💡 Mood hint arrow now points at the Elevated button specifically<br>
-          • ✨ First step of focus mode: top bar and step counter hidden so "How was X?" appears cleanly<br>
-          • 📜 Footer hidden until both journal hint and survival kit hint have been seen<br>
-          • 📤 Export: 12-month chart section hidden entirely when not enough data<br>
-          • 🗑️ Delete all data now also removes personal information (local + cloud)<br>
-          • 📍 Post-submit scroll adjusted so Close Journal button stays visible under iPhone notch<br>
-        </div>
-        <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.63</strong><br>
-          • 🎨 Logo easter egg: long-press logo for "Next logo" shortcut; confetti + toast on discovery; unlocks "Easter Egg Found" achievement<br>
-          • Onboarding: new user flow hides journal, login, survival kit, footer, and FABs until first entry; "Click here to get started" hint on journal button; survival kit hint after first entry<br>
-          • Hints: all reset on sign-out and full reset; "Back up online" hint gated behind having entries<br>
-          • FAB hide: moved from long-press to "Hide this button permanently" option inside each FAB's popup<br>
-          • Full Reset: delete all data now also resets all settings; hints and easter egg flags fully cleared<br>
-          • Additional tracking step hidden by default for new users; re-enable via Customise form in settings<br>
-          • Focus mode: progress dots hidden on mood step; mood long-press hint with arrow pointing to Elevated<br>
-          • Home screen: buttons always stacked vertically; sized to content with matching width; no hover effects<br>
-          • Open Journal button hidden when no entries exist<br>
-        </div>
-        <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.62</strong><br>
-          • 🔗 Mood Linking (BETA): long-press a mood in focus mode to link a secondary mood; both shown highlighted; counted in stats and PDF; shown in entry list and review step<br>
-          • Mood Linking toggle in Journal Options (off by default)<br>
-          • Customise form: switch off by default; sleep quality still disabled until turned on<br>
-          • Settings: reset now correctly clears customise form and mood linking preferences<br>
-          • Survival kit: gratitude section restored from Firestore on login<br>
-          • Draft saving indicator moved to bottom-right in focus mode<br>
-        </div>
-        <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.60</strong><br>
-          • 📋 Customise form: toggle individual steps on/off (energy, sleep, quality, meds, additional, notes); master switch in Journal Options; default is all on except sleep quality<br>
-          • Sleep sync: resync button hidden while synced (shows after Undo); banner colour matches sleep range; mobile hover fix; editing sleep visits quality step before returning to summary<br>
-          • Focus mode: notes field preserved when navigating between steps<br>
-          • Elaborate Responses: step notes preserved in confirm-step mode; correctly loaded when editing a saved entry<br>
-          • Medication step fix: correctly shown when using + Log today<br>
-          • Survival kit: rounded header bottom for smooth transition to nav bar<br>
-          • Reset settings now restores customise form defaults<br>
-        </div>
-        <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.59</strong><br>
-          • 📝 Elaborate Responses: per-step notes in focused mode, combined into tomorrow's intention<br>
-          • Stats: custom timeframe picker (30d / 60d / 90d / custom / All time); year calendar legend above streak, uniform size<br>
-          • Sleep sync: actual hours saved from HealthKit; undo sync button; synced banner in sleep step<br>
-          • Edit tomorrow's intention from past entry popup<br>
-          • Survival kit: section completion ticks; karma ← → navigation; notch colour fix<br>
-          • Double-click save guard; stable mood no longer shows secondary mood; correlation |r|&lt;0.1 filter<br>
         </div>
       </div>
       <div class="confirm-buttons" style="margin-top:16px;">
@@ -2855,7 +2669,7 @@
 
         <div style="margin-top:4px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.87</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.98</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -2879,15 +2693,15 @@
           <div style="font-weight: 600; margin-bottom: 8px; color: #495057;">🔔 Daily Mood Reminder</div>
           <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
             <label style="flex: 1; color: #6c757d; font-size: 0.95em;">Remind me at:</label>
-            <input type="time" id="reminderTime" value="07:00" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1em; color: #495057;">
+            <input type="time" id="reminderTime" value="07:00" onchange="_persistReminderSettings()" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1em; color: #495057;">
           </div>
           <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
             <label for="reminderEnabled" style="flex: 1; color: #6c757d; font-size: 0.95em; cursor: pointer;">Reminders on:</label>
-            <label class="bb-switch"><input type="checkbox" id="reminderEnabled"><span class="bb-slider"></span></label>
+            <label class="bb-switch"><input type="checkbox" id="reminderEnabled" onchange="_onReminderToggleChange()"><span class="bb-slider"></span></label>
           </div>
           <div style="display: flex; align-items: center; gap: 12px;">
             <label for="weeklySummaryEnabled" style="flex: 1; color: #6c757d; font-size: 0.95em; cursor: pointer;">Weekly summary (Sundays):</label>
-            <label class="bb-switch"><input type="checkbox" id="weeklySummaryEnabled" checked><span class="bb-slider"></span></label>
+            <label class="bb-switch"><input type="checkbox" id="weeklySummaryEnabled" onchange="_onWeeklyToggleChange()" checked><span class="bb-slider"></span></label>
           </div>
         </div>
 
@@ -2961,7 +2775,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.87</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.98</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -3012,7 +2826,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.87</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.98</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -3048,7 +2862,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.87</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.98</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -3082,7 +2896,7 @@
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
-            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.87</span>
+            <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.98</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
             <div class="settings-health-info"></div>
@@ -3599,6 +3413,16 @@
               }
               if (d.healthSyncEnabled !== undefined) {
                 localStorage.setItem('bbHealthSyncEnabled', d.healthSyncEnabled ? '1' : '0');
+              }
+              // Reminder/weekly summary — sync across devices
+              if (d.reminderEnabled !== undefined) localStorage.setItem('reminderEnabled', d.reminderEnabled ? 'true' : 'false');
+              if (d.reminderTime !== undefined && d.reminderTime) localStorage.setItem('reminderTime', d.reminderTime);
+              if (d.weeklySummaryEnabled !== undefined) localStorage.setItem('weeklySummaryEnabled', d.weeklySummaryEnabled ? 'true' : 'false');
+              // Reschedule local notifications on this device using the synced settings.
+              // scheduleReminder() gates on reminderEnabled internally; weekly summary
+              // is rescheduled by the entries-load flow (loadEntries → scheduleWeeklySummary).
+              if (isNative() && typeof scheduleReminder === 'function') {
+                scheduleReminder().catch(() => {});
               }
               if (d.personalHintDone) localStorage.setItem('bbPersonalHintDone', '1');
               // Sync customise form settings
@@ -5575,6 +5399,10 @@
         }
         window._currentStreak = currentStreak;
         localStorage.setItem('bbCurrentStreak', currentStreak);
+        if (window.db && window.currentUser) {
+          window.db.collection('userSettings').doc(window.currentUser.uid)
+            .set({ currentStreak: currentStreak }, { merge: true }).catch(() => {});
+        }
       }
 
       if (entries.length <= 1) {
@@ -5645,6 +5473,10 @@
         }
         window._currentStreak = currentStreak;
         localStorage.setItem('bbCurrentStreak', currentStreak);
+        if (window.db && window.currentUser) {
+          window.db.collection('userSettings').doc(window.currentUser.uid)
+            .set({ currentStreak: currentStreak }, { merge: true }).catch(() => {});
+        }
       }
 
       // Calculate missing entries in the last 30 days (or since first entry if more recent)
@@ -12972,15 +12804,20 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       if (isNative()) {
 
         const LocalNotifications = getPlugin('LocalNotifications');
+        const _setNotifInfo = t => document.querySelectorAll('.settings-notif-info').forEach(el => el.textContent = t);
         if (LocalNotifications) {
           try {
-            // Check notification permission
             const { display } = await LocalNotifications.checkPermissions();
-            document.querySelectorAll('.settings-notif-info').forEach(el => el.textContent =
-              `Notifications: ${display === 'granted' ? '✅ Allowed' : '❌ Blocked in phone settings'}`);
-
-            // (reminder status display removed)
-          } catch (e) {}
+            _setNotifInfo(
+              display === 'granted' ? 'Notifications: ✅ Authorised' :
+              display === 'denied'  ? 'Notifications: ❌ Blocked in iOS Settings' :
+                                      'Notifications: ⚠️ Not yet authorised'
+            );
+          } catch (e) {
+            _setNotifInfo('Notifications: ❓ Unknown');
+          }
+        } else {
+          _setNotifInfo('Notifications: ❌ Unavailable');
         }
 
         // Check health data authorisation
@@ -13799,44 +13636,87 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     }
 
 
+    // Persist reminder/weekly settings: localStorage + reschedule + Firestore (cross-device)
+    async function _persistReminderSettings() {
+      const timeEl = document.getElementById('reminderTime');
+      const enabledEl = document.getElementById('reminderEnabled');
+      const weeklyEl = document.getElementById('weeklySummaryEnabled');
+      if (!timeEl || !enabledEl || !weeklyEl) return;
+      const time = timeEl.value || '07:00';
+      const enabled = enabledEl.checked;
+      const weeklyEnabled = weeklyEl.checked;
+      localStorage.setItem('reminderTime', time);
+      localStorage.setItem('reminderEnabled', enabled.toString());
+      localStorage.setItem('weeklySummaryEnabled', weeklyEnabled.toString());
+      if (isNative()) {
+        await scheduleReminder();
+        const LocalNotifications = getPlugin('LocalNotifications');
+        if (!weeklyEnabled) {
+          if (LocalNotifications) await LocalNotifications.cancel({ notifications: [{ id: 2 }] }).catch(() => {});
+        } else if (_allEntries) {
+          scheduleWeeklySummary(_allEntries);
+        }
+      }
+      if (window.db && window.currentUser) {
+        window.db.collection('userSettings').doc(window.currentUser.uid)
+          .set({ reminderEnabled: enabled, reminderTime: time, weeklySummaryEnabled: weeklyEnabled }, { merge: true })
+          .catch(() => {});
+      }
+    }
+
+    // Ensure iOS notification permission before turning a toggle on; reverts toggle if denied
+    async function _ensureNotifPermission(toggleId) {
+      if (!isNative()) return true;
+      const LocalNotifications = getPlugin('LocalNotifications');
+      if (!LocalNotifications) return true;
+      try {
+        let { display } = await LocalNotifications.checkPermissions();
+        if (display !== 'granted') {
+          const r = await LocalNotifications.requestPermissions();
+          display = r.display;
+        }
+        if (display !== 'granted') {
+          const el = document.getElementById(toggleId);
+          if (el) el.checked = false;
+          alert('🔕 Notifications are blocked. Enable them in iOS Settings → BipolarBear → Notifications, then try again.');
+          // Refresh permission display in settings
+          document.querySelectorAll('.settings-notif-info').forEach(el => el.textContent =
+            `Notifications: ❌ Blocked in phone settings`);
+          return false;
+        }
+        document.querySelectorAll('.settings-notif-info').forEach(el => el.textContent =
+          `Notifications: ✅ Allowed`);
+        return true;
+      } catch (e) {
+        return true; // best-effort: don't block on plugin errors
+      }
+    }
+
+    async function _onReminderToggleChange() {
+      if (document.getElementById('reminderEnabled').checked) {
+        if (!(await _ensureNotifPermission('reminderEnabled'))) return;
+      }
+      await _persistReminderSettings();
+    }
+
+    async function _onWeeklyToggleChange() {
+      if (document.getElementById('weeklySummaryEnabled').checked) {
+        if (!(await _ensureNotifPermission('weeklySummaryEnabled'))) return;
+      }
+      await _persistReminderSettings();
+    }
+
+    window._persistReminderSettings = _persistReminderSettings;
+    window._onReminderToggleChange = _onReminderToggleChange;
+    window._onWeeklyToggleChange = _onWeeklyToggleChange;
+
     async function saveSettings() {
       // Dismiss close settings hint if active
       if (localStorage.getItem('bbCloseSettingsHintDone') !== '1' && localStorage.getItem('bbCustomiseAdditionalHintDone') === '1') {
         _dismissCloseSettingsHint();
       }
-      // Save reminder settings (if native)
-      if (isNative()) {
-        const prevTime = localStorage.getItem('reminderTime') || '07:00';
-        const prevEnabled = localStorage.getItem('reminderEnabled') === 'true';
-        const prevWeekly = localStorage.getItem('weeklySummaryEnabled') === 'true';
-
-        const time = document.getElementById('reminderTime').value;
-        const enabled = document.getElementById('reminderEnabled').checked;
-        const weeklyEnabled = document.getElementById('weeklySummaryEnabled').checked;
-
-        localStorage.setItem('reminderTime', time);
-        localStorage.setItem('reminderEnabled', enabled.toString());
-        localStorage.setItem('weeklySummaryEnabled', weeklyEnabled.toString());
-
-        // Reschedule notification with new time
-        await scheduleReminder();
-        if (!weeklyEnabled) {
-          const LocalNotifications = getPlugin('LocalNotifications');
-          if (LocalNotifications) await LocalNotifications.cancel({ notifications: [{ id: 2 }] }).catch(() => {});
-        } else if (_allEntries) {
-          scheduleWeeklySummary(_allEntries);
-        }
-
-        const changed = time !== prevTime || enabled !== prevEnabled || weeklyEnabled !== prevWeekly;
-        if (changed) {
-          const [h, m] = time.split(':');
-          const hour = parseInt(h);
-          const ampm = hour >= 12 ? 'PM' : 'AM';
-          const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
-          const displayTime = `${displayHour}:${m} ${ampm}`;
-          alert(enabled ? `✅ Reminder set for ${displayTime} daily!` : '🔕 Reminders turned off');
-        }
-      }
+      // Reminder/weekly toggles auto-save on change via _persistReminderSettings —
+      // no need to re-write them here.
 
       // Save incognito mode + auto-advance
       const _incogVal = document.getElementById('incognitoModeToggle').checked;

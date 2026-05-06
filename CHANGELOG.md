@@ -1,5 +1,24 @@
 # BipolarBear Changelog
 
+## v0.98
+- 🐛 Fix: After signing in on a new device, journal streak (`bbCurrentStreak`) and stability (`bbStableStreak`) now load from Firestore (`userSettings.currentStreak`) immediately on the home page — previously the streak badge under the Journal button stayed hidden until the user opened the journal page (where `loadEntries()` recalculated and saved the streak)
+- 🐛 Fix: `bbCurrentStreak` is now persisted to Firestore alongside `stableStreak` whenever entries reload — completes the cross-device sync loop
+- 🐛 Fix: Achievement toasts no longer re-fire on a new device — `unlockedAchievements` now syncs to/from Firestore on sign-in, so already-earned achievements like "3-Day Streak" don't pop up when logging an entry on a new install
+- 🐛 Fix: Sign-out now clears `bbCurrentStreak`, `bbStableStreak`, `bbAnon_streak`, `bbAnon_monika`, `bbAnon_verified`, `bbAnonLastVisit` from localStorage — previously these leaked across accounts (e.g. signing into a fresh account showed the previous user's "49d stability")
+- 🐛 Fix: Sign-out now hides `journalStreakBadge`, `anonStreakBadge`, and `anonMessagesBadge` and resets the survival kit progress text to "5 / 13" — UI no longer keeps showing the previous account's stats
+- 🐛 Fix: Bipolar Anonymous monika and verified flag now sync from Firestore (`anonProfile.monika`, `anonProfile.verified`) on sign-in — anon FAB badge ("👋 monika · 💬 streak"), monika display, and the new-messages badge populate without needing to visit the board first. `_bbSaveProfile()` in `anonymous.html` now writes `verified` into `anonProfile`
+- ✨ FAB dock customisation now syncs across devices — slot assignments (`bbFabSlot_1`–`bbFabSlot_4`) and hidden flags (`bbWaFabHidden`, `bbQuickNoteFabHidden`, `bbCoffeeFabHidden`, `bbFeedbackFabHidden`, `bbFooterHidden`) are saved to `userSettings.fabState` via a new `_syncFabsToFirestore()` helper in `fab.js`, called after every picker assignment, hide-permanently action, and extra-FAB hide. Restored on sign-in in `index.html`'s `auth.onAuthStateChanged` handler with `_applyFabDock()` re-run
+
+## v0.97
+- 🐛 Fix: Reminder & weekly summary toggles in Mobile Settings now persist instantly when toggled — previously the "← Back" button only swapped panels without writing to localStorage, so unsaved toggles were lost on modal close
+- ✨ Toggles now request iOS notification permission inline (`LocalNotifications.requestPermissions()`) — if denied, the toggle reverts and a clear "Blocked in iOS Settings → BipolarBear → Notifications" alert appears
+- ✨ `reminderEnabled`, `reminderTime`, and `weeklySummaryEnabled` now sync to Firestore (`userSettings` doc) and load on login — settings persist across devices on the same account
+- On login, `scheduleReminder()` is re-run on the new device using the synced settings; weekly summary reschedules via the existing entries-load flow
+- Auto-save replaces the old reminder block in `saveSettings()` (which only fired when the main Save button was tapped)
+- ✨ Bipolar Anonymous: returning signed-in users with a cached monika now go straight to the board — synchronous pre-activation script in `anonymous.html` activates `screen-board` before Firebase auth + `_bbRestoreProfile` resolve, eliminating the verify-screen flash. `bbAnon_verified='true'` is now also set for BB App users on successful boot so the next visit hits the fast path
+- 🎨 Bipolar Anonymous: `renderPosts()` now collapses runs of deleted posts to a single tombstone — keeps the most recent deleted (first in newest-first order) and drops the rest, so admins removing spam don't leave a wall of "post deleted" entries
+- ✨ New-user tutorial: Bipolar Anonymous button and profile/sign-in FAB are now hidden until the tutorial complete toast is dismissed (`bbFabsUnlocked`). Step 4 (sign-in blocking screen) is auto-skipped since the auth button is no longer shown mid-tutorial — users can sign in after exploring the app
+
 ## v0.96
 - 🌐 Hosting migrated from GitHub Pages to **Cloudflare Pages** — auto-deploys from GitHub on every push to `main`
 - 🌐 `bipolaranonymous.app` added as alias domain — serves identical content to `bipolarbear.app`, URL bar stays as the visited domain; nameservers managed via Namecheap → Cloudflare

@@ -997,11 +997,51 @@
             if (d.stableStreak    !== undefined) {
               localStorage.setItem('bbStableStreak', String(d.stableStreak || 0));
             }
+            if (typeof d.currentStreak === 'number') {
+              localStorage.setItem('bbCurrentStreak', String(d.currentStreak));
+            }
+            // Restore unlocked achievements so journal.html doesn't re-toast already-earned ones
+            if (Array.isArray(d.unlockedAchievements)) {
+              localStorage.setItem('unlockedAchievements', JSON.stringify(d.unlockedAchievements));
+            }
+            // Restore FAB customisation (slot assignments + hidden flags)
+            if (d.fabState && typeof d.fabState === 'object') {
+              const _fs = d.fabState;
+              for (let s = 1; s <= 4; s++) {
+                if (_fs['slot' + s]) localStorage.setItem('bbFabSlot_' + s, _fs['slot' + s]);
+              }
+              ['bbWaFabHidden','bbQuickNoteFabHidden','bbCoffeeFabHidden','bbFeedbackFabHidden','bbFooterHidden'].forEach(k => {
+                if (_fs[k] === '1') localStorage.setItem(k, '1');
+              });
+              if (typeof window._applyFabDock === 'function') window._applyFabDock();
+            }
             const _ap = d.anonProfile || {};
             if (typeof _ap.visitStreak === 'number') {
               localStorage.setItem('bbAnon_streak', String(_ap.visitStreak));
             }
+            if (_ap.monika) localStorage.setItem('bbAnon_monika', _ap.monika);
+            if (_ap.verified) localStorage.setItem('bbAnon_verified', 'true');
             _updateStreakBadge(); // refresh badge now that we have the latest values
+            // Refresh anonymous "new messages" badge now that monika/verified are in place
+            if (currentUser && localStorage.getItem('bbAnon_verified') === 'true') {
+              const _badge2 = document.getElementById('anonMessagesBadge');
+              const _lastVisit2 = parseInt(localStorage.getItem('bbAnonLastVisit') || '0', 10);
+              if (_badge2 && _lastVisit2) {
+                db.collection('bbAnonPosts')
+                  .where('timestamp', '>', firebase.firestore.Timestamp.fromMillis(_lastVisit2))
+                  .limit(5).get().then(snap => {
+                    const _myMonika = localStorage.getItem('bbAnon_monika') || '';
+                    const _newCount = snap.docs.filter(dd => !dd.data().deleted && (_myMonika ? dd.data().name !== _myMonika : true)).length;
+                    _badge2.textContent = _newCount > 0
+                      ? '💬 ' + _newCount + ' new message' + (_newCount === 1 ? '' : 's')
+                      : '✓ No new messages';
+                    _badge2.style.display = 'block';
+                  }).catch(() => {});
+              } else if (_badge2 && !_lastVisit2) {
+                _badge2.textContent = '💬 Tap to join the community';
+                _badge2.style.display = 'block';
+              }
+            }
             // Re-run the survival tick check now that localStorage is populated
             const sTick = document.getElementById('survivalTick');
             if (sTick) {
@@ -1176,16 +1216,27 @@
     function _applyOnboardingGating() {
       const step = _getOnboardingStep();
 
-      // Auth FAB wrapper: visible from step 4
-      const _authWrap = document.getElementById('authFabWrapper');
-      if (_authWrap) _authWrap.style.display = step < 4 ? 'none' : '';
-
       // Auto-set bbFabsUnlocked when tutorial completes
       if (localStorage.getItem('bbFabsUnlocked') !== '1' &&
           step >= 12 && localStorage.getItem('bbTutorialToastShown') === '1' &&
           !document.getElementById('tutorialCompleteModal')) {
         localStorage.setItem('bbFabsUnlocked', '1');
       }
+      const _fabsUnlocked = localStorage.getItem('bbFabsUnlocked') === '1';
+
+      // Step 4 was the "save your progress" sign-in blocking step. Auth FAB and
+      // Anonymous button are now hidden until tutorial completes, so step 4 is
+      // skipped automatically — advance straight to 5 (logo hint).
+      if (step === 4) {
+        _advanceOnboardingStep(5);
+        return;
+      }
+
+      // Auth FAB + Anonymous button: hidden until tutorial complete
+      const _authWrap = document.getElementById('authFabWrapper');
+      if (_authWrap) _authWrap.style.display = _fabsUnlocked ? '' : 'none';
+      const _anonContainer = document.getElementById('anonymousContainer');
+      if (_anonContainer) _anonContainer.style.display = _fabsUnlocked ? '' : 'none';
 
       // Survival kit: visible from step 6
       const _survival = document.getElementById('survivalContainer');
@@ -1221,20 +1272,12 @@
       if (_waLbl) _waLbl.style.display = 'none';
       // Feedback hint: don't force-hide at step 12 — popup dismiss handler shows it
 
-      // Auth area hint: step 4 (save progress) only
+      // Sign-in hint permanently hidden (step 4 removed from tutorial flow)
       const _siHint = document.getElementById('signinHint');
-      const _siLbl = document.getElementById('signinHintLabel');
-      if (_siHint) {
-        if (step === 4) {
-          if (_siLbl) _siLbl.textContent = 'Save your progress here.';
-          setTimeout(() => { if (_getOnboardingStep() === 4) _siHint.style.display = 'flex'; }, 800);
-        } else {
-          _siHint.style.display = 'none';
-        }
-      }
+      if (_siHint) _siHint.style.display = 'none';
 
       // ── Hint overlay ──
-      const _blockingSteps = new Set([4, 5]);
+      const _blockingSteps = new Set([5]);
       const _isBlocking = _blockingSteps.has(step);
       const _overlay = document.getElementById('bbHintOverlay');
       if (_overlay) _overlay.style.display = _isBlocking ? '' : 'none';
@@ -1247,7 +1290,6 @@
       });
       if (_isBlocking) {
         const _elevMap = {
-          4:  [document.getElementById('signinHint'), document.getElementById('authFabWrapper')],
           5:  [document.getElementById('logoHint'),   document.querySelector('.logo-bounce-wrapper')],
         };
         (_elevMap[step] || []).filter(Boolean).forEach(el => {
@@ -1256,12 +1298,7 @@
           if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
           el.classList.add('bb-hint-elevated');
         });
-        if (step === 4) {
-          const _authBtn = document.getElementById('authFabWrapper');
-          if (_authBtn) setTimeout(() => _showIndexHintPointer(_authBtn), 850);
-        } else {
-          _hideIndexHintPointer();
-        }
+        _hideIndexHintPointer();
       } else {
         _hideIndexHintPointer();
       }
@@ -1294,7 +1331,6 @@
       // step → [targetId, hintId]
       const _isNatLock = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
       const _map = {
-        4:  ['authFabWrapper', 'signinHintInner'],
         5:  ['.logo-img',       'logoHint'],
       };
       function _getTarget(s) { const e = _map[s]; if (!e) return null; const id = e[0]; return id.startsWith('.') ? document.querySelector(id) : document.getElementById(id); }
@@ -1302,11 +1338,6 @@
       function _nudge() {
         const s = _getOnboardingStep();
         let tgt = _getTarget(s);
-        // authFabWrapper uses translateX(-50%) — nudging it directly breaks centering;
-        // nudge the visible inner button instead
-        if (tgt && tgt.id === 'authFabWrapper') {
-          tgt = tgt.querySelector('button:not([style*="display: none"])') || tgt.querySelector('button');
-        }
         [_getHint(s), tgt].forEach(el => {
           if (!el) return;
           const _prev = el.style.animation;
@@ -1431,6 +1462,10 @@
         'unlockedAchievements',
         'bbHasEntries',
         'bbOnboardingStep',
+        // Streaks & stats — must clear so they don't leak between accounts
+        'bbCurrentStreak', 'bbStableStreak',
+        // Anonymous board state
+        'bbAnon_streak', 'bbAnon_monika', 'bbAnon_verified', 'bbAnonLastVisit',
         // Mood step tutorial hints
         'bb_moodTipShown', 'bb_fmMoodTipShown',
         'bb_fmChooseMoodHintDone', 'bb_fmMoodInfoCloseHintDone',
@@ -1458,6 +1493,17 @@
       if (jTick) jTick.setAttribute('data-done', 'false');
       const sTick = document.getElementById('survivalTick');
       if (sTick) sTick.setAttribute('data-done', 'false');
+
+      // Hide streak / anon badges so old account's stats don't linger on the home page
+      const _jBadge = document.getElementById('journalStreakBadge');
+      if (_jBadge) _jBadge.style.display = 'none';
+      const _aBadge = document.getElementById('anonStreakBadge');
+      if (_aBadge) _aBadge.style.display = 'none';
+      const _amBadge = document.getElementById('anonMessagesBadge');
+      if (_amBadge) _amBadge.style.display = 'none';
+      // Reset survival kit progress count to default (4 always-complete sections + 1 anon = 5/13)
+      const _sp = document.getElementById('survivalProgress');
+      if (_sp) _sp.textContent = '5 / 13 sections complete';
 
       if (auth) auth.signOut();
     }
@@ -1996,9 +2042,11 @@
     })();
 
     // ── What's New popup ──
-    const _APP_VERSION = '0.89';
+    const _APP_VERSION = '0.98';
     window._APP_VERSION = _APP_VERSION;
     const _WHATS_NEW_HEADLINES = {
+      '0.98': 'Streaks, achievements & FAB dock now sync across your devices when you sign in',
+      '0.97': 'Reminders & weekly summary now save instantly and sync across your devices',
       '0.89': 'Sign in & account management now shared across all pages — one place for everything',
       '0.88': 'FAB dock buttons updated to a softer look',
       '0.87': "What's new popup — see new features at a glance every update",
