@@ -90,7 +90,38 @@ beta.html           Password gate for web preview (Capacitor bypasses this entir
 privacy.html        Privacy policy (static)
 ```
 
-### 2.2 Shared JavaScript — fab.js
+### 2.2 Shared JavaScript
+
+```
+fab.js                       Floating action bar dock (loaded on index/journal/survival-kit)
+js/shared/firebase-config.js Single source of truth for the Firebase Web SDK config object,
+                             exposed as window.BB_FIREBASE_CONFIG. Each page's inline init
+                             block reads from this rather than redeclaring a literal.
+js/shared/platform.js        Capacitor platform detection helpers — exposes isNative(),
+                             isIOS(), isAndroid() as bare globals (legacy) and via
+                             window.BB.platform.* (canonical namespace).
+js/shared/debug.js           Optional console.log gating. window.BB.log() is a no-op when
+                             localStorage.bbDebug === '0'; warn/error always pass through.
+```
+
+Loading order: every page includes `<script src="js/shared/platform.js">`, then
+`debug.js`, then `firebase-config.js` near the top of `<head>`, before the inline
+script that calls `firebase.initializeApp()`. They have no external dependencies
+and are safe to load synchronously.
+
+#### Working on Android (Android Studio)
+
+```bash
+npx cap sync android       # copy webDir + js/shared into the Android project
+npx cap open android       # opens Android Studio; build & run from there
+```
+
+To enable verbose Chrome DevTools logging from a connected Android device:
+`chrome://inspect` in Chrome on the host machine, then inspect the WebView. The
+`bbDebug` flag (see `js/shared/debug.js`) is on by default; set
+`localStorage.bbDebug = '0'` from the DevTools console to silence info logs.
+
+#### fab.js
 
 `fab.js` is loaded on `index.html`, `journal.html`, and `survival-kit.html`. It provides:
 

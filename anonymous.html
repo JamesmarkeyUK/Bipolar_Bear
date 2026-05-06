@@ -9,6 +9,11 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Bipolar Anonymous">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- Shared helpers: load before any inline script that depends on isNative()/window.BB_FIREBASE_CONFIG. -->
+  <script src="js/shared/platform.js"></script>
+  <script src="js/shared/debug.js"></script>
+  <script src="js/shared/firebase-config.js"></script>
   <style>
     :root {
       --yellow:      #f5c800;
@@ -942,14 +947,9 @@ function saveLiked() {
 function initFirebase() {
   try {
     if (!firebase.apps.length) {
-      firebase.initializeApp({
-        apiKey:            'AIzaSyBlF7DjbOvU4xgM47kAd6Ttx42_W1BPVUY',
-        authDomain:        'bipolarbear-app.firebaseapp.com',
-        projectId:         'bipolarbear-app',
-        storageBucket:     'bipolarbear-app.firebasestorage.app',
-        messagingSenderId: '566288727451',
-        appId:             '1:566288727451:web:8921f3242193df115df53e',
-      });
+      // Config lives in js/shared/firebase-config.js so every page reads the
+      // same source of truth.
+      firebase.initializeApp(window.BB_FIREBASE_CONFIG);
     }
     db = firebase.firestore();
     db.enablePersistence({ synchronizeTabs: true }).catch(() => {});

@@ -9,6 +9,11 @@
   <style>body{background:linear-gradient(135deg,#ffaa33 0%,#ff8833 100%)}</style>
   <script>if(!window.Capacitor&&location.protocol!=='file:'&&localStorage.getItem('bbWebUnlocked')!=='true'){location.replace('beta.html');}
   {const _np=window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()&&localStorage.getItem('bbNativePinEnabled')==='1';if((localStorage.getItem('bbGuestPinSalt')||_np)&&sessionStorage.getItem('bbPinUnlocked')!=='1'){location.replace('index.html');}}</script>
+
+  <!-- Shared helpers: load before any inline script that depends on isNative()/window.BB_FIREBASE_CONFIG. -->
+  <script src="js/shared/platform.js"></script>
+  <script src="js/shared/debug.js"></script>
+  <script src="js/shared/firebase-config.js"></script>
   <meta name="description" content="Your personal bipolar survival kit — mood scale, coping strategies, resources and community support.">
   <meta name="robots" content="noindex, nofollow">
 
@@ -3787,14 +3792,9 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
     }
 
     // ── Firebase init ──
-    const firebaseConfig = {
-      apiKey: "AIzaSyBlF7DjbOvU4xgM47kAd6Ttx42_W1BPVUY",
-      authDomain: "bipolarbear-app.firebaseapp.com",
-      projectId: "bipolarbear-app",
-      storageBucket: "bipolarbear-app.firebasestorage.app",
-      messagingSenderId: "566288727451",
-      appId: "1:566288727451:web:8921f3242193df115df53e"
-    };
+    // Config lives in js/shared/firebase-config.js so every page reads the
+    // same source of truth.
+    const firebaseConfig = window.BB_FIREBASE_CONFIG;
     let auth;
     var db = null, currentUser = null; // var so window.db / window.currentUser work across script blocks
     try {

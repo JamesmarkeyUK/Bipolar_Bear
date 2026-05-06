@@ -9,6 +9,12 @@
   <style>body{background:linear-gradient(135deg,#ffaa33 0%,#ff8833 100%)}</style>
   <script>if(!window.Capacitor&&location.protocol!=='file:'&&localStorage.getItem('bbWebUnlocked')!=='true'){location.replace('beta.html');}
   {const _np=window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()&&localStorage.getItem('bbNativePinEnabled')==='1';if((localStorage.getItem('bbGuestPinSalt')||_np)&&sessionStorage.getItem('bbPinUnlocked')!=='1'){location.replace('index.html');}}</script>
+
+  <!-- Shared helpers: load before any inline script that depends on isNative()/window.BB_FIREBASE_CONFIG/BB.onboarding. -->
+  <script src="js/shared/platform.js"></script>
+  <script src="js/shared/debug.js"></script>
+  <script src="js/shared/firebase-config.js"></script>
+  <script src="js/shared/onboarding.js"></script>
   <meta name="description" content="Checkin with the Bear. Track your bipolar mood, energy, sleep and medication daily with Bipolar Bear.">
   <meta name="robots" content="noindex, nofollow">
 
@@ -2987,44 +2993,34 @@
 
   <script>
     // ── Capacitor detection helpers (hoisted function declarations) ──
-    // These are needed by top-level code in this script block (e.g. PIN idle relock at
-    // line ~6427) that runs before the separate Capacitor <script> block can execute.
-    // Function declarations are hoisted, so they're safe to call anywhere in this block.
-    // The Capacitor block later assigns the same logic to window.isNative/isIOS/isAndroid
-    // for cross-block access — these two definitions coexist without conflict.
-    function isNative()  { return !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()); }
-    function isIOS()     { return isNative() && window.Capacitor.getPlatform() === 'ios'; }
-    function isAndroid() { return isNative() && window.Capacitor.getPlatform() === 'android'; }
+    // isNative() / isIOS() / isAndroid() are now provided by js/shared/platform.js,
+    // which is loaded as a synchronous <script> in the page head. They're available
+    // as bare globals here (window.isNative etc.) for backwards compatibility.
 
     // Declare Firebase variables globally
     let auth, db, currentUser = null, isGuestMode = true;
 
     // ── Onboarding step helpers ──
-    let _hintMigrationDone = false;
+    // _getOnboardingStep() is provided by js/shared/onboarding.js — the
+    // local function delegates so existing inline call sites work unchanged.
+    /**
+     * @returns {number} Current onboarding step (0–12).
+     */
     function _getOnboardingStep() {
-      if (!localStorage.getItem('bbOnboardingStep') && localStorage.getItem('bbHasEntries') === '1') {
-        localStorage.setItem('bbOnboardingStep', '12');
-      }
-      const step = parseInt(localStorage.getItem('bbOnboardingStep') || '0', 10);
-      // Tutorial complete — auto-mark any focused-mode entry hints as done so newly-added
-      // hints never appear for users who have already finished the onboarding tutorial.
-      if (step >= 12 && !_hintMigrationDone) {
-        _hintMigrationDone = true;
-        ['bb_fmChooseMoodHintDone','bb_fmMoodInfoCloseHintDone','bbSettingsHintDone',
-         'bbCustomiseFormHintDone','bbCustomiseAdditionalHintDone','bbCloseSettingsHintDone',
-         'bb_fmMoodTipShown'].forEach(f => { if (!localStorage.getItem(f)) localStorage.setItem(f, '1'); });
-        localStorage.removeItem('bb_fmTapHoldHintPending');
-        localStorage.removeItem('bb_fmTapHoldHintReady');
-        localStorage.removeItem('bbAdvancedBadgePending');
-        localStorage.removeItem('bbAdvancedBadgeVisible');
-      }
-      return step;
+      return window.BB.onboarding.getStep();
     }
+    /**
+     * Advance the user's onboarding step. No-op if `to` is not strictly
+     * greater than the current step. Persists to localStorage and to
+     * Firestore (`userSettings/{uid}.onboardingStep`) when signed in, then
+     * re-runs the journal page's gating callback to show/hide hints.
+     *
+     * @param {number} to Target step.
+     */
     function _advanceOnboardingStep(to) {
       const cur = _getOnboardingStep();
       if (to <= cur) return;
-      const _isNat = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
-      if (to === 9) to = 10; // step 9 (WA hint) removed from tutorial on all platforms
+      if (to === 9) to = 10; // step 9 (WhatsApp hint) was removed from the tutorial.
       localStorage.setItem('bbOnboardingStep', String(to));
       if (typeof currentUser !== 'undefined' && currentUser && typeof db !== 'undefined' && db) {
         db.collection('userSettings').doc(currentUser.uid).set({ onboardingStep: to }, { merge: true }).catch(() => {});
@@ -3032,44 +3028,16 @@
       _applyJournalOnboardingGating();
     }
 
+    /** Navigates to the survival kit page. */
     function _survivalNavClick() {
       location.replace('survival-kit.html');
     }
 
     let _allEntries = []; // full sorted entry list for personalised feedback
 
-    function _resolvePointerPosition(ptr, hintEls) {
-      const vw = window.innerWidth, vh = window.innerHeight;
-      const sz = 72;
-      const pad = 16;
-      const candidates = [
-        { left: vw / 2, top: vh / 2 },
-        { left: vw / 2, top: vh * 0.25 },
-        { left: vw / 2, top: vh * 0.75 },
-        { left: vw * 0.25, top: vh / 2 },
-        { left: vw * 0.75, top: vh / 2 },
-      ];
-      function overlaps(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) {
-        return ax1 < bx2 && ax2 > bx1 && ay1 < by2 && ay2 > by1;
-      }
-      for (const c of candidates) {
-        const px1 = c.left - sz / 2 - pad, py1 = c.top - sz / 2 - pad;
-        const px2 = c.left + sz / 2 + pad, py2 = c.top + sz / 2 + pad;
-        const hit = hintEls.some(el => {
-          if (!el) return false;
-          const r = el.getBoundingClientRect();
-          return overlaps(px1, py1, px2, py2, r.left, r.top, r.right, r.bottom);
-        });
-        if (!hit) {
-          ptr.style.left = c.left + 'px';
-          ptr.style.top = c.top + 'px';
-          ptr.style.transform = 'translate(-50%,-50%)';
-          return true;
-        }
-      }
-      ptr.style.display = 'none';
-      return false;
-    }
+    // _resolvePointerPosition is provided by js/shared/onboarding.js.
+    // Local alias kept so existing call sites in this script work unchanged.
+    const _resolvePointerPosition = window.BB.onboarding.resolvePointerPosition;
     function _showHintPointer(targetEl) {
       document.getElementById('_bbHintPointer')?.remove();
       const ptr = document.createElement('div');
@@ -3261,16 +3229,9 @@
 
     // Wait for Firebase to load
     function initializeApp() {
-      // Firebase Configuration
-      const firebaseConfig = {
-        apiKey: "AIzaSyBlF7DjbOvU4xgM47kAd6Ttx42_W1BPVUY",
-        authDomain: "bipolarbear-app.firebaseapp.com",
-        projectId: "bipolarbear-app",
-        storageBucket: "bipolarbear-app.firebasestorage.app",
-        messagingSenderId: "566288727451",
-        appId: "1:566288727451:web:8921f3242193df115df53e",
-        measurementId: "G-7TX0FRWEF1"
-      };
+      // Config lives in js/shared/firebase-config.js so every page reads the
+      // same source of truth.
+      const firebaseConfig = window.BB_FIREBASE_CONFIG;
 
       // Initialize Firebase with error handling
       
@@ -14020,12 +13981,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
        Safely ignored in browser / PWA mode.
   ============================================================ -->
   <script>
-    // ── Detect whether we're running inside a Capacitor native app ──
-    // Assigned to window.* (not const) so all other <script> blocks can call them.
-    // const/let are scoped to their own <script> tag and are invisible to other blocks.
-    window.isNative  = () => window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
-    window.isIOS     = () => window.isNative() && window.Capacitor.getPlatform() === 'ios';
-    window.isAndroid = () => window.isNative() && window.Capacitor.getPlatform() === 'android';
+    // window.isNative / window.isIOS / window.isAndroid are provided by
+    // js/shared/platform.js (loaded once in <head>) and are available across
+    // every <script> block in this page.
 
     // ── Helper: safe plugin getter ──
     function getPlugin(name) {

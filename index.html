@@ -8,6 +8,12 @@
   <!-- Beta gate: must be first — fires before any render -->
   <style>body{background:linear-gradient(135deg,#ffaa33 0%,#ff8833 100%)}</style>
   <script>if(!window.Capacitor&&location.protocol!=='file:'&&localStorage.getItem('bbWebUnlocked')!=='true'){location.replace('beta.html');}</script>
+
+  <!-- Shared helpers: load before any inline script that depends on isNative()/window.BB_FIREBASE_CONFIG/BB.onboarding. -->
+  <script src="js/shared/platform.js"></script>
+  <script src="js/shared/debug.js"></script>
+  <script src="js/shared/firebase-config.js"></script>
+  <script src="js/shared/onboarding.js"></script>
   <meta name="description" content="Checkin with the Bear. Free mood journal and survival kit for people living with bipolar disorder. Track mood, energy, sleep and medication daily.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://www.bipolarbear.app/">
@@ -825,14 +831,9 @@
     }
 
     // ── Firebase init ──
-    const firebaseConfig = {
-      apiKey: "AIzaSyBlF7DjbOvU4xgM47kAd6Ttx42_W1BPVUY",
-      authDomain: "bipolarbear-app.firebaseapp.com",
-      projectId: "bipolarbear-app",
-      storageBucket: "bipolarbear-app.firebasestorage.app",
-      messagingSenderId: "566288727451",
-      appId: "1:566288727451:web:8921f3242193df115df53e"
-    };
+    // Config lives in js/shared/firebase-config.js so every page reads the
+    // same source of truth.
+    const firebaseConfig = window.BB_FIREBASE_CONFIG;
     let auth, db, currentUser = null;
     try {
       firebase.initializeApp(firebaseConfig);
@@ -1099,27 +1100,24 @@
     } catch(e) { console.warn('Firebase init failed on index.html', e); }
 
     // ── Onboarding step helpers ──
-    let _hintMigrationDone = false;
+    // _getOnboardingStep() is provided by js/shared/onboarding.js — the
+    // implementation here delegates to it. The local function name is kept
+    // because inline event handlers (e.g. onclick="…_advanceOnboardingStep(12)")
+    // resolve against the script's lexical scope.
+    /**
+     * @returns {number} Current onboarding step (0–12).
+     */
     function _getOnboardingStep() {
-      // Migration: existing users with entries but no step → mark as complete
-      if (!localStorage.getItem('bbOnboardingStep') && localStorage.getItem('bbHasEntries') === '1') {
-        localStorage.setItem('bbOnboardingStep', '12');
-      }
-      const step = parseInt(localStorage.getItem('bbOnboardingStep') || '0', 10);
-      // Tutorial complete — auto-mark any focused-mode entry hints as done so newly-added
-      // hints never appear for users who have already finished the onboarding tutorial.
-      if (step >= 12 && !_hintMigrationDone) {
-        _hintMigrationDone = true;
-        ['bb_fmChooseMoodHintDone','bb_fmMoodInfoCloseHintDone','bbSettingsHintDone',
-         'bbCustomiseFormHintDone','bbCustomiseAdditionalHintDone','bbCloseSettingsHintDone',
-         'bb_fmMoodTipShown'].forEach(f => { if (!localStorage.getItem(f)) localStorage.setItem(f, '1'); });
-        localStorage.removeItem('bb_fmTapHoldHintPending');
-        localStorage.removeItem('bb_fmTapHoldHintReady');
-        localStorage.removeItem('bbAdvancedBadgePending');
-        localStorage.removeItem('bbAdvancedBadgeVisible');
-      }
-      return step;
+      return window.BB.onboarding.getStep();
     }
+    /**
+     * Advance the user's onboarding step. No-op if `to` is not strictly
+     * greater than the current step. Persists to localStorage and to
+     * Firestore (`userSettings/{uid}.onboardingStep`) when signed in.
+     * Triggers the tutorial-complete modal the first time step ≥ 12.
+     *
+     * @param {number} to Target step.
+     */
     function _advanceOnboardingStep(to) {
       const cur = _getOnboardingStep();
       if (to <= cur) return;
@@ -1138,36 +1136,9 @@
     window._getOnboardingStep = _getOnboardingStep;
     window._advanceOnboardingStep = _advanceOnboardingStep;
 
-    function _resolvePointerPosition(ptr, hintEls) {
-      const vw = window.innerWidth, vh = window.innerHeight;
-      const sz = 72, pad = 16;
-      const candidates = [
-        { left: vw / 2, top: vh / 2 },
-        { left: vw / 2, top: vh * 0.25 },
-        { left: vw / 2, top: vh * 0.75 },
-        { left: vw * 0.25, top: vh / 2 },
-        { left: vw * 0.75, top: vh / 2 },
-      ];
-      function overlaps(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) {
-        return ax1 < bx2 && ax2 > bx1 && ay1 < by2 && ay2 > by1;
-      }
-      for (const c of candidates) {
-        const px1 = c.left - sz / 2 - pad, py1 = c.top - sz / 2 - pad;
-        const px2 = c.left + sz / 2 + pad, py2 = c.top + sz / 2 + pad;
-        const hit = hintEls.some(el => {
-          if (!el) return false;
-          const r = el.getBoundingClientRect();
-          return overlaps(px1, py1, px2, py2, r.left, r.top, r.right, r.bottom);
-        });
-        if (!hit) {
-          ptr.style.left = c.left + 'px';
-          ptr.style.top = c.top + 'px';
-          ptr.style.transform = 'translate(-50%,-50%)';
-          return;
-        }
-      }
-      ptr.style.display = 'none';
-    }
+    // _resolvePointerPosition is provided by js/shared/onboarding.js.
+    // Local alias kept so existing call sites in this script work unchanged.
+    const _resolvePointerPosition = window.BB.onboarding.resolvePointerPosition;
     function _showIndexHintPointer(targetEl) {
       document.getElementById('_bbIdxHintPointer')?.remove();
       const rect = targetEl.getBoundingClientRect();

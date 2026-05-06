@@ -1,49 +1,115 @@
-const CACHE_NAME = 'bipolarbear-v2';
+/**
+ * BipolarBear PWA service worker.
+ *
+ * Strategy: network-first with a cache fallback. Successful GETs are cached as
+ * we see them so the app keeps working when the device drops offline. We
+ * bypass Google/Firebase/CDN traffic entirely — Firestore handles its own
+ * offline persistence and we don't want to fight it.
+ *
+ * Bump CACHE_NAME whenever a precached asset changes; old caches are deleted
+ * on activate. Currently registered from journal.html and survival-kit.html
+ * (see `navigator.serviceWorker.register('/service-worker.js')` in those
+ * files); the other pages still benefit because the cache is shared per-origin.
+ *
+ * @file service-worker.js
+ */
+
+// Bump this string to invalidate every client's cache. Format: <slug>-vN.
+const CACHE_NAME = 'bipolarbear-v3';
+
+/**
+ * Files that should be available offline. Each entry is precached on `install`.
+ * Keep entries to ones we always want offline; per-request caching below
+ * picks up everything else as the user navigates.
+ */
 const STATIC_ASSETS = [
   './index.html',
   './journal.html',
   './survival-kit.html',
+  './anonymous.html',
+  './beta.html',
+  './privacy.html',
+  './fab.js',
+  './manifest.json',
+  './manifest-anonymous.json',
+  './js/shared/platform.js',
+  './js/shared/debug.js',
+  './js/shared/firebase-config.js',
   './icons/bipolarbear.png',
 ];
 
-self.addEventListener('install', event => {
+/**
+ * Hostnames whose responses we deliberately bypass. Firebase and Google CDNs
+ * have their own caching and offline behaviour — caching them here would
+ * stale-pin SDK builds.
+ */
+const BYPASS_HOSTS = ['googleapis.com', 'firebase', 'gstatic.com'];
+
+self.addEventListener('install', (event) => {
+  // Take over as soon as installation finishes — we don't need the old SW
+  // to keep serving while the new one warms up.
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(STATIC_ASSETS)).catch(() => {})
+    caches
+      .open(CACHE_NAME)
+      .then((cache) => cache.addAll(STATIC_ASSETS))
+      // Best-effort: a missing file shouldn't block install.
+      .catch(() => {})
   );
 });
 
-self.addEventListener('activate', event => {
+self.addEventListener('activate', (event) => {
+  // Drop every cache that isn't ours, then claim open clients so the new SW
+  // controls them without a reload.
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(
+          keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))
+        )
+      )
+      .then(() => self.clients.claim())
   );
 });
 
-self.addEventListener('fetch', event => {
-  // Only handle GET requests
-  if (event.request.method !== 'GET') return;
-  // Don't intercept any Google/Firebase API or CDN requests — always go to network
-  const url = event.request.url;
-  if (url.includes('googleapis.com') ||
-      url.includes('firebase') ||
-      url.includes('gstatic.com')) return;
+self.addEventListener('fetch', (event) => {
+  const req = event.request;
+
+  // Service workers only see GETs in practice, but be defensive.
+  if (req.method !== 'GET') return;
+
+  // Don't intercept Firebase / Google traffic — let it go straight to network.
+  const url = req.url;
+  if (BYPASS_HOSTS.some((h) => url.includes(h))) return;
 
   event.respondWith(
-    fetch(event.request)
-      .then(response => {
-        // Cache successful responses for static assets
+    fetch(req)
+      .then((response) => {
+        // Cache successful responses for next time.
         if (response.ok) {
           const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+          caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
         }
         return response;
       })
-      .catch(() => caches.match(event.request).then(cached => cached || new Response('', { status: 503, statusText: 'Offline' })))
+      .catch(() =>
+        // Network failed: serve from cache. For top-level navigations,
+        // fall back to index.html so the app shell renders rather than a
+        // bare offline error.
+        caches.match(req).then((cached) => {
+          if (cached) return cached;
+          if (req.mode === 'navigate') {
+            return caches.match('./index.html');
+          }
+          return new Response('', { status: 503, statusText: 'Offline' });
+        })
+      )
   );
 });
 
-self.addEventListener('message', event => {
+self.addEventListener('message', (event) => {
+  // Lets a page force-activate a waiting service worker:
+  //   navigator.serviceWorker.controller.postMessage({ type: 'SKIP_WAITING' });
   if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
 });

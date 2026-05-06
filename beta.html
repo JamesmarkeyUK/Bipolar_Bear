@@ -10,6 +10,11 @@
   <link rel="apple-touch-icon" href="/icons/favicons/apple-touch-icon.png">
   <meta name="theme-color" content="#ff9500">
 
+  <!-- Shared helpers: load before any inline script that depends on isNative()/window.BB_FIREBASE_CONFIG. -->
+  <script src="js/shared/platform.js"></script>
+  <script src="js/shared/debug.js"></script>
+  <script src="js/shared/firebase-config.js"></script>
+
   <!-- Firebase SDK loaded inline in body, just before first use -->
 
   <style>
@@ -515,15 +520,9 @@
 
   <script>
     // ── Firebase init ──
-    const firebaseConfig = {
-      apiKey: "AIzaSyBlF7DjbOvU4xgM47kAd6Ttx42_W1BPVUY",
-      authDomain: "bipolarbear-app.firebaseapp.com",
-      projectId: "bipolarbear-app",
-      storageBucket: "bipolarbear-app.firebasestorage.app",
-      messagingSenderId: "566288727451",
-      appId: "1:566288727451:web:8921f3242193df115df53e"
-    };
-    firebase.initializeApp(firebaseConfig);
+    // Config lives in js/shared/firebase-config.js so every page reads the
+    // same source of truth.
+    firebase.initializeApp(window.BB_FIREBASE_CONFIG);
     const auth = firebase.auth();
     const db = firebase.firestore();
 
