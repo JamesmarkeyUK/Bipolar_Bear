@@ -1,13 +1,50 @@
-/* fab.js — Shared FAB dock for BipolarBear
-   Used by: index.html, journal.html, survival-kit.html
-   NOT for: anonymous.html
-*/
+/**
+ * @file fab.js — Shared floating action bar (FAB dock) for BipolarBear.
+ *
+ * Loaded by index.html, journal.html and survival-kit.html. NOT loaded by
+ * anonymous.html (that page uses its own yellow-themed FAB layout).
+ *
+ * Self-contained IIFE that on load:
+ *   1. Applies first-run defaults (empty slot 1 for brand-new installs).
+ *   2. Injects all FAB markup, CSS and modals into the document.
+ *   3. Wires global handlers exposed on `window.*` for inline `onclick=` use.
+ *
+ * Cross-block dependencies (set by the page's inline script *before* fab.js
+ * runs in practice — but we defensively check at call-time):
+ *   - window.db          → firebase.firestore() instance
+ *   - window.currentUser → signed-in Firebase user, or undefined when guest
+ *   - window.firebase    → Firebase compat SDK global
+ *   - window._fabOnSignOut, window._fabOpenAuth, window._fabBeforeSignIn,
+ *     window._fabOpenPersonalInfo, window._onFabFeedbackClose,
+ *     window._confirmDeleteGuestData → optional page-specific hooks.
+ *
+ * localStorage keys this module reads/writes:
+ *   bbFabSlot_1..4            — id of FAB assigned to each slot
+ *   bbWaFabHidden             — chat (Crisis Support) hidden
+ *   bbQuickNoteFabHidden      — security (Data Security) hidden
+ *   bbCoffeeFabHidden         — coffee FAB hidden
+ *   bbFeedbackFabHidden       — feedback FAB hidden
+ *   bbFooterHidden            — entire footer hidden
+ *   bbFabsUnlocked            — '1' once the onboarding tutorial has unlocked the dock
+ *   bbFabFirstRunDone         — '1' after first-run defaults applied (one-shot)
+ *   bbQuickNotes              — JSON array of saved quick notes
+ */
 (function () {
   'use strict';
 
   // ── Cross-device persistence ──────────────────────────────────────────────
-  // Save current FAB customisation (slot assignments + hidden flags) to Firestore.
-  // Restored on sign-in from index.html so the user's layout follows them across devices.
+
+  /**
+   * Mirror the current FAB customisation (slot assignments + hidden flags)
+   * to Firestore so the layout follows the user across devices. Restored on
+   * sign-in by index.html's auth listener.
+   *
+   * No-op when not signed in — `window.currentUser` is undefined for guests
+   * (and was previously undefined for everyone before the bug fix that
+   * exposes it on window — see the v0.99 settings-persistence fix).
+   *
+   * @returns {void}
+   */
   function _syncFabsToFirestore() {
     if (!window.db || !window.currentUser) return;
     const fabState = {};
@@ -24,14 +61,20 @@
   window._syncFabsToFirestore = _syncFabsToFirestore;
 
   // ── First-run defaults ────────────────────────────────────────────────────
-  // For brand-new installs we hide the Crisis Support FAB by default so the
-  // dock starts with a dotted placeholder in slot 1. Tapping the placeholder
-  // opens the picker — and because the chat FAB is "hidden" it appears there
-  // as a re-addable option, subtly teaching the user that the dock is
-  // customisable.
-  //
-  // Existing users are detected by the presence of any pre-existing FAB
-  // state, journal entries, or onboarding progress, and are left alone.
+
+  /**
+   * One-shot migration that hides the Crisis Support FAB on brand-new
+   * installs so the dock starts with a dotted placeholder in slot 1. Tapping
+   * the placeholder opens the picker, and because the chat FAB is "hidden"
+   * it appears there as a re-addable option — subtly teaching the user that
+   * the dock is customisable.
+   *
+   * Returning users are detected by any of: existing FAB state, journal
+   * entries, or onboarding progress. They are left untouched.
+   *
+   * Idempotent via the bbFabFirstRunDone flag (set on first run, never reset
+   * except by full account/data deletion).
+   */
   (function _applyFirstRunFabDefaults() {
     if (localStorage.getItem('bbFabFirstRunDone') === '1') return;
     const _existingFabKeys = [
@@ -50,18 +93,32 @@
   })();
 
   // ── Config ────────────────────────────────────────────────────────────────
+
+  /**
+   * Default FABs, one per slot. `hiddenKey` is the localStorage flag that
+   * removes the FAB from the dock when set to '1'. Reordering this array
+   * does not move existing users' FABs — slot persistence is keyed on `id`
+   * via bbFabSlot_*.
+   */
   const _FAB_DEFAULTS = [
     { id: 'chat',     icon: '🆘', label: 'Crisis Support',  desc: 'Samaritans & community chat', hiddenKey: 'bbWaFabHidden',        slotNum: 1 },
     { id: 'e2ee',     icon: '🔐', label: 'Data Security',   desc: 'How your data is kept safe',  hiddenKey: 'bbQuickNoteFabHidden',  slotNum: 2 },
     { id: 'coffee',   icon: '☕', label: 'Buy Us a Coffee', desc: 'Support Bipolar Bear',         hiddenKey: 'bbCoffeeFabHidden',     slotNum: 3 },
     { id: 'feedback', icon: '📣', label: 'Send Feedback',   desc: 'Help us make it better',      hiddenKey: 'bbFeedbackFabHidden',   slotNum: 4 },
   ];
+  /**
+   * Extra FABs available via the picker — never auto-assigned, only added
+   * by the user. Each maps to a hidden `<button id="<id>ExtraFab">` injected
+   * by `_injectHTML()` and revealed by `_applyFabDock()` when assigned.
+   */
   const _FAB_EXTRAS = [
     { id: 'quicknote', icon: '📝', label: 'Quick Note', desc: 'Reminder for your next journal entry' },
     { id: 'stats',     icon: '📊', label: 'Statistics',  desc: 'Open your mood journal stats' },
     { id: 'celeb',     icon: '⭐', label: 'Celebrity',   desc: 'Famous people with bipolar disorder' },
     { id: 'goals',     icon: '🎯', label: 'Goals',       desc: 'View your survival kit goals' },
   ];
+
+  /** Public figures shown by the Celebrity FAB. `wiki` is the URL slug. */
   const _CELEBS = [
     { name: 'Mariah Carey',        field: 'Singer',                        wiki: 'Mariah_Carey' },
     { name: 'Kanye West',          field: 'Musician & Artist',              wiki: 'Kanye_West' },
@@ -88,9 +145,13 @@
     { name: 'Syd Barrett',         field: 'Musician — Pink Floyd',          wiki: 'Syd_Barrett' },
     { name: 'Axl Rose',            field: "Musician — Guns N' Roses",       wiki: 'Axl_Rose' },
   ];
+  /** Map from extra FAB id → DOM id of the injected button. */
   const _extraMap = { stats: 'statsExtraFab', celeb: 'celebExtraFab', goals: 'goalsExtraFab', quicknote: 'quicknoteExtraFab' };
 
   // ── CSS ───────────────────────────────────────────────────────────────────
+  // All FAB styling is injected into <head> as a single <style> so pages
+  // don't need to copy this CSS. Selectors are namespaced (`fab-*`, `bb-*`)
+  // to avoid collisions with the host page's stylesheet.
   const _styleEl = document.createElement('style');
   _styleEl.textContent = `
     .fab-footer {
@@ -198,6 +259,19 @@
   document.head.appendChild(_styleEl);
 
   // ── HTML injection ────────────────────────────────────────────────────────
+
+  /**
+   * Build and inject every FAB button + every modal into the page. Targets
+   * `#app-shell` when present (so FABs sit inside the iPhone-style frame on
+   * journal/index/survival-kit) and falls back to `<body>`.
+   *
+   * Triggered once on DOM ready (or immediately if the document is already
+   * parsed). After injection, defers `_applyFabDock()` past two animation
+   * frames so the layout has settled and `#app-shell.offsetWidth` is valid
+   * for slot positioning.
+   *
+   * @returns {void}
+   */
   function _injectHTML() {
     const _wrap = document.createElement('div');
     _wrap.innerHTML = `
@@ -444,6 +518,24 @@
   }
 
   // ── FAB dock: visibility + slot positioning ───────────────────────────────
+
+  /**
+   * Recompute every FAB's visibility and horizontal position based on the
+   * current localStorage state. Called on first injection, on every window
+   * resize, and after any state change (picker action, hide-permanently).
+   *
+   * Behaviour summary:
+   *   - Pre-tutorial (`bbFabsUnlocked !== '1'`): everything hidden, returns early.
+   *   - Default FABs render in their assigned slot (or `slotNum` fallback).
+   *   - Hidden defaults free their slot for an extra FAB or placeholder.
+   *   - Truly empty slots show the dotted `+` placeholder which opens the picker.
+   *
+   * Slot horizontal positions are derived from `#app-shell.offsetWidth` on
+   * desktop (≥920px, where the shell creates a containing block via
+   * `transform: translateZ(0)`) and from `window.innerWidth` on mobile.
+   *
+   * @returns {void}
+   */
   function _applyFabDock() {
     const _fabsUnlocked = localStorage.getItem('bbFabsUnlocked') === '1';
     const _footer = document.querySelector('.fab-footer');
@@ -540,7 +632,19 @@
   window.addEventListener('resize', _applyFabDock);
 
   // ── FAB picker ────────────────────────────────────────────────────────────
+
+  /** Slot the picker is currently choosing for (1–4). Captured per-open. */
   let _fabPickerSlot = null;
+
+  /**
+   * Open the picker sheet for `slot`. Lists every default FAB the user has
+   * hidden (so they can re-add it) plus every extra FAB not currently
+   * assigned to another slot. Selecting an option clears that FAB's hidden
+   * flag, removes it from any other slot it occupies, assigns it to `slot`,
+   * re-renders the dock and syncs to Firestore.
+   *
+   * @param {number} slot Target slot (1–4).
+   */
   window._openFabPicker = function (slot) {
     _fabPickerSlot = slot;
     const _opts = document.getElementById('bbFabPickerOptions');
@@ -592,10 +696,17 @@
     const _m = document.getElementById('bbFabPickerModal');
     if (_m) _m.style.display = 'flex';
   };
+  /** Dismiss the picker without making a change. */
   window.closeFabPicker = function () {
     const _m = document.getElementById('bbFabPickerModal');
     if (_m) _m.style.display = 'none';
   };
+
+  /**
+   * Remove an extra FAB from whichever slot it occupies. Called from the
+   * "🙈 Hide this button" links inside extra-FAB modals.
+   * @param {string} extraId One of the `_FAB_EXTRAS[].id` values.
+   */
   window._hideExtraFab = function (extraId) {
     for (let s = 1; s <= 4; s++) {
       if (localStorage.getItem('bbFabSlot_' + s) === extraId) localStorage.removeItem('bbFabSlot_' + s);
@@ -605,11 +716,23 @@
   };
 
   // ── Core FAB modal open/close ─────────────────────────────────────────────
+  // Thin show/hide handlers wired to inline `onclick=` attributes.
+
+  /** @returns {void} */
   window.openChatModal = function () { document.getElementById('chatModal').classList.add('open'); };
+  /** @returns {void} */
   window.closeChatModal = function () { document.getElementById('chatModal').classList.remove('open'); };
+  /** @returns {void} */
   window.openSecurityModal = function () { document.getElementById('securityModal').classList.add('open'); };
+  /** @returns {void} */
   window.closeSecurityModal = function () { document.getElementById('securityModal').classList.remove('open'); };
 
+  /**
+   * Open the "Buy us a coffee" modal and best-effort fetch the current
+   * funding percentage from `counters/appCosts` in Firestore. Fails silently
+   * on network/permission errors — the modal still opens.
+   * @returns {Promise<void>}
+   */
   window.openCoffeeModal = async function () {
     document.getElementById('coffeeModal2').classList.add('open');
     const _db = window.db || (window.firebase && window.firebase.firestore ? window.firebase.firestore() : null);
@@ -625,10 +748,18 @@
       } catch (e) {}
     }
   };
+  /** @returns {void} */
   window.closeCoffeeModal = function () { document.getElementById('coffeeModal2').classList.remove('open'); };
 
   // ── Feedback FAB ──────────────────────────────────────────────────────────
+
+  /** Currently-selected feedback type ('bug' | 'comment' | 'idea') or null. */
   let _fbType = null;
+
+  /**
+   * Open the feedback modal, resetting type selection and message field, and
+   * filling in the page/version metadata line.
+   */
   window.openFabFeedback = function () {
     _fbType = null;
     const _modal = document.getElementById('bbFabFeedbackModal');
@@ -645,11 +776,21 @@
     }
     if (_modal) _modal.classList.add('open');
   };
+  /**
+   * Close the feedback modal and fire the optional `_onFabFeedbackClose`
+   * page hook (used by index/journal to advance onboarding state).
+   */
   window.closeFabFeedback = function () {
     const _modal = document.getElementById('bbFabFeedbackModal');
     if (_modal) _modal.classList.remove('open');
     if (typeof window._onFabFeedbackClose === 'function') window._onFabFeedbackClose();
   };
+
+  /**
+   * Toggle which feedback-type chip is selected. Also reveals the optional
+   * email input for bug reports (so we can follow up).
+   * @param {'bug'|'comment'|'idea'} type
+   */
   window.selectFabFeedbackType = function (type) {
     _fbType = type;
     document.querySelectorAll('.bb-fb-type-btn').forEach(b => b.classList.remove('selected'));
@@ -659,6 +800,12 @@
     const _emailRow = document.getElementById('bbFbEmailRow');
     if (_emailRow) _emailRow.style.display = type === 'bug' ? '' : 'none';
   };
+  /**
+   * Validate and submit feedback to Firestore (`feedback` collection). Signs
+   * the user in anonymously if they're a guest so the write is allowed by
+   * the security rules. Shows a thank-you alert on success.
+   * @returns {Promise<void>}
+   */
   window.submitFabFeedback = async function () {
     const _errEl = document.getElementById('bbFbError');
     const _msgEl = document.getElementById('bbFbMessage');
@@ -689,6 +836,10 @@
     }
   };
 
+  /**
+   * Tag feedback submissions with their runtime so we can triage by platform.
+   * @returns {'native'|'pwa'|'web'}
+   */
   function _getFbPlatform() {
     if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) return 'native';
     if (window.matchMedia('(display-mode: standalone)').matches) return 'pwa';
@@ -696,11 +847,18 @@
   }
 
   // ── Extra FAB modals ──────────────────────────────────────────────────────
+
+  /** Open the Statistics teaser modal — links across to journal.html. */
   window.openStatsModal = function () {
     const _m = document.getElementById('bbStatsModal');
     if (_m) _m.style.display = 'flex';
   };
 
+  /**
+   * Open the Goals modal, populating the list from the user's `dailyGoals`
+   * localStorage entry (set by the survival-kit page). Empty-state message
+   * shown when nothing is configured.
+   */
   window.openGoalsModal = function () {
     const _list = document.getElementById('bbGoalsList');
     if (_list) {
@@ -715,26 +873,40 @@
     const _m = document.getElementById('bbGoalsModal');
     if (_m) _m.style.display = 'flex';
   };
+  /** Hide the Goals modal. */
   window.closeGoalsModal = function () {
     const _m = document.getElementById('bbGoalsModal');
     if (_m) _m.style.display = 'none';
   };
 
+  /** Currently displayed index into `_CELEBS` (random on load for variety). */
   let _celebIdx = Math.floor(Math.random() * _CELEBS.length);
+  /** Wikipedia thumbnail URL cache, keyed by `wiki` slug. `null` = no thumbnail. */
   const _celebImgCache = {};
+
+  /** Open the Celebrity modal showing the current celebrity. */
   window.openCelebModal = function () {
     _renderCeleb();
     const _m = document.getElementById('bbCelebModal');
     if (_m) _m.style.display = 'flex';
   };
+  /** Hide the Celebrity modal. */
   window.closeCelebModal = function () {
     const _m = document.getElementById('bbCelebModal');
     if (_m) _m.style.display = 'none';
   };
+  /** Advance to the next celebrity (wraps). */
   window.nextCeleb = function () {
     _celebIdx = (_celebIdx + 1) % _CELEBS.length;
     _renderCeleb();
   };
+
+  /**
+   * Paint name + field for the current celebrity and lazy-fetch their
+   * Wikipedia thumbnail (cached per slug). Falls back to a ⭐ glyph when no
+   * image is available or the fetch fails.
+   * @returns {Promise<void>}
+   */
   async function _renderCeleb() {
     const c = _CELEBS[_celebIdx];
     const _nameEl  = document.getElementById('bbCelebName');
@@ -762,6 +934,10 @@
     }
   }
 
+  /**
+   * Open the Quick Note modal with an empty textarea and focus it after a
+   * short delay (gives the modal CSS time to settle on iOS).
+   */
   window.openQuickNoteModal = function () {
     const _m   = document.getElementById('bbQuickNoteModal');
     const _inp = document.getElementById('bbQuickNoteInput');
@@ -769,10 +945,19 @@
     if (_m) _m.style.display = 'flex';
     setTimeout(() => { if (_inp) _inp.focus(); }, 120);
   };
+
+  /** Hide the Quick Note modal. */
   window.closeQuickNoteModal = function () {
     const _m = document.getElementById('bbQuickNoteModal');
     if (_m) _m.style.display = 'none';
   };
+
+  /**
+   * Append the current textarea content to `bbQuickNotes` in localStorage
+   * and show a transient "Note saved!" toast. Empty input → close-only.
+   * Notes are read by journal.html on the next entry compose to surface
+   * them as reminders.
+   */
   window.saveQuickNote = function () {
     const _inp  = document.getElementById('bbQuickNoteInput');
     const _text = _inp ? _inp.value.trim() : '';
@@ -791,8 +976,18 @@
   };
 
   // ── Shared auth modal ────────────────────────────────────────────────────
+  // Sign-in / sign-up dialog used by every page that loads fab.js. The page
+  // wires up optional hooks (_fabOnShowAuth, _fabOnCloseAuth, _fabOnSignOut,
+  // _fabBeforeSignIn) before calling showAuthModal().
+
+  /** Whether the auth modal is currently in sign-up mode (toggled by the link). */
   let _bbIsSignUp = false;
 
+  /**
+   * Show the sign-in / sign-up dialog. Resets all fields and switches to
+   * sign-in mode (reset by the toggle link). Fires `_fabOnShowAuth` if the
+   * page provided one.
+   */
   window.showAuthModal = function () {
     _bbIsSignUp = false;
     const title  = document.getElementById('bbAuthTitle');
@@ -812,12 +1007,20 @@
     if (typeof window._fabOnShowAuth === 'function') window._fabOnShowAuth();
   };
 
+  /**
+   * Hide the auth modal and fire the optional `_fabOnCloseAuth` page hook.
+   */
   window.closeAuthModal = function () {
     const modal = document.getElementById('bbAuthModal');
     if (modal) modal.classList.remove('active');
     if (typeof window._fabOnCloseAuth === 'function') window._fabOnCloseAuth();
   };
 
+  /**
+   * Show the account-management dialog (signed-in users only). Reads the
+   * current Firebase Auth user fresh each call. Resets all sub-panels
+   * (change password / change email) to their collapsed state.
+   */
   window.showAccountModal = function () {
     const _fb  = window.firebase;
     const user = _fb && _fb.auth ? _fb.auth().currentUser : null;
@@ -846,11 +1049,17 @@
     if (typeof window._fabOnShowAuth === 'function') window._fabOnShowAuth();
   };
 
+  /** Hide the account modal. */
   window.closeAccountModal = function () {
     const modal = document.getElementById('bbAccountModal');
     if (modal) modal.classList.remove('active');
   };
 
+  /**
+   * Sign-out handler for the account modal. Prefers the page-supplied
+   * `_fabOnSignOut` hook (lets index/journal clear localStorage, cancel
+   * notifications, etc.) and falls back to a plain Firebase sign-out.
+   */
   window._bbAccountLogout = function () {
     window.closeAccountModal();
     if (typeof window._fabOnSignOut === 'function') {
@@ -861,6 +1070,11 @@
     }
   };
 
+  /**
+   * Show a transient status banner inside the account modal.
+   * @param {string} text Message to display.
+   * @param {boolean} ok  true → green/success, false → red/error.
+   */
   function _bbAccountShowMsg(text, ok) {
     const msg = document.getElementById('bbAccountMsg');
     if (!msg) return;
@@ -870,6 +1084,11 @@
     msg.style.display    = 'block';
   }
 
+  /**
+   * Validate inputs, re-authenticate with the current password, then call
+   * Firebase `updatePassword`. Shows a green status on success or a red
+   * "Current password is incorrect" / generic error otherwise.
+   */
   window._bbSubmitPasswordChange = function () {
     const _fb  = window.firebase;
     const user = _fb && _fb.auth ? _fb.auth().currentUser : null;
@@ -894,6 +1113,11 @@
       });
   };
 
+  /**
+   * Validate inputs, re-authenticate with the current password, then call
+   * Firebase `updateEmail`. Distinguishes between wrong-password,
+   * email-already-in-use, and generic errors in the status banner.
+   */
   window._bbSubmitEmailChange = function () {
     const _fb  = window.firebase;
     const user = _fb && _fb.auth ? _fb.auth().currentUser : null;
@@ -920,6 +1144,16 @@
       });
   };
 
+  /**
+   * Attach the toggle-mode and submit handlers for the auth modal. Called
+   * once from `_injectHTML` after the modal markup is in the DOM.
+   *
+   * Submit behaviour:
+   *   - Sign in: Firebase `signInWithEmailAndPassword`, then close modal.
+   *   - Sign up: createUser, send styled verification via Cloud Function
+   *     (falls back to native sendEmailVerification on failure), sign back
+   *     out, and tell the user to verify before signing in.
+   */
   function _bbWireAuthListeners() {
     const toggle = document.getElementById('bbAuthToggle');
     const submit = document.getElementById('bbAuthSubmit');
@@ -978,6 +1212,15 @@
   }
 
   // ── Hide permanently ──────────────────────────────────────────────────────
+
+  /**
+   * Permanently hide a default FAB. Closes the matching modal, sets the
+   * relevant `bbXxxFabHidden` flag, re-renders the dock and syncs to
+   * Firestore. The hidden FAB then appears in the picker as a re-addable
+   * option.
+   *
+   * @param {'chat'|'wa'|'quicknote'|'feedback'|'coffee'} type
+   */
   window._showHidePermanently = function (type) {
     if (type === 'chat' || type === 'wa') {
       window.closeChatModal();
