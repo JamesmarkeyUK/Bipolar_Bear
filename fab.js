@@ -23,6 +23,32 @@
   }
   window._syncFabsToFirestore = _syncFabsToFirestore;
 
+  // ── First-run defaults ────────────────────────────────────────────────────
+  // For brand-new installs we hide the Crisis Support FAB by default so the
+  // dock starts with a dotted placeholder in slot 1. Tapping the placeholder
+  // opens the picker — and because the chat FAB is "hidden" it appears there
+  // as a re-addable option, subtly teaching the user that the dock is
+  // customisable.
+  //
+  // Existing users are detected by the presence of any pre-existing FAB
+  // state, journal entries, or onboarding progress, and are left alone.
+  (function _applyFirstRunFabDefaults() {
+    if (localStorage.getItem('bbFabFirstRunDone') === '1') return;
+    const _existingFabKeys = [
+      'bbFabSlot_1', 'bbFabSlot_2', 'bbFabSlot_3', 'bbFabSlot_4',
+      'bbWaFabHidden', 'bbQuickNoteFabHidden', 'bbCoffeeFabHidden',
+      'bbFeedbackFabHidden', 'bbFooterHidden',
+    ];
+    const _isReturningUser =
+      localStorage.getItem('bbHasEntries') === '1' ||
+      parseInt(localStorage.getItem('bbOnboardingStep') || '0', 10) > 0 ||
+      _existingFabKeys.some(k => localStorage.getItem(k) !== null);
+    if (!_isReturningUser) {
+      localStorage.setItem('bbWaFabHidden', '1');
+    }
+    localStorage.setItem('bbFabFirstRunDone', '1');
+  })();
+
   // ── Config ────────────────────────────────────────────────────────────────
   const _FAB_DEFAULTS = [
     { id: 'chat',     icon: '🆘', label: 'Crisis Support',  desc: 'Samaritans & community chat', hiddenKey: 'bbWaFabHidden',        slotNum: 1 },

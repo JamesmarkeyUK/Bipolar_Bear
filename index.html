@@ -839,8 +839,15 @@
       firebase.initializeApp(firebaseConfig);
       auth = firebase.auth();
       db = firebase.firestore();
+      // Expose to window so other <script> blocks (and shared modules like
+      // fab.js) can access them. `let` declarations don't attach to window,
+      // and a number of call sites — including fab.js's _syncFabsToFirestore
+      // and the journal toggle handlers — gate on window.db / window.currentUser.
+      window.auth = auth;
+      window.db = db;
       auth.onAuthStateChanged(user => {
         currentUser = user && !user.isAnonymous ? user : null;
+        window.currentUser = currentUser;
 
         // Clear stale guest PIN if it was set by a different account.
         // Guest PINs (bbGuestPinSalt) are only valid for the account that created them.
@@ -1022,7 +1029,10 @@
             }
             if (_ap.monika) localStorage.setItem('bbAnon_monika', _ap.monika);
             if (_ap.verified) localStorage.setItem('bbAnon_verified', 'true');
-            _updateStreakBadge(); // refresh badge now that we have the latest values
+            _updateStreakBadge(); // refresh badge from the values we just wrote
+            // Then recompute from entries to fix the stale-currentStreak case
+            // (Firestore field only updates when journal.html opens). Best-effort.
+            _recomputeStreakFromEntries(user);
             // Refresh anonymous "new messages" badge now that monika/verified are in place
             if (currentUser && localStorage.getItem('bbAnon_verified') === 'true') {
               const _badge2 = document.getElementById('anonMessagesBadge');
@@ -1351,6 +1361,11 @@
     updateOnlineStatus();
 
     // Streak badges under journal + anonymous buttons
+    /**
+     * Render the journal + anonymous streak badges from current localStorage values.
+     * Cheap synchronous read — call after any mutation to bbCurrentStreak,
+     * bbStableStreak, bbAnon_streak, bbAnon_monika.
+     */
     function _updateStreakBadge() {
       const streak = parseInt(localStorage.getItem('bbCurrentStreak') || '0', 10);
       const stable = parseInt(localStorage.getItem('bbStableStreak')  || '0', 10);
@@ -1388,6 +1403,61 @@
       }
     }
     _updateStreakBadge();
+
+    /**
+     * Recompute the journal streak by reading the user's entries collection
+     * directly. Used on sign-in to fix the stale-streak bug: the
+     * userSettings.currentStreak field is only refreshed by journal.html when
+     * the user opens the journal page, so on a fresh device login the cached
+     * value can lag well behind the truth (e.g. 1 day shown when reality is 600).
+     *
+     * Mirrors the streak algorithm in journal.html (see displayStats around
+     * the entryDates Set). If the two ever drift, factor into js/shared/streak.js.
+     *
+     * Reads only the plaintext `timestamp` field — entry payloads are E2E
+     * encrypted, but timestamp + userId are stored alongside in cleartext.
+     *
+     * @param {firebase.User} user The signed-in Firebase user.
+     */
+    async function _recomputeStreakFromEntries(user) {
+      if (!db || !user) return;
+      const _fmt = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      try {
+        const snap = await db.collection('entries')
+          .where('userId', '==', user.uid)
+          .get();
+        const entryDates = new Set();
+        snap.forEach(doc => {
+          const ts = doc.data().timestamp;
+          if (typeof ts !== 'number') return;
+          entryDates.add(_fmt(new Date(ts)));
+        });
+        if (entryDates.size === 0) return; // never overwrite a real value with 0
+
+        const useToday = localStorage.getItem('journalDefaultToday') === 'true';
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        let checkDate = new Date(today);
+        if (!useToday) checkDate.setDate(checkDate.getDate() - 1);
+        // If the anchor day has no entry, slide one day back so streaks don't
+        // break the moment the user hasn't logged today (or yesterday) yet.
+        if (!entryDates.has(_fmt(checkDate))) {
+          checkDate.setDate(checkDate.getDate() - 1);
+        }
+        let streak = 0;
+        while (entryDates.has(_fmt(checkDate))) {
+          streak++;
+          checkDate.setDate(checkDate.getDate() - 1);
+        }
+
+        localStorage.setItem('bbCurrentStreak', String(streak));
+        db.collection('userSettings').doc(user.uid)
+          .set({ currentStreak: streak }, { merge: true }).catch(() => {});
+        _updateStreakBadge();
+      } catch (e) {
+        if (window.BB && window.BB.warn) window.BB.warn('[index] streak recompute failed:', e);
+      }
+    }
+    window._recomputeStreakFromEntries = _recomputeStreakFromEntries;
 
     // Tap badge → explain both counters
     (function() {

@@ -3248,6 +3248,13 @@
           auth.setPersistence(firebase.auth.Auth.Persistence.SESSION).catch(() => {});
         }
         db = firebase.firestore();
+        // Expose to window so other <script> blocks (and shared modules like
+        // fab.js) can access them. `let` declarations don't attach to window,
+        // and a number of call sites — including fab.js's _syncFabsToFirestore
+        // and the toggle handlers below — gate writes on window.db / window.currentUser.
+        // Without this, those Firestore writes silently no-op.
+        window.auth = auth;
+        window.db = db;
         // Enable offline persistence — queues writes while offline and syncs on reconnect.
         // synchronizeTabs: false = simple exclusive lock, acquired almost instantly.
         // (synchronizeTabs: true = multi-tab leader election taking 3-5s, unnecessary in
@@ -3267,6 +3274,7 @@
           console.warn('onAuthStateChanged did not fire — falling back to guest mode');
           isGuestMode = true;
           currentUser = null;
+          window.currentUser = null;
           loadEntries();
         }
       }, 4000);
@@ -3277,6 +3285,7 @@
         _authResolved = true;
         if (user && !user.isAnonymous) {
           currentUser = user;
+          window.currentUser = user;
           isGuestMode = false;
           document.getElementById('appContent').classList.add('visible');
           document.getElementById('signinBtn').style.display = 'none';
@@ -3501,6 +3510,7 @@
           }).catch(() => { loadEntries(); });
         } else {
           currentUser = null;
+          window.currentUser = null;
           isGuestMode = true;
           document.getElementById('signinBtn').style.display = '';
           document.getElementById('userInfo').style.display = 'none';
@@ -3520,6 +3530,7 @@
       // Defer for the same TDZ reason as the guest onAuthStateChanged branch above.
       isGuestMode = true;
       currentUser = null;
+      window.currentUser = null;
       setTimeout(() => loadEntries(), 0);
     }
   }
@@ -3565,6 +3576,7 @@
           console.error('Firebase failed to load, continuing in guest mode');
           isGuestMode = true;
           currentUser = null;
+          window.currentUser = null;
           loadEntries();
         }
       }, 500);
