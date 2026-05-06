@@ -15,7 +15,9 @@
  */
 
 // Bump this string to invalidate every client's cache. Format: <slug>-vN.
-const CACHE_NAME = 'bipolarbear-v3';
+// v4: per-page CSS/JS were extracted to css/* and js/* in Phase 4 of the
+//     2026-Q2 refactor — every old client must drop its v3 cache.
+const CACHE_NAME = 'bipolarbear-v4';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
@@ -29,13 +31,33 @@ const STATIC_ASSETS = [
   './anonymous.html',
   './beta.html',
   './privacy.html',
+
+  // FAB dock + page-specific JS (extracted from inline scripts in Phase 4).
   './fab.js',
-  './manifest.json',
-  './manifest-anonymous.json',
+  './js/index.js',
+  './js/journal.js',
+  './js/survival-kit.js',
+  './js/anonymous.js',
+  './js/beta.js',
+
+  // Shared modules — small, loaded by every page.
   './js/shared/platform.js',
   './js/shared/debug.js',
   './js/shared/firebase-config.js',
-  './icons/bipolarbear.png',
+  './js/shared/onboarding.js',
+
+  // Page-specific stylesheets (extracted from inline <style> in Phase 4).
+  './css/index.css',
+  './css/journal.css',
+  './css/survival-kit.css',
+  './css/anonymous.css',
+  './css/beta.css',
+
+  // Manifests. Icons are deliberately not precached — they're served from
+  // /icons/favicons/ (referenced in <link rel="icon">) and the browser's
+  // own image cache handles them adequately.
+  './manifest.json',
+  './manifest-anonymous.json',
 ];
 
 /**
