@@ -11408,21 +11408,67 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     }
     window.confirmResetSettings = confirmResetSettings;
 
+    /**
+     * Two-step confirmation flow that branches on auth state:
+     *  - Signed in → "Delete Account" (full Firebase Auth + Firestore + local wipe)
+     *  - Guest    → "Full Reset" (entries + localStorage only)
+     * The actual destruction lives in deleteAllEntries({ deleteAccount }).
+     */
     function confirmDeleteAll() {
       const count = _allEntries.length;
+      const isSignedIn = !!currentUser;
       const accountLine = currentUser ? `Account: ${currentUser.email}\n` : `(Guest mode — browser storage)\n`;
-      const message = `⚠️ FULL RESET?\n\n${accountLine}\nThis will permanently delete all ${count} entries AND reset all settings to defaults.\n\nThis CANNOT be undone! Make sure to export a backup first.`;
-      if (confirm(message)) {
-        if (confirm(`FINAL WARNING: Delete all ${count} entries and reset settings for ${currentUser ? currentUser.email : 'guest'}?\n\nThis CANNOT be undone.`)) {
-          deleteAllEntries();
-        }
-      }
+      const action = isSignedIn
+        ? `permanently delete your BipolarBear account, all ${count} entries, and reset everything`
+        : `permanently delete all ${count} entries AND reset all settings to defaults`;
+      const message = `⚠️ ${isSignedIn ? 'DELETE ACCOUNT' : 'FULL RESET'}?\n\n${accountLine}\nThis will ${action}.\n\nThis CANNOT be undone! Make sure to export a backup first.`;
+      if (!confirm(message)) return;
+      const finalLine = isSignedIn
+        ? `FINAL WARNING: Permanently delete account ${currentUser.email} and all ${count} entries?\n\nThis CANNOT be undone.`
+        : `FINAL WARNING: Delete all ${count} entries and reset settings for guest?\n\nThis CANNOT be undone.`;
+      if (!confirm(finalLine)) return;
+      deleteAllEntries({ deleteAccount: isSignedIn });
     }
 
-    async function deleteAllEntries() {
+    /**
+     * Wipes the user's data. Two modes via opts.deleteAccount:
+     *
+     *  - false (default): "full reset" — entries deleted (Firestore for
+     *    accounts, localStorage `entry:*` for guests), localStorage cleared,
+     *    userSettings doc reset to defaults (signed-in users), personalDetails
+     *    doc deleted, then sign-out + redirect to index.
+     *
+     *  - true: "delete account" — everything above PLUS userSettings doc
+     *    deleted (rather than reset), bbAnonMonikas reservation released,
+     *    anonProfiles cross-device record deleted for both account and anon
+     *    emails, and finally `currentUser.delete()` removes the Firebase Auth
+     *    record. Re-authenticates upfront with the user's password so we
+     *    never end up in a half-deleted state.
+     *
+     * @param {{ deleteAccount?: boolean }} [opts]
+     */
+    async function deleteAllEntries(opts) {
+      opts = opts || {};
+      const deleteAccount = !!opts.deleteAccount;
+
+      // Re-authenticate upfront for account deletion. If the user can't
+      // confirm their password we abort BEFORE touching any data — leaves
+      // them in a known-good state.
+      if (deleteAccount && currentUser) {
+        const _pw = prompt('Re-enter your password to confirm account deletion:');
+        if (!_pw) return; // cancelled
+        try {
+          const _cred = firebase.auth.EmailAuthProvider.credential(currentUser.email, _pw);
+          await currentUser.reauthenticateWithCredential(_cred);
+        } catch (_e) {
+          alert('Wrong password. Account not deleted.');
+          return;
+        }
+      }
+
       try {
         let deleted = 0;
-        
+
         if (currentUser) {
           // Delete all entries from Firestore
           const snapshot = await db.collection('entries')
@@ -11461,6 +11507,10 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
          'bbHasEntries',
          'bbOnboardingStep',
          'bbFeedbackFabHidden','bbWaFabHidden','bbFooterHidden',
+         // FAB customisation: clear slot assignments and the first-run flag
+         // so the new install gets the empty slot-1 placeholder again.
+         'bbFabSlot_1','bbFabSlot_2','bbFabSlot_3','bbFabSlot_4',
+         'bbFabsUnlocked','bbFabFirstRunDone',
          'bbLogoEasterEggFound','bbCustomFieldHintDone',
          'personalName','personalDOB','personalMedicalNum','personalDiagnosis',
          'personalDiagnosisDate','personalAddress','personalMobile','personalEmail',
@@ -11529,23 +11579,61 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         localStorage.removeItem('bbTutorialToastShown');
         localStorage.removeItem('bbWelcomeShown');
 
-        // Clear Firestore userSettings fields that survive entry deletion
+        // Firestore cleanup. Two modes:
+        //   deleteAccount → wipe every document tied to this user
+        //   reset only    → reset userSettings fields, drop personalDetails
         if (currentUser && db) {
-          db.collection('userSettings').doc(currentUser.uid).set({
-            currentMedList: [], dailyGoals: [], dailyBudget: '', logoVariant: 0,
-            focusedModeEnabled: true, fmConfirmStep: false, elaborateResponsesEnabled: false,
-            intentionEnabled: false, incognitoMode: false, moreDataOpenByDefault: false,
-            achievementToastsEnabled: true, showMoodSuggestion: false, moodLinkingEnabled: false,
-            customTrackingFields: [], trackingFields: {}, labelOverrides: {},
-            moodDefinitions: {}, copingStrategies: {},
-            onboardingStep: 0,
-            helpedVoted: false,
-            healthSyncEnabled: false,
-            personalHintDone: false,
-          }, { merge: true }).catch(() => {});
-          // Delete personal details document entirely
-          db.collection('personalDetails').doc(currentUser.uid).delete().catch(() => {});
+          if (deleteAccount) {
+            // Drop the entire userSettings doc (includes nested anonProfile).
+            await db.collection('userSettings').doc(currentUser.uid).delete().catch(() => {});
+            await db.collection('personalDetails').doc(currentUser.uid).delete().catch(() => {});
+
+            // Release the anon-board monika reservation so others can claim it.
+            const _monika = localStorage.getItem('bbAnon_monika');
+            if (_monika) {
+              await db.collection('bbAnonMonikas').doc(_monika.toLowerCase()).delete().catch(() => {});
+            }
+
+            // Drop cross-device anon profile lookups (hashed by lowercase email).
+            const _hashEmail = async (email) => {
+              const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(email.toLowerCase().trim()));
+              return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+            };
+            const _emails = [currentUser.email, localStorage.getItem('bbAnon_email')]
+              .filter(Boolean)
+              .filter((e, i, arr) => arr.indexOf(e) === i); // de-dup
+            for (const _e of _emails) {
+              try {
+                const _hash = await _hashEmail(_e);
+                await db.collection('anonProfiles').doc(_hash).delete().catch(() => {});
+              } catch (_) {}
+            }
+          } else {
+            // Reset-only path: keep the userSettings doc, fields go back to defaults.
+            db.collection('userSettings').doc(currentUser.uid).set({
+              currentMedList: [], dailyGoals: [], dailyBudget: '', logoVariant: 0,
+              focusedModeEnabled: true, fmConfirmStep: false, elaborateResponsesEnabled: false,
+              intentionEnabled: false, incognitoMode: false, moreDataOpenByDefault: false,
+              achievementToastsEnabled: true, showMoodSuggestion: false, moodLinkingEnabled: false,
+              customTrackingFields: [], trackingFields: {}, labelOverrides: {},
+              moodDefinitions: {}, copingStrategies: {},
+              onboardingStep: 0,
+              helpedVoted: false,
+              healthSyncEnabled: false,
+              personalHintDone: false,
+            }, { merge: true }).catch(() => {});
+            // Personal details always go regardless of mode.
+            db.collection('personalDetails').doc(currentUser.uid).delete().catch(() => {});
+          }
         }
+
+        // Clear anon-board localStorage so the next user on this browser
+        // starts clean.
+        ['bbAnon_monika','bbAnon_email','bbAnon_verified','bbAnon_isAdmin',
+         'bbAnon_streak','bbAnon_med','bbAnon_medList','bbAnon_showMeds',
+         'bbAnon_showStable','bbAnon_stableSince','bbAnon_stableStreak',
+         'bbAnon_colorKey','bbAnon_initials','bbAnon_liked','bbAnon_hasPosted',
+         'bbAnonLastVisit','bbAnonVisitDate'].forEach(k => localStorage.removeItem(k));
         // Reset logo to default immediately
         if (typeof applyLogoVariant === 'function') applyLogoVariant(0);
 
@@ -11559,8 +11647,26 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         // Also clear the native Keychain PIN so it can't be reused after account reset
         try { window.Capacitor?.Plugins?.SecureStorage?.removeItem?.('bb_native_pin')?.catch?.(() => {}); } catch(e) {}
 
-        alert(`Successfully deleted ${deleted} entries.`);
-        if (typeof auth !== 'undefined' && auth && currentUser) {
+        // Account-deletion mode: delete the Firebase Auth record. We re-authed
+        // upfront so this should succeed; if it doesn't, fall through to
+        // sign-out so the user isn't trapped in a half-deleted state.
+        let _accountDeleted = false;
+        if (deleteAccount && currentUser) {
+          try {
+            await currentUser.delete();
+            _accountDeleted = true;
+          } catch (_e) {
+            console.error('user.delete failed', _e);
+            // Data is already gone from Firestore — best to sign out.
+          }
+        }
+
+        alert(deleteAccount
+          ? (_accountDeleted ? '✅ Account deleted.' : '⚠️ Data deleted but the auth account could not be removed. Please contact support.')
+          : `Successfully deleted ${deleted} entries.`);
+
+        // Redirect to home. user.delete() already signs out; otherwise sign out manually.
+        if (!_accountDeleted && typeof auth !== 'undefined' && auth && currentUser) {
           auth.signOut().catch(() => {}).finally(() => location.replace('index.html'));
         } else {
           location.replace('index.html');
@@ -12874,6 +12980,21 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       const _lockedEl = document.getElementById('fullResetLocked');
       if (_resetEl) _resetEl.style.display = _protected ? 'none' : '';
       if (_lockedEl) _lockedEl.style.display = _protected ? '' : 'none';
+      // Re-label the section based on whether we're signed in: when signed in
+      // the action deletes the BipolarBear account itself, not just the data.
+      if (_resetEl && !_protected) {
+        const _isSignedIn = !!currentUser;
+        const _heading = _resetEl.querySelector('div:first-child');
+        const _desc    = _resetEl.querySelector('div:nth-child(2)');
+        const _btn     = _resetEl.querySelector('button');
+        if (_heading) _heading.textContent = _isSignedIn ? '🗑️ Delete Account' : '🗑️ Full Reset';
+        if (_desc) {
+          _desc.textContent = _isSignedIn
+            ? 'Permanently delete your BipolarBear account, all journal entries, and reset the app. This cannot be undone.'
+            : 'Permanently delete all journal entries and reset all settings to their defaults. This cannot be undone.';
+        }
+        if (_btn) _btn.innerHTML = _isSignedIn ? '🗑️ Delete Account' : '🗑️ Delete All Data &amp; Reset Settings';
+      }
     }
     function closeAdvancedMore2() {
       document.getElementById('settingsAdvancedMore2Panel').style.display = 'none';

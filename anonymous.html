@@ -1000,7 +1000,11 @@ function showScreen(id) {
 
 async function boot(user) {
   const isReal = user && !user.isAnonymous;
-  _bbUser = (isReal && user.emailVerified) ? user : null;
+  // Treat any BipolarBear-signed-in user as "the BB user" — the anon board
+  // verifies email itself via the code flow below, so we don't gate on
+  // user.emailVerified here. Pre-fill + save-back keeps the BB account and
+  // the anon email connected.
+  _bbUser = isReal ? user : null;
   _updateLogoCursor();
   // Show "← Home" on verify/monika screens only for BB App users (Firebase Auth)
   ['verify-back-btn', 'monika-back-btn'].forEach(id => {
@@ -1028,10 +1032,6 @@ async function boot(user) {
       showScreen('monika');
       setupMonika();
     }
-  } else if (isReal && !user.emailVerified) {
-    // Signed in but email not yet verified in main app
-    showScreen('verify');
-    showEmailVerificationRequired(user);
   } else if (profile.verified && profile.monika) {
     // Standalone verified (email code path, not signed in to main app)
     showScreen('board');
@@ -1043,71 +1043,6 @@ async function boot(user) {
     // Not verified — show email+code verify screen
     showScreen('verify');
     setupVerify();
-  }
-}
-
-function showEmailVerificationRequired(user) {
-  // Show a tailored message on the verify screen asking them to verify their BipolarBear email
-  const emailStep = document.getElementById('step-email');
-  const codeStep  = document.getElementById('step-code');
-  const errDiv    = document.getElementById('verify-error');
-  const cardTitle = document.querySelector('#screen-verify .card-title');
-  const cardSub   = document.querySelector('#screen-verify .card-sub');
-  if (emailStep) emailStep.style.display = 'none';
-  if (codeStep)  codeStep.style.display  = 'none';
-  if (cardTitle) cardTitle.textContent = 'Verify your email ✉️';
-  if (cardSub)   cardSub.textContent   = 'Before joining the community, please verify your BipolarBear account email.';
-  if (errDiv) {
-    errDiv.innerHTML =
-      'We sent a verification link to <strong>' + (user ? user.email : 'your email') + '</strong>.' +
-      ' Click it in your inbox, then tap the button below.' +
-      '<div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">' +
-        '<button id="bbAnonCheckVerified" style="background:var(--yellow);border:none;border-radius:10px;color:var(--dark);font-weight:700;padding:11px;font-size:0.95em;cursor:pointer;">I\'ve verified — continue →</button>' +
-        '<button id="bbAnonResendVerify" style="background:none;border:1.5px solid #7a6a20;border-radius:10px;color:#7a6a20;font-weight:600;padding:10px;font-size:0.88em;cursor:pointer;">Resend verification email</button>' +
-      '</div>';
-    errDiv.style.cssText = 'display:block;padding:14px;background:rgba(245,200,0,0.07);border:1.5px solid rgba(245,200,0,0.25);border-radius:12px;font-size:13px;color:#495057;line-height:1.5;';
-
-    document.getElementById('bbAnonCheckVerified').onclick = async function() {
-      const u = firebase.auth().currentUser;
-      if (!u) return;
-      this.textContent = 'Checking…';
-      await u.reload().catch(() => {});
-      const fresh = firebase.auth().currentUser;
-      if (fresh && fresh.emailVerified) {
-        boot(fresh);
-      } else {
-        this.textContent = 'I\'ve verified — continue →';
-        errDiv.querySelector && (errDiv.insertAdjacentHTML('beforeend',
-          '<div style="margin-top:8px;color:#dc3545;font-size:12px;">Still not verified — please check your inbox and click the link first.</div>'));
-      }
-    };
-
-    document.getElementById('bbAnonResendVerify').onclick = async function() {
-      if (this.disabled) return;
-      this.disabled = true;
-      this.textContent = 'Sending…';
-      try {
-        const u = firebase.auth().currentUser;
-        if (!u) throw new Error('Not signed in');
-        await u.sendEmailVerification();
-        this.textContent = '✅ Sent! Check your inbox';
-        setTimeout(() => {
-          this.textContent = 'Resend verification email';
-          this.disabled = false;
-        }, 30000); // 30s cooldown to avoid rate-limit
-      } catch(e) {
-        console.error('[bbAnonResendVerify]', e.code, e.message);
-        if (e.code === 'auth/too-many-requests') {
-          this.textContent = 'Too many attempts — wait a minute';
-        } else {
-          this.textContent = 'Failed — try again shortly';
-        }
-        setTimeout(() => {
-          this.textContent = 'Resend verification email';
-          this.disabled = false;
-        }, 10000);
-      }
-    };
   }
 }
 
@@ -1233,6 +1168,14 @@ function setupVerify() {
   emailIn.style.color      = '';
   emailIn.style.cursor     = '';
 
+  // Pre-fill the BipolarBear account email when the user is signed in via
+  // the main app — saves typing and lets us link the verified anon email
+  // back to their user account afterwards. Editable: they may want to use
+  // a different inbox.
+  if (!emailIn.value && _bbUser && _bbUser.email) {
+    emailIn.value = _bbUser.email;
+  }
+
   emailIn.addEventListener('input',   _validateEmail);
   emailIn.addEventListener('keydown', e => { if (e.key === 'Enter' && !sendBtn.disabled) sendBtn.click(); });
 
@@ -1338,10 +1281,23 @@ function setupVerify() {
         localStorage.setItem('bbAnon_isAdmin', 'true');
       }
       localStorage.setItem('bbAnon_verified', 'true');
-      localStorage.setItem('bbAnon_email', _pendingEmail); // marks standalone path (not Firebase auth)
-      // Returning user on a new device — try to restore their profile from Firestore
+      localStorage.setItem('bbAnon_email', _pendingEmail);
+
+      // If the user is signed in via the BipolarBear app, link the verified
+      // anon email to their user account so it can be used for future
+      // recovery / cross-device restore, then pull any existing anon profile
+      // they've already set up against this account (uid lookup beats
+      // email-hash lookup).
+      if (_bbUser && db) {
+        db.collection('userSettings').doc(_bbUser.uid)
+          .set({ anonEmail: _pendingEmail }, { merge: true }).catch(() => {});
+        await _bbRestoreProfile(_bbUser.uid);
+      }
+      // Standalone path: email-hash lookup. _anonRestoreProfile no-ops when
+      // _bbUser is set, so safe to call unconditionally.
       const _restored = await _anonRestoreProfile(_pendingEmail);
-      if (_restored) {
+
+      if (profile.monika || _restored) {
         showScreen('board');
         initBoard();
       } else {

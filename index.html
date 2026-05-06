@@ -911,53 +911,11 @@
           if (userInfo) { userInfo.style.display = 'flex'; }
           if (userEmail) userEmail.textContent = user.email;
           window._fabOpenAuth = window.showAccountModal;
-          // Show verification banner if email not yet verified
-          if (!user.emailVerified) {
-            let _vBanner = document.getElementById('bbEmailVerifyBanner');
-            if (!_vBanner) {
-              _vBanner = document.createElement('div');
-              _vBanner.id = 'bbEmailVerifyBanner';
-              Object.assign(_vBanner.style, {
-                margin: '0 0 16px', padding: '12px 16px',
-                background: 'rgba(255,255,255,0.18)', borderRadius: '14px',
-                fontSize: '0.85em', color: 'white', lineHeight: '1.5',
-                textAlign: 'center',
-              });
-              _vBanner.innerHTML = '✉️ <strong>Please verify your email</strong> — check your inbox for a link from BipolarBear.' +
-                ' <button id="bbResendVerifyBtn" style="margin-top:8px;display:block;width:100%;background:rgba(255,255,255,0.25);border:none;border-radius:8px;color:white;font-weight:600;padding:7px;cursor:pointer;font-size:0.9em;">Resend verification email</button>';
-              const _btns = document.querySelector('.buttons');
-              if (_btns) _btns.parentNode.insertBefore(_vBanner, _btns);
-            }
-            document.getElementById('bbResendVerifyBtn').onclick = async function() {
-              if (this.disabled) return;
-              this.disabled = true;
-              this.textContent = 'Sending…';
-              try {
-                const _fns = firebase.app().functions('europe-west1');
-                await _fns.httpsCallable('sendVerificationEmail')({});
-                this.textContent = '✅ Sent! Check your inbox';
-                setTimeout(() => {
-                  this.textContent = 'Resend verification email';
-                  this.disabled = false;
-                }, 30000);
-              } catch(e) {
-                console.error('[bbResendVerify]', e.code, e.message);
-                // Fall back to Firebase native send
-                try {
-                  const fresh = firebase.auth().currentUser;
-                  if (fresh) await fresh.sendEmailVerification();
-                  this.textContent = '✅ Sent! Check your inbox';
-                  setTimeout(() => { this.textContent = 'Resend verification email'; this.disabled = false; }, 30000);
-                } catch(e2) {
-                  this.textContent = e2.code === 'auth/too-many-requests' ? 'Too many attempts — wait a minute' : 'Failed — try again shortly';
-                  setTimeout(() => { this.textContent = 'Resend verification email'; this.disabled = false; }, 10000);
-                }
-              }
-            };
-          } else {
-            const _vBanner = document.getElementById('bbEmailVerifyBanner');
-            if (_vBanner) _vBanner.remove();
-          }
+          // Email verification is now handled on the Bipolar Anonymous board
+          // (anonymous.html) — no need to nag here. If a stale banner from an
+          // older client version is still in the DOM, clear it.
+          const _vBanner = document.getElementById('bbEmailVerifyBanner');
+          if (_vBanner) _vBanner.remove();
           // Load user settings from Firestore (logo variant + survival kit data for ticks)
           db.collection('userSettings').doc(user.uid).get().then(doc => {
             if (!doc.exists) return;
