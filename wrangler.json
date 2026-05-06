@@ -1,6 +1,5 @@
 {
   "name": "bipolarbear",
-  "account_id": "12fb850ff7cd52f3ef0244b1837e3008",
   "compatibility_date": "2026-05-04",
   "main": "worker.js",
   "observability": {
