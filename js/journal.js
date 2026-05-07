@@ -1181,11 +1181,13 @@ window.addEventListener('pageshow', () => {
     }
 
     function saveDraft() {
-      if (_getOnboardingStep() === 0) return; // no drafts until first real entry is saved
-      if (editingEntry) return;
-      if (!selectedMood) return;
+      // Early returns must clear the "Saving draft…" indicator that scheduleDraftSave()
+      // showed — otherwise it stays visible forever (looks like a stuck save).
+      if (_getOnboardingStep() === 0) { showDraftStatus('clear'); return; } // no drafts until first real entry is saved
+      if (editingEntry) { showDraftStatus('clear'); return; }
+      if (!selectedMood) { showDraftStatus('clear'); return; }
       const targetKey = document.getElementById('entryDate')?.value;
-      if (!targetKey) return;
+      if (!targetKey) { showDraftStatus('clear'); return; }
       const draft = {
         targetKey,
         mood: selectedMood,
@@ -9729,6 +9731,10 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     // Function to set date picker to today
     function setDefaultDate() {
       const dateInput = document.getElementById('entryDate');
+      // Top-level boot call runs before body content is parsed, so the input
+      // may not exist yet. Bail out — later flows (form open, edit) call this
+      // again once the DOM is ready.
+      if (!dateInput) return;
       const useToday = localStorage.getItem('journalDefaultToday') === 'true';
       const base = new Date();
       if (!useToday) base.setDate(base.getDate() - 1);
@@ -12071,8 +12077,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
 
 // ── BLOCK 5: service-worker registration ──
 // Easter egg: click logo 5 times to cycle original -> happy -> sad -> original
-    // Logo variant is persisted in localStorage and Firestore (for logged-in users)
-    const logoImg = document.querySelector('.easter-egg-logo');
+    // Logo variant is persisted in localStorage and Firestore (for logged-in users).
+    // journal.js loads at the top of <body> (before <img class="easter-egg-logo">),
+    // so the element lookup + listener wiring must wait for DOMContentLoaded.
     const logoSrcs = [
       'images/logos/good_logo.png',
       'images/logos/elevated_logo.png',
@@ -12084,7 +12091,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
 
     function applyLogoVariant(idx) {
       logoCurrentIndex = idx;
-      logoImg.src = logoSrcs[idx];
+      const _img = document.querySelector('.easter-egg-logo');
+      if (_img) _img.src = logoSrcs[idx];
     }
 
     function saveLogoVariant(idx) {
@@ -12101,47 +12109,58 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       }
     }
 
-    // Restore logo on load from localStorage
-    applyLogoVariant(logoCurrentIndex);
-    logoImg.style.cursor = 'pointer';
+    function _initLogoEasterEgg() {
+      const logoImg = document.querySelector('.easter-egg-logo');
+      if (!logoImg) return;
 
-    logoImg.addEventListener('click', () => {
-      clearTimeout(logoResetTimer);
-      logoClickCount++;
+      // Restore logo on load from localStorage
+      applyLogoVariant(logoCurrentIndex);
+      logoImg.style.cursor = 'pointer';
 
-      logoImg.style.transition = 'transform 0.1s ease';
-      logoImg.style.transform = 'scale(1.15) rotate(5deg)';
-      setTimeout(() => { logoImg.style.transform = ''; }, 120);
+      logoImg.addEventListener('click', () => {
+        clearTimeout(logoResetTimer);
+        logoClickCount++;
 
-      if (logoClickCount === 5) {
-        logoClickCount = 0;
-        logoCurrentIndex = (logoCurrentIndex + 1) % logoSrcs.length;
-        saveLogoVariant(logoCurrentIndex);
+        logoImg.style.transition = 'transform 0.1s ease';
+        logoImg.style.transform = 'scale(1.15) rotate(5deg)';
+        setTimeout(() => { logoImg.style.transform = ''; }, 120);
 
-        // Sync app icon with logo variant (native only)
-        try {
-          if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.setAppIcon) {
-            const iconNames = [null, 'AppIcon_Happy', 'AppIcon_Sad'];
-            window.webkit.messageHandlers.setAppIcon.postMessage({ name: iconNames[logoCurrentIndex] || null });
-          }
-        } catch(e) {}
+        if (logoClickCount === 5) {
+          logoClickCount = 0;
+          logoCurrentIndex = (logoCurrentIndex + 1) % logoSrcs.length;
+          saveLogoVariant(logoCurrentIndex);
 
-        logoImg.style.transition = 'transform 0.4s ease, opacity 0.3s ease';
-        logoImg.style.transform = 'scale(0) rotate(180deg)';
-        logoImg.style.opacity = '0';
-        setTimeout(() => {
-          logoImg.src = logoSrcs[logoCurrentIndex];
-          logoImg.style.transform = 'scale(1.1) rotate(-5deg)';
-          logoImg.style.opacity = '1';
+          // Sync app icon with logo variant (native only)
+          try {
+            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.setAppIcon) {
+              const iconNames = [null, 'AppIcon_Happy', 'AppIcon_Sad'];
+              window.webkit.messageHandlers.setAppIcon.postMessage({ name: iconNames[logoCurrentIndex] || null });
+            }
+          } catch(e) {}
+
+          logoImg.style.transition = 'transform 0.4s ease, opacity 0.3s ease';
+          logoImg.style.transform = 'scale(0) rotate(180deg)';
+          logoImg.style.opacity = '0';
           setTimeout(() => {
-            logoImg.style.transition = '';
-            logoImg.style.transform = '';
-          }, 200);
-        }, 300);
-      } else {
-        logoResetTimer = setTimeout(() => { logoClickCount = 0; }, 1500);
-      }
-    });
+            logoImg.src = logoSrcs[logoCurrentIndex];
+            logoImg.style.transform = 'scale(1.1) rotate(-5deg)';
+            logoImg.style.opacity = '1';
+            setTimeout(() => {
+              logoImg.style.transition = '';
+              logoImg.style.transform = '';
+            }, 200);
+          }, 300);
+        } else {
+          logoResetTimer = setTimeout(() => { logoClickCount = 0; }, 1500);
+        }
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', _initLogoEasterEgg);
+    } else {
+      _initLogoEasterEgg();
+    }
 
 // ── BLOCK 6: logo easter egg + ancillary boot fixups ──
 // Auto-open changelog if navigated from What's New popup

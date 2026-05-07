@@ -17,7 +17,9 @@
 // Bump this string to invalidate every client's cache. Format: <slug>-vN.
 // v4: per-page CSS/JS were extracted to css/* and js/* in Phase 4 of the
 //     2026-Q2 refactor — every old client must drop its v3 cache.
-const CACHE_NAME = 'bipolarbear-v4';
+// v5: fix journal.js boot crash (setDefaultDate ran before #entryDate existed,
+//     leaving logoCurrentIndex in TDZ → broke delete-all + easter egg).
+const CACHE_NAME = 'bipolarbear-v5';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
