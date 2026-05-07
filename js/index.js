@@ -1013,7 +1013,8 @@ const journalFeatures = [
         if (_arr('customReminders')) _c++;
         _c++; // bipolar-anon section is always complete (info section)
         if (_c >= 13) {
-          _prog.style.display = 'none';
+          _prog.textContent = '✓ All sections completed';
+          _prog.style.display = 'block';
         } else {
           _prog.textContent = _c + ' / 13 sections complete';
           _prog.style.display = 'block';
