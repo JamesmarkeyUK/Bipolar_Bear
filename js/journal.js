@@ -6579,6 +6579,10 @@ window.addEventListener('pageshow', () => {
       selectedEnergy = 5;
       selectedSleep = 7.5;
       selectedSleepQuality = null;
+      // Hide the sleep-quality sub-section explicitly — clearing the value
+      // alone wasn't enough; the panel stayed visible after a tap-and-hold.
+      const _rstSqEl = document.getElementById('sleepQualitySubSection');
+      if (_rstSqEl) _rstSqEl.style.display = 'none';
       selectedIntention = '';
       selectedStepNotes = {};
       document.getElementById('notes').value = '';
