@@ -19,7 +19,9 @@
 //     2026-Q2 refactor — every old client must drop its v3 cache.
 // v5: fix journal.js boot crash (setDefaultDate ran before #entryDate existed,
 //     leaving logoCurrentIndex in TDZ → broke delete-all + easter egg).
-const CACHE_NAME = 'bipolarbear-v5';
+// v6: move <script src="js/journal.js"> to end of <body> in journal.html so
+//     all DOM nodes the script touches at top-level exist when it runs.
+const CACHE_NAME = 'bipolarbear-v6';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

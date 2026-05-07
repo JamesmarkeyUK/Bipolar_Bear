@@ -75,7 +75,6 @@
   <div id="scroll-view">
   <!-- Full-screen cover that matches the page gradient, prevents flash of uninitialized content on load/resume -->
   <div id="pageCover" style="position:fixed;inset:0;background:linear-gradient(135deg,#ffaa33 0%,#ff8833 100%);z-index:9999;pointer-events:none;transition:opacity 0.15s ease;"></div>
-  <script src="js/journal.js"></script>
 
   <!-- Authentication handled by shared fab.js modals -->
   <!-- Legacy auth-container placeholder (removed) -->
@@ -1530,6 +1529,12 @@
   <div class="home-indicator"></div>
 </div><!-- /#iphone-frame -->
 
+  <!-- journal.js is loaded here (end of body) so DOM nodes referenced by
+       top-level code (#entryDate, .easter-egg-logo, etc.) exist when the
+       script runs. Firebase compat SDKs above are deferred — the
+       `typeof firebase !== 'undefined'` guard inside initializeApp falls
+       back to a window.load listener for the Firebase race. -->
+  <script src="js/journal.js"></script>
   <script src="fab.js"></script>
 </body>
 </html>
