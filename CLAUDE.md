@@ -206,3 +206,4 @@ translateZ(0)`), and to the viewport otherwise. See `_applyFabDock()` in
 - Don't skip git pre-commit hooks. If a hook fails, fix the cause; don't `--no-verify`.
 - Don't create PRs unless asked. Direct merge / fast-forward is fine for solo work.
 - For big refactors, do one commit per phase so individual phases stay revertable.
+- After creating a PR, auto-subscribe to PR activity (`subscribe_pr_activity`) without asking — watch CI and review comments by default.
