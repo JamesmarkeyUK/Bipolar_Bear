@@ -943,11 +943,11 @@ function renderUserPill() {
   document.getElementById('board-user-pill').innerHTML = `
     <div style="display:flex;align-items:center;gap:5px;">
       <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,${g1},${g2});display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:11px;flex-shrink:0;">${esc(av)}</div>
-      <span style="font-size:12px;color:rgba(255,255,255,0.9);font-weight:600;">[${esc(m)}]</span>
+      <span style="font-size:12px;color:rgba(0,0,0,0.75);font-weight:600;">[${esc(m)}]</span>
       ${profile.isAdmin ? '<span style="background:rgba(0,0,0,0.55);color:#fff;font-size:9px;font-weight:800;border-radius:4px;padding:1px 5px;">ADMIN</span>' : ''}
       <span>🔥</span>
-      <span style="font-size:11px;color:rgba(255,255,255,0.8);">${s}d</span>
-      ${profile.showStable && profile.stableStreak > 0 ? `<span>🧘</span><span style="font-size:11px;color:rgba(255,255,255,0.8);">${profile.stableStreak}d</span>` : ''}
+      <span style="font-size:11px;color:rgba(0,0,0,0.6);">${s}d</span>
+      ${profile.showStable && profile.stableStreak > 0 ? `<span>🧘</span><span style="font-size:11px;color:rgba(0,0,0,0.6);">${profile.stableStreak}d</span>` : ''}
     </div>`;
 }
 
