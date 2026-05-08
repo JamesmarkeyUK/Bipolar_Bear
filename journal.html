@@ -86,7 +86,7 @@
         <h2 id="authTitle">Welcome to Bipolar Bear 🐻</h2>
       </div>
       <div class="auth-box-body">
-        <div id="authError" style="color: #ff6b6b; text-align: center; margin-bottom: 15px; display: none;"></div>
+        <div id="authError" style="color: #c92a2a; font-weight: 600; text-align: center; margin-bottom: 15px; display: none;"></div>
         
         <input type="email" id="authEmail" class="auth-input" placeholder="Email" />
         <input type="password" id="authPassword" class="auth-input" placeholder="Password" />
@@ -123,7 +123,7 @@
               <path d="M12,20 Q8,10 12,2" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" fill="none"/>
               <polyline points="7,6 12,1 17,6" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
             </svg>
-            <span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,255,255,0.9);font-family:'Georgia',serif;letter-spacing:0.01em;white-space:nowrap;">🐻 Go back here</span>
+            <span style="font-size:0.72em;font-weight:700;font-style:italic;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-family:'Georgia',serif;letter-spacing:0.01em;white-space:nowrap;">🐻 Go back here</span>
           </div>
         </div>
         <div style="margin-left:auto;position:relative;">
@@ -189,20 +189,20 @@
     <div id="todayCompleteSection" style="display:none; text-align:center; margin-bottom:16px;">
       <div id="editTodayBtn" onclick="viewTodayEntry()" style="background:rgba(255,255,255,0.1); border:1.5px solid rgba(255,255,255,0.2); border-radius:16px; padding:12px 18px; display:inline-flex; align-items:center; gap:10px; cursor:pointer; -webkit-tap-highlight-color:transparent;">
         <span style="font-size:1.2em;">✅</span>
-        <span id="entryCompleteLabel" style="color:rgba(255,255,255,0.75); font-weight:600; font-size:0.9em;">View yesterday's entry</span>
+        <span id="entryCompleteLabel" style="color:#fff; text-shadow:0 1px 3px rgba(0,0,0,0.3); font-weight:600; font-size:0.9em;">View yesterday's entry</span>
       </div>
       <div id="completionActionsRow" style="display:none; justify-content:center; gap:8px; flex-wrap:wrap; margin-top:8px;">
         <button id="missingEntriesAction" onclick="showMissingDates()" style="display:none; background:rgba(255,149,0,0.9); color:white; border:none; border-radius:20px; padding:7px 16px; font-size:0.85em; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent; box-shadow:0 2px 8px rgba(0,0,0,0.15);"></button>
-        <button id="startOtherEntryBtn" onclick="startOtherDateEntry()" style="display:none; background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.6); border:1.5px solid rgba(255,255,255,0.2); border-radius:20px; padding:7px 16px; font-size:0.85em; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent;"></button>
+        <button id="startOtherEntryBtn" onclick="startOtherDateEntry()" style="display:none; background:rgba(255,255,255,0.18); color:#fff; text-shadow:0 1px 3px rgba(0,0,0,0.25); border:1.5px solid rgba(255,255,255,0.55); border-radius:20px; padding:7px 16px; font-size:0.85em; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent;"></button>
       </div>
     </div>
 
     <div class="card" id="entryFormCard" style="background: var(--brand-tint); display:none;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-        <button id="editCancelBtn" onclick="cancelEdit()" style="display:none;background:none;border:none;color:#adb5bd;font-size:0.82em;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;">← Back</button>
+        <button id="editCancelBtn" onclick="cancelEdit()" style="display:none;background:none;border:none;color:#6c757d;font-size:0.82em;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;">← Back</button>
         <button id="formCalendarBtn" onclick="toggleDatePicker()" style="background:none;border:none;font-size:1.5em;cursor:pointer;padding:4px;line-height:1;-webkit-tap-highlight-color:transparent;flex-shrink:0;" title="Change date">🗓️</button>
         <h2 id="entryFormHeading" style="margin:0;flex:1;text-align:center;">How was yesterday?</h2>
-        <button id="favouriteBtn" onclick="toggleFavourite()" style="background:none;border:none;font-size:1.5em;cursor:pointer;padding:4px;line-height:1;color:#adb5bd;-webkit-tap-highlight-color:transparent;flex-shrink:0;" title="Favourite">☆</button>
+        <button id="favouriteBtn" onclick="toggleFavourite()" style="background:none;border:none;font-size:1.5em;cursor:pointer;padding:4px;line-height:1;color:#6c757d;-webkit-tap-highlight-color:transparent;flex-shrink:0;" title="Favourite">☆</button>
       </div>
       
       
@@ -347,7 +347,7 @@
             <span></span>
             <button onclick="showFieldPicker()" style="width:36px;height:36px;min-width:36px;min-height:36px;border-radius:50%;background:rgba(255,149,0,0.08);color:var(--brand-primary);font-size:1.3em;border:2px dashed var(--brand-primary);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1;-webkit-tap-highlight-color:transparent;box-sizing:border-box;">+</button>
             <label style="display:flex;align-items:center;gap:6px;cursor:pointer;justify-content:flex-end;" onclick="toggleMoreDataDefault()">
-              <span style="font-size:0.75em;color:#adb5bd;">Open by default</span>
+              <span style="font-size:0.75em;color:#6c757d;">Open by default</span>
               <span id="moreDataDefaultSwitch" style="display:inline-flex;width:32px;height:18px;border-radius:9px;background:#dee2e6;position:relative;transition:background 0.2s;flex-shrink:0;">
                 <span style="width:14px;height:14px;border-radius:50%;background:white;position:absolute;top:2px;left:2px;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);"></span>
               </span>
@@ -361,28 +361,28 @@
         <button id="draftClearBtn" onclick="clearDraftWithConfirm()" class="hidden-until-mood" style="min-width:52px; background:white; color:#ff6b6b; border:none; border-radius:10px; font-size:1.3em; cursor:pointer; box-shadow:0 3px 12px rgba(0,0,0,0.15); transition:all 0.3s ease; -webkit-tap-highlight-color:transparent;">🗑️</button>
         <button class="submit-btn hidden-until-mood" id="submitBtn" onclick="showSaveConfirmModal()" style="flex:1; min-width:0; width:auto;">Save Today's Entry ✨</button>
       </div>
-      <div id="draftStatus" style="text-align:center; font-size:0.78em; color:#adb5bd; margin-top:6px; min-height:1.1em; transition:opacity 0.5s ease; opacity:0;"></div>
+      <div id="draftStatus" style="text-align:center; font-size:0.78em; color:#6c757d; margin-top:6px; min-height:1.1em; transition:opacity 0.5s ease; opacity:0;"></div>
     </div>
 
     <!-- Switch to focused mode (shown below full form card when user has switched away from focused mode) -->
     <div id="fullFormExitLink" style="display:none;text-align:center;margin-top:10px;">
-      <button onclick="_fmSwitchToFocusedMode()" style="background:none;border:none;color:rgba(255,255,255,0.7);font-size:0.78em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Switch to focused mode</button>
+      <button onclick="_fmSwitchToFocusedMode()" style="background:none;border:none;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);text-decoration:underline;font-size:0.78em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Switch to focused mode</button>
     </div>
 
     <!-- Focused Mode Card -->
     <div class="card" id="focusedModeCard" style="background:var(--brand-tint);display:none;flex-direction:column;padding:20px 20px 16px;">
       <!-- Top bar: back + progress dots + skip -->
       <div id="fmTopBar" style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-        <button id="fmBackBtn" onclick="_fmBack()" style="background:none;border:none;color:#adb5bd;font-size:0.85em;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;white-space:nowrap;">← Back</button>
+        <button id="fmBackBtn" onclick="_fmBack()" style="background:none;border:none;color:#6c757d;font-size:0.85em;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;white-space:nowrap;">← Back</button>
         <div id="fmProgressDots" style="display:flex;gap:5px;flex:1;justify-content:center;align-items:center;"></div>
-        <button id="fmSkipBtn" onclick="_fmSkip()" style="background:none;border:none;color:#adb5bd;font-size:0.85em;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;white-space:nowrap;">Skip →</button>
+        <button id="fmSkipBtn" onclick="_fmSkip()" style="background:none;border:none;color:#6c757d;font-size:0.85em;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;white-space:nowrap;">Skip →</button>
       </div>
-      <div id="fmStepCounter" style="text-align:center;font-size:0.75em;color:#adb5bd;margin-bottom:10px;"></div>
+      <div id="fmStepCounter" style="text-align:center;font-size:0.75em;color:#6c757d;margin-bottom:10px;"></div>
 
       <!-- Completed-step summary chips + save shortcut -->
       <div style="display:flex;align-items:center;gap:6px;justify-content:center;margin-bottom:14px;">
         <div id="fmSummaryBar" style="display:none;flex-wrap:nowrap;overflow-x:auto;gap:6px;justify-content:center;scrollbar-width:none;"></div>
-        <button id="fmSaveShortcutBtn" onclick="_fmGoToDone()" style="display:none;background:none;border:none;color:#adb5bd;font-size:1.1em;cursor:pointer;padding:0 2px;-webkit-tap-highlight-color:transparent;line-height:1;flex-shrink:0;" title="Go to save">💾</button>
+        <button id="fmSaveShortcutBtn" onclick="_fmGoToDone()" style="display:none;background:none;border:none;color:#6c757d;font-size:1.1em;cursor:pointer;padding:0 2px;-webkit-tap-highlight-color:transparent;line-height:1;flex-shrink:0;" title="Go to save">💾</button>
       </div>
 
       <!-- Question -->
@@ -397,7 +397,7 @@
         <button id="fmDeleteBtn" onclick="_fmDoneDelete()" style="display:none;min-width:52px;height:52px;background:white;color:#ff6b6b;border:2px solid #ff6b6b;border-radius:14px;font-size:1.3em;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;">🗑️</button>
         <button id="fmNextBtn" onclick="_fmNext()" style="flex:1;padding:14px;background:var(--brand-primary);color:white;border:none;border-radius:14px;font-size:1em;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">Next →</button>
       </div>
-      <div id="fmDraftStatus" style="text-align:right;font-size:0.75em;color:#adb5bd;margin-top:4px;min-height:1em;transition:opacity 0.5s ease;opacity:0;"></div>
+      <div id="fmDraftStatus" style="text-align:right;font-size:0.75em;color:#6c757d;margin-top:4px;min-height:1em;transition:opacity 0.5s ease;opacity:0;"></div>
 
     </div>
 
@@ -406,7 +406,7 @@
     <!-- Journal Toggle Button (hidden until initial load completes) -->
     <!-- Onboarding hint 2: step 1 — points down to the journal toggle button -->
     <div id="journalHint2" style="display:none;flex-direction:column;align-items:center;gap:2px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-bottom:-6px;">
-      <span style="font-size:0.78em;font-weight:700;font-style:italic;color:rgba(255,255,255,0.9);font-family:'Georgia',serif;letter-spacing:0.01em;text-align:center;max-width:220px;line-height:1.4;">🐻 Click to open your past entries and statistics</span>
+      <span style="font-size:0.78em;font-weight:700;font-style:italic;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-family:'Georgia',serif;letter-spacing:0.01em;text-align:center;max-width:220px;line-height:1.4;">🐻 Click to open your past entries and statistics</span>
       <svg width="24" height="22" viewBox="0 0 24 22" fill="none">
         <path d="M12,2 Q8,12 12,20" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" fill="none"/>
         <polyline points="7,16 12,21 17,16" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
@@ -423,7 +423,7 @@
         <path d="M12,20 Q8,10 12,2" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" fill="none"/>
         <polyline points="7,6 12,1 17,6" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
       </svg>
-      <span style="font-size:0.78em;font-weight:700;font-style:italic;color:rgba(255,255,255,0.9);font-family:'Georgia',serif;letter-spacing:0.01em;text-align:center;max-width:220px;line-height:1.4;">🐻 Close the journal again here</span>
+      <span style="font-size:0.78em;font-weight:700;font-style:italic;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-family:'Georgia',serif;letter-spacing:0.01em;text-align:center;max-width:220px;line-height:1.4;">🐻 Close the journal again here</span>
     </div>
 
     <div class="card" id="journalCard" style="display: none;">
@@ -512,7 +512,7 @@
           <div style="margin-bottom:8px;"><b>Middle moods are harder</b> — "Stable" and "Low" are narrow bands in the middle of the scale. When signals are mixed, the Bear may land on either. The extremes (Manic, Elevated, Depressed) are easier to detect.</div>
           <div style="margin-bottom:8px;"><b>It's not a diagnosis</b> — this is a pattern-spotting tool, not a clinical assessment. It works best over time as a prompt to reflect, not as a definitive label for how you feel.</div>
         </div>
-        <p style="color:#adb5bd;font-size:0.76em;margin-top:8px;">BETA — accuracy improves as more fields are filled in each day.</p>
+        <p style="color:#6c757d;font-size:0.76em;margin-top:8px;">BETA — accuracy improves as more fields are filled in each day.</p>
         <div class="confirm-buttons" style="margin-top:14px;">
           <button class="confirm-btn confirm-btn-no" onclick="document.getElementById('moodCalcPage2').style.display='none';document.getElementById('moodCalcPage1').style.display='';">← Back</button>
           <button class="confirm-btn" onclick="document.getElementById('moodCalcInfoModal').classList.remove('active');document.getElementById('moodCalcPage2').style.display='none';document.getElementById('moodCalcPage1').style.display='';" style="background:var(--brand-primary);color:white;">Got it</button>
@@ -525,9 +525,9 @@
   <div class="confirm-modal" id="feedbackModal" onclick="if(event.target===this)closeFeedbackModal()">
     <div class="confirm-content" style="max-width:500px;">
       <h3 style="margin-bottom:4px;"><img src="images/moods/AI_Bear.png" style="max-width: 50px" ><br>Personalised Feedback</h3>
-      <p style="color:#adb5bd;font-size:0.8em;margin-bottom:8px;">Based on your journal data only — not medical advice.</p>
+      <p style="color:#6c757d;font-size:0.8em;margin-bottom:8px;">Based on your journal data only — not medical advice.</p>
       <div id="feedbackBody" style="max-height:62vh;overflow-y:auto;"></div>
-      <p onclick="const b=document.getElementById('rInfoBox');const open=b.style.display!=='none';b.style.display=open?'none':'block';document.getElementById('rInfoChevron').textContent=open?'▼':'▲';if(!open)this.scrollIntoView({behavior:'smooth',block:'start'});" style="color:#adb5bd;font-size:0.8em;margin-top:12px;margin-bottom:0;cursor:pointer;display:flex;align-items:center;gap:6px;-webkit-tap-highlight-color:transparent;">
+      <p onclick="const b=document.getElementById('rInfoBox');const open=b.style.display!=='none';b.style.display=open?'none':'block';document.getElementById('rInfoChevron').textContent=open?'▼':'▲';if(!open)this.scrollIntoView({behavior:'smooth',block:'start'});" style="color:#6c757d;font-size:0.8em;margin-top:12px;margin-bottom:0;cursor:pointer;display:flex;align-items:center;gap:6px;-webkit-tap-highlight-color:transparent;">
         <span>ℹ️</span>
         <span style="flex:1;">What does r = … mean?</span>
         <span id="rInfoChevron">▼</span>
@@ -555,15 +555,15 @@
       </div>
       <p id="moodInfoBody" style="font-size:0.9em;color:#495057;line-height:1.65;margin:0 0 14px;text-align:left;"></p>
       <div id="moodInfoDefinition" style="display:none;border-top:1px solid #f0f0f0;padding-top:12px;margin-bottom:14px;">
-        <div style="font-size:0.78em;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#adb5bd;margin-bottom:6px;">Your Definition</div>
+        <div style="font-size:0.78em;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#6c757d;margin-bottom:6px;">Your Definition</div>
         <div id="moodInfoDefinitionText" style="font-size:0.88em;color:#495057;line-height:1.5;font-style:italic;"></div>
       </div>
       <div id="moodInfoCoping" style="display:none;border-top:1px solid #f0f0f0;padding-top:12px;margin-bottom:16px;">
-        <div style="font-size:0.78em;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#adb5bd;margin-bottom:8px;">Your Coping Strategies</div>
+        <div style="font-size:0.78em;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#6c757d;margin-bottom:8px;">Your Coping Strategies</div>
         <div id="moodInfoCopingList"></div>
       </div>
       <div id="moodInfoMemories" style="display:none;border-top:1px solid #f0f0f0;padding-top:12px;margin-bottom:16px;">
-        <div style="font-size:0.78em;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#adb5bd;margin-bottom:8px;">Most Recent Memory</div>
+        <div style="font-size:0.78em;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#6c757d;margin-bottom:8px;">Most Recent Memory</div>
         <div id="moodInfoMemoriesList"></div>
       </div>
       <div id="moodInfoSurvivalLink" style="display:none;border-top:1px solid #f0f0f0;padding-top:12px;margin-bottom:16px;text-align:center;">
@@ -571,7 +571,7 @@
       </div>
       <div id="moodInfoLinkRow" style="display:none;border-top:1px solid #f0f0f0;padding-top:12px;margin-bottom:14px;text-align:center;">
         <button id="moodInfoLinkBtn" style="background:none;border:2px solid var(--brand-primary);border-radius:20px;color:var(--brand-primary);padding:8px 18px;font-size:0.88em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;"></button>
-        <p id="moodInfoLinkCaption" style="font-size:0.75em;color:#adb5bd;margin:6px 0 0;line-height:1.4;">Counted in both mood stats · doesn't add an extra day</p>
+        <p id="moodInfoLinkCaption" style="font-size:0.75em;color:#6c757d;margin:6px 0 0;line-height:1.4;">Counted in both mood stats · doesn't add an extra day</p>
       </div>
       <div class="confirm-buttons">
         <button class="confirm-btn confirm-btn-no" onclick="closeMoodInfo()">Close</button>
@@ -621,7 +621,7 @@
       <hr style="border:none;border-top:1px solid #e9ecef;margin:4px 0 14px;">
       <div id="pdfChartSection">
       <div style="font-size:0.8em;font-weight:600;color:#495057;margin-bottom:8px;">12-month charts (5 Max)</div>
-      <div id="pdfChartsNoData" style="display:none;font-size:0.82em;color:#adb5bd;margin-bottom:18px;text-align:center;">You require 3 months+ of data for this feature</div>
+      <div id="pdfChartsNoData" style="display:none;font-size:0.82em;color:#6c757d;margin-bottom:18px;text-align:center;">You require 3 months+ of data for this feature</div>
       <div id="pdfChartButtons" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;">
         <button id="pdfChartMood" data-on="1" onclick="_togglePdfChart('Mood')" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;border-radius:12px;border:1.5px solid var(--brand-primary);background:rgba(255,149,0,0.1);color:var(--brand-primary);cursor:pointer;font-size:0.78em;font-weight:600;min-width:56px;-webkit-tap-highlight-color:transparent;"><span style="font-size:1.3em;">📊</span><span>Mood</span></button>
         <button id="pdfChartSleep" data-on="1" onclick="_togglePdfChart('Sleep')" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;border-radius:12px;border:1.5px solid var(--brand-primary);background:rgba(255,149,0,0.1);color:var(--brand-primary);cursor:pointer;font-size:0.78em;font-weight:600;min-width:56px;-webkit-tap-highlight-color:transparent;"><span style="font-size:1.3em;">🛌</span><span>Sleep</span></button>
@@ -653,7 +653,7 @@
           • ✨ FAB dock customisation (slot order &amp; hidden buttons) now syncs across your devices via your account<br>
         </div>
         <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.97</strong><br>
+          <strong style="color:#6c757d;">v0.97</strong><br>
           • 🐛 Fix: Reminder &amp; weekly summary toggles now save instantly when changed (no need to tap Save)<br>
           • ✨ Reminder/weekly toggles now request iOS notification permission inline — clear "Blocked in iOS Settings" alert if denied<br>
           • ✨ Reminder time, reminders on/off, and weekly summary now sync across devices via your account<br>
@@ -662,18 +662,18 @@
           • ✨ Bipolar Anonymous button and sign-in button hidden during tutorial — revealed once tutorial is complete<br>
         </div>
         <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.87</strong><br>
+          <strong style="color:#6c757d;">v0.87</strong><br>
           • ✨ "What's New" popup on every update — headline feature + full changelog link<br>
         </div>
         <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.86</strong><br>
+          <strong style="color:#6c757d;">v0.86</strong><br>
           • ✨ FAB picker now shows hidden default buttons so you can add them back<br>
           • ✨ All FABs have "Hide this button" — removed from dock, returns to picker<br>
           • ✨ Celebrity FAB now loads real Wikipedia photos<br>
           • 🐛 Fix: Quick Note hide button now works correctly<br>
         </div>
         <div style="margin-bottom:14px;">
-          <strong style="color:#adb5bd;">v0.85</strong><br>
+          <strong style="color:#6c757d;">v0.85</strong><br>
           • ✨ Dock synced across all 3 pages — hide a button on one page, it's hidden everywhere<br>
           • ✨ Empty dock slots show a + placeholder; tap to add Stats, Celebrity, Goals, or Quick Note<br>
         </div>
@@ -759,7 +759,7 @@
     <div class="confirm-content" style="max-width:500px;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
         <h3 id="saveConfirmTitle" style="margin:0;">Ready to save? ✨</h3>
-        <button onclick="closeSaveConfirmModal()" style="background:none;border:none;font-size:1.4em;cursor:pointer;color:#adb5bd;line-height:1;padding:2px 4px;-webkit-tap-highlight-color:transparent;">✕</button>
+        <button onclick="closeSaveConfirmModal()" style="background:none;border:none;font-size:1.4em;cursor:pointer;color:#6c757d;line-height:1;padding:2px 4px;-webkit-tap-highlight-color:transparent;">✕</button>
       </div>
       <div id="saveConfirmSummary" style="margin-bottom:16px;"></div>
       <div class="confirm-buttons">
@@ -773,11 +773,11 @@
   <div id="pinOverlay" style="position:fixed;inset:0;background:linear-gradient(135deg,var(--brand-primary-light) 0%,var(--brand-primary-mid) 100%);z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:24px;display:none;">
     <img src="icons/AppIcon.png" width="72" height="72" style="border-radius:18px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
     <h2 style="color:white;margin-bottom:6px;font-size:1.3em;">Bipolar Bear</h2>
-    <p style="color:rgba(255,255,255,0.85);font-size:0.88em;margin-bottom:28px;">Enter your PIN to continue</p>
+    <p style="color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-size:0.88em;margin-bottom:28px;">Enter your PIN to continue</p>
     <div id="pinDots" style="display:flex;gap:12px;margin-bottom:24px;">
       <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
     </div>
-    <div id="pinError" style="color:#ffe0b0;font-size:0.85em;min-height:20px;margin-bottom:8px;"></div>
+    <div id="pinError" style="color:#fff;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,0.35);font-size:0.85em;min-height:20px;margin-bottom:8px;"></div>
     <div style="display:grid;grid-template-columns:repeat(3,72px);gap:10px;margin-bottom:16px;">
       <button class="pin-key" onclick="pinKey('1')">1</button>
       <button class="pin-key" onclick="pinKey('2')">2</button>
@@ -792,7 +792,7 @@
       <button class="pin-key" onclick="pinKey('0')">0</button>
       <button class="pin-key pin-key-del" onclick="pinDel()">⌫</button>
     </div>
-    <button onclick="pinForgot()" style="background:none;border:none;color:rgba(255,255,255,0.6);font-size:0.78em;cursor:pointer;margin-top:8px;padding:4px 12px;">Forgot PIN?</button>
+    <button onclick="pinForgot()" style="background:none;border:none;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-size:0.78em;cursor:pointer;margin-top:8px;padding:4px 12px;text-decoration:underline;">Forgot PIN?</button>
   </div>
 
   <!-- PIN Setup Modal -->
@@ -829,11 +829,11 @@
   <div id="guestPinSetupOverlay" style="position:fixed;inset:0;background:linear-gradient(135deg,var(--brand-primary-light) 0%,var(--brand-primary-mid) 100%);z-index:9998;flex-direction:column;align-items:center;justify-content:center;padding:24px;display:none;">
     <img src="icons/AppIcon.png" width="72" height="72" style="border-radius:18px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
     <h2 id="guestPinSetupTitle" style="color:white;margin-bottom:6px;font-size:1.3em;text-align:center;">Protect your data</h2>
-    <p id="guestPinSetupDesc" style="color:rgba(255,255,255,0.85);font-size:0.88em;margin-bottom:28px;text-align:center;max-width:260px;">Choose a 4-digit PIN to lock your journal.</p>
+    <p id="guestPinSetupDesc" style="color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-size:0.88em;margin-bottom:28px;text-align:center;max-width:260px;">Choose a 4-digit PIN to lock your journal.</p>
     <div id="guestPinSetupDots" style="display:flex;gap:12px;margin-bottom:24px;">
       <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
     </div>
-    <div id="guestPinSetupError" style="color:#ffe0b0;font-size:0.85em;min-height:20px;margin-bottom:8px;text-align:center;"></div>
+    <div id="guestPinSetupError" style="color:#fff;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,0.35);font-size:0.85em;min-height:20px;margin-bottom:8px;text-align:center;"></div>
     <div style="display:grid;grid-template-columns:repeat(3,72px);gap:10px;margin-bottom:16px;">
       <button class="pin-key" onclick="guestPinSetupKey('1')">1</button>
       <button class="pin-key" onclick="guestPinSetupKey('2')">2</button>
@@ -848,7 +848,7 @@
       <button class="pin-key" onclick="guestPinSetupKey('0')">0</button>
       <button class="pin-key pin-key-del" onclick="guestPinSetupDel()">⌫</button>
     </div>
-    <p style="color:rgba(255,255,255,0.6);font-size:0.75em;text-align:center;max-width:240px;line-height:1.5;">Your PIN encrypts your data on this device. If you forget your PIN, your entries cannot be recovered.</p>
+    <p style="color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-size:0.75em;text-align:center;max-width:240px;line-height:1.5;">Your PIN encrypts your data on this device. If you forget your PIN, your entries cannot be recovered.</p>
   </div>
 
   <!-- Favourite Anniversary Modal -->
@@ -943,7 +943,7 @@
           📊 Daylio Export (.csv)
         </button>
         <button class="confirm-btn confirm-btn-no" onclick="closeImportModal()" style="width: 100%;">Cancel</button>
-        <button class="confirm-btn" onclick="closeImportModal();window.location.href='index.html#feedback'" style="background:white;color:#868e96;border:2px solid #868e96;width:100%;font-size:0.82em;">📣 Request a new import format</button>
+        <button class="confirm-btn" onclick="closeImportModal();window.location.href='index.html#feedback'" style="background:white;color:#495057;border:2px solid #6c757d;width:100%;font-size:0.82em;">📣 Request a new import format</button>
       </div>
     </div>
   </div>
@@ -1162,27 +1162,27 @@
             <summary style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;padding:2px 0;">
               <div>
                 <div style="font-weight:600;color:#495057;font-size:0.95em;">📋 Customise form</div>
-                <div style="color:#adb5bd;font-size:0.82em;margin-top:2px;">Choose which fields appear</div>
+                <div style="color:#6c757d;font-size:0.82em;margin-top:2px;">Choose which fields appear</div>
               </div>
-              <span style="color:#adb5bd;font-size:1em;line-height:1;">▸</span>
+              <span style="color:#6c757d;font-size:1em;line-height:1;">▸</span>
             </summary>
             <div id="stepTogglesRow" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;"></div>
           </details>
         </div>
 
         <div style="text-align: center; display: flex; justify-content: center; gap: 16px; margin-bottom: 14px;">
-          <button onclick="showAchievementsPanel()" style="background: none; border: none; color: #adb5bd; font-size: 0.82em; cursor: pointer; padding: 4px 8px; letter-spacing: 0.02em;">🏅 Achievements</button>
+          <button onclick="showAchievementsPanel()" style="background: none; border: none; color: #6c757d; font-size: 0.82em; cursor: pointer; padding: 4px 8px; letter-spacing: 0.02em;">🏅 Achievements</button>
           <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
             <div id="advancedSettingsBadgeHint" style="display:none;flex-direction:row;align-items:center;gap:3px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-bottom:2px;">
               <span style="font-size:0.78em;font-weight:700;font-style:italic;color:var(--brand-primary);font-family:'Georgia',serif;">🐻 Click here</span>
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><line x1="8" y1="2" x2="8" y2="13" stroke="var(--brand-primary)" stroke-width="2.5" stroke-linecap="round"/><polyline points="3,8 8,13 13,8" stroke="var(--brand-primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
             </div>
-            <button id="advancedSettingsBtn" onclick="openAdvancedSettings()" style="background: none; border: none; color: #adb5bd; font-size: 0.82em; cursor: pointer; padding: 4px 8px; letter-spacing: 0.02em;">🛠️ Advanced ▸</button>
+            <button id="advancedSettingsBtn" onclick="openAdvancedSettings()" style="background: none; border: none; color: #6c757d; font-size: 0.82em; cursor: pointer; padding: 4px 8px; letter-spacing: 0.02em;">🛠️ Advanced ▸</button>
           </div>
         </div>
 
         <div style="margin-top:4px;text-align:center;">
-          <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
+          <div style="color: #6c757d; font-size: 0.78em; line-height: 1.8;">
             <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.98</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
@@ -1225,7 +1225,7 @@
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
           <div>
             <div style="font-weight: 600; color: #495057; font-size: 0.95em;">📱 Sync health data</div>
-            <div style="color: #adb5bd; font-size: 0.82em; margin-top: 2px; max-width: 220px; line-height: 1.4;">Import steps &amp; sleep hours from your phone's health app</div>
+            <div style="color: #6c757d; font-size: 0.82em; margin-top: 2px; max-width: 220px; line-height: 1.4;">Import steps &amp; sleep hours from your phone's health app</div>
           </div>
           <label class="bb-switch"><input type="checkbox" id="healthSyncToggle" onchange="_toggleHealthSync()"><span class="bb-slider"></span></label>
         </div>
@@ -1238,8 +1238,8 @@
         </div>
 
         <div style="margin-top:16px;text-align:center;">
-          <div class="settings-notif-info" style="color:#adb5bd;font-size:0.78em;"></div>
-          <div class="settings-health-info" style="color:#adb5bd;font-size:0.78em;"></div>
+          <div class="settings-notif-info" style="color:#6c757d;font-size:0.78em;"></div>
+          <div class="settings-health-info" style="color:#6c757d;font-size:0.78em;"></div>
         </div>
       </div>
 
@@ -1257,7 +1257,7 @@
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0;">
             <div>
               <div style="font-weight: 600; color: #495057; font-size: 0.95em;">🎯 Focus mode</div>
-              <div style="color: #adb5bd; font-size: 0.82em; margin-top: 2px;">Only one question at a time</div>
+              <div style="color: #6c757d; font-size: 0.82em; margin-top: 2px;">Only one question at a time</div>
             </div>
             <label class="bb-switch"><input type="checkbox" id="focusModeToggle" onchange="_toggleFocusedMode()"><span class="bb-slider"></span></label>
           </div>
@@ -1266,14 +1266,14 @@
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
               <div>
                 <div style="font-weight: 600; color: #495057; font-size: 0.95em;">⏸ Confirm each step</div>
-                <div style="color: #adb5bd; font-size: 0.82em; margin-top: 2px;">Show a Next button instead of auto-advancing</div>
+                <div style="color: #6c757d; font-size: 0.82em; margin-top: 2px;">Show a Next button instead of auto-advancing</div>
               </div>
               <label class="bb-switch"><input type="checkbox" id="fmConfirmStepToggle" onchange="_toggleFmConfirmStep()"><span class="bb-slider"></span></label>
             </div>
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0;">
               <div>
                 <div style="font-weight: 600; color: #495057; font-size: 0.95em;">📝 Elaborate Responses</div>
-                <div style="color: #adb5bd; font-size: 0.82em; margin-top: 2px;">Add optional notes to each step &amp; set tomorrow's intention</div>
+                <div style="color: #6c757d; font-size: 0.82em; margin-top: 2px;">Add optional notes to each step &amp; set tomorrow's intention</div>
               </div>
               <label class="bb-switch"><input type="checkbox" id="elaborateResponsesToggle" onchange="_toggleElaborateResponses()"><span class="bb-slider"></span></label>
             </div>
@@ -1288,7 +1288,7 @@
         </div>
 
         <div style="margin-top:16px;text-align:center;">
-          <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
+          <div style="color: #6c757d; font-size: 0.78em; line-height: 1.8;">
             <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.98</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
@@ -1310,7 +1310,7 @@
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
           <div>
             <div style="font-weight: 600; color: #495057; font-size: 0.95em;">🔗 Mood Linking</div>
-            <div style="color: #adb5bd; font-size: 0.82em; margin-top: 2px;">BETA: Link two moods to show a variation in mood</div>
+            <div style="color: #6c757d; font-size: 0.82em; margin-top: 2px;">BETA: Link two moods to show a variation in mood</div>
           </div>
           <label class="bb-switch"><input type="checkbox" id="moodLinkingToggle" onchange="_toggleMoodLinking()"><span class="bb-slider"></span></label>
         </div>
@@ -1318,7 +1318,7 @@
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
           <div>
             <div style="font-weight: 600; color: #495057; font-size: 0.95em;">🐻 Bear suggested mood</div>
-            <div style="color: #adb5bd; font-size: 0.82em; margin-top: 2px;">BETA: Suggest a mood state before saving</div>
+            <div style="color: #6c757d; font-size: 0.82em; margin-top: 2px;">BETA: Suggest a mood state before saving</div>
           </div>
           <label class="bb-switch"><input type="checkbox" id="moodSuggestionToggle" onchange="_toggleMoodSuggestion()"><span class="bb-slider"></span></label>
         </div>
@@ -1326,7 +1326,7 @@
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
           <div>
             <div style="font-weight: 600; color: #495057; font-size: 0.95em;">🕵️ Incognito Mode</div>
-            <div style="color: #adb5bd; font-size: 0.82em; margin-top: 2px;">Hide entries from PDF export by default</div>
+            <div style="color: #6c757d; font-size: 0.82em; margin-top: 2px;">Hide entries from PDF export by default</div>
           </div>
           <label class="bb-switch"><input type="checkbox" id="incognitoModeToggle" onchange="_toggleIncognitoMode()"><span class="bb-slider"></span></label>
         </div>
@@ -1339,7 +1339,7 @@
         </div>
 
         <div style="margin-top:16px;text-align:center;">
-          <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
+          <div style="color: #6c757d; font-size: 0.78em; line-height: 1.8;">
             <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.98</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
@@ -1375,7 +1375,7 @@
         </div>
 
         <div style="margin-top:16px;text-align:center;">
-          <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
+          <div style="color: #6c757d; font-size: 0.78em; line-height: 1.8;">
             <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.98</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>
@@ -1397,11 +1397,11 @@
         <div id="fullResetSection" style="margin-bottom: 16px;">
           <div style="font-weight: 600; margin-bottom: 6px; color: #495057; font-size: 0.95em;">🗑️ Full Reset</div>
           <div style="color: #6c757d; font-size: 0.82em; margin-bottom: 10px;">Permanently delete all journal entries and reset all settings to their defaults. This cannot be undone.</div>
-          <button onclick="closeSettingsModal(); confirmDeleteAll();" style="width:100%;background:rgba(255,107,107,0.08);border:1.5px solid #ff6b6b;color:#ff6b6b;font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">🗑️ Delete All Data &amp; Reset Settings</button>
+          <button onclick="closeSettingsModal(); confirmDeleteAll();" style="width:100%;background:rgba(201,42,42,0.08);border:1.5px solid #c92a2a;color:#c92a2a;font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">🗑️ Delete All Data &amp; Reset Settings</button>
         </div>
         <div id="fullResetLocked" style="display:none;margin-bottom:16px;">
           <div style="font-weight:600;margin-bottom:6px;color:#495057;font-size:0.95em;">🗑️ Full Reset</div>
-          <div style="color:#adb5bd;font-size:0.82em;padding:10px;border:1.5px solid #dee2e6;border-radius:20px;text-align:center;">🔒 Account cannot be deleted</div>
+          <div style="color:#6c757d;font-size:0.82em;padding:10px;border:1.5px solid #dee2e6;border-radius:20px;text-align:center;">🔒 Account cannot be deleted</div>
         </div>
 
         <hr style="border: none; border-top: 1px solid #e9ecef; margin-bottom: 16px;">
@@ -1409,7 +1409,7 @@
         <button onclick="closeAdvancedMore2()" style="width:100%;background:rgba(255,149,0,0.1);border:1.5px solid var(--brand-primary);color:var(--brand-primary);font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">← Back</button>
 
         <div style="margin-top:16px;text-align:center;">
-          <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
+          <div style="color: #6c757d; font-size: 0.78em; line-height: 1.8;">
             <span onclick="document.getElementById('changelogModal').classList.add('active')" style="cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;">Version: 0.98</span>
             <span class="settings-platform-info"></span>
             <div class="settings-notif-info"></div>

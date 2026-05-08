@@ -122,10 +122,11 @@
       font-size: 0.78em;
       font-weight: 700;
       font-style: italic;
-      color: rgba(255,255,255,0.9);
+      color: #fff;
       white-space: nowrap;
       font-family: 'Georgia', serif;
       letter-spacing: 0.01em;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
     }
 
     .logo {
@@ -148,8 +149,8 @@
     .tagline {
       font-size: 1.4em;
       margin-bottom: 50px;
-      font-weight: 400;
-      text-shadow: 0 1px 4px rgba(0,0,0,0.25);
+      font-weight: 500;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.35);
     }
 
     .buttons {
@@ -202,9 +203,9 @@
       transition: opacity 0.2s, border-color 0.2s, background 0.2s;
     }
     .btn-anonymous.locked {
-      background: rgba(255, 255, 255, 0.07);
-      color: rgba(255, 255, 255, 0.45);
-      border: 3px dashed rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.85);
+      border: 3px dashed rgba(255, 255, 255, 0.55);
       box-shadow: none;
       cursor: default;
       pointer-events: none;
@@ -214,21 +215,21 @@
       text-align: center;
       font-size: 0.78em;
       font-weight: 600;
-      color: rgba(255,255,255,0.95);
+      color: #fff;
       margin-top: 4px;
       letter-spacing: 0.1px;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
     }
     .btn-subnote-muted {
       display: block;
       text-align: center;
       font-size: 0.78em;
       font-weight: 600;
-      color: rgba(255,255,255,0.78);
+      color: #fff;
       margin-top: 4px;
       letter-spacing: 0.1px;
       font-style: italic;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.18);
+      text-shadow: 0 1px 3px rgba(0,0,0,0.35);
     }
 
     .btn.btn-whatsapp {
@@ -401,9 +402,9 @@
       .modal-btn-primary:hover { background: var(--brand-primary-dark); }
       .modal-btn-secondary:hover { background: #e9ecef; }
     }
-    .modal-toggle { text-align: center; font-size: 0.9em; color: #6c757d; margin-top: 4px; }
+    .modal-toggle { text-align: center; font-size: 0.9em; color: #495057; margin-top: 4px; }
     .modal-toggle span { color: var(--brand-primary); cursor: pointer; font-weight: 600; }
-    .modal-error { color: #ff6b6b; font-size: 0.9em; margin-bottom: 10px; display: none; }
+    .modal-error { color: #c92a2a; font-size: 0.9em; margin-bottom: 10px; display: none; }
 
     /* ── Entry status tick inside journal button ── */
     .entry-tick {
