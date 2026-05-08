@@ -54,7 +54,7 @@ const journalFeatures = [
 
 // ── BLOCK 2: Firebase init + auth listener + onboarding helpers ──
 // ── Beta gate (web only) ──
-    if (!window.Capacitor && location.protocol !== 'file:' && localStorage.getItem('bbWebUnlocked') !== 'true') {
+    if (!window.Capacitor && location.protocol !== 'file:' && BB.storage.get('WebUnlocked') !== 'true') {
       location.replace('beta.html');
     }
 
@@ -80,13 +80,13 @@ const journalFeatures = [
         // Clear stale guest PIN if it was set by a different account.
         // Guest PINs (bbGuestPinSalt) are only valid for the account that created them.
         if (user && !user.isAnonymous) {
-          const _hasGuestPin = !!localStorage.getItem('bbGuestPinSalt');
-          const _pinUID      = localStorage.getItem('bbPinLinkedUID');
+          const _hasGuestPin = !!BB.storage.get('GuestPinSalt');
+          const _pinUID      = BB.storage.get('PinLinkedUID');
           if (_hasGuestPin && _pinUID !== user.uid) {
-            localStorage.removeItem('bbGuestPinSalt');
-            localStorage.removeItem('bbPinCode');
-            localStorage.removeItem('bbPinEnabled');
-            localStorage.removeItem('bbPinLinkedUID');
+            BB.storage.remove('GuestPinSalt');
+            BB.storage.remove('PinCode');
+            BB.storage.remove('PinEnabled');
+            BB.storage.remove('PinLinkedUID');
             sessionStorage.setItem('bbPinUnlocked', '1');
             const _pinOv = document.getElementById('guestPinOverlay');
             if (_pinOv && _pinOv.style.display !== 'none') _pinOv.style.display = 'none';
@@ -101,20 +101,20 @@ const journalFeatures = [
             anonBtn.classList.remove('locked');
             if (anonNote) anonNote.style.display = 'none';
             // New messages badge — only if they've verified for Anonymous
-            if (localStorage.getItem('bbAnon_verified') === 'true') {
+            if (BB.storage.get('Anon_verified') === 'true') {
               const _badge     = document.getElementById('anonMessagesBadge');
-              const _lastVisit = parseInt(localStorage.getItem('bbAnonLastVisit') || '0', 10);
+              const _lastVisit = parseInt(BB.storage.get('AnonLastVisit') || '0', 10);
               if (_badge) {
                 if (!_lastVisit) {
                   _badge.textContent  = '💬 Tap to join the community';
                   _badge.style.display = 'block';
                 } else {
-                  db.collection('bbAnonPosts')
+                  db.collection(BB_BRAND.collections.posts)
                     .where('timestamp', '>', firebase.firestore.Timestamp.fromMillis(_lastVisit))
                     .limit(5)
                     .get()
                     .then(snap => {
-                      const _myMonika  = localStorage.getItem('bbAnon_monika') || '';
+                      const _myMonika  = BB.storage.get('Anon_monika') || '';
                   const _newCount = snap.docs.filter(d => !d.data().deleted && (_myMonika ? d.data().name !== _myMonika : true)).length;
                       _badge.textContent   = _newCount > 0
                         ? '💬 ' + _newCount + ' new message' + (_newCount === 1 ? '' : 's')
@@ -159,25 +159,25 @@ const journalFeatures = [
             // Step 9 (WA hint) removed from tutorial — skip on all platforms
             if (_finalStep === 9) _finalStep = 10;
             if (_finalStep !== _localStep) {
-              localStorage.setItem('bbOnboardingStep', String(_finalStep));
+              BB.storage.set('OnboardingStep', String(_finalStep));
               db.collection('userSettings').doc(user.uid).set({ onboardingStep: _finalStep }, { merge: true }).catch(() => {});
             } else if (_localStep > _serverStep) {
               db.collection('userSettings').doc(user.uid).set({ onboardingStep: _localStep }, { merge: true }).catch(() => {});
             }
             // Restore hint flags from Firestore
-            if (d.personalHintDone) localStorage.setItem('bbPersonalHintDone', '1');
-            if (d.tutorialToastShown) localStorage.setItem('bbTutorialToastShown', '1');
+            if (d.personalHintDone) BB.storage.set('PersonalHintDone', '1');
+            if (d.tutorialToastShown) BB.storage.set('TutorialToastShown', '1');
             // If tutorial is complete, silently ensure all completion flags are set on login.
             // Never show the tutorial-complete popup here — it only fires via _advanceOnboardingStep.
             if (_finalStep >= 12) {
-              localStorage.setItem('bbTutorialToastShown', '1');
-              localStorage.setItem('bbFabsUnlocked', '1');
+              BB.storage.set('TutorialToastShown', '1');
+              BB.storage.set('FabsUnlocked', '1');
               // Prevent survival-kit celebration toast from re-firing on a new device/browser
-              localStorage.setItem('bbSurvivalCelebDone', '1');
-              ['bbWelcomeShown','bbSurvivalKitVisited','bbMedHintDone','bbMoodDefHintDone',
-               'bb_fmChooseMoodHintDone','bb_fmMoodInfoCloseHintDone','bbSettingsHintDone',
-               'bbCustomiseFormHintDone','bbCustomiseAdditionalHintDone','bbCloseSettingsHintDone',
-               'bb_fmMoodTipShown'].forEach(f => { if (!localStorage.getItem(f)) localStorage.setItem(f, '1'); });
+              BB.storage.set('SurvivalCelebDone', '1');
+              ['WelcomeShown','SurvivalKitVisited','MedHintDone','MoodDefHintDone',
+               '_fmChooseMoodHintDone','_fmMoodInfoCloseHintDone','SettingsHintDone',
+               'CustomiseFormHintDone','CustomiseAdditionalHintDone','CloseSettingsHintDone',
+               '_fmMoodTipShown'].forEach(f => { if (!BB.storage.get(f)) BB.storage.set(f, '1'); });
               if (!d.tutorialToastShown) {
                 db.collection('userSettings').doc(user.uid).set({ tutorialToastShown: true }, { merge: true }).catch(() => {});
               }
@@ -189,10 +189,10 @@ const journalFeatures = [
             if (d.currentMedList  !== undefined) localStorage.setItem('currentMedList',  JSON.stringify(d.currentMedList));
             if (d.dailyGoals      !== undefined) localStorage.setItem('dailyGoals',      JSON.stringify(d.dailyGoals));
             if (d.stableStreak    !== undefined) {
-              localStorage.setItem('bbStableStreak', String(d.stableStreak || 0));
+              BB.storage.set('StableStreak', String(d.stableStreak || 0));
             }
             if (typeof d.currentStreak === 'number') {
-              localStorage.setItem('bbCurrentStreak', String(d.currentStreak));
+              BB.storage.set('CurrentStreak', String(d.currentStreak));
             }
             // Restore unlocked achievements so journal.html doesn't re-toast already-earned ones
             if (Array.isArray(d.unlockedAchievements)) {
@@ -202,7 +202,7 @@ const journalFeatures = [
             if (d.fabState && typeof d.fabState === 'object') {
               const _fs = d.fabState;
               for (let s = 1; s <= 4; s++) {
-                if (_fs['slot' + s]) localStorage.setItem('bbFabSlot_' + s, _fs['slot' + s]);
+                if (_fs['slot' + s]) BB.storage.set('FabSlot_' + s, _fs['slot' + s]);
               }
               ['bbWaFabHidden','bbQuickNoteFabHidden','bbCoffeeFabHidden','bbFeedbackFabHidden','bbFooterHidden'].forEach(k => {
                 if (_fs[k] === '1') localStorage.setItem(k, '1');
@@ -211,23 +211,23 @@ const journalFeatures = [
             }
             const _ap = d.anonProfile || {};
             if (typeof _ap.visitStreak === 'number') {
-              localStorage.setItem('bbAnon_streak', String(_ap.visitStreak));
+              BB.storage.set('Anon_streak', String(_ap.visitStreak));
             }
-            if (_ap.monika) localStorage.setItem('bbAnon_monika', _ap.monika);
-            if (_ap.verified) localStorage.setItem('bbAnon_verified', 'true');
+            if (_ap.monika) BB.storage.set('Anon_monika', _ap.monika);
+            if (_ap.verified) BB.storage.set('Anon_verified', 'true');
             _updateStreakBadge(); // refresh badge from the values we just wrote
             // Then recompute from entries to fix the stale-currentStreak case
             // (Firestore field only updates when journal.html opens). Best-effort.
             _recomputeStreakFromEntries(user);
             // Refresh anonymous "new messages" badge now that monika/verified are in place
-            if (currentUser && localStorage.getItem('bbAnon_verified') === 'true') {
+            if (currentUser && BB.storage.get('Anon_verified') === 'true') {
               const _badge2 = document.getElementById('anonMessagesBadge');
-              const _lastVisit2 = parseInt(localStorage.getItem('bbAnonLastVisit') || '0', 10);
+              const _lastVisit2 = parseInt(BB.storage.get('AnonLastVisit') || '0', 10);
               if (_badge2 && _lastVisit2) {
-                db.collection('bbAnonPosts')
+                db.collection(BB_BRAND.collections.posts)
                   .where('timestamp', '>', firebase.firestore.Timestamp.fromMillis(_lastVisit2))
                   .limit(5).get().then(snap => {
-                    const _myMonika = localStorage.getItem('bbAnon_monika') || '';
+                    const _myMonika = BB.storage.get('Anon_monika') || '';
                     const _newCount = snap.docs.filter(dd => !dd.data().deleted && (_myMonika ? dd.data().name !== _myMonika : true)).length;
                     _badge2.textContent = _newCount > 0
                       ? '💬 ' + _newCount + ' new message' + (_newCount === 1 ? '' : 's')
@@ -265,7 +265,7 @@ const journalFeatures = [
             const targetKey = toKey(target);
             // If cache confidently says done, trust it immediately — no need to hit server
             try {
-              const _cached = JSON.parse(localStorage.getItem('bb_entryStatus') || 'null');
+              const _cached = JSON.parse(BB.storage.get('_entryStatus') || 'null');
               if (_cached && _cached.key === targetKey && _cached.done === true) return;
             } catch(e) {}
             // Single-field query only (compound queries need a Firestore index which may not exist)
@@ -281,7 +281,7 @@ const journalFeatures = [
                 });
                 const tick = document.getElementById('journalEntryTick');
                 if (tick) tick.setAttribute('data-done', done ? 'true' : 'false');
-                try { localStorage.setItem('bb_entryStatus', JSON.stringify({ key: targetKey, done })); } catch(e) {}
+                try { BB.storage.set('_entryStatus', JSON.stringify({ key: targetKey, done })); } catch(e) {}
               }).catch(() => {});
           })();
         } else {
@@ -318,14 +318,14 @@ const journalFeatures = [
       const cur = _getOnboardingStep();
       if (to <= cur) return;
       if (to === 9) to = 10; // step 9 (WA hint) removed from tutorial on all platforms
-      localStorage.setItem('bbOnboardingStep', String(to));
+      BB.storage.set('OnboardingStep', String(to));
       if (typeof currentUser !== 'undefined' && currentUser && typeof db !== 'undefined' && db) {
         db.collection('userSettings').doc(currentUser.uid).set({ onboardingStep: to }, { merge: true }).catch(() => {});
       }
       _applyOnboardingGating();
       // Show tutorial complete popup the first time step reaches 12
-      if (to >= 12 && localStorage.getItem('bbTutorialToastShown') !== '1') {
-        localStorage.setItem('bbTutorialToastShown', '1');
+      if (to >= 12 && BB.storage.get('TutorialToastShown') !== '1') {
+        BB.storage.set('TutorialToastShown', '1');
         setTimeout(_showTutorialCompleteModal, 400);
       }
     }
@@ -358,7 +358,7 @@ const journalFeatures = [
       if (document.getElementById('tutorialCompleteModal')) return;
       const overlay = document.createElement('div');
       overlay.id = 'tutorialCompleteModal';
-      overlay.innerHTML = `<div style="background:linear-gradient(135deg,#ff8833,#ffaa33);border-radius:20px;padding:28px 32px;text-align:center;max-width:300px;width:calc(100vw - 64px);box-shadow:0 12px 48px rgba(255,107,0,0.55);">
+      overlay.innerHTML = `<div style="background:linear-gradient(135deg,var(--brand-primary-mid),var(--brand-primary-light));border-radius:20px;padding:28px 32px;text-align:center;max-width:300px;width:calc(100vw - 64px);box-shadow:0 12px 48px rgba(255,107,0,0.55);">
         <div style="font-size:2.6em;margin-bottom:10px;">🎓</div>
         <div style="font-weight:800;font-size:1.1em;color:white;margin-bottom:6px;">Tutorial Complete!</div>
         <div style="font-size:0.88em;color:rgba(255,255,255,0.9);line-height:1.5;margin-bottom:16px;">Done for now! There will be a few more hints as you progress.</div>
@@ -371,7 +371,7 @@ const journalFeatures = [
       overlay.addEventListener('click', () => {
         overlay.remove();
         // Unlock FABs now that tutorial popup is dismissed
-        localStorage.setItem('bbFabsUnlocked', '1');
+        BB.storage.set('FabsUnlocked', '1');
         _applyOnboardingGating();
       });
       document.body.appendChild(overlay);
@@ -384,12 +384,12 @@ const journalFeatures = [
       const step = _getOnboardingStep();
 
       // Auto-set bbFabsUnlocked when tutorial completes
-      if (localStorage.getItem('bbFabsUnlocked') !== '1' &&
-          step >= 12 && localStorage.getItem('bbTutorialToastShown') === '1' &&
+      if (BB.storage.get('FabsUnlocked') !== '1' &&
+          step >= 12 && BB.storage.get('TutorialToastShown') === '1' &&
           !document.getElementById('tutorialCompleteModal')) {
-        localStorage.setItem('bbFabsUnlocked', '1');
+        BB.storage.set('FabsUnlocked', '1');
       }
-      const _fabsUnlocked = localStorage.getItem('bbFabsUnlocked') === '1';
+      const _fabsUnlocked = BB.storage.get('FabsUnlocked') === '1';
 
       // Step 4 was the "save your progress" sign-in blocking step. Auth FAB and
       // Anonymous button are now hidden until tutorial completes, so step 4 is
@@ -419,7 +419,7 @@ const journalFeatures = [
 
       // Privacy note: shown until first journal button click
       const _pn = document.getElementById('privacyNote');
-      if (_pn) _pn.style.display = localStorage.getItem('bbPrivacyNoteDismissed') === '1' ? 'none' : '';
+      if (_pn) _pn.style.display = BB.storage.get('PrivacyNoteDismissed') === '1' ? 'none' : '';
 
       // ── Hints ──
       // Hint 1 (journalStartHint): step 0 only
@@ -475,10 +475,10 @@ const journalFeatures = [
       if (_prog) {
         // Count completed tutorial milestones directly from flags — not from step number,
         // since step can reach 10+ via logo/survival/feedback flow without multiple entries.
-        const _e1 = localStorage.getItem('bbHasEntries') === '1';                     // Entry 1: first real entry
-        const _e2 = localStorage.getItem('bbSettingsHintDone') === '1';               // Entry 2: settings hint seen
-        const _e3 = localStorage.getItem('bbCloseSettingsHintDone') === '1';          // Entry 3: settings tutorial done
-        const _e4 = localStorage.getItem('bb_fmMoodTipShown') === '1';               // Entry 4: tap & hold hint done
+        const _e1 = BB.storage.get('HasEntries') === '1';                     // Entry 1: first real entry
+        const _e2 = BB.storage.get('SettingsHintDone') === '1';               // Entry 2: settings hint seen
+        const _e3 = BB.storage.get('CloseSettingsHintDone') === '1';          // Entry 3: settings tutorial done
+        const _e4 = BB.storage.get('_fmMoodTipShown') === '1';               // Entry 4: tap & hold hint done
         if (_e4) {
           _prog.style.display = 'none';
         } else {
@@ -553,10 +553,10 @@ const journalFeatures = [
      * bbStableStreak, bbAnon_streak, bbAnon_monika.
      */
     function _updateStreakBadge() {
-      const streak = parseInt(localStorage.getItem('bbCurrentStreak') || '0', 10);
-      const stable = parseInt(localStorage.getItem('bbStableStreak')  || '0', 10);
-      const anon   = parseInt(localStorage.getItem('bbAnon_streak')   || '0', 10);
-      const hasAnon = !!localStorage.getItem('bbAnon_monika');
+      const streak = parseInt(BB.storage.get('CurrentStreak') || '0', 10);
+      const stable = parseInt(BB.storage.get('StableStreak')  || '0', 10);
+      const anon   = parseInt(BB.storage.get('Anon_streak')   || '0', 10);
+      const hasAnon = !!BB.storage.get('Anon_monika');
 
       // Journal badge: 🔥 + 🧘
       const badge = document.getElementById('journalStreakBadge');
@@ -574,12 +574,12 @@ const journalFeatures = [
           // _monika is user-supplied (Bipolar Anonymous nickname) — escape it
           // before splicing into innerHTML so a tampered localStorage value
           // can't inject markup. The rest of the template is static.
-          const _monika = _escHtml(localStorage.getItem('bbAnon_monika') || '');
+          const _monika = _escHtml(BB.storage.get('Anon_monika') || '');
           const _monikaStr = _monika ? `👋 ${_monika} &nbsp;·&nbsp; ` : '';
           anonBadge.innerHTML     = `${_monikaStr}💬 ${anon} day${anon === 1 ? '' : 's'} streak`;
           anonBadge.style.display = 'block';
         } else if (hasAnon) {
-          const _monika = _escHtml(localStorage.getItem('bbAnon_monika') || '');
+          const _monika = _escHtml(BB.storage.get('Anon_monika') || '');
           if (_monika) {
             anonBadge.innerHTML     = `👋 ${_monika}`;
             anonBadge.style.display = 'block';
@@ -638,7 +638,7 @@ const journalFeatures = [
           checkDate.setDate(checkDate.getDate() - 1);
         }
 
-        localStorage.setItem('bbCurrentStreak', String(streak));
+        BB.storage.set('CurrentStreak', String(streak));
         db.collection('userSettings').doc(user.uid)
           .set({ currentStreak: streak }, { merge: true }).catch(() => {});
         _updateStreakBadge();
@@ -685,37 +685,46 @@ const journalFeatures = [
       // Clear all user-specific cached data before signing out.
       // bbOnboardingStep is intentionally NOT cleared here — Firestore preserves it
       // so the user resumes at the same onboarding step on re-login on any device.
-      const keysToRemove = [
-        'bb_entryStatus',
+      // Brand-prefixed keys: cleared via BB.storage so the same code works
+      // across variants (the 'bb' prefix comes from BB_BRAND.storagePrefix).
+      // 'OnboardingStep' is intentionally NOT here — Firestore preserves it
+      // so the user resumes at the same onboarding step on re-login.
+      const bbKeysToRemove = [
+        '_entryStatus',
+        'HasEntries',
+        // Streaks & stats — must clear so they don't leak between accounts
+        'CurrentStreak', 'StableStreak',
+        // Anonymous board state
+        'Anon_streak', 'Anon_monika', 'Anon_verified', 'AnonLastVisit',
+        // Mood step tutorial hints
+        '_moodTipShown', '_fmMoodTipShown',
+        '_fmChooseMoodHintDone', '_fmMoodInfoCloseHintDone',
+        // Settings / customise tutorial hints
+        'SettingsHintDone',
+        'CustomiseFormHintDone', 'CustomiseAdditionalHintDone', 'CloseSettingsHintDone',
+        'AdvancedTutorialToastShown',
+        // Advanced settings badge + tap-hold hint pending
+        'AdvancedBadgePending', 'AdvancedBadgeVisible',
+        '_fmTapHoldHintPending', '_fmTapHoldHintReady',
+        // Misc hints
+        'PersonalHintDone',
+        'FavouriteHintSeen', 'PrivateHintSeen', 'FavAnniShown',
+        'FeedbackFabHidden', 'WaFabHidden', 'CoffeeFabHidden', 'QuickNoteFabHidden', 'FooterHidden', 'FabsUnlocked',
+        'FabSlot_1', 'FabSlot_2', 'FabSlot_3', 'FabSlot_4',
+        'LogoEasterEggFound',
+        'PinEnabled', 'PinCode',
+        'WelcomeShown',
+      ];
+      bbKeysToRemove.forEach(k => BB.storage.remove(k));
+
+      // Non-prefixed user-data keys: shared across variants, cleared via
+      // raw localStorage.
+      const otherKeysToRemove = [
         'moodDefinitions', 'copingStrategies',
         'currentMedList', 'dailyGoals',
         'unlockedAchievements',
-        'bbHasEntries',
-        'bbOnboardingStep',
-        // Streaks & stats — must clear so they don't leak between accounts
-        'bbCurrentStreak', 'bbStableStreak',
-        // Anonymous board state
-        'bbAnon_streak', 'bbAnon_monika', 'bbAnon_verified', 'bbAnonLastVisit',
-        // Mood step tutorial hints
-        'bb_moodTipShown', 'bb_fmMoodTipShown',
-        'bb_fmChooseMoodHintDone', 'bb_fmMoodInfoCloseHintDone',
-        // Settings / customise tutorial hints
-        'bbSettingsHintDone',
-        'bbCustomiseFormHintDone', 'bbCustomiseAdditionalHintDone', 'bbCloseSettingsHintDone',
-        'bbAdvancedTutorialToastShown',
-        // Advanced settings badge + tap-hold hint pending
-        'bbAdvancedBadgePending', 'bbAdvancedBadgeVisible',
-        'bb_fmTapHoldHintPending', 'bb_fmTapHoldHintReady',
-        // Misc hints
-        'bbPersonalHintDone',
-        'bbFavouriteHintSeen', 'bbPrivateHintSeen', 'bbFavAnniShown',
-        'bbFeedbackFabHidden', 'bbWaFabHidden', 'bbCoffeeFabHidden', 'bbQuickNoteFabHidden', 'bbFooterHidden', 'bbFabsUnlocked',
-        'bbFabSlot_1', 'bbFabSlot_2', 'bbFabSlot_3', 'bbFabSlot_4',
-        'bbLogoEasterEggFound',
-        'bbPinEnabled', 'bbPinCode',
-        'bbWelcomeShown',
       ];
-      keysToRemove.forEach(k => localStorage.removeItem(k));
+      otherKeysToRemove.forEach(k => localStorage.removeItem(k));
       sessionStorage.removeItem('bbPinUnlocked');
 
       // Reset both ticks to inactive
@@ -887,7 +896,7 @@ const journalFeatures = [
               <div style="font-size:0.88em;color:#666;line-height:1.55;margin-bottom:18px;">This will restore all hidden dock buttons back to their default positions.</div>
               <div style="display:flex;gap:10px;">
                 <button id="_dockCancelBtn" style="flex:1;padding:11px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-weight:600;font-size:0.9em;cursor:pointer;">Cancel</button>
-                <button id="_dockConfirmBtn" style="flex:1;padding:11px;background:#ff9500;color:white;border:none;border-radius:10px;font-weight:600;font-size:0.9em;cursor:pointer;">Reset</button>
+                <button id="_dockConfirmBtn" style="flex:1;padding:11px;background:var(--brand-primary);color:white;border:none;border-radius:10px;font-weight:600;font-size:0.9em;cursor:pointer;">Reset</button>
               </div>
             </div>`;
             Object.assign(_confirmOverlay.style, {
@@ -898,31 +907,31 @@ const journalFeatures = [
             document.getElementById('_dockCancelBtn').addEventListener('click', () => _confirmOverlay.remove());
             document.getElementById('_dockConfirmBtn').addEventListener('click', () => {
               _confirmOverlay.remove();
-              ['bbWaFabHidden','bbQuickNoteFabHidden','bbCoffeeFabHidden','bbFeedbackFabHidden','bbFabSlot_1','bbFabSlot_2','bbFabSlot_3','bbFabSlot_4'].forEach(k => localStorage.removeItem(k));
+              ['WaFabHidden','QuickNoteFabHidden','CoffeeFabHidden','FeedbackFabHidden','FabSlot_1','FabSlot_2','FabSlot_3','FabSlot_4'].forEach(k => BB.storage.remove(k));
               _applyOnboardingGating();
               const _t = document.createElement('div');
-              Object.assign(_t.style, { position:'fixed', top:'calc(env(safe-area-inset-top,0px) + 12px)', left:'50%', transform:'translateX(-50%)', background:'#ff9500', color:'white', padding:'10px 20px', borderRadius:'20px', fontWeight:'700', fontSize:'0.9em', zIndex:'9999', whiteSpace:'nowrap', boxShadow:'0 4px 16px rgba(0,0,0,0.2)', pointerEvents:'none' });
+              Object.assign(_t.style, { position:'fixed', top:'calc(env(safe-area-inset-top,0px) + 12px)', left:'50%', transform:'translateX(-50%)', background:'var(--brand-primary)', color:'white', padding:'10px 20px', borderRadius:'20px', fontWeight:'700', fontSize:'0.9em', zIndex:'9999', whiteSpace:'nowrap', boxShadow:'0 4px 16px rgba(0,0,0,0.2)', pointerEvents:'none' });
               _t.textContent = '✅ Dock reset';
               document.body.appendChild(_t);
               setTimeout(() => _t.remove(), 2000);
             });
           } else {
             // Skip tutorial — jump to step 12 and mark all tutorial flags as done
-            localStorage.removeItem('bbOnboardingStep');
+            BB.storage.remove('OnboardingStep');
             // Pre-set flags so _advanceOnboardingStep doesn't show the popup
-            localStorage.setItem('bbTutorialToastShown', '1');
-            localStorage.setItem('bbFabsUnlocked', '1');
+            BB.storage.set('TutorialToastShown', '1');
+            BB.storage.set('FabsUnlocked', '1');
             _advanceOnboardingStep(12);
             [
-              'bbTutorialToastShown', 'bbWelcomeShown', 'bbSurvivalKitVisited',
-              'bb_fmChooseMoodHintDone', 'bb_fmMoodInfoCloseHintDone', 'bb_fmMoodTipShown',
-              'bbSettingsHintDone', 'bbCustomiseFormHintDone', 'bbCustomiseAdditionalHintDone',
-              'bbCloseSettingsHintDone', 'bbAdvancedTutorialToastShown', 'bbMedHintDone',
-              'bbMoodDefHintDone', 'bbPersonalHintDone',
-            ].forEach(k => localStorage.setItem(k, '1'));
+              'TutorialToastShown', 'WelcomeShown', 'SurvivalKitVisited',
+              '_fmChooseMoodHintDone', '_fmMoodInfoCloseHintDone', '_fmMoodTipShown',
+              'SettingsHintDone', 'CustomiseFormHintDone', 'CustomiseAdditionalHintDone',
+              'CloseSettingsHintDone', 'AdvancedTutorialToastShown', 'MedHintDone',
+              'MoodDefHintDone', 'PersonalHintDone',
+            ].forEach(k => BB.storage.set(k, '1'));
             _applyOnboardingGating();
             const _t = document.createElement('div');
-            Object.assign(_t.style, { position:'fixed', top:'calc(env(safe-area-inset-top,0px) + 12px)', left:'50%', transform:'translateX(-50%)', background:'#ff9500', color:'white', padding:'10px 20px', borderRadius:'20px', fontWeight:'700', fontSize:'0.9em', zIndex:'9999', whiteSpace:'nowrap', boxShadow:'0 4px 16px rgba(0,0,0,0.2)', pointerEvents:'none' });
+            Object.assign(_t.style, { position:'fixed', top:'calc(env(safe-area-inset-top,0px) + 12px)', left:'50%', transform:'translateX(-50%)', background:'var(--brand-primary)', color:'white', padding:'10px 20px', borderRadius:'20px', fontWeight:'700', fontSize:'0.9em', zIndex:'9999', whiteSpace:'nowrap', boxShadow:'0 4px 16px rgba(0,0,0,0.2)', pointerEvents:'none' });
             _t.textContent = '✅ Tutorial skipped — enjoy the app!';
             document.body.appendChild(_t);
             setTimeout(() => _t.remove(), 2800);
@@ -954,7 +963,7 @@ const journalFeatures = [
 
       // 1. Check cached status written by journal.html on load
       try {
-        const cached = JSON.parse(localStorage.getItem('bb_entryStatus') || 'null');
+        const cached = JSON.parse(BB.storage.get('_entryStatus') || 'null');
         if (cached && cached.key === targetKey) { setTickDone(cached.done); return; }
       } catch(e) {}
 
@@ -1081,8 +1090,8 @@ const journalFeatures = [
         currentIndex = (currentIndex + 1) % srcs.length;
         saveLogoVariant(currentIndex);
         // Mark easter egg found on first discovery
-        const _firstFind = !localStorage.getItem('bbLogoEasterEggFound');
-        if (_firstFind) localStorage.setItem('bbLogoEasterEggFound', '1');
+        const _firstFind = !BB.storage.get('LogoEasterEggFound');
+        if (_firstFind) BB.storage.set('LogoEasterEggFound', '1');
         // Sync app icon (native only)
         try {
           if (window.webkit?.messageHandlers?.setAppIcon) {
@@ -1102,15 +1111,15 @@ const journalFeatures = [
             logoImg.style.transition = '';
             logoImg.style.transform = '';
             // Celebration
-            launchConfetti(18, ['#ff9500', '#ff6b00', '#ffd43b', '#ffffff', '#ff8c42']);
-            if (_firstFind) showToast('🎨 Easter egg found!', '#ff9500');
+            launchConfetti(18, ['var(--brand-primary)', 'var(--brand-primary-dark)', '#ffd43b', '#ffffff', '#ff8c42']);
+            if (_firstFind) showToast('🎨 Easter egg found!', 'var(--brand-primary)');
           }, 200);
         }, 300);
       }
 
-      const _journalColors  = ['#ff9500','#ff6b00','#ffd43b','#ffec99','#ff8c42','#fab005'];
+      const _journalColors  = ['var(--brand-primary)','var(--brand-primary-dark)','#ffd43b','#ffec99','#ff8c42','#fab005'];
       const _survivalColors = ['#51cf66','#339af0','#20c997','#74c0fc','#63e6be','#4dabf7'];
-      const _bothColors     = ['#ff9500','#ff6b00','#51cf66','#339af0','#f06595','#ffd43b','#a9e34b','#cc5de8'];
+      const _bothColors     = ['var(--brand-primary)','var(--brand-primary-dark)','#51cf66','#339af0','#f06595','#ffd43b','#a9e34b','#cc5de8'];
 
       // Survival toast fires only once ever (localStorage); journal + combined fire every launch
       let _bothFired = false;
@@ -1120,16 +1129,16 @@ const journalFeatures = [
           if (_bothFired) return;
           _bothFired = true;
           launchConfetti(90, _bothColors);
-          showToast('🎉 All done today — great work!', 'linear-gradient(135deg,#ffaa33,#ff8833)');
+          showToast('🎉 All done today — great work!', 'linear-gradient(135deg,var(--brand-primary-light),var(--brand-primary-mid))');
         } else if (type === 'journal') {
           if (_bothFired) return; // combined already fired, skip individual
           launchConfetti(45, _journalColors);
-          showToast('📔 Journal up to date!', 'linear-gradient(135deg,#ffaa33,#ff8833)');
+          showToast('📔 Journal up to date!', 'linear-gradient(135deg,var(--brand-primary-light),var(--brand-primary-mid))');
         } else if (type === 'survival') {
-          if (localStorage.getItem('bbSurvivalCelebDone') === '1') return;
-          localStorage.setItem('bbSurvivalCelebDone', '1');
+          if (BB.storage.get('SurvivalCelebDone') === '1') return;
+          BB.storage.set('SurvivalCelebDone', '1');
           launchConfetti(45, _survivalColors);
-          showToast('🆘 Survival kit filled in!', 'linear-gradient(135deg,#ffaa33,#ff8833)');
+          showToast('🆘 Survival kit filled in!', 'linear-gradient(135deg,var(--brand-primary-light),var(--brand-primary-mid))');
         }
       }
 
@@ -1218,7 +1227,7 @@ function _handleIndexJournalNav() {
       if (document.getElementById('bbWelcomeModal')) return;
       const overlay = document.createElement('div');
       overlay.id = 'bbWelcomeModal';
-      overlay.innerHTML = `<div style="background:linear-gradient(135deg,#ff8833,#ffaa33);border-radius:20px;padding:28px 28px 24px;text-align:center;max-width:300px;width:calc(100vw - 64px);box-shadow:0 12px 48px rgba(255,107,0,0.55);">
+      overlay.innerHTML = `<div style="background:linear-gradient(135deg,var(--brand-primary-mid),var(--brand-primary-light));border-radius:20px;padding:28px 28px 24px;text-align:center;max-width:300px;width:calc(100vw - 64px);box-shadow:0 12px 48px rgba(255,107,0,0.55);">
         <div style="font-size:2.4em;margin-bottom:10px;">🐻</div>
         <div style="font-weight:800;font-size:1.05em;color:white;margin-bottom:10px;line-height:1.4;">Welcome to your BipolarBear.app!</div>
         <div style="font-size:0.88em;color:rgba(255,255,255,0.92);line-height:1.55;margin-bottom:18px;">This will be your mood journal and personalised survival kit going forward.<br><br>I'm here to help you get started. Let's go!</div>
@@ -1230,7 +1239,7 @@ function _handleIndexJournalNav() {
       });
       overlay.addEventListener('click', () => {
         overlay.remove();
-        localStorage.setItem('bbWelcomeShown', '1');
+        BB.storage.set('WelcomeShown', '1');
       });
       document.body.appendChild(overlay);
       overlay.style.opacity = '0';
@@ -1239,7 +1248,7 @@ function _handleIndexJournalNav() {
     }
 
     // Show welcome popup only on first launch AND only for new users (step 0, no entries)
-    if (!localStorage.getItem('bbWelcomeShown') && _getOnboardingStep() === 0 && !localStorage.getItem('bbHasEntries')) {
+    if (!BB.storage.get('WelcomeShown') && _getOnboardingStep() === 0 && !BB.storage.get('HasEntries')) {
       setTimeout(_showWelcomePopup, 600);
     }
 
@@ -1249,11 +1258,11 @@ function _handleIndexJournalNav() {
       const _s = _getOnboardingStep();
       if (_s === 10) {
         _advanceOnboardingStep(12);
-        if (localStorage.getItem('bbTutorialToastShown') !== '1') {
-          localStorage.setItem('bbTutorialToastShown', '1');
+        if (BB.storage.get('TutorialToastShown') !== '1') {
+          BB.storage.set('TutorialToastShown', '1');
           setTimeout(_showTutorialCompleteModal, 400);
         }
-      } else if (_s >= 4 && _s < 12 && localStorage.getItem('bbHasEntries') === '1') {
+      } else if (_s >= 4 && _s < 12 && BB.storage.get('HasEntries') === '1') {
         // User has logged their first entry and returned to home — mark tutorial complete
         _advanceOnboardingStep(12);
       }
@@ -1273,10 +1282,10 @@ function _handleIndexJournalNav() {
       '0.84': 'Survival kit compass removed from tutorial for a smoother experience',
     };
     function _checkWhatsNew() {
-      const lastSeen = localStorage.getItem('bbLastSeenVersion');
+      const lastSeen = BB.storage.get('LastSeenVersion');
       if (lastSeen === _APP_VERSION) return;
       const step = _getOnboardingStep();
-      if (step < 12 || localStorage.getItem('bbTutorialToastShown') !== '1') return;
+      if (step < 12 || BB.storage.get('TutorialToastShown') !== '1') return;
       // Don't show if tutorial complete popup is still on screen
       if (document.getElementById('tutorialCompleteModal')) return;
       const headline = _WHATS_NEW_HEADLINES[_APP_VERSION];
@@ -1289,10 +1298,10 @@ function _handleIndexJournalNav() {
       if (hEl) hEl.textContent = headline;
       popup.style.display = 'block';
       // Mark as seen immediately so navigating away doesn't re-show it
-      localStorage.setItem('bbLastSeenVersion', _APP_VERSION);
+      BB.storage.set('LastSeenVersion', _APP_VERSION);
     }
     function _dismissWhatsNew() {
-      localStorage.setItem('bbLastSeenVersion', _APP_VERSION);
+      BB.storage.set('LastSeenVersion', _APP_VERSION);
       const popup = document.getElementById('whatsNewPopup');
       if (popup) popup.style.display = 'none';
     }
@@ -1309,8 +1318,8 @@ function _handleIndexJournalNav() {
 // ── App-wide PIN lock (guest encryption PIN or native logged-in PIN) ──
     (function() {
       const _isNat = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
-      const hasGuestPin = !!localStorage.getItem('bbGuestPinSalt');
-      const hasNativePin = _isNat && localStorage.getItem('bbNativePinEnabled') === '1';
+      const hasGuestPin = !!BB.storage.get('GuestPinSalt');
+      const hasNativePin = _isNat && BB.storage.get('NativePinEnabled') === '1';
       if (!hasGuestPin && !hasNativePin) return;
 
       const unlocked = sessionStorage.getItem('bbPinUnlocked') === '1';
@@ -1353,7 +1362,7 @@ function _handleIndexJournalNav() {
 
       // Native logged-in PIN: verify against Keychain
       const _isNat = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
-      if (_isNat && localStorage.getItem('bbNativePinEnabled') === '1') {
+      if (_isNat && BB.storage.get('NativePinEnabled') === '1') {
         try {
           const _ss = window.Capacitor?.Plugins?.SecureStorage;
           const stored = _ss ? await Promise.race([
@@ -1376,7 +1385,7 @@ function _handleIndexJournalNav() {
       }
 
       // Guest PIN: verify against localStorage
-      const saved = localStorage.getItem('bbPinCode');
+      const saved = BB.storage.get('PinCode');
       if (_idxPinBuf !== saved) {
         document.getElementById('idxPinError').textContent = 'Incorrect PIN. Try again.';
         setTimeout(() => {
@@ -1388,7 +1397,7 @@ function _handleIndexJournalNav() {
       }
 
       // Correct — derive key and store in session
-      const salt = localStorage.getItem('bbGuestPinSalt');
+      const salt = BB.storage.get('GuestPinSalt');
       if (salt) {
         try {
           const saltBytes = Uint8Array.from(atob(salt), c => c.charCodeAt(0));
@@ -1476,9 +1485,9 @@ function _handleIndexJournalNav() {
 
     function _nukeGuestData() {
       // Preserve web beta unlock so user isn't redirected to beta.html after wipe
-      const _webUnlocked = localStorage.getItem('bbWebUnlocked');
+      const _webUnlocked = BB.storage.get('WebUnlocked');
       localStorage.clear();
-      if (_webUnlocked) localStorage.setItem('bbWebUnlocked', _webUnlocked);
+      if (_webUnlocked) BB.storage.set('WebUnlocked', _webUnlocked);
       sessionStorage.clear();
       location.replace(location.pathname);
     }
@@ -1492,9 +1501,9 @@ function _handleIndexJournalNav() {
 
     async function idxPinForgot() {
       const _isNat = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
-      if (_isNat && localStorage.getItem('bbNativePinEnabled') === '1') {
+      if (_isNat && BB.storage.get('NativePinEnabled') === '1') {
         if (!confirm('This will disable the app PIN. Your journal data stays safe.\n\nContinue?')) return;
-        localStorage.removeItem('bbNativePinEnabled');
+        BB.storage.remove('NativePinEnabled');
         await (window.Capacitor?.Plugins?.SecureStorage?.removeItem('bb_native_pin') ?? Promise.resolve()).catch(() => {});
         sessionStorage.setItem('bbPinUnlocked', '1');
         document.getElementById('guestPinOverlay').style.display = 'none';

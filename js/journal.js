@@ -81,7 +81,7 @@ window.addEventListener('pageshow', () => {
       const cur = _getOnboardingStep();
       if (to <= cur) return;
       if (to === 9) to = 10; // step 9 (WhatsApp hint) was removed from the tutorial.
-      localStorage.setItem('bbOnboardingStep', String(to));
+      BB.storage.set('OnboardingStep', String(to));
       if (typeof currentUser !== 'undefined' && currentUser && typeof db !== 'undefined' && db) {
         db.collection('userSettings').doc(currentUser.uid).set({ onboardingStep: to }, { merge: true }).catch(() => {});
       }
@@ -130,12 +130,12 @@ window.addEventListener('pageshow', () => {
 
     function _applyJournalOnboardingGating() {
       // Settings button removed — auto-skip settings tutorial hints
-      if (localStorage.getItem('bbSettingsHintDone') !== '1') {
-        localStorage.setItem('bbSettingsHintDone', '1');
-        localStorage.setItem('bbCustomiseFormHintDone', '1');
-        localStorage.setItem('bbCustomiseAdditionalHintDone', '1');
-        localStorage.setItem('bbCloseSettingsHintDone', '1');
-        localStorage.setItem('bbAdvancedTutorialToastShown', '1');
+      if (BB.storage.get('SettingsHintDone') !== '1') {
+        BB.storage.set('SettingsHintDone', '1');
+        BB.storage.set('CustomiseFormHintDone', '1');
+        BB.storage.set('CustomiseAdditionalHintDone', '1');
+        BB.storage.set('CloseSettingsHintDone', '1');
+        BB.storage.set('AdvancedTutorialToastShown', '1');
       }
       const step = _getOnboardingStep();
       // Home button: visible from step 3
@@ -158,7 +158,7 @@ window.addEventListener('pageshow', () => {
 
       // Settings hint: show only during focused-mode mood step on 3rd entry (before tutorial done)
       const _sHint = document.getElementById('settingsHint');
-      const _settingsDone = localStorage.getItem('bbSettingsHintDone') === '1';
+      const _settingsDone = BB.storage.get('SettingsHintDone') === '1';
       let _showSettings = false;
       try {
         _showSettings = !_settingsDone &&
@@ -168,11 +168,11 @@ window.addEventListener('pageshow', () => {
       } catch(e) { /* _fmActive/_fmSteps not yet initialised (TDZ on page load) */ }
       if (_sHint) _sHint.style.display = _showSettings ? 'flex' : 'none';
       const _sBtn = document.getElementById('settingsBtn');
-      if (_sBtn) _sBtn.style.display = (_settingsDone || _showSettings || localStorage.getItem('bbAdvancedBadgeVisible') === '1' || step >= 12) ? '' : 'none';
+      if (_sBtn) _sBtn.style.display = (_settingsDone || _showSettings || BB.storage.get('AdvancedBadgeVisible') === '1' || step >= 12) ? '' : 'none';
       if (typeof _updateAdvancedBadge === 'function') _updateAdvancedBadge();
       // Med hint: active when medHintEl is in the DOM (medication step rendered)
       const _medHintEl = document.getElementById('medHintEl');
-      const _showMedHint = !!_medHintEl && localStorage.getItem('bbMedHintDone') !== '1';
+      const _showMedHint = !!_medHintEl && BB.storage.get('MedHintDone') !== '1';
       const _isBlocking = _blockingSteps.has(step) || _showSettings || _showMedHint;
       const _overlay = document.getElementById('bbHintOverlay');
       if (_overlay) _overlay.style.display = _isBlocking ? '' : 'none';
@@ -264,7 +264,7 @@ window.addEventListener('pageshow', () => {
           return;
         }
         // Settings hint lock (independent)
-        if (localStorage.getItem('bbSettingsHintDone') !== '1') {
+        if (BB.storage.get('SettingsHintDone') !== '1') {
           const sHint = document.getElementById('settingsHint');
           if (sHint && sHint.style.display !== 'none') {
             const sBtn = document.getElementById('settingsBtn');
@@ -283,7 +283,7 @@ window.addEventListener('pageshow', () => {
     })();
 
     // ── Beta gate (web only) ──
-    if (!window.Capacitor && location.protocol !== 'file:' && localStorage.getItem('bbWebUnlocked') !== 'true') {
+    if (!window.Capacitor && location.protocol !== 'file:' && BB.storage.get('WebUnlocked') !== 'true') {
       location.replace('beta.html');
     }
 
@@ -353,7 +353,7 @@ window.addEventListener('pageshow', () => {
           document.getElementById('userEmail').textContent = user.email;
           _updateJournalAuthFab(true);
           _justLoggedIn = true;
-          localStorage.removeItem('bb_entryStatus');
+          BB.storage.remove('_entryStatus');
           migrateGoodMoodToStable(user);
           // Load user settings from Firestore, then derive key + migrate + load entries
           // Race against 5 s — if Firestore hangs here _authResolved is already true so
@@ -403,17 +403,17 @@ window.addEventListener('pageshow', () => {
                 });
               }
               if (d.pinEnabled && d.pinCode) {
-                localStorage.setItem('bbPinEnabled', '1');
-                localStorage.setItem('bbPinCode', d.pinCode);
+                BB.storage.set('PinEnabled', '1');
+                BB.storage.set('PinCode', d.pinCode);
                 // User just authenticated via email — treat this session as unlocked
                 // so they aren't prompted again immediately after signing in
                 sessionStorage.setItem('bbPinUnlocked', '1');
               } else {
                 // No PIN for this user (new account or PIN removed) — clear any leftover
                 // (also clears any guest PIN that was set before account creation)
-                localStorage.removeItem('bbPinEnabled');
-                localStorage.removeItem('bbPinCode');
-                localStorage.removeItem('bbGuestPinSalt');
+                BB.storage.remove('PinEnabled');
+                BB.storage.remove('PinCode');
+                BB.storage.remove('GuestPinSalt');
                 sessionStorage.removeItem('bb_guest_key');
                 _guestCryptoKey = null;
               }
@@ -442,7 +442,7 @@ window.addEventListener('pageshow', () => {
                 localStorage.setItem('moodLinkingEnabled', d.moodLinkingEnabled ? '1' : '0');
               }
               if (d.healthSyncEnabled !== undefined) {
-                localStorage.setItem('bbHealthSyncEnabled', d.healthSyncEnabled ? '1' : '0');
+                BB.storage.set('HealthSyncEnabled', d.healthSyncEnabled ? '1' : '0');
               }
               // Reminder/weekly summary — sync across devices
               if (d.reminderEnabled !== undefined) localStorage.setItem('reminderEnabled', d.reminderEnabled ? 'true' : 'false');
@@ -454,7 +454,7 @@ window.addEventListener('pageshow', () => {
               if (isNative() && typeof scheduleReminder === 'function') {
                 scheduleReminder().catch(() => {});
               }
-              if (d.personalHintDone) localStorage.setItem('bbPersonalHintDone', '1');
+              if (d.personalHintDone) BB.storage.set('PersonalHintDone', '1');
               // Sync customise form settings
               if (d.customiseFormEnabled !== undefined) localStorage.setItem('customiseFormEnabled', d.customiseFormEnabled ? 'true' : 'false');
               if (d.disabledSteps !== undefined) {
@@ -464,7 +464,7 @@ window.addEventListener('pageshow', () => {
               const _serverStep = d.onboardingStep || 0;
               const _localStep = _getOnboardingStep();
               const _finalStep = Math.max(_serverStep, _localStep);
-              if (_finalStep !== _localStep) localStorage.setItem('bbOnboardingStep', String(_finalStep));
+              if (_finalStep !== _localStep) BB.storage.set('OnboardingStep', String(_finalStep));
               if (_localStep > _serverStep) {
                 db.collection('userSettings').doc(user.uid).set({ onboardingStep: _localStep }, { merge: true }).catch(() => {});
               }
@@ -535,11 +535,12 @@ window.addEventListener('pageshow', () => {
               }
             } else {
               // New user — clear all previous user's settings and hints, enable focused mode by default
-              ['bbPinEnabled','bbPinCode','moreDataOpenByDefault','showMoodSuggestion',
-               'moodLinkingEnabled',
-               'bbFavAnniShown',
-               'bbPrivateHintSeen','bbFavouriteHintSeen','bb_moodTipShown','bb_fmMoodTipShown','bb_draft'].forEach(k => localStorage.removeItem(k));
-              localStorage.removeItem('bbOnboardingStep'); // new user starts at step 0
+              ['PinEnabled','PinCode','FavAnniShown',
+               'PrivateHintSeen','FavouriteHintSeen','_moodTipShown','_fmMoodTipShown','_draft']
+                .forEach(k => BB.storage.remove(k));
+              ['moreDataOpenByDefault','showMoodSuggestion','moodLinkingEnabled']
+                .forEach(k => localStorage.removeItem(k));
+              BB.storage.remove('OnboardingStep'); // new user starts at step 0
               localStorage.setItem('focusedModeEnabled', '1');
               sessionStorage.removeItem('bbPinUnlocked');
               _updatePinSettingsBtn();
@@ -604,7 +605,7 @@ window.addEventListener('pageshow', () => {
       if (fab) {
         fab.textContent = '⚙️';
         fab.title = 'Settings';
-        fab.style.background = '#ff9500';
+        fab.style.background = 'var(--brand-primary)';
         fab.style.color = 'white';
         fab.style.border = 'none';
         fab.style.boxShadow = '0 2px 10px rgba(255,149,0,0.35)';
@@ -615,8 +616,8 @@ window.addEventListener('pageshow', () => {
         fab.textContent = '👤';
         fab.title = 'Profile / Sign in';
         fab.style.background = 'white';
-        fab.style.color = '#ff9500';
-        fab.style.border = '2px solid #ff9500';
+        fab.style.color = 'var(--brand-primary)';
+        fab.style.border = '2px solid var(--brand-primary)';
         fab.style.boxShadow = '0 2px 10px rgba(255,149,0,0.25)';
       }
     }
@@ -709,7 +710,7 @@ window.addEventListener('pageshow', () => {
       sessionStorage.removeItem('bb_user_key');
       _userCryptoKey = null;
       _pendingAuthPassword = null;
-      localStorage.removeItem('bbNativePinEnabled');
+      BB.storage.remove('NativePinEnabled');
       if (isNative()) {
         const _ss = window.Capacitor?.Plugins?.SecureStorage;
         if (_ss) {
@@ -955,7 +956,7 @@ window.addEventListener('pageshow', () => {
     function _applyMoreDataDefaultToggle(on) {
       const t = document.getElementById('moreDataDefaultSwitch');
       if (!t) return;
-      t.style.background = on ? '#ff9500' : '#dee2e6';
+      t.style.background = on ? 'var(--brand-primary)' : '#dee2e6';
       t.children[0].style.transform = on ? 'translateX(14px)' : '';
     }
     function toggleMoreDataDefault() {
@@ -1011,7 +1012,7 @@ window.addEventListener('pageshow', () => {
       const btn = document.getElementById('privateBtn');
       if (!btn) return;
       btn.style.opacity = selectedPdfHide ? '1' : '0.5';
-      btn.style.borderColor = selectedPdfHide ? '#ff9500' : '#dee2e6';
+      btn.style.borderColor = selectedPdfHide ? 'var(--brand-primary)' : '#dee2e6';
     }
     function _showFeatureHint(emoji, text, storageKey) {
       if (localStorage.getItem(storageKey) === '1') return;
@@ -1054,13 +1055,13 @@ window.addEventListener('pageshow', () => {
     function _fmLongPressStart(mood, e) {
       _fmLongPressed = false;
       // Prevent tap-and-hold during "Choose a mood" hint
-      if (localStorage.getItem('bb_fmChooseMoodHintDone') !== '1') return;
+      if (BB.storage.get('_fmChooseMoodHintDone') !== '1') return;
       _fmLongPressTimer = setTimeout(() => {
         _fmLongPressed = true;
         nativeHaptic && nativeHaptic('medium');
         // Dismiss the one-time hint permanently
-        if (!localStorage.getItem('bb_fmMoodTipShown')) {
-          localStorage.setItem('bb_fmMoodTipShown', '1');
+        if (!BB.storage.get('_fmMoodTipShown')) {
+          BB.storage.set('_fmMoodTipShown', '1');
           _renderFocusedStep();
         }
         showMoodInfo(mood);
@@ -1073,8 +1074,8 @@ window.addEventListener('pageshow', () => {
     function _fmMoodTap(mood) {
       if (_fmLongPressed) { _fmLongPressed = false; return; }
       // Dismiss "Choose a mood" hint on first tap
-      if (localStorage.getItem('bb_fmChooseMoodHintDone') !== '1') {
-        localStorage.setItem('bb_fmChooseMoodHintDone', '1');
+      if (BB.storage.get('_fmChooseMoodHintDone') !== '1') {
+        BB.storage.set('_fmChooseMoodHintDone', '1');
         const _card = document.getElementById('focusedModeCard');
         if (_card) _card.style.zIndex = '';
         const _overlay = document.getElementById('bbHintOverlay');
@@ -1082,9 +1083,9 @@ window.addEventListener('pageshow', () => {
         // Fall through — allow the tap to also select the mood
       }
       // Block taps during "Tap & Hold" hint — must long press
-      if (localStorage.getItem('bb_fmMoodTipShown') !== '1' &&
-          localStorage.getItem('bb_fmChooseMoodHintDone') === '1' &&
-          localStorage.getItem('bb_fmTapHoldHintReady') === '1') {
+      if (BB.storage.get('_fmMoodTipShown') !== '1' &&
+          BB.storage.get('_fmChooseMoodHintDone') === '1' &&
+          BB.storage.get('_fmTapHoldHintReady') === '1') {
         const _hint = document.getElementById('_fmTapHoldHintEl');
         const _moodBtns = document.querySelectorAll('.mood-btn');
         [_hint, ..._moodBtns].forEach(el => {
@@ -1148,7 +1149,7 @@ window.addEventListener('pageshow', () => {
       const btn = document.getElementById('favouriteBtn');
       if (!btn) return;
       btn.textContent = selectedFavourite ? '★' : '☆';
-      btn.style.color = selectedFavourite ? '#ff9500' : '#adb5bd';
+      btn.style.color = selectedFavourite ? 'var(--brand-primary)' : '#adb5bd';
     }
     window.toggleFavourite = toggleFavourite;
 
@@ -1214,12 +1215,12 @@ window.addEventListener('pageshow', () => {
         sleepSynced: _sleepHealthSynced,
         stepNotes: selectedStepNotes,
       };
-      try { localStorage.setItem('bb_draft', JSON.stringify(draft)); } catch(e) {}
+      try { BB.storage.set('_draft', JSON.stringify(draft)); } catch(e) {}
       showDraftStatus('saved');
     }
 
     function clearDraft() {
-      localStorage.removeItem('bb_draft');
+      BB.storage.remove('_draft');
       showDraftStatus('clear');
     }
 
@@ -1228,7 +1229,7 @@ window.addEventListener('pageshow', () => {
       const targetKey = document.getElementById('entryDate')?.value;
       if (!targetKey) return;
       let draft;
-      try { draft = JSON.parse(localStorage.getItem('bb_draft') || 'null'); } catch(e) { return; }
+      try { draft = JSON.parse(BB.storage.get('_draft') || 'null'); } catch(e) { return; }
       if (!draft || draft.targetKey !== targetKey || !draft.mood) return;
 
       // Select mood (reveals rest of form)
@@ -1451,8 +1452,8 @@ window.addEventListener('pageshow', () => {
 
         // One-time tip: "tap the mood again to see more info"
         const _tipEl = document.getElementById('moodSelectorTip');
-        if (_tipEl && !window.Capacitor && !localStorage.getItem('bb_moodTipShown')) {
-          localStorage.setItem('bb_moodTipShown', '1');
+        if (_tipEl && !window.Capacitor && !BB.storage.get('_moodTipShown')) {
+          BB.storage.set('_moodTipShown', '1');
           _tipEl.textContent = '💡 Click again for more info';
           _tipEl.style.display = '';
           setTimeout(() => { _tipEl.style.opacity = '0'; _tipEl.style.transition = 'opacity 0.5s'; setTimeout(() => { _tipEl.style.display = 'none'; _tipEl.style.opacity = ''; _tipEl.style.transition = ''; }, 500); }, 3000);
@@ -1464,7 +1465,7 @@ window.addEventListener('pageshow', () => {
           el.classList.add('show-after-mood');
         });
         // Auto-sync health data if setting is ON
-        if (localStorage.getItem('bbHealthSyncEnabled') === '1') {
+        if (BB.storage.get('HealthSyncEnabled') === '1') {
           importStepsFromHealth();
           importSleepFromHealth();
         }
@@ -1497,7 +1498,7 @@ window.addEventListener('pageshow', () => {
       } catch(e) {}
 
       // Show bipolar UK definition — collapse it behind a toggle when personal def exists
-      const _bipolarHtml = `${def.text}<br><a href="${_bipolarUkUrl}" target="_blank" style="color:#ff9500;font-size:0.82em;white-space:nowrap;">Full definition — Bipolar UK ↗</a>`;
+      const _bipolarHtml = `${def.text}<br><a href="${_bipolarUkUrl}" target="_blank" style="color:var(--brand-primary);font-size:0.82em;white-space:nowrap;">Full definition — Bipolar UK ↗</a>`;
       if (_personalDef) {
         document.getElementById('moodInfoBody').innerHTML = `<button onclick="const b=document.getElementById('_moodBipBody');const open=b.style.display!=='none';b.style.display=open?'none':'';this.textContent=open?'Bipolar UK Definition — click here':'Bipolar UK Definition';" style="background:none;border:none;color:#adb5bd;font-size:0.82em;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px;-webkit-tap-highlight-color:transparent;">Bipolar UK Definition — click here</button><div id="_moodBipBody" style="display:none;margin-top:6px;font-size:0.9em;color:#495057;line-height:1.65;">${_bipolarHtml}</div>`;
       } else {
@@ -1630,7 +1631,7 @@ window.addEventListener('pageshow', () => {
 
       document.getElementById('moodInfoModal').classList.add('active');
       // Hint 3: "Close to continue" — shown when tap+hold hint was just fired (first time seeing moodInfoModal)
-      if (localStorage.getItem('bb_fmMoodInfoCloseHintDone') !== '1') {
+      if (BB.storage.get('_fmMoodInfoCloseHintDone') !== '1') {
         const _mi = document.getElementById('moodInfoModal');
         if (_mi) _mi.dataset.closeHintActive = '1';
         const _confirmBtns = document.querySelector('#moodInfoModal .confirm-buttons');
@@ -1638,7 +1639,7 @@ window.addEventListener('pageshow', () => {
           const _ch = document.createElement('div');
           _ch.id = '_fmMoodInfoCloseHintEl';
           _ch.style.cssText = 'display:flex;flex-direction:row;align-items:center;gap:4px;margin-right:8px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;';
-          _ch.innerHTML = `<span style="font-size:0.72em;font-weight:700;font-style:italic;color:#ff9500;font-family:'Georgia',serif;letter-spacing:0.01em;">🐻 Close to continue</span><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><line x1="2" y1="8" x2="13" y2="8" stroke="#ff9500" stroke-width="2" stroke-linecap="round"/><polyline points="8,3 13,8 8,13" stroke="#ff9500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
+          _ch.innerHTML = `<span style="font-size:0.72em;font-weight:700;font-style:italic;color:var(--brand-primary);font-family:'Georgia',serif;letter-spacing:0.01em;">🐻 Close to continue</span><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><line x1="2" y1="8" x2="13" y2="8" stroke="var(--brand-primary)" stroke-width="2" stroke-linecap="round"/><polyline points="8,3 13,8 8,13" stroke="var(--brand-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
           _confirmBtns.insertBefore(_ch, _confirmBtns.firstChild);
           const _closeBtn = _confirmBtns.querySelector('.confirm-btn-no');
           if (_closeBtn) _closeBtn.style.zIndex = '1001';
@@ -1648,8 +1649,8 @@ window.addEventListener('pageshow', () => {
 
     function closeMoodInfo() {
       // Dismiss hint 3 if active
-      if (localStorage.getItem('bb_fmMoodInfoCloseHintDone') !== '1') {
-        localStorage.setItem('bb_fmMoodInfoCloseHintDone', '1');
+      if (BB.storage.get('_fmMoodInfoCloseHintDone') !== '1') {
+        BB.storage.set('_fmMoodInfoCloseHintDone', '1');
         const _mi = document.getElementById('moodInfoModal');
         if (_mi) delete _mi.dataset.closeHintActive;
         const _ch = document.getElementById('_fmMoodInfoCloseHintEl');
@@ -1733,7 +1734,7 @@ window.addEventListener('pageshow', () => {
       });
 
       // For first-time users (no entries yet), start cycle on Stable so it's pre-highlighted
-      if (!localStorage.getItem('bbHasEntries') && !selectedMood && moodBtns[2]) {
+      if (!BB.storage.get('HasEntries') && !selectedMood && moodBtns[2]) {
         cycleIndex = 2;
         applyHover(moodBtns[2]);
       }
@@ -1887,15 +1888,15 @@ window.addEventListener('pageshow', () => {
 
         currentPage = 1; // Reset to first page to see new entry
         // Activate advanced settings badge on the entry after tutorial completes
-        if (_wasNewEntry && localStorage.getItem('bbAdvancedBadgePending') === '1') {
-          localStorage.removeItem('bbAdvancedBadgePending');
-          localStorage.setItem('bbAdvancedBadgeVisible', '1');
+        if (_wasNewEntry && BB.storage.get('AdvancedBadgePending') === '1') {
+          BB.storage.remove('AdvancedBadgePending');
+          BB.storage.set('AdvancedBadgeVisible', '1');
           _updateAdvancedBadge();
         }
         // Activate tap & hold mood hint on the entry after the settings tutorial completes
-        if (_wasNewEntry && localStorage.getItem('bb_fmTapHoldHintPending') === '1') {
-          localStorage.removeItem('bb_fmTapHoldHintPending');
-          localStorage.setItem('bb_fmTapHoldHintReady', '1');
+        if (_wasNewEntry && BB.storage.get('_fmTapHoldHintPending') === '1') {
+          BB.storage.remove('_fmTapHoldHintPending');
+          BB.storage.set('_fmTapHoldHintReady', '1');
         }
         loadEntries();
         nativeHaptic('success');
@@ -1940,7 +1941,7 @@ window.addEventListener('pageshow', () => {
       // Guest PIN: require PIN creation before first save.
       // Also triggers if bbPinEnabled='1' but no salt — stale data from the old optional
       // PIN feature that has no encryption. Treat it as "no PIN" and set up fresh.
-      if (!currentUser && (localStorage.getItem('bbPinEnabled') !== '1' || !localStorage.getItem('bbGuestPinSalt'))) {
+      if (!currentUser && (BB.storage.get('PinEnabled') !== '1' || !BB.storage.get('GuestPinSalt'))) {
         _savingEntry = false;
         _showGuestPinSetup(async () => {
           _savingEntry = true;
@@ -1956,14 +1957,14 @@ window.addEventListener('pageshow', () => {
     // account is brand new (0 Firestore entries), so returning users are never affected.
     async function migrateGoodMoodToStable(user) {
       // One-time migration: rename mood 'good' → 'stable' in all Firestore entries
-      if (localStorage.getItem('bbMigGoodStable') === '1') return;
+      if (BB.storage.get('MigGoodStable') === '1') return;
       try {
         const snap = await db.collection('entries')
           .where('userId', '==', user.uid)
           .get({ source: 'server' });
         const toFix = snap.docs.filter(doc => doc.data().mood === 'good');
         if (toFix.length === 0) {
-          localStorage.setItem('bbMigGoodStable', '1');
+          BB.storage.set('MigGoodStable', '1');
           return;
         }
         // Batch in groups of 500
@@ -1973,7 +1974,7 @@ window.addEventListener('pageshow', () => {
           toFix.slice(i, i + BATCH_SIZE).forEach(doc => batch.update(doc.ref, { mood: 'stable' }));
           await batch.commit();
         }
-        localStorage.setItem('bbMigGoodStable', '1');
+        BB.storage.set('MigGoodStable', '1');
       } catch(e) {
         console.warn('bbMigGoodStable failed, will retry next load', e);
       }
@@ -2043,9 +2044,9 @@ window.addEventListener('pageshow', () => {
         }
         // Remove local copies and clean up guest PIN data
         guestEntries.forEach(({ localKey }) => localStorage.removeItem(localKey));
-        localStorage.removeItem('bbGuestPinSalt');
-        localStorage.removeItem('bbPinEnabled');
-        localStorage.removeItem('bbPinCode');
+        BB.storage.remove('GuestPinSalt');
+        BB.storage.remove('PinEnabled');
+        BB.storage.remove('PinCode');
         sessionStorage.removeItem('bb_guest_key');
         _guestCryptoKey = null;
       } catch(e) {
@@ -2191,7 +2192,7 @@ window.addEventListener('pageshow', () => {
         if (entriesHeader) entriesHeader.style.display = 'flex';
 
         // Mark that the user has entries — unlocks FABs/login/survival kit on index
-        localStorage.setItem('bbHasEntries', '1');
+        BB.storage.set('HasEntries', '1');
 
         if (loader) loader.style.display = 'none';
         entries.sort((a, b) => b.timestamp - a.timestamp);
@@ -2247,7 +2248,7 @@ window.addEventListener('pageshow', () => {
                   <img src="images/moods/${entry.mood}.png" alt="${entry.mood}" class="entry-mood" style="width:32px;height:32px;object-fit:contain;">
                   ${entry.linkedMood ? `<img src="images/moods/${entry.linkedMood}.png" alt="${entry.linkedMood}" style="width:22px;height:22px;object-fit:contain;opacity:0.75;margin-left:-4px;" title="Also: ${entry.linkedMood}">` : ''}
                   ${entry.pdfHide ? `<span style="font-size:1em;line-height:1;opacity:0.7;" title="Private">🕵️</span>` : ''}
-                  ${entry.favourite ? `<span style="font-size:1em;color:#ff9500;line-height:1;" title="Favourite">★</span>` : ''}
+                  ${entry.favourite ? `<span style="font-size:1em;color:var(--brand-primary);line-height:1;" title="Favourite">★</span>` : ''}
                   <button class="edit-btn" id="edit-${actualIndex}" title="Edit entry" style="background:none; border:none; cursor:pointer; font-size:1.1em; padding:4px;">✏️</button>
                   <button class="delete-btn" id="delete-${actualIndex}">×</button>
                 </div>
@@ -2295,7 +2296,7 @@ window.addEventListener('pageshow', () => {
         const _pageNums = [];
         for (let p = _pageStart; p <= _pageEnd; p++) _pageNums.push(p);
         const _pageButtons = _pageNums.map(p =>
-          `<button class="pagination-btn" onclick="goToPage(${p})" style="${p === currentPage ? 'background:#ff9500;color:white;border-color:#ff9500;' : ''}">${p}</button>`
+          `<button class="pagination-btn" onclick="goToPage(${p})" style="${p === currentPage ? 'background:var(--brand-primary);color:white;border-color:var(--brand-primary);' : ''}">${p}</button>`
         ).join('');
         const paginationHtml = `
           <div style="margin-top: 15px;">
@@ -2305,7 +2306,7 @@ window.addEventListener('pageshow', () => {
               <button class="pagination-btn" onclick="goToPage(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''} title="Last">»</button>
             </div>
             <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-              <button onclick="exportPDF()" class="btn-export-pdf" style="padding: 10px 20px; background: white; color: #ff9500; border: 2px solid #ff9500; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">📄 Export PDF</button>
+              <button onclick="exportPDF()" class="btn-export-pdf" style="padding: 10px 20px; background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary); border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">📄 Export PDF</button>
               <button onclick="document.getElementById('exportModal').classList.add('active')" class="btn-export-backup" style="padding: 10px 20px; background: white; color: #51cf66; border: 2px solid #51cf66; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">Backup data</button>
               <button onclick="showImportModal()" class="btn-export-import" style="padding: 10px 20px; background: white; color: #74c0fc; border: 2px solid #74c0fc; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">Import</button>
             </div>
@@ -2315,14 +2316,14 @@ window.addEventListener('pageshow', () => {
                 <button onclick="logout()" class="logout-btn-list" style="flex-shrink:0;padding:7px 14px;background:white;color:#adb5bd;border:1.5px solid #dee2e6;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.85em;-webkit-tap-highlight-color:transparent;">Logout</button>
               ` : `
                 <span style="font-size:0.82em;color:#adb5bd;font-style:italic;">Login to backup data online</span>
-                <button onclick="window.showAuthModal()" style="flex-shrink:0;padding:7px 14px;background:#ff9500;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.85em;-webkit-tap-highlight-color:transparent;">Sign In / Up</button>
+                <button onclick="window.showAuthModal()" style="flex-shrink:0;padding:7px 14px;background:var(--brand-primary);color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.85em;-webkit-tap-highlight-color:transparent;">Sign In / Up</button>
               `}
             </div>
             <div style="text-align:center;margin-top:8px;position:relative;display:inline-block;width:100%;">
               <button onclick="_dismissPersonalDetailsHint();showPersonalDetailsModal()" style="background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;padding:4px 8px;text-decoration:underline;text-underline-offset:2px;-webkit-tap-highlight-color:transparent;">👤 Your personal details</button>
-              ${localStorage.getItem('bbPersonalHintDone') !== '1' ? `<div id="personalDetailsJournalHint" style="display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-top:2px;">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="8" y1="13" x2="8" y2="2" stroke="#ff9500" stroke-width="2" stroke-linecap="round"/><polyline points="3,7 8,2 13,7" stroke="#ff9500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-                <span style="font-size:0.72em;font-weight:700;font-style:italic;color:#ff9500;font-family:'Georgia',serif;letter-spacing:0.01em;">🐻 Add your details here</span>
+              ${BB.storage.get('PersonalHintDone') !== '1' ? `<div id="personalDetailsJournalHint" style="display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-top:2px;">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="8" y1="13" x2="8" y2="2" stroke="var(--brand-primary)" stroke-width="2" stroke-linecap="round"/><polyline points="3,7 8,2 13,7" stroke="var(--brand-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                <span style="font-size:0.72em;font-weight:700;font-style:italic;color:var(--brand-primary);font-family:'Georgia',serif;letter-spacing:0.01em;">🐻 Add your details here</span>
               </div>` : ''}
             </div>
           </div>
@@ -2433,7 +2434,7 @@ window.addEventListener('pageshow', () => {
           }
         }
         window._currentStreak = currentStreak;
-        localStorage.setItem('bbCurrentStreak', currentStreak);
+        BB.storage.set('CurrentStreak', currentStreak);
         if (window.db && window.currentUser) {
           window.db.collection('userSettings').doc(window.currentUser.uid)
             .set({ currentStreak: currentStreak }, { merge: true }).catch(() => {});
@@ -2507,7 +2508,7 @@ window.addEventListener('pageshow', () => {
           }
         }
         window._currentStreak = currentStreak;
-        localStorage.setItem('bbCurrentStreak', currentStreak);
+        BB.storage.set('CurrentStreak', currentStreak);
         if (window.db && window.currentUser) {
           window.db.collection('userSettings').doc(window.currentUser.uid)
             .set({ currentStreak: currentStreak }, { merge: true }).catch(() => {});
@@ -2621,7 +2622,7 @@ window.addEventListener('pageshow', () => {
       const _pfLimitedNote = statsTimeframe !== 'all' ? `<div style="font-size:0.75em;color:#adb5bd;margin-top:2px;">Based on ${statsTimeframe}d data — limited insights</div>` : '';
       document.getElementById('streakStats').innerHTML = (localStorage.getItem('showMoodSuggestion') === '1' && statsEntries.length > 0)
         ? `<div style="text-align:center;margin:8px 0 16px;">
-            <button onclick="showPersonalisedFeedback()" style="background:none;border:none;color:#ff9500;font-size:0.88em;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:4px 0;"><img src="images/moods/AI_Bear.png" style="max-width: 50px" > <br>Personalised Feedback (BETA)</button><br>
+            <button onclick="showPersonalisedFeedback()" style="background:none;border:none;color:var(--brand-primary);font-size:0.88em;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:4px 0;"><img src="images/moods/AI_Bear.png" style="max-width: 50px" > <br>Personalised Feedback (BETA)</button><br>
             ${_pfLimitedNote}
            </div>`
         : '';
@@ -2647,7 +2648,7 @@ window.addEventListener('pageshow', () => {
         title.textContent = '⚡ Energy — Daily Breakdown';
         body.innerHTML = sorted.map(e => {
           const d = new Date(e.date).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
-          return row(d, `${e.energy}/10`, e.energy/10, '#ff9500');
+          return row(d, `${e.energy}/10`, e.energy/10, 'var(--brand-primary)');
         }).join('');
       } else if (type === 'sleep') {
         title.textContent = '😴 Sleep — Daily Breakdown';
@@ -2707,7 +2708,7 @@ window.addEventListener('pageshow', () => {
         title.textContent = '🗓️ Tracked Days';
         body.innerHTML = sorted.map(e => {
           const d = new Date(e.date).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
-          const c = _moodColors[e.mood] || '#ff9500';
+          const c = _moodColors[e.mood] || 'var(--brand-primary)';
           const lbl = _moodLabels[e.mood] || e.mood;
           return `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;margin-bottom:4px;border-radius:8px;background:${c}18;border-left:3px solid ${c};">
             <span style="color:#495057;font-size:0.9em;">${d}</span>
@@ -2739,7 +2740,7 @@ window.addEventListener('pageshow', () => {
         el.innerHTML = favs.map(entry => {
           const d = new Date(entry.date);
           const label = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
-          const color = moodColors[entry.mood] || '#ff9500';
+          const color = moodColors[entry.mood] || 'var(--brand-primary)';
           const notesPreview = entry.notes
             ? `<div style="font-size:0.82em;color:#6c757d;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${entry.notes}</div>`
             : '';
@@ -2750,7 +2751,7 @@ window.addEventListener('pageshow', () => {
                 <div style="font-weight:600;font-size:0.88em;">${label}</div>
                 ${notesPreview}
               </div>
-              <button onclick="openFavouriteDetail('${entry.id || ''}')" style="flex-shrink:0;padding:6px 14px;background:white;border:1.5px solid #ff9500;color:#ff9500;border-radius:8px;font-weight:600;font-size:0.82em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Open</button>
+              <button onclick="openFavouriteDetail('${entry.id || ''}')" style="flex-shrink:0;padding:6px 14px;background:white;border:1.5px solid var(--brand-primary);color:var(--brand-primary);border-radius:8px;font-weight:600;font-size:0.82em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Open</button>
             </div>`;
         }).join('');
       }
@@ -2844,7 +2845,7 @@ window.addEventListener('pageshow', () => {
         el.innerHTML = favs.map(entry => {
           const d = new Date(entry.date);
           const label = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
-          const color = moodColors[entry.mood] || '#ff9500';
+          const color = moodColors[entry.mood] || 'var(--brand-primary)';
           const notesPreview = entry.notes
             ? `<div style="font-size:0.82em;color:#6c757d;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${entry.notes}</div>`
             : '';
@@ -2855,7 +2856,7 @@ window.addEventListener('pageshow', () => {
                 <div style="font-weight:600;font-size:0.88em;">${label}</div>
                 ${notesPreview}
               </div>
-              <button onclick="openFavAnniversaryDetail('${entry.id || ''}')" style="flex-shrink:0;padding:6px 14px;background:white;border:1.5px solid #ff9500;color:#ff9500;border-radius:8px;font-weight:600;font-size:0.82em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Open</button>
+              <button onclick="openFavAnniversaryDetail('${entry.id || ''}')" style="flex-shrink:0;padding:6px 14px;background:white;border:1.5px solid var(--brand-primary);color:var(--brand-primary);border-radius:8px;font-weight:600;font-size:0.82em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Open</button>
             </div>`;
         }).join('');
       }
@@ -2888,7 +2889,7 @@ window.addEventListener('pageshow', () => {
     function _checkFavAnniversaryToday(entries) {
       const today = new Date();
       const todayKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-      if (localStorage.getItem('bbFavAnniShown') === todayKey) return;
+      if (BB.storage.get('FavAnniShown') === todayKey) return;
       const month = today.getMonth() + 1;
       const day = today.getDate();
       const thisYear = today.getFullYear();
@@ -2898,7 +2899,7 @@ window.addEventListener('pageshow', () => {
         return d.getMonth() + 1 === month && d.getDate() === day && d.getFullYear() !== thisYear;
       });
       if (annivFavs.length > 0) {
-        localStorage.setItem('bbFavAnniShown', todayKey);
+        BB.storage.set('FavAnniShown', todayKey);
         setTimeout(() => showFavAnniversaryModal(month, day), 1500);
       }
     }
@@ -3149,10 +3150,10 @@ window.addEventListener('pageshow', () => {
         if (_guestPinSetupBuffer === _guestPinSetupFirst) {
           const saltBytes = crypto.getRandomValues(new Uint8Array(16));
           const saltB64 = btoa(String.fromCharCode(...saltBytes));
-          localStorage.setItem('bbGuestPinSalt', saltB64);
-          localStorage.setItem('bbPinEnabled', '1');
-          localStorage.setItem('bbPinCode', _guestPinSetupFirst);
-          localStorage.setItem('bbPinLinkedUID', currentUser ? currentUser.uid : 'guest');
+          BB.storage.set('GuestPinSalt', saltB64);
+          BB.storage.set('PinEnabled', '1');
+          BB.storage.set('PinCode', _guestPinSetupFirst);
+          BB.storage.set('PinLinkedUID', currentUser ? currentUser.uid : 'guest');
           sessionStorage.setItem('bbPinUnlocked', '1');
           _guestCryptoKey = await _guestDeriveKey(_guestPinSetupFirst, saltB64);
           await _guestExportKeyToSession(_guestCryptoKey);
@@ -3200,9 +3201,9 @@ window.addEventListener('pageshow', () => {
     window._guestPinForgotReset = _guestPinForgotReset;
 
     function _initPinLock() {
-      const enabled = localStorage.getItem('bbPinEnabled') === '1';
+      const enabled = BB.storage.get('PinEnabled') === '1';
       const unlocked = sessionStorage.getItem('bbPinUnlocked') === '1';
-      const hasSalt  = !!localStorage.getItem('bbGuestPinSalt');
+      const hasSalt  = !!BB.storage.get('GuestPinSalt');
       _updatePinSettingsBtn();
       // Guest encryption PINs (identified by bbGuestPinSalt) are handled inline in the
       // entries area — no full-screen overlay. The overlay is only for logged-in users'
@@ -3214,7 +3215,7 @@ window.addEventListener('pageshow', () => {
     }
 
     function _updatePinSettingsBtn() {
-      const enabled = localStorage.getItem('bbPinEnabled') === '1';
+      const enabled = BB.storage.get('PinEnabled') === '1';
       const text = enabled ? '🔒 PIN: On — Change / Disable' : '🔒 Enable PIN Lock';
       const btn = document.getElementById('pinLockSettingsBtnMain');
       if (btn) btn.textContent = text;
@@ -3222,8 +3223,8 @@ window.addEventListener('pageshow', () => {
 
     function _syncPinToFirestore() {
       if (!currentUser) return;
-      const enabled = localStorage.getItem('bbPinEnabled') === '1';
-      const code = localStorage.getItem('bbPinCode') || null;
+      const enabled = BB.storage.get('PinEnabled') === '1';
+      const code = BB.storage.get('PinCode') || null;
       db.collection('userSettings').doc(currentUser.uid).set(
         { pinEnabled: enabled, pinCode: code },
         { merge: true }
@@ -3235,7 +3236,7 @@ window.addEventListener('pageshow', () => {
       _pinBuffer += digit;
       _renderPinDots('pinDots', _pinBuffer.length, false);
       if (_pinBuffer.length === 4) {
-        const saved = localStorage.getItem('bbPinCode');
+        const saved = BB.storage.get('PinCode');
         if (_pinBuffer === saved) {
           sessionStorage.setItem('bbPinUnlocked', '1');
           const el = document.getElementById('pinOverlay');
@@ -3244,7 +3245,7 @@ window.addEventListener('pageshow', () => {
           if (!currentUser) {
             const _enteredPin = _pinBuffer;
             _pinBuffer = '';
-            const salt = localStorage.getItem('bbGuestPinSalt');
+            const salt = BB.storage.get('GuestPinSalt');
             if (salt) {
               _guestDeriveKey(_enteredPin, salt).then(key => {
                 _guestCryptoKey = key;
@@ -3275,8 +3276,8 @@ window.addEventListener('pageshow', () => {
         return;
       }
       if (confirm('Reset PIN?\n\nThis will disable PIN lock. You can set a new one in Settings → Advanced.')) {
-        localStorage.removeItem('bbPinCode');
-        localStorage.removeItem('bbPinEnabled');
+        BB.storage.remove('PinCode');
+        BB.storage.remove('PinEnabled');
         _syncPinToFirestore();
         sessionStorage.setItem('bbPinUnlocked', '1');
         const el = document.getElementById('pinOverlay');
@@ -3286,7 +3287,7 @@ window.addEventListener('pageshow', () => {
     }
 
     function openPinSettings() {
-      const enabled = localStorage.getItem('bbPinEnabled') === '1';
+      const enabled = BB.storage.get('PinEnabled') === '1';
       _pinSetupBuffer = '';
       _pinSetupFirst = '';
       _pinSetupStep = enabled ? 'confirm_old' : 'set';
@@ -3323,7 +3324,7 @@ window.addEventListener('pageshow', () => {
 
       if (_pinSetupStep === 'confirm_old') {
         // Verify existing PIN
-        if (_pinSetupBuffer === localStorage.getItem('bbPinCode')) {
+        if (_pinSetupBuffer === BB.storage.get('PinCode')) {
           _pinSetupBuffer = '';
           _pinSetupStep = 'set';
           document.getElementById('pinSetupTitle').textContent = '🔒 New PIN';
@@ -3355,7 +3356,7 @@ window.addEventListener('pageshow', () => {
                 _ss.setItem('bb_native_pin', _pinSetupFirst),
                 new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 3000)),
               ]);
-              localStorage.setItem('bbNativePinEnabled', '1');
+              BB.storage.set('NativePinEnabled', '1');
               sessionStorage.setItem('bbPinUnlocked', '1');
               _nativePinSetupMode = false;
               closePinSetup();
@@ -3365,8 +3366,8 @@ window.addEventListener('pageshow', () => {
               setTimeout(() => { _pinSetupBuffer = ''; _pinSetupFirst = ''; _pinSetupStep = 'set'; desc.textContent = 'Choose a 4-digit PIN.'; _renderPinDots('pinSetupDots', 0, true); errEl.textContent = ''; }, 1200);
             }
           } else {
-          localStorage.setItem('bbPinCode', _pinSetupFirst);
-          localStorage.setItem('bbPinEnabled', '1');
+          BB.storage.set('PinCode', _pinSetupFirst);
+          BB.storage.set('PinEnabled', '1');
           sessionStorage.setItem('bbPinUnlocked', '1');
           _syncPinToFirestore();
           closePinSetup();
@@ -3396,8 +3397,8 @@ window.addEventListener('pageshow', () => {
     }
 
     function disablePin() {
-      localStorage.removeItem('bbPinCode');
-      localStorage.removeItem('bbPinEnabled');
+      BB.storage.remove('PinCode');
+      BB.storage.remove('PinEnabled');
       _syncPinToFirestore();
       closePinSetup();
       _updatePinSettingsBtn();
@@ -3410,7 +3411,7 @@ window.addEventListener('pageshow', () => {
 
     function openNativePinSettings() {
       _nativePinSetupMode = true;
-      const enabled = localStorage.getItem('bbNativePinEnabled') === '1';
+      const enabled = BB.storage.get('NativePinEnabled') === '1';
       _pinSetupBuffer = '';
       _pinSetupFirst = '';
       _pinSetupStep = 'set';
@@ -3427,7 +3428,7 @@ window.addEventListener('pageshow', () => {
     }
 
     async function disableNativePin() {
-      localStorage.removeItem('bbNativePinEnabled');
+      BB.storage.remove('NativePinEnabled');
       sessionStorage.removeItem('bbPinUnlocked');
       await (window.Capacitor?.Plugins?.SecureStorage?.removeItem('bb_native_pin') ?? Promise.resolve()).catch(() => {});
       _nativePinSetupMode = false;
@@ -3436,7 +3437,7 @@ window.addEventListener('pageshow', () => {
     }
 
     function _updateNativePinBtn() {
-      const enabled = localStorage.getItem('bbNativePinEnabled') === '1';
+      const enabled = BB.storage.get('NativePinEnabled') === '1';
       const btn = document.getElementById('nativePinSettingsBtn');
       if (btn) btn.textContent = enabled ? '🔒 PIN: On — Change / Disable' : '🔒 Enable PIN';
     }
@@ -3467,7 +3468,7 @@ window.addEventListener('pageshow', () => {
     }
 
     // ── Guest inactivity relock (5 min) ──
-    if (localStorage.getItem('bbGuestPinSalt')) {
+    if (BB.storage.get('GuestPinSalt')) {
       let _idleTimer;
       function _resetIdleTimer() {
         clearTimeout(_idleTimer);
@@ -3485,7 +3486,7 @@ window.addEventListener('pageshow', () => {
     }
 
     // ── Native app PIN inactivity relock (5 min) ──
-    if (isNative() && localStorage.getItem('bbNativePinEnabled') === '1') {
+    if (isNative() && BB.storage.get('NativePinEnabled') === '1') {
       let _nativeIdleTimer;
       function _resetNativeIdleTimer() {
         clearTimeout(_nativeIdleTimer);
@@ -3529,7 +3530,7 @@ window.addEventListener('pageshow', () => {
     let _sleepSuggestedVal  = null;
     let _sleepHealthSynced  = false; // true only when sleep came from a health data sync
 
-    const _FM_MOOD_COLORS  = { manic:'#ff4444', elevated:'#ff9500', stable:'#51cf66', good:'#51cf66', low:'#845ef7', depressed:'#5c7cfa' };
+    const _FM_MOOD_COLORS  = { manic:'#ff4444', elevated:'var(--brand-primary)', stable:'#51cf66', good:'#51cf66', low:'#845ef7', depressed:'#5c7cfa' };
     const _FM_MOOD_LABELS  = { manic:'Manic', elevated:'Elevated', stable:'Stable', good:'Stable', low:'Low', depressed:'Depressed' };
 
     const _FM_ENERGY_LEVELS = [
@@ -3653,7 +3654,7 @@ window.addEventListener('pageshow', () => {
     function _toggleHealthSync() {
       const chk = document.getElementById('healthSyncToggle');
       const val = chk && chk.checked ? '1' : '0';
-      localStorage.setItem('bbHealthSyncEnabled', val);
+      BB.storage.set('HealthSyncEnabled', val);
       if (window.db && window.currentUser) {
         window.db.collection('userSettings').doc(window.currentUser.uid)
           .set({ healthSyncEnabled: val === '1' }, { merge: true }).catch(() => {});
@@ -3738,7 +3739,7 @@ window.addEventListener('pageshow', () => {
       _fmSyncFormVisuals();
       // Only show the full form if the current date hasn't been logged yet
       try {
-        const _cached = JSON.parse(localStorage.getItem('bb_entryStatus') || 'null');
+        const _cached = JSON.parse(BB.storage.get('_entryStatus') || 'null');
         if (_cached && _cached.done) {
           document.getElementById('entryFormCard').style.display = 'none';
         } else {
@@ -3924,10 +3925,10 @@ window.addEventListener('pageshow', () => {
       document.querySelectorAll('[data-budget]').forEach(b => b.classList.toggle('selected', b.dataset.budget === selectedBudget));
     }
 
-    const _FM_MOOD_BG     = { manic:'#fff0f0', elevated:'#fff8e6', stable:'#f0fff4', good:'#f0fff4', low:'#f5f0ff', depressed:'#f0f4ff' };
+    const _FM_MOOD_BG     = { manic:'#fff0f0', elevated:'var(--brand-secondary-tint)', stable:'#f0fff4', good:'#f0fff4', low:'#f5f0ff', depressed:'#f0f4ff' };
     function _fmApplyMoodTheme(mood) {
-      const accent = (mood && _FM_MOOD_COLORS[mood]) || '#ff9500';
-      const bg     = (mood && _FM_MOOD_BG[mood])     || '#fff8f0';
+      const accent = (mood && _FM_MOOD_COLORS[mood]) || 'var(--brand-primary)';
+      const bg     = (mood && _FM_MOOD_BG[mood])     || 'var(--brand-tint)';
       const card   = document.getElementById('focusedModeCard');
       const sticky = document.getElementById('fmNextRow');
       if (card)   { card.style.background = bg;   card.style.setProperty('--fm-accent', accent); }
@@ -4010,7 +4011,7 @@ window.addEventListener('pageshow', () => {
       } else {
         nextRow.style.display = 'flex';
       }
-      const _accent = (selectedMood && _FM_MOOD_COLORS[selectedMood]) || '#ff9500';
+      const _accent = (selectedMood && _FM_MOOD_COLORS[selectedMood]) || 'var(--brand-primary)';
       if (step.id === 'done') {
         const _noChanges = editingEntry && !_hasEditChanges();
         nextBtn.textContent = !selectedMood ? '😊 Select a mood →' : (_noChanges ? 'Close' : (editingEntry ? '✏️ Update entry' : '💾 Save Entry'));
@@ -4028,7 +4029,7 @@ window.addEventListener('pageshow', () => {
       document.getElementById('fmContent').innerHTML = _fmRenderContent(step);
       if (step.id === 'notes') setTimeout(() => { const ta = document.getElementById('fmNotesInput'); if (ta) ta.focus(); }, 120);
       // Auto-sync health data if setting is ON
-      if (localStorage.getItem('bbHealthSyncEnabled') === '1') {
+      if (BB.storage.get('HealthSyncEnabled') === '1') {
         if (step.id === 'energy' && _fmStepsResult === null && !window._healthSyncInProgress) {
           setTimeout(() => importStepsFromHealth(), 0);
         } else if (step.id === 'sleep' && _fmSleepImported === null && !window._healthSyncInProgress && !_fmSleepAutoSyncDone) {
@@ -4047,9 +4048,9 @@ window.addEventListener('pageshow', () => {
       const _obStep = _getOnboardingStep();
       const _fmNeedsElevation = (typeof _fmActive !== 'undefined' && _fmActive) && [1,2,3,8].includes(_obStep);
       if (step.id === 'mood') {
-        const _chooseDone = localStorage.getItem('bb_fmChooseMoodHintDone') === '1';
-        const _tapDone = localStorage.getItem('bb_fmMoodTipShown') === '1';
-        const _moodHintActive = (!_chooseDone && !editingEntry) || (!_tapDone && _chooseDone && localStorage.getItem('bb_fmTapHoldHintReady') === '1');
+        const _chooseDone = BB.storage.get('_fmChooseMoodHintDone') === '1';
+        const _tapDone = BB.storage.get('_fmMoodTipShown') === '1';
+        const _moodHintActive = (!_chooseDone && !editingEntry) || (!_tapDone && _chooseDone && BB.storage.get('_fmTapHoldHintReady') === '1');
         const _overlay = document.getElementById('bbHintOverlay');
         if (_moodHintActive) {
           if (_overlay) _overlay.style.display = '';
@@ -4071,7 +4072,7 @@ window.addEventListener('pageshow', () => {
       _notesEl.id = 'fmStepNotesEl';
       if (_noteOpen) _notesEl.open = true;
       _notesEl.style.cssText = 'margin-top:14px;';
-      _notesEl.innerHTML = `<summary style="font-size:0.85em;font-weight:600;color:#6c757d;cursor:pointer;list-style:none;display:flex;align-items:center;gap:5px;-webkit-tap-highlight-color:transparent;padding:4px 0;" onclick="this.querySelector('.bb-stpchev').style.transform=this.parentElement.open?'rotate(0deg)':'rotate(90deg)'"><span class="bb-stpchev" style="font-size:0.75em;color:#6c757d;transition:transform 0.2s;">${_noteOpen ? '▼' : '▶'}</span>📝 Add a note</summary><textarea id="fmStepNoteInput" placeholder="Why did you feel this way?" style="width:100%;height:60px;border:1.5px solid #e9ecef;border-radius:10px;padding:10px;margin-top:6px;font-size:0.88em;font-family:inherit;resize:none;box-sizing:border-box;outline:none;transition:border-color 0.15s;" oninput="selectedStepNotes['${step.id}']=this.value;saveDraft();" onfocus="this.style.borderColor='#ff9500'" onblur="this.style.borderColor='#e9ecef'">${_noteVal.replace(/</g,'&lt;')}</textarea>`;
+      _notesEl.innerHTML = `<summary style="font-size:0.85em;font-weight:600;color:#6c757d;cursor:pointer;list-style:none;display:flex;align-items:center;gap:5px;-webkit-tap-highlight-color:transparent;padding:4px 0;" onclick="this.querySelector('.bb-stpchev').style.transform=this.parentElement.open?'rotate(0deg)':'rotate(90deg)'"><span class="bb-stpchev" style="font-size:0.75em;color:#6c757d;transition:transform 0.2s;">${_noteOpen ? '▼' : '▶'}</span>📝 Add a note</summary><textarea id="fmStepNoteInput" placeholder="Why did you feel this way?" style="width:100%;height:60px;border:1.5px solid #e9ecef;border-radius:10px;padding:10px;margin-top:6px;font-size:0.88em;font-family:inherit;resize:none;box-sizing:border-box;outline:none;transition:border-color 0.15s;" oninput="selectedStepNotes['${step.id}']=this.value;saveDraft();" onfocus="this.style.borderColor='var(--brand-primary)'" onblur="this.style.borderColor='#e9ecef'">${_noteVal.replace(/</g,'&lt;')}</textarea>`;
       const _container = document.getElementById('fmContent');
       if (_container) _container.appendChild(_notesEl);
     }
@@ -4087,14 +4088,14 @@ window.addEventListener('pageshow', () => {
       switch (step.id) {
         case 'mood': {
           // Pre-select Stable as a suggestion for first-time users
-          if (!selectedMood && !localStorage.getItem('bbHasEntries')) selectedMood = 'stable';
-          const _chooseMoodHintDone = localStorage.getItem('bb_fmChooseMoodHintDone') === '1';
+          if (!selectedMood && !BB.storage.get('HasEntries')) selectedMood = 'stable';
+          const _chooseMoodHintDone = BB.storage.get('_fmChooseMoodHintDone') === '1';
           const _showChooseMoodHint = !_chooseMoodHintDone && !editingEntry;
-          const _showFmTip = !localStorage.getItem('bb_fmMoodTipShown') && _chooseMoodHintDone && localStorage.getItem('bb_fmTapHoldHintReady') === '1';
+          const _showFmTip = !BB.storage.get('_fmMoodTipShown') && _chooseMoodHintDone && BB.storage.get('_fmTapHoldHintReady') === '1';
           // Quick notes from index.html — show accumulated notes above mood selector
           let _quickNotesHtml = '';
           try {
-            const _qn = JSON.parse(localStorage.getItem('bbQuickNotes') || '[]');
+            const _qn = JSON.parse(BB.storage.get('QuickNotes') || '[]');
             if (_qn.length > 0) {
               const _noteRows = _qn.map((n, i) => {
                 const _esc = n.text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -4124,7 +4125,7 @@ window.addEventListener('pageshow', () => {
                 if (_pe && _pe.intention) {
                   const _piClean = _pe.intention.split(/\n?_{3,}\n/)[0].trim();
                   if (_piClean) {
-                    _prevIntentionHtml = `<div style="background:#fff8f0;border-radius:10px;padding:10px 14px;margin-bottom:14px;border-left:3px solid #ff9500;"><p style="font-size:0.75em;font-weight:700;color:#ff9500;margin:0 0 3px;text-transform:uppercase;letter-spacing:0.3px;">🌅 Your intention was…</p><p style="font-size:0.85em;color:#495057;margin:0;line-height:1.4;font-style:italic;">${_piClean.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p></div>`;
+                    _prevIntentionHtml = `<div style="background:var(--brand-tint);border-radius:10px;padding:10px 14px;margin-bottom:14px;border-left:3px solid var(--brand-primary);"><p style="font-size:0.75em;font-weight:700;color:var(--brand-primary);margin:0 0 3px;text-transform:uppercase;letter-spacing:0.3px;">🌅 Your intention was…</p><p style="font-size:0.85em;color:#495057;margin:0;line-height:1.4;font-style:italic;">${_piClean.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p></div>`;
                   }
                 }
               }
@@ -4134,7 +4135,7 @@ window.addEventListener('pageshow', () => {
           if (selectedLinkedMood) {
             _linkedChip = '';
           } else if (_fmLinkMoodPickerOpen && selectedMood) {
-            _linkedChip = `<p style="text-align:center;font-size:0.82em;color:#ff9500;font-weight:600;margin-top:12px;margin-bottom:0;">🔗 Now tap another mood to link it</p>
+            _linkedChip = `<p style="text-align:center;font-size:0.82em;color:var(--brand-primary);font-weight:600;margin-top:12px;margin-bottom:0;">🔗 Now tap another mood to link it</p>
               <p style="text-align:center;font-size:0.72em;color:#adb5bd;margin-top:4px;margin-bottom:0;">Tap <strong>${cap(selectedMood)}</strong> again to skip &nbsp;<button onclick="_fmLinkMoodPickerOpen=false;_renderFocusedStep();" style="background:none;border:none;color:#adb5bd;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:0;text-decoration:underline;">Cancel</button></p>`;
           } else if (selectedMood && localStorage.getItem('moodLinkingEnabled') === '1') {
             _linkedChip = `<p style="text-align:center;font-size:0.72em;color:#adb5bd;margin-top:8px;margin-bottom:0;">Hold to link a secondary mood</p>`;
@@ -4154,7 +4155,7 @@ window.addEventListener('pageshow', () => {
               </button>`).join('')}
           </div>
           ${_linkedChip}
-          ${selectedLinkedMood ? `<button onclick="_fmAdvance()" style="width:100%;margin-top:14px;padding:12px;background:#ff9500;color:white;border:none;border-radius:14px;font-size:0.95em;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">Continue →</button>` : ''}
+          ${selectedLinkedMood ? `<button onclick="_fmAdvance()" style="width:100%;margin-top:14px;padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:14px;font-size:0.95em;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">Continue →</button>` : ''}
           ${_showChooseMoodHint ? `<div id="_fmChooseMoodHintEl" style="display:flex;flex-direction:column;align-items:center;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-top:8px;">
             <svg width="24" height="22" viewBox="0 0 24 22" fill="none">
               <path d="M 12,20 Q 8,10 12,2" stroke="rgba(255,149,0,0.7)" stroke-width="2" stroke-linecap="round" fill="none"/>
@@ -4172,11 +4173,11 @@ window.addEventListener('pageshow', () => {
         }
 
         case 'energy': {
-          const _autoSyncEnergy = localStorage.getItem('bbHealthSyncEnabled') === '1';
+          const _autoSyncEnergy = BB.storage.get('HealthSyncEnabled') === '1';
           // Show re-sync button only when health sync is ON and data has already been imported
           const _stepsSyncBtn = (_autoSyncEnergy && _fmStepsResult) ? `<button onclick="importStepsFromHealth()" style="width:100%;padding:11px 16px;margin-bottom:14px;
             background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:12px;
-            color:#ff9500;font-weight:600;font-size:0.88em;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+            color:var(--brand-primary);font-weight:600;font-size:0.88em;cursor:pointer;-webkit-tap-highlight-color:transparent;">
             📱 Steps: ${_fmStepsResult} — Re-sync</button>` : '';
           const _energyCards = `<div class="fm-card-grid">${_FM_ENERGY_LEVELS.map(l => {
             const isSel = !_fmEnergyClear && selectedEnergy === l.val;
@@ -4195,7 +4196,7 @@ window.addEventListener('pageshow', () => {
         }
 
         case 'sleep': {
-          const _autoSyncSleep = localStorage.getItem('bbHealthSyncEnabled') === '1';
+          const _autoSyncSleep = BB.storage.get('HealthSyncEnabled') === '1';
           const _syncText = _fmSleepError === 'fail' ? '❌ Sync failed — try again'
             : _fmSleepError === 'nodata' ? '🤷 No sleep data found — try again'
             : '📱 Re-sync from Health App';
@@ -4203,7 +4204,7 @@ window.addEventListener('pageshow', () => {
           const _showSleepSyncBtn = _autoSyncSleep && (_fmSleepError || (_fmSleepAutoSyncDone && !_fmSleepImported && !_sleepHealthSynced));
           const syncBtn = _showSleepSyncBtn ? `<button onclick="importSleepFromHealth()" style="width:100%;padding:11px 16px;margin-bottom:14px;
             background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:12px;
-            color:#ff9500;font-weight:600;font-size:0.88em;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+            color:var(--brand-primary);font-weight:600;font-size:0.88em;cursor:pointer;-webkit-tap-highlight-color:transparent;">
             ${_syncText}</button>` : '';
           // For exact (synced) values, highlight the closest bucket visually
           let _closestFmBucket = null;
@@ -4282,14 +4283,14 @@ window.addEventListener('pageshow', () => {
               medListHtml = `<div style="text-align:center;margin:0 0 10px;display:flex;flex-direction:column;gap:3px;">${_valid.map(m => `<span style="font-size:0.85em;color:#6c757d;">💊 ${String(m.name)}${m.dosage ? ' ' + String(m.dosage) : ''}</span>`).join('')}</div>`;
             }
           } catch(e) {}
-          const _medHintDone = localStorage.getItem('bbMedHintDone') === '1';
+          const _medHintDone = BB.storage.get('MedHintDone') === '1';
           return `${medListHtml}
             <div style="text-align:center;margin-bottom:${_medHintDone ? '14' : '4'}px;">
-              <button id="manageMedsBtn" onclick="_dismissMedHint();showMedicationList()" style="background:none;border:none;color:${_medHintDone ? '#ff9500' : 'rgba(255,255,255,0.9)'};font-size:0.8em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;text-decoration:underline;text-underline-offset:2px;">✏️ Manage medications</button>
+              <button id="manageMedsBtn" onclick="_dismissMedHint();showMedicationList()" style="background:none;border:none;color:${_medHintDone ? 'var(--brand-primary)' : 'rgba(255,255,255,0.9)'};font-size:0.8em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;text-decoration:underline;text-underline-offset:2px;">✏️ Manage medications</button>
               ${_medHintDone ? '' : `<div id="medHintEl" style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:4px;margin-bottom:10px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="8" y1="13" x2="8" y2="2" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round"/><polyline points="3,7 8,2 13,7" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,255,255,0.9);font-family:'Georgia',serif;letter-spacing:0.01em;text-shadow:0 1px 4px rgba(0,0,0,0.5);">🐻 Log your medication here</span></div>`}
             </div>
             <button class="fm-opt fm-hover-orange ${selectedMedication==='not-taken'?'sel':''}"
-              onclick="selectedMedication='not-taken'; _fmAdvance();" style="border-left:4px solid #ff9500;">
+              onclick="selectedMedication='not-taken'; _fmAdvance();" style="border-left:4px solid var(--brand-primary);">
               <span>❌ Not taken</span></button>
             <button class="fm-opt fm-hover-green ${selectedMedication==='taken'?'sel':''}"
               onclick="selectedMedication='taken'; _fmAdvance();" style="border-left:4px solid #51cf66;margin-top:8px;">
@@ -4298,14 +4299,14 @@ window.addEventListener('pageshow', () => {
 
         case 'goals':
           return [
-            {val:'none', label:'❌ No',  color:'#ff9500'},
-            {val:'some', label:'✅ Yes', color:'#ff9500'},
+            {val:'none', label:'❌ No',  color:'var(--brand-primary)'},
+            {val:'some', label:'✅ Yes', color:'var(--brand-primary)'},
           ].map((o,i) => `<button class="fm-opt ${selectedGoals===o.val?'sel':''}"
             onclick="selectedGoals='${o.val}'; _fmAdvance();"
             style="border-left:4px solid ${o.color};${i>0?'margin-top:8px;':''}">
             <span>${o.label}</span></button>`).join('') +
           `<div style="text-align:center;margin-top:14px;">
-            <button onclick="showGoalsList()" style="background:none;border:none;color:#ff9500;font-size:0.85em;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px;-webkit-tap-highlight-color:transparent;">View / Edit Goals</button>
+            <button onclick="showGoalsList()" style="background:none;border:none;color:var(--brand-primary);font-size:0.85em;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px;-webkit-tap-highlight-color:transparent;">View / Edit Goals</button>
           </div>`;
 
         case 'anxiety':
@@ -4334,8 +4335,8 @@ window.addEventListener('pageshow', () => {
 
         case 'exercise':
           return [
-            {val:'no',  label:'🛋️ No',  color:'#ff9500'},
-            {val:'yes', label:'🏋️ Yes', color:'#ff9500'},
+            {val:'no',  label:'🛋️ No',  color:'var(--brand-primary)'},
+            {val:'yes', label:'🏋️ Yes', color:'var(--brand-primary)'},
           ].map((o,i) => `<button class="fm-opt ${selectedExercise===o.val?'sel':''}"
             onclick="selectedExercise='${o.val}'; _fmAdvance();"
             style="border-left:4px solid ${o.color};${i>0?'margin-top:8px;':''}">
@@ -4343,8 +4344,8 @@ window.addEventListener('pageshow', () => {
 
         case 'outside':
           return [
-            {val:'no',  label:'🏠 No',  color:'#ff9500'},
-            {val:'yes', label:'🌤️ Yes', color:'#ff9500'},
+            {val:'no',  label:'🏠 No',  color:'var(--brand-primary)'},
+            {val:'yes', label:'🌤️ Yes', color:'var(--brand-primary)'},
           ].map((o,i) => `<button class="fm-opt ${selectedOutside===o.val?'sel':''}"
             onclick="selectedOutside='${o.val}'; _fmAdvance();"
             style="border-left:4px solid ${o.color};${i>0?'margin-top:8px;':''}">
@@ -4352,8 +4353,8 @@ window.addEventListener('pageshow', () => {
 
         case 'alcohol':
           return [
-            {val:'yes', label:'🍺 Yes', color:'#ff9500'},
-            {val:'no',  label:'✅ No',  color:'#ff9500'},
+            {val:'yes', label:'🍺 Yes', color:'var(--brand-primary)'},
+            {val:'no',  label:'✅ No',  color:'var(--brand-primary)'},
           ].map((o,i) => `<button class="fm-opt ${selectedAlcohol===o.val?'sel':''}"
             onclick="selectedAlcohol='${o.val}'; _fmAdvance();"
             style="border-left:4px solid ${o.color};${i>0?'margin-top:8px;':''}">
@@ -4362,16 +4363,16 @@ window.addEventListener('pageshow', () => {
         case 'budget': {
           const _budgetVal = localStorage.getItem('dailyBudget') || '';
           const _budgetInfo = _budgetVal
-            ? `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:10px 14px;background:#fff8f0;border-radius:12px;border:1.5px solid rgba(255,149,0,0.3);">
+            ? `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:10px 14px;background:var(--brand-tint);border-radius:12px;border:1.5px solid rgba(255,149,0,0.3);">
                 <span style="font-size:0.9em;color:#495057;">💰 Daily budget: <b>${_budgetVal}</b></span>
-                <button onclick="showBudgetModal()" style="padding:4px 12px;background:#ff9500;color:white;border:none;border-radius:8px;font-size:0.8em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Change</button>
+                <button onclick="showBudgetModal()" style="padding:4px 12px;background:var(--brand-primary);color:white;border:none;border-radius:8px;font-size:0.8em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Change</button>
               </div>`
             : `<div style="text-align:center;margin-bottom:14px;">
-                <button onclick="showBudgetModal()" style="padding:8px 18px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:12px;color:#ff9500;font-weight:600;font-size:0.88em;cursor:pointer;-webkit-tap-highlight-color:transparent;">💰 Set daily budget</button>
+                <button onclick="showBudgetModal()" style="padding:8px 18px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:12px;color:var(--brand-primary);font-weight:600;font-size:0.88em;cursor:pointer;-webkit-tap-highlight-color:transparent;">💰 Set daily budget</button>
               </div>`;
           return _budgetInfo + [
-            {val:'no',  label:'❌ Over budget', color:'#ff9500'},
-            {val:'yes', label:'✅ On track',    color:'#ff9500'},
+            {val:'no',  label:'❌ Over budget', color:'var(--brand-primary)'},
+            {val:'yes', label:'✅ On track',    color:'var(--brand-primary)'},
           ].map((o,i) => `<button class="fm-opt ${selectedBudget===o.val?'sel':''}"
             onclick="selectedBudget='${o.val}'; _fmAdvance();"
             style="border-left:4px solid ${o.color};${i>0?'margin-top:8px;':''}">
@@ -4392,7 +4393,7 @@ window.addEventListener('pageshow', () => {
           // Helper: horizontal row of answer buttons
           const _btns = opts => opts.map((o, i) => {
             const _hc = i === 0 ? 'fm-hover-orange' : i === opts.length - 1 ? 'fm-hover-green' : 'fm-hover-grey';
-            const _sc = i === 0 ? '#ff9500' : i === opts.length - 1 ? '#51cf66' : '#adb5bd';
+            const _sc = i === 0 ? 'var(--brand-primary)' : i === opts.length - 1 ? '#51cf66' : '#adb5bd';
             const _clr = o.clr || o.set.replace(/='[^']*'/, '=null');
             const _click = o.sel ? _clr : o.set;
             return `<button class="${_hc}" onclick="${_click}" style="flex:1;padding:8px 4px;border:1.5px solid ${o.sel?_sc:'#dee2e6'};border-radius:10px;background:${o.sel?_sc+'22':'white'};color:${o.sel?'#212529':'#6c757d'};font-size:0.82em;font-weight:${o.sel?'600':'400'};cursor:pointer;-webkit-tap-highlight-color:transparent;text-align:center;line-height:1.3;">${o.label}</button>`;
@@ -4404,8 +4405,8 @@ window.addEventListener('pageshow', () => {
             if (ex.id === 'goals') {
               const _goalItems = JSON.parse(localStorage.getItem('dailyGoals') || '[]');
               const _goalsDetail = _goalItems.length > 0
-                ? (() => { const _dg = _goalItems.map(g => `<span style="display:inline-block;background:rgba(255,149,0,0.12);border-radius:6px;padding:2px 7px;margin:2px;font-size:0.8em;color:#495057;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${g}</span>`).join(''); return `<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:8px 12px;background:#fff8f0;border-radius:10px;border:1.5px solid rgba(255,149,0,0.3);gap:8px;"><div style="flex:1;min-width:0;flex-wrap:wrap;display:flex;align-items:center;">${_dg}</div><button onclick="showGoalsList()" style="padding:3px 10px;background:#ff9500;color:white;border:none;border-radius:7px;font-size:0.78em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;">Change</button></div>`; })()
-                : `<button onclick="showGoalsList()" style="padding:7px 16px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:10px;color:#ff9500;font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">🏅 Set daily goals</button>`;
+                ? (() => { const _dg = _goalItems.map(g => `<span style="display:inline-block;background:rgba(255,149,0,0.12);border-radius:6px;padding:2px 7px;margin:2px;font-size:0.8em;color:#495057;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${g}</span>`).join(''); return `<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:8px 12px;background:var(--brand-tint);border-radius:10px;border:1.5px solid rgba(255,149,0,0.3);gap:8px;"><div style="flex:1;min-width:0;flex-wrap:wrap;display:flex;align-items:center;">${_dg}</div><button onclick="showGoalsList()" style="padding:3px 10px;background:var(--brand-primary);color:white;border:none;border-radius:7px;font-size:0.78em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;">Change</button></div>`; })()
+                : `<button onclick="showGoalsList()" style="padding:7px 16px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">🏅 Set daily goals</button>`;
               const _goalsTitleClick = _goalItems.length > 0
                 ? "var el=document.getElementById('fmGoalsDetail');el.style.display=el.style.display==='none'?'':'none';"
                 : "showGoalsList()";
@@ -4415,31 +4416,31 @@ window.addEventListener('pageshow', () => {
                 : '';
               _md += `<span onclick="${_goalsTitleClick}" style="font-size:0.88em;font-weight:600;color:#495057;white-space:nowrap;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">🏅 Goal progress?</span>
               <div style="display:flex;gap:6px;">${_btns([
-                  {label:'❌<br>No',  color:'#ff9500', sel:selectedGoals==='none', set:"selectedGoals='none';_fmCheckMoreData()"},
-                  {label:'✅<br>On track', color:'#ff9500', sel:selectedGoals==='some', set:"selectedGoals='some';_fmCheckMoreData()"},
+                  {label:'❌<br>No',  color:'var(--brand-primary)', sel:selectedGoals==='none', set:"selectedGoals='none';_fmCheckMoreData()"},
+                  {label:'✅<br>On track', color:'var(--brand-primary)', sel:selectedGoals==='some', set:"selectedGoals='some';_fmCheckMoreData()"},
                 ])}</div>
               ${_goalsNoteHtml}
               <div id="fmGoalsDetail" style="grid-column:1/-1;display:none;">${_goalsDetail}</div>`;
             } else if (ex.id === 'anxiety') {
               _md += _ilr('😰 Anxiety', [
-                {label:'😰<br>More',   color:'#ff9500', sel:selectedAnxiety==='high',   set:"selectedAnxiety='high';_fmCheckMoreData()"},
-                {label:'😐<br>Normal', color:'#ff9500', sel:selectedAnxiety==='medium', set:"selectedAnxiety='medium';_fmCheckMoreData()"},
-                {label:'😌<br>Less',   color:'#ff9500', sel:selectedAnxiety==='low',    set:"selectedAnxiety='low';_fmCheckMoreData()"},
+                {label:'😰<br>More',   color:'var(--brand-primary)', sel:selectedAnxiety==='high',   set:"selectedAnxiety='high';_fmCheckMoreData()"},
+                {label:'😐<br>Normal', color:'var(--brand-primary)', sel:selectedAnxiety==='medium', set:"selectedAnxiety='medium';_fmCheckMoreData()"},
+                {label:'😌<br>Less',   color:'var(--brand-primary)', sel:selectedAnxiety==='low',    set:"selectedAnxiety='low';_fmCheckMoreData()"},
               ]);
               _md += _ilr('😓 Stress', [
-                {label:'😰<br>More',   color:'#ff9500', sel:selectedStress==='high',   set:"selectedStress='high';_fmCheckMoreData()"},
-                {label:'😐<br>Normal', color:'#ff9500', sel:selectedStress==='medium', set:"selectedStress='medium';_fmCheckMoreData()"},
-                {label:'😌<br>Less',   color:'#ff9500', sel:selectedStress==='low',    set:"selectedStress='low';_fmCheckMoreData()"},
+                {label:'😰<br>More',   color:'var(--brand-primary)', sel:selectedStress==='high',   set:"selectedStress='high';_fmCheckMoreData()"},
+                {label:'😐<br>Normal', color:'var(--brand-primary)', sel:selectedStress==='medium', set:"selectedStress='medium';_fmCheckMoreData()"},
+                {label:'😌<br>Less',   color:'var(--brand-primary)', sel:selectedStress==='low',    set:"selectedStress='low';_fmCheckMoreData()"},
               ]);
               _md += _ilr('😤 Irritability', [
-                {label:'😤<br>More',   color:'#ff9500', sel:selectedIrritability==='yes',    set:"selectedIrritability='yes';_fmCheckMoreData()"},
-                {label:'😐<br>Normal', color:'#ff9500', sel:selectedIrritability==='medium', set:"selectedIrritability='medium';_fmCheckMoreData()"},
-                {label:'😌<br>Less',   color:'#ff9500', sel:selectedIrritability==='no',     set:"selectedIrritability='no';_fmCheckMoreData()"},
+                {label:'😤<br>More',   color:'var(--brand-primary)', sel:selectedIrritability==='yes',    set:"selectedIrritability='yes';_fmCheckMoreData()"},
+                {label:'😐<br>Normal', color:'var(--brand-primary)', sel:selectedIrritability==='medium', set:"selectedIrritability='medium';_fmCheckMoreData()"},
+                {label:'😌<br>Less',   color:'var(--brand-primary)', sel:selectedIrritability==='no',     set:"selectedIrritability='no';_fmCheckMoreData()"},
               ]);
             } else if (ex.id === 'exercise') {
               _md += _ilr('🏋️ Exercise', [
-                {label:'🛋️<br>No',  color:'#ff9500', sel:selectedExercise==='no',  set:"selectedExercise='no';_fmCheckMoreData()"},
-                {label:'🏋️<br>Yes', color:'#ff9500', sel:selectedExercise==='yes', set:"selectedExercise='yes';_fmCheckMoreData()"},
+                {label:'🛋️<br>No',  color:'var(--brand-primary)', sel:selectedExercise==='no',  set:"selectedExercise='no';_fmCheckMoreData()"},
+                {label:'🏋️<br>Yes', color:'var(--brand-primary)', sel:selectedExercise==='yes', set:"selectedExercise='yes';_fmCheckMoreData()"},
               ]);
             } else if (ex.id === 'outside') {
               const _outsideNoteVal = selectedStepNotes['outside'] || '';
@@ -4448,8 +4449,8 @@ window.addEventListener('pageshow', () => {
                 : '';
               _md += `<span style="font-size:0.88em;font-weight:600;color:#495057;white-space:nowrap;">🌤️ Outside</span>
               <div style="display:flex;gap:6px;">${_btns([
-                  {label:'🏠<br>No',  color:'#ff9500', sel:selectedOutside==='no',  set:"selectedOutside='no';_fmCheckMoreData()"},
-                  {label:'🌤️<br>Yes', color:'#ff9500', sel:selectedOutside==='yes', set:"selectedOutside='yes';_fmCheckMoreData()"},
+                  {label:'🏠<br>No',  color:'var(--brand-primary)', sel:selectedOutside==='no',  set:"selectedOutside='no';_fmCheckMoreData()"},
+                  {label:'🌤️<br>Yes', color:'var(--brand-primary)', sel:selectedOutside==='yes', set:"selectedOutside='yes';_fmCheckMoreData()"},
                 ])}</div>
               ${_outsideNoteHtml}`;
             } else if (ex.id === 'alcohol') {
@@ -4459,15 +4460,15 @@ window.addEventListener('pageshow', () => {
                 : '';
               _md += `<span style="font-size:0.88em;font-weight:600;color:#495057;white-space:nowrap;">${_getBuiltinFieldLabel('trackAlcohol','🍺 Alcohol')}</span>
               <div style="display:flex;gap:6px;">${_btns([
-                  {label:'🍺<br>Yes', color:'#ff9500', sel:selectedAlcohol==='yes', set:"selectedAlcohol='yes';_fmCheckMoreData()"},
-                  {label:'✅<br>No',  color:'#ff9500', sel:selectedAlcohol==='no',  set:"selectedAlcohol='no';_fmCheckMoreData()"},
+                  {label:'🍺<br>Yes', color:'var(--brand-primary)', sel:selectedAlcohol==='yes', set:"selectedAlcohol='yes';_fmCheckMoreData()"},
+                  {label:'✅<br>No',  color:'var(--brand-primary)', sel:selectedAlcohol==='no',  set:"selectedAlcohol='no';_fmCheckMoreData()"},
                 ])}</div>
               ${_alcoholNoteHtml}`;
             } else if (ex.id === 'budget') {
               const _bv = localStorage.getItem('dailyBudget') || '';
               const _budgetDetail = _bv
-                ? `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#fff8f0;border-radius:10px;border:1.5px solid rgba(255,149,0,0.3);"><span style="font-size:0.85em;color:#495057;">💰 Daily budget: <b>${_bv}</b></span><button onclick="showBudgetModal()" style="padding:3px 10px;background:#ff9500;color:white;border:none;border-radius:7px;font-size:0.78em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Change</button></div>`
-                : `<button onclick="showBudgetModal()" style="padding:7px 16px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:10px;color:#ff9500;font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">💰 Set daily budget</button>`;
+                ? `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--brand-tint);border-radius:10px;border:1.5px solid rgba(255,149,0,0.3);"><span style="font-size:0.85em;color:#495057;">💰 Daily budget: <b>${_bv}</b></span><button onclick="showBudgetModal()" style="padding:3px 10px;background:var(--brand-primary);color:white;border:none;border-radius:7px;font-size:0.78em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Change</button></div>`
+                : `<button onclick="showBudgetModal()" style="padding:7px 16px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">💰 Set daily budget</button>`;
               const _budgetTitleClick = _bv
                 ? "var el=document.getElementById('fmBudgetDetail');el.style.display=el.style.display==='none'?'':'none';"
                 : "showBudgetModal()";
@@ -4477,8 +4478,8 @@ window.addEventListener('pageshow', () => {
                 : '';
               _md += `<span onclick="${_budgetTitleClick}" style="font-size:0.88em;font-weight:600;color:#495057;white-space:nowrap;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">💰 Budget on track?</span>
               <div style="display:flex;gap:6px;">${_btns([
-                  {label:'❌<br>Over',     color:'#ff9500', sel:selectedBudget==='no',  set:"selectedBudget='no';_fmCheckMoreData()"},
-                  {label:'✅<br>On track', color:'#ff9500', sel:selectedBudget==='yes', set:"selectedBudget='yes';_fmCheckMoreData()"},
+                  {label:'❌<br>Over',     color:'var(--brand-primary)', sel:selectedBudget==='no',  set:"selectedBudget='no';_fmCheckMoreData()"},
+                  {label:'✅<br>On track', color:'var(--brand-primary)', sel:selectedBudget==='yes', set:"selectedBudget='yes';_fmCheckMoreData()"},
                 ])}</div>
               ${_budgetNoteHtml}
               <div id="fmBudgetDetail" style="grid-column:1/-1;display:none;">${_budgetDetail}</div>`;
@@ -4486,8 +4487,8 @@ window.addEventListener('pageshow', () => {
           }
           for (const f of _custFields) {
             const _fPosNo = f.positive === 'no';
-            const _noOpt  = {label:`${_fPosNo?'✅':'✗'}<br>No`,               color:'#ff9500',  sel:selectedCustom[f.id]==='no',  set:`selectedCustom['${f.id}']='no';_fmCheckMoreData()`};
-            const _yesOpt = {label:`${_fPosNo&&f.emoji?f.emoji:'✅'}<br>Yes`, color:_fPosNo?'#dc3545':'#ff9500', sel:selectedCustom[f.id]==='yes', set:`selectedCustom['${f.id}']='yes';_fmCheckMoreData()`};
+            const _noOpt  = {label:`${_fPosNo?'✅':'✗'}<br>No`,               color:'var(--brand-primary)',  sel:selectedCustom[f.id]==='no',  set:`selectedCustom['${f.id}']='no';_fmCheckMoreData()`};
+            const _yesOpt = {label:`${_fPosNo&&f.emoji?f.emoji:'✅'}<br>Yes`, color:_fPosNo?'#dc3545':'var(--brand-primary)', sel:selectedCustom[f.id]==='yes', set:`selectedCustom['${f.id}']='yes';_fmCheckMoreData()`};
             _STEP_NOTE_LABELS[f.id] = `${f.emoji||''} ${f.label}`.trim();
             const _cfNegSel = _fPosNo ? selectedCustom[f.id]==='yes' : selectedCustom[f.id]==='no';
             const _cfNoteVal = selectedStepNotes[f.id] || '';
@@ -4498,7 +4499,7 @@ window.addEventListener('pageshow', () => {
             <div style="display:flex;gap:6px;">${_btns(_fPosNo ? [_yesOpt, _noOpt] : [_noOpt, _yesOpt])}</div>
             ${_cfNoteHtml}`;
           }
-          const _showCfHint = !localStorage.getItem('bbCustomFieldHintDone');
+          const _showCfHint = !BB.storage.get('CustomFieldHintDone');
           const _cfHintHtml = _showCfHint
             ? `<div id="fmCustomFieldHint" style="display:flex;flex-direction:column;align-items:center;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-top:6px;">
                 <span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,149,0,0.9);white-space:nowrap;font-family:'Georgia',serif;">🐻 Customise your data fields</span>
@@ -4511,12 +4512,12 @@ window.addEventListener('pageshow', () => {
             return `<p style="text-align:center;color:#6c757d;font-size:0.9em;margin:0 0 16px;">Would you like to track other things?</p>
               <div style="text-align:center;margin-bottom:12px;">
                 ${_cfHintHtml}
-                <button onclick="showFieldPicker()" style="padding:10px 22px;background:rgba(255,149,0,0.08);border:2px dashed #ff9500;border-radius:12px;color:#ff9500;font-size:0.9em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">+ Add tracking fields</button>
+                <button onclick="showFieldPicker()" style="padding:10px 22px;background:rgba(255,149,0,0.08);border:2px dashed var(--brand-primary);border-radius:12px;color:var(--brand-primary);font-size:0.9em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">+ Add tracking fields</button>
               </div>`;
           return `<div style="display:grid;grid-template-columns:min-content 1fr;gap:8px 10px;align-items:center;">${_md}</div>
             <div style="display:flex;flex-direction:column;align-items:center;margin-top:10px;">
               ${_cfHintHtml}
-              <button onclick="showFieldPicker()" style="width:36px;height:36px;min-width:36px;min-height:36px;flex-shrink:0;border-radius:50%;background:rgba(255,149,0,0.08);color:#ff9500;font-size:1.3em;border:2px dashed #ff9500;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1;-webkit-tap-highlight-color:transparent;box-sizing:border-box;">+</button>
+              <button onclick="showFieldPicker()" style="width:36px;height:36px;min-width:36px;min-height:36px;flex-shrink:0;border-radius:50%;background:rgba(255,149,0,0.08);color:var(--brand-primary);font-size:1.3em;border:2px dashed var(--brand-primary);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1;-webkit-tap-highlight-color:transparent;box-sizing:border-box;">+</button>
             </div>`;
         }
 
@@ -4536,13 +4537,13 @@ window.addEventListener('pageshow', () => {
               <textarea id="fmIntentionInput" placeholder="What do you intend for tomorrow?"
                 style="width:100%;height:68px;border:2px solid #e9ecef;border-radius:12px;padding:12px;margin-top:8px;
                 font-size:0.95em;font-family:inherit;resize:none;box-sizing:border-box;outline:none;transition:border-color 0.15s;"
-                oninput="this.style.borderColor='#ff9500'">${selectedIntention||''}</textarea>
+                oninput="this.style.borderColor='var(--brand-primary)'">${selectedIntention||''}</textarea>
             </details>` : ''}`;
         }
 
         case 'done': {
           if (!selectedMood) return `<p style="text-align:center;color:#dc3545;font-size:0.9em;">⚠️ Go back and select a mood first.</p>`;
-          const mc = _FM_MOOD_COLORS[selectedMood]||'#ff9500';
+          const mc = _FM_MOOD_COLORS[selectedMood]||'var(--brand-primary)';
           const eLabel = {0:'💀 Not enough',3:'🪫 Less than usual',5:'⚡️ Normal',7:'🔋 More than usual',10:'🚀 Too much'}[selectedEnergy]||selectedEnergy;
           const sLabel = {5:'≤5h',6.5:'6–7h',8:'7–9h',9.5:'9–10h',11:'10+h'}[selectedSleep]||selectedSleep+'h';
           const notesVal = (document.getElementById('fmNotesInput')||document.getElementById('notes')||{}).value||'';
@@ -4592,9 +4593,9 @@ window.addEventListener('pageshow', () => {
             intentionVal && intentionVal.trim() ? { text:`🌅 ${intentionVal.trim()}`, step:'notes', wrap:true } : null,
           ].filter(Boolean);
           const _est = _estimateMoodState();
-          const _estColor  = _FM_MOOD_COLORS[_est.mood] || '#ff9500';
+          const _estColor  = _FM_MOOD_COLORS[_est.mood] || 'var(--brand-primary)';
           const _estLabel  = _FM_MOOD_LABELS[_est.mood];
-          const _est2Color = _est.secondMood ? (_FM_MOOD_COLORS[_est.secondMood] || '#ff9500') : null;
+          const _est2Color = _est.secondMood ? (_FM_MOOD_COLORS[_est.secondMood] || 'var(--brand-primary)') : null;
           const _est2Label = _est.secondMood ? _FM_MOOD_LABELS[_est.secondMood] : null;
           const _mkMoodBtn = (m, lbl, col) => {
             if (!m) return '';
@@ -4624,7 +4625,7 @@ window.addEventListener('pageshow', () => {
               </div>
             </div>`;
           const _incogOn = localStorage.getItem('incognitoMode') === 'true';
-          const _privBorder = selectedPdfHide ? 'border:1.5px solid #ff9500;' : 'border:1.5px solid #e9ecef;';
+          const _privBorder = selectedPdfHide ? 'border:1.5px solid var(--brand-primary);' : 'border:1.5px solid #e9ecef;';
           const _privRow = _incogOn ? `
             <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding:10px 14px;background:#f8f9fa;border-radius:12px;${_privBorder}">
               <span style="font-size:0.88em;color:#6c757d;">🕵️ Hide from PDF export</span>
@@ -4939,7 +4940,7 @@ window.addEventListener('pageshow', () => {
     window._fmDoneDelete = _fmDoneDelete;
 
     function _fmNotesInput(ta) {
-      ta.style.borderColor = '#ff9500';
+      ta.style.borderColor = 'var(--brand-primary)';
       const w = ta.value.trim() ? ta.value.trim().split(/\s+/).length : 0;
       const el = document.getElementById('fmWordCount');
       if (el) el.textContent = '✍️ ' + w + ' word' + (w === 1 ? '' : 's');
@@ -5205,7 +5206,7 @@ window.addEventListener('pageshow', () => {
       const accentMap = {
         '#51cf66': [81, 207, 102],
         '#ff6b6b': [255, 107, 107],
-        '#ff9500': [255, 149, 0],
+        'var(--brand-primary)': [255, 149, 0],
         '#adb5bd': [173, 181, 189],
         '#667eea': [102, 126, 234],
         '#764ba2': [118, 75, 162]
@@ -5257,7 +5258,7 @@ window.addEventListener('pageshow', () => {
         if (r !== null && Math.abs(r) >= 0.2) {
           results.push(ins('⚡', 'Sleep & Next-Day Energy',
             `A ${strength(r)} link (r = ${r.toFixed(2)}): ${r >= 0 ? 'more sleep tends to mean higher energy the next day' : 'an unexpected inverse trend between sleep and next-day energy'}.`,
-            Math.abs(r) >= 0.3 ? '#ff9500' : '#adb5bd'));
+            Math.abs(r) >= 0.3 ? 'var(--brand-primary)' : '#adb5bd'));
         }
       }
 
@@ -5307,7 +5308,7 @@ window.addEventListener('pageshow', () => {
         const word = parseFloat(avg) >= 4.5 ? 'elevated' : parseFloat(avg) >= 3.5 ? 'stable' : parseFloat(avg) >= 2.5 ? 'mixed' : 'lower';
         results.push(ins('🔴', '3+ Nights of Low Sleep',
           `${runCount} runs of 3+ consecutive nights under 6h detected. The day after such a run, mood tended to be ${word} (avg ${msFmt(avg)}).`,
-          parseFloat(avg) < 3 ? '#ff6b6b' : '#ff9500'));
+          parseFloat(avg) < 3 ? '#ff6b6b' : 'var(--brand-primary)'));
       }
 
       // ── 6. Day-of-week patterns ──
@@ -5434,7 +5435,7 @@ window.addEventListener('pageshow', () => {
           const detail  = avgHi && avgLo ? `High-stress days avg mood: ${msFmt(avgHi)} vs low-stress days: ${msFmt(avgLo)}.` : '';
           results.push(ins('😓', 'Stress & Mood',
             `A ${strength(r)} link between stress and mood (r = ${r.toFixed(2)}): ${r < 0 ? 'higher stress days tend to have lower mood' : 'stress doesn\'t seem to suppress mood for you — possibly a sign of resilience'}.`,
-            r < -0.2 ? '#ff9500' : '#adb5bd', detail));
+            r < -0.2 ? 'var(--brand-primary)' : '#adb5bd', detail));
         }
       }
 
@@ -5466,7 +5467,7 @@ window.addEventListener('pageshow', () => {
             diff > 0
               ? `Irritable days correlate with higher mood scores (avg ${msFmt(avgIrrit.toFixed(1))} vs ${msFmt(avgCalm.toFixed(1))} on calm days) — irritability may signal elevated or mixed states for you.`
               : `Mood is ${Math.abs(diff).toFixed(1)} pts lower on irritable days (avg ${msFmt(avgIrrit.toFixed(1))} vs ${msFmt(avgCalm.toFixed(1))}) — irritability tends to accompany low mood.`,
-            diff > 0.5 ? '#ff9500' : '#ff6b6b'));
+            diff > 0.5 ? 'var(--brand-primary)' : '#ff6b6b'));
         }
       }
 
@@ -5622,7 +5623,7 @@ window.addEventListener('pageshow', () => {
         first_medication:  _hasMed,
         first_goal:        _hasGoal,
         survival_kit:      _hasDef && _hasStrat && _hasMed && _hasGoal,
-        logo_easter_egg:   localStorage.getItem('bbLogoEasterEggFound') === '1',
+        logo_easter_egg:   BB.storage.get('LogoEasterEggFound') === '1',
         tutorial_complete: _getOnboardingStep() >= 12,
       };
 
@@ -5692,7 +5693,7 @@ window.addEventListener('pageshow', () => {
         toast.innerHTML = `<div style="font-size:2em;margin-bottom:4px;">${ach.emoji}</div><div style="font-weight:700;font-size:0.95em;margin-bottom:2px;">Achievement Unlocked!</div><div style="font-weight:600;font-size:0.88em;">${ach.title}</div><div style="font-size:0.78em;color:rgba(255,255,255,0.85);margin-top:2px;">${ach.desc}</div>${extraLabel}`;
         Object.assign(toast.style, {
           position:'fixed', bottom:'90px', left:'50%', transform:'translateX(-50%) translateY(10px)',
-          background:'linear-gradient(135deg,#ff8833,#ffaa33)', color:'white',
+          background:'linear-gradient(135deg,var(--brand-primary-mid),var(--brand-primary-light))', color:'white',
           borderRadius:'16px', padding:'14px 20px', boxShadow:'0 8px 32px rgba(255,107,0,0.45)',
           textAlign:'center', zIndex:'9999', minWidth:'220px', maxWidth:'280px',
           opacity:'0', transition:'opacity 0.4s ease, transform 0.4s ease', cursor:'pointer',
@@ -5737,9 +5738,9 @@ window.addEventListener('pageshow', () => {
       _updateAchNotifBtn();
       document.getElementById('achievementsGrid').innerHTML = ACHIEVEMENTS.map(a => {
         const unlocked = stored.includes(a.id);
-        return `<div style="text-align:center;padding:12px 8px;background:${unlocked ? 'rgba(255,149,0,0.1)' : '#f8f9fa'};border:1.5px solid ${unlocked ? '#ff9500' : '#e9ecef'};border-radius:12px;opacity:${unlocked ? '1' : '0.4'};">
+        return `<div style="text-align:center;padding:12px 8px;background:${unlocked ? 'rgba(255,149,0,0.1)' : '#f8f9fa'};border:1.5px solid ${unlocked ? 'var(--brand-primary)' : '#e9ecef'};border-radius:12px;opacity:${unlocked ? '1' : '0.4'};">
           <div style="font-size:1.8em;margin-bottom:4px;filter:${unlocked ? 'none' : 'grayscale(1)'};">${a.emoji}</div>
-          <div style="font-weight:700;font-size:0.78em;color:${unlocked ? '#ff6b00' : '#6c757d'};line-height:1.2;margin-bottom:2px;">${a.title}</div>
+          <div style="font-weight:700;font-size:0.78em;color:${unlocked ? 'var(--brand-primary-dark)' : '#6c757d'};line-height:1.2;margin-bottom:2px;">${a.title}</div>
           <div style="font-size:0.7em;color:#6c757d;line-height:1.3;">${a.desc}</div>
         </div>`;
       }).join('');
@@ -5795,7 +5796,7 @@ window.addEventListener('pageshow', () => {
       yesterday.setDate(yesterday.getDate() - 1);
       const currentKey = useToday ? todayKey : toKey(yesterday);
       const currentDone = entryDates.has(currentKey);
-      try { localStorage.setItem('bb_entryStatus', JSON.stringify({ key: currentKey, done: currentDone })); } catch(e) {}
+      try { BB.storage.set('_entryStatus', JSON.stringify({ key: currentKey, done: currentDone })); } catch(e) {}
       if (_suppressFormOpen) {
         _suppressFormOpen = false;
         document.getElementById('entryFormCard').style.display = 'none';
@@ -6322,7 +6323,7 @@ window.addEventListener('pageshow', () => {
         const isCurrentMonth = _monthCalOffset === 0;
         const isBirthday = birthday && date.getMonth() === birthday.month && d === birthday.day;
         const bg = entry ? moodColors[entry.mood] : (isFuture && !isCurrentMonth) ? 'transparent' : '#e9ecef';
-        const border = isToday ? '2px solid #ff9500' : isBirthday ? '2px dashed #e91e8c' : '2px solid transparent';
+        const border = isToday ? '2px solid var(--brand-primary)' : isBirthday ? '2px dashed #e91e8c' : '2px solid transparent';
         const color = entry ? 'white' : (isFuture && !isCurrentMonth) ? 'transparent' : '#adb5bd';
         const opacity = (isFuture && !isCurrentMonth) ? 0.25 : 1;
         let displayText = d;
@@ -6482,16 +6483,16 @@ window.addEventListener('pageshow', () => {
           const _intClean = _intRaw.split(/\n?_{3,}\n/)[0].trim();
           const _intEsc = _intClean.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
           if (_intClean) {
-            html += `<div style="background:#fff8f0;border-radius:8px;padding:10px;font-size:0.85em;color:#6c757d;line-height:1.4;margin-top:8px;">🌅 <b>Intention for tomorrow:</b> ${_intEsc}</div>`;
+            html += `<div style="background:var(--brand-tint);border-radius:8px;padding:10px;font-size:0.85em;color:#6c757d;line-height:1.4;margin-top:8px;">🌅 <b>Intention for tomorrow:</b> ${_intEsc}</div>`;
           }
         }
         // Bipolar Bear thought — collapsible, only shown when suggestion feature enabled
         if (localStorage.getItem('showMoodSuggestion') === '1') {
           const _est = _estimateMoodFromEntry(entry);
           if (_est.mood === 'stable') _est.secondMood = null;
-          const _estColor  = _FM_MOOD_COLORS[_est.mood] || '#ff9500';
+          const _estColor  = _FM_MOOD_COLORS[_est.mood] || 'var(--brand-primary)';
           const _estLabel  = _FM_MOOD_LABELS[_est.mood] || cap(_est.mood);
-          const _est2Color = _est.secondMood ? (_FM_MOOD_COLORS[_est.secondMood] || '#ff9500') : null;
+          const _est2Color = _est.secondMood ? (_FM_MOOD_COLORS[_est.secondMood] || 'var(--brand-primary)') : null;
           const _est2Label = _est.secondMood ? (_FM_MOOD_LABELS[_est.secondMood] || cap(_est.secondMood)) : null;
           html += `<div style="margin-top:10px;border-radius:10px;border:1px solid rgba(255,149,0,0.2);overflow:hidden;">
             <button onclick="var b=this.nextElementSibling;var open=b.style.display!=='none';b.style.display=open?'none':'block';this.querySelector('.bb-chev-d').style.transform=open?'rotate(0deg)':'rotate(180deg)';"
@@ -7112,9 +7113,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         _visibleCount++;
         const on = _defaultOn.has(k);
         b.dataset.on = on ? '1' : '0';
-        b.style.border = on ? '1.5px solid #ff9500' : '1.5px solid #adb5bd';
+        b.style.border = on ? '1.5px solid var(--brand-primary)' : '1.5px solid #adb5bd';
         b.style.background = on ? 'rgba(255,149,0,0.1)' : 'rgba(0,0,0,0.04)';
-        b.style.color = on ? '#ff9500' : '#adb5bd';
+        b.style.color = on ? 'var(--brand-primary)' : '#adb5bd';
       });
 
       // Show/hide the no-data message
@@ -7152,9 +7153,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         }
       }
       btn.dataset.on = turningOn ? '1' : '0';
-      btn.style.border = turningOn ? '1.5px solid #ff9500' : '1.5px solid #adb5bd';
+      btn.style.border = turningOn ? '1.5px solid var(--brand-primary)' : '1.5px solid #adb5bd';
       btn.style.background = turningOn ? 'rgba(255,149,0,0.1)' : 'rgba(0,0,0,0.04)';
-      btn.style.color = turningOn ? '#ff9500' : '#adb5bd';
+      btn.style.color = turningOn ? 'var(--brand-primary)' : '#adb5bd';
     }
     window._togglePdfChart = _togglePdfChart;
 
@@ -8391,8 +8392,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
           currentPage = 1;
           // Immediately clear tick so index.html reflects deletion without waiting for loadEntries
           try {
-            const _s = JSON.parse(localStorage.getItem('bb_entryStatus') || 'null');
-            if (_s) { _s.done = false; localStorage.setItem('bb_entryStatus', JSON.stringify(_s)); }
+            const _s = JSON.parse(BB.storage.get('_entryStatus') || 'null');
+            if (_s) { _s.done = false; BB.storage.set('_entryStatus', JSON.stringify(_s)); }
           } catch(e) {}
           // Reset form to fresh new-entry state (clears edit mode, data, heading)
           resetEntryForm();
@@ -8588,10 +8589,10 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
 
         // Clear draft (cancel any pending auto-save first so it can't re-write after removal)
         clearTimeout(_draftSaveTimer);
-        localStorage.removeItem('bb_draft');
+        BB.storage.remove('_draft');
 
         // Clear home-screen tick caches so buttons show as unchecked
-        localStorage.removeItem('bb_entryStatus');
+        BB.storage.remove('_entryStatus');
         localStorage.removeItem('moodDefinitions');
         localStorage.removeItem('copingStrategies');
         localStorage.removeItem('moodMemories');
@@ -8634,19 +8635,19 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
 
         // Clear people-helped voted state so user can vote again after reset
         localStorage.removeItem('bipolarHelpedVoted');
-        localStorage.removeItem('bbPersonalHintDone');
-        localStorage.removeItem('bbMedHintDone');
-        localStorage.removeItem('bbSettingsHintDone');
-        localStorage.removeItem('bbCustomiseFormHintDone');
-        localStorage.removeItem('bbCustomiseAdditionalHintDone');
-        localStorage.removeItem('bbCloseSettingsHintDone');
-        localStorage.removeItem('bbCustomiseFormCollapsed');
-        localStorage.removeItem('bbAdvancedTutorialToastShown');
-        localStorage.removeItem('bbSurvivalKitVisited');
-        localStorage.removeItem('bbMoodDefHintDone');
-        localStorage.removeItem('bbPrivacyNoteDismissed');
-        localStorage.removeItem('bbTutorialToastShown');
-        localStorage.removeItem('bbWelcomeShown');
+        BB.storage.remove('PersonalHintDone');
+        BB.storage.remove('MedHintDone');
+        BB.storage.remove('SettingsHintDone');
+        BB.storage.remove('CustomiseFormHintDone');
+        BB.storage.remove('CustomiseAdditionalHintDone');
+        BB.storage.remove('CloseSettingsHintDone');
+        BB.storage.remove('CustomiseFormCollapsed');
+        BB.storage.remove('AdvancedTutorialToastShown');
+        BB.storage.remove('SurvivalKitVisited');
+        BB.storage.remove('MoodDefHintDone');
+        BB.storage.remove('PrivacyNoteDismissed');
+        BB.storage.remove('TutorialToastShown');
+        BB.storage.remove('WelcomeShown');
 
         // Firestore cleanup. Two modes:
         //   deleteAccount → wipe every document tied to this user
@@ -8658,9 +8659,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
             await db.collection('personalDetails').doc(currentUser.uid).delete().catch(() => {});
 
             // Release the anon-board monika reservation so others can claim it.
-            const _monika = localStorage.getItem('bbAnon_monika');
+            const _monika = BB.storage.get('Anon_monika');
             if (_monika) {
-              await db.collection('bbAnonMonikas').doc(_monika.toLowerCase()).delete().catch(() => {});
+              await db.collection(BB_BRAND.collections.monikas).doc(_monika.toLowerCase()).delete().catch(() => {});
             }
 
             // Drop cross-device anon profile lookups (hashed by lowercase email).
@@ -8668,7 +8669,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
               const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(email.toLowerCase().trim()));
               return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
             };
-            const _emails = [currentUser.email, localStorage.getItem('bbAnon_email')]
+            const _emails = [currentUser.email, BB.storage.get('Anon_email')]
               .filter(Boolean)
               .filter((e, i, arr) => arr.indexOf(e) === i); // de-dup
             for (const _e of _emails) {
@@ -8698,20 +8699,20 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
 
         // Clear anon-board localStorage so the next user on this browser
         // starts clean.
-        ['bbAnon_monika','bbAnon_email','bbAnon_verified','bbAnon_isAdmin',
-         'bbAnon_streak','bbAnon_med','bbAnon_medList','bbAnon_showMeds',
-         'bbAnon_showStable','bbAnon_stableSince','bbAnon_stableStreak',
-         'bbAnon_colorKey','bbAnon_initials','bbAnon_liked','bbAnon_hasPosted',
-         'bbAnonLastVisit','bbAnonVisitDate'].forEach(k => localStorage.removeItem(k));
+        ['Anon_monika','Anon_email','Anon_verified','Anon_isAdmin',
+         'Anon_streak','Anon_med','Anon_medList','Anon_showMeds',
+         'Anon_showStable','Anon_stableSince','Anon_stableStreak',
+         'Anon_colorKey','Anon_initials','Anon_liked','Anon_hasPosted',
+         'AnonLastVisit','AnonVisitDate'].forEach(k => BB.storage.remove(k));
         // Reset logo to default immediately
         if (typeof applyLogoVariant === 'function') applyLogoVariant(0);
 
         // Final explicit PIN clear before redirect — guards against any WKWebView localStorage
         // flush race where earlier removes might not have persisted across the navigation boundary.
-        localStorage.removeItem('bbNativePinEnabled');
-        localStorage.removeItem('bbPinEnabled');
-        localStorage.removeItem('bbPinCode');
-        localStorage.removeItem('bbGuestPinSalt');
+        BB.storage.remove('NativePinEnabled');
+        BB.storage.remove('PinEnabled');
+        BB.storage.remove('PinCode');
+        BB.storage.remove('GuestPinSalt');
         sessionStorage.removeItem('bbPinUnlocked');
         // Also clear the native Keychain PIN so it can't be reused after account reset
         try { window.Capacitor?.Plugins?.SecureStorage?.removeItem?.('bb_native_pin')?.catch?.(() => {}); } catch(e) {}
@@ -8776,7 +8777,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       const _FIXED = [30, 60, 90];
       const isCustom = statsTimeframe !== 'all' && !_FIXED.includes(statsTimeframe);
       const _row = (label, value, isActive) => {
-        const activeStyle = isActive ? 'background:#fff4e6;font-weight:700;color:#ff6b00;' : 'background:white;font-weight:400;color:#212529;';
+        const activeStyle = isActive ? 'background:#fff4e6;font-weight:700;color:var(--brand-primary-dark);' : 'background:white;font-weight:400;color:#212529;';
         return `<button onclick="${value}" style="display:block;width:100%;padding:11px 18px;border:none;text-align:left;font-size:0.95em;cursor:pointer;border-bottom:1px solid #f1f3f5;${activeStyle}-webkit-tap-highlight-color:transparent;" onmouseover="this.style.background='#fff4e6'" onmouseout="this.style.background='${isActive ? '#fff4e6' : 'white'}'">
           ${label}${isActive ? ' ✓' : ''}
         </button>`;
@@ -8786,7 +8787,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         _row('60 days', "_tfPickerSelect(60)", statsTimeframe === 60) +
         _row('90 days', "_tfPickerSelect(90)", statsTimeframe === 90) +
         `<div style="border-bottom:1px solid #f1f3f5;">
-          <button onclick="_tfShowCustomInput()" style="display:block;width:100%;padding:11px 18px;border:none;text-align:left;font-size:0.95em;cursor:pointer;${isCustom ? 'background:#fff4e6;font-weight:700;color:#ff6b00;' : 'background:white;color:#212529;'}-webkit-tap-highlight-color:transparent;" onmouseover="this.style.background='#fff4e6'" onmouseout="this.style.background='${isCustom ? '#fff4e6' : 'white'}'">
+          <button onclick="_tfShowCustomInput()" style="display:block;width:100%;padding:11px 18px;border:none;text-align:left;font-size:0.95em;cursor:pointer;${isCustom ? 'background:#fff4e6;font-weight:700;color:var(--brand-primary-dark);' : 'background:white;color:#212529;'}-webkit-tap-highlight-color:transparent;" onmouseover="this.style.background='#fff4e6'" onmouseout="this.style.background='${isCustom ? '#fff4e6' : 'white'}'">
             ${isCustom ? `${statsTimeframe} days ✓ <span style="opacity:0.6;font-size:0.9em;">✏️</span>` : 'Custom days…'}
           </button>
           <div id="tfCustomRow" style="display:none;padding:8px 14px 12px;border-top:1px solid #f1f3f5;">
@@ -8795,7 +8796,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
                 style="width:90px;padding:7px 10px;border:1.5px solid #dee2e6;border-radius:8px;font-size:0.95em;outline:none;"
                 onkeydown="if(event.key==='Enter')_tfPickerSelectCustom()"
                 onclick="event.stopPropagation()">
-              <button onclick="_tfPickerSelectCustom()" style="padding:7px 14px;background:#ff6b00;color:white;border:none;border-radius:8px;font-size:0.9em;font-weight:600;cursor:pointer;">OK</button>
+              <button onclick="_tfPickerSelectCustom()" style="padding:7px 14px;background:var(--brand-primary-dark);color:white;border:none;border-radius:8px;font-size:0.9em;font-weight:600;cursor:pointer;">OK</button>
             </div>
           </div>
         </div>` +
@@ -9408,10 +9409,10 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       if (!el) return;
       const goals = JSON.parse(localStorage.getItem('dailyGoals') || '[]');
       if (goals.length === 0) {
-        el.innerHTML = `<button onclick="showGoalsList()" style="padding:7px 16px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:10px;color:#ff9500;font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">🏅 Set daily goals</button>`;
+        el.innerHTML = `<button onclick="showGoalsList()" style="padding:7px 16px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">🏅 Set daily goals</button>`;
       } else {
         const chips = goals.map(g => `<span style="display:inline-block;background:rgba(255,149,0,0.12);border-radius:6px;padding:2px 7px;margin:2px;font-size:0.8em;color:#495057;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${g}</span>`).join('');
-        el.innerHTML = `<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:8px 12px;background:#fff8f0;border-radius:10px;border:1.5px solid rgba(255,149,0,0.3);gap:8px;"><div style="flex:1;min-width:0;flex-wrap:wrap;display:flex;align-items:center;">${chips}</div><button onclick="showGoalsList()" style="padding:3px 10px;background:#ff9500;color:white;border:none;border-radius:7px;font-size:0.78em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;">Edit</button></div>`;
+        el.innerHTML = `<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:8px 12px;background:var(--brand-tint);border-radius:10px;border:1.5px solid rgba(255,149,0,0.3);gap:8px;"><div style="flex:1;min-width:0;flex-wrap:wrap;display:flex;align-items:center;">${chips}</div><button onclick="showGoalsList()" style="padding:3px 10px;background:var(--brand-primary);color:white;border:none;border-radius:7px;font-size:0.78em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;">Edit</button></div>`;
       }
     }
 
@@ -9430,9 +9431,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       if (!el) return;
       const val = localStorage.getItem('dailyBudget') || '';
       if (!val) {
-        el.innerHTML = `<button onclick="showBudgetModal()" style="padding:7px 16px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:10px;color:#ff9500;font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">💰 Set daily budget</button>`;
+        el.innerHTML = `<button onclick="showBudgetModal()" style="padding:7px 16px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">💰 Set daily budget</button>`;
       } else {
-        el.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#fff8f0;border-radius:10px;border:1.5px solid rgba(255,149,0,0.3);"><span style="font-size:0.9em;color:#495057;">💰 Daily budget: <b>${val}</b></span><button onclick="showBudgetModal()" style="padding:3px 10px;background:#ff9500;color:white;border:none;border-radius:7px;font-size:0.78em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Change</button></div>`;
+        el.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--brand-tint);border-radius:10px;border:1.5px solid rgba(255,149,0,0.3);"><span style="font-size:0.9em;color:#495057;">💰 Daily budget: <b>${val}</b></span><button onclick="showBudgetModal()" style="padding:3px 10px;background:var(--brand-primary);color:white;border:none;border-radius:7px;font-size:0.78em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Change</button></div>`;
       }
     }
 
@@ -9650,7 +9651,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
           listContainer.innerHTML = missingDates.map(date => {
             const dateStr = date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             const isToday = date.toDateString() === today.toDateString();
-            const style = isToday ? 'background: #fff3cd; border-left: 4px solid #ff9500;' : '';
+            const style = isToday ? 'background: #fff3cd; border-left: 4px solid var(--brand-primary);' : '';
             const dateValue = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
             
             return `
@@ -9876,9 +9877,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
 
     async function showSettingsModal() {
       // Clear advanced badge when settings is opened; show in-modal hint pointing to Advanced
-      const _badgeWasActive = localStorage.getItem('bbAdvancedBadgeVisible') === '1';
+      const _badgeWasActive = BB.storage.get('AdvancedBadgeVisible') === '1';
       if (_badgeWasActive) {
-        localStorage.removeItem('bbAdvancedBadgeVisible');
+        BB.storage.remove('AdvancedBadgeVisible');
         _updateAdvancedBadge();
       }
       // Update logo display
@@ -9918,7 +9919,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       document.getElementById('elaborateResponsesToggle').checked = localStorage.getItem('elaborateResponsesEnabled') === 'true';
       _renderStepToggles();
       const _cfDetails = document.getElementById('customiseFormDetails');
-      if (_cfDetails) _cfDetails.open = localStorage.getItem('bbCustomiseFormCollapsed') !== '1';
+      if (_cfDetails) _cfDetails.open = BB.storage.get('CustomiseFormCollapsed') !== '1';
 
       // If not native, show download prompt instead of native settings
       if (!isNative()) {
@@ -9929,9 +9930,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         document.querySelectorAll('.settings-platform-info').forEach(el => el.textContent = ' · 🌐 Web');
         const _advHintElW = document.getElementById('advancedSettingsBadgeHint');
         if (_advHintElW) _advHintElW.style.display = _badgeWasActive ? 'flex' : 'none';
-        if (localStorage.getItem('bbSettingsHintDone') === '1' && localStorage.getItem('bbCustomiseFormHintDone') !== '1') {
+        if (BB.storage.get('SettingsHintDone') === '1' && BB.storage.get('CustomiseFormHintDone') !== '1') {
           _showCustomiseFormHint();
-        } else if (localStorage.getItem('bbCustomiseAdditionalHintDone') === '1' && localStorage.getItem('bbCloseSettingsHintDone') !== '1') {
+        } else if (BB.storage.get('CustomiseAdditionalHintDone') === '1' && BB.storage.get('CloseSettingsHintDone') !== '1') {
           _showCloseSettingsHint();
         }
         return;
@@ -9949,7 +9950,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       document.getElementById('reminderTime').value = savedTime;
       document.getElementById('reminderEnabled').checked = enabled;
       document.getElementById('weeklySummaryEnabled').checked = weeklyEnabled;
-      document.getElementById('healthSyncToggle').checked = localStorage.getItem('bbHealthSyncEnabled') === '1';
+      document.getElementById('healthSyncToggle').checked = BB.storage.get('HealthSyncEnabled') === '1';
 
       // Show platform info
       document.querySelectorAll('.settings-platform-info').forEach(el => el.textContent = ` · ${window.Capacitor.getPlatform() === 'ios' ? '🍎 iOS' : '🤖 Android'}`);
@@ -9985,9 +9986,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       // Show "Click here" hint above Advanced button if badge was active
       const _advHintEl = document.getElementById('advancedSettingsBadgeHint');
       if (_advHintEl) _advHintEl.style.display = _badgeWasActive ? 'flex' : 'none';
-      if (localStorage.getItem('bbSettingsHintDone') === '1' && localStorage.getItem('bbCustomiseFormHintDone') !== '1') {
+      if (BB.storage.get('SettingsHintDone') === '1' && BB.storage.get('CustomiseFormHintDone') !== '1') {
         _showCustomiseFormHint();
-      } else if (localStorage.getItem('bbCustomiseAdditionalHintDone') === '1' && localStorage.getItem('bbCloseSettingsHintDone') !== '1') {
+      } else if (BB.storage.get('CustomiseAdditionalHintDone') === '1' && BB.storage.get('CloseSettingsHintDone') !== '1') {
         _showCloseSettingsHint();
       }
     }
@@ -10172,7 +10173,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       }
       _renderStepToggles();
       // Hint progression: dismiss customise form hint and show additional hint
-      if (localStorage.getItem('bbCustomiseFormHintDone') !== '1') {
+      if (BB.storage.get('CustomiseFormHintDone') !== '1') {
         _dismissCustomiseFormHint();
         _showCustomiseAdditionalHint();
       }
@@ -10181,7 +10182,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
 
     function _toggleStep(id) {
       // Check before mutating so we know whether to trigger dismissal chain
-      const _wasAdditionalHintPending = id === 'more_data' && localStorage.getItem('bbCustomiseAdditionalHintDone') !== '1';
+      const _wasAdditionalHintPending = id === 'more_data' && BB.storage.get('CustomiseAdditionalHintDone') !== '1';
       const dis = _getDisabledSteps();
       const idx = dis.indexOf(id);
       if (idx >= 0) dis.splice(idx, 1); else dis.push(id);
@@ -10212,16 +10213,16 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       if (!row) return;
       let _rawDis = [];
       try { _rawDis = JSON.parse(localStorage.getItem('disabledSteps') || '[]'); } catch(e) {}
-      const _hintActive = localStorage.getItem('bbCustomiseAdditionalHintDone') !== '1' && localStorage.getItem('bbCustomiseFormHintDone') === '1';
+      const _hintActive = BB.storage.get('CustomiseAdditionalHintDone') !== '1' && BB.storage.get('CustomiseFormHintDone') === '1';
       row.innerHTML = _CORE_STEP_TOGGLES.map(t => {
         const on = !_rawDis.includes(t.id);
         const _idAttr = t.id === 'more_data' ? ' id="stepToggleMoreData"' : '';
         // During the additional hint, dim all buttons except Additional and pulse it
         const _dimmed = _hintActive && t.id !== 'more_data';
         const _pulsing = _hintActive && t.id === 'more_data';
-        const _borderColor = _pulsing ? '#ff9500' : (on ? '#ff9500' : '#dee2e6');
+        const _borderColor = _pulsing ? 'var(--brand-primary)' : (on ? 'var(--brand-primary)' : '#dee2e6');
         const _bg = _pulsing ? 'rgba(255,149,0,0.18)' : (on ? 'rgba(255,149,0,0.1)' : 'white');
-        const _color = on ? '#ff9500' : '#adb5bd';
+        const _color = on ? 'var(--brand-primary)' : '#adb5bd';
         const _extraStyle = _dimmed ? 'opacity:0.3;pointer-events:none;' : (_pulsing ? 'animation:hintFade 1.6s ease-in-out infinite;box-shadow:0 0 0 3px rgba(255,149,0,0.35);' : '');
         return `<button${_idAttr} onclick="_toggleStep('${t.id}')" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;border-radius:12px;border:1.5px solid ${_borderColor};background:${_bg};color:${_color};cursor:pointer;font-size:0.82em;font-weight:600;min-width:52px;-webkit-tap-highlight-color:transparent;${_extraStyle}"><span style="font-size:1.3em;">${t.icon}</span><span>${t.label}</span></button>`;
       }).join('');
@@ -10282,7 +10283,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       if (!list) return;
       const pill = active =>
         active
-          ? `<span style="background:#ff9500;color:white;border-radius:20px;padding:3px 10px;font-size:0.78em;font-weight:600;">On</span>`
+          ? `<span style="background:var(--brand-primary);color:white;border-radius:20px;padding:3px 10px;font-size:0.78em;font-weight:600;">On</span>`
           : `<span style="background:#e9ecef;color:#adb5bd;border-radius:20px;padding:3px 10px;font-size:0.78em;font-weight:600;">Off</span>`;
 
       const _deletedBuiltin = JSON.parse(localStorage.getItem('deletedBuiltinFields') || '[]');
@@ -10310,7 +10311,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
                 <input id="builtinFieldEditInput" type="text" value="${_storedLabel ? _storedLabel.replace(/^\S+\s*/, '') : f.label.replace(/^\S+\s*/, '')}" maxlength="20"
                   style="flex:1;height:38px;padding:0 10px;border:1.5px solid #e9ecef;border-radius:8px;font-size:0.9em;outline:none;box-sizing:border-box;"
                   onkeydown="if(event.key==='Enter')saveBuiltinFieldLabel('${f.key}')">
-                <button onclick="saveBuiltinFieldLabel('${f.key}')" style="height:38px;box-sizing:border-box;background:#ff9500;color:white;border:none;border-radius:8px;padding:0 12px;font-size:0.85em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Save</button>
+                <button onclick="saveBuiltinFieldLabel('${f.key}')" style="height:38px;box-sizing:border-box;background:var(--brand-primary);color:white;border:none;border-radius:8px;padding:0 12px;font-size:0.85em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Save</button>
                 <button onclick="cancelBuiltinFieldEdit()" style="height:38px;box-sizing:border-box;background:#e9ecef;color:#495057;border:none;border-radius:8px;padding:0 10px;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">✕</button>
               </div>
               <div id="editEmojiPickerGrid" style="display:none;flex-wrap:wrap;gap:2px;padding:6px;background:#f8f9fa;border-radius:8px;max-height:120px;overflow-y:auto;">${_bEmojiGrid}</div>
@@ -10358,7 +10359,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
               <input id="customFieldEditInput" type="text" value="${f.label}" maxlength="15"
                 style="flex:1;height:38px;padding:0 10px;border:1.5px solid #e9ecef;border-radius:8px;font-size:0.9em;outline:none;box-sizing:border-box;"
                 onkeydown="if(event.key==='Enter')saveCustomFieldEdit()">
-              <button onclick="saveCustomFieldEdit()" style="height:38px;box-sizing:border-box;background:#ff9500;color:white;border:none;border-radius:8px;padding:0 12px;font-size:0.85em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Save</button>
+              <button onclick="saveCustomFieldEdit()" style="height:38px;box-sizing:border-box;background:var(--brand-primary);color:white;border:none;border-radius:8px;padding:0 12px;font-size:0.85em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Save</button>
               <button onclick="cancelCustomFieldEdit()" style="height:38px;box-sizing:border-box;background:#e9ecef;color:#495057;border:none;border-radius:8px;padding:0 10px;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">✕</button>
             </div>
             <div id="editEmojiPickerGrid" style="display:none;flex-wrap:wrap;gap:2px;padding:4px 2px;background:#f0f0f0;border-radius:8px;">
@@ -10386,7 +10387,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
           <input id="customFieldInput" type="text" placeholder="Field name… (max 15)" maxlength="15"
             style="flex:1;height:38px;padding:0 10px;border:1.5px solid #e9ecef;border-radius:8px;font-size:0.9em;outline:none;box-sizing:border-box;"
             onkeydown="if(event.key==='Enter')addCustomField()">
-          <button onclick="addCustomField()" style="height:38px;box-sizing:border-box;background:#ff9500;color:white;border:none;border-radius:8px;padding:0 12px;font-size:0.85em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Add</button>
+          <button onclick="addCustomField()" style="height:38px;box-sizing:border-box;background:var(--brand-primary);color:white;border:none;border-radius:8px;padding:0 12px;font-size:0.85em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Add</button>
         </div>
         <div id="emojiPickerGrid" style="display:none;flex-wrap:wrap;gap:2px;padding:4px 2px;background:#f8f9fa;border-radius:8px;">
           ${emojiPickerGrid}
@@ -10400,8 +10401,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
 
     function showFieldPicker() {
       // Dismiss the "Customise your data fields" hint permanently on first open
-      if (!localStorage.getItem('bbCustomFieldHintDone')) {
-        localStorage.setItem('bbCustomFieldHintDone', '1');
+      if (!BB.storage.get('CustomFieldHintDone')) {
+        BB.storage.set('CustomFieldHintDone', '1');
         const _hint = document.getElementById('fmCustomFieldHint');
         if (_hint) _hint.style.display = 'none';
       }
@@ -10719,9 +10720,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         document.getElementById('settingsMobilePanel').style.display = '';
       } else {
         document.getElementById('settingsMainPanel').style.display = '';
-        if (localStorage.getItem('bbSettingsHintDone') === '1' && localStorage.getItem('bbCustomiseFormHintDone') !== '1') {
+        if (BB.storage.get('SettingsHintDone') === '1' && BB.storage.get('CustomiseFormHintDone') !== '1') {
           _showCustomiseFormHint();
-        } else if (localStorage.getItem('bbCustomiseAdditionalHintDone') === '1' && localStorage.getItem('bbCloseSettingsHintDone') !== '1') {
+        } else if (BB.storage.get('CustomiseAdditionalHintDone') === '1' && BB.storage.get('CloseSettingsHintDone') !== '1') {
           _showCloseSettingsHint();
         }
       }
@@ -10879,7 +10880,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
 
     async function saveSettings() {
       // Dismiss close settings hint if active
-      if (localStorage.getItem('bbCloseSettingsHintDone') !== '1' && localStorage.getItem('bbCustomiseAdditionalHintDone') === '1') {
+      if (BB.storage.get('CloseSettingsHintDone') !== '1' && BB.storage.get('CustomiseAdditionalHintDone') === '1') {
         _dismissCloseSettingsHint();
       }
       // Reminder/weekly toggles auto-save on change via _persistReminderSettings —
@@ -10930,9 +10931,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     // ── Quick notes: dismiss a single note by id ──
     function _dismissQuickNote(id) {
       try {
-        const _notes = JSON.parse(localStorage.getItem('bbQuickNotes') || '[]');
+        const _notes = JSON.parse(BB.storage.get('QuickNotes') || '[]');
         const _filtered = _notes.filter(n => n.id !== id);
-        localStorage.setItem('bbQuickNotes', JSON.stringify(_filtered));
+        BB.storage.set('QuickNotes', JSON.stringify(_filtered));
       } catch(_) {}
       _renderFocusedStep();
     }
@@ -10944,8 +10945,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     window.showPersonalDetailsModal = showPersonalDetailsModal;
     window.closePersonalDetailsModal = closePersonalDetailsModal;
     function _dismissPersonalDetailsHint() {
-      if (localStorage.getItem('bbPersonalHintDone') === '1') return;
-      localStorage.setItem('bbPersonalHintDone', '1');
+      if (BB.storage.get('PersonalHintDone') === '1') return;
+      BB.storage.set('PersonalHintDone', '1');
       document.getElementById('personalDetailsJournalHint')?.remove();
       if (typeof currentUser !== 'undefined' && currentUser && typeof db !== 'undefined' && db) {
         db.collection('userSettings').doc(currentUser.uid).set({ personalHintDone: true }, { merge: true }).catch(() => {});
@@ -10954,18 +10955,18 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     window._dismissPersonalDetailsHint = _dismissPersonalDetailsHint;
 
     function _dismissMedHint() {
-      if (localStorage.getItem('bbMedHintDone') === '1') return;
-      localStorage.setItem('bbMedHintDone', '1');
+      if (BB.storage.get('MedHintDone') === '1') return;
+      BB.storage.set('MedHintDone', '1');
       document.getElementById('medHintEl')?.remove();
       const _mb = document.getElementById('manageMedsBtn');
-      if (_mb) _mb.style.color = '#ff9500';
+      if (_mb) _mb.style.color = 'var(--brand-primary)';
       _applyJournalOnboardingGating();
     }
     window._dismissMedHint = _dismissMedHint;
 
     function _dismissSettingsHint() {
-      if (localStorage.getItem('bbSettingsHintDone') === '1') return;
-      localStorage.setItem('bbSettingsHintDone', '1');
+      if (BB.storage.get('SettingsHintDone') === '1') return;
+      BB.storage.set('SettingsHintDone', '1');
       const h = document.getElementById('settingsHint');
       if (h) h.style.display = 'none';
       _applyJournalOnboardingGating();
@@ -10973,7 +10974,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     window._dismissSettingsHint = _dismissSettingsHint;
 
     function _updateAdvancedBadge() {
-      const _visible = localStorage.getItem('bbAdvancedBadgeVisible') === '1';
+      const _visible = BB.storage.get('AdvancedBadgeVisible') === '1';
       const _badge = document.getElementById('settingsAdvancedBadge');
       if (_badge) _badge.style.display = _visible ? '' : 'none';
     }
@@ -10992,7 +10993,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       if (_cw) { _cw.style.zIndex = '11'; _cw.style.background = 'white'; _cw.style.borderRadius = '10px'; _cw.style.padding = '10px'; _cw.style.margin = '-10px'; }
     }
     function _dismissCustomiseFormHint() {
-      localStorage.setItem('bbCustomiseFormHintDone', '1');
+      BB.storage.set('CustomiseFormHintDone', '1');
       const _hel = document.getElementById('customiseFormHintEl');
       if (_hel) _hel.style.display = 'none';
       const _ao = document.getElementById('bbHintOverlay');
@@ -11017,7 +11018,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       _renderStepToggles();
     }
     function _dismissCustomiseAdditionalHint() {
-      localStorage.setItem('bbCustomiseAdditionalHintDone', '1');
+      BB.storage.set('CustomiseAdditionalHintDone', '1');
       const _ao = document.getElementById('bbHintOverlay');
       if (_ao) _ao.style.display = 'none';
       const _amo = document.getElementById('advancedHintOverlay');
@@ -11046,7 +11047,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       if (_hel) _hel.style.zIndex = '11';
     }
     function _dismissCloseSettingsHint() {
-      localStorage.setItem('bbCloseSettingsHintDone', '1');
+      BB.storage.set('CloseSettingsHintDone', '1');
       const _hel = document.getElementById('closeSettingsHintEl');
       if (_hel) { _hel.style.display = 'none'; _hel.style.zIndex = ''; }
       const _ao = document.getElementById('bbHintOverlay');
@@ -11058,10 +11059,10 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       const _cb = document.getElementById('settingsCloseBtn');
       if (_cb) _cb.style.zIndex = '';
       // Show tutorial complete toast and queue advanced badge + tap-hold hint for next entry
-      if (localStorage.getItem('bbAdvancedTutorialToastShown') !== '1') {
-        localStorage.setItem('bbAdvancedTutorialToastShown', '1');
-        localStorage.setItem('bbAdvancedBadgePending', '1');
-        localStorage.setItem('bb_fmTapHoldHintPending', '1'); // activates tap & hold hint on the NEXT entry
+      if (BB.storage.get('AdvancedTutorialToastShown') !== '1') {
+        BB.storage.set('AdvancedTutorialToastShown', '1');
+        BB.storage.set('AdvancedBadgePending', '1');
+        BB.storage.set('_fmTapHoldHintPending', '1'); // activates tap & hold hint on the NEXT entry
         setTimeout(() => _showFeatureHint('🎉', "Advanced tutorial complete. You're all set now!", '_bbAdvancedTutorialToast'), 400);
       }
     }
@@ -11069,8 +11070,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     // ── Customise form hint page lock ──
     (function() {
       document.addEventListener('click', function(e) {
-        if (localStorage.getItem('bbCustomiseFormHintDone') === '1') return;
-        if (localStorage.getItem('bbSettingsHintDone') !== '1') return;
+        if (BB.storage.get('CustomiseFormHintDone') === '1') return;
+        if (BB.storage.get('SettingsHintDone') !== '1') return;
         const modal = document.getElementById('settingsModal');
         if (!modal || !modal.classList.contains('active')) return;
         const tog = document.getElementById('customiseFormToggle');
@@ -11093,8 +11094,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     // ── Customise additional hint page lock ──
     (function() {
       document.addEventListener('click', function(e) {
-        if (localStorage.getItem('bbCustomiseAdditionalHintDone') === '1') return;
-        if (localStorage.getItem('bbCustomiseFormHintDone') !== '1') return;
+        if (BB.storage.get('CustomiseAdditionalHintDone') === '1') return;
+        if (BB.storage.get('CustomiseFormHintDone') !== '1') return;
         const modal = document.getElementById('settingsModal');
         if (!modal || !modal.classList.contains('active')) return;
         const addBtn = document.getElementById('stepToggleMoreData');
@@ -11113,8 +11114,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     // ── Close settings hint page lock ──
     (function() {
       document.addEventListener('click', function(e) {
-        if (localStorage.getItem('bbCloseSettingsHintDone') === '1') return;
-        if (localStorage.getItem('bbCustomiseAdditionalHintDone') !== '1') return;
+        if (BB.storage.get('CloseSettingsHintDone') === '1') return;
+        if (BB.storage.get('CustomiseAdditionalHintDone') !== '1') return;
         const modal = document.getElementById('settingsModal');
         if (!modal || !modal.classList.contains('active')) return;
         const closeBtn = document.getElementById('settingsCloseBtn');
@@ -11135,7 +11136,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     // ── Med hint page lock (independent of onboarding step) ──
     (function() {
       document.addEventListener('click', function(e) {
-        if (localStorage.getItem('bbMedHintDone') === '1') return;
+        if (BB.storage.get('MedHintDone') === '1') return;
         const hint = document.getElementById('medHintEl');
         if (!hint) return;
         const btn = document.getElementById('manageMedsBtn');
@@ -11153,7 +11154,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     // ── Mood info close hint page lock ──
     (function() {
       document.addEventListener('click', function(e) {
-        if (localStorage.getItem('bb_fmMoodInfoCloseHintDone') === '1') return;
+        if (BB.storage.get('_fmMoodInfoCloseHintDone') === '1') return;
         const modal = document.getElementById('moodInfoModal');
         if (!modal || !modal.classList.contains('active') || !modal.dataset.closeHintActive) return;
         const closeBtn = modal.querySelector('.confirm-btn-no');
@@ -11198,7 +11199,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       const StatusBar = getPlugin('StatusBar');
       if (!StatusBar) return;
       try {
-        await StatusBar.setBackgroundColor({ color: '#ff9500' });
+        await StatusBar.setBackgroundColor({ color: 'var(--brand-primary)' });
         await StatusBar.setStyle({ style: 'DARK' }); // dark icons on orange bg
         await StatusBar.setOverlaysWebView({ overlay: false });
         console.log('✅ StatusBar configured');
@@ -11299,7 +11300,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
             },
             sound: 'default',
             smallIcon: 'ic_notification',
-            iconColor: '#ff9500'
+            iconColor: 'var(--brand-primary)'
           }]
         });
 
@@ -11347,7 +11348,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
               allowWhileIdle: true
             },
             smallIcon: 'ic_notification',
-            iconColor: '#ff9500'
+            iconColor: 'var(--brand-primary)'
           }]
         });
       } catch (e) { console.warn('Weekly summary schedule error:', e); }
@@ -11376,7 +11377,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
             body: `You have ${favCount} favourite entr${favCount === 1 ? 'y' : 'ies'} from this date — want to review them?`,
             schedule: { at: schedDate, allowWhileIdle: true },
             smallIcon: 'ic_notification',
-            iconColor: '#ff9500',
+            iconColor: 'var(--brand-primary)',
             extra: { anniversaryMonth: month, anniversaryDay: day }
           }]
         });
@@ -12001,7 +12002,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         bottom: 80px;
         left: 50%;
         transform: translateX(-50%);
-        background: linear-gradient(135deg, #ffaa33 0%, #ff8833 100%);
+        background: linear-gradient(135deg, var(--brand-primary-light) 0%, var(--brand-primary-mid) 100%);
         color: white;
         padding: 15px 20px;
         border-radius: 12px;
@@ -12019,7 +12020,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
           Track offline, faster loading, app-like experience
         </div>
         <div style="display: flex; gap: 10px; justify-content: center;">
-          <button id="pwa-install-btn" style="background: white; color: #ff9500; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">
+          <button id="pwa-install-btn" style="background: white; color: var(--brand-primary); border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">
             Install Now
           </button>
           <button id="pwa-dismiss-btn" style="background: rgba(255,255,255,0.2); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">

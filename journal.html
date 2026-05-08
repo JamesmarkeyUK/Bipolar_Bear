@@ -10,7 +10,8 @@
   <script>if(!window.Capacitor&&location.protocol!=='file:'&&localStorage.getItem('bbWebUnlocked')!=='true'){location.replace('beta.html');}
   {const _np=window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()&&localStorage.getItem('bbNativePinEnabled')==='1';if((localStorage.getItem('bbGuestPinSalt')||_np)&&sessionStorage.getItem('bbPinUnlocked')!=='1'){location.replace('index.html');}}</script>
 
-  <!-- Shared helpers: load before any inline script that depends on isNative()/window.BB_FIREBASE_CONFIG/BB.onboarding. -->
+  <!-- Shared helpers: load before any inline script that depends on isNative()/window.BB_FIREBASE_CONFIG/BB.onboarding/BB.storage. brand-config.js must come first so the BB.storage helper is available before debug.js + onboarding.js try to read localStorage through it. -->
+  <script src="js/shared/brand-config.js"></script>
   <script src="js/shared/platform.js"></script>
   <script src="js/shared/debug.js"></script>
   <script src="js/shared/firebase-config.js"></script>
@@ -66,6 +67,7 @@
   <!-- jsPDF for PDF export (deferred — only used on user action) -->
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   
+  <link rel="stylesheet" href="css/theme.css">
   <link rel="stylesheet" href="css/journal.css">
 </head>
 <body>
@@ -74,7 +76,7 @@
   <div id="app-shell">
   <div id="scroll-view">
   <!-- Full-screen cover that matches the page gradient, prevents flash of uninitialized content on load/resume -->
-  <div id="pageCover" style="position:fixed;inset:0;background:linear-gradient(135deg,#ffaa33 0%,#ff8833 100%);z-index:9999;pointer-events:none;transition:opacity 0.15s ease;"></div>
+  <div id="pageCover" style="position:fixed;inset:0;background:linear-gradient(135deg,var(--brand-primary-light) 0%,var(--brand-primary-mid) 100%);z-index:9999;pointer-events:none;transition:opacity 0.15s ease;"></div>
 
   <!-- Authentication handled by shared fab.js modals -->
   <!-- Legacy auth-container placeholder (removed) -->
@@ -195,7 +197,7 @@
       </div>
     </div>
 
-    <div class="card" id="entryFormCard" style="background: #fff8f0; display:none;">
+    <div class="card" id="entryFormCard" style="background: var(--brand-tint); display:none;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
         <button id="editCancelBtn" onclick="cancelEdit()" style="display:none;background:none;border:none;color:#adb5bd;font-size:0.82em;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;">← Back</button>
         <button id="formCalendarBtn" onclick="toggleDatePicker()" style="background:none;border:none;font-size:1.5em;cursor:pointer;padding:4px;line-height:1;-webkit-tap-highlight-color:transparent;flex-shrink:0;" title="Change date">🗓️</button>
@@ -264,7 +266,7 @@
       </div>
 
       <div class="form-group hidden-until-mood" id="moreDataArea" style="margin-top:4px;">
-        <button type="button" id="moreDataToggle" onclick="toggleMoreData()" style="background:none;border:none;color:#ff9500;font-size:0.88em;font-weight:600;cursor:pointer;padding:4px 0;text-decoration:underline;text-underline-offset:3px;">📊 More data</button>
+        <button type="button" id="moreDataToggle" onclick="toggleMoreData()" style="background:none;border:none;color:var(--brand-primary);font-size:0.88em;font-weight:600;cursor:pointer;padding:4px 0;text-decoration:underline;text-underline-offset:3px;">📊 More data</button>
         <div id="moreDataSection" style="display:none;margin-top:12px;border-radius:10px;">
           <!-- All tracking rows in ONE unified 4-column grid so buttons align across rows -->
           <div style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;align-items:center;gap:8px;width:100%;">
@@ -343,7 +345,7 @@
           </div>
           <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;margin-top:10px;padding-bottom:6px;">
             <span></span>
-            <button onclick="showFieldPicker()" style="width:36px;height:36px;min-width:36px;min-height:36px;border-radius:50%;background:rgba(255,149,0,0.08);color:#ff9500;font-size:1.3em;border:2px dashed #ff9500;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1;-webkit-tap-highlight-color:transparent;box-sizing:border-box;">+</button>
+            <button onclick="showFieldPicker()" style="width:36px;height:36px;min-width:36px;min-height:36px;border-radius:50%;background:rgba(255,149,0,0.08);color:var(--brand-primary);font-size:1.3em;border:2px dashed var(--brand-primary);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1;-webkit-tap-highlight-color:transparent;box-sizing:border-box;">+</button>
             <label style="display:flex;align-items:center;gap:6px;cursor:pointer;justify-content:flex-end;" onclick="toggleMoreDataDefault()">
               <span style="font-size:0.75em;color:#adb5bd;">Open by default</span>
               <span id="moreDataDefaultSwitch" style="display:inline-flex;width:32px;height:18px;border-radius:9px;background:#dee2e6;position:relative;transition:background 0.2s;flex-shrink:0;">
@@ -368,7 +370,7 @@
     </div>
 
     <!-- Focused Mode Card -->
-    <div class="card" id="focusedModeCard" style="background:#fff8f0;display:none;flex-direction:column;padding:20px 20px 16px;">
+    <div class="card" id="focusedModeCard" style="background:var(--brand-tint);display:none;flex-direction:column;padding:20px 20px 16px;">
       <!-- Top bar: back + progress dots + skip -->
       <div id="fmTopBar" style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
         <button id="fmBackBtn" onclick="_fmBack()" style="background:none;border:none;color:#adb5bd;font-size:0.85em;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;white-space:nowrap;">← Back</button>
@@ -391,9 +393,9 @@
       <div id="fmContent" style="flex:1;"></div>
 
       <!-- Next/Save button row (shown only for non-auto steps) -->
-      <div id="fmNextRow" style="display:none;margin-top:16px;gap:10px;align-items:center;position:sticky;bottom:0;background:#fff8f0;padding-bottom:4px;">
+      <div id="fmNextRow" style="display:none;margin-top:16px;gap:10px;align-items:center;position:sticky;bottom:0;background:var(--brand-tint);padding-bottom:4px;">
         <button id="fmDeleteBtn" onclick="_fmDoneDelete()" style="display:none;min-width:52px;height:52px;background:white;color:#ff6b6b;border:2px solid #ff6b6b;border-radius:14px;font-size:1.3em;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;">🗑️</button>
-        <button id="fmNextBtn" onclick="_fmNext()" style="flex:1;padding:14px;background:#ff9500;color:white;border:none;border-radius:14px;font-size:1em;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">Next →</button>
+        <button id="fmNextBtn" onclick="_fmNext()" style="flex:1;padding:14px;background:var(--brand-primary);color:white;border:none;border-radius:14px;font-size:1em;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">Next →</button>
       </div>
       <div id="fmDraftStatus" style="text-align:right;font-size:0.75em;color:#adb5bd;margin-top:4px;min-height:1em;transition:opacity 0.5s ease;opacity:0;"></div>
 
@@ -431,7 +433,7 @@
           <div id="timeframePickerWrapper" style="position:relative;">
             <button id="statsToggleBtn" class="stats-toggle-btn"
               onclick="_showTimeframePicker()"
-              style="padding: 10px 20px; background: white; color: #ff6b00; border: 2px solid #ff6b00; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); -webkit-tap-highlight-color:transparent; user-select:none; display:flex; align-items:center; gap:8px;">
+              style="padding: 10px 20px; background: white; color: var(--brand-primary-dark); border: 2px solid var(--brand-primary-dark); border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); -webkit-tap-highlight-color:transparent; user-select:none; display:flex; align-items:center; gap:8px;">
               <span id="statsToggleLabel" style="white-space:normal;word-break:break-word;text-align:center;">Showing 30d</span>
               <span style="font-size:1em;opacity:0.7;flex-shrink:0;">≡</span>
             </button>
@@ -449,7 +451,7 @@
       </div>
 
       <div id="entriesLoading" style="display:none; text-align:center; padding: 30px 0;">
-        <div style="display:inline-block; width:36px; height:36px; border:4px solid #f0e6d3; border-top-color:#ff9500; border-radius:50%; animation:spin 0.8s linear infinite;"></div>
+        <div style="display:inline-block; width:36px; height:36px; border:4px solid #f0e6d3; border-top-color:var(--brand-primary); border-radius:50%; animation:spin 0.8s linear infinite;"></div>
         <div style="margin-top:12px; color:#6c757d; font-size:0.95em;">Loading your journal...</div>
       </div>
       <div id="entries"></div>
@@ -498,7 +500,7 @@
         </div>
         <div class="confirm-buttons" style="margin-top:14px;">
           <button class="confirm-btn confirm-btn-no" onclick="document.getElementById('moodCalcPage1').style.display='none';document.getElementById('moodCalcPage2').style.display='';">More info →</button>
-          <button class="confirm-btn" onclick="document.getElementById('moodCalcInfoModal').classList.remove('active')" style="background:#ff9500;color:white;">Got it</button>
+          <button class="confirm-btn" onclick="document.getElementById('moodCalcInfoModal').classList.remove('active')" style="background:var(--brand-primary);color:white;">Got it</button>
         </div>
       </div>
       <!-- Page 2 -->
@@ -513,7 +515,7 @@
         <p style="color:#adb5bd;font-size:0.76em;margin-top:8px;">BETA — accuracy improves as more fields are filled in each day.</p>
         <div class="confirm-buttons" style="margin-top:14px;">
           <button class="confirm-btn confirm-btn-no" onclick="document.getElementById('moodCalcPage2').style.display='none';document.getElementById('moodCalcPage1').style.display='';">← Back</button>
-          <button class="confirm-btn" onclick="document.getElementById('moodCalcInfoModal').classList.remove('active');document.getElementById('moodCalcPage2').style.display='none';document.getElementById('moodCalcPage1').style.display='';" style="background:#ff9500;color:white;">Got it</button>
+          <button class="confirm-btn" onclick="document.getElementById('moodCalcInfoModal').classList.remove('active');document.getElementById('moodCalcPage2').style.display='none';document.getElementById('moodCalcPage1').style.display='';" style="background:var(--brand-primary);color:white;">Got it</button>
         </div>
       </div>
     </div>
@@ -530,7 +532,7 @@
         <span style="flex:1;">What does r = … mean?</span>
         <span id="rInfoChevron">▼</span>
       </p>
-      <div id="rInfoBox" style="display:none;background:#fff8f0;border:1px solid #ffd6a0;border-radius:10px;padding:10px 14px;margin-top:8px;font-size:0.82em;color:#495057;line-height:1.6;">
+      <div id="rInfoBox" style="display:none;background:var(--brand-tint);border:1px solid #ffd6a0;border-radius:10px;padding:10px 14px;margin-top:8px;font-size:0.82em;color:#495057;line-height:1.6;">
         <strong>What does r = … mean?</strong><br>
         r is the <em>correlation coefficient</em> — a number between −1 and +1 that measures how consistently two things move together in your data.<br><br>
         <strong>r = +1</strong> — perfect positive link (e.g. more sleep always means better mood)<br>
@@ -565,10 +567,10 @@
         <div id="moodInfoMemoriesList"></div>
       </div>
       <div id="moodInfoSurvivalLink" style="display:none;border-top:1px solid #f0f0f0;padding-top:12px;margin-bottom:16px;text-align:center;">
-        <a onclick="closeMoodInfo(); location.replace('survival-kit.html');" style="font-size:0.85em;color:#ff9500;font-weight:600;cursor:pointer;text-decoration:none;">✏️ Customise in Survival Guide →</a>
+        <a onclick="closeMoodInfo(); location.replace('survival-kit.html');" style="font-size:0.85em;color:var(--brand-primary);font-weight:600;cursor:pointer;text-decoration:none;">✏️ Customise in Survival Guide →</a>
       </div>
       <div id="moodInfoLinkRow" style="display:none;border-top:1px solid #f0f0f0;padding-top:12px;margin-bottom:14px;text-align:center;">
-        <button id="moodInfoLinkBtn" style="background:none;border:2px solid #ff9500;border-radius:20px;color:#ff9500;padding:8px 18px;font-size:0.88em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;"></button>
+        <button id="moodInfoLinkBtn" style="background:none;border:2px solid var(--brand-primary);border-radius:20px;color:var(--brand-primary);padding:8px 18px;font-size:0.88em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;"></button>
         <p id="moodInfoLinkCaption" style="font-size:0.75em;color:#adb5bd;margin:6px 0 0;line-height:1.4;">Counted in both mood stats · doesn't add an extra day</p>
       </div>
       <div class="confirm-buttons">
@@ -621,18 +623,18 @@
       <div style="font-size:0.8em;font-weight:600;color:#495057;margin-bottom:8px;">12-month charts (5 Max)</div>
       <div id="pdfChartsNoData" style="display:none;font-size:0.82em;color:#adb5bd;margin-bottom:18px;text-align:center;">You require 3 months+ of data for this feature</div>
       <div id="pdfChartButtons" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;">
-        <button id="pdfChartMood" data-on="1" onclick="_togglePdfChart('Mood')" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;border-radius:12px;border:1.5px solid #ff9500;background:rgba(255,149,0,0.1);color:#ff9500;cursor:pointer;font-size:0.78em;font-weight:600;min-width:56px;-webkit-tap-highlight-color:transparent;"><span style="font-size:1.3em;">📊</span><span>Mood</span></button>
-        <button id="pdfChartSleep" data-on="1" onclick="_togglePdfChart('Sleep')" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;border-radius:12px;border:1.5px solid #ff9500;background:rgba(255,149,0,0.1);color:#ff9500;cursor:pointer;font-size:0.78em;font-weight:600;min-width:56px;-webkit-tap-highlight-color:transparent;"><span style="font-size:1.3em;">🛌</span><span>Sleep</span></button>
-        <button id="pdfChartEnergy" data-on="1" onclick="_togglePdfChart('Energy')" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;border-radius:12px;border:1.5px solid #ff9500;background:rgba(255,149,0,0.1);color:#ff9500;cursor:pointer;font-size:0.78em;font-weight:600;min-width:56px;-webkit-tap-highlight-color:transparent;"><span style="font-size:1.3em;">⚡️</span><span>Energy</span></button>
-        <button id="pdfChartSteps" data-on="1" onclick="_togglePdfChart('Steps')" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;border-radius:12px;border:1.5px solid #ff9500;background:rgba(255,149,0,0.1);color:#ff9500;cursor:pointer;font-size:0.78em;font-weight:600;min-width:56px;-webkit-tap-highlight-color:transparent;"><span style="font-size:1.3em;">🚶</span><span>Steps</span></button>
-        <button id="pdfChartSleepQ" data-on="1" onclick="_togglePdfChart('SleepQ')" style="display:none;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;border-radius:12px;border:1.5px solid #ff9500;background:rgba(255,149,0,0.1);color:#ff9500;cursor:pointer;font-size:0.78em;font-weight:600;min-width:56px;-webkit-tap-highlight-color:transparent;"><span style="font-size:1.3em;">💤</span><span>Sleep Q</span></button>
-        <button id="pdfChartGoals" data-on="1" onclick="_togglePdfChart('Goals')" style="display:none;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;border-radius:12px;border:1.5px solid #ff9500;background:rgba(255,149,0,0.1);color:#ff9500;cursor:pointer;font-size:0.78em;font-weight:600;min-width:56px;-webkit-tap-highlight-color:transparent;"><span style="font-size:1.3em;">🏅</span><span>Goals</span></button>
-        <button id="pdfChartBudget" data-on="1" onclick="_togglePdfChart('Budget')" style="display:none;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;border-radius:12px;border:1.5px solid #ff9500;background:rgba(255,149,0,0.1);color:#ff9500;cursor:pointer;font-size:0.78em;font-weight:600;min-width:56px;-webkit-tap-highlight-color:transparent;"><span style="font-size:1.3em;">💰</span><span>Budget</span></button>
+        <button id="pdfChartMood" data-on="1" onclick="_togglePdfChart('Mood')" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;border-radius:12px;border:1.5px solid var(--brand-primary);background:rgba(255,149,0,0.1);color:var(--brand-primary);cursor:pointer;font-size:0.78em;font-weight:600;min-width:56px;-webkit-tap-highlight-color:transparent;"><span style="font-size:1.3em;">📊</span><span>Mood</span></button>
+        <button id="pdfChartSleep" data-on="1" onclick="_togglePdfChart('Sleep')" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;border-radius:12px;border:1.5px solid var(--brand-primary);background:rgba(255,149,0,0.1);color:var(--brand-primary);cursor:pointer;font-size:0.78em;font-weight:600;min-width:56px;-webkit-tap-highlight-color:transparent;"><span style="font-size:1.3em;">🛌</span><span>Sleep</span></button>
+        <button id="pdfChartEnergy" data-on="1" onclick="_togglePdfChart('Energy')" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;border-radius:12px;border:1.5px solid var(--brand-primary);background:rgba(255,149,0,0.1);color:var(--brand-primary);cursor:pointer;font-size:0.78em;font-weight:600;min-width:56px;-webkit-tap-highlight-color:transparent;"><span style="font-size:1.3em;">⚡️</span><span>Energy</span></button>
+        <button id="pdfChartSteps" data-on="1" onclick="_togglePdfChart('Steps')" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;border-radius:12px;border:1.5px solid var(--brand-primary);background:rgba(255,149,0,0.1);color:var(--brand-primary);cursor:pointer;font-size:0.78em;font-weight:600;min-width:56px;-webkit-tap-highlight-color:transparent;"><span style="font-size:1.3em;">🚶</span><span>Steps</span></button>
+        <button id="pdfChartSleepQ" data-on="1" onclick="_togglePdfChart('SleepQ')" style="display:none;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;border-radius:12px;border:1.5px solid var(--brand-primary);background:rgba(255,149,0,0.1);color:var(--brand-primary);cursor:pointer;font-size:0.78em;font-weight:600;min-width:56px;-webkit-tap-highlight-color:transparent;"><span style="font-size:1.3em;">💤</span><span>Sleep Q</span></button>
+        <button id="pdfChartGoals" data-on="1" onclick="_togglePdfChart('Goals')" style="display:none;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;border-radius:12px;border:1.5px solid var(--brand-primary);background:rgba(255,149,0,0.1);color:var(--brand-primary);cursor:pointer;font-size:0.78em;font-weight:600;min-width:56px;-webkit-tap-highlight-color:transparent;"><span style="font-size:1.3em;">🏅</span><span>Goals</span></button>
+        <button id="pdfChartBudget" data-on="1" onclick="_togglePdfChart('Budget')" style="display:none;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;border-radius:12px;border:1.5px solid var(--brand-primary);background:rgba(255,149,0,0.1);color:var(--brand-primary);cursor:pointer;font-size:0.78em;font-weight:600;min-width:56px;-webkit-tap-highlight-color:transparent;"><span style="font-size:1.3em;">💰</span><span>Budget</span></button>
       </div>
       </div><!-- /pdfChartSection -->
       <div class="confirm-buttons">
         <button class="confirm-btn confirm-btn-no" onclick="document.getElementById('pdfExportModal').classList.remove('active')">Cancel</button>
-        <button class="confirm-btn confirm-btn-yes" style="background:#ff9500;border-color:#ff9500;color:white;" onclick="document.getElementById('pdfExportModal').classList.remove('active');_doExportPDF(document.getElementById('pdfLeftPeriod').value,document.getElementById('pdfRightPeriod').value,{mood:document.getElementById('pdfChartMood').dataset.on==='1',sleep:document.getElementById('pdfChartSleep').dataset.on==='1',energy:document.getElementById('pdfChartEnergy').dataset.on==='1',steps:document.getElementById('pdfChartSteps').dataset.on==='1'&&document.getElementById('pdfChartSteps').style.display!=='none',sleepQ:document.getElementById('pdfChartSleepQ').dataset.on==='1'&&document.getElementById('pdfChartSleepQ').style.display!=='none',goals:document.getElementById('pdfChartGoals').dataset.on==='1'&&document.getElementById('pdfChartGoals').style.display!=='none',budget:document.getElementById('pdfChartBudget').dataset.on==='1'&&document.getElementById('pdfChartBudget').style.display!=='none'},document.getElementById('pdfRecentEntries').value)">Generate PDF</button>
+        <button class="confirm-btn confirm-btn-yes" style="background:var(--brand-primary);border-color:var(--brand-primary);color:white;" onclick="document.getElementById('pdfExportModal').classList.remove('active');_doExportPDF(document.getElementById('pdfLeftPeriod').value,document.getElementById('pdfRightPeriod').value,{mood:document.getElementById('pdfChartMood').dataset.on==='1',sleep:document.getElementById('pdfChartSleep').dataset.on==='1',energy:document.getElementById('pdfChartEnergy').dataset.on==='1',steps:document.getElementById('pdfChartSteps').dataset.on==='1'&&document.getElementById('pdfChartSteps').style.display!=='none',sleepQ:document.getElementById('pdfChartSleepQ').dataset.on==='1'&&document.getElementById('pdfChartSleepQ').style.display!=='none',goals:document.getElementById('pdfChartGoals').dataset.on==='1'&&document.getElementById('pdfChartGoals').style.display!=='none',budget:document.getElementById('pdfChartBudget').dataset.on==='1'&&document.getElementById('pdfChartBudget').style.display!=='none'},document.getElementById('pdfRecentEntries').value)">Generate PDF</button>
       </div>
     </div>
   </div>
@@ -643,7 +645,7 @@
       <h3 style="margin-bottom:16px;">📋 Changelog</h3>
       <div style="text-align:left; font-size:0.9em; color:#495057; line-height:1.7;">
         <div style="margin-bottom:14px;">
-          <strong style="color:#ff9500;">v0.98</strong><br>
+          <strong style="color:var(--brand-primary);">v0.98</strong><br>
           • 🐛 Fix: Journal streak &amp; stability counters now load on home page immediately after sign-in (no need to visit Journal first)<br>
           • 🐛 Fix: Achievement toasts no longer re-fire on a new device — unlocked achievements now sync across devices<br>
           • 🐛 Fix: Sign-out now clears streak, stability, and Bipolar Anonymous stats so the next account starts fresh<br>
@@ -692,7 +694,7 @@
       </div>
       <div class="confirm-buttons">
         <button class="confirm-btn confirm-btn-no" onclick="closeCalMonthPicker()">Cancel</button>
-        <button class="confirm-btn" onclick="applyCalMonthPicker()" style="background:#ff9500;color:white;border-color:#ff9500;">Go</button>
+        <button class="confirm-btn" onclick="applyCalMonthPicker()" style="background:var(--brand-primary);color:white;border-color:var(--brand-primary);">Go</button>
       </div>
     </div>
   </div>
@@ -762,13 +764,13 @@
       <div id="saveConfirmSummary" style="margin-bottom:16px;"></div>
       <div class="confirm-buttons">
         <button class="confirm-btn confirm-btn-no" onclick="closeSaveConfirmModal()">← Edit</button>
-        <button id="saveConfirmSaveBtn" class="confirm-btn confirm-btn-yes" onclick="closeSaveConfirmModal(); saveAndOpenJournal()" style="color:#ff9500;border-color:#ff9500;">Save ✨</button>
+        <button id="saveConfirmSaveBtn" class="confirm-btn confirm-btn-yes" onclick="closeSaveConfirmModal(); saveAndOpenJournal()" style="color:var(--brand-primary);border-color:var(--brand-primary);">Save ✨</button>
       </div>
     </div>
   </div>
 
   <!-- PIN Lock Overlay (shown on load when PIN is enabled) -->
-  <div id="pinOverlay" style="position:fixed;inset:0;background:linear-gradient(135deg,#ffaa33 0%,#ff8833 100%);z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:24px;display:none;">
+  <div id="pinOverlay" style="position:fixed;inset:0;background:linear-gradient(135deg,var(--brand-primary-light) 0%,var(--brand-primary-mid) 100%);z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:24px;display:none;">
     <img src="icons/AppIcon.png" width="72" height="72" style="border-radius:18px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
     <h2 style="color:white;margin-bottom:6px;font-size:1.3em;">Bipolar Bear</h2>
     <p style="color:rgba(255,255,255,0.85);font-size:0.88em;margin-bottom:28px;">Enter your PIN to continue</p>
@@ -824,7 +826,7 @@
   </div>
 
   <!-- Guest PIN Setup Overlay (mandatory on first entry save for guests) -->
-  <div id="guestPinSetupOverlay" style="position:fixed;inset:0;background:linear-gradient(135deg,#ffaa33 0%,#ff8833 100%);z-index:9998;flex-direction:column;align-items:center;justify-content:center;padding:24px;display:none;">
+  <div id="guestPinSetupOverlay" style="position:fixed;inset:0;background:linear-gradient(135deg,var(--brand-primary-light) 0%,var(--brand-primary-mid) 100%);z-index:9998;flex-direction:column;align-items:center;justify-content:center;padding:24px;display:none;">
     <img src="icons/AppIcon.png" width="72" height="72" style="border-radius:18px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
     <h2 id="guestPinSetupTitle" style="color:white;margin-bottom:6px;font-size:1.3em;text-align:center;">Protect your data</h2>
     <p id="guestPinSetupDesc" style="color:rgba(255,255,255,0.85);font-size:0.88em;margin-bottom:28px;text-align:center;max-width:260px;">Choose a 4-digit PIN to lock your journal.</p>
@@ -856,7 +858,7 @@
       <div id="favAnniversaryList" style="max-height:55vh;overflow-y:auto;margin-bottom:16px;"></div>
       <div class="confirm-buttons">
         <button class="confirm-btn confirm-btn-no" onclick="closeFavAnniversaryModal()">Close</button>
-        <button class="confirm-btn" onclick="rescheduleAnniversary()" style="background:white;color:#ff9500;border:2px solid #ff9500;">Show again next year</button>
+        <button class="confirm-btn" onclick="rescheduleAnniversary()" style="background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);">Show again next year</button>
       </div>
     </div>
   </div>
@@ -876,7 +878,7 @@
       </div>
       
       <div class="confirm-buttons">
-        <button class="confirm-btn" onclick="addMedication()" style="background: white; color: #ff9500; border: 2px solid #ff9500;">Add Medication</button>
+        <button class="confirm-btn" onclick="addMedication()" style="background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary);">Add Medication</button>
         <button class="confirm-btn confirm-btn-no" onclick="closeMedicationModal()">Close</button>
       </div>
     </div>
@@ -892,7 +894,7 @@
         <input type="text" id="newGoalText" placeholder="New goal (e.g. Go to the gym)" style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1em; box-sizing: border-box;">
       </div>
       <div class="confirm-buttons">
-        <button class="confirm-btn" onclick="addGoal()" style="background: white; color: #ff9500; border: 2px solid #ff9500;">Add Goal</button>
+        <button class="confirm-btn" onclick="addGoal()" style="background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary);">Add Goal</button>
         <button class="confirm-btn confirm-btn-no" onclick="closeGoalsModal()">Close</button>
       </div>
     </div>
@@ -906,7 +908,7 @@
       <input type="text" id="budgetInput" placeholder="e.g. £50 daily" onkeydown="if(event.key==='Enter')saveBudgetSetting()" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;box-sizing:border-box;outline:none;margin-bottom:16px;">
       <div class="confirm-buttons">
         <button class="confirm-btn confirm-btn-no" onclick="closeBudgetModal()">Cancel</button>
-        <button class="confirm-btn confirm-btn-yes" onclick="saveBudgetSetting()" style="background:#ff9500;border-color:#ff9500;color:white;">Save</button>
+        <button class="confirm-btn confirm-btn-yes" onclick="saveBudgetSetting()" style="background:var(--brand-primary);border-color:var(--brand-primary);color:white;">Save</button>
       </div>
     </div>
   </div>
@@ -917,7 +919,7 @@
       <h3>Choose Export Format</h3>
       <p style="margin-bottom: 25px; color: #6c757d;">Select the format for your backup</p>
       <div class="confirm-buttons" style="flex-direction: column; gap: 15px;">
-        <button class="confirm-btn" onclick="document.getElementById('exportModal').classList.remove('active');exportData()" style="background: white; color: #ff9500; border: 2px solid #ff9500; width: 100%;">
+        <button class="confirm-btn" onclick="document.getElementById('exportModal').classList.remove('active');exportData()" style="background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary); width: 100%;">
           🐻 Bipolar Bear (.json)
         </button>
         <button class="confirm-btn" onclick="document.getElementById('exportModal').classList.remove('active');exportDataCSV()" style="background: white; color: #51cf66; border: 2px solid #51cf66; width: 100%;">
@@ -934,7 +936,7 @@
       <h3>Choose Import Format</h3>
       <p style="margin-bottom: 25px; color: #6c757d;">Select the format of your data file</p>
       <div class="confirm-buttons" style="flex-direction: column; gap: 15px;">
-        <button class="confirm-btn" onclick="selectImportFormat('bipolarbear')" style="background: white; color: #ff9500; border: 2px solid #ff9500; width: 100%;">
+        <button class="confirm-btn" onclick="selectImportFormat('bipolarbear')" style="background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary); width: 100%;">
           🐻 BipolarBear Format (.json)
         </button>
         <button class="confirm-btn" onclick="selectImportFormat('daylio')" style="background: white; color: #4dabf7; border: 2px solid #4dabf7; width: 100%;">
@@ -1055,7 +1057,7 @@
         </select>
       </div>
       <div class="confirm-buttons">
-        <button class="confirm-btn" onclick="saveEditedEntry()" style="background:white; color:#ff9500; border:2px solid #ff9500;">Save Changes</button>
+        <button class="confirm-btn" onclick="saveEditedEntry()" style="background:white; color:var(--brand-primary); border:2px solid var(--brand-primary);">Save Changes</button>
         <button class="confirm-btn confirm-btn-no" onclick="closeEditModal()">Cancel</button>
       </div>
     </div>
@@ -1085,7 +1087,7 @@
         <div style="font-weight:600; font-size:1.05em; margin-bottom:8px;">Import health data</div>
         <p style="color:#6c757d; font-size:0.9em; margin-bottom:16px;">Import data from your phone's health app.</p>
         <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:4px;">
-          <button class="confirm-btn" onclick="doSleepOnlySync()" style="background:white;color:#ff9500;border:2px solid #ff9500;">😴 Import sleep</button>
+          <button class="confirm-btn" onclick="doSleepOnlySync()" style="background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);">😴 Import sleep</button>
           <button class="confirm-btn confirm-btn-no" onclick="closeSleepSyncModal()">Close</button>
         </div>
       </div>
@@ -1108,7 +1110,7 @@
         <div style="font-weight:600; font-size:1.05em; margin-bottom:8px;">Import health data</div>
         <p style="color:#6c757d; font-size:0.9em; margin-bottom:16px;">Import data from your phone's health app.</p>
         <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:4px;">
-          <button class="confirm-btn" onclick="doStepsOnlySync()" style="background:white;color:#ff9500;border:2px solid #ff9500;">🏃 Import steps</button>
+          <button class="confirm-btn" onclick="doStepsOnlySync()" style="background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);">🏃 Import steps</button>
           <button class="confirm-btn confirm-btn-no" onclick="closeEnergySyncModal()">Close</button>
         </div>
       </div>
@@ -1153,8 +1155,8 @@
 
           <div id="customiseFormWrap" style="margin-bottom:16px;position:relative;">
           <div id="customiseFormHintEl" style="display:none;flex-direction:column;align-items:flex-end;gap:2px;margin-bottom:4px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;">
-            <span style="font-size:0.72em;font-weight:700;font-style:italic;color:#ff9500;font-family:'Georgia',serif;letter-spacing:0.01em;">🐻 Click here</span>
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><line x1="8" y1="2" x2="8" y2="13" stroke="#ff9500" stroke-width="2" stroke-linecap="round"/><polyline points="3,8 8,13 13,8" stroke="#ff9500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+            <span style="font-size:0.72em;font-weight:700;font-style:italic;color:var(--brand-primary);font-family:'Georgia',serif;letter-spacing:0.01em;">🐻 Click here</span>
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><line x1="8" y1="2" x2="8" y2="13" stroke="var(--brand-primary)" stroke-width="2" stroke-linecap="round"/><polyline points="3,8 8,13 13,8" stroke="var(--brand-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
           </div>
           <details id="customiseFormDetails" ontoggle="if(this.open){_onCustomiseDetailsOpen();localStorage.removeItem('bbCustomiseFormCollapsed');}else{localStorage.setItem('bbCustomiseFormCollapsed','1');}">
             <summary style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;padding:2px 0;">
@@ -1172,8 +1174,8 @@
           <button onclick="showAchievementsPanel()" style="background: none; border: none; color: #adb5bd; font-size: 0.82em; cursor: pointer; padding: 4px 8px; letter-spacing: 0.02em;">🏅 Achievements</button>
           <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
             <div id="advancedSettingsBadgeHint" style="display:none;flex-direction:row;align-items:center;gap:3px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-bottom:2px;">
-              <span style="font-size:0.78em;font-weight:700;font-style:italic;color:#ff9500;font-family:'Georgia',serif;">🐻 Click here</span>
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><line x1="8" y1="2" x2="8" y2="13" stroke="#ff9500" stroke-width="2.5" stroke-linecap="round"/><polyline points="3,8 8,13 13,8" stroke="#ff9500" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+              <span style="font-size:0.78em;font-weight:700;font-style:italic;color:var(--brand-primary);font-family:'Georgia',serif;">🐻 Click here</span>
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><line x1="8" y1="2" x2="8" y2="13" stroke="var(--brand-primary)" stroke-width="2.5" stroke-linecap="round"/><polyline points="3,8 8,13 13,8" stroke="var(--brand-primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
             </div>
             <button id="advancedSettingsBtn" onclick="openAdvancedSettings()" style="background: none; border: none; color: #adb5bd; font-size: 0.82em; cursor: pointer; padding: 4px 8px; letter-spacing: 0.02em;">🛠️ Advanced ▸</button>
           </div>
@@ -1231,7 +1233,7 @@
         <hr style="border: none; border-top: 1px solid #e9ecef; margin-bottom: 20px;">
 
         <div style="display:flex;gap:10px;">
-          <button onclick="closeMobileSettings()" style="flex:1;background:rgba(255,149,0,0.1);border:1.5px solid #ff9500;color:#ff9500;font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">← Back</button>
+          <button onclick="closeMobileSettings()" style="flex:1;background:rgba(255,149,0,0.1);border:1.5px solid var(--brand-primary);color:var(--brand-primary);font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">← Back</button>
           <button onclick="_openFocusModeSettings()" style="flex:1;background:rgba(108,117,125,0.08);border:1.5px solid #adb5bd;color:#495057;font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">Focus Mode →</button>
         </div>
 
@@ -1281,7 +1283,7 @@
         <hr style="border: none; border-top: 1px solid #e9ecef; margin-bottom: 16px;">
 
         <div style="display:flex;gap:10px;">
-          <button onclick="closeAdvancedSettings()" style="flex:1;background:rgba(255,149,0,0.1);border:1.5px solid #ff9500;color:#ff9500;font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">← Back</button>
+          <button onclick="closeAdvancedSettings()" style="flex:1;background:rgba(255,149,0,0.1);border:1.5px solid var(--brand-primary);color:var(--brand-primary);font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">← Back</button>
           <button onclick="openAdvancedJournal()" style="flex:1;background:rgba(108,117,125,0.08);border:1.5px solid #adb5bd;color:#495057;font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">Journal →</button>
         </div>
 
@@ -1332,7 +1334,7 @@
         <hr style="border: none; border-top: 1px solid #e9ecef; margin-bottom: 16px;">
 
         <div style="display:flex;gap:10px;">
-          <button onclick="closeAdvancedJournal()" style="flex:1;background:rgba(255,149,0,0.1);border:1.5px solid #ff9500;color:#ff9500;font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">← Back</button>
+          <button onclick="closeAdvancedJournal()" style="flex:1;background:rgba(255,149,0,0.1);border:1.5px solid var(--brand-primary);color:var(--brand-primary);font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">← Back</button>
           <button onclick="openAdvancedMore()" style="flex:1;background:rgba(108,117,125,0.08);border:1.5px solid #adb5bd;color:#495057;font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">More →</button>
         </div>
 
@@ -1363,12 +1365,12 @@
           <div style="display: flex; gap: 8px; align-items: center;">
             <input type="date" id="statsStartDateInput" style="flex: 1; padding: 8px 10px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em; color: #495057;">
             <button onclick="clearStatsStartDate()" style="padding: 8px 12px; background: white; color: #6c757d; border: 2px solid #e9ecef; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 600; white-space: nowrap;">Clear</button>
-            <button onclick="saveStatsStartDate()" class="btn-outline-orange" style="padding: 8px 12px; background: white; color: #ff9500; border: 2px solid #ff9500; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 600; white-space: nowrap;">Save</button>
+            <button onclick="saveStatsStartDate()" class="btn-outline-orange" style="padding: 8px 12px; background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary); border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 600; white-space: nowrap;">Save</button>
           </div>
         </div>
 
         <div style="display:flex;gap:10px;">
-          <button onclick="closeAdvancedMore()" style="flex:1;background:rgba(255,149,0,0.1);border:1.5px solid #ff9500;color:#ff9500;font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">← Back</button>
+          <button onclick="closeAdvancedMore()" style="flex:1;background:rgba(255,149,0,0.1);border:1.5px solid var(--brand-primary);color:var(--brand-primary);font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">← Back</button>
           <button onclick="openAdvancedMore2()" style="flex:1;background:rgba(108,117,125,0.08);border:1.5px solid #adb5bd;color:#495057;font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">Delete →</button>
         </div>
 
@@ -1404,7 +1406,7 @@
 
         <hr style="border: none; border-top: 1px solid #e9ecef; margin-bottom: 16px;">
 
-        <button onclick="closeAdvancedMore2()" style="width:100%;background:rgba(255,149,0,0.1);border:1.5px solid #ff9500;color:#ff9500;font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">← Back</button>
+        <button onclick="closeAdvancedMore2()" style="width:100%;background:rgba(255,149,0,0.1);border:1.5px solid var(--brand-primary);color:var(--brand-primary);font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">← Back</button>
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #adb5bd; font-size: 0.78em; line-height: 1.8;">
@@ -1422,7 +1424,7 @@
         <div id="achievementsCount" style="text-align:center;color:#6c757d;font-size:0.85em;margin-bottom:16px;"></div>
         <div id="achievementsGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-height:calc(85dvh - 240px);overflow-y:auto;overflow-x:hidden;"></div>
         <button id="achNotifToggleBtn" onclick="toggleAchievementNotifications()" style="margin-top: 16px; width: 100%; background: white; color: #6c757d; border: 1.5px solid #dee2e6; font-size: 0.85em; cursor: pointer; padding: 9px; font-weight: 600; border-radius: 20px;"></button>
-        <button onclick="closeAchievementsPanel()" style="margin-top: 10px; width: 100%; background: rgba(255,149,0,0.1); border: 1.5px solid #ff9500; color: #ff9500; font-size: 0.9em; cursor: pointer; padding: 10px; font-weight: 600; border-radius: 20px;">← Back</button>
+        <button onclick="closeAchievementsPanel()" style="margin-top: 10px; width: 100%; background: rgba(255,149,0,0.1); border: 1.5px solid var(--brand-primary); color: var(--brand-primary); font-size: 0.9em; cursor: pointer; padding: 10px; font-weight: 600; border-radius: 20px;">← Back</button>
       </div>
 
     </div>
@@ -1463,7 +1465,7 @@
       </div>
 
       <div class="confirm-buttons" style="margin-top: 20px;">
-        <button class="confirm-btn" onclick="savePersonalDetails()" style="background: white; color: #ff9500; border: 2px solid #ff9500;">Save</button>
+        <button class="confirm-btn" onclick="savePersonalDetails()" style="background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary);">Save</button>
         <button class="confirm-btn confirm-btn-no" onclick="closePersonalDetailsModal()">Close</button>
       </div>
     </div>

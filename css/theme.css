@@ -1,0 +1,33 @@
+/**
+ * Theme tokens for the current brand variant.
+ *
+ * Phase 1 scaffolding for the multi-variant refactor: these custom
+ * properties are defined here but no existing rule references them yet.
+ * Phase 2 will sweep brand-coloured literals (#ff9500, #ff8833, etc.) in
+ * css/*.css to use these tokens.
+ *
+ * Keep semantic colours (success greens, danger reds, neutral greys) out
+ * of this file — they are condition-neutral and shouldn't change per
+ * variant.
+ *
+ * @file css/theme.css
+ */
+:root {
+  /* Primary brand (orange in BipolarBear). */
+  --brand-primary: #ff9500;
+  --brand-primary-dark: #ff6b00;
+  --brand-primary-mid: #ff8833;
+  --brand-primary-light: #ffaa33;
+  --brand-tint: #fff8f0;
+
+  /* Secondary brand, used by the anonymous community board (yellow). */
+  --brand-secondary: #f5c800;
+  --brand-secondary-tint: #fff8e6;
+
+  /* Composed gradient that recurs across page backgrounds. */
+  --brand-gradient: linear-gradient(
+    135deg,
+    var(--brand-primary-light) 0%,
+    var(--brand-primary-mid) 100%
+  );
+}

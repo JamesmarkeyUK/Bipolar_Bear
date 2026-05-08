@@ -4,11 +4,11 @@
     img { -webkit-touch-callout: none; user-select: none; }
 
     :root {
-      --orange: #ff9500;
-      --orange-dark: #ff6b00;
+      --orange: var(--brand-primary);
+      --orange-dark: var(--brand-primary-dark);
       --text: #2d2d2d;
       --text-light: #6c757d;
-      --bg: #fff8f0;
+      --bg: var(--brand-tint);
       --card-bg: #ffffff;
       --border: #ffe0b2;
     }
@@ -138,7 +138,7 @@
     .helped-plus-btn.voted {
       background: white;
       border-color: white;
-      color: #ff6b00;
+      color: var(--brand-primary-dark);
       box-shadow: 0 0 14px rgba(255,255,255,0.45);
     }
     @keyframes votePop {
@@ -256,7 +256,7 @@
     .sticky-nav a.active {
       color: var(--orange);
       border-bottom-color: var(--orange);
-      background: #fff8f0;
+      background: var(--brand-tint);
     }
 
     /* ── LAYOUT ── */
@@ -336,7 +336,7 @@
     }
 
     .mood-card.manic     { background: #fff0f0; border-color: #ff4444; }
-    .mood-card.hypomanic { background: #fff8e6; border-color: #ff9500; }
+    .mood-card.hypomanic { background: var(--brand-secondary-tint); border-color: var(--brand-primary); }
     .mood-card.stable    { background: #f0fff4; border-color: #51cf66; }
     .mood-card.depressed { background: #f0f4ff; border-color: #5c7cfa; }
     .mood-card.crisis    { background: #f5f0ff; border-color: #845ef7; }
@@ -378,7 +378,7 @@
       transition: background 0.2s;
     }
 
-    @media (hover: hover) and (pointer: fine) { .accordion-header:hover { background: #fff8f0; } }
+    @media (hover: hover) and (pointer: fine) { .accordion-header:hover { background: var(--brand-tint); } }
 
     .accordion-header .chevron {
       font-size: 0.8em;
@@ -427,7 +427,7 @@
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(255,149,0,0.3);
       }
-      .link-btn.secondary:hover { background: #fff8f0; }
+      .link-btn.secondary:hover { background: var(--brand-tint); }
     }
 
     /* ── STEPS ── */
@@ -702,14 +702,14 @@
     }
 
     .mood-icon-btn.manic.selected,    .mood-icon-btn.manic.active-mood    { border-color: #ff4444; background: #fff0f0; }
-    .mood-icon-btn.hypomanic.selected,.mood-icon-btn.hypomanic.active-mood { border-color: #ff9500; background: #fff8e6; }
+    .mood-icon-btn.hypomanic.selected,.mood-icon-btn.hypomanic.active-mood { border-color: var(--brand-primary); background: var(--brand-secondary-tint); }
     .mood-icon-btn.stable.selected,   .mood-icon-btn.stable.active-mood   { border-color: #51cf66; background: #f0fff4; }
     .mood-icon-btn.neutral.selected,  .mood-icon-btn.neutral.active-mood  { border-color: #74c0fc; background: #f0f8ff; }
     .mood-icon-btn.low.selected,      .mood-icon-btn.low.active-mood      { border-color: #845ef7; background: #f5f0ff; }
     .mood-icon-btn.depressed.selected,.mood-icon-btn.depressed.active-mood { border-color: #5c7cfa; background: #f0f4ff; }
     @media (hover: hover) and (pointer: fine) {
       .mood-icon-btn.manic:hover     { border-color: #ff4444; background: #fff0f0; }
-      .mood-icon-btn.hypomanic:hover { border-color: #ff9500; background: #fff8e6; }
+      .mood-icon-btn.hypomanic:hover { border-color: var(--brand-primary); background: var(--brand-secondary-tint); }
       .mood-icon-btn.stable:hover    { border-color: #51cf66; background: #f0fff4; }
       .mood-icon-btn.neutral:hover   { border-color: #74c0fc; background: #f0f8ff; }
       .mood-icon-btn.low:hover       { border-color: #845ef7; background: #f5f0ff; }
@@ -731,7 +731,7 @@
     }
 
     .mood-detail-panel.manic     { background: #fff0f0; border: 2px solid #ff4444; }
-    .mood-detail-panel.hypomanic { background: #fff8e6; border: 2px solid #ff9500; }
+    .mood-detail-panel.hypomanic { background: var(--brand-secondary-tint); border: 2px solid var(--brand-primary); }
     .mood-detail-panel.stable    { background: #f0fff4; border: 2px solid #51cf66; }
     .mood-detail-panel.neutral   { background: #f0f8ff; border: 2px solid #74c0fc; }
     .mood-detail-panel.low       { background: #f5f0ff; border: 2px solid #845ef7; }
@@ -792,7 +792,7 @@
 
     /* Force light mode — prevent OS dark mode from affecting colours */
     :root { color-scheme: light; }
-    html { background-color: #ff6b00; }
+    html { background-color: var(--brand-primary-dark); }
 
     /* ── Auth / Settings Modal ── */
     .overlay-modal {
@@ -828,7 +828,7 @@
       box-sizing: border-box;
       color: #2d2d2d;
     }
-    .modal-input:focus { outline: none; border-color: #ff9500; }
+    .modal-input:focus { outline: none; border-color: var(--brand-primary); }
     .modal-btn {
       width: 100%;
       padding: 13px;
@@ -840,14 +840,14 @@
       margin-bottom: 10px;
       transition: all 0.2s;
     }
-    .modal-btn-primary { background: #ff9500; color: white; }
+    .modal-btn-primary { background: var(--brand-primary); color: white; }
     .modal-btn-secondary { background: #f8f9fa; color: #495057; border: 2px solid #e9ecef; }
     @media (hover: hover) and (pointer: fine) {
-      .modal-btn-primary:hover { background: #ff6b00; }
+      .modal-btn-primary:hover { background: var(--brand-primary-dark); }
       .modal-btn-secondary:hover { background: #e9ecef; }
     }
     .modal-toggle { text-align: center; font-size: 0.9em; color: #6c757d; margin-top: 4px; }
-    .modal-toggle span { color: #ff9500; cursor: pointer; font-weight: 600; }
+    .modal-toggle span { color: var(--brand-primary); cursor: pointer; font-weight: 600; }
     .modal-error { color: #ff6b6b; font-size: 0.9em; margin-bottom: 10px; display: none; }
     @keyframes hintFade { 0%,100%{opacity:0.55;transform:translateY(0)} 50%{opacity:1;transform:translateY(-4px)} }
     @keyframes bbHintNudge { 0%,100%{transform:scale(1)} 25%{transform:scale(1.18) rotate(-4deg)} 75%{transform:scale(1.12) rotate(3deg)} }

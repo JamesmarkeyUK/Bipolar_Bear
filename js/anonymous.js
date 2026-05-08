@@ -28,14 +28,14 @@
 // ─────────────────────────────────────────────────────────────────
 // Beta gate (web only) — keep in sync with other pages
 // ─────────────────────────────────────────────────────────────────
-if (!window.Capacitor && location.protocol !== 'file:' && localStorage.getItem('bbWebUnlocked') !== 'true') {
+if (!window.Capacitor && location.protocol !== 'file:' && BB.storage.get('WebUnlocked') !== 'true') {
   location.replace('beta.html');
 }
 
 // ─────────────────────────────────────────────────────────────────
 // Constants & state
 // ─────────────────────────────────────────────────────────────────
-const YELLOW      = '#f5c800';
+const YELLOW      = 'var(--brand-secondary)';
 const YELLOW_DARK = '#c49e00';
 const YELLOW_LT   = '#ffe566';
 const ADMIN_EMAIL = 'inbox@jamesmarkey.co.uk';
@@ -63,38 +63,38 @@ let _boardSetupDone = false; // initBoard's one-time handler wiring (compose, FA
 
 // Persisted user profile (localStorage)
 const profile = {
-  get monika()      { return localStorage.getItem('bbAnon_monika')    || ''; },
-  get verified()    { return localStorage.getItem('bbAnon_verified')  === 'true'; },
-  get showMeds()    { return localStorage.getItem('bbAnon_showMeds')    === 'true'; },
-  get showStable()  { return localStorage.getItem('bbAnon_showStable') === 'true'; },
-  get stableStreak(){ return parseInt(localStorage.getItem('bbAnon_stableStreak') || '0', 10); },
-  get stableSince() { return localStorage.getItem('bbAnon_stableSince') || ''; }, // standalone: YYYY-MM-DD
-  get med()         { return localStorage.getItem('bbAnon_med')       || ''; },
+  get monika()      { return BB.storage.get('Anon_monika')    || ''; },
+  get verified()    { return BB.storage.get('Anon_verified')  === 'true'; },
+  get showMeds()    { return BB.storage.get('Anon_showMeds')    === 'true'; },
+  get showStable()  { return BB.storage.get('Anon_showStable') === 'true'; },
+  get stableStreak(){ return parseInt(BB.storage.get('Anon_stableStreak') || '0', 10); },
+  get stableSince() { return BB.storage.get('Anon_stableSince') || ''; }, // standalone: YYYY-MM-DD
+  get med()         { return BB.storage.get('Anon_med')       || ''; },
   get medList()     {
     try {
-      const s = localStorage.getItem('bbAnon_medList');
+      const s = BB.storage.get('Anon_medList');
       if (s) return JSON.parse(s);
-      const m = localStorage.getItem('bbAnon_med');
+      const m = BB.storage.get('Anon_med');
       return m ? [{ name: m, dosage: '' }] : [];
     } catch(e) { return []; }
   },
-  get hasPosted()   { return localStorage.getItem('bbAnon_hasPosted') === 'true'; },
-  get isAdmin()     { return localStorage.getItem('bbAnon_isAdmin')   === 'true'; },
-  get colorKey()    { return localStorage.getItem('bbAnon_colorKey')  || 'orange'; },
+  get hasPosted()   { return BB.storage.get('Anon_hasPosted') === 'true'; },
+  get isAdmin()     { return BB.storage.get('Anon_isAdmin')   === 'true'; },
+  get colorKey()    { return BB.storage.get('Anon_colorKey')  || 'orange'; },
   get grad1()       { const p = COLOR_PRESETS.find(c => c.key === this.colorKey); return p ? p.g1 : YELLOW_LT; },
   get grad2()       { const p = COLOR_PRESETS.find(c => c.key === this.colorKey); return p ? p.g2 : YELLOW_DARK; },
-  get customInit()  { return localStorage.getItem('bbAnon_initials')  || ''; },
+  get customInit()  { return BB.storage.get('Anon_initials')  || ''; },
   avatarInitials()  { return this.customInit || initials(this.monika); },
   // Pull streak from journal if available, else default to 1
-  get streak()      { return parseInt(localStorage.getItem('bbAnon_streak') || '1', 10); },
+  get streak()      { return parseInt(BB.storage.get('Anon_streak') || '1', 10); },
 };
 
 // Liked posts set (persisted)
 const likedPosts = new Set(
-  JSON.parse(localStorage.getItem('bbAnon_liked') || '[]')
+  JSON.parse(BB.storage.get('Anon_liked') || '[]')
 );
 function saveLiked() {
-  localStorage.setItem('bbAnon_liked', JSON.stringify([...likedPosts]));
+  BB.storage.set('Anon_liked', JSON.stringify([...likedPosts]));
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -128,9 +128,9 @@ function initFirebase() {
       }
 
       // Subsequent auth changes — sign-out while on board (Firebase-auth path only)
-      if (!isReal && localStorage.getItem('bbAnon_verified') === 'true' && !localStorage.getItem('bbAnon_email')) {
-        localStorage.removeItem('bbAnon_verified');
-        localStorage.removeItem('bbAnon_isAdmin');
+      if (!isReal && BB.storage.get('Anon_verified') === 'true' && !BB.storage.get('Anon_email')) {
+        BB.storage.remove('Anon_verified');
+        BB.storage.remove('Anon_isAdmin');
         if (unsubPosts) { unsubPosts(); unsubPosts = null; }
         boot(null);
       }
@@ -172,13 +172,13 @@ async function boot(user) {
     // Signed in to BipolarBear with verified email — skip code verification
     // Set/clear admin flag based on Firebase Auth email
     if (user.email && user.email.toLowerCase() === ADMIN_EMAIL) {
-      localStorage.setItem('bbAnon_isAdmin', 'true');
+      BB.storage.set('Anon_isAdmin', 'true');
     } else {
-      localStorage.removeItem('bbAnon_isAdmin');
+      BB.storage.remove('Anon_isAdmin');
     }
     // Mark as verified for the synchronous pre-activation hint on next visit.
     // Cleared on sign-out by the auth-change handler above.
-    localStorage.setItem('bbAnon_verified', 'true');
+    BB.storage.set('Anon_verified', 'true');
     // Restore full anon profile (monika, meds, stable, etc.) from userSettings
     await _bbRestoreProfile(user.uid);
     if (profile.monika) {
@@ -434,10 +434,10 @@ function setupVerify() {
       await window._anonVerifyCode({ sessionId: _sessionId, code });
       // ✅ Verified
       if (_pendingEmail.toLowerCase() === ADMIN_EMAIL) {
-        localStorage.setItem('bbAnon_isAdmin', 'true');
+        BB.storage.set('Anon_isAdmin', 'true');
       }
-      localStorage.setItem('bbAnon_verified', 'true');
-      localStorage.setItem('bbAnon_email', _pendingEmail);
+      BB.storage.set('Anon_verified', 'true');
+      BB.storage.set('Anon_email', _pendingEmail);
 
       // If the user is signed in via the BipolarBear app, link the verified
       // anon email to their user account so it can be used for future
@@ -505,7 +505,7 @@ function setupVerify() {
 async function isMonikaInUse(monika, ownMonika) {
   if (!db) return false;
   if (ownMonika && monika.toLowerCase() === ownMonika.toLowerCase()) return false;
-  const doc = await db.collection('bbAnonMonikas').doc(monika.toLowerCase()).get();
+  const doc = await db.collection(BB_BRAND.collections.monikas).doc(monika.toLowerCase()).get();
   return doc.exists;
 }
 
@@ -550,8 +550,8 @@ function setupMonika() {
       }
     } catch (e) { /* network error — allow through */ }
     errEl.style.display = 'none';
-    localStorage.setItem('bbAnon_monika', monika);
-    if (db) db.collection('bbAnonMonikas').doc(monika.toLowerCase()).set({ monika, createdAt: firebase.firestore.FieldValue.serverTimestamp() }).catch(() => {});
+    BB.storage.set('Anon_monika', monika);
+    if (db) db.collection(BB_BRAND.collections.monikas).doc(monika.toLowerCase()).set({ monika, createdAt: firebase.firestore.FieldValue.serverTimestamp() }).catch(() => {});
     _bbSaveProfile(); // persist monika to userSettings for cross-device recovery
     showScreen('meds');
     setupMeds();
@@ -563,7 +563,7 @@ function setupMonika() {
 // ─────────────────────────────────────────────────────────────────
 function setupMeds() {
   document.getElementById('meds-yes').onclick = async () => {
-    localStorage.setItem('bbAnon_showMeds', 'true');
+    BB.storage.set('Anon_showMeds', 'true');
     // For BB App users, pre-populate med list from their Firestore data
     if (_bbUser && db) {
       try {
@@ -571,8 +571,8 @@ function setupMeds() {
         if (snap.exists) {
           const list = snap.data().currentMedList || [];
           if (list.length > 0) {
-            localStorage.setItem('bbAnon_medList', JSON.stringify(list));
-            localStorage.setItem('bbAnon_med', list.map(m => m.name).filter(Boolean).join(', '));
+            BB.storage.set('Anon_medList', JSON.stringify(list));
+            BB.storage.set('Anon_med', list.map(m => m.name).filter(Boolean).join(', '));
           }
         }
       } catch(e) { /* silently fail — user can add manually */ }
@@ -581,7 +581,7 @@ function setupMeds() {
     setupMedDefine(() => { showScreen('board'); initBoard(); });
   };
   document.getElementById('meds-no').onclick = () => {
-    localStorage.setItem('bbAnon_showMeds', 'false');
+    BB.storage.set('Anon_showMeds', 'false');
     showScreen('board');
     initBoard();
   };
@@ -592,17 +592,17 @@ function setupMeds() {
 // ─────────────────────────────────────────────────────────────────
 function _anonGetMedList() {
   try {
-    const s = localStorage.getItem('bbAnon_medList');
+    const s = BB.storage.get('Anon_medList');
     if (s) return JSON.parse(s);
-    const m = localStorage.getItem('bbAnon_med');
+    const m = BB.storage.get('Anon_med');
     return m ? [{ name: m, dosage: '' }] : [];
   } catch(e) { return []; }
 }
 
 async function _anonSaveMedList(list) {
-  localStorage.setItem('bbAnon_medList', JSON.stringify(list));
+  BB.storage.set('Anon_medList', JSON.stringify(list));
   const medStr = list.map(m => m.name).filter(Boolean).join(', ');
-  localStorage.setItem('bbAnon_med', medStr);
+  BB.storage.set('Anon_med', medStr);
   // Sync back to BB App if the user is signed into BipolarBear
   if (_bbUser && db) {
     try {
@@ -627,7 +627,7 @@ async function _anonEmailHash(email) {
 // Write current profile to anonProfiles/{hash}. No-op for BB users (they use userSettings).
 async function _anonSaveProfile() {
   if (!db || _bbUser) return;
-  const email = localStorage.getItem('bbAnon_email');
+  const email = BB.storage.get('Anon_email');
   if (!email) return;
   try {
     const hash = await _anonEmailHash(email);
@@ -640,8 +640,8 @@ async function _anonSaveProfile() {
       showStable:   profile.showStable,
       stableSince:  profile.stableSince || null,
       stableStreak: profile.stableStreak,
-      visitStreak:  parseInt(localStorage.getItem('bbAnon_streak') || '0', 10),
-      visitDate:    localStorage.getItem('bbAnonVisitDate') || null,
+      visitStreak:  parseInt(BB.storage.get('Anon_streak') || '0', 10),
+      visitDate:    BB.storage.get('AnonVisitDate') || null,
       updatedAt:    firebase.firestore.FieldValue.serverTimestamp(),
     }, { merge: true });
   } catch(e) { console.warn('[Anonymous] profile save failed', e); }
@@ -655,23 +655,23 @@ async function _anonRestoreProfile(email) {
     const doc  = await db.collection('anonProfiles').doc(hash).get();
     if (!doc.exists) return false;
     const d = doc.data();
-    if (d.monika)              localStorage.setItem('bbAnon_monika',   d.monika);
-    if (d.colorKey)            localStorage.setItem('bbAnon_colorKey', d.colorKey);
-    if (d.customInit !== undefined) localStorage.setItem('bbAnon_initials', d.customInit || '');
-    if (d.showMeds   !== undefined) localStorage.setItem('bbAnon_showMeds', d.showMeds ? 'true' : 'false');
+    if (d.monika)              BB.storage.set('Anon_monika',   d.monika);
+    if (d.colorKey)            BB.storage.set('Anon_colorKey', d.colorKey);
+    if (d.customInit !== undefined) BB.storage.set('Anon_initials', d.customInit || '');
+    if (d.showMeds   !== undefined) BB.storage.set('Anon_showMeds', d.showMeds ? 'true' : 'false');
     if (d.medList && d.medList.length > 0) {
-      localStorage.setItem('bbAnon_medList', JSON.stringify(d.medList));
-      localStorage.setItem('bbAnon_med', d.medList.map(m => m.name).filter(Boolean).join(', '));
+      BB.storage.set('Anon_medList', JSON.stringify(d.medList));
+      BB.storage.set('Anon_med', d.medList.map(m => m.name).filter(Boolean).join(', '));
     }
-    if (d.showStable !== undefined) localStorage.setItem('bbAnon_showStable', d.showStable ? 'true' : 'false');
+    if (d.showStable !== undefined) BB.storage.set('Anon_showStable', d.showStable ? 'true' : 'false');
     if (d.stableSince) {
-      localStorage.setItem('bbAnon_stableSince', d.stableSince);
+      BB.storage.set('Anon_stableSince', d.stableSince);
       // Recompute days since (it grows each day automatically)
       const days = Math.max(0, Math.floor((Date.now() - new Date(d.stableSince).getTime()) / 86400000));
-      localStorage.setItem('bbAnon_stableStreak', String(days));
+      BB.storage.set('Anon_stableStreak', String(days));
     }
-    if (typeof d.visitStreak === 'number') localStorage.setItem('bbAnon_streak',  String(d.visitStreak));
-    if (d.visitDate)                       localStorage.setItem('bbAnonVisitDate', d.visitDate);
+    if (typeof d.visitStreak === 'number') BB.storage.set('Anon_streak',  String(d.visitStreak));
+    if (d.visitDate)                       BB.storage.set('AnonVisitDate', d.visitDate);
     return !!d.monika;
   } catch(e) {
     console.warn('[Anonymous] profile restore failed', e);
@@ -691,7 +691,7 @@ async function _bbRestoreProfile(uid) {
     const d   = doc.exists ? doc.data() : {};
     // Stable streak is computed by journal.html and stored flat
     if (typeof d.stableStreak === 'number') {
-      localStorage.setItem('bbAnon_stableStreak', String(d.stableStreak));
+      BB.storage.set('Anon_stableStreak', String(d.stableStreak));
     }
     // Anon board profile is nested under anonProfile
     let ap = d.anonProfile || {};
@@ -713,19 +713,19 @@ async function _bbRestoreProfile(uid) {
         }
       } catch (_) { /* best-effort */ }
     }
-    if (ap.monika)                   localStorage.setItem('bbAnon_monika',      ap.monika);
-    if (ap.colorKey)                 localStorage.setItem('bbAnon_colorKey',    ap.colorKey);
-    if (ap.customInit !== undefined) localStorage.setItem('bbAnon_initials',    ap.customInit || '');
-    if (ap.showMeds   !== undefined) localStorage.setItem('bbAnon_showMeds',    ap.showMeds   ? 'true' : 'false');
-    if (ap.showStable !== undefined) localStorage.setItem('bbAnon_showStable',  ap.showStable ? 'true' : 'false');
-    if (ap.stableSince)              localStorage.setItem('bbAnon_stableSince', ap.stableSince);
+    if (ap.monika)                   BB.storage.set('Anon_monika',      ap.monika);
+    if (ap.colorKey)                 BB.storage.set('Anon_colorKey',    ap.colorKey);
+    if (ap.customInit !== undefined) BB.storage.set('Anon_initials',    ap.customInit || '');
+    if (ap.showMeds   !== undefined) BB.storage.set('Anon_showMeds',    ap.showMeds   ? 'true' : 'false');
+    if (ap.showStable !== undefined) BB.storage.set('Anon_showStable',  ap.showStable ? 'true' : 'false');
+    if (ap.stableSince)              BB.storage.set('Anon_stableSince', ap.stableSince);
     const medList = ap.medList && ap.medList.length ? ap.medList : (d.currentMedList || []);
     if (medList.length) {
-      localStorage.setItem('bbAnon_medList', JSON.stringify(medList));
-      localStorage.setItem('bbAnon_med', medList.map(m => m.name).filter(Boolean).join(', '));
+      BB.storage.set('Anon_medList', JSON.stringify(medList));
+      BB.storage.set('Anon_med', medList.map(m => m.name).filter(Boolean).join(', '));
     }
-    if (typeof ap.visitStreak === 'number') localStorage.setItem('bbAnon_streak',     String(ap.visitStreak));
-    if (ap.visitDate)                       localStorage.setItem('bbAnonVisitDate',    ap.visitDate);
+    if (typeof ap.visitStreak === 'number') BB.storage.set('Anon_streak',     String(ap.visitStreak));
+    if (ap.visitDate)                       BB.storage.set('AnonVisitDate',    ap.visitDate);
     // Mirror restored profile to anonProfiles so standalone email-code path
     // can restore it on a fresh browser/device without needing Firebase Auth.
     if (ap.monika && _bbUser && _bbUser.email) {
@@ -760,9 +760,9 @@ function _bbSaveProfile() {
     medList:     _anonGetMedList(),
     showStable:  profile.showStable,
     stableSince: profile.stableSince || null,
-    visitStreak: parseInt(localStorage.getItem('bbAnon_streak') || '0', 10),
-    visitDate:   localStorage.getItem('bbAnonVisitDate') || null,
-    verified:    localStorage.getItem('bbAnon_verified') === 'true',
+    visitStreak: parseInt(BB.storage.get('Anon_streak') || '0', 10),
+    visitDate:   BB.storage.get('AnonVisitDate') || null,
+    verified:    BB.storage.get('Anon_verified') === 'true',
   };
   db.collection('userSettings').doc(_bbUser.uid).set(
     { anonProfile: data }, { merge: true }
@@ -890,7 +890,7 @@ function openMedSettings() {
 
   document.getElementById('med-ov-cancel').onclick = () => closeOv('ov-med');
   document.getElementById('med-ov-save').onclick = async () => {
-    localStorage.setItem('bbAnon_showMeds', showMeds ? 'true' : 'false');
+    BB.storage.set('Anon_showMeds', showMeds ? 'true' : 'false');
     await _anonSaveMedList(medList);
     _anonSaveProfile(); _bbSaveProfile();
     closeOv('ov-med');
@@ -905,17 +905,17 @@ function openMedSettings() {
 // ─────────────────────────────────────────────────────────────────
 function _updateAnonStreak() {
   const today     = new Date().toISOString().slice(0, 10);
-  const lastDate  = localStorage.getItem('bbAnonVisitDate') || '';
+  const lastDate  = BB.storage.get('AnonVisitDate') || '';
   if (lastDate === today) return; // already counted today
   const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-  const prev      = parseInt(localStorage.getItem('bbAnon_streak') || '0', 10);
+  const prev      = parseInt(BB.storage.get('Anon_streak') || '0', 10);
   const streak    = lastDate === yesterday ? prev + 1 : 1;
-  localStorage.setItem('bbAnon_streak',  String(streak));
-  localStorage.setItem('bbAnonVisitDate', today);
+  BB.storage.set('Anon_streak',  String(streak));
+  BB.storage.set('AnonVisitDate', today);
 }
 
 function initBoard() {
-  localStorage.setItem('bbAnonLastVisit', Date.now());
+  BB.storage.set('AnonLastVisit', Date.now());
   _updateAnonStreak();
   renderUserPill();
   // One-time DOM handler wiring. initBoard() is reachable from multiple paths
@@ -1009,7 +1009,7 @@ function listenPosts() {
   document.getElementById('post-list').innerHTML =
     '<div class="empty-state">Loading…</div>';
 
-  unsubPosts = db.collection('bbAnonPosts')
+  unsubPosts = db.collection(BB_BRAND.collections.posts)
     .where('tab', '==', currentTab)
     .limit(60)
     .onSnapshot(snap => {
@@ -1044,7 +1044,7 @@ async function cleanOldPosts() {
   if (!db) return;
   const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   try {
-    const snap = await db.collection('bbAnonPosts')
+    const snap = await db.collection(BB_BRAND.collections.posts)
       .where('timestamp', '<', cutoff)
       .get();
     if (snap.empty) return;
@@ -1199,13 +1199,13 @@ function handleLike(btn) {
     btn.classList.remove('liked');
     btn.dataset.likes = count - 1;
     span.textContent  = count - 1;
-    if (db) db.collection('bbAnonPosts').doc(id).update({ likes: firebase.firestore.FieldValue.increment(-1) }).catch(() => {});
+    if (db) db.collection(BB_BRAND.collections.posts).doc(id).update({ likes: firebase.firestore.FieldValue.increment(-1) }).catch(() => {});
   } else {
     likedPosts.add(id);
     btn.classList.add('liked');
     btn.dataset.likes = count + 1;
     span.textContent  = count + 1;
-    if (db) db.collection('bbAnonPosts').doc(id).update({ likes: firebase.firestore.FieldValue.increment(1) }).catch(() => {});
+    if (db) db.collection(BB_BRAND.collections.posts).doc(id).update({ likes: firebase.firestore.FieldValue.increment(1) }).catch(() => {});
   }
   saveLiked();
 }
@@ -1215,11 +1215,11 @@ function handleLike(btn) {
 // ─────────────────────────────────────────────────────────────────
 function pollCanPost() {
   if (profile.canPost || !profile.hasPosted) return;
-  const firstId = localStorage.getItem('bbAnon_firstPostId');
+  const firstId = BB.storage.get('Anon_firstPostId');
   if (!firstId || !db) return;
-  db.collection('bbAnonPosts').doc(firstId).get().then(doc => {
+  db.collection(BB_BRAND.collections.posts).doc(firstId).get().then(doc => {
     if (doc.exists && (doc.data().likes || 0) > 0) {
-      localStorage.setItem('bbAnon_canPost', 'true');
+      BB.storage.set('Anon_canPost', 'true');
     }
   }).catch(() => {});
 }
@@ -1297,7 +1297,7 @@ function setupCompose() {
     let docId = null;
     if (db) {
       try {
-        const ref = await db.collection('bbAnonPosts').add({
+        const ref = await db.collection(BB_BRAND.collections.posts).add({
           ...entry,
           timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         });
@@ -1307,8 +1307,8 @@ function setupCompose() {
     }
 
     if (!profile.hasPosted) {
-      if (docId) localStorage.setItem('bbAnon_firstPostId', docId);
-      localStorage.setItem('bbAnon_hasPosted', 'true');
+      if (docId) BB.storage.set('Anon_firstPostId', docId);
+      BB.storage.set('Anon_hasPosted', 'true');
       openOv('ov-firstpost');
     }
     _posting = false;
@@ -1350,18 +1350,18 @@ function openStableSettings() {
   document.getElementById('stable-ov-cancel').onclick = () => closeOv('ov-stable');
 
   document.getElementById('stable-ov-save').onclick = () => {
-    localStorage.setItem('bbAnon_showStable', showStable ? 'true' : 'false');
+    BB.storage.set('Anon_showStable', showStable ? 'true' : 'false');
 
     if (!isBB) {
       // Compute days from entered date
       const since = document.getElementById('stable-ov-date').value; // YYYY-MM-DD
       if (since) {
-        localStorage.setItem('bbAnon_stableSince', since);
+        BB.storage.set('Anon_stableSince', since);
         const days = Math.max(0, Math.floor((Date.now() - new Date(since).getTime()) / 86400000));
-        localStorage.setItem('bbAnon_stableStreak', String(days));
+        BB.storage.set('Anon_stableStreak', String(days));
       } else {
-        localStorage.removeItem('bbAnon_stableSince');
-        localStorage.setItem('bbAnon_stableStreak', '0');
+        BB.storage.remove('Anon_stableSince');
+        BB.storage.set('Anon_stableStreak', '0');
       }
     }
 
@@ -1387,7 +1387,7 @@ function setupOverlayActions() {
     closeOv('ov-sos');
     // Production: write SOS report to Firestore for moderator review
     if (db && sosTargetName) {
-      db.collection('bbAnonReports').add({
+      db.collection(BB_BRAND.collections.reports).add({
         type: 'sos', targetName: sosTargetName,
         reportedBy: profile.monika, timestamp: firebase.firestore.FieldValue.serverTimestamp(),
       }).catch(() => {});
@@ -1401,7 +1401,7 @@ function setupOverlayActions() {
       closeOv('ov-report');
       if (db && reportTargetId) {
         const post = localPosts.find(p => p.id === reportTargetId);
-        db.collection('bbAnonReports').add({
+        db.collection(BB_BRAND.collections.reports).add({
           type: 'report', postId: reportTargetId, reason: btn.dataset.reason,
           postText: post ? post.text : '',
           postName: post ? post.name : '',
@@ -1410,7 +1410,7 @@ function setupOverlayActions() {
           timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         }).catch(() => {});
         // Flag post so 7-day auto-delete skips it
-        db.collection('bbAnonPosts').doc(reportTargetId)
+        db.collection(BB_BRAND.collections.posts).doc(reportTargetId)
           .update({ reported: true }).catch(() => {});
       }
       showHint('Report submitted — thank you 🙏');
@@ -1422,7 +1422,7 @@ function setupOverlayActions() {
   document.getElementById('sdel-confirm').addEventListener('click', () => {
     closeOv('ov-self-delete');
     if (db && selfDeleteId) {
-      db.collection('bbAnonPosts').doc(selfDeleteId).delete().catch(() => {});
+      db.collection(BB_BRAND.collections.posts).doc(selfDeleteId).delete().catch(() => {});
       localPosts = localPosts.filter(p => p.id !== selfDeleteId);
       renderPosts(currentTab === 'general' ? assembleGeneralPosts(localPosts) : sortPosts(localPosts));
     }
@@ -1442,7 +1442,7 @@ function setupOverlayActions() {
 // ─────────────────────────────────────────────────────────────────
 function adminDeletePost(id) {
   if (!db || !id) return;
-  db.collection('bbAnonPosts').doc(id).update({
+  db.collection(BB_BRAND.collections.posts).doc(id).update({
     deleted: true,
     deletedByAdmin: true,
     deletedAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -1576,9 +1576,9 @@ document.getElementById('ms-save').addEventListener('click', async () => {
   const newInit  = document.getElementById('ms-initials').value.toUpperCase().slice(0, 2);
   const selKey   = document.querySelector('#ms-colors .color-swatch.selected')?.dataset.key || profile.colorKey;
 
-  localStorage.setItem('bbAnon_monika',   newMonika);
-  localStorage.setItem('bbAnon_initials', newInit);
-  localStorage.setItem('bbAnon_colorKey', selKey);
+  BB.storage.set('Anon_monika',   newMonika);
+  BB.storage.set('Anon_initials', newInit);
+  BB.storage.set('Anon_colorKey', selKey);
 
   closeOv('ov-monika');
   renderUserPill();
@@ -1588,7 +1588,7 @@ document.getElementById('ms-save').addEventListener('click', async () => {
   if (db && oldMonika) {
     const col = COLOR_PRESETS.find(c => c.key === selKey) || COLOR_PRESETS[0];
     try {
-      const snap  = await db.collection('bbAnonPosts').where('name', '==', oldMonika).get();
+      const snap  = await db.collection(BB_BRAND.collections.posts).where('name', '==', oldMonika).get();
       const batch = db.batch();
       snap.docs.forEach(doc => batch.update(doc.ref, {
         name:     newMonika,
@@ -1597,8 +1597,8 @@ document.getElementById('ms-save').addEventListener('click', async () => {
         grad2:    col.g2,
       }));
       if (oldMonika.toLowerCase() !== newMonika.toLowerCase()) {
-        batch.delete(db.collection('bbAnonMonikas').doc(oldMonika.toLowerCase()));
-        batch.set(db.collection('bbAnonMonikas').doc(newMonika.toLowerCase()), { monika: newMonika, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+        batch.delete(db.collection(BB_BRAND.collections.monikas).doc(oldMonika.toLowerCase()));
+        batch.set(db.collection(BB_BRAND.collections.monikas).doc(newMonika.toLowerCase()), { monika: newMonika, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
       }
       await batch.commit();
     } catch (e) { console.warn('[Monika] update posts failed', e); }

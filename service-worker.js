@@ -34,7 +34,39 @@
 //     anonProfiles/{hash(email)} when userSettings has no anonProfile, so
 //     a BB account whose email was already used standalone reuses the
 //     existing monika instead of prompting for a new one.
-const CACHE_NAME = 'bipolarbear-v12';
+// v13: add js/shared/brand-config.js + css/theme.css scaffolding (Phase 1
+//     of the multi-variant refactor). Additive only — nothing consumes
+//     them yet, but they are linked from every HTML page so must be in
+//     the offline cache.
+// v14: Phase 2 of the multi-variant refactor — sweep brand-coloured hex
+//     literals in css/{index,journal,survival-kit,anonymous,beta}.css
+//     onto the var(--brand-*) tokens defined in theme.css. Visually
+//     identical, but every CSS-precached file changed so v13 caches
+//     would still serve the old palette.
+// v15: extend the same sweep to inline style="..." attributes in the
+//     five page HTML files. Paint-blocking <style>body{...}</style>
+//     blocks and <meta theme-color> values intentionally still use hex
+//     literals (one can't see :root tokens at parse time, the other
+//     isn't CSS).
+// v16: complete the Phase 2 sweep across js/{index,journal,survival-kit,
+//     anonymous}.js and fab.js. Brand hex literals in template-literal
+//     style="..." strings, .style.X assignments, Object.assign({style,
+//     background, color}), and confetti/toast colour arrays now resolve
+//     via var(--brand-*). All five files still parse via `node --check`.
+// v17: Phase 3a of the multi-variant refactor — add BB.storage helper to
+//     brand-config.js and sweep the 19 'bbAnon{Posts,Monikas,Reports}'
+//     Firestore collection literals onto BB_BRAND.collections.*. Runtime
+//     behaviour identical (the resolved values match the old literals).
+// v18: Phase 3b — sweep ~390 localStorage call sites across js/shared/{
+//     debug,onboarding}.js, js/{index,journal,survival-kit,anonymous,
+//     beta}.js, fab.js onto BB.storage. brand-config.js moved to first
+//     in the shared-helpers script load so debug.js + onboarding.js can
+//     read through BB.storage. sessionStorage and a small set of
+//     mixed/dual-use array literals intentionally still use raw
+//     localStorage (documented in commit notes); they don't block the
+//     multi-variant goal because they don't hardcode the prefix
+//     anywhere a future variant would need to override.
+const CACHE_NAME = 'bipolarbear-v18';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
@@ -60,8 +92,12 @@ const STATIC_ASSETS = [
   // Shared modules — small, loaded by every page.
   './js/shared/platform.js',
   './js/shared/debug.js',
+  './js/shared/brand-config.js',
   './js/shared/firebase-config.js',
   './js/shared/onboarding.js',
+
+  // Shared theme tokens (loaded before page-specific CSS).
+  './css/theme.css',
 
   // Page-specific stylesheets (extracted from inline <style> in Phase 4).
   './css/index.css',
