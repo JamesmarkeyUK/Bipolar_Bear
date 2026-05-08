@@ -30,7 +30,11 @@
 // v10: beta.html / css / js — remove WhatsApp group link.
 // v11: js/anonymous.js — fix duplicate chat messages (initBoard handler
 //     wiring is now one-time; Post button has an in-flight guard).
-const CACHE_NAME = 'bipolarbear-v11';
+// v12: js/anonymous.js — _bbRestoreProfile falls back to
+//     anonProfiles/{hash(email)} when userSettings has no anonProfile, so
+//     a BB account whose email was already used standalone reuses the
+//     existing monika instead of prompting for a new one.
+const CACHE_NAME = 'bipolarbear-v12';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

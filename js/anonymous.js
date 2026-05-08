@@ -688,14 +688,31 @@ async function _bbRestoreProfile(uid) {
   if (!db || !uid) return;
   try {
     const doc = await db.collection('userSettings').doc(uid).get();
-    if (!doc.exists) return;
-    const d = doc.data();
+    const d   = doc.exists ? doc.data() : {};
     // Stable streak is computed by journal.html and stored flat
     if (typeof d.stableStreak === 'number') {
       localStorage.setItem('bbAnon_stableStreak', String(d.stableStreak));
     }
     // Anon board profile is nested under anonProfile
-    const ap = d.anonProfile || {};
+    let ap = d.anonProfile || {};
+    // Fallback: if this BB account has never been used to set up an anon
+    // profile but the same email already verified on bipolaranonymous.app
+    // (standalone path), pull the existing monika+settings from
+    // anonProfiles/{hash(email)} so the user doesn't get prompted to pick a
+    // second monika. We then copy it into userSettings/{uid}.anonProfile so
+    // future sessions take the fast path.
+    if (!ap.monika && _bbUser && _bbUser.email) {
+      try {
+        const hash    = await _anonEmailHash(_bbUser.email);
+        const anonDoc = await db.collection('anonProfiles').doc(hash).get();
+        if (anonDoc.exists && anonDoc.data().monika) {
+          ap = anonDoc.data();
+          db.collection('userSettings').doc(uid).set(
+            { anonProfile: ap }, { merge: true }
+          ).catch(() => {});
+        }
+      } catch (_) { /* best-effort */ }
+    }
     if (ap.monika)                   localStorage.setItem('bbAnon_monika',      ap.monika);
     if (ap.colorKey)                 localStorage.setItem('bbAnon_colorKey',    ap.colorKey);
     if (ap.customInit !== undefined) localStorage.setItem('bbAnon_initials',    ap.customInit || '');
