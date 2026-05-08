@@ -25,7 +25,9 @@
 //     (email-code) users in the Monika settings overlay.
 // v8: css/anonymous.css + js/anonymous.js — make Monika settings sheet
 //     scrollable, hide duplicate "Discover BipolarBear" link on anon domain.
-const CACHE_NAME = 'bipolarbear-v8';
+// v9: js/anonymous.js — hide Stability Counter on Monika sheet for
+//     standalone (anon-direct) users; BB-app users only.
+const CACHE_NAME = 'bipolarbear-v9';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
