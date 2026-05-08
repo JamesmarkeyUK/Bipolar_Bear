@@ -38,7 +38,12 @@
 //     of the multi-variant refactor). Additive only — nothing consumes
 //     them yet, but they are linked from every HTML page so must be in
 //     the offline cache.
-const CACHE_NAME = 'bipolarbear-v13';
+// v14: Phase 2 of the multi-variant refactor — sweep brand-coloured hex
+//     literals in css/{index,journal,survival-kit,anonymous,beta}.css
+//     onto the var(--brand-*) tokens defined in theme.css. Visually
+//     identical, but every CSS-precached file changed so v13 caches
+//     would still serve the old palette.
+const CACHE_NAME = 'bipolarbear-v14';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

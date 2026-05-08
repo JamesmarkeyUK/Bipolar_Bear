@@ -31,7 +31,7 @@
 
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #ffaa33 0%, #ff8833 100%);
+      background: linear-gradient(135deg, var(--brand-primary-light) 0%, var(--brand-primary-mid) 100%);
       min-height: 100vh;
       padding: 10px;
       color: #333;
@@ -96,8 +96,8 @@
       box-sizing: border-box;
     }
     .fm-opt.sel {
-      border-color: #ff9500; background: rgba(255,149,0,0.08);
-      color: #ff9500; font-weight: 700;
+      border-color: var(--brand-primary); background: rgba(255,149,0,0.08);
+      color: var(--brand-primary); font-weight: 700;
     }
     .fm-opt:active { background: #f8f9fa; }
 
@@ -134,10 +134,10 @@
       #sqBad:hover    { border-color:#dc3545!important; background:#dc354514!important; color:#dc3545!important; }
       #sqUnsure:hover { border-color:#adb5bd!important; background:#adb5bd14!important; color:#6c757d!important; }
       #sqGood:hover   { border-color:#51cf66!important; background:#51cf6614!important; color:#51cf66!important; }
-      .fm-hover-orange:not(.sel):hover { border-color:#ff9500!important; background:#ff950018!important; color:#212529!important; font-weight:700!important; }
+      .fm-hover-orange:not(.sel):hover { border-color:var(--brand-primary)!important; background:#ff950018!important; color:#212529!important; font-weight:700!important; }
       .fm-hover-green:not(.sel):hover  { border-color:#51cf66!important; background:#51cf6618!important; color:#212529!important; font-weight:700!important; }
       .fm-hover-grey:not(.sel):hover   { border-color:#adb5bd!important; background:#adb5bd18!important; color:#212529!important; font-weight:700!important; }
-      .fm-opt.fm-hover-orange:hover { border-left-color:#ff9500!important; background:#ff950010!important; }
+      .fm-opt.fm-hover-orange:hover { border-left-color:var(--brand-primary)!important; background:#ff950010!important; }
       .fm-opt.fm-hover-green:hover  { border-left-color:#51cf66!important; background:#51cf6610!important; }
     }
     .fm-card-btn:active { transform: translateY(-1px); }
@@ -150,8 +150,8 @@
       background: #dee2e6; flex-shrink: 0;
       transition: background 0.2s, transform 0.2s;
     }
-    .fm-dot.done { background: var(--fm-accent, #ff9500); }
-    .fm-dot.cur  { background: var(--fm-accent, #ff9500); transform: scale(1.4); }
+    .fm-dot.done { background: var(--fm-accent, var(--brand-primary)); }
+    .fm-dot.cur  { background: var(--fm-accent, var(--brand-primary)); transform: scale(1.4); }
 
     /* ── Toggle switch ── */
     .bb-switch {
@@ -187,7 +187,7 @@
       transition: transform 0.2s;
       box-shadow: 0 1px 3px rgba(0,0,0,0.25);
     }
-    .bb-switch input:checked + .bb-slider { background: #ff9500; }
+    .bb-switch input:checked + .bb-slider { background: var(--brand-primary); }
     .bb-switch input:checked + .bb-slider:before { transform: translateX(19px); }
 
     /* ── PIN lock ── */
@@ -203,7 +203,7 @@
       background: rgba(0,0,0,0.1);
       border-color: #adb5bd;
     }
-    .pin-dot-dark.filled { background: #ff9500; border-color: #ff9500; }
+    .pin-dot-dark.filled { background: var(--brand-primary); border-color: var(--brand-primary); }
     .pin-key {
       width: 64px; height: 64px;
       border-radius: 50%;
@@ -275,20 +275,20 @@
     }
 
     .mood-manic.selected    { border-color: #ff4444; background: #fff0f0; }
-    .mood-elevated.selected { border-color: #ff9500; background: #fff8e6; }
+    .mood-elevated.selected { border-color: var(--brand-primary); background: var(--brand-secondary-tint); }
     .mood-stable.selected   { border-color: #51cf66; background: #f0fff4; }
     .mood-good.selected     { border-color: #51cf66; background: #f0fff4; } /* legacy */
     .mood-low.selected      { border-color: #845ef7; background: #f5f0ff; }
     .mood-depressed.selected{ border-color: #5c7cfa; background: #f0f4ff; }
     .mood-btn.linked        { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
     .mood-manic.linked    { border-color: #ff4444; background: #fff0f0; border-style: dashed; }
-    .mood-elevated.linked { border-color: #ff9500; background: #fff8e6; border-style: dashed; }
+    .mood-elevated.linked { border-color: var(--brand-primary); background: var(--brand-secondary-tint); border-style: dashed; }
     .mood-stable.linked   { border-color: #51cf66; background: #f0fff4; border-style: dashed; }
     .mood-low.linked      { border-color: #845ef7; background: #f5f0ff; border-style: dashed; }
     .mood-depressed.linked{ border-color: #5c7cfa; background: #f0f4ff; border-style: dashed; }
     @media (hover: hover) and (pointer: fine) {
       .mood-manic:hover    { border-color: #ff4444; background: #fff0f0; }
-      .mood-elevated:hover { border-color: #ff9500; background: #fff8e6; }
+      .mood-elevated:hover { border-color: var(--brand-primary); background: var(--brand-secondary-tint); }
       .mood-stable:hover   { border-color: #51cf66; background: #f0fff4; }
       .mood-good:hover     { border-color: #51cf66; background: #f0fff4; } /* legacy */
       .mood-low:hover      { border-color: #845ef7; background: #f5f0ff; }
@@ -333,7 +333,7 @@
       padding-left: 24px;
       margin-left: 10px;
       width: calc(100% - 10px);
-      border-color: #ff9500;
+      border-color: var(--brand-primary);
       text-align: center;
       background-color: #fff5e6 !important;
     }
@@ -373,7 +373,7 @@
 
     textarea:focus, input:focus {
       outline: none;
-      border-color: #ff9500;
+      border-color: var(--brand-primary);
     }
 
     textarea {
@@ -627,8 +627,8 @@
     }
 
     .medication-btn.selected {
-      background: #ff9500;
-      border-color: #ff9500;
+      background: var(--brand-primary);
+      border-color: var(--brand-primary);
     }
 
     /* Dark blue for "not taken" medication option */
@@ -781,7 +781,7 @@
     }
 
     .auth-box-header {
-      background: linear-gradient(135deg, #ffaa33 0%, #ff8833 100%);
+      background: linear-gradient(135deg, var(--brand-primary-light) 0%, var(--brand-primary-mid) 100%);
       padding: 30px 40px 25px;
       text-align: center;
     }
@@ -808,15 +808,15 @@
 
     .auth-input:focus {
       outline: none;
-      border-color: #ff9500;
+      border-color: var(--brand-primary);
     }
 
     .auth-btn {
       width: 100%;
       padding: 15px;
       background: white;
-      color: #ff9500;
-      border: 3px solid #ff9500;
+      color: var(--brand-primary);
+      border: 3px solid var(--brand-primary);
       border-radius: 10px;
       font-size: 1.1em;
       font-weight: 600;
@@ -828,7 +828,7 @@
 
     @media (hover: hover) and (pointer: fine) {
       .auth-btn:hover {
-        background: #ff9500;
+        background: var(--brand-primary);
         color: white;
         transform: translateY(-2px);
         box-shadow: 0 5px 16px rgba(255, 149, 0, 0.35);
@@ -843,7 +843,7 @@
     }
 
     .auth-toggle span {
-      color: #ff9500;
+      color: var(--brand-primary);
       font-weight: 600;
     }
 
@@ -1281,7 +1281,7 @@
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
       }
       .confirm-btn-yes:hover { background: #ff6b6b; color: white; }
-      #saveConfirmModal .confirm-btn-yes:hover { background: #ff9500; border-color: #ff9500; color: white !important; }
+      #saveConfirmModal .confirm-btn-yes:hover { background: var(--brand-primary); border-color: var(--brand-primary); color: white !important; }
       .confirm-btn-no:hover { background: #f8f9fa; border-color: #adb5bd; }
     }
 
@@ -1297,8 +1297,8 @@
     .pagination-btn {
       padding: 10px 16px;
       background: white;
-      color: #ff9500;
-      border: 2px solid #ff9500;
+      color: var(--brand-primary);
+      border: 2px solid var(--brand-primary);
       border-radius: 8px;
       cursor: pointer;
       font-weight: 600;
@@ -1308,7 +1308,7 @@
 
     @media (hover: hover) and (pointer: fine) {
       .pagination-btn:hover:not(:disabled) {
-        background: #ff9500;
+        background: var(--brand-primary);
         color: white;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
         transform: translateY(-2px);
@@ -1360,7 +1360,7 @@
 
     /* Force light mode — prevent OS dark mode from affecting colours */
     :root { color-scheme: light; }
-    html { background-color: #ff8833; }
+    html { background-color: var(--brand-primary-mid); }
 
     @keyframes datePulse {
       0%   { box-shadow: 0 0 0 0 rgba(255,149,0,0.7); transform: scale(1); }
@@ -1371,7 +1371,7 @@
     }
     #entryDate.date-edit-highlight {
       animation: datePulse 0.8s ease-out;
-      border-color: #ff9500 !important;
+      border-color: var(--brand-primary) !important;
       outline: 2px solid rgba(255,149,0,0.6);
     }
     /* Button & card hover — desktop pointer devices only */
@@ -1388,11 +1388,11 @@
     @media (hover: hover) and (pointer: fine) {
       .home-link-journal:hover  { background: rgba(255,255,255,0.35); }
       .journal-toggle-btn:hover { background: rgba(255,255,255,0.35) !important; transform: translateY(-2px); }
-      .stats-toggle-btn:hover   { background: #ff6b00 !important; color: white !important; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.25) !important; }
-      .btn-outline-orange:hover { background: #ff9500 !important; color: white !important; }
+      .stats-toggle-btn:hover   { background: var(--brand-primary-dark) !important; color: white !important; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.25) !important; }
+      .btn-outline-orange:hover { background: var(--brand-primary) !important; color: white !important; }
       .btn-outline-red:hover    { background: #ff3b30 !important; color: white !important; }
       .stat-card[onclick]:hover { transform: scale(1.05); }
-      .btn-export-pdf:hover    { background: #ff9500 !important; color: white !important; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.25) !important; }
+      .btn-export-pdf:hover    { background: var(--brand-primary) !important; color: white !important; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.25) !important; }
       .btn-export-backup:hover { background: #51cf66 !important; color: white !important; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.25) !important; }
       .btn-export-import:hover { background: #74c0fc !important; color: white !important; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.25) !important; }
       .logout-btn-list:hover   { border-color: #adb5bd !important; }
@@ -1469,7 +1469,7 @@
         width: 100%;
         height: 100%;
         border-radius: 30px;
-        background: linear-gradient(135deg, #ffaa33 0%, #ff8833 100%);
+        background: linear-gradient(135deg, var(--brand-primary-light) 0%, var(--brand-primary-mid) 100%);
         transform: translateZ(0);
       }
       #scroll-view {

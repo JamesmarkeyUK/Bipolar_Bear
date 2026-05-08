@@ -1,6 +1,6 @@
 /* ── BLOCK 1 ── */
 :root {
-      --yellow:      #f5c800;
+      --yellow:      var(--brand-secondary);
       --yellow-dark: #c49e00;
       --yellow-light:#ffe566;
       --yellow-bg:   #fffde7;
