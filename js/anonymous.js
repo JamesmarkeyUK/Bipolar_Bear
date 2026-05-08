@@ -59,6 +59,7 @@ let reportTargetId  = '';
 let adminDeleteId   = '';
 let selfDeleteId    = '';
 let _bbUser         = null; // Firebase-auth verified user (BB App path)
+let _boardSetupDone = false; // initBoard's one-time handler wiring (compose, FAB, tabs, overlays)
 
 // Persisted user profile (localStorage)
 const profile = {
@@ -900,10 +901,17 @@ function initBoard() {
   localStorage.setItem('bbAnonLastVisit', Date.now());
   _updateAnonStreak();
   renderUserPill();
-  setupTabs();
-  setupFAB();
-  setupCompose();
-  setupOverlayActions();
+  // One-time DOM handler wiring. initBoard() is reachable from multiple paths
+  // (boot, verify success, meds yes/no) — re-running setup* would attach
+  // duplicate click handlers to the Post / SOS / report / delete buttons,
+  // which is what caused chat messages to be written twice.
+  if (!_boardSetupDone) {
+    setupTabs();
+    setupFAB();
+    setupCompose();
+    setupOverlayActions();
+    _boardSetupDone = true;
+  }
   setTab('general');
   cleanOldPosts();
   _anonSaveProfile(); _bbSaveProfile(); // persist profile to Firestore
@@ -1238,9 +1246,13 @@ function setupCompose() {
 
   document.getElementById('compose-cancel').addEventListener('click', () => closeOv('ov-compose'));
 
+  let _posting = false;
   post.addEventListener('click', async () => {
+    if (_posting) return; // guard against double-tap / re-entrant clicks
     const text = ta.value.trim();
     if (!text) return;
+    _posting = true;
+    post.disabled = true;
     closeOv('ov-compose');
 
     const now = new Date();
@@ -1282,6 +1294,7 @@ function setupCompose() {
       localStorage.setItem('bbAnon_hasPosted', 'true');
       openOv('ov-firstpost');
     }
+    _posting = false;
   });
 }
 
