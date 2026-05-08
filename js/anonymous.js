@@ -505,7 +505,7 @@ function setupVerify() {
 async function isMonikaInUse(monika, ownMonika) {
   if (!db) return false;
   if (ownMonika && monika.toLowerCase() === ownMonika.toLowerCase()) return false;
-  const doc = await db.collection('bbAnonMonikas').doc(monika.toLowerCase()).get();
+  const doc = await db.collection(BB_BRAND.collections.monikas).doc(monika.toLowerCase()).get();
   return doc.exists;
 }
 
@@ -551,7 +551,7 @@ function setupMonika() {
     } catch (e) { /* network error — allow through */ }
     errEl.style.display = 'none';
     localStorage.setItem('bbAnon_monika', monika);
-    if (db) db.collection('bbAnonMonikas').doc(monika.toLowerCase()).set({ monika, createdAt: firebase.firestore.FieldValue.serverTimestamp() }).catch(() => {});
+    if (db) db.collection(BB_BRAND.collections.monikas).doc(monika.toLowerCase()).set({ monika, createdAt: firebase.firestore.FieldValue.serverTimestamp() }).catch(() => {});
     _bbSaveProfile(); // persist monika to userSettings for cross-device recovery
     showScreen('meds');
     setupMeds();
@@ -1009,7 +1009,7 @@ function listenPosts() {
   document.getElementById('post-list').innerHTML =
     '<div class="empty-state">Loading…</div>';
 
-  unsubPosts = db.collection('bbAnonPosts')
+  unsubPosts = db.collection(BB_BRAND.collections.posts)
     .where('tab', '==', currentTab)
     .limit(60)
     .onSnapshot(snap => {
@@ -1044,7 +1044,7 @@ async function cleanOldPosts() {
   if (!db) return;
   const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   try {
-    const snap = await db.collection('bbAnonPosts')
+    const snap = await db.collection(BB_BRAND.collections.posts)
       .where('timestamp', '<', cutoff)
       .get();
     if (snap.empty) return;
@@ -1199,13 +1199,13 @@ function handleLike(btn) {
     btn.classList.remove('liked');
     btn.dataset.likes = count - 1;
     span.textContent  = count - 1;
-    if (db) db.collection('bbAnonPosts').doc(id).update({ likes: firebase.firestore.FieldValue.increment(-1) }).catch(() => {});
+    if (db) db.collection(BB_BRAND.collections.posts).doc(id).update({ likes: firebase.firestore.FieldValue.increment(-1) }).catch(() => {});
   } else {
     likedPosts.add(id);
     btn.classList.add('liked');
     btn.dataset.likes = count + 1;
     span.textContent  = count + 1;
-    if (db) db.collection('bbAnonPosts').doc(id).update({ likes: firebase.firestore.FieldValue.increment(1) }).catch(() => {});
+    if (db) db.collection(BB_BRAND.collections.posts).doc(id).update({ likes: firebase.firestore.FieldValue.increment(1) }).catch(() => {});
   }
   saveLiked();
 }
@@ -1217,7 +1217,7 @@ function pollCanPost() {
   if (profile.canPost || !profile.hasPosted) return;
   const firstId = localStorage.getItem('bbAnon_firstPostId');
   if (!firstId || !db) return;
-  db.collection('bbAnonPosts').doc(firstId).get().then(doc => {
+  db.collection(BB_BRAND.collections.posts).doc(firstId).get().then(doc => {
     if (doc.exists && (doc.data().likes || 0) > 0) {
       localStorage.setItem('bbAnon_canPost', 'true');
     }
@@ -1297,7 +1297,7 @@ function setupCompose() {
     let docId = null;
     if (db) {
       try {
-        const ref = await db.collection('bbAnonPosts').add({
+        const ref = await db.collection(BB_BRAND.collections.posts).add({
           ...entry,
           timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         });
@@ -1387,7 +1387,7 @@ function setupOverlayActions() {
     closeOv('ov-sos');
     // Production: write SOS report to Firestore for moderator review
     if (db && sosTargetName) {
-      db.collection('bbAnonReports').add({
+      db.collection(BB_BRAND.collections.reports).add({
         type: 'sos', targetName: sosTargetName,
         reportedBy: profile.monika, timestamp: firebase.firestore.FieldValue.serverTimestamp(),
       }).catch(() => {});
@@ -1401,7 +1401,7 @@ function setupOverlayActions() {
       closeOv('ov-report');
       if (db && reportTargetId) {
         const post = localPosts.find(p => p.id === reportTargetId);
-        db.collection('bbAnonReports').add({
+        db.collection(BB_BRAND.collections.reports).add({
           type: 'report', postId: reportTargetId, reason: btn.dataset.reason,
           postText: post ? post.text : '',
           postName: post ? post.name : '',
@@ -1410,7 +1410,7 @@ function setupOverlayActions() {
           timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         }).catch(() => {});
         // Flag post so 7-day auto-delete skips it
-        db.collection('bbAnonPosts').doc(reportTargetId)
+        db.collection(BB_BRAND.collections.posts).doc(reportTargetId)
           .update({ reported: true }).catch(() => {});
       }
       showHint('Report submitted — thank you 🙏');
@@ -1422,7 +1422,7 @@ function setupOverlayActions() {
   document.getElementById('sdel-confirm').addEventListener('click', () => {
     closeOv('ov-self-delete');
     if (db && selfDeleteId) {
-      db.collection('bbAnonPosts').doc(selfDeleteId).delete().catch(() => {});
+      db.collection(BB_BRAND.collections.posts).doc(selfDeleteId).delete().catch(() => {});
       localPosts = localPosts.filter(p => p.id !== selfDeleteId);
       renderPosts(currentTab === 'general' ? assembleGeneralPosts(localPosts) : sortPosts(localPosts));
     }
@@ -1442,7 +1442,7 @@ function setupOverlayActions() {
 // ─────────────────────────────────────────────────────────────────
 function adminDeletePost(id) {
   if (!db || !id) return;
-  db.collection('bbAnonPosts').doc(id).update({
+  db.collection(BB_BRAND.collections.posts).doc(id).update({
     deleted: true,
     deletedByAdmin: true,
     deletedAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -1588,7 +1588,7 @@ document.getElementById('ms-save').addEventListener('click', async () => {
   if (db && oldMonika) {
     const col = COLOR_PRESETS.find(c => c.key === selKey) || COLOR_PRESETS[0];
     try {
-      const snap  = await db.collection('bbAnonPosts').where('name', '==', oldMonika).get();
+      const snap  = await db.collection(BB_BRAND.collections.posts).where('name', '==', oldMonika).get();
       const batch = db.batch();
       snap.docs.forEach(doc => batch.update(doc.ref, {
         name:     newMonika,
@@ -1597,8 +1597,8 @@ document.getElementById('ms-save').addEventListener('click', async () => {
         grad2:    col.g2,
       }));
       if (oldMonika.toLowerCase() !== newMonika.toLowerCase()) {
-        batch.delete(db.collection('bbAnonMonikas').doc(oldMonika.toLowerCase()));
-        batch.set(db.collection('bbAnonMonikas').doc(newMonika.toLowerCase()), { monika: newMonika, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+        batch.delete(db.collection(BB_BRAND.collections.monikas).doc(oldMonika.toLowerCase()));
+        batch.set(db.collection(BB_BRAND.collections.monikas).doc(newMonika.toLowerCase()), { monika: newMonika, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
       }
       await batch.commit();
     } catch (e) { console.warn('[Monika] update posts failed', e); }

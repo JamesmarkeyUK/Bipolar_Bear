@@ -8660,7 +8660,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
             // Release the anon-board monika reservation so others can claim it.
             const _monika = localStorage.getItem('bbAnon_monika');
             if (_monika) {
-              await db.collection('bbAnonMonikas').doc(_monika.toLowerCase()).delete().catch(() => {});
+              await db.collection(BB_BRAND.collections.monikas).doc(_monika.toLowerCase()).delete().catch(() => {});
             }
 
             // Drop cross-device anon profile lookups (hashed by lowercase email).

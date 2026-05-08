@@ -109,7 +109,7 @@ const journalFeatures = [
                   _badge.textContent  = '💬 Tap to join the community';
                   _badge.style.display = 'block';
                 } else {
-                  db.collection('bbAnonPosts')
+                  db.collection(BB_BRAND.collections.posts)
                     .where('timestamp', '>', firebase.firestore.Timestamp.fromMillis(_lastVisit))
                     .limit(5)
                     .get()
@@ -224,7 +224,7 @@ const journalFeatures = [
               const _badge2 = document.getElementById('anonMessagesBadge');
               const _lastVisit2 = parseInt(localStorage.getItem('bbAnonLastVisit') || '0', 10);
               if (_badge2 && _lastVisit2) {
-                db.collection('bbAnonPosts')
+                db.collection(BB_BRAND.collections.posts)
                   .where('timestamp', '>', firebase.firestore.Timestamp.fromMillis(_lastVisit2))
                   .limit(5).get().then(snap => {
                     const _myMonika = localStorage.getItem('bbAnon_monika') || '';

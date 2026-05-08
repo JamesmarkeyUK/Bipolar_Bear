@@ -53,7 +53,11 @@
 //     style="..." strings, .style.X assignments, Object.assign({style,
 //     background, color}), and confetti/toast colour arrays now resolve
 //     via var(--brand-*). All five files still parse via `node --check`.
-const CACHE_NAME = 'bipolarbear-v16';
+// v17: Phase 3a of the multi-variant refactor — add BB.storage helper to
+//     brand-config.js and sweep the 19 'bbAnon{Posts,Monikas,Reports}'
+//     Firestore collection literals onto BB_BRAND.collections.*. Runtime
+//     behaviour identical (the resolved values match the old literals).
+const CACHE_NAME = 'bipolarbear-v17';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

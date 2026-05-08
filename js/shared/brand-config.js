@@ -51,3 +51,48 @@ window.BB_BRAND = {
   descriptionAnonymous:
     'An anonymous peer community for people living with bipolar disorder',
 };
+
+/**
+ * Shared `BB` namespace, also populated by platform.js, debug.js, and
+ * onboarding.js. brand-config.js loads first among the four shared
+ * helpers, so the assign-or-create idiom is safe in either order.
+ */
+window.BB = window.BB || {};
+
+/**
+ * localStorage wrapper that prefixes every key with BB_BRAND.storagePrefix.
+ *
+ * Use `BB.storage.get('Xxx')` in JS instead of
+ * `localStorage.getItem('bbXxx')` so the same source file works across
+ * variants that use different prefixes. Inline `<script>` blocks in HTML
+ * (the beta-gate, native-PIN-gate, etc.) still use literal keys because
+ * they run before this module loads — those are parameterised at build
+ * time per variant, not at runtime.
+ *
+ * Try/catch matches debug.js: localStorage can throw in iOS Safari
+ * private mode. We fail open on read (return null) and silently no-op
+ * on write — every caller already handles a missing value.
+ */
+window.BB.storage = {
+  get: function (key) {
+    try {
+      return localStorage.getItem(window.BB_BRAND.storagePrefix + key);
+    } catch (_) {
+      return null;
+    }
+  },
+  set: function (key, value) {
+    try {
+      localStorage.setItem(window.BB_BRAND.storagePrefix + key, value);
+    } catch (_) {
+      // ignore
+    }
+  },
+  remove: function (key) {
+    try {
+      localStorage.removeItem(window.BB_BRAND.storagePrefix + key);
+    } catch (_) {
+      // ignore
+    }
+  },
+};
