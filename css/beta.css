@@ -286,29 +286,6 @@ input[type="text"]:focus {
   letter-spacing: 0.01em;
 }
 
-.whatsapp-btn {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  background: rgba(37,211,102,0.2);
-  border: 1.5px solid rgba(37,211,102,0.5);
-  border-radius: 30px;
-  padding: 12px 24px;
-  color: white;
-  text-decoration: none;
-  font-weight: 700;
-  font-size: 0.95em;
-  margin: 20px auto 0;
-  max-width: 260px;
-  -webkit-tap-highlight-color: transparent;
-  box-shadow: 0 4px 14px rgba(37,211,102,0.2);
-}
-
-@media (hover: none) and (pointer: coarse) {
-  .whatsapp-btn { display: flex; }
-}
-
 /* ─── iPhone 15 Pro frame (desktop ≥ 520 px) ─── */
 #iphone-frame { width: 100%; }
 #app-shell    { width: 100%; }

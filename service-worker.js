@@ -27,7 +27,8 @@
 //     scrollable, hide duplicate "Discover BipolarBear" link on anon domain.
 // v9: js/anonymous.js — hide Stability Counter on Monika sheet for
 //     standalone (anon-direct) users; BB-app users only.
-const CACHE_NAME = 'bipolarbear-v9';
+// v10: beta.html / css / js — remove WhatsApp group link.
+const CACHE_NAME = 'bipolarbear-v10';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
