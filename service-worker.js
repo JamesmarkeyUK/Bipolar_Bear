@@ -21,7 +21,9 @@
 //     leaving logoCurrentIndex in TDZ → broke delete-all + easter egg).
 // v6: move <script src="js/journal.js"> to end of <body> in journal.html so
 //     all DOM nodes the script touches at top-level exist when it runs.
-const CACHE_NAME = 'bipolarbear-v6';
+// v7: anonymous.html + js/anonymous.js — add Sign Out button for standalone
+//     (email-code) users in the Monika settings overlay.
+const CACHE_NAME = 'bipolarbear-v7';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

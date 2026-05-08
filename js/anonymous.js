@@ -1495,10 +1495,27 @@ function openMonikaSettings() {
     updatePreview();
   };
 
+  // Sign Out is only meaningful for standalone (email-code) users; BB-app
+  // users sign out from the main app. _bbUser is null on the standalone path.
+  const msSignOut = document.getElementById('ms-signout');
+  if (msSignOut) msSignOut.style.display = _bbUser ? 'none' : 'block';
+
   openOv('ov-monika');
 }
 
 document.getElementById('ms-cancel').addEventListener('click', () => closeOv('ov-monika'));
+
+document.getElementById('ms-signout').addEventListener('click', () => {
+  // Standalone sign-out: clear all bbAnon_* identity/session state. Profile
+  // data persists in anonProfiles/{sha256email} so the same email re-verifies
+  // back into the same identity.
+  Object.keys(localStorage)
+    .filter(k => k === 'bbAnonLastVisit' || k === 'bbAnonVisitDate' || k.startsWith('bbAnon_'))
+    .forEach(k => localStorage.removeItem(k));
+  if (unsubPosts) { unsubPosts(); unsubPosts = null; }
+  closeOv('ov-monika');
+  boot(null);
+});
 const _msHomeBtn = document.getElementById('ms-home');
 _msHomeBtn.textContent = _isAnonDomain ? '🐻 Discover BipolarBear →' : '← Back to Bipolar Bear';
 _msHomeBtn.addEventListener('click', () => {
