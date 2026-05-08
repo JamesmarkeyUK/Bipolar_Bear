@@ -7,7 +7,6 @@
  *     (`betaSignups` collection)
  *   - Access-code gate (`accessPw`): unlocks the web build by writing
  *     `bbWebUnlocked='true'` to localStorage, then redirects to index.html
- *   - WhatsApp button hide on Firefox (its redirect support is poor)
  *   - "People helped" counter from `counters/peopleHelped` (or
  *     `peopleHelpedApp` on native)
  *   - Logo easter egg: 5 quick taps cycles through the 3 logo variants and
@@ -125,12 +124,6 @@
       document.getElementById('accessPw').focus();
     }
   };
-
-  // ── Hide WhatsApp button on Firefox mobile (poor redirect support) ──
-  if (/Firefox|FxiOS/i.test(navigator.userAgent)) {
-    const wa = document.querySelector('.whatsapp-btn');
-    if (wa) wa.style.display = 'none';
-  }
 
   // ── People helped counter ──
   // One-shot fetch from Firestore. The native build uses a separate counter
