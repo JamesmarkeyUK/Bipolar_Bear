@@ -1,12 +1,12 @@
 /* ── BLOCK 1 ── */
 :root {
       --yellow:      var(--brand-secondary);
-      --yellow-dark: #c49e00;
+      --yellow-dark: #a07e00;
       --yellow-light:#ffe566;
       --yellow-bg:   #fffde7;
       --cream:       #FFFBF5;
       --dark:        #1a1500;
-      --muted:       #7a6a20;
+      --muted:       #5c5018;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
     input, textarea { user-select: text; -webkit-user-select: text; }
@@ -233,10 +233,10 @@
     .code-box {
       flex: 1; min-width: 0; height: 52px; border-radius: 12px;
       background: #f5f5f5; border: 2px solid #eee;
-      text-align: center; font-size: 22px; font-weight: 800; color: var(--yellow);
+      text-align: center; font-size: 22px; font-weight: 800; color: var(--dark);
       outline: none; transition: all 0.15s; font-family: inherit;
     }
-    .code-box.filled { background: var(--yellow-bg); border-color: var(--yellow); }
+    .code-box.filled { background: var(--yellow-bg); border-color: var(--yellow); color: var(--dark); }
 
     /* ── Buttons ── */
     .btn-primary {
@@ -245,7 +245,7 @@
       font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit;
       transition: opacity 0.15s;
     }
-    .btn-primary:disabled { background: #eee; color: #aaa; cursor: default; }
+    .btn-primary:disabled { background: #d8d8d8; color: #495057; cursor: default; }
     .btn-secondary {
       background: #f0f0f0; color: var(--muted); border: none;
       border-radius: 10px; padding: 11px; font-size: 14px; cursor: pointer; font-family: inherit;
@@ -294,11 +294,11 @@
     .med-input-row .bb-input { flex: 1; margin: 0; }
     .med-toggle-btn {
       flex: 1; padding: 9px; border-radius: 10px; font-size: 13px; font-weight: 700;
-      border: 2px solid #e9ecef; background: #f8f9fa; color: #868e96; cursor: pointer;
+      border: 2px solid #e9ecef; background: #f8f9fa; color: #495057; cursor: pointer;
       font-family: inherit; transition: border-color 0.15s, background 0.15s, color 0.15s;
     }
     .med-toggle-btn.active {
-      border-color: var(--yellow); background: var(--yellow-bg); color: var(--yellow);
+      border-color: var(--yellow); background: var(--yellow-bg); color: var(--dark);
     }
 
     /* ── Board ── */
@@ -315,7 +315,7 @@
       padding: 8px 14px; border-radius: 20px; font-size: 0.9em; font-weight: 600;
       transition: background 0.2s; border: none; cursor: pointer; font-family: inherit;
     }
-    @media (hover: hover) and (pointer: fine) { .board-back-btn:hover { background: rgba(0,0,0,0.48); } }
+    @media (hover: hover) and (pointer: fine) { .board-back-btn:hover { background: rgba(0,0,0,0.18); } }
     .board-logo { display: flex; align-items: center; gap: 10px; }
     .board-logo img { width: 36px; height: 36px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
     .board-logo-name { font-size: 18px; font-weight: 800; color: var(--dark); letter-spacing: -0.3px; }
@@ -348,7 +348,7 @@
       padding: 6px 12px; cursor: pointer; font-size: 13px; color: var(--muted);
       font-family: inherit; transition: all 0.15s;
     }
-    .like-btn.liked { background: var(--yellow-bg); border-color: var(--yellow); color: var(--yellow); font-weight: 700; }
+    .like-btn.liked { background: var(--yellow-bg); border-color: var(--yellow); color: var(--dark); font-weight: 700; }
     .icon-btn { background: none; border: none; cursor: pointer; font-size: 18px; opacity: 0.5; padding: 4px; line-height: 1; }
 
     /* System message */

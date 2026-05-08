@@ -22,9 +22,9 @@
     details summary::-webkit-details-marker { display: none; }
     details[open] .bb-note-chev { transform: rotate(90deg); }
     /* Improve muted text readability across the app */
-    .bb-muted { color: #6c757d !important; }
+    .bb-muted { color: #495057 !important; }
     @media (max-width: 600px) {
-      .bb-light-muted { color: #6c757d !important; }
+      .bb-light-muted { color: #495057 !important; }
     }
     @media (hover: hover) and (pointer: fine) { .cal-cell:hover { transform: scale(1.2); z-index: 1; } }
     .cal-cell:active { transform: scale(1.1); z-index: 1; }
@@ -72,7 +72,7 @@
 
     .tagline {
       font-size: 1.1em;
-      opacity: 0.9;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
     }
 
     .card {
@@ -459,7 +459,7 @@
     }
 
     .entry-notes {
-      color: #6c757d;
+      color: #495057;
       line-height: 1.6;
       text-align: left;
       display: -webkit-box;
@@ -472,7 +472,7 @@
     .no-entries {
       text-align: center;
       padding: 40px;
-      color: #6c757d;
+      color: #495057;
       font-style: italic;
     }
 
@@ -503,22 +503,23 @@
     }
 
     .stat-label {
-      color: #6c757d;
+      color: #495057;
       margin-top: 5px;
     }
 
     .delete-btn {
-      background: #ff6b6b;
+      background: #c92a2a;
       color: white;
       border: none;
       padding: 5px 10px;
       border-radius: 5px;
       cursor: pointer;
       font-size: 0.9em;
+      font-weight: 600;
     }
 
     @media (hover: hover) and (pointer: fine) {
-      .delete-btn:hover { background: #ff5252; }
+      .delete-btn:hover { background: #a51111; }
     }
 
     .energy-selector {
@@ -703,7 +704,7 @@
     }
 
     .medication-delete {
-      background: #ff6b6b;
+      background: #c92a2a;
       color: white;
       border: none;
       padding: 6px 12px;
@@ -714,7 +715,7 @@
     }
 
     @media (hover: hover) and (pointer: fine) {
-      .medication-delete:hover { background: #ff5252; }
+      .medication-delete:hover { background: #a51111; }
     }
 
     .chart-container {
@@ -837,7 +838,7 @@
 
     .auth-toggle {
       text-align: center;
-      color: #6c757d;
+      color: #495057;
       margin-top: 15px;
       cursor: pointer;
     }
@@ -1265,8 +1266,8 @@
 
     .confirm-btn-yes {
       background: white;
-      color: #ff6b6b;
-      border: 2px solid #ff6b6b;
+      color: #c92a2a;
+      border: 2px solid #c92a2a;
     }
 
     .confirm-btn-no {
@@ -1280,7 +1281,7 @@
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
       }
-      .confirm-btn-yes:hover { background: #ff6b6b; color: white; }
+      .confirm-btn-yes:hover { background: #c92a2a; color: white; }
       #saveConfirmModal .confirm-btn-yes:hover { background: var(--brand-primary); border-color: var(--brand-primary); color: white !important; }
       .confirm-btn-no:hover { background: #f8f9fa; border-color: #adb5bd; }
     }
@@ -1317,14 +1318,14 @@
 
     .pagination-btn:disabled {
       background: #f8f9fa;
-      color: #adb5bd;
-      border-color: #e9ecef;
+      color: #6c757d;
+      border-color: #dee2e6;
       cursor: not-allowed;
       box-shadow: none;
     }
 
     .pagination-info {
-      color: #6c757d;
+      color: #495057;
       font-weight: 600;
     }
 
@@ -1333,10 +1334,11 @@
       text-align: center;
       margin: 20px auto 30px;
       font-size: 0.9em;
-      color: rgba(255, 255, 255, 0.85);
+      color: #fff;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
       text-decoration: none;
       padding: 8px 16px;
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.25);
       border-radius: 20px;
       backdrop-filter: blur(10px);
       transition: all 0.3s ease;

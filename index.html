@@ -99,7 +99,7 @@
             <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </span>
         </a>
-        <div id="journalTutorialProgress" style="text-align:center;font-size:0.7em;color:rgba(255,255,255,0.75);margin-top:4px;font-style:italic;display:none;"></div>
+        <div id="journalTutorialProgress" style="text-align:center;font-size:0.7em;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);margin-top:4px;font-style:italic;display:none;"></div>
         <div id="journalStreakBadge" class="btn-subnote"></div>
       </div>
       <div id="journalStartHint" style="display:none; flex-direction:column; align-items:center; gap:2px; pointer-events:none; animation:hintFade 2.4s ease-in-out infinite; margin-top:-4px;">
@@ -107,7 +107,7 @@
           <path d="M 12,20 Q 8,10 12,2" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" fill="none"/>
           <polyline points="7,6 12,1 17,6" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         </svg>
-        <span style="font-size:0.78em;font-weight:700;font-style:italic;color:rgba(255,255,255,0.9);white-space:nowrap;font-family:'Georgia',serif;letter-spacing:0.01em;">🐻 Click here to get started!</span>
+        <span style="font-size:0.78em;font-weight:700;font-style:italic;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);white-space:nowrap;font-family:'Georgia',serif;letter-spacing:0.01em;">🐻 Click here to get started!</span>
       </div>
 
       <div class="btn-container" id="survivalContainer">
@@ -125,7 +125,7 @@
           <path d="M 12,20 Q 8,10 12,2" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" fill="none"/>
           <polyline points="7,6 12,1 17,6" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         </svg>
-        <span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,255,255,0.9);font-family:'Georgia',serif;letter-spacing:0.01em;text-align:center;max-width:200px;line-height:1.4;">🐻 Click here to learn and share more about your bipolar</span>
+        <span style="font-size:0.72em;font-weight:700;font-style:italic;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-family:'Georgia',serif;letter-spacing:0.01em;text-align:center;max-width:200px;line-height:1.4;">🐻 Click here to learn and share more about your bipolar</span>
       </div>
 
       <div class="btn-container" id="anonymousContainer">
@@ -171,7 +171,7 @@
   <!-- Auth hint (shown at step 4: save progress) -->
   <div id="signinHint" style="display:none; position:fixed; bottom:76px; left:50%; transform:translateX(-50%); flex-direction:column; align-items:center; gap:4px; pointer-events:none; z-index:51;">
     <div id="signinHintInner" style="animation:signinHintPulse 1.6s ease-in-out infinite; display:flex; flex-direction:column; align-items:center; gap:4px;">
-      <span style="color:white; font-size:0.72em; opacity:0.85;">Stored securely in Firebase</span>
+      <span style="color:white; font-size:0.72em; text-shadow:0 1px 3px rgba(0,0,0,0.3);">Stored securely in Firebase</span>
       <span id="signinHintLabel" class="fab-hint-label">🐻 Save your progress here</span>
       <svg width="16" height="18" viewBox="0 0 16 18" fill="none"><line x1="8" y1="1" x2="8" y2="14" stroke="rgba(255,255,255,0.85)" stroke-width="2" stroke-linecap="round"/><polyline points="3,9 8,15 13,9" stroke="rgba(255,255,255,0.85)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
     </div>
@@ -212,7 +212,7 @@
           Cancel
         </button>
         <button onclick="_showHidePermanently('wa')"
-          style="padding:10px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+          style="padding:10px;background:none;border:none;color:#6c757d;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;">
           🙈 Hide this button
         </button>
       </div>
@@ -274,7 +274,7 @@
   <div id="guestPinOverlay" style="display:none;position:fixed;inset:0;background:linear-gradient(135deg,var(--brand-primary-light) 0%,var(--brand-primary-mid) 100%);z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:24px;">
     <img src="icons/AppIcon.png" width="72" height="72" style="border-radius:18px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
     <h2 style="color:white;margin-bottom:6px;font-size:1.3em;">Bipolar Bear</h2>
-    <p style="color:rgba(255,255,255,0.85);font-size:0.88em;margin-bottom:12px;">Enter your PIN to continue</p>
+    <p style="color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-size:0.88em;margin-bottom:12px;">Enter your PIN to continue</p>
     <button onclick="document.getElementById('pinE2eeModal').style.display='flex'" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:white;border-radius:20px;padding:5px 14px;font-size:0.78em;cursor:pointer;margin-bottom:22px;-webkit-tap-highlight-color:transparent;">🔐 More info</button>
     <!-- E2EE info sub-modal (inside overlay so z-index works automatically) -->
     <div id="pinE2eeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:10001;align-items:center;justify-content:center;padding:24px;" onclick="if(event.target===this)this.style.display='none'">
@@ -292,7 +292,7 @@
       <div style="width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,0.4);border:2px solid rgba(255,255,255,0.8);transition:background 0.15s;" class="idx-pin-dot"></div>
       <div style="width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,0.4);border:2px solid rgba(255,255,255,0.8);transition:background 0.15s;" class="idx-pin-dot"></div>
     </div>
-    <div id="idxPinError" style="color:#ffe0b0;font-size:0.85em;min-height:20px;margin-bottom:8px;"></div>
+    <div id="idxPinError" style="color:#fff;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,0.35);font-size:0.85em;min-height:20px;margin-bottom:8px;"></div>
     <div style="display:grid;grid-template-columns:repeat(3,72px);gap:10px;margin-bottom:16px;">
       <button onclick="idxPinKey('1')" style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.2);border:none;color:white;font-size:1.5em;font-weight:600;cursor:pointer;">1</button>
       <button onclick="idxPinKey('2')" style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.2);border:none;color:white;font-size:1.5em;font-weight:600;cursor:pointer;">2</button>
@@ -307,12 +307,12 @@
       <button onclick="idxPinKey('0')" style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.2);border:none;color:white;font-size:1.5em;font-weight:600;cursor:pointer;">0</button>
       <button onclick="idxPinDel()" style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.2);border:none;color:white;font-size:1.2em;cursor:pointer;">⌫</button>
     </div>
-    <button onclick="idxPinForgot()" style="background:none;border:none;color:rgba(255,255,255,0.6);font-size:0.78em;cursor:pointer;margin-top:8px;padding:4px 12px;">Forgot PIN?</button>
+    <button onclick="idxPinForgot()" style="background:none;border:none;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-size:0.78em;cursor:pointer;margin-top:8px;padding:4px 12px;text-decoration:underline;">Forgot PIN?</button>
   </div>
 
   <!-- Screen dimmer: fades in after 3 min idle on PIN page to save battery -->
   <div id="pinSleepOverlay" style="display:none;position:fixed;inset:0;background:#000;z-index:10002;align-items:center;justify-content:center;cursor:pointer;" onclick="_wakePinDimmer()">
-    <span style="color:rgba(255,255,255,0.2);font-size:0.85em;user-select:none;">Tap to wake</span>
+    <span style="color:rgba(255,255,255,0.55);font-size:0.85em;user-select:none;">Tap to wake</span>
   </div>
 
   

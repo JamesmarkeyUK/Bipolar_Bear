@@ -70,7 +70,7 @@
 //     fab.js so the "🗑 Delete all guest data" button in the shared auth
 //     modal works on /journal and /survival-kit too (was a silent no-op
 //     because window._confirmDeleteGuestData was only defined on /).
-const CACHE_NAME = 'bipolarbear-v19';
+const CACHE_NAME = 'bipolarbear-v20';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
