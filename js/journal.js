@@ -8572,6 +8572,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
          'bb_fmTapHoldHintPending','bb_fmTapHoldHintReady',
          'bbHasEntries',
          'bbOnboardingStep',
+         // Streaks — must clear so the home page doesn't render a stale badge
+         // for the just-deleted account on the post-redirect render.
+         'bbCurrentStreak','bbStableStreak',
          'bbFeedbackFabHidden','bbWaFabHidden','bbFooterHidden',
          // FAB customisation: clear slot assignments and the first-run flag
          // so the new install gets the empty slot-1 placeholder again.
