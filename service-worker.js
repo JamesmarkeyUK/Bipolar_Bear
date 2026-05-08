@@ -28,7 +28,9 @@
 // v9: js/anonymous.js — hide Stability Counter on Monika sheet for
 //     standalone (anon-direct) users; BB-app users only.
 // v10: beta.html / css / js — remove WhatsApp group link.
-const CACHE_NAME = 'bipolarbear-v10';
+// v11: js/anonymous.js — fix duplicate chat messages (initBoard handler
+//     wiring is now one-time; Post button has an in-flight guard).
+const CACHE_NAME = 'bipolarbear-v11';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
