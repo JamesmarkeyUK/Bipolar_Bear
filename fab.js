@@ -49,7 +49,7 @@
     if (!window.db || !window.currentUser) return;
     const fabState = {};
     for (let s = 1; s <= 4; s++) {
-      const v = localStorage.getItem('bbFabSlot_' + s);
+      const v = BB.storage.get('FabSlot_' + s);
       if (v) fabState['slot' + s] = v;
     }
     ['bbWaFabHidden','bbQuickNoteFabHidden','bbCoffeeFabHidden','bbFeedbackFabHidden','bbFooterHidden'].forEach(k => {
@@ -76,20 +76,20 @@
    * except by full account/data deletion).
    */
   (function _applyFirstRunFabDefaults() {
-    if (localStorage.getItem('bbFabFirstRunDone') === '1') return;
+    if (BB.storage.get('FabFirstRunDone') === '1') return;
     const _existingFabKeys = [
       'bbFabSlot_1', 'bbFabSlot_2', 'bbFabSlot_3', 'bbFabSlot_4',
       'bbWaFabHidden', 'bbQuickNoteFabHidden', 'bbCoffeeFabHidden',
       'bbFeedbackFabHidden', 'bbFooterHidden',
     ];
     const _isReturningUser =
-      localStorage.getItem('bbHasEntries') === '1' ||
-      parseInt(localStorage.getItem('bbOnboardingStep') || '0', 10) > 0 ||
+      BB.storage.get('HasEntries') === '1' ||
+      parseInt(BB.storage.get('OnboardingStep') || '0', 10) > 0 ||
       _existingFabKeys.some(k => localStorage.getItem(k) !== null);
     if (!_isReturningUser) {
-      localStorage.setItem('bbWaFabHidden', '1');
+      BB.storage.set('WaFabHidden', '1');
     }
-    localStorage.setItem('bbFabFirstRunDone', '1');
+    BB.storage.set('FabFirstRunDone', '1');
   })();
 
   // ── Config ────────────────────────────────────────────────────────────────
@@ -537,7 +537,7 @@
    * @returns {void}
    */
   function _applyFabDock() {
-    const _fabsUnlocked = localStorage.getItem('bbFabsUnlocked') === '1';
+    const _fabsUnlocked = BB.storage.get('FabsUnlocked') === '1';
     const _footer = document.querySelector('.fab-footer');
 
     // Center auth FAB: show when dock unlocked
@@ -574,10 +574,10 @@
     };
 
     const _defVis = {
-      chat:     localStorage.getItem('bbWaFabHidden')        !== '1',
-      e2ee:     localStorage.getItem('bbQuickNoteFabHidden') !== '1',
-      coffee:   localStorage.getItem('bbCoffeeFabHidden')    !== '1',
-      feedback: localStorage.getItem('bbFeedbackFabHidden')  !== '1',
+      chat:     BB.storage.get('WaFabHidden')        !== '1',
+      e2ee:     BB.storage.get('QuickNoteFabHidden') !== '1',
+      coffee:   BB.storage.get('CoffeeFabHidden')    !== '1',
+      feedback: BB.storage.get('FeedbackFabHidden')  !== '1',
     };
     const _defEl = {
       chat:     document.getElementById('chatFab'),
@@ -591,7 +591,7 @@
     _FAB_DEFAULTS.forEach(_def => {
       let _found = null;
       for (let s = 1; s <= 4; s++) {
-        if (localStorage.getItem('bbFabSlot_' + s) === _def.id) { _found = s; break; }
+        if (BB.storage.get('FabSlot_' + s) === _def.id) { _found = s; break; }
       }
       _defaultSlotMap[_def.id] = _found !== null ? _found : _def.slotNum;
     });
@@ -610,7 +610,7 @@
     Object.values(_extraMap).forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
     for (let s = 1; s <= 4; s++) {
       if (!_slotOccupied[s]) {
-        const _assigned = localStorage.getItem('bbFabSlot_' + s);
+        const _assigned = BB.storage.get('FabSlot_' + s);
         if (_assigned && _extraMap[_assigned]) {
           const _ef = document.getElementById(_extraMap[_assigned]);
           if (_ef) { _ef.style.display = 'flex'; _ef.style.left = _slotPos[s]; }
@@ -622,7 +622,7 @@
     for (let s = 1; s <= 4; s++) {
       const _ph = document.getElementById('fabPh' + s);
       if (!_ph) continue;
-      const _assigned = localStorage.getItem('bbFabSlot_' + s);
+      const _assigned = BB.storage.get('FabSlot_' + s);
       const _hasExtra = _assigned && _extraMap[_assigned] && !_slotOccupied[s];
       _ph.style.display = (!_slotOccupied[s] && !_hasExtra) ? 'flex' : 'none';
       _ph.style.left = _slotPos[s];
@@ -658,9 +658,9 @@
         _btn.addEventListener('click', () => {
           localStorage.removeItem(_def.hiddenKey);
           for (let s = 1; s <= 4; s++) {
-            if (localStorage.getItem('bbFabSlot_' + s) === _def.id) localStorage.removeItem('bbFabSlot_' + s);
+            if (BB.storage.get('FabSlot_' + s) === _def.id) BB.storage.remove('FabSlot_' + s);
           }
-          localStorage.setItem('bbFabSlot_' + _fabPickerSlot, _def.id);
+          BB.storage.set('FabSlot_' + _fabPickerSlot, _def.id);
           closeFabPicker();
           _applyFabDock();
           _syncFabsToFirestore();
@@ -670,7 +670,7 @@
     });
     const _assignedExtras = new Set();
     for (let s = 1; s <= 4; s++) {
-      const v = localStorage.getItem('bbFabSlot_' + s);
+      const v = BB.storage.get('FabSlot_' + s);
       if (v && _extraMap[v]) _assignedExtras.add(v);
     }
     _FAB_EXTRAS.forEach(_extra => {
@@ -680,9 +680,9 @@
         _btn.innerHTML = `<span style="font-size:1.6em;line-height:1;">${_extra.icon}</span><div><div style="font-weight:700;font-size:0.95em;color:#212529;">${_extra.label}</div><div style="font-size:0.8em;color:#adb5bd;margin-top:2px;">${_extra.desc}</div></div>`;
         _btn.addEventListener('click', () => {
           for (let s = 1; s <= 4; s++) {
-            if (localStorage.getItem('bbFabSlot_' + s) === _extra.id) localStorage.removeItem('bbFabSlot_' + s);
+            if (BB.storage.get('FabSlot_' + s) === _extra.id) BB.storage.remove('FabSlot_' + s);
           }
-          localStorage.setItem('bbFabSlot_' + _fabPickerSlot, _extra.id);
+          BB.storage.set('FabSlot_' + _fabPickerSlot, _extra.id);
           closeFabPicker();
           _applyFabDock();
           _syncFabsToFirestore();
@@ -709,7 +709,7 @@
    */
   window._hideExtraFab = function (extraId) {
     for (let s = 1; s <= 4; s++) {
-      if (localStorage.getItem('bbFabSlot_' + s) === extraId) localStorage.removeItem('bbFabSlot_' + s);
+      if (BB.storage.get('FabSlot_' + s) === extraId) BB.storage.remove('FabSlot_' + s);
     }
     _applyFabDock();
     _syncFabsToFirestore();
@@ -963,9 +963,9 @@
     const _text = _inp ? _inp.value.trim() : '';
     window.closeQuickNoteModal();
     if (!_text) return;
-    const _notes = JSON.parse(localStorage.getItem('bbQuickNotes') || '[]');
+    const _notes = JSON.parse(BB.storage.get('QuickNotes') || '[]');
     _notes.push({ text: _text, ts: Date.now(), id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5) });
-    localStorage.setItem('bbQuickNotes', JSON.stringify(_notes));
+    BB.storage.set('QuickNotes', JSON.stringify(_notes));
     const _t = document.createElement('div');
     _t.textContent = '📝 Note saved!';
     Object.assign(_t.style, { position: 'fixed', bottom: '80px', left: '50%', transform: 'translateX(-50%)',
@@ -1207,16 +1207,16 @@
   window._showHidePermanently = function (type) {
     if (type === 'chat' || type === 'wa') {
       window.closeChatModal();
-      localStorage.setItem('bbWaFabHidden', '1');
+      BB.storage.set('WaFabHidden', '1');
     } else if (type === 'quicknote') {
       window.closeSecurityModal();
-      localStorage.setItem('bbQuickNoteFabHidden', '1');
+      BB.storage.set('QuickNoteFabHidden', '1');
     } else if (type === 'feedback') {
       window.closeFabFeedback();
-      localStorage.setItem('bbFeedbackFabHidden', '1');
+      BB.storage.set('FeedbackFabHidden', '1');
     } else if (type === 'coffee') {
       window.closeCoffeeModal();
-      localStorage.setItem('bbCoffeeFabHidden', '1');
+      BB.storage.set('CoffeeFabHidden', '1');
     }
     _applyFabDock();
     _syncFabsToFirestore();

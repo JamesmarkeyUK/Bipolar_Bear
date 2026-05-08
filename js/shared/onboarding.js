@@ -40,13 +40,13 @@
    */
   function getStep() {
     if (
-      !localStorage.getItem('bbOnboardingStep') &&
-      localStorage.getItem('bbHasEntries') === '1'
+      !BB.storage.get('OnboardingStep') &&
+      BB.storage.get('HasEntries') === '1'
     ) {
-      localStorage.setItem('bbOnboardingStep', '12');
+      BB.storage.set('OnboardingStep', '12');
     }
 
-    var step = parseInt(localStorage.getItem('bbOnboardingStep') || '0', 10);
+    var step = parseInt(BB.storage.get('OnboardingStep') || '0', 10);
 
     if (step >= 12 && !_hintMigrationDone) {
       _hintMigrationDone = true;
@@ -61,10 +61,10 @@
       ].forEach(function (f) {
         if (!localStorage.getItem(f)) localStorage.setItem(f, '1');
       });
-      localStorage.removeItem('bb_fmTapHoldHintPending');
-      localStorage.removeItem('bb_fmTapHoldHintReady');
-      localStorage.removeItem('bbAdvancedBadgePending');
-      localStorage.removeItem('bbAdvancedBadgeVisible');
+      BB.storage.remove('_fmTapHoldHintPending');
+      BB.storage.remove('_fmTapHoldHintReady');
+      BB.storage.remove('AdvancedBadgePending');
+      BB.storage.remove('AdvancedBadgeVisible');
     }
     return step;
   }

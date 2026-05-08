@@ -81,7 +81,7 @@ window.addEventListener('pageshow', () => {
       const cur = _getOnboardingStep();
       if (to <= cur) return;
       if (to === 9) to = 10; // step 9 (WhatsApp hint) was removed from the tutorial.
-      localStorage.setItem('bbOnboardingStep', String(to));
+      BB.storage.set('OnboardingStep', String(to));
       if (typeof currentUser !== 'undefined' && currentUser && typeof db !== 'undefined' && db) {
         db.collection('userSettings').doc(currentUser.uid).set({ onboardingStep: to }, { merge: true }).catch(() => {});
       }
@@ -130,12 +130,12 @@ window.addEventListener('pageshow', () => {
 
     function _applyJournalOnboardingGating() {
       // Settings button removed — auto-skip settings tutorial hints
-      if (localStorage.getItem('bbSettingsHintDone') !== '1') {
-        localStorage.setItem('bbSettingsHintDone', '1');
-        localStorage.setItem('bbCustomiseFormHintDone', '1');
-        localStorage.setItem('bbCustomiseAdditionalHintDone', '1');
-        localStorage.setItem('bbCloseSettingsHintDone', '1');
-        localStorage.setItem('bbAdvancedTutorialToastShown', '1');
+      if (BB.storage.get('SettingsHintDone') !== '1') {
+        BB.storage.set('SettingsHintDone', '1');
+        BB.storage.set('CustomiseFormHintDone', '1');
+        BB.storage.set('CustomiseAdditionalHintDone', '1');
+        BB.storage.set('CloseSettingsHintDone', '1');
+        BB.storage.set('AdvancedTutorialToastShown', '1');
       }
       const step = _getOnboardingStep();
       // Home button: visible from step 3
@@ -158,7 +158,7 @@ window.addEventListener('pageshow', () => {
 
       // Settings hint: show only during focused-mode mood step on 3rd entry (before tutorial done)
       const _sHint = document.getElementById('settingsHint');
-      const _settingsDone = localStorage.getItem('bbSettingsHintDone') === '1';
+      const _settingsDone = BB.storage.get('SettingsHintDone') === '1';
       let _showSettings = false;
       try {
         _showSettings = !_settingsDone &&
@@ -168,11 +168,11 @@ window.addEventListener('pageshow', () => {
       } catch(e) { /* _fmActive/_fmSteps not yet initialised (TDZ on page load) */ }
       if (_sHint) _sHint.style.display = _showSettings ? 'flex' : 'none';
       const _sBtn = document.getElementById('settingsBtn');
-      if (_sBtn) _sBtn.style.display = (_settingsDone || _showSettings || localStorage.getItem('bbAdvancedBadgeVisible') === '1' || step >= 12) ? '' : 'none';
+      if (_sBtn) _sBtn.style.display = (_settingsDone || _showSettings || BB.storage.get('AdvancedBadgeVisible') === '1' || step >= 12) ? '' : 'none';
       if (typeof _updateAdvancedBadge === 'function') _updateAdvancedBadge();
       // Med hint: active when medHintEl is in the DOM (medication step rendered)
       const _medHintEl = document.getElementById('medHintEl');
-      const _showMedHint = !!_medHintEl && localStorage.getItem('bbMedHintDone') !== '1';
+      const _showMedHint = !!_medHintEl && BB.storage.get('MedHintDone') !== '1';
       const _isBlocking = _blockingSteps.has(step) || _showSettings || _showMedHint;
       const _overlay = document.getElementById('bbHintOverlay');
       if (_overlay) _overlay.style.display = _isBlocking ? '' : 'none';
@@ -264,7 +264,7 @@ window.addEventListener('pageshow', () => {
           return;
         }
         // Settings hint lock (independent)
-        if (localStorage.getItem('bbSettingsHintDone') !== '1') {
+        if (BB.storage.get('SettingsHintDone') !== '1') {
           const sHint = document.getElementById('settingsHint');
           if (sHint && sHint.style.display !== 'none') {
             const sBtn = document.getElementById('settingsBtn');
@@ -283,7 +283,7 @@ window.addEventListener('pageshow', () => {
     })();
 
     // ── Beta gate (web only) ──
-    if (!window.Capacitor && location.protocol !== 'file:' && localStorage.getItem('bbWebUnlocked') !== 'true') {
+    if (!window.Capacitor && location.protocol !== 'file:' && BB.storage.get('WebUnlocked') !== 'true') {
       location.replace('beta.html');
     }
 
@@ -353,7 +353,7 @@ window.addEventListener('pageshow', () => {
           document.getElementById('userEmail').textContent = user.email;
           _updateJournalAuthFab(true);
           _justLoggedIn = true;
-          localStorage.removeItem('bb_entryStatus');
+          BB.storage.remove('_entryStatus');
           migrateGoodMoodToStable(user);
           // Load user settings from Firestore, then derive key + migrate + load entries
           // Race against 5 s — if Firestore hangs here _authResolved is already true so
@@ -403,17 +403,17 @@ window.addEventListener('pageshow', () => {
                 });
               }
               if (d.pinEnabled && d.pinCode) {
-                localStorage.setItem('bbPinEnabled', '1');
-                localStorage.setItem('bbPinCode', d.pinCode);
+                BB.storage.set('PinEnabled', '1');
+                BB.storage.set('PinCode', d.pinCode);
                 // User just authenticated via email — treat this session as unlocked
                 // so they aren't prompted again immediately after signing in
                 sessionStorage.setItem('bbPinUnlocked', '1');
               } else {
                 // No PIN for this user (new account or PIN removed) — clear any leftover
                 // (also clears any guest PIN that was set before account creation)
-                localStorage.removeItem('bbPinEnabled');
-                localStorage.removeItem('bbPinCode');
-                localStorage.removeItem('bbGuestPinSalt');
+                BB.storage.remove('PinEnabled');
+                BB.storage.remove('PinCode');
+                BB.storage.remove('GuestPinSalt');
                 sessionStorage.removeItem('bb_guest_key');
                 _guestCryptoKey = null;
               }
@@ -442,7 +442,7 @@ window.addEventListener('pageshow', () => {
                 localStorage.setItem('moodLinkingEnabled', d.moodLinkingEnabled ? '1' : '0');
               }
               if (d.healthSyncEnabled !== undefined) {
-                localStorage.setItem('bbHealthSyncEnabled', d.healthSyncEnabled ? '1' : '0');
+                BB.storage.set('HealthSyncEnabled', d.healthSyncEnabled ? '1' : '0');
               }
               // Reminder/weekly summary — sync across devices
               if (d.reminderEnabled !== undefined) localStorage.setItem('reminderEnabled', d.reminderEnabled ? 'true' : 'false');
@@ -454,7 +454,7 @@ window.addEventListener('pageshow', () => {
               if (isNative() && typeof scheduleReminder === 'function') {
                 scheduleReminder().catch(() => {});
               }
-              if (d.personalHintDone) localStorage.setItem('bbPersonalHintDone', '1');
+              if (d.personalHintDone) BB.storage.set('PersonalHintDone', '1');
               // Sync customise form settings
               if (d.customiseFormEnabled !== undefined) localStorage.setItem('customiseFormEnabled', d.customiseFormEnabled ? 'true' : 'false');
               if (d.disabledSteps !== undefined) {
@@ -464,7 +464,7 @@ window.addEventListener('pageshow', () => {
               const _serverStep = d.onboardingStep || 0;
               const _localStep = _getOnboardingStep();
               const _finalStep = Math.max(_serverStep, _localStep);
-              if (_finalStep !== _localStep) localStorage.setItem('bbOnboardingStep', String(_finalStep));
+              if (_finalStep !== _localStep) BB.storage.set('OnboardingStep', String(_finalStep));
               if (_localStep > _serverStep) {
                 db.collection('userSettings').doc(user.uid).set({ onboardingStep: _localStep }, { merge: true }).catch(() => {});
               }
@@ -535,11 +535,12 @@ window.addEventListener('pageshow', () => {
               }
             } else {
               // New user — clear all previous user's settings and hints, enable focused mode by default
-              ['bbPinEnabled','bbPinCode','moreDataOpenByDefault','showMoodSuggestion',
-               'moodLinkingEnabled',
-               'bbFavAnniShown',
-               'bbPrivateHintSeen','bbFavouriteHintSeen','bb_moodTipShown','bb_fmMoodTipShown','bb_draft'].forEach(k => localStorage.removeItem(k));
-              localStorage.removeItem('bbOnboardingStep'); // new user starts at step 0
+              ['PinEnabled','PinCode','FavAnniShown',
+               'PrivateHintSeen','FavouriteHintSeen','_moodTipShown','_fmMoodTipShown','_draft']
+                .forEach(k => BB.storage.remove(k));
+              ['moreDataOpenByDefault','showMoodSuggestion','moodLinkingEnabled']
+                .forEach(k => localStorage.removeItem(k));
+              BB.storage.remove('OnboardingStep'); // new user starts at step 0
               localStorage.setItem('focusedModeEnabled', '1');
               sessionStorage.removeItem('bbPinUnlocked');
               _updatePinSettingsBtn();
@@ -709,7 +710,7 @@ window.addEventListener('pageshow', () => {
       sessionStorage.removeItem('bb_user_key');
       _userCryptoKey = null;
       _pendingAuthPassword = null;
-      localStorage.removeItem('bbNativePinEnabled');
+      BB.storage.remove('NativePinEnabled');
       if (isNative()) {
         const _ss = window.Capacitor?.Plugins?.SecureStorage;
         if (_ss) {
@@ -1054,13 +1055,13 @@ window.addEventListener('pageshow', () => {
     function _fmLongPressStart(mood, e) {
       _fmLongPressed = false;
       // Prevent tap-and-hold during "Choose a mood" hint
-      if (localStorage.getItem('bb_fmChooseMoodHintDone') !== '1') return;
+      if (BB.storage.get('_fmChooseMoodHintDone') !== '1') return;
       _fmLongPressTimer = setTimeout(() => {
         _fmLongPressed = true;
         nativeHaptic && nativeHaptic('medium');
         // Dismiss the one-time hint permanently
-        if (!localStorage.getItem('bb_fmMoodTipShown')) {
-          localStorage.setItem('bb_fmMoodTipShown', '1');
+        if (!BB.storage.get('_fmMoodTipShown')) {
+          BB.storage.set('_fmMoodTipShown', '1');
           _renderFocusedStep();
         }
         showMoodInfo(mood);
@@ -1073,8 +1074,8 @@ window.addEventListener('pageshow', () => {
     function _fmMoodTap(mood) {
       if (_fmLongPressed) { _fmLongPressed = false; return; }
       // Dismiss "Choose a mood" hint on first tap
-      if (localStorage.getItem('bb_fmChooseMoodHintDone') !== '1') {
-        localStorage.setItem('bb_fmChooseMoodHintDone', '1');
+      if (BB.storage.get('_fmChooseMoodHintDone') !== '1') {
+        BB.storage.set('_fmChooseMoodHintDone', '1');
         const _card = document.getElementById('focusedModeCard');
         if (_card) _card.style.zIndex = '';
         const _overlay = document.getElementById('bbHintOverlay');
@@ -1082,9 +1083,9 @@ window.addEventListener('pageshow', () => {
         // Fall through — allow the tap to also select the mood
       }
       // Block taps during "Tap & Hold" hint — must long press
-      if (localStorage.getItem('bb_fmMoodTipShown') !== '1' &&
-          localStorage.getItem('bb_fmChooseMoodHintDone') === '1' &&
-          localStorage.getItem('bb_fmTapHoldHintReady') === '1') {
+      if (BB.storage.get('_fmMoodTipShown') !== '1' &&
+          BB.storage.get('_fmChooseMoodHintDone') === '1' &&
+          BB.storage.get('_fmTapHoldHintReady') === '1') {
         const _hint = document.getElementById('_fmTapHoldHintEl');
         const _moodBtns = document.querySelectorAll('.mood-btn');
         [_hint, ..._moodBtns].forEach(el => {
@@ -1214,12 +1215,12 @@ window.addEventListener('pageshow', () => {
         sleepSynced: _sleepHealthSynced,
         stepNotes: selectedStepNotes,
       };
-      try { localStorage.setItem('bb_draft', JSON.stringify(draft)); } catch(e) {}
+      try { BB.storage.set('_draft', JSON.stringify(draft)); } catch(e) {}
       showDraftStatus('saved');
     }
 
     function clearDraft() {
-      localStorage.removeItem('bb_draft');
+      BB.storage.remove('_draft');
       showDraftStatus('clear');
     }
 
@@ -1228,7 +1229,7 @@ window.addEventListener('pageshow', () => {
       const targetKey = document.getElementById('entryDate')?.value;
       if (!targetKey) return;
       let draft;
-      try { draft = JSON.parse(localStorage.getItem('bb_draft') || 'null'); } catch(e) { return; }
+      try { draft = JSON.parse(BB.storage.get('_draft') || 'null'); } catch(e) { return; }
       if (!draft || draft.targetKey !== targetKey || !draft.mood) return;
 
       // Select mood (reveals rest of form)
@@ -1451,8 +1452,8 @@ window.addEventListener('pageshow', () => {
 
         // One-time tip: "tap the mood again to see more info"
         const _tipEl = document.getElementById('moodSelectorTip');
-        if (_tipEl && !window.Capacitor && !localStorage.getItem('bb_moodTipShown')) {
-          localStorage.setItem('bb_moodTipShown', '1');
+        if (_tipEl && !window.Capacitor && !BB.storage.get('_moodTipShown')) {
+          BB.storage.set('_moodTipShown', '1');
           _tipEl.textContent = '💡 Click again for more info';
           _tipEl.style.display = '';
           setTimeout(() => { _tipEl.style.opacity = '0'; _tipEl.style.transition = 'opacity 0.5s'; setTimeout(() => { _tipEl.style.display = 'none'; _tipEl.style.opacity = ''; _tipEl.style.transition = ''; }, 500); }, 3000);
@@ -1464,7 +1465,7 @@ window.addEventListener('pageshow', () => {
           el.classList.add('show-after-mood');
         });
         // Auto-sync health data if setting is ON
-        if (localStorage.getItem('bbHealthSyncEnabled') === '1') {
+        if (BB.storage.get('HealthSyncEnabled') === '1') {
           importStepsFromHealth();
           importSleepFromHealth();
         }
@@ -1630,7 +1631,7 @@ window.addEventListener('pageshow', () => {
 
       document.getElementById('moodInfoModal').classList.add('active');
       // Hint 3: "Close to continue" — shown when tap+hold hint was just fired (first time seeing moodInfoModal)
-      if (localStorage.getItem('bb_fmMoodInfoCloseHintDone') !== '1') {
+      if (BB.storage.get('_fmMoodInfoCloseHintDone') !== '1') {
         const _mi = document.getElementById('moodInfoModal');
         if (_mi) _mi.dataset.closeHintActive = '1';
         const _confirmBtns = document.querySelector('#moodInfoModal .confirm-buttons');
@@ -1648,8 +1649,8 @@ window.addEventListener('pageshow', () => {
 
     function closeMoodInfo() {
       // Dismiss hint 3 if active
-      if (localStorage.getItem('bb_fmMoodInfoCloseHintDone') !== '1') {
-        localStorage.setItem('bb_fmMoodInfoCloseHintDone', '1');
+      if (BB.storage.get('_fmMoodInfoCloseHintDone') !== '1') {
+        BB.storage.set('_fmMoodInfoCloseHintDone', '1');
         const _mi = document.getElementById('moodInfoModal');
         if (_mi) delete _mi.dataset.closeHintActive;
         const _ch = document.getElementById('_fmMoodInfoCloseHintEl');
@@ -1733,7 +1734,7 @@ window.addEventListener('pageshow', () => {
       });
 
       // For first-time users (no entries yet), start cycle on Stable so it's pre-highlighted
-      if (!localStorage.getItem('bbHasEntries') && !selectedMood && moodBtns[2]) {
+      if (!BB.storage.get('HasEntries') && !selectedMood && moodBtns[2]) {
         cycleIndex = 2;
         applyHover(moodBtns[2]);
       }
@@ -1887,15 +1888,15 @@ window.addEventListener('pageshow', () => {
 
         currentPage = 1; // Reset to first page to see new entry
         // Activate advanced settings badge on the entry after tutorial completes
-        if (_wasNewEntry && localStorage.getItem('bbAdvancedBadgePending') === '1') {
-          localStorage.removeItem('bbAdvancedBadgePending');
-          localStorage.setItem('bbAdvancedBadgeVisible', '1');
+        if (_wasNewEntry && BB.storage.get('AdvancedBadgePending') === '1') {
+          BB.storage.remove('AdvancedBadgePending');
+          BB.storage.set('AdvancedBadgeVisible', '1');
           _updateAdvancedBadge();
         }
         // Activate tap & hold mood hint on the entry after the settings tutorial completes
-        if (_wasNewEntry && localStorage.getItem('bb_fmTapHoldHintPending') === '1') {
-          localStorage.removeItem('bb_fmTapHoldHintPending');
-          localStorage.setItem('bb_fmTapHoldHintReady', '1');
+        if (_wasNewEntry && BB.storage.get('_fmTapHoldHintPending') === '1') {
+          BB.storage.remove('_fmTapHoldHintPending');
+          BB.storage.set('_fmTapHoldHintReady', '1');
         }
         loadEntries();
         nativeHaptic('success');
@@ -1940,7 +1941,7 @@ window.addEventListener('pageshow', () => {
       // Guest PIN: require PIN creation before first save.
       // Also triggers if bbPinEnabled='1' but no salt — stale data from the old optional
       // PIN feature that has no encryption. Treat it as "no PIN" and set up fresh.
-      if (!currentUser && (localStorage.getItem('bbPinEnabled') !== '1' || !localStorage.getItem('bbGuestPinSalt'))) {
+      if (!currentUser && (BB.storage.get('PinEnabled') !== '1' || !BB.storage.get('GuestPinSalt'))) {
         _savingEntry = false;
         _showGuestPinSetup(async () => {
           _savingEntry = true;
@@ -1956,14 +1957,14 @@ window.addEventListener('pageshow', () => {
     // account is brand new (0 Firestore entries), so returning users are never affected.
     async function migrateGoodMoodToStable(user) {
       // One-time migration: rename mood 'good' → 'stable' in all Firestore entries
-      if (localStorage.getItem('bbMigGoodStable') === '1') return;
+      if (BB.storage.get('MigGoodStable') === '1') return;
       try {
         const snap = await db.collection('entries')
           .where('userId', '==', user.uid)
           .get({ source: 'server' });
         const toFix = snap.docs.filter(doc => doc.data().mood === 'good');
         if (toFix.length === 0) {
-          localStorage.setItem('bbMigGoodStable', '1');
+          BB.storage.set('MigGoodStable', '1');
           return;
         }
         // Batch in groups of 500
@@ -1973,7 +1974,7 @@ window.addEventListener('pageshow', () => {
           toFix.slice(i, i + BATCH_SIZE).forEach(doc => batch.update(doc.ref, { mood: 'stable' }));
           await batch.commit();
         }
-        localStorage.setItem('bbMigGoodStable', '1');
+        BB.storage.set('MigGoodStable', '1');
       } catch(e) {
         console.warn('bbMigGoodStable failed, will retry next load', e);
       }
@@ -2043,9 +2044,9 @@ window.addEventListener('pageshow', () => {
         }
         // Remove local copies and clean up guest PIN data
         guestEntries.forEach(({ localKey }) => localStorage.removeItem(localKey));
-        localStorage.removeItem('bbGuestPinSalt');
-        localStorage.removeItem('bbPinEnabled');
-        localStorage.removeItem('bbPinCode');
+        BB.storage.remove('GuestPinSalt');
+        BB.storage.remove('PinEnabled');
+        BB.storage.remove('PinCode');
         sessionStorage.removeItem('bb_guest_key');
         _guestCryptoKey = null;
       } catch(e) {
@@ -2191,7 +2192,7 @@ window.addEventListener('pageshow', () => {
         if (entriesHeader) entriesHeader.style.display = 'flex';
 
         // Mark that the user has entries — unlocks FABs/login/survival kit on index
-        localStorage.setItem('bbHasEntries', '1');
+        BB.storage.set('HasEntries', '1');
 
         if (loader) loader.style.display = 'none';
         entries.sort((a, b) => b.timestamp - a.timestamp);
@@ -2320,7 +2321,7 @@ window.addEventListener('pageshow', () => {
             </div>
             <div style="text-align:center;margin-top:8px;position:relative;display:inline-block;width:100%;">
               <button onclick="_dismissPersonalDetailsHint();showPersonalDetailsModal()" style="background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;padding:4px 8px;text-decoration:underline;text-underline-offset:2px;-webkit-tap-highlight-color:transparent;">👤 Your personal details</button>
-              ${localStorage.getItem('bbPersonalHintDone') !== '1' ? `<div id="personalDetailsJournalHint" style="display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-top:2px;">
+              ${BB.storage.get('PersonalHintDone') !== '1' ? `<div id="personalDetailsJournalHint" style="display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-top:2px;">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="8" y1="13" x2="8" y2="2" stroke="var(--brand-primary)" stroke-width="2" stroke-linecap="round"/><polyline points="3,7 8,2 13,7" stroke="var(--brand-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
                 <span style="font-size:0.72em;font-weight:700;font-style:italic;color:var(--brand-primary);font-family:'Georgia',serif;letter-spacing:0.01em;">🐻 Add your details here</span>
               </div>` : ''}
@@ -2433,7 +2434,7 @@ window.addEventListener('pageshow', () => {
           }
         }
         window._currentStreak = currentStreak;
-        localStorage.setItem('bbCurrentStreak', currentStreak);
+        BB.storage.set('CurrentStreak', currentStreak);
         if (window.db && window.currentUser) {
           window.db.collection('userSettings').doc(window.currentUser.uid)
             .set({ currentStreak: currentStreak }, { merge: true }).catch(() => {});
@@ -2507,7 +2508,7 @@ window.addEventListener('pageshow', () => {
           }
         }
         window._currentStreak = currentStreak;
-        localStorage.setItem('bbCurrentStreak', currentStreak);
+        BB.storage.set('CurrentStreak', currentStreak);
         if (window.db && window.currentUser) {
           window.db.collection('userSettings').doc(window.currentUser.uid)
             .set({ currentStreak: currentStreak }, { merge: true }).catch(() => {});
@@ -2888,7 +2889,7 @@ window.addEventListener('pageshow', () => {
     function _checkFavAnniversaryToday(entries) {
       const today = new Date();
       const todayKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-      if (localStorage.getItem('bbFavAnniShown') === todayKey) return;
+      if (BB.storage.get('FavAnniShown') === todayKey) return;
       const month = today.getMonth() + 1;
       const day = today.getDate();
       const thisYear = today.getFullYear();
@@ -2898,7 +2899,7 @@ window.addEventListener('pageshow', () => {
         return d.getMonth() + 1 === month && d.getDate() === day && d.getFullYear() !== thisYear;
       });
       if (annivFavs.length > 0) {
-        localStorage.setItem('bbFavAnniShown', todayKey);
+        BB.storage.set('FavAnniShown', todayKey);
         setTimeout(() => showFavAnniversaryModal(month, day), 1500);
       }
     }
@@ -3149,10 +3150,10 @@ window.addEventListener('pageshow', () => {
         if (_guestPinSetupBuffer === _guestPinSetupFirst) {
           const saltBytes = crypto.getRandomValues(new Uint8Array(16));
           const saltB64 = btoa(String.fromCharCode(...saltBytes));
-          localStorage.setItem('bbGuestPinSalt', saltB64);
-          localStorage.setItem('bbPinEnabled', '1');
-          localStorage.setItem('bbPinCode', _guestPinSetupFirst);
-          localStorage.setItem('bbPinLinkedUID', currentUser ? currentUser.uid : 'guest');
+          BB.storage.set('GuestPinSalt', saltB64);
+          BB.storage.set('PinEnabled', '1');
+          BB.storage.set('PinCode', _guestPinSetupFirst);
+          BB.storage.set('PinLinkedUID', currentUser ? currentUser.uid : 'guest');
           sessionStorage.setItem('bbPinUnlocked', '1');
           _guestCryptoKey = await _guestDeriveKey(_guestPinSetupFirst, saltB64);
           await _guestExportKeyToSession(_guestCryptoKey);
@@ -3200,9 +3201,9 @@ window.addEventListener('pageshow', () => {
     window._guestPinForgotReset = _guestPinForgotReset;
 
     function _initPinLock() {
-      const enabled = localStorage.getItem('bbPinEnabled') === '1';
+      const enabled = BB.storage.get('PinEnabled') === '1';
       const unlocked = sessionStorage.getItem('bbPinUnlocked') === '1';
-      const hasSalt  = !!localStorage.getItem('bbGuestPinSalt');
+      const hasSalt  = !!BB.storage.get('GuestPinSalt');
       _updatePinSettingsBtn();
       // Guest encryption PINs (identified by bbGuestPinSalt) are handled inline in the
       // entries area — no full-screen overlay. The overlay is only for logged-in users'
@@ -3214,7 +3215,7 @@ window.addEventListener('pageshow', () => {
     }
 
     function _updatePinSettingsBtn() {
-      const enabled = localStorage.getItem('bbPinEnabled') === '1';
+      const enabled = BB.storage.get('PinEnabled') === '1';
       const text = enabled ? '🔒 PIN: On — Change / Disable' : '🔒 Enable PIN Lock';
       const btn = document.getElementById('pinLockSettingsBtnMain');
       if (btn) btn.textContent = text;
@@ -3222,8 +3223,8 @@ window.addEventListener('pageshow', () => {
 
     function _syncPinToFirestore() {
       if (!currentUser) return;
-      const enabled = localStorage.getItem('bbPinEnabled') === '1';
-      const code = localStorage.getItem('bbPinCode') || null;
+      const enabled = BB.storage.get('PinEnabled') === '1';
+      const code = BB.storage.get('PinCode') || null;
       db.collection('userSettings').doc(currentUser.uid).set(
         { pinEnabled: enabled, pinCode: code },
         { merge: true }
@@ -3235,7 +3236,7 @@ window.addEventListener('pageshow', () => {
       _pinBuffer += digit;
       _renderPinDots('pinDots', _pinBuffer.length, false);
       if (_pinBuffer.length === 4) {
-        const saved = localStorage.getItem('bbPinCode');
+        const saved = BB.storage.get('PinCode');
         if (_pinBuffer === saved) {
           sessionStorage.setItem('bbPinUnlocked', '1');
           const el = document.getElementById('pinOverlay');
@@ -3244,7 +3245,7 @@ window.addEventListener('pageshow', () => {
           if (!currentUser) {
             const _enteredPin = _pinBuffer;
             _pinBuffer = '';
-            const salt = localStorage.getItem('bbGuestPinSalt');
+            const salt = BB.storage.get('GuestPinSalt');
             if (salt) {
               _guestDeriveKey(_enteredPin, salt).then(key => {
                 _guestCryptoKey = key;
@@ -3275,8 +3276,8 @@ window.addEventListener('pageshow', () => {
         return;
       }
       if (confirm('Reset PIN?\n\nThis will disable PIN lock. You can set a new one in Settings → Advanced.')) {
-        localStorage.removeItem('bbPinCode');
-        localStorage.removeItem('bbPinEnabled');
+        BB.storage.remove('PinCode');
+        BB.storage.remove('PinEnabled');
         _syncPinToFirestore();
         sessionStorage.setItem('bbPinUnlocked', '1');
         const el = document.getElementById('pinOverlay');
@@ -3286,7 +3287,7 @@ window.addEventListener('pageshow', () => {
     }
 
     function openPinSettings() {
-      const enabled = localStorage.getItem('bbPinEnabled') === '1';
+      const enabled = BB.storage.get('PinEnabled') === '1';
       _pinSetupBuffer = '';
       _pinSetupFirst = '';
       _pinSetupStep = enabled ? 'confirm_old' : 'set';
@@ -3323,7 +3324,7 @@ window.addEventListener('pageshow', () => {
 
       if (_pinSetupStep === 'confirm_old') {
         // Verify existing PIN
-        if (_pinSetupBuffer === localStorage.getItem('bbPinCode')) {
+        if (_pinSetupBuffer === BB.storage.get('PinCode')) {
           _pinSetupBuffer = '';
           _pinSetupStep = 'set';
           document.getElementById('pinSetupTitle').textContent = '🔒 New PIN';
@@ -3355,7 +3356,7 @@ window.addEventListener('pageshow', () => {
                 _ss.setItem('bb_native_pin', _pinSetupFirst),
                 new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 3000)),
               ]);
-              localStorage.setItem('bbNativePinEnabled', '1');
+              BB.storage.set('NativePinEnabled', '1');
               sessionStorage.setItem('bbPinUnlocked', '1');
               _nativePinSetupMode = false;
               closePinSetup();
@@ -3365,8 +3366,8 @@ window.addEventListener('pageshow', () => {
               setTimeout(() => { _pinSetupBuffer = ''; _pinSetupFirst = ''; _pinSetupStep = 'set'; desc.textContent = 'Choose a 4-digit PIN.'; _renderPinDots('pinSetupDots', 0, true); errEl.textContent = ''; }, 1200);
             }
           } else {
-          localStorage.setItem('bbPinCode', _pinSetupFirst);
-          localStorage.setItem('bbPinEnabled', '1');
+          BB.storage.set('PinCode', _pinSetupFirst);
+          BB.storage.set('PinEnabled', '1');
           sessionStorage.setItem('bbPinUnlocked', '1');
           _syncPinToFirestore();
           closePinSetup();
@@ -3396,8 +3397,8 @@ window.addEventListener('pageshow', () => {
     }
 
     function disablePin() {
-      localStorage.removeItem('bbPinCode');
-      localStorage.removeItem('bbPinEnabled');
+      BB.storage.remove('PinCode');
+      BB.storage.remove('PinEnabled');
       _syncPinToFirestore();
       closePinSetup();
       _updatePinSettingsBtn();
@@ -3410,7 +3411,7 @@ window.addEventListener('pageshow', () => {
 
     function openNativePinSettings() {
       _nativePinSetupMode = true;
-      const enabled = localStorage.getItem('bbNativePinEnabled') === '1';
+      const enabled = BB.storage.get('NativePinEnabled') === '1';
       _pinSetupBuffer = '';
       _pinSetupFirst = '';
       _pinSetupStep = 'set';
@@ -3427,7 +3428,7 @@ window.addEventListener('pageshow', () => {
     }
 
     async function disableNativePin() {
-      localStorage.removeItem('bbNativePinEnabled');
+      BB.storage.remove('NativePinEnabled');
       sessionStorage.removeItem('bbPinUnlocked');
       await (window.Capacitor?.Plugins?.SecureStorage?.removeItem('bb_native_pin') ?? Promise.resolve()).catch(() => {});
       _nativePinSetupMode = false;
@@ -3436,7 +3437,7 @@ window.addEventListener('pageshow', () => {
     }
 
     function _updateNativePinBtn() {
-      const enabled = localStorage.getItem('bbNativePinEnabled') === '1';
+      const enabled = BB.storage.get('NativePinEnabled') === '1';
       const btn = document.getElementById('nativePinSettingsBtn');
       if (btn) btn.textContent = enabled ? '🔒 PIN: On — Change / Disable' : '🔒 Enable PIN';
     }
@@ -3467,7 +3468,7 @@ window.addEventListener('pageshow', () => {
     }
 
     // ── Guest inactivity relock (5 min) ──
-    if (localStorage.getItem('bbGuestPinSalt')) {
+    if (BB.storage.get('GuestPinSalt')) {
       let _idleTimer;
       function _resetIdleTimer() {
         clearTimeout(_idleTimer);
@@ -3485,7 +3486,7 @@ window.addEventListener('pageshow', () => {
     }
 
     // ── Native app PIN inactivity relock (5 min) ──
-    if (isNative() && localStorage.getItem('bbNativePinEnabled') === '1') {
+    if (isNative() && BB.storage.get('NativePinEnabled') === '1') {
       let _nativeIdleTimer;
       function _resetNativeIdleTimer() {
         clearTimeout(_nativeIdleTimer);
@@ -3653,7 +3654,7 @@ window.addEventListener('pageshow', () => {
     function _toggleHealthSync() {
       const chk = document.getElementById('healthSyncToggle');
       const val = chk && chk.checked ? '1' : '0';
-      localStorage.setItem('bbHealthSyncEnabled', val);
+      BB.storage.set('HealthSyncEnabled', val);
       if (window.db && window.currentUser) {
         window.db.collection('userSettings').doc(window.currentUser.uid)
           .set({ healthSyncEnabled: val === '1' }, { merge: true }).catch(() => {});
@@ -3738,7 +3739,7 @@ window.addEventListener('pageshow', () => {
       _fmSyncFormVisuals();
       // Only show the full form if the current date hasn't been logged yet
       try {
-        const _cached = JSON.parse(localStorage.getItem('bb_entryStatus') || 'null');
+        const _cached = JSON.parse(BB.storage.get('_entryStatus') || 'null');
         if (_cached && _cached.done) {
           document.getElementById('entryFormCard').style.display = 'none';
         } else {
@@ -4028,7 +4029,7 @@ window.addEventListener('pageshow', () => {
       document.getElementById('fmContent').innerHTML = _fmRenderContent(step);
       if (step.id === 'notes') setTimeout(() => { const ta = document.getElementById('fmNotesInput'); if (ta) ta.focus(); }, 120);
       // Auto-sync health data if setting is ON
-      if (localStorage.getItem('bbHealthSyncEnabled') === '1') {
+      if (BB.storage.get('HealthSyncEnabled') === '1') {
         if (step.id === 'energy' && _fmStepsResult === null && !window._healthSyncInProgress) {
           setTimeout(() => importStepsFromHealth(), 0);
         } else if (step.id === 'sleep' && _fmSleepImported === null && !window._healthSyncInProgress && !_fmSleepAutoSyncDone) {
@@ -4047,9 +4048,9 @@ window.addEventListener('pageshow', () => {
       const _obStep = _getOnboardingStep();
       const _fmNeedsElevation = (typeof _fmActive !== 'undefined' && _fmActive) && [1,2,3,8].includes(_obStep);
       if (step.id === 'mood') {
-        const _chooseDone = localStorage.getItem('bb_fmChooseMoodHintDone') === '1';
-        const _tapDone = localStorage.getItem('bb_fmMoodTipShown') === '1';
-        const _moodHintActive = (!_chooseDone && !editingEntry) || (!_tapDone && _chooseDone && localStorage.getItem('bb_fmTapHoldHintReady') === '1');
+        const _chooseDone = BB.storage.get('_fmChooseMoodHintDone') === '1';
+        const _tapDone = BB.storage.get('_fmMoodTipShown') === '1';
+        const _moodHintActive = (!_chooseDone && !editingEntry) || (!_tapDone && _chooseDone && BB.storage.get('_fmTapHoldHintReady') === '1');
         const _overlay = document.getElementById('bbHintOverlay');
         if (_moodHintActive) {
           if (_overlay) _overlay.style.display = '';
@@ -4087,14 +4088,14 @@ window.addEventListener('pageshow', () => {
       switch (step.id) {
         case 'mood': {
           // Pre-select Stable as a suggestion for first-time users
-          if (!selectedMood && !localStorage.getItem('bbHasEntries')) selectedMood = 'stable';
-          const _chooseMoodHintDone = localStorage.getItem('bb_fmChooseMoodHintDone') === '1';
+          if (!selectedMood && !BB.storage.get('HasEntries')) selectedMood = 'stable';
+          const _chooseMoodHintDone = BB.storage.get('_fmChooseMoodHintDone') === '1';
           const _showChooseMoodHint = !_chooseMoodHintDone && !editingEntry;
-          const _showFmTip = !localStorage.getItem('bb_fmMoodTipShown') && _chooseMoodHintDone && localStorage.getItem('bb_fmTapHoldHintReady') === '1';
+          const _showFmTip = !BB.storage.get('_fmMoodTipShown') && _chooseMoodHintDone && BB.storage.get('_fmTapHoldHintReady') === '1';
           // Quick notes from index.html — show accumulated notes above mood selector
           let _quickNotesHtml = '';
           try {
-            const _qn = JSON.parse(localStorage.getItem('bbQuickNotes') || '[]');
+            const _qn = JSON.parse(BB.storage.get('QuickNotes') || '[]');
             if (_qn.length > 0) {
               const _noteRows = _qn.map((n, i) => {
                 const _esc = n.text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -4172,7 +4173,7 @@ window.addEventListener('pageshow', () => {
         }
 
         case 'energy': {
-          const _autoSyncEnergy = localStorage.getItem('bbHealthSyncEnabled') === '1';
+          const _autoSyncEnergy = BB.storage.get('HealthSyncEnabled') === '1';
           // Show re-sync button only when health sync is ON and data has already been imported
           const _stepsSyncBtn = (_autoSyncEnergy && _fmStepsResult) ? `<button onclick="importStepsFromHealth()" style="width:100%;padding:11px 16px;margin-bottom:14px;
             background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:12px;
@@ -4195,7 +4196,7 @@ window.addEventListener('pageshow', () => {
         }
 
         case 'sleep': {
-          const _autoSyncSleep = localStorage.getItem('bbHealthSyncEnabled') === '1';
+          const _autoSyncSleep = BB.storage.get('HealthSyncEnabled') === '1';
           const _syncText = _fmSleepError === 'fail' ? '❌ Sync failed — try again'
             : _fmSleepError === 'nodata' ? '🤷 No sleep data found — try again'
             : '📱 Re-sync from Health App';
@@ -4282,7 +4283,7 @@ window.addEventListener('pageshow', () => {
               medListHtml = `<div style="text-align:center;margin:0 0 10px;display:flex;flex-direction:column;gap:3px;">${_valid.map(m => `<span style="font-size:0.85em;color:#6c757d;">💊 ${String(m.name)}${m.dosage ? ' ' + String(m.dosage) : ''}</span>`).join('')}</div>`;
             }
           } catch(e) {}
-          const _medHintDone = localStorage.getItem('bbMedHintDone') === '1';
+          const _medHintDone = BB.storage.get('MedHintDone') === '1';
           return `${medListHtml}
             <div style="text-align:center;margin-bottom:${_medHintDone ? '14' : '4'}px;">
               <button id="manageMedsBtn" onclick="_dismissMedHint();showMedicationList()" style="background:none;border:none;color:${_medHintDone ? 'var(--brand-primary)' : 'rgba(255,255,255,0.9)'};font-size:0.8em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;text-decoration:underline;text-underline-offset:2px;">✏️ Manage medications</button>
@@ -4498,7 +4499,7 @@ window.addEventListener('pageshow', () => {
             <div style="display:flex;gap:6px;">${_btns(_fPosNo ? [_yesOpt, _noOpt] : [_noOpt, _yesOpt])}</div>
             ${_cfNoteHtml}`;
           }
-          const _showCfHint = !localStorage.getItem('bbCustomFieldHintDone');
+          const _showCfHint = !BB.storage.get('CustomFieldHintDone');
           const _cfHintHtml = _showCfHint
             ? `<div id="fmCustomFieldHint" style="display:flex;flex-direction:column;align-items:center;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-top:6px;">
                 <span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,149,0,0.9);white-space:nowrap;font-family:'Georgia',serif;">🐻 Customise your data fields</span>
@@ -5622,7 +5623,7 @@ window.addEventListener('pageshow', () => {
         first_medication:  _hasMed,
         first_goal:        _hasGoal,
         survival_kit:      _hasDef && _hasStrat && _hasMed && _hasGoal,
-        logo_easter_egg:   localStorage.getItem('bbLogoEasterEggFound') === '1',
+        logo_easter_egg:   BB.storage.get('LogoEasterEggFound') === '1',
         tutorial_complete: _getOnboardingStep() >= 12,
       };
 
@@ -5795,7 +5796,7 @@ window.addEventListener('pageshow', () => {
       yesterday.setDate(yesterday.getDate() - 1);
       const currentKey = useToday ? todayKey : toKey(yesterday);
       const currentDone = entryDates.has(currentKey);
-      try { localStorage.setItem('bb_entryStatus', JSON.stringify({ key: currentKey, done: currentDone })); } catch(e) {}
+      try { BB.storage.set('_entryStatus', JSON.stringify({ key: currentKey, done: currentDone })); } catch(e) {}
       if (_suppressFormOpen) {
         _suppressFormOpen = false;
         document.getElementById('entryFormCard').style.display = 'none';
@@ -8391,8 +8392,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
           currentPage = 1;
           // Immediately clear tick so index.html reflects deletion without waiting for loadEntries
           try {
-            const _s = JSON.parse(localStorage.getItem('bb_entryStatus') || 'null');
-            if (_s) { _s.done = false; localStorage.setItem('bb_entryStatus', JSON.stringify(_s)); }
+            const _s = JSON.parse(BB.storage.get('_entryStatus') || 'null');
+            if (_s) { _s.done = false; BB.storage.set('_entryStatus', JSON.stringify(_s)); }
           } catch(e) {}
           // Reset form to fresh new-entry state (clears edit mode, data, heading)
           resetEntryForm();
@@ -8588,10 +8589,10 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
 
         // Clear draft (cancel any pending auto-save first so it can't re-write after removal)
         clearTimeout(_draftSaveTimer);
-        localStorage.removeItem('bb_draft');
+        BB.storage.remove('_draft');
 
         // Clear home-screen tick caches so buttons show as unchecked
-        localStorage.removeItem('bb_entryStatus');
+        BB.storage.remove('_entryStatus');
         localStorage.removeItem('moodDefinitions');
         localStorage.removeItem('copingStrategies');
         localStorage.removeItem('moodMemories');
@@ -8634,19 +8635,19 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
 
         // Clear people-helped voted state so user can vote again after reset
         localStorage.removeItem('bipolarHelpedVoted');
-        localStorage.removeItem('bbPersonalHintDone');
-        localStorage.removeItem('bbMedHintDone');
-        localStorage.removeItem('bbSettingsHintDone');
-        localStorage.removeItem('bbCustomiseFormHintDone');
-        localStorage.removeItem('bbCustomiseAdditionalHintDone');
-        localStorage.removeItem('bbCloseSettingsHintDone');
-        localStorage.removeItem('bbCustomiseFormCollapsed');
-        localStorage.removeItem('bbAdvancedTutorialToastShown');
-        localStorage.removeItem('bbSurvivalKitVisited');
-        localStorage.removeItem('bbMoodDefHintDone');
-        localStorage.removeItem('bbPrivacyNoteDismissed');
-        localStorage.removeItem('bbTutorialToastShown');
-        localStorage.removeItem('bbWelcomeShown');
+        BB.storage.remove('PersonalHintDone');
+        BB.storage.remove('MedHintDone');
+        BB.storage.remove('SettingsHintDone');
+        BB.storage.remove('CustomiseFormHintDone');
+        BB.storage.remove('CustomiseAdditionalHintDone');
+        BB.storage.remove('CloseSettingsHintDone');
+        BB.storage.remove('CustomiseFormCollapsed');
+        BB.storage.remove('AdvancedTutorialToastShown');
+        BB.storage.remove('SurvivalKitVisited');
+        BB.storage.remove('MoodDefHintDone');
+        BB.storage.remove('PrivacyNoteDismissed');
+        BB.storage.remove('TutorialToastShown');
+        BB.storage.remove('WelcomeShown');
 
         // Firestore cleanup. Two modes:
         //   deleteAccount → wipe every document tied to this user
@@ -8658,7 +8659,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
             await db.collection('personalDetails').doc(currentUser.uid).delete().catch(() => {});
 
             // Release the anon-board monika reservation so others can claim it.
-            const _monika = localStorage.getItem('bbAnon_monika');
+            const _monika = BB.storage.get('Anon_monika');
             if (_monika) {
               await db.collection(BB_BRAND.collections.monikas).doc(_monika.toLowerCase()).delete().catch(() => {});
             }
@@ -8668,7 +8669,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
               const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(email.toLowerCase().trim()));
               return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
             };
-            const _emails = [currentUser.email, localStorage.getItem('bbAnon_email')]
+            const _emails = [currentUser.email, BB.storage.get('Anon_email')]
               .filter(Boolean)
               .filter((e, i, arr) => arr.indexOf(e) === i); // de-dup
             for (const _e of _emails) {
@@ -8698,20 +8699,20 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
 
         // Clear anon-board localStorage so the next user on this browser
         // starts clean.
-        ['bbAnon_monika','bbAnon_email','bbAnon_verified','bbAnon_isAdmin',
-         'bbAnon_streak','bbAnon_med','bbAnon_medList','bbAnon_showMeds',
-         'bbAnon_showStable','bbAnon_stableSince','bbAnon_stableStreak',
-         'bbAnon_colorKey','bbAnon_initials','bbAnon_liked','bbAnon_hasPosted',
-         'bbAnonLastVisit','bbAnonVisitDate'].forEach(k => localStorage.removeItem(k));
+        ['Anon_monika','Anon_email','Anon_verified','Anon_isAdmin',
+         'Anon_streak','Anon_med','Anon_medList','Anon_showMeds',
+         'Anon_showStable','Anon_stableSince','Anon_stableStreak',
+         'Anon_colorKey','Anon_initials','Anon_liked','Anon_hasPosted',
+         'AnonLastVisit','AnonVisitDate'].forEach(k => BB.storage.remove(k));
         // Reset logo to default immediately
         if (typeof applyLogoVariant === 'function') applyLogoVariant(0);
 
         // Final explicit PIN clear before redirect — guards against any WKWebView localStorage
         // flush race where earlier removes might not have persisted across the navigation boundary.
-        localStorage.removeItem('bbNativePinEnabled');
-        localStorage.removeItem('bbPinEnabled');
-        localStorage.removeItem('bbPinCode');
-        localStorage.removeItem('bbGuestPinSalt');
+        BB.storage.remove('NativePinEnabled');
+        BB.storage.remove('PinEnabled');
+        BB.storage.remove('PinCode');
+        BB.storage.remove('GuestPinSalt');
         sessionStorage.removeItem('bbPinUnlocked');
         // Also clear the native Keychain PIN so it can't be reused after account reset
         try { window.Capacitor?.Plugins?.SecureStorage?.removeItem?.('bb_native_pin')?.catch?.(() => {}); } catch(e) {}
@@ -9876,9 +9877,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
 
     async function showSettingsModal() {
       // Clear advanced badge when settings is opened; show in-modal hint pointing to Advanced
-      const _badgeWasActive = localStorage.getItem('bbAdvancedBadgeVisible') === '1';
+      const _badgeWasActive = BB.storage.get('AdvancedBadgeVisible') === '1';
       if (_badgeWasActive) {
-        localStorage.removeItem('bbAdvancedBadgeVisible');
+        BB.storage.remove('AdvancedBadgeVisible');
         _updateAdvancedBadge();
       }
       // Update logo display
@@ -9918,7 +9919,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       document.getElementById('elaborateResponsesToggle').checked = localStorage.getItem('elaborateResponsesEnabled') === 'true';
       _renderStepToggles();
       const _cfDetails = document.getElementById('customiseFormDetails');
-      if (_cfDetails) _cfDetails.open = localStorage.getItem('bbCustomiseFormCollapsed') !== '1';
+      if (_cfDetails) _cfDetails.open = BB.storage.get('CustomiseFormCollapsed') !== '1';
 
       // If not native, show download prompt instead of native settings
       if (!isNative()) {
@@ -9929,9 +9930,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         document.querySelectorAll('.settings-platform-info').forEach(el => el.textContent = ' · 🌐 Web');
         const _advHintElW = document.getElementById('advancedSettingsBadgeHint');
         if (_advHintElW) _advHintElW.style.display = _badgeWasActive ? 'flex' : 'none';
-        if (localStorage.getItem('bbSettingsHintDone') === '1' && localStorage.getItem('bbCustomiseFormHintDone') !== '1') {
+        if (BB.storage.get('SettingsHintDone') === '1' && BB.storage.get('CustomiseFormHintDone') !== '1') {
           _showCustomiseFormHint();
-        } else if (localStorage.getItem('bbCustomiseAdditionalHintDone') === '1' && localStorage.getItem('bbCloseSettingsHintDone') !== '1') {
+        } else if (BB.storage.get('CustomiseAdditionalHintDone') === '1' && BB.storage.get('CloseSettingsHintDone') !== '1') {
           _showCloseSettingsHint();
         }
         return;
@@ -9949,7 +9950,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       document.getElementById('reminderTime').value = savedTime;
       document.getElementById('reminderEnabled').checked = enabled;
       document.getElementById('weeklySummaryEnabled').checked = weeklyEnabled;
-      document.getElementById('healthSyncToggle').checked = localStorage.getItem('bbHealthSyncEnabled') === '1';
+      document.getElementById('healthSyncToggle').checked = BB.storage.get('HealthSyncEnabled') === '1';
 
       // Show platform info
       document.querySelectorAll('.settings-platform-info').forEach(el => el.textContent = ` · ${window.Capacitor.getPlatform() === 'ios' ? '🍎 iOS' : '🤖 Android'}`);
@@ -9985,9 +9986,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       // Show "Click here" hint above Advanced button if badge was active
       const _advHintEl = document.getElementById('advancedSettingsBadgeHint');
       if (_advHintEl) _advHintEl.style.display = _badgeWasActive ? 'flex' : 'none';
-      if (localStorage.getItem('bbSettingsHintDone') === '1' && localStorage.getItem('bbCustomiseFormHintDone') !== '1') {
+      if (BB.storage.get('SettingsHintDone') === '1' && BB.storage.get('CustomiseFormHintDone') !== '1') {
         _showCustomiseFormHint();
-      } else if (localStorage.getItem('bbCustomiseAdditionalHintDone') === '1' && localStorage.getItem('bbCloseSettingsHintDone') !== '1') {
+      } else if (BB.storage.get('CustomiseAdditionalHintDone') === '1' && BB.storage.get('CloseSettingsHintDone') !== '1') {
         _showCloseSettingsHint();
       }
     }
@@ -10172,7 +10173,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       }
       _renderStepToggles();
       // Hint progression: dismiss customise form hint and show additional hint
-      if (localStorage.getItem('bbCustomiseFormHintDone') !== '1') {
+      if (BB.storage.get('CustomiseFormHintDone') !== '1') {
         _dismissCustomiseFormHint();
         _showCustomiseAdditionalHint();
       }
@@ -10181,7 +10182,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
 
     function _toggleStep(id) {
       // Check before mutating so we know whether to trigger dismissal chain
-      const _wasAdditionalHintPending = id === 'more_data' && localStorage.getItem('bbCustomiseAdditionalHintDone') !== '1';
+      const _wasAdditionalHintPending = id === 'more_data' && BB.storage.get('CustomiseAdditionalHintDone') !== '1';
       const dis = _getDisabledSteps();
       const idx = dis.indexOf(id);
       if (idx >= 0) dis.splice(idx, 1); else dis.push(id);
@@ -10212,7 +10213,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       if (!row) return;
       let _rawDis = [];
       try { _rawDis = JSON.parse(localStorage.getItem('disabledSteps') || '[]'); } catch(e) {}
-      const _hintActive = localStorage.getItem('bbCustomiseAdditionalHintDone') !== '1' && localStorage.getItem('bbCustomiseFormHintDone') === '1';
+      const _hintActive = BB.storage.get('CustomiseAdditionalHintDone') !== '1' && BB.storage.get('CustomiseFormHintDone') === '1';
       row.innerHTML = _CORE_STEP_TOGGLES.map(t => {
         const on = !_rawDis.includes(t.id);
         const _idAttr = t.id === 'more_data' ? ' id="stepToggleMoreData"' : '';
@@ -10400,8 +10401,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
 
     function showFieldPicker() {
       // Dismiss the "Customise your data fields" hint permanently on first open
-      if (!localStorage.getItem('bbCustomFieldHintDone')) {
-        localStorage.setItem('bbCustomFieldHintDone', '1');
+      if (!BB.storage.get('CustomFieldHintDone')) {
+        BB.storage.set('CustomFieldHintDone', '1');
         const _hint = document.getElementById('fmCustomFieldHint');
         if (_hint) _hint.style.display = 'none';
       }
@@ -10719,9 +10720,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         document.getElementById('settingsMobilePanel').style.display = '';
       } else {
         document.getElementById('settingsMainPanel').style.display = '';
-        if (localStorage.getItem('bbSettingsHintDone') === '1' && localStorage.getItem('bbCustomiseFormHintDone') !== '1') {
+        if (BB.storage.get('SettingsHintDone') === '1' && BB.storage.get('CustomiseFormHintDone') !== '1') {
           _showCustomiseFormHint();
-        } else if (localStorage.getItem('bbCustomiseAdditionalHintDone') === '1' && localStorage.getItem('bbCloseSettingsHintDone') !== '1') {
+        } else if (BB.storage.get('CustomiseAdditionalHintDone') === '1' && BB.storage.get('CloseSettingsHintDone') !== '1') {
           _showCloseSettingsHint();
         }
       }
@@ -10879,7 +10880,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
 
     async function saveSettings() {
       // Dismiss close settings hint if active
-      if (localStorage.getItem('bbCloseSettingsHintDone') !== '1' && localStorage.getItem('bbCustomiseAdditionalHintDone') === '1') {
+      if (BB.storage.get('CloseSettingsHintDone') !== '1' && BB.storage.get('CustomiseAdditionalHintDone') === '1') {
         _dismissCloseSettingsHint();
       }
       // Reminder/weekly toggles auto-save on change via _persistReminderSettings —
@@ -10930,9 +10931,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     // ── Quick notes: dismiss a single note by id ──
     function _dismissQuickNote(id) {
       try {
-        const _notes = JSON.parse(localStorage.getItem('bbQuickNotes') || '[]');
+        const _notes = JSON.parse(BB.storage.get('QuickNotes') || '[]');
         const _filtered = _notes.filter(n => n.id !== id);
-        localStorage.setItem('bbQuickNotes', JSON.stringify(_filtered));
+        BB.storage.set('QuickNotes', JSON.stringify(_filtered));
       } catch(_) {}
       _renderFocusedStep();
     }
@@ -10944,8 +10945,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     window.showPersonalDetailsModal = showPersonalDetailsModal;
     window.closePersonalDetailsModal = closePersonalDetailsModal;
     function _dismissPersonalDetailsHint() {
-      if (localStorage.getItem('bbPersonalHintDone') === '1') return;
-      localStorage.setItem('bbPersonalHintDone', '1');
+      if (BB.storage.get('PersonalHintDone') === '1') return;
+      BB.storage.set('PersonalHintDone', '1');
       document.getElementById('personalDetailsJournalHint')?.remove();
       if (typeof currentUser !== 'undefined' && currentUser && typeof db !== 'undefined' && db) {
         db.collection('userSettings').doc(currentUser.uid).set({ personalHintDone: true }, { merge: true }).catch(() => {});
@@ -10954,8 +10955,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     window._dismissPersonalDetailsHint = _dismissPersonalDetailsHint;
 
     function _dismissMedHint() {
-      if (localStorage.getItem('bbMedHintDone') === '1') return;
-      localStorage.setItem('bbMedHintDone', '1');
+      if (BB.storage.get('MedHintDone') === '1') return;
+      BB.storage.set('MedHintDone', '1');
       document.getElementById('medHintEl')?.remove();
       const _mb = document.getElementById('manageMedsBtn');
       if (_mb) _mb.style.color = 'var(--brand-primary)';
@@ -10964,8 +10965,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     window._dismissMedHint = _dismissMedHint;
 
     function _dismissSettingsHint() {
-      if (localStorage.getItem('bbSettingsHintDone') === '1') return;
-      localStorage.setItem('bbSettingsHintDone', '1');
+      if (BB.storage.get('SettingsHintDone') === '1') return;
+      BB.storage.set('SettingsHintDone', '1');
       const h = document.getElementById('settingsHint');
       if (h) h.style.display = 'none';
       _applyJournalOnboardingGating();
@@ -10973,7 +10974,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     window._dismissSettingsHint = _dismissSettingsHint;
 
     function _updateAdvancedBadge() {
-      const _visible = localStorage.getItem('bbAdvancedBadgeVisible') === '1';
+      const _visible = BB.storage.get('AdvancedBadgeVisible') === '1';
       const _badge = document.getElementById('settingsAdvancedBadge');
       if (_badge) _badge.style.display = _visible ? '' : 'none';
     }
@@ -10992,7 +10993,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       if (_cw) { _cw.style.zIndex = '11'; _cw.style.background = 'white'; _cw.style.borderRadius = '10px'; _cw.style.padding = '10px'; _cw.style.margin = '-10px'; }
     }
     function _dismissCustomiseFormHint() {
-      localStorage.setItem('bbCustomiseFormHintDone', '1');
+      BB.storage.set('CustomiseFormHintDone', '1');
       const _hel = document.getElementById('customiseFormHintEl');
       if (_hel) _hel.style.display = 'none';
       const _ao = document.getElementById('bbHintOverlay');
@@ -11017,7 +11018,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       _renderStepToggles();
     }
     function _dismissCustomiseAdditionalHint() {
-      localStorage.setItem('bbCustomiseAdditionalHintDone', '1');
+      BB.storage.set('CustomiseAdditionalHintDone', '1');
       const _ao = document.getElementById('bbHintOverlay');
       if (_ao) _ao.style.display = 'none';
       const _amo = document.getElementById('advancedHintOverlay');
@@ -11046,7 +11047,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       if (_hel) _hel.style.zIndex = '11';
     }
     function _dismissCloseSettingsHint() {
-      localStorage.setItem('bbCloseSettingsHintDone', '1');
+      BB.storage.set('CloseSettingsHintDone', '1');
       const _hel = document.getElementById('closeSettingsHintEl');
       if (_hel) { _hel.style.display = 'none'; _hel.style.zIndex = ''; }
       const _ao = document.getElementById('bbHintOverlay');
@@ -11058,10 +11059,10 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       const _cb = document.getElementById('settingsCloseBtn');
       if (_cb) _cb.style.zIndex = '';
       // Show tutorial complete toast and queue advanced badge + tap-hold hint for next entry
-      if (localStorage.getItem('bbAdvancedTutorialToastShown') !== '1') {
-        localStorage.setItem('bbAdvancedTutorialToastShown', '1');
-        localStorage.setItem('bbAdvancedBadgePending', '1');
-        localStorage.setItem('bb_fmTapHoldHintPending', '1'); // activates tap & hold hint on the NEXT entry
+      if (BB.storage.get('AdvancedTutorialToastShown') !== '1') {
+        BB.storage.set('AdvancedTutorialToastShown', '1');
+        BB.storage.set('AdvancedBadgePending', '1');
+        BB.storage.set('_fmTapHoldHintPending', '1'); // activates tap & hold hint on the NEXT entry
         setTimeout(() => _showFeatureHint('🎉', "Advanced tutorial complete. You're all set now!", '_bbAdvancedTutorialToast'), 400);
       }
     }
@@ -11069,8 +11070,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     // ── Customise form hint page lock ──
     (function() {
       document.addEventListener('click', function(e) {
-        if (localStorage.getItem('bbCustomiseFormHintDone') === '1') return;
-        if (localStorage.getItem('bbSettingsHintDone') !== '1') return;
+        if (BB.storage.get('CustomiseFormHintDone') === '1') return;
+        if (BB.storage.get('SettingsHintDone') !== '1') return;
         const modal = document.getElementById('settingsModal');
         if (!modal || !modal.classList.contains('active')) return;
         const tog = document.getElementById('customiseFormToggle');
@@ -11093,8 +11094,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     // ── Customise additional hint page lock ──
     (function() {
       document.addEventListener('click', function(e) {
-        if (localStorage.getItem('bbCustomiseAdditionalHintDone') === '1') return;
-        if (localStorage.getItem('bbCustomiseFormHintDone') !== '1') return;
+        if (BB.storage.get('CustomiseAdditionalHintDone') === '1') return;
+        if (BB.storage.get('CustomiseFormHintDone') !== '1') return;
         const modal = document.getElementById('settingsModal');
         if (!modal || !modal.classList.contains('active')) return;
         const addBtn = document.getElementById('stepToggleMoreData');
@@ -11113,8 +11114,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     // ── Close settings hint page lock ──
     (function() {
       document.addEventListener('click', function(e) {
-        if (localStorage.getItem('bbCloseSettingsHintDone') === '1') return;
-        if (localStorage.getItem('bbCustomiseAdditionalHintDone') !== '1') return;
+        if (BB.storage.get('CloseSettingsHintDone') === '1') return;
+        if (BB.storage.get('CustomiseAdditionalHintDone') !== '1') return;
         const modal = document.getElementById('settingsModal');
         if (!modal || !modal.classList.contains('active')) return;
         const closeBtn = document.getElementById('settingsCloseBtn');
@@ -11135,7 +11136,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     // ── Med hint page lock (independent of onboarding step) ──
     (function() {
       document.addEventListener('click', function(e) {
-        if (localStorage.getItem('bbMedHintDone') === '1') return;
+        if (BB.storage.get('MedHintDone') === '1') return;
         const hint = document.getElementById('medHintEl');
         if (!hint) return;
         const btn = document.getElementById('manageMedsBtn');
@@ -11153,7 +11154,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     // ── Mood info close hint page lock ──
     (function() {
       document.addEventListener('click', function(e) {
-        if (localStorage.getItem('bb_fmMoodInfoCloseHintDone') === '1') return;
+        if (BB.storage.get('_fmMoodInfoCloseHintDone') === '1') return;
         const modal = document.getElementById('moodInfoModal');
         if (!modal || !modal.classList.contains('active') || !modal.dataset.closeHintActive) return;
         const closeBtn = modal.querySelector('.confirm-btn-no');

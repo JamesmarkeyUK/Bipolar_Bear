@@ -28,7 +28,7 @@
   const db = firebase.firestore();
 
   // If already unlocked, skip straight to the app.
-  if (localStorage.getItem('bbWebUnlocked') === 'true') {
+  if (BB.storage.get('WebUnlocked') === 'true') {
     location.replace('index.html');
   }
 
@@ -116,7 +116,7 @@
     const val = document.getElementById('accessPw').value;
     const errEl = document.getElementById('pwError');
     if (val === 'bipolar') {
-      localStorage.setItem('bbWebUnlocked', 'true');
+      BB.storage.set('WebUnlocked', 'true');
       location.replace('index.html');
     } else {
       errEl.style.display = '';

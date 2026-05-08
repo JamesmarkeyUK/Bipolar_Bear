@@ -173,7 +173,7 @@ function _esc(s) {
       _skUpdateTicks();
 
       // First-ever visit: show welcome popup instead of blocking mood-selector hint
-      if (localStorage.getItem('bbSurvivalKitVisited') !== '1') {
+      if (BB.storage.get('SurvivalKitVisited') !== '1') {
         sessionStorage.removeItem('_bbSkipScroll');
         setTimeout(() => {
           if (document.getElementById('skWelcomeModal')) return;
@@ -191,8 +191,8 @@ function _esc(s) {
           });
           _modal.addEventListener('click', () => {
             _modal.remove();
-            localStorage.setItem('bbSurvivalKitVisited', '1');
-            localStorage.setItem('bbMoodDefHintDone', '1');
+            BB.storage.set('SurvivalKitVisited', '1');
+            BB.storage.set('MoodDefHintDone', '1');
             _applySkOnboardingGating();
           });
           document.body.appendChild(_modal);
@@ -422,7 +422,7 @@ function _esc(s) {
 
     function _getCelebQueue() {
       try {
-        const q = JSON.parse(localStorage.getItem('bbCelebQueue') || '[]');
+        const q = JSON.parse(BB.storage.get('CelebQueue') || '[]');
         if (Array.isArray(q) && q.length > 0) return q;
       } catch(e) {}
       // Build a fresh shuffled queue
@@ -437,7 +437,7 @@ function _esc(s) {
     function _getCelebIdx() {
       let queue = _getCelebQueue();
       const idx = queue.shift();
-      localStorage.setItem('bbCelebQueue', JSON.stringify(queue));
+      BB.storage.set('CelebQueue', JSON.stringify(queue));
       return idx;
     }
 
@@ -1129,9 +1129,9 @@ function _esc(s) {
 
     // Track visits and show hint on 2nd+ visit
     (function() {
-      const _vc = parseInt(localStorage.getItem('bbSkVisitCount') || '0', 10) + 1;
-      localStorage.setItem('bbSkVisitCount', String(_vc));
-      if (_vc >= 2 && !localStorage.getItem('bbSkHelperHintDone')) {
+      const _vc = parseInt(BB.storage.get('SkVisitCount') || '0', 10) + 1;
+      BB.storage.set('SkVisitCount', String(_vc));
+      if (_vc >= 2 && !BB.storage.get('SkHelperHintDone')) {
         const _hint = document.getElementById('skHelperHint');
         if (_hint) _hint.style.display = 'flex';
       }
@@ -1911,7 +1911,7 @@ function _esc(s) {
 
 // ── BLOCK 3 ──
 // ── Beta gate (web only) ──
-    if (!window.Capacitor && location.protocol !== 'file:' && localStorage.getItem('bbWebUnlocked') !== 'true') {
+    if (!window.Capacitor && location.protocol !== 'file:' && BB.storage.get('WebUnlocked') !== 'true') {
       location.replace('beta.html');
     }
 
@@ -2022,7 +2022,7 @@ function _esc(s) {
       }
       window.toggleHelped = async function() {
         // Dismiss helper hint
-        localStorage.setItem('bbSkHelperHintDone', '1');
+        BB.storage.set('SkHelperHintDone', '1');
         const _hh = document.getElementById('skHelperHint');
         if (_hh) _hh.style.display = 'none';
         const alreadyVoted = await getVotedState();
@@ -2419,7 +2419,7 @@ function _esc(s) {
 
 // ── BLOCK 6 ──
 // ── Guest inactivity relock (5 min) ──
-    if (localStorage.getItem('bbGuestPinSalt')) {
+    if (BB.storage.get('GuestPinSalt')) {
       let _idleTimer;
       function _resetIdleTimer() {
         clearTimeout(_idleTimer);

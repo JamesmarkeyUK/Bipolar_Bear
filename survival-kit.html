@@ -10,10 +10,10 @@
   <script>if(!window.Capacitor&&location.protocol!=='file:'&&localStorage.getItem('bbWebUnlocked')!=='true'){location.replace('beta.html');}
   {const _np=window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()&&localStorage.getItem('bbNativePinEnabled')==='1';if((localStorage.getItem('bbGuestPinSalt')||_np)&&sessionStorage.getItem('bbPinUnlocked')!=='1'){location.replace('index.html');}}</script>
 
-  <!-- Shared helpers: load before any inline script that depends on isNative()/window.BB_FIREBASE_CONFIG. -->
+  <!-- Shared helpers: load before any inline script that depends on isNative()/window.BB_FIREBASE_CONFIG/BB.storage. brand-config.js must come first so debug.js can use BB.storage. -->
+  <script src="js/shared/brand-config.js"></script>
   <script src="js/shared/platform.js"></script>
   <script src="js/shared/debug.js"></script>
-  <script src="js/shared/brand-config.js"></script>
   <script src="js/shared/firebase-config.js"></script>
   <meta name="description" content="Your personal bipolar survival kit — mood scale, coping strategies, resources and community support.">
   <meta name="robots" content="noindex, nofollow">

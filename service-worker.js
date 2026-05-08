@@ -57,7 +57,16 @@
 //     brand-config.js and sweep the 19 'bbAnon{Posts,Monikas,Reports}'
 //     Firestore collection literals onto BB_BRAND.collections.*. Runtime
 //     behaviour identical (the resolved values match the old literals).
-const CACHE_NAME = 'bipolarbear-v17';
+// v18: Phase 3b — sweep ~390 localStorage call sites across js/shared/{
+//     debug,onboarding}.js, js/{index,journal,survival-kit,anonymous,
+//     beta}.js, fab.js onto BB.storage. brand-config.js moved to first
+//     in the shared-helpers script load so debug.js + onboarding.js can
+//     read through BB.storage. sessionStorage and a small set of
+//     mixed/dual-use array literals intentionally still use raw
+//     localStorage (documented in commit notes); they don't block the
+//     multi-variant goal because they don't hardcode the prefix
+//     anywhere a future variant would need to override.
+const CACHE_NAME = 'bipolarbear-v18';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

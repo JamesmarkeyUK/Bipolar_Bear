@@ -2,8 +2,8 @@
  * Debug logging helper, gated by a localStorage flag so logs can be turned
  * on/off on a device without rebuilding.
  *
- *   localStorage.setItem('bbDebug', '0');  // silence info logs
- *   localStorage.removeItem('bbDebug');    // restore default (verbose)
+ *   BB.storage.set('Debug', '0');  // silence info logs
+ *   BB.storage.remove('Debug');    // restore default (verbose)
  *
  * `BB.log` is silenceable; `BB.warn` and `BB.error` always pass through —
  * warnings and errors should never be silently swallowed.
@@ -19,7 +19,7 @@
    */
   function _enabled() {
     try {
-      return localStorage.getItem('bbDebug') !== '0';
+      return BB.storage.get('Debug') !== '0';
     } catch (_) {
       // localStorage can throw in incognito on iOS — fail open (verbose).
       return true;
