@@ -381,7 +381,7 @@
     /* ── Overlays ── */
     .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: flex-end; z-index: 100; }
     .overlay.hidden { display: none; }
-    .sheet { background: #fff; border-radius: 24px 24px 0 0; padding: 24px 24px calc(40px + env(safe-area-inset-bottom, 0px)); width: 100%; }
+    .sheet { background: #fff; border-radius: 24px 24px 0 0; padding: 24px 24px calc(40px + env(safe-area-inset-bottom, 0px)); width: 100%; max-height: 90vh; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
     .sheet-icon  { font-size: 36px; text-align: center; margin-bottom: 12px; }
     .sheet-title { font-size: 18px; font-weight: 700; color: var(--dark); text-align: center; margin-bottom: 8px; }
     .sheet-sub   { font-size: 13px; color: var(--muted); text-align: center; line-height: 1.6; margin-bottom: 20px; }

@@ -23,7 +23,9 @@
 //     all DOM nodes the script touches at top-level exist when it runs.
 // v7: anonymous.html + js/anonymous.js — add Sign Out button for standalone
 //     (email-code) users in the Monika settings overlay.
-const CACHE_NAME = 'bipolarbear-v7';
+// v8: css/anonymous.css + js/anonymous.js — make Monika settings sheet
+//     scrollable, hide duplicate "Discover BipolarBear" link on anon domain.
+const CACHE_NAME = 'bipolarbear-v8';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

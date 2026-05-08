@@ -1517,10 +1517,13 @@ document.getElementById('ms-signout').addEventListener('click', () => {
   boot(null);
 });
 const _msHomeBtn = document.getElementById('ms-home');
-_msHomeBtn.textContent = _isAnonDomain ? '🐻 Discover BipolarBear →' : '← Back to Bipolar Bear';
-_msHomeBtn.addEventListener('click', () => {
-  location.href = _isAnonDomain ? 'https://bipolarbear.app' : 'index.html';
-});
+if (_isAnonDomain) {
+  // "Discover BipolarBear" is already in the info popup — don't duplicate it here.
+  _msHomeBtn.style.display = 'none';
+} else {
+  _msHomeBtn.textContent = '← Back to Bipolar Bear';
+  _msHomeBtn.addEventListener('click', () => { location.href = 'index.html'; });
+}
 document.getElementById('ms-med-btn').addEventListener('click', openMedSettings);
 document.getElementById('ms-stable-btn').addEventListener('click', openStableSettings);
 
