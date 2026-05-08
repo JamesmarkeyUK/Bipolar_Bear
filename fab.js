@@ -1150,9 +1150,8 @@
    *
    * Submit behaviour:
    *   - Sign in: Firebase `signInWithEmailAndPassword`, then close modal.
-   *   - Sign up: createUser, send styled verification via Cloud Function
-   *     (falls back to native sendEmailVerification on failure), sign back
-   *     out, and tell the user to verify before signing in.
+   *   - Sign up: createUser, then close modal. Email verification is handled
+   *     on the Bipolar Anonymous board, not here.
    */
   function _bbWireAuthListeners() {
     const toggle = document.getElementById('bbAuthToggle');
@@ -1183,23 +1182,7 @@
         if (typeof window._fabBeforeSignIn === 'function') window._fabBeforeSignIn();
         try {
           if (_bbIsSignUp) {
-            const _cred = await auth.createUserWithEmailAndPassword(email, password);
-            // Send styled verification email via Cloud Function (falls back to Firebase default)
-            try {
-              const _fns = window.firebase.app().functions('europe-west1');
-              await _fns.httpsCallable('sendVerificationEmail')({});
-            } catch (_verErr) {
-              console.warn('[fab] sendVerificationEmail CF failed, falling back:', _verErr);
-              await _cred.user.sendEmailVerification().catch(() => {});
-            }
-            // Show confirmation — don't close the modal yet
-            if (errEl) {
-              errEl.innerHTML = '✉️ Account created! We\'ve sent a verification link to <strong>' + email + '</strong>. Click it to activate your account, then sign in.';
-              errEl.style.cssText = 'display:block;color:#2f9e44;background:rgba(81,207,102,0.08);border:1.5px solid rgba(81,207,102,0.3);border-radius:8px;padding:10px 14px;font-size:13px;line-height:1.5;margin-bottom:8px;';
-            }
-            // Sign back out — they must verify before using the app
-            await auth.signOut();
-            return;
+            await auth.createUserWithEmailAndPassword(email, password);
           } else {
             await auth.signInWithEmailAndPassword(email, password);
           }
