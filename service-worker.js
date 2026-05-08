@@ -70,7 +70,12 @@
 //     fab.js so the "🗑 Delete all guest data" button in the shared auth
 //     modal works on /journal and /survival-kit too (was a silent no-op
 //     because window._confirmDeleteGuestData was only defined on /).
-const CACHE_NAME = 'bipolarbear-v19';
+// v20: deleteAllEntries() in js/journal.js now redirects from a finally
+//     block so the user always lands on /index.html (where the tutorial
+//     restarts) even if a Firestore step throws mid-cleanup. Previously
+//     a partial-failure path showed an error alert and stayed on
+//     /journal in a half-deleted state.
+const CACHE_NAME = 'bipolarbear-v20';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

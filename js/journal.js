@@ -8533,9 +8533,13 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         }
       }
 
-      try {
-        let deleted = 0;
+      // Hoisted so the finally block can read them after a partial-failure
+      // throw. _accountDeleted is set to true only after currentUser.delete()
+      // resolves; deleted accumulates as entries are removed.
+      let _accountDeleted = false;
+      let deleted = 0;
 
+      try {
         if (currentUser) {
           // Delete all entries from Firestore
           const snapshot = await db.collection('entries')
@@ -8720,7 +8724,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         // Account-deletion mode: delete the Firebase Auth record. We re-authed
         // upfront so this should succeed; if it doesn't, fall through to
         // sign-out so the user isn't trapped in a half-deleted state.
-        let _accountDeleted = false;
+        // (_accountDeleted is declared above the outer try so the finally
+        // block can read it.)
         if (deleteAccount && currentUser) {
           try {
             await currentUser.delete();
@@ -8734,16 +8739,23 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         alert(deleteAccount
           ? (_accountDeleted ? '✅ Account deleted.' : '⚠️ Data deleted but the auth account could not be removed. Please contact support.')
           : `Successfully deleted ${deleted} entries.`);
-
-        // Redirect to home. user.delete() already signs out; otherwise sign out manually.
-        if (!_accountDeleted && typeof auth !== 'undefined' && auth && currentUser) {
-          auth.signOut().catch(() => {}).finally(() => location.replace('index.html'));
-        } else {
-          location.replace('index.html');
-        }
       } catch (error) {
         console.error('Error deleting all entries:', error);
-        alert('Could not delete all entries: ' + error.message);
+        alert('Some cleanup steps failed: ' + error.message + '\n\nYou will be redirected to the home page so you can start fresh.');
+      } finally {
+        // Always redirect to /index.html so the tutorial restarts. We hit
+        // this finally regardless of whether the try succeeded or threw,
+        // so a Firestore blip mid-cleanup can't leave the user stranded
+        // on /journal in a half-deleted state.
+        //
+        // user.delete() auto-signs the user out, so we only sign out
+        // manually when the account-delete didn't run or failed AND a
+        // session is still active. signOut is best-effort (no await) —
+        // the new page will pick up whatever auth state actually persists.
+        if (!_accountDeleted && typeof auth !== 'undefined' && auth && currentUser) {
+          auth.signOut().catch(() => {});
+        }
+        location.replace('index.html');
       }
     }
 
