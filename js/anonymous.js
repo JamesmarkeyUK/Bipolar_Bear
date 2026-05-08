@@ -1447,12 +1447,16 @@ function openMonikaSettings() {
     }
   }
 
-  // Stability status row
+  // Stability counter is BB-app only — standalone (anon-direct) users
+  // don't track journal-driven streaks, so the option is hidden for them.
+  const msStableBtn = document.getElementById('ms-stable-btn');
+  if (msStableBtn) msStableBtn.style.display = _bbUser ? '' : 'none';
+
   const msStableStatus = document.getElementById('ms-stable-status');
-  if (msStableStatus) {
+  if (msStableStatus && _bbUser) {
     const streak = profile.stableStreak;
     if (!streak && !profile.stableSince) {
-      msStableStatus.textContent = _bbUser ? 'Not set up yet' : 'No stable date set';
+      msStableStatus.textContent = 'Not set up yet';
     } else {
       msStableStatus.textContent = streak > 0
         ? (profile.showStable ? `${streak}d · Visible on posts` : `${streak}d · Private`)
@@ -1517,10 +1521,13 @@ document.getElementById('ms-signout').addEventListener('click', () => {
   boot(null);
 });
 const _msHomeBtn = document.getElementById('ms-home');
-_msHomeBtn.textContent = _isAnonDomain ? '🐻 Discover BipolarBear →' : '← Back to Bipolar Bear';
-_msHomeBtn.addEventListener('click', () => {
-  location.href = _isAnonDomain ? 'https://bipolarbear.app' : 'index.html';
-});
+if (_isAnonDomain) {
+  // "Discover BipolarBear" is already in the info popup — don't duplicate it here.
+  _msHomeBtn.style.display = 'none';
+} else {
+  _msHomeBtn.textContent = '← Back to Bipolar Bear';
+  _msHomeBtn.addEventListener('click', () => { location.href = 'index.html'; });
+}
 document.getElementById('ms-med-btn').addEventListener('click', openMedSettings);
 document.getElementById('ms-stable-btn').addEventListener('click', openStableSettings);
 
