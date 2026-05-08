@@ -43,7 +43,12 @@
 //     onto the var(--brand-*) tokens defined in theme.css. Visually
 //     identical, but every CSS-precached file changed so v13 caches
 //     would still serve the old palette.
-const CACHE_NAME = 'bipolarbear-v14';
+// v15: extend the same sweep to inline style="..." attributes in the
+//     five page HTML files. Paint-blocking <style>body{...}</style>
+//     blocks and <meta theme-color> values intentionally still use hex
+//     literals (one can't see :root tokens at parse time, the other
+//     isn't CSS).
+const CACHE_NAME = 'bipolarbear-v15';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

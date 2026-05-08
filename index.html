@@ -75,9 +75,9 @@
 
   <!-- Auth FAB: centred over white notch -->
   <div id="authFabWrapper" style="position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:50; pointer-events:none; display:flex; align-items:center; justify-content:center;">
-    <button id="signinBtn" onclick="window.showAuthModal()" style="width:44px;height:44px;min-width:44px;background:white;color:#ff9500;border:2px solid #ff9500;border-radius:50%;cursor:pointer;font-size:1.15em;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 10px rgba(255,149,0,0.25);pointer-events:auto;">👤</button>
+    <button id="signinBtn" onclick="window.showAuthModal()" style="width:44px;height:44px;min-width:44px;background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);border-radius:50%;cursor:pointer;font-size:1.15em;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 10px rgba(255,149,0,0.25);pointer-events:auto;">👤</button>
     <div id="userInfo" style="display:none; flex-direction:row; align-items:center; pointer-events:auto;">
-      <button onclick="window.showAccountModal()" style="width:44px;height:44px;min-width:44px;background:#ff9500;color:white;border:none;border-radius:50%;cursor:pointer;font-size:1.15em;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 10px rgba(255,149,0,0.35);">👤</button>
+      <button onclick="window.showAccountModal()" style="width:44px;height:44px;min-width:44px;background:var(--brand-primary);color:white;border:none;border-radius:50%;cursor:pointer;font-size:1.15em;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 10px rgba(255,149,0,0.35);">👤</button>
     </div>
   </div>
   <div class="container">
@@ -184,13 +184,13 @@
       <div style="display:flex;align-items:flex-start;gap:12px;">
         <span style="font-size:1.5em;line-height:1;flex-shrink:0;margin-top:1px;">🎉</span>
         <div style="flex:1;min-width:0;">
-          <div id="whatsNewVersion" style="font-size:0.7em;font-weight:700;color:#ff9500;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:5px;"></div>
+          <div id="whatsNewVersion" style="font-size:0.7em;font-weight:700;color:var(--brand-primary);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:5px;"></div>
           <div id="whatsNewHeadline" style="font-size:0.9em;color:#212529;line-height:1.45;font-weight:600;"></div>
         </div>
       </div>
       <div style="display:flex;gap:8px;margin-top:14px;">
         <button onclick="_dismissWhatsNew()" style="flex:1;padding:10px;background:#f8f9fa;color:#6c757d;border:none;border-radius:10px;font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Got it</button>
-        <button onclick="_openFullChangelog()" style="flex:1;padding:10px;background:#ff9500;color:white;border:none;border-radius:10px;font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Full changelog ↗</button>
+        <button onclick="_openFullChangelog()" style="flex:1;padding:10px;background:var(--brand-primary);color:white;border:none;border-radius:10px;font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Full changelog ↗</button>
       </div>
     </div>
   </div>
@@ -238,7 +238,7 @@
         <textarea           id="pdNotes"     placeholder="Notes (optional)" rows="3"                  style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;resize:vertical;font-family:inherit;"></textarea>
       </div>
       <div style="display:flex;gap:10px;margin-top:20px;">
-        <button onclick="savePersonalDetails()" style="flex:1;padding:12px;background:#ff9500;color:white;border:none;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;">Save</button>
+        <button onclick="savePersonalDetails()" style="flex:1;padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;">Save</button>
         <button onclick="closePersonalDetailsModal()" style="padding:12px 18px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;cursor:pointer;">Close</button>
       </div>
     </div>
@@ -271,7 +271,7 @@
   
 
   <!-- Guest PIN unlock overlay (shown on index when journal data is encrypted) -->
-  <div id="guestPinOverlay" style="display:none;position:fixed;inset:0;background:linear-gradient(135deg,#ffaa33 0%,#ff8833 100%);z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:24px;">
+  <div id="guestPinOverlay" style="display:none;position:fixed;inset:0;background:linear-gradient(135deg,var(--brand-primary-light) 0%,var(--brand-primary-mid) 100%);z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:24px;">
     <img src="icons/AppIcon.png" width="72" height="72" style="border-radius:18px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
     <h2 style="color:white;margin-bottom:6px;font-size:1.3em;">Bipolar Bear</h2>
     <p style="color:rgba(255,255,255,0.85);font-size:0.88em;margin-bottom:12px;">Enter your PIN to continue</p>
@@ -283,7 +283,7 @@
         <p style="font-size:0.85em;color:#495057;line-height:1.6;margin-bottom:10px;">Your journal entries are <strong>end-to-end encrypted</strong> — scrambled before they leave your device. Only you can read them. Not even we can.</p>
         <p style="font-size:0.85em;color:#495057;line-height:1.6;margin-bottom:10px;">Think of it like a locked diary that only unlocks with your combination — your <strong>password + PIN together</strong> form that key.</p>
         <p style="font-size:0.85em;color:#495057;line-height:1.6;margin-bottom:16px;">For personal and mental health data, this level of privacy really matters. Your entries stay private, always.</p>
-        <button onclick="document.getElementById('pinE2eeModal').style.display='none'" style="width:100%;padding:11px;background:#ff9500;color:white;border:none;border-radius:12px;font-weight:700;cursor:pointer;font-size:0.9em;">Got it</button>
+        <button onclick="document.getElementById('pinE2eeModal').style.display='none'" style="width:100%;padding:11px;background:var(--brand-primary);color:white;border:none;border-radius:12px;font-weight:700;cursor:pointer;font-size:0.9em;">Got it</button>
       </div>
     </div>
     <div id="idxPinDots" style="display:flex;gap:12px;margin-bottom:24px;">
