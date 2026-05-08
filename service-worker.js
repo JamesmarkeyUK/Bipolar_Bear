@@ -34,7 +34,11 @@
 //     anonProfiles/{hash(email)} when userSettings has no anonProfile, so
 //     a BB account whose email was already used standalone reuses the
 //     existing monika instead of prompting for a new one.
-const CACHE_NAME = 'bipolarbear-v12';
+// v13: add js/shared/brand-config.js + css/theme.css scaffolding (Phase 1
+//     of the multi-variant refactor). Additive only — nothing consumes
+//     them yet, but they are linked from every HTML page so must be in
+//     the offline cache.
+const CACHE_NAME = 'bipolarbear-v13';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
@@ -60,8 +64,12 @@ const STATIC_ASSETS = [
   // Shared modules — small, loaded by every page.
   './js/shared/platform.js',
   './js/shared/debug.js',
+  './js/shared/brand-config.js',
   './js/shared/firebase-config.js',
   './js/shared/onboarding.js',
+
+  // Shared theme tokens (loaded before page-specific CSS).
+  './css/theme.css',
 
   // Page-specific stylesheets (extracted from inline <style> in Phase 4).
   './css/index.css',
