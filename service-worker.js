@@ -66,7 +66,11 @@
 //     localStorage (documented in commit notes); they don't block the
 //     multi-variant goal because they don't hardcode the prefix
 //     anywhere a future variant would need to override.
-const CACHE_NAME = 'bipolarbear-v18';
+// v19: move _nukeGuestData / _confirmDeleteGuestData from js/index.js to
+//     fab.js so the "🗑 Delete all guest data" button in the shared auth
+//     modal works on /journal and /survival-kit too (was a silent no-op
+//     because window._confirmDeleteGuestData was only defined on /).
+const CACHE_NAME = 'bipolarbear-v19';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
