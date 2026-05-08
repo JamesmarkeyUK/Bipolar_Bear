@@ -1483,21 +1483,10 @@ function _handleIndexJournalNav() {
       );
     })();
 
-    function _nukeGuestData() {
-      // Preserve web beta unlock so user isn't redirected to beta.html after wipe
-      const _webUnlocked = BB.storage.get('WebUnlocked');
-      localStorage.clear();
-      if (_webUnlocked) BB.storage.set('WebUnlocked', _webUnlocked);
-      sessionStorage.clear();
-      location.replace(location.pathname);
-    }
-
-    function _confirmDeleteGuestData() {
-      if (!confirm('This will permanently delete all your guest data — journal entries, settings, and preferences. There is no way to recover them.\n\nAre you absolutely sure?')) return;
-      if (!confirm('Last chance — everything will be deleted and you will start fresh. Continue?')) return;
-      _nukeGuestData();
-    }
-    window._confirmDeleteGuestData = _confirmDeleteGuestData;
+    // _nukeGuestData / _confirmDeleteGuestData live in fab.js so the
+    // "Delete all guest data" button in the shared auth modal works on
+    // every page that loads fab.js, not just this one. Both are exposed
+    // as window._nukeGuestData / window._confirmDeleteGuestData.
 
     async function idxPinForgot() {
       const _isNat = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
@@ -1512,5 +1501,5 @@ function _handleIndexJournalNav() {
       // Guest PIN: full wipe (PIN is the encryption key — no recovery possible)
       if (!confirm('Your PIN is the encryption key for your journal. Without it, your entries cannot be recovered.\n\nThis will permanently delete all your data and start fresh.\n\nAre you absolutely sure?')) return;
       if (!confirm('Last chance — all entries and data will be deleted. Continue?')) return;
-      _nukeGuestData();
+      window._nukeGuestData();
     }

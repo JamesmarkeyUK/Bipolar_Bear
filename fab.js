@@ -15,8 +15,15 @@
  *   - window.currentUser → signed-in Firebase user, or undefined when guest
  *   - window.firebase    → Firebase compat SDK global
  *   - window._fabOnSignOut, window._fabOpenAuth, window._fabBeforeSignIn,
- *     window._fabOpenPersonalInfo, window._onFabFeedbackClose,
- *     window._confirmDeleteGuestData → optional page-specific hooks.
+ *     window._fabOpenPersonalInfo, window._onFabFeedbackClose
+ *     → optional page-specific hooks.
+ *
+ * Symbols this module *defines* on window for inline `onclick=` use and
+ * for cross-page reuse (so any page that loads fab.js can call them):
+ *   - window._nukeGuestData / window._confirmDeleteGuestData
+ *     → guest-data wipe; powers the "🗑 Delete all guest data" button in
+ *       the shared auth modal, plus the guest-PIN "forgot" path in
+ *       js/index.js.
  *
  * localStorage keys this module reads/writes:
  *   bbFabSlot_1..4            — id of FAB assigned to each slot
@@ -31,6 +38,52 @@
  */
 (function () {
   'use strict';
+
+  // ── Guest-data wipe ───────────────────────────────────────────────────────
+
+  /**
+   * Wipe every localStorage + sessionStorage key for this origin and reload
+   * the page. Preserves the `WebUnlocked` beta-gate flag so the user isn't
+   * bounced to /beta.html after the wipe.
+   *
+   * Lives in fab.js (not js/index.js) so the "🗑 Delete all guest data"
+   * button in the shared auth modal works identically on every page that
+   * loads fab.js (index, journal, survival-kit). Pre-fix the button was a
+   * no-op on /journal and /survival-kit because window._confirmDeleteGuestData
+   * was only defined on /index.
+   *
+   * @returns {void}
+   */
+  function _nukeGuestData() {
+    const _webUnlocked = window.BB && window.BB.storage
+      ? window.BB.storage.get('WebUnlocked')
+      : localStorage.getItem('bbWebUnlocked');
+    localStorage.clear();
+    if (_webUnlocked) {
+      if (window.BB && window.BB.storage) {
+        window.BB.storage.set('WebUnlocked', _webUnlocked);
+      } else {
+        localStorage.setItem('bbWebUnlocked', _webUnlocked);
+      }
+    }
+    sessionStorage.clear();
+    location.replace(location.pathname);
+  }
+
+  /**
+   * Two-step confirmation wrapper around `_nukeGuestData`. Bails out as
+   * soon as either confirm() returns false.
+   *
+   * @returns {void}
+   */
+  function _confirmDeleteGuestData() {
+    if (!confirm('This will permanently delete all your guest data — journal entries, settings, and preferences. There is no way to recover them.\n\nAre you absolutely sure?')) return;
+    if (!confirm('Last chance — everything will be deleted and you will start fresh. Continue?')) return;
+    _nukeGuestData();
+  }
+
+  window._nukeGuestData = _nukeGuestData;
+  window._confirmDeleteGuestData = _confirmDeleteGuestData;
 
   // ── Cross-device persistence ──────────────────────────────────────────────
 
