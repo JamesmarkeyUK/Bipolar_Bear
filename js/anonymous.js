@@ -35,7 +35,7 @@ if (!window.Capacitor && location.protocol !== 'file:' && localStorage.getItem('
 // ─────────────────────────────────────────────────────────────────
 // Constants & state
 // ─────────────────────────────────────────────────────────────────
-const YELLOW      = '#f5c800';
+const YELLOW      = 'var(--brand-secondary)';
 const YELLOW_DARK = '#c49e00';
 const YELLOW_LT   = '#ffe566';
 const ADMIN_EMAIL = 'inbox@jamesmarkey.co.uk';

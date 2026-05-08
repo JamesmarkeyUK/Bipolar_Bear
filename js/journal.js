@@ -604,7 +604,7 @@ window.addEventListener('pageshow', () => {
       if (fab) {
         fab.textContent = '⚙️';
         fab.title = 'Settings';
-        fab.style.background = '#ff9500';
+        fab.style.background = 'var(--brand-primary)';
         fab.style.color = 'white';
         fab.style.border = 'none';
         fab.style.boxShadow = '0 2px 10px rgba(255,149,0,0.35)';
@@ -615,8 +615,8 @@ window.addEventListener('pageshow', () => {
         fab.textContent = '👤';
         fab.title = 'Profile / Sign in';
         fab.style.background = 'white';
-        fab.style.color = '#ff9500';
-        fab.style.border = '2px solid #ff9500';
+        fab.style.color = 'var(--brand-primary)';
+        fab.style.border = '2px solid var(--brand-primary)';
         fab.style.boxShadow = '0 2px 10px rgba(255,149,0,0.25)';
       }
     }
@@ -955,7 +955,7 @@ window.addEventListener('pageshow', () => {
     function _applyMoreDataDefaultToggle(on) {
       const t = document.getElementById('moreDataDefaultSwitch');
       if (!t) return;
-      t.style.background = on ? '#ff9500' : '#dee2e6';
+      t.style.background = on ? 'var(--brand-primary)' : '#dee2e6';
       t.children[0].style.transform = on ? 'translateX(14px)' : '';
     }
     function toggleMoreDataDefault() {
@@ -1011,7 +1011,7 @@ window.addEventListener('pageshow', () => {
       const btn = document.getElementById('privateBtn');
       if (!btn) return;
       btn.style.opacity = selectedPdfHide ? '1' : '0.5';
-      btn.style.borderColor = selectedPdfHide ? '#ff9500' : '#dee2e6';
+      btn.style.borderColor = selectedPdfHide ? 'var(--brand-primary)' : '#dee2e6';
     }
     function _showFeatureHint(emoji, text, storageKey) {
       if (localStorage.getItem(storageKey) === '1') return;
@@ -1148,7 +1148,7 @@ window.addEventListener('pageshow', () => {
       const btn = document.getElementById('favouriteBtn');
       if (!btn) return;
       btn.textContent = selectedFavourite ? '★' : '☆';
-      btn.style.color = selectedFavourite ? '#ff9500' : '#adb5bd';
+      btn.style.color = selectedFavourite ? 'var(--brand-primary)' : '#adb5bd';
     }
     window.toggleFavourite = toggleFavourite;
 
@@ -1497,7 +1497,7 @@ window.addEventListener('pageshow', () => {
       } catch(e) {}
 
       // Show bipolar UK definition — collapse it behind a toggle when personal def exists
-      const _bipolarHtml = `${def.text}<br><a href="${_bipolarUkUrl}" target="_blank" style="color:#ff9500;font-size:0.82em;white-space:nowrap;">Full definition — Bipolar UK ↗</a>`;
+      const _bipolarHtml = `${def.text}<br><a href="${_bipolarUkUrl}" target="_blank" style="color:var(--brand-primary);font-size:0.82em;white-space:nowrap;">Full definition — Bipolar UK ↗</a>`;
       if (_personalDef) {
         document.getElementById('moodInfoBody').innerHTML = `<button onclick="const b=document.getElementById('_moodBipBody');const open=b.style.display!=='none';b.style.display=open?'none':'';this.textContent=open?'Bipolar UK Definition — click here':'Bipolar UK Definition';" style="background:none;border:none;color:#adb5bd;font-size:0.82em;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px;-webkit-tap-highlight-color:transparent;">Bipolar UK Definition — click here</button><div id="_moodBipBody" style="display:none;margin-top:6px;font-size:0.9em;color:#495057;line-height:1.65;">${_bipolarHtml}</div>`;
       } else {
@@ -1638,7 +1638,7 @@ window.addEventListener('pageshow', () => {
           const _ch = document.createElement('div');
           _ch.id = '_fmMoodInfoCloseHintEl';
           _ch.style.cssText = 'display:flex;flex-direction:row;align-items:center;gap:4px;margin-right:8px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;';
-          _ch.innerHTML = `<span style="font-size:0.72em;font-weight:700;font-style:italic;color:#ff9500;font-family:'Georgia',serif;letter-spacing:0.01em;">🐻 Close to continue</span><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><line x1="2" y1="8" x2="13" y2="8" stroke="#ff9500" stroke-width="2" stroke-linecap="round"/><polyline points="8,3 13,8 8,13" stroke="#ff9500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
+          _ch.innerHTML = `<span style="font-size:0.72em;font-weight:700;font-style:italic;color:var(--brand-primary);font-family:'Georgia',serif;letter-spacing:0.01em;">🐻 Close to continue</span><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><line x1="2" y1="8" x2="13" y2="8" stroke="var(--brand-primary)" stroke-width="2" stroke-linecap="round"/><polyline points="8,3 13,8 8,13" stroke="var(--brand-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
           _confirmBtns.insertBefore(_ch, _confirmBtns.firstChild);
           const _closeBtn = _confirmBtns.querySelector('.confirm-btn-no');
           if (_closeBtn) _closeBtn.style.zIndex = '1001';
@@ -2247,7 +2247,7 @@ window.addEventListener('pageshow', () => {
                   <img src="images/moods/${entry.mood}.png" alt="${entry.mood}" class="entry-mood" style="width:32px;height:32px;object-fit:contain;">
                   ${entry.linkedMood ? `<img src="images/moods/${entry.linkedMood}.png" alt="${entry.linkedMood}" style="width:22px;height:22px;object-fit:contain;opacity:0.75;margin-left:-4px;" title="Also: ${entry.linkedMood}">` : ''}
                   ${entry.pdfHide ? `<span style="font-size:1em;line-height:1;opacity:0.7;" title="Private">🕵️</span>` : ''}
-                  ${entry.favourite ? `<span style="font-size:1em;color:#ff9500;line-height:1;" title="Favourite">★</span>` : ''}
+                  ${entry.favourite ? `<span style="font-size:1em;color:var(--brand-primary);line-height:1;" title="Favourite">★</span>` : ''}
                   <button class="edit-btn" id="edit-${actualIndex}" title="Edit entry" style="background:none; border:none; cursor:pointer; font-size:1.1em; padding:4px;">✏️</button>
                   <button class="delete-btn" id="delete-${actualIndex}">×</button>
                 </div>
@@ -2295,7 +2295,7 @@ window.addEventListener('pageshow', () => {
         const _pageNums = [];
         for (let p = _pageStart; p <= _pageEnd; p++) _pageNums.push(p);
         const _pageButtons = _pageNums.map(p =>
-          `<button class="pagination-btn" onclick="goToPage(${p})" style="${p === currentPage ? 'background:#ff9500;color:white;border-color:#ff9500;' : ''}">${p}</button>`
+          `<button class="pagination-btn" onclick="goToPage(${p})" style="${p === currentPage ? 'background:var(--brand-primary);color:white;border-color:var(--brand-primary);' : ''}">${p}</button>`
         ).join('');
         const paginationHtml = `
           <div style="margin-top: 15px;">
@@ -2305,7 +2305,7 @@ window.addEventListener('pageshow', () => {
               <button class="pagination-btn" onclick="goToPage(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''} title="Last">»</button>
             </div>
             <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-              <button onclick="exportPDF()" class="btn-export-pdf" style="padding: 10px 20px; background: white; color: #ff9500; border: 2px solid #ff9500; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">📄 Export PDF</button>
+              <button onclick="exportPDF()" class="btn-export-pdf" style="padding: 10px 20px; background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary); border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">📄 Export PDF</button>
               <button onclick="document.getElementById('exportModal').classList.add('active')" class="btn-export-backup" style="padding: 10px 20px; background: white; color: #51cf66; border: 2px solid #51cf66; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">Backup data</button>
               <button onclick="showImportModal()" class="btn-export-import" style="padding: 10px 20px; background: white; color: #74c0fc; border: 2px solid #74c0fc; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">Import</button>
             </div>
@@ -2315,14 +2315,14 @@ window.addEventListener('pageshow', () => {
                 <button onclick="logout()" class="logout-btn-list" style="flex-shrink:0;padding:7px 14px;background:white;color:#adb5bd;border:1.5px solid #dee2e6;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.85em;-webkit-tap-highlight-color:transparent;">Logout</button>
               ` : `
                 <span style="font-size:0.82em;color:#adb5bd;font-style:italic;">Login to backup data online</span>
-                <button onclick="window.showAuthModal()" style="flex-shrink:0;padding:7px 14px;background:#ff9500;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.85em;-webkit-tap-highlight-color:transparent;">Sign In / Up</button>
+                <button onclick="window.showAuthModal()" style="flex-shrink:0;padding:7px 14px;background:var(--brand-primary);color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.85em;-webkit-tap-highlight-color:transparent;">Sign In / Up</button>
               `}
             </div>
             <div style="text-align:center;margin-top:8px;position:relative;display:inline-block;width:100%;">
               <button onclick="_dismissPersonalDetailsHint();showPersonalDetailsModal()" style="background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;padding:4px 8px;text-decoration:underline;text-underline-offset:2px;-webkit-tap-highlight-color:transparent;">👤 Your personal details</button>
               ${localStorage.getItem('bbPersonalHintDone') !== '1' ? `<div id="personalDetailsJournalHint" style="display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-top:2px;">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="8" y1="13" x2="8" y2="2" stroke="#ff9500" stroke-width="2" stroke-linecap="round"/><polyline points="3,7 8,2 13,7" stroke="#ff9500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-                <span style="font-size:0.72em;font-weight:700;font-style:italic;color:#ff9500;font-family:'Georgia',serif;letter-spacing:0.01em;">🐻 Add your details here</span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="8" y1="13" x2="8" y2="2" stroke="var(--brand-primary)" stroke-width="2" stroke-linecap="round"/><polyline points="3,7 8,2 13,7" stroke="var(--brand-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                <span style="font-size:0.72em;font-weight:700;font-style:italic;color:var(--brand-primary);font-family:'Georgia',serif;letter-spacing:0.01em;">🐻 Add your details here</span>
               </div>` : ''}
             </div>
           </div>
@@ -2621,7 +2621,7 @@ window.addEventListener('pageshow', () => {
       const _pfLimitedNote = statsTimeframe !== 'all' ? `<div style="font-size:0.75em;color:#adb5bd;margin-top:2px;">Based on ${statsTimeframe}d data — limited insights</div>` : '';
       document.getElementById('streakStats').innerHTML = (localStorage.getItem('showMoodSuggestion') === '1' && statsEntries.length > 0)
         ? `<div style="text-align:center;margin:8px 0 16px;">
-            <button onclick="showPersonalisedFeedback()" style="background:none;border:none;color:#ff9500;font-size:0.88em;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:4px 0;"><img src="images/moods/AI_Bear.png" style="max-width: 50px" > <br>Personalised Feedback (BETA)</button><br>
+            <button onclick="showPersonalisedFeedback()" style="background:none;border:none;color:var(--brand-primary);font-size:0.88em;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:4px 0;"><img src="images/moods/AI_Bear.png" style="max-width: 50px" > <br>Personalised Feedback (BETA)</button><br>
             ${_pfLimitedNote}
            </div>`
         : '';
@@ -2647,7 +2647,7 @@ window.addEventListener('pageshow', () => {
         title.textContent = '⚡ Energy — Daily Breakdown';
         body.innerHTML = sorted.map(e => {
           const d = new Date(e.date).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
-          return row(d, `${e.energy}/10`, e.energy/10, '#ff9500');
+          return row(d, `${e.energy}/10`, e.energy/10, 'var(--brand-primary)');
         }).join('');
       } else if (type === 'sleep') {
         title.textContent = '😴 Sleep — Daily Breakdown';
@@ -2707,7 +2707,7 @@ window.addEventListener('pageshow', () => {
         title.textContent = '🗓️ Tracked Days';
         body.innerHTML = sorted.map(e => {
           const d = new Date(e.date).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
-          const c = _moodColors[e.mood] || '#ff9500';
+          const c = _moodColors[e.mood] || 'var(--brand-primary)';
           const lbl = _moodLabels[e.mood] || e.mood;
           return `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;margin-bottom:4px;border-radius:8px;background:${c}18;border-left:3px solid ${c};">
             <span style="color:#495057;font-size:0.9em;">${d}</span>
@@ -2739,7 +2739,7 @@ window.addEventListener('pageshow', () => {
         el.innerHTML = favs.map(entry => {
           const d = new Date(entry.date);
           const label = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
-          const color = moodColors[entry.mood] || '#ff9500';
+          const color = moodColors[entry.mood] || 'var(--brand-primary)';
           const notesPreview = entry.notes
             ? `<div style="font-size:0.82em;color:#6c757d;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${entry.notes}</div>`
             : '';
@@ -2750,7 +2750,7 @@ window.addEventListener('pageshow', () => {
                 <div style="font-weight:600;font-size:0.88em;">${label}</div>
                 ${notesPreview}
               </div>
-              <button onclick="openFavouriteDetail('${entry.id || ''}')" style="flex-shrink:0;padding:6px 14px;background:white;border:1.5px solid #ff9500;color:#ff9500;border-radius:8px;font-weight:600;font-size:0.82em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Open</button>
+              <button onclick="openFavouriteDetail('${entry.id || ''}')" style="flex-shrink:0;padding:6px 14px;background:white;border:1.5px solid var(--brand-primary);color:var(--brand-primary);border-radius:8px;font-weight:600;font-size:0.82em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Open</button>
             </div>`;
         }).join('');
       }
@@ -2844,7 +2844,7 @@ window.addEventListener('pageshow', () => {
         el.innerHTML = favs.map(entry => {
           const d = new Date(entry.date);
           const label = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
-          const color = moodColors[entry.mood] || '#ff9500';
+          const color = moodColors[entry.mood] || 'var(--brand-primary)';
           const notesPreview = entry.notes
             ? `<div style="font-size:0.82em;color:#6c757d;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${entry.notes}</div>`
             : '';
@@ -2855,7 +2855,7 @@ window.addEventListener('pageshow', () => {
                 <div style="font-weight:600;font-size:0.88em;">${label}</div>
                 ${notesPreview}
               </div>
-              <button onclick="openFavAnniversaryDetail('${entry.id || ''}')" style="flex-shrink:0;padding:6px 14px;background:white;border:1.5px solid #ff9500;color:#ff9500;border-radius:8px;font-weight:600;font-size:0.82em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Open</button>
+              <button onclick="openFavAnniversaryDetail('${entry.id || ''}')" style="flex-shrink:0;padding:6px 14px;background:white;border:1.5px solid var(--brand-primary);color:var(--brand-primary);border-radius:8px;font-weight:600;font-size:0.82em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Open</button>
             </div>`;
         }).join('');
       }
@@ -3529,7 +3529,7 @@ window.addEventListener('pageshow', () => {
     let _sleepSuggestedVal  = null;
     let _sleepHealthSynced  = false; // true only when sleep came from a health data sync
 
-    const _FM_MOOD_COLORS  = { manic:'#ff4444', elevated:'#ff9500', stable:'#51cf66', good:'#51cf66', low:'#845ef7', depressed:'#5c7cfa' };
+    const _FM_MOOD_COLORS  = { manic:'#ff4444', elevated:'var(--brand-primary)', stable:'#51cf66', good:'#51cf66', low:'#845ef7', depressed:'#5c7cfa' };
     const _FM_MOOD_LABELS  = { manic:'Manic', elevated:'Elevated', stable:'Stable', good:'Stable', low:'Low', depressed:'Depressed' };
 
     const _FM_ENERGY_LEVELS = [
@@ -3924,10 +3924,10 @@ window.addEventListener('pageshow', () => {
       document.querySelectorAll('[data-budget]').forEach(b => b.classList.toggle('selected', b.dataset.budget === selectedBudget));
     }
 
-    const _FM_MOOD_BG     = { manic:'#fff0f0', elevated:'#fff8e6', stable:'#f0fff4', good:'#f0fff4', low:'#f5f0ff', depressed:'#f0f4ff' };
+    const _FM_MOOD_BG     = { manic:'#fff0f0', elevated:'var(--brand-secondary-tint)', stable:'#f0fff4', good:'#f0fff4', low:'#f5f0ff', depressed:'#f0f4ff' };
     function _fmApplyMoodTheme(mood) {
-      const accent = (mood && _FM_MOOD_COLORS[mood]) || '#ff9500';
-      const bg     = (mood && _FM_MOOD_BG[mood])     || '#fff8f0';
+      const accent = (mood && _FM_MOOD_COLORS[mood]) || 'var(--brand-primary)';
+      const bg     = (mood && _FM_MOOD_BG[mood])     || 'var(--brand-tint)';
       const card   = document.getElementById('focusedModeCard');
       const sticky = document.getElementById('fmNextRow');
       if (card)   { card.style.background = bg;   card.style.setProperty('--fm-accent', accent); }
@@ -4010,7 +4010,7 @@ window.addEventListener('pageshow', () => {
       } else {
         nextRow.style.display = 'flex';
       }
-      const _accent = (selectedMood && _FM_MOOD_COLORS[selectedMood]) || '#ff9500';
+      const _accent = (selectedMood && _FM_MOOD_COLORS[selectedMood]) || 'var(--brand-primary)';
       if (step.id === 'done') {
         const _noChanges = editingEntry && !_hasEditChanges();
         nextBtn.textContent = !selectedMood ? '😊 Select a mood →' : (_noChanges ? 'Close' : (editingEntry ? '✏️ Update entry' : '💾 Save Entry'));
@@ -4071,7 +4071,7 @@ window.addEventListener('pageshow', () => {
       _notesEl.id = 'fmStepNotesEl';
       if (_noteOpen) _notesEl.open = true;
       _notesEl.style.cssText = 'margin-top:14px;';
-      _notesEl.innerHTML = `<summary style="font-size:0.85em;font-weight:600;color:#6c757d;cursor:pointer;list-style:none;display:flex;align-items:center;gap:5px;-webkit-tap-highlight-color:transparent;padding:4px 0;" onclick="this.querySelector('.bb-stpchev').style.transform=this.parentElement.open?'rotate(0deg)':'rotate(90deg)'"><span class="bb-stpchev" style="font-size:0.75em;color:#6c757d;transition:transform 0.2s;">${_noteOpen ? '▼' : '▶'}</span>📝 Add a note</summary><textarea id="fmStepNoteInput" placeholder="Why did you feel this way?" style="width:100%;height:60px;border:1.5px solid #e9ecef;border-radius:10px;padding:10px;margin-top:6px;font-size:0.88em;font-family:inherit;resize:none;box-sizing:border-box;outline:none;transition:border-color 0.15s;" oninput="selectedStepNotes['${step.id}']=this.value;saveDraft();" onfocus="this.style.borderColor='#ff9500'" onblur="this.style.borderColor='#e9ecef'">${_noteVal.replace(/</g,'&lt;')}</textarea>`;
+      _notesEl.innerHTML = `<summary style="font-size:0.85em;font-weight:600;color:#6c757d;cursor:pointer;list-style:none;display:flex;align-items:center;gap:5px;-webkit-tap-highlight-color:transparent;padding:4px 0;" onclick="this.querySelector('.bb-stpchev').style.transform=this.parentElement.open?'rotate(0deg)':'rotate(90deg)'"><span class="bb-stpchev" style="font-size:0.75em;color:#6c757d;transition:transform 0.2s;">${_noteOpen ? '▼' : '▶'}</span>📝 Add a note</summary><textarea id="fmStepNoteInput" placeholder="Why did you feel this way?" style="width:100%;height:60px;border:1.5px solid #e9ecef;border-radius:10px;padding:10px;margin-top:6px;font-size:0.88em;font-family:inherit;resize:none;box-sizing:border-box;outline:none;transition:border-color 0.15s;" oninput="selectedStepNotes['${step.id}']=this.value;saveDraft();" onfocus="this.style.borderColor='var(--brand-primary)'" onblur="this.style.borderColor='#e9ecef'">${_noteVal.replace(/</g,'&lt;')}</textarea>`;
       const _container = document.getElementById('fmContent');
       if (_container) _container.appendChild(_notesEl);
     }
@@ -4124,7 +4124,7 @@ window.addEventListener('pageshow', () => {
                 if (_pe && _pe.intention) {
                   const _piClean = _pe.intention.split(/\n?_{3,}\n/)[0].trim();
                   if (_piClean) {
-                    _prevIntentionHtml = `<div style="background:#fff8f0;border-radius:10px;padding:10px 14px;margin-bottom:14px;border-left:3px solid #ff9500;"><p style="font-size:0.75em;font-weight:700;color:#ff9500;margin:0 0 3px;text-transform:uppercase;letter-spacing:0.3px;">🌅 Your intention was…</p><p style="font-size:0.85em;color:#495057;margin:0;line-height:1.4;font-style:italic;">${_piClean.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p></div>`;
+                    _prevIntentionHtml = `<div style="background:var(--brand-tint);border-radius:10px;padding:10px 14px;margin-bottom:14px;border-left:3px solid var(--brand-primary);"><p style="font-size:0.75em;font-weight:700;color:var(--brand-primary);margin:0 0 3px;text-transform:uppercase;letter-spacing:0.3px;">🌅 Your intention was…</p><p style="font-size:0.85em;color:#495057;margin:0;line-height:1.4;font-style:italic;">${_piClean.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p></div>`;
                   }
                 }
               }
@@ -4134,7 +4134,7 @@ window.addEventListener('pageshow', () => {
           if (selectedLinkedMood) {
             _linkedChip = '';
           } else if (_fmLinkMoodPickerOpen && selectedMood) {
-            _linkedChip = `<p style="text-align:center;font-size:0.82em;color:#ff9500;font-weight:600;margin-top:12px;margin-bottom:0;">🔗 Now tap another mood to link it</p>
+            _linkedChip = `<p style="text-align:center;font-size:0.82em;color:var(--brand-primary);font-weight:600;margin-top:12px;margin-bottom:0;">🔗 Now tap another mood to link it</p>
               <p style="text-align:center;font-size:0.72em;color:#adb5bd;margin-top:4px;margin-bottom:0;">Tap <strong>${cap(selectedMood)}</strong> again to skip &nbsp;<button onclick="_fmLinkMoodPickerOpen=false;_renderFocusedStep();" style="background:none;border:none;color:#adb5bd;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:0;text-decoration:underline;">Cancel</button></p>`;
           } else if (selectedMood && localStorage.getItem('moodLinkingEnabled') === '1') {
             _linkedChip = `<p style="text-align:center;font-size:0.72em;color:#adb5bd;margin-top:8px;margin-bottom:0;">Hold to link a secondary mood</p>`;
@@ -4154,7 +4154,7 @@ window.addEventListener('pageshow', () => {
               </button>`).join('')}
           </div>
           ${_linkedChip}
-          ${selectedLinkedMood ? `<button onclick="_fmAdvance()" style="width:100%;margin-top:14px;padding:12px;background:#ff9500;color:white;border:none;border-radius:14px;font-size:0.95em;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">Continue →</button>` : ''}
+          ${selectedLinkedMood ? `<button onclick="_fmAdvance()" style="width:100%;margin-top:14px;padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:14px;font-size:0.95em;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">Continue →</button>` : ''}
           ${_showChooseMoodHint ? `<div id="_fmChooseMoodHintEl" style="display:flex;flex-direction:column;align-items:center;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-top:8px;">
             <svg width="24" height="22" viewBox="0 0 24 22" fill="none">
               <path d="M 12,20 Q 8,10 12,2" stroke="rgba(255,149,0,0.7)" stroke-width="2" stroke-linecap="round" fill="none"/>
@@ -4176,7 +4176,7 @@ window.addEventListener('pageshow', () => {
           // Show re-sync button only when health sync is ON and data has already been imported
           const _stepsSyncBtn = (_autoSyncEnergy && _fmStepsResult) ? `<button onclick="importStepsFromHealth()" style="width:100%;padding:11px 16px;margin-bottom:14px;
             background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:12px;
-            color:#ff9500;font-weight:600;font-size:0.88em;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+            color:var(--brand-primary);font-weight:600;font-size:0.88em;cursor:pointer;-webkit-tap-highlight-color:transparent;">
             📱 Steps: ${_fmStepsResult} — Re-sync</button>` : '';
           const _energyCards = `<div class="fm-card-grid">${_FM_ENERGY_LEVELS.map(l => {
             const isSel = !_fmEnergyClear && selectedEnergy === l.val;
@@ -4203,7 +4203,7 @@ window.addEventListener('pageshow', () => {
           const _showSleepSyncBtn = _autoSyncSleep && (_fmSleepError || (_fmSleepAutoSyncDone && !_fmSleepImported && !_sleepHealthSynced));
           const syncBtn = _showSleepSyncBtn ? `<button onclick="importSleepFromHealth()" style="width:100%;padding:11px 16px;margin-bottom:14px;
             background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:12px;
-            color:#ff9500;font-weight:600;font-size:0.88em;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+            color:var(--brand-primary);font-weight:600;font-size:0.88em;cursor:pointer;-webkit-tap-highlight-color:transparent;">
             ${_syncText}</button>` : '';
           // For exact (synced) values, highlight the closest bucket visually
           let _closestFmBucket = null;
@@ -4285,11 +4285,11 @@ window.addEventListener('pageshow', () => {
           const _medHintDone = localStorage.getItem('bbMedHintDone') === '1';
           return `${medListHtml}
             <div style="text-align:center;margin-bottom:${_medHintDone ? '14' : '4'}px;">
-              <button id="manageMedsBtn" onclick="_dismissMedHint();showMedicationList()" style="background:none;border:none;color:${_medHintDone ? '#ff9500' : 'rgba(255,255,255,0.9)'};font-size:0.8em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;text-decoration:underline;text-underline-offset:2px;">✏️ Manage medications</button>
+              <button id="manageMedsBtn" onclick="_dismissMedHint();showMedicationList()" style="background:none;border:none;color:${_medHintDone ? 'var(--brand-primary)' : 'rgba(255,255,255,0.9)'};font-size:0.8em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;text-decoration:underline;text-underline-offset:2px;">✏️ Manage medications</button>
               ${_medHintDone ? '' : `<div id="medHintEl" style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:4px;margin-bottom:10px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="8" y1="13" x2="8" y2="2" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round"/><polyline points="3,7 8,2 13,7" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,255,255,0.9);font-family:'Georgia',serif;letter-spacing:0.01em;text-shadow:0 1px 4px rgba(0,0,0,0.5);">🐻 Log your medication here</span></div>`}
             </div>
             <button class="fm-opt fm-hover-orange ${selectedMedication==='not-taken'?'sel':''}"
-              onclick="selectedMedication='not-taken'; _fmAdvance();" style="border-left:4px solid #ff9500;">
+              onclick="selectedMedication='not-taken'; _fmAdvance();" style="border-left:4px solid var(--brand-primary);">
               <span>❌ Not taken</span></button>
             <button class="fm-opt fm-hover-green ${selectedMedication==='taken'?'sel':''}"
               onclick="selectedMedication='taken'; _fmAdvance();" style="border-left:4px solid #51cf66;margin-top:8px;">
@@ -4298,14 +4298,14 @@ window.addEventListener('pageshow', () => {
 
         case 'goals':
           return [
-            {val:'none', label:'❌ No',  color:'#ff9500'},
-            {val:'some', label:'✅ Yes', color:'#ff9500'},
+            {val:'none', label:'❌ No',  color:'var(--brand-primary)'},
+            {val:'some', label:'✅ Yes', color:'var(--brand-primary)'},
           ].map((o,i) => `<button class="fm-opt ${selectedGoals===o.val?'sel':''}"
             onclick="selectedGoals='${o.val}'; _fmAdvance();"
             style="border-left:4px solid ${o.color};${i>0?'margin-top:8px;':''}">
             <span>${o.label}</span></button>`).join('') +
           `<div style="text-align:center;margin-top:14px;">
-            <button onclick="showGoalsList()" style="background:none;border:none;color:#ff9500;font-size:0.85em;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px;-webkit-tap-highlight-color:transparent;">View / Edit Goals</button>
+            <button onclick="showGoalsList()" style="background:none;border:none;color:var(--brand-primary);font-size:0.85em;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px;-webkit-tap-highlight-color:transparent;">View / Edit Goals</button>
           </div>`;
 
         case 'anxiety':
@@ -4334,8 +4334,8 @@ window.addEventListener('pageshow', () => {
 
         case 'exercise':
           return [
-            {val:'no',  label:'🛋️ No',  color:'#ff9500'},
-            {val:'yes', label:'🏋️ Yes', color:'#ff9500'},
+            {val:'no',  label:'🛋️ No',  color:'var(--brand-primary)'},
+            {val:'yes', label:'🏋️ Yes', color:'var(--brand-primary)'},
           ].map((o,i) => `<button class="fm-opt ${selectedExercise===o.val?'sel':''}"
             onclick="selectedExercise='${o.val}'; _fmAdvance();"
             style="border-left:4px solid ${o.color};${i>0?'margin-top:8px;':''}">
@@ -4343,8 +4343,8 @@ window.addEventListener('pageshow', () => {
 
         case 'outside':
           return [
-            {val:'no',  label:'🏠 No',  color:'#ff9500'},
-            {val:'yes', label:'🌤️ Yes', color:'#ff9500'},
+            {val:'no',  label:'🏠 No',  color:'var(--brand-primary)'},
+            {val:'yes', label:'🌤️ Yes', color:'var(--brand-primary)'},
           ].map((o,i) => `<button class="fm-opt ${selectedOutside===o.val?'sel':''}"
             onclick="selectedOutside='${o.val}'; _fmAdvance();"
             style="border-left:4px solid ${o.color};${i>0?'margin-top:8px;':''}">
@@ -4352,8 +4352,8 @@ window.addEventListener('pageshow', () => {
 
         case 'alcohol':
           return [
-            {val:'yes', label:'🍺 Yes', color:'#ff9500'},
-            {val:'no',  label:'✅ No',  color:'#ff9500'},
+            {val:'yes', label:'🍺 Yes', color:'var(--brand-primary)'},
+            {val:'no',  label:'✅ No',  color:'var(--brand-primary)'},
           ].map((o,i) => `<button class="fm-opt ${selectedAlcohol===o.val?'sel':''}"
             onclick="selectedAlcohol='${o.val}'; _fmAdvance();"
             style="border-left:4px solid ${o.color};${i>0?'margin-top:8px;':''}">
@@ -4362,16 +4362,16 @@ window.addEventListener('pageshow', () => {
         case 'budget': {
           const _budgetVal = localStorage.getItem('dailyBudget') || '';
           const _budgetInfo = _budgetVal
-            ? `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:10px 14px;background:#fff8f0;border-radius:12px;border:1.5px solid rgba(255,149,0,0.3);">
+            ? `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:10px 14px;background:var(--brand-tint);border-radius:12px;border:1.5px solid rgba(255,149,0,0.3);">
                 <span style="font-size:0.9em;color:#495057;">💰 Daily budget: <b>${_budgetVal}</b></span>
-                <button onclick="showBudgetModal()" style="padding:4px 12px;background:#ff9500;color:white;border:none;border-radius:8px;font-size:0.8em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Change</button>
+                <button onclick="showBudgetModal()" style="padding:4px 12px;background:var(--brand-primary);color:white;border:none;border-radius:8px;font-size:0.8em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Change</button>
               </div>`
             : `<div style="text-align:center;margin-bottom:14px;">
-                <button onclick="showBudgetModal()" style="padding:8px 18px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:12px;color:#ff9500;font-weight:600;font-size:0.88em;cursor:pointer;-webkit-tap-highlight-color:transparent;">💰 Set daily budget</button>
+                <button onclick="showBudgetModal()" style="padding:8px 18px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:12px;color:var(--brand-primary);font-weight:600;font-size:0.88em;cursor:pointer;-webkit-tap-highlight-color:transparent;">💰 Set daily budget</button>
               </div>`;
           return _budgetInfo + [
-            {val:'no',  label:'❌ Over budget', color:'#ff9500'},
-            {val:'yes', label:'✅ On track',    color:'#ff9500'},
+            {val:'no',  label:'❌ Over budget', color:'var(--brand-primary)'},
+            {val:'yes', label:'✅ On track',    color:'var(--brand-primary)'},
           ].map((o,i) => `<button class="fm-opt ${selectedBudget===o.val?'sel':''}"
             onclick="selectedBudget='${o.val}'; _fmAdvance();"
             style="border-left:4px solid ${o.color};${i>0?'margin-top:8px;':''}">
@@ -4392,7 +4392,7 @@ window.addEventListener('pageshow', () => {
           // Helper: horizontal row of answer buttons
           const _btns = opts => opts.map((o, i) => {
             const _hc = i === 0 ? 'fm-hover-orange' : i === opts.length - 1 ? 'fm-hover-green' : 'fm-hover-grey';
-            const _sc = i === 0 ? '#ff9500' : i === opts.length - 1 ? '#51cf66' : '#adb5bd';
+            const _sc = i === 0 ? 'var(--brand-primary)' : i === opts.length - 1 ? '#51cf66' : '#adb5bd';
             const _clr = o.clr || o.set.replace(/='[^']*'/, '=null');
             const _click = o.sel ? _clr : o.set;
             return `<button class="${_hc}" onclick="${_click}" style="flex:1;padding:8px 4px;border:1.5px solid ${o.sel?_sc:'#dee2e6'};border-radius:10px;background:${o.sel?_sc+'22':'white'};color:${o.sel?'#212529':'#6c757d'};font-size:0.82em;font-weight:${o.sel?'600':'400'};cursor:pointer;-webkit-tap-highlight-color:transparent;text-align:center;line-height:1.3;">${o.label}</button>`;
@@ -4404,8 +4404,8 @@ window.addEventListener('pageshow', () => {
             if (ex.id === 'goals') {
               const _goalItems = JSON.parse(localStorage.getItem('dailyGoals') || '[]');
               const _goalsDetail = _goalItems.length > 0
-                ? (() => { const _dg = _goalItems.map(g => `<span style="display:inline-block;background:rgba(255,149,0,0.12);border-radius:6px;padding:2px 7px;margin:2px;font-size:0.8em;color:#495057;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${g}</span>`).join(''); return `<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:8px 12px;background:#fff8f0;border-radius:10px;border:1.5px solid rgba(255,149,0,0.3);gap:8px;"><div style="flex:1;min-width:0;flex-wrap:wrap;display:flex;align-items:center;">${_dg}</div><button onclick="showGoalsList()" style="padding:3px 10px;background:#ff9500;color:white;border:none;border-radius:7px;font-size:0.78em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;">Change</button></div>`; })()
-                : `<button onclick="showGoalsList()" style="padding:7px 16px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:10px;color:#ff9500;font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">🏅 Set daily goals</button>`;
+                ? (() => { const _dg = _goalItems.map(g => `<span style="display:inline-block;background:rgba(255,149,0,0.12);border-radius:6px;padding:2px 7px;margin:2px;font-size:0.8em;color:#495057;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${g}</span>`).join(''); return `<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:8px 12px;background:var(--brand-tint);border-radius:10px;border:1.5px solid rgba(255,149,0,0.3);gap:8px;"><div style="flex:1;min-width:0;flex-wrap:wrap;display:flex;align-items:center;">${_dg}</div><button onclick="showGoalsList()" style="padding:3px 10px;background:var(--brand-primary);color:white;border:none;border-radius:7px;font-size:0.78em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;">Change</button></div>`; })()
+                : `<button onclick="showGoalsList()" style="padding:7px 16px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">🏅 Set daily goals</button>`;
               const _goalsTitleClick = _goalItems.length > 0
                 ? "var el=document.getElementById('fmGoalsDetail');el.style.display=el.style.display==='none'?'':'none';"
                 : "showGoalsList()";
@@ -4415,31 +4415,31 @@ window.addEventListener('pageshow', () => {
                 : '';
               _md += `<span onclick="${_goalsTitleClick}" style="font-size:0.88em;font-weight:600;color:#495057;white-space:nowrap;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">🏅 Goal progress?</span>
               <div style="display:flex;gap:6px;">${_btns([
-                  {label:'❌<br>No',  color:'#ff9500', sel:selectedGoals==='none', set:"selectedGoals='none';_fmCheckMoreData()"},
-                  {label:'✅<br>On track', color:'#ff9500', sel:selectedGoals==='some', set:"selectedGoals='some';_fmCheckMoreData()"},
+                  {label:'❌<br>No',  color:'var(--brand-primary)', sel:selectedGoals==='none', set:"selectedGoals='none';_fmCheckMoreData()"},
+                  {label:'✅<br>On track', color:'var(--brand-primary)', sel:selectedGoals==='some', set:"selectedGoals='some';_fmCheckMoreData()"},
                 ])}</div>
               ${_goalsNoteHtml}
               <div id="fmGoalsDetail" style="grid-column:1/-1;display:none;">${_goalsDetail}</div>`;
             } else if (ex.id === 'anxiety') {
               _md += _ilr('😰 Anxiety', [
-                {label:'😰<br>More',   color:'#ff9500', sel:selectedAnxiety==='high',   set:"selectedAnxiety='high';_fmCheckMoreData()"},
-                {label:'😐<br>Normal', color:'#ff9500', sel:selectedAnxiety==='medium', set:"selectedAnxiety='medium';_fmCheckMoreData()"},
-                {label:'😌<br>Less',   color:'#ff9500', sel:selectedAnxiety==='low',    set:"selectedAnxiety='low';_fmCheckMoreData()"},
+                {label:'😰<br>More',   color:'var(--brand-primary)', sel:selectedAnxiety==='high',   set:"selectedAnxiety='high';_fmCheckMoreData()"},
+                {label:'😐<br>Normal', color:'var(--brand-primary)', sel:selectedAnxiety==='medium', set:"selectedAnxiety='medium';_fmCheckMoreData()"},
+                {label:'😌<br>Less',   color:'var(--brand-primary)', sel:selectedAnxiety==='low',    set:"selectedAnxiety='low';_fmCheckMoreData()"},
               ]);
               _md += _ilr('😓 Stress', [
-                {label:'😰<br>More',   color:'#ff9500', sel:selectedStress==='high',   set:"selectedStress='high';_fmCheckMoreData()"},
-                {label:'😐<br>Normal', color:'#ff9500', sel:selectedStress==='medium', set:"selectedStress='medium';_fmCheckMoreData()"},
-                {label:'😌<br>Less',   color:'#ff9500', sel:selectedStress==='low',    set:"selectedStress='low';_fmCheckMoreData()"},
+                {label:'😰<br>More',   color:'var(--brand-primary)', sel:selectedStress==='high',   set:"selectedStress='high';_fmCheckMoreData()"},
+                {label:'😐<br>Normal', color:'var(--brand-primary)', sel:selectedStress==='medium', set:"selectedStress='medium';_fmCheckMoreData()"},
+                {label:'😌<br>Less',   color:'var(--brand-primary)', sel:selectedStress==='low',    set:"selectedStress='low';_fmCheckMoreData()"},
               ]);
               _md += _ilr('😤 Irritability', [
-                {label:'😤<br>More',   color:'#ff9500', sel:selectedIrritability==='yes',    set:"selectedIrritability='yes';_fmCheckMoreData()"},
-                {label:'😐<br>Normal', color:'#ff9500', sel:selectedIrritability==='medium', set:"selectedIrritability='medium';_fmCheckMoreData()"},
-                {label:'😌<br>Less',   color:'#ff9500', sel:selectedIrritability==='no',     set:"selectedIrritability='no';_fmCheckMoreData()"},
+                {label:'😤<br>More',   color:'var(--brand-primary)', sel:selectedIrritability==='yes',    set:"selectedIrritability='yes';_fmCheckMoreData()"},
+                {label:'😐<br>Normal', color:'var(--brand-primary)', sel:selectedIrritability==='medium', set:"selectedIrritability='medium';_fmCheckMoreData()"},
+                {label:'😌<br>Less',   color:'var(--brand-primary)', sel:selectedIrritability==='no',     set:"selectedIrritability='no';_fmCheckMoreData()"},
               ]);
             } else if (ex.id === 'exercise') {
               _md += _ilr('🏋️ Exercise', [
-                {label:'🛋️<br>No',  color:'#ff9500', sel:selectedExercise==='no',  set:"selectedExercise='no';_fmCheckMoreData()"},
-                {label:'🏋️<br>Yes', color:'#ff9500', sel:selectedExercise==='yes', set:"selectedExercise='yes';_fmCheckMoreData()"},
+                {label:'🛋️<br>No',  color:'var(--brand-primary)', sel:selectedExercise==='no',  set:"selectedExercise='no';_fmCheckMoreData()"},
+                {label:'🏋️<br>Yes', color:'var(--brand-primary)', sel:selectedExercise==='yes', set:"selectedExercise='yes';_fmCheckMoreData()"},
               ]);
             } else if (ex.id === 'outside') {
               const _outsideNoteVal = selectedStepNotes['outside'] || '';
@@ -4448,8 +4448,8 @@ window.addEventListener('pageshow', () => {
                 : '';
               _md += `<span style="font-size:0.88em;font-weight:600;color:#495057;white-space:nowrap;">🌤️ Outside</span>
               <div style="display:flex;gap:6px;">${_btns([
-                  {label:'🏠<br>No',  color:'#ff9500', sel:selectedOutside==='no',  set:"selectedOutside='no';_fmCheckMoreData()"},
-                  {label:'🌤️<br>Yes', color:'#ff9500', sel:selectedOutside==='yes', set:"selectedOutside='yes';_fmCheckMoreData()"},
+                  {label:'🏠<br>No',  color:'var(--brand-primary)', sel:selectedOutside==='no',  set:"selectedOutside='no';_fmCheckMoreData()"},
+                  {label:'🌤️<br>Yes', color:'var(--brand-primary)', sel:selectedOutside==='yes', set:"selectedOutside='yes';_fmCheckMoreData()"},
                 ])}</div>
               ${_outsideNoteHtml}`;
             } else if (ex.id === 'alcohol') {
@@ -4459,15 +4459,15 @@ window.addEventListener('pageshow', () => {
                 : '';
               _md += `<span style="font-size:0.88em;font-weight:600;color:#495057;white-space:nowrap;">${_getBuiltinFieldLabel('trackAlcohol','🍺 Alcohol')}</span>
               <div style="display:flex;gap:6px;">${_btns([
-                  {label:'🍺<br>Yes', color:'#ff9500', sel:selectedAlcohol==='yes', set:"selectedAlcohol='yes';_fmCheckMoreData()"},
-                  {label:'✅<br>No',  color:'#ff9500', sel:selectedAlcohol==='no',  set:"selectedAlcohol='no';_fmCheckMoreData()"},
+                  {label:'🍺<br>Yes', color:'var(--brand-primary)', sel:selectedAlcohol==='yes', set:"selectedAlcohol='yes';_fmCheckMoreData()"},
+                  {label:'✅<br>No',  color:'var(--brand-primary)', sel:selectedAlcohol==='no',  set:"selectedAlcohol='no';_fmCheckMoreData()"},
                 ])}</div>
               ${_alcoholNoteHtml}`;
             } else if (ex.id === 'budget') {
               const _bv = localStorage.getItem('dailyBudget') || '';
               const _budgetDetail = _bv
-                ? `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#fff8f0;border-radius:10px;border:1.5px solid rgba(255,149,0,0.3);"><span style="font-size:0.85em;color:#495057;">💰 Daily budget: <b>${_bv}</b></span><button onclick="showBudgetModal()" style="padding:3px 10px;background:#ff9500;color:white;border:none;border-radius:7px;font-size:0.78em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Change</button></div>`
-                : `<button onclick="showBudgetModal()" style="padding:7px 16px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:10px;color:#ff9500;font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">💰 Set daily budget</button>`;
+                ? `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--brand-tint);border-radius:10px;border:1.5px solid rgba(255,149,0,0.3);"><span style="font-size:0.85em;color:#495057;">💰 Daily budget: <b>${_bv}</b></span><button onclick="showBudgetModal()" style="padding:3px 10px;background:var(--brand-primary);color:white;border:none;border-radius:7px;font-size:0.78em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Change</button></div>`
+                : `<button onclick="showBudgetModal()" style="padding:7px 16px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">💰 Set daily budget</button>`;
               const _budgetTitleClick = _bv
                 ? "var el=document.getElementById('fmBudgetDetail');el.style.display=el.style.display==='none'?'':'none';"
                 : "showBudgetModal()";
@@ -4477,8 +4477,8 @@ window.addEventListener('pageshow', () => {
                 : '';
               _md += `<span onclick="${_budgetTitleClick}" style="font-size:0.88em;font-weight:600;color:#495057;white-space:nowrap;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">💰 Budget on track?</span>
               <div style="display:flex;gap:6px;">${_btns([
-                  {label:'❌<br>Over',     color:'#ff9500', sel:selectedBudget==='no',  set:"selectedBudget='no';_fmCheckMoreData()"},
-                  {label:'✅<br>On track', color:'#ff9500', sel:selectedBudget==='yes', set:"selectedBudget='yes';_fmCheckMoreData()"},
+                  {label:'❌<br>Over',     color:'var(--brand-primary)', sel:selectedBudget==='no',  set:"selectedBudget='no';_fmCheckMoreData()"},
+                  {label:'✅<br>On track', color:'var(--brand-primary)', sel:selectedBudget==='yes', set:"selectedBudget='yes';_fmCheckMoreData()"},
                 ])}</div>
               ${_budgetNoteHtml}
               <div id="fmBudgetDetail" style="grid-column:1/-1;display:none;">${_budgetDetail}</div>`;
@@ -4486,8 +4486,8 @@ window.addEventListener('pageshow', () => {
           }
           for (const f of _custFields) {
             const _fPosNo = f.positive === 'no';
-            const _noOpt  = {label:`${_fPosNo?'✅':'✗'}<br>No`,               color:'#ff9500',  sel:selectedCustom[f.id]==='no',  set:`selectedCustom['${f.id}']='no';_fmCheckMoreData()`};
-            const _yesOpt = {label:`${_fPosNo&&f.emoji?f.emoji:'✅'}<br>Yes`, color:_fPosNo?'#dc3545':'#ff9500', sel:selectedCustom[f.id]==='yes', set:`selectedCustom['${f.id}']='yes';_fmCheckMoreData()`};
+            const _noOpt  = {label:`${_fPosNo?'✅':'✗'}<br>No`,               color:'var(--brand-primary)',  sel:selectedCustom[f.id]==='no',  set:`selectedCustom['${f.id}']='no';_fmCheckMoreData()`};
+            const _yesOpt = {label:`${_fPosNo&&f.emoji?f.emoji:'✅'}<br>Yes`, color:_fPosNo?'#dc3545':'var(--brand-primary)', sel:selectedCustom[f.id]==='yes', set:`selectedCustom['${f.id}']='yes';_fmCheckMoreData()`};
             _STEP_NOTE_LABELS[f.id] = `${f.emoji||''} ${f.label}`.trim();
             const _cfNegSel = _fPosNo ? selectedCustom[f.id]==='yes' : selectedCustom[f.id]==='no';
             const _cfNoteVal = selectedStepNotes[f.id] || '';
@@ -4511,12 +4511,12 @@ window.addEventListener('pageshow', () => {
             return `<p style="text-align:center;color:#6c757d;font-size:0.9em;margin:0 0 16px;">Would you like to track other things?</p>
               <div style="text-align:center;margin-bottom:12px;">
                 ${_cfHintHtml}
-                <button onclick="showFieldPicker()" style="padding:10px 22px;background:rgba(255,149,0,0.08);border:2px dashed #ff9500;border-radius:12px;color:#ff9500;font-size:0.9em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">+ Add tracking fields</button>
+                <button onclick="showFieldPicker()" style="padding:10px 22px;background:rgba(255,149,0,0.08);border:2px dashed var(--brand-primary);border-radius:12px;color:var(--brand-primary);font-size:0.9em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">+ Add tracking fields</button>
               </div>`;
           return `<div style="display:grid;grid-template-columns:min-content 1fr;gap:8px 10px;align-items:center;">${_md}</div>
             <div style="display:flex;flex-direction:column;align-items:center;margin-top:10px;">
               ${_cfHintHtml}
-              <button onclick="showFieldPicker()" style="width:36px;height:36px;min-width:36px;min-height:36px;flex-shrink:0;border-radius:50%;background:rgba(255,149,0,0.08);color:#ff9500;font-size:1.3em;border:2px dashed #ff9500;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1;-webkit-tap-highlight-color:transparent;box-sizing:border-box;">+</button>
+              <button onclick="showFieldPicker()" style="width:36px;height:36px;min-width:36px;min-height:36px;flex-shrink:0;border-radius:50%;background:rgba(255,149,0,0.08);color:var(--brand-primary);font-size:1.3em;border:2px dashed var(--brand-primary);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1;-webkit-tap-highlight-color:transparent;box-sizing:border-box;">+</button>
             </div>`;
         }
 
@@ -4536,13 +4536,13 @@ window.addEventListener('pageshow', () => {
               <textarea id="fmIntentionInput" placeholder="What do you intend for tomorrow?"
                 style="width:100%;height:68px;border:2px solid #e9ecef;border-radius:12px;padding:12px;margin-top:8px;
                 font-size:0.95em;font-family:inherit;resize:none;box-sizing:border-box;outline:none;transition:border-color 0.15s;"
-                oninput="this.style.borderColor='#ff9500'">${selectedIntention||''}</textarea>
+                oninput="this.style.borderColor='var(--brand-primary)'">${selectedIntention||''}</textarea>
             </details>` : ''}`;
         }
 
         case 'done': {
           if (!selectedMood) return `<p style="text-align:center;color:#dc3545;font-size:0.9em;">⚠️ Go back and select a mood first.</p>`;
-          const mc = _FM_MOOD_COLORS[selectedMood]||'#ff9500';
+          const mc = _FM_MOOD_COLORS[selectedMood]||'var(--brand-primary)';
           const eLabel = {0:'💀 Not enough',3:'🪫 Less than usual',5:'⚡️ Normal',7:'🔋 More than usual',10:'🚀 Too much'}[selectedEnergy]||selectedEnergy;
           const sLabel = {5:'≤5h',6.5:'6–7h',8:'7–9h',9.5:'9–10h',11:'10+h'}[selectedSleep]||selectedSleep+'h';
           const notesVal = (document.getElementById('fmNotesInput')||document.getElementById('notes')||{}).value||'';
@@ -4592,9 +4592,9 @@ window.addEventListener('pageshow', () => {
             intentionVal && intentionVal.trim() ? { text:`🌅 ${intentionVal.trim()}`, step:'notes', wrap:true } : null,
           ].filter(Boolean);
           const _est = _estimateMoodState();
-          const _estColor  = _FM_MOOD_COLORS[_est.mood] || '#ff9500';
+          const _estColor  = _FM_MOOD_COLORS[_est.mood] || 'var(--brand-primary)';
           const _estLabel  = _FM_MOOD_LABELS[_est.mood];
-          const _est2Color = _est.secondMood ? (_FM_MOOD_COLORS[_est.secondMood] || '#ff9500') : null;
+          const _est2Color = _est.secondMood ? (_FM_MOOD_COLORS[_est.secondMood] || 'var(--brand-primary)') : null;
           const _est2Label = _est.secondMood ? _FM_MOOD_LABELS[_est.secondMood] : null;
           const _mkMoodBtn = (m, lbl, col) => {
             if (!m) return '';
@@ -4624,7 +4624,7 @@ window.addEventListener('pageshow', () => {
               </div>
             </div>`;
           const _incogOn = localStorage.getItem('incognitoMode') === 'true';
-          const _privBorder = selectedPdfHide ? 'border:1.5px solid #ff9500;' : 'border:1.5px solid #e9ecef;';
+          const _privBorder = selectedPdfHide ? 'border:1.5px solid var(--brand-primary);' : 'border:1.5px solid #e9ecef;';
           const _privRow = _incogOn ? `
             <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding:10px 14px;background:#f8f9fa;border-radius:12px;${_privBorder}">
               <span style="font-size:0.88em;color:#6c757d;">🕵️ Hide from PDF export</span>
@@ -4939,7 +4939,7 @@ window.addEventListener('pageshow', () => {
     window._fmDoneDelete = _fmDoneDelete;
 
     function _fmNotesInput(ta) {
-      ta.style.borderColor = '#ff9500';
+      ta.style.borderColor = 'var(--brand-primary)';
       const w = ta.value.trim() ? ta.value.trim().split(/\s+/).length : 0;
       const el = document.getElementById('fmWordCount');
       if (el) el.textContent = '✍️ ' + w + ' word' + (w === 1 ? '' : 's');
@@ -5205,7 +5205,7 @@ window.addEventListener('pageshow', () => {
       const accentMap = {
         '#51cf66': [81, 207, 102],
         '#ff6b6b': [255, 107, 107],
-        '#ff9500': [255, 149, 0],
+        'var(--brand-primary)': [255, 149, 0],
         '#adb5bd': [173, 181, 189],
         '#667eea': [102, 126, 234],
         '#764ba2': [118, 75, 162]
@@ -5257,7 +5257,7 @@ window.addEventListener('pageshow', () => {
         if (r !== null && Math.abs(r) >= 0.2) {
           results.push(ins('⚡', 'Sleep & Next-Day Energy',
             `A ${strength(r)} link (r = ${r.toFixed(2)}): ${r >= 0 ? 'more sleep tends to mean higher energy the next day' : 'an unexpected inverse trend between sleep and next-day energy'}.`,
-            Math.abs(r) >= 0.3 ? '#ff9500' : '#adb5bd'));
+            Math.abs(r) >= 0.3 ? 'var(--brand-primary)' : '#adb5bd'));
         }
       }
 
@@ -5307,7 +5307,7 @@ window.addEventListener('pageshow', () => {
         const word = parseFloat(avg) >= 4.5 ? 'elevated' : parseFloat(avg) >= 3.5 ? 'stable' : parseFloat(avg) >= 2.5 ? 'mixed' : 'lower';
         results.push(ins('🔴', '3+ Nights of Low Sleep',
           `${runCount} runs of 3+ consecutive nights under 6h detected. The day after such a run, mood tended to be ${word} (avg ${msFmt(avg)}).`,
-          parseFloat(avg) < 3 ? '#ff6b6b' : '#ff9500'));
+          parseFloat(avg) < 3 ? '#ff6b6b' : 'var(--brand-primary)'));
       }
 
       // ── 6. Day-of-week patterns ──
@@ -5434,7 +5434,7 @@ window.addEventListener('pageshow', () => {
           const detail  = avgHi && avgLo ? `High-stress days avg mood: ${msFmt(avgHi)} vs low-stress days: ${msFmt(avgLo)}.` : '';
           results.push(ins('😓', 'Stress & Mood',
             `A ${strength(r)} link between stress and mood (r = ${r.toFixed(2)}): ${r < 0 ? 'higher stress days tend to have lower mood' : 'stress doesn\'t seem to suppress mood for you — possibly a sign of resilience'}.`,
-            r < -0.2 ? '#ff9500' : '#adb5bd', detail));
+            r < -0.2 ? 'var(--brand-primary)' : '#adb5bd', detail));
         }
       }
 
@@ -5466,7 +5466,7 @@ window.addEventListener('pageshow', () => {
             diff > 0
               ? `Irritable days correlate with higher mood scores (avg ${msFmt(avgIrrit.toFixed(1))} vs ${msFmt(avgCalm.toFixed(1))} on calm days) — irritability may signal elevated or mixed states for you.`
               : `Mood is ${Math.abs(diff).toFixed(1)} pts lower on irritable days (avg ${msFmt(avgIrrit.toFixed(1))} vs ${msFmt(avgCalm.toFixed(1))}) — irritability tends to accompany low mood.`,
-            diff > 0.5 ? '#ff9500' : '#ff6b6b'));
+            diff > 0.5 ? 'var(--brand-primary)' : '#ff6b6b'));
         }
       }
 
@@ -5692,7 +5692,7 @@ window.addEventListener('pageshow', () => {
         toast.innerHTML = `<div style="font-size:2em;margin-bottom:4px;">${ach.emoji}</div><div style="font-weight:700;font-size:0.95em;margin-bottom:2px;">Achievement Unlocked!</div><div style="font-weight:600;font-size:0.88em;">${ach.title}</div><div style="font-size:0.78em;color:rgba(255,255,255,0.85);margin-top:2px;">${ach.desc}</div>${extraLabel}`;
         Object.assign(toast.style, {
           position:'fixed', bottom:'90px', left:'50%', transform:'translateX(-50%) translateY(10px)',
-          background:'linear-gradient(135deg,#ff8833,#ffaa33)', color:'white',
+          background:'linear-gradient(135deg,var(--brand-primary-mid),var(--brand-primary-light))', color:'white',
           borderRadius:'16px', padding:'14px 20px', boxShadow:'0 8px 32px rgba(255,107,0,0.45)',
           textAlign:'center', zIndex:'9999', minWidth:'220px', maxWidth:'280px',
           opacity:'0', transition:'opacity 0.4s ease, transform 0.4s ease', cursor:'pointer',
@@ -5737,9 +5737,9 @@ window.addEventListener('pageshow', () => {
       _updateAchNotifBtn();
       document.getElementById('achievementsGrid').innerHTML = ACHIEVEMENTS.map(a => {
         const unlocked = stored.includes(a.id);
-        return `<div style="text-align:center;padding:12px 8px;background:${unlocked ? 'rgba(255,149,0,0.1)' : '#f8f9fa'};border:1.5px solid ${unlocked ? '#ff9500' : '#e9ecef'};border-radius:12px;opacity:${unlocked ? '1' : '0.4'};">
+        return `<div style="text-align:center;padding:12px 8px;background:${unlocked ? 'rgba(255,149,0,0.1)' : '#f8f9fa'};border:1.5px solid ${unlocked ? 'var(--brand-primary)' : '#e9ecef'};border-radius:12px;opacity:${unlocked ? '1' : '0.4'};">
           <div style="font-size:1.8em;margin-bottom:4px;filter:${unlocked ? 'none' : 'grayscale(1)'};">${a.emoji}</div>
-          <div style="font-weight:700;font-size:0.78em;color:${unlocked ? '#ff6b00' : '#6c757d'};line-height:1.2;margin-bottom:2px;">${a.title}</div>
+          <div style="font-weight:700;font-size:0.78em;color:${unlocked ? 'var(--brand-primary-dark)' : '#6c757d'};line-height:1.2;margin-bottom:2px;">${a.title}</div>
           <div style="font-size:0.7em;color:#6c757d;line-height:1.3;">${a.desc}</div>
         </div>`;
       }).join('');
@@ -6322,7 +6322,7 @@ window.addEventListener('pageshow', () => {
         const isCurrentMonth = _monthCalOffset === 0;
         const isBirthday = birthday && date.getMonth() === birthday.month && d === birthday.day;
         const bg = entry ? moodColors[entry.mood] : (isFuture && !isCurrentMonth) ? 'transparent' : '#e9ecef';
-        const border = isToday ? '2px solid #ff9500' : isBirthday ? '2px dashed #e91e8c' : '2px solid transparent';
+        const border = isToday ? '2px solid var(--brand-primary)' : isBirthday ? '2px dashed #e91e8c' : '2px solid transparent';
         const color = entry ? 'white' : (isFuture && !isCurrentMonth) ? 'transparent' : '#adb5bd';
         const opacity = (isFuture && !isCurrentMonth) ? 0.25 : 1;
         let displayText = d;
@@ -6482,16 +6482,16 @@ window.addEventListener('pageshow', () => {
           const _intClean = _intRaw.split(/\n?_{3,}\n/)[0].trim();
           const _intEsc = _intClean.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
           if (_intClean) {
-            html += `<div style="background:#fff8f0;border-radius:8px;padding:10px;font-size:0.85em;color:#6c757d;line-height:1.4;margin-top:8px;">🌅 <b>Intention for tomorrow:</b> ${_intEsc}</div>`;
+            html += `<div style="background:var(--brand-tint);border-radius:8px;padding:10px;font-size:0.85em;color:#6c757d;line-height:1.4;margin-top:8px;">🌅 <b>Intention for tomorrow:</b> ${_intEsc}</div>`;
           }
         }
         // Bipolar Bear thought — collapsible, only shown when suggestion feature enabled
         if (localStorage.getItem('showMoodSuggestion') === '1') {
           const _est = _estimateMoodFromEntry(entry);
           if (_est.mood === 'stable') _est.secondMood = null;
-          const _estColor  = _FM_MOOD_COLORS[_est.mood] || '#ff9500';
+          const _estColor  = _FM_MOOD_COLORS[_est.mood] || 'var(--brand-primary)';
           const _estLabel  = _FM_MOOD_LABELS[_est.mood] || cap(_est.mood);
-          const _est2Color = _est.secondMood ? (_FM_MOOD_COLORS[_est.secondMood] || '#ff9500') : null;
+          const _est2Color = _est.secondMood ? (_FM_MOOD_COLORS[_est.secondMood] || 'var(--brand-primary)') : null;
           const _est2Label = _est.secondMood ? (_FM_MOOD_LABELS[_est.secondMood] || cap(_est.secondMood)) : null;
           html += `<div style="margin-top:10px;border-radius:10px;border:1px solid rgba(255,149,0,0.2);overflow:hidden;">
             <button onclick="var b=this.nextElementSibling;var open=b.style.display!=='none';b.style.display=open?'none':'block';this.querySelector('.bb-chev-d').style.transform=open?'rotate(0deg)':'rotate(180deg)';"
@@ -7112,9 +7112,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         _visibleCount++;
         const on = _defaultOn.has(k);
         b.dataset.on = on ? '1' : '0';
-        b.style.border = on ? '1.5px solid #ff9500' : '1.5px solid #adb5bd';
+        b.style.border = on ? '1.5px solid var(--brand-primary)' : '1.5px solid #adb5bd';
         b.style.background = on ? 'rgba(255,149,0,0.1)' : 'rgba(0,0,0,0.04)';
-        b.style.color = on ? '#ff9500' : '#adb5bd';
+        b.style.color = on ? 'var(--brand-primary)' : '#adb5bd';
       });
 
       // Show/hide the no-data message
@@ -7152,9 +7152,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         }
       }
       btn.dataset.on = turningOn ? '1' : '0';
-      btn.style.border = turningOn ? '1.5px solid #ff9500' : '1.5px solid #adb5bd';
+      btn.style.border = turningOn ? '1.5px solid var(--brand-primary)' : '1.5px solid #adb5bd';
       btn.style.background = turningOn ? 'rgba(255,149,0,0.1)' : 'rgba(0,0,0,0.04)';
-      btn.style.color = turningOn ? '#ff9500' : '#adb5bd';
+      btn.style.color = turningOn ? 'var(--brand-primary)' : '#adb5bd';
     }
     window._togglePdfChart = _togglePdfChart;
 
@@ -8776,7 +8776,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       const _FIXED = [30, 60, 90];
       const isCustom = statsTimeframe !== 'all' && !_FIXED.includes(statsTimeframe);
       const _row = (label, value, isActive) => {
-        const activeStyle = isActive ? 'background:#fff4e6;font-weight:700;color:#ff6b00;' : 'background:white;font-weight:400;color:#212529;';
+        const activeStyle = isActive ? 'background:#fff4e6;font-weight:700;color:var(--brand-primary-dark);' : 'background:white;font-weight:400;color:#212529;';
         return `<button onclick="${value}" style="display:block;width:100%;padding:11px 18px;border:none;text-align:left;font-size:0.95em;cursor:pointer;border-bottom:1px solid #f1f3f5;${activeStyle}-webkit-tap-highlight-color:transparent;" onmouseover="this.style.background='#fff4e6'" onmouseout="this.style.background='${isActive ? '#fff4e6' : 'white'}'">
           ${label}${isActive ? ' ✓' : ''}
         </button>`;
@@ -8786,7 +8786,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         _row('60 days', "_tfPickerSelect(60)", statsTimeframe === 60) +
         _row('90 days', "_tfPickerSelect(90)", statsTimeframe === 90) +
         `<div style="border-bottom:1px solid #f1f3f5;">
-          <button onclick="_tfShowCustomInput()" style="display:block;width:100%;padding:11px 18px;border:none;text-align:left;font-size:0.95em;cursor:pointer;${isCustom ? 'background:#fff4e6;font-weight:700;color:#ff6b00;' : 'background:white;color:#212529;'}-webkit-tap-highlight-color:transparent;" onmouseover="this.style.background='#fff4e6'" onmouseout="this.style.background='${isCustom ? '#fff4e6' : 'white'}'">
+          <button onclick="_tfShowCustomInput()" style="display:block;width:100%;padding:11px 18px;border:none;text-align:left;font-size:0.95em;cursor:pointer;${isCustom ? 'background:#fff4e6;font-weight:700;color:var(--brand-primary-dark);' : 'background:white;color:#212529;'}-webkit-tap-highlight-color:transparent;" onmouseover="this.style.background='#fff4e6'" onmouseout="this.style.background='${isCustom ? '#fff4e6' : 'white'}'">
             ${isCustom ? `${statsTimeframe} days ✓ <span style="opacity:0.6;font-size:0.9em;">✏️</span>` : 'Custom days…'}
           </button>
           <div id="tfCustomRow" style="display:none;padding:8px 14px 12px;border-top:1px solid #f1f3f5;">
@@ -8795,7 +8795,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
                 style="width:90px;padding:7px 10px;border:1.5px solid #dee2e6;border-radius:8px;font-size:0.95em;outline:none;"
                 onkeydown="if(event.key==='Enter')_tfPickerSelectCustom()"
                 onclick="event.stopPropagation()">
-              <button onclick="_tfPickerSelectCustom()" style="padding:7px 14px;background:#ff6b00;color:white;border:none;border-radius:8px;font-size:0.9em;font-weight:600;cursor:pointer;">OK</button>
+              <button onclick="_tfPickerSelectCustom()" style="padding:7px 14px;background:var(--brand-primary-dark);color:white;border:none;border-radius:8px;font-size:0.9em;font-weight:600;cursor:pointer;">OK</button>
             </div>
           </div>
         </div>` +
@@ -9408,10 +9408,10 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       if (!el) return;
       const goals = JSON.parse(localStorage.getItem('dailyGoals') || '[]');
       if (goals.length === 0) {
-        el.innerHTML = `<button onclick="showGoalsList()" style="padding:7px 16px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:10px;color:#ff9500;font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">🏅 Set daily goals</button>`;
+        el.innerHTML = `<button onclick="showGoalsList()" style="padding:7px 16px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">🏅 Set daily goals</button>`;
       } else {
         const chips = goals.map(g => `<span style="display:inline-block;background:rgba(255,149,0,0.12);border-radius:6px;padding:2px 7px;margin:2px;font-size:0.8em;color:#495057;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${g}</span>`).join('');
-        el.innerHTML = `<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:8px 12px;background:#fff8f0;border-radius:10px;border:1.5px solid rgba(255,149,0,0.3);gap:8px;"><div style="flex:1;min-width:0;flex-wrap:wrap;display:flex;align-items:center;">${chips}</div><button onclick="showGoalsList()" style="padding:3px 10px;background:#ff9500;color:white;border:none;border-radius:7px;font-size:0.78em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;">Edit</button></div>`;
+        el.innerHTML = `<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:8px 12px;background:var(--brand-tint);border-radius:10px;border:1.5px solid rgba(255,149,0,0.3);gap:8px;"><div style="flex:1;min-width:0;flex-wrap:wrap;display:flex;align-items:center;">${chips}</div><button onclick="showGoalsList()" style="padding:3px 10px;background:var(--brand-primary);color:white;border:none;border-radius:7px;font-size:0.78em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;">Edit</button></div>`;
       }
     }
 
@@ -9430,9 +9430,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       if (!el) return;
       const val = localStorage.getItem('dailyBudget') || '';
       if (!val) {
-        el.innerHTML = `<button onclick="showBudgetModal()" style="padding:7px 16px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:10px;color:#ff9500;font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">💰 Set daily budget</button>`;
+        el.innerHTML = `<button onclick="showBudgetModal()" style="padding:7px 16px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">💰 Set daily budget</button>`;
       } else {
-        el.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#fff8f0;border-radius:10px;border:1.5px solid rgba(255,149,0,0.3);"><span style="font-size:0.9em;color:#495057;">💰 Daily budget: <b>${val}</b></span><button onclick="showBudgetModal()" style="padding:3px 10px;background:#ff9500;color:white;border:none;border-radius:7px;font-size:0.78em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Change</button></div>`;
+        el.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--brand-tint);border-radius:10px;border:1.5px solid rgba(255,149,0,0.3);"><span style="font-size:0.9em;color:#495057;">💰 Daily budget: <b>${val}</b></span><button onclick="showBudgetModal()" style="padding:3px 10px;background:var(--brand-primary);color:white;border:none;border-radius:7px;font-size:0.78em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Change</button></div>`;
       }
     }
 
@@ -9650,7 +9650,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
           listContainer.innerHTML = missingDates.map(date => {
             const dateStr = date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             const isToday = date.toDateString() === today.toDateString();
-            const style = isToday ? 'background: #fff3cd; border-left: 4px solid #ff9500;' : '';
+            const style = isToday ? 'background: #fff3cd; border-left: 4px solid var(--brand-primary);' : '';
             const dateValue = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
             
             return `
@@ -10219,9 +10219,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         // During the additional hint, dim all buttons except Additional and pulse it
         const _dimmed = _hintActive && t.id !== 'more_data';
         const _pulsing = _hintActive && t.id === 'more_data';
-        const _borderColor = _pulsing ? '#ff9500' : (on ? '#ff9500' : '#dee2e6');
+        const _borderColor = _pulsing ? 'var(--brand-primary)' : (on ? 'var(--brand-primary)' : '#dee2e6');
         const _bg = _pulsing ? 'rgba(255,149,0,0.18)' : (on ? 'rgba(255,149,0,0.1)' : 'white');
-        const _color = on ? '#ff9500' : '#adb5bd';
+        const _color = on ? 'var(--brand-primary)' : '#adb5bd';
         const _extraStyle = _dimmed ? 'opacity:0.3;pointer-events:none;' : (_pulsing ? 'animation:hintFade 1.6s ease-in-out infinite;box-shadow:0 0 0 3px rgba(255,149,0,0.35);' : '');
         return `<button${_idAttr} onclick="_toggleStep('${t.id}')" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;border-radius:12px;border:1.5px solid ${_borderColor};background:${_bg};color:${_color};cursor:pointer;font-size:0.82em;font-weight:600;min-width:52px;-webkit-tap-highlight-color:transparent;${_extraStyle}"><span style="font-size:1.3em;">${t.icon}</span><span>${t.label}</span></button>`;
       }).join('');
@@ -10282,7 +10282,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       if (!list) return;
       const pill = active =>
         active
-          ? `<span style="background:#ff9500;color:white;border-radius:20px;padding:3px 10px;font-size:0.78em;font-weight:600;">On</span>`
+          ? `<span style="background:var(--brand-primary);color:white;border-radius:20px;padding:3px 10px;font-size:0.78em;font-weight:600;">On</span>`
           : `<span style="background:#e9ecef;color:#adb5bd;border-radius:20px;padding:3px 10px;font-size:0.78em;font-weight:600;">Off</span>`;
 
       const _deletedBuiltin = JSON.parse(localStorage.getItem('deletedBuiltinFields') || '[]');
@@ -10310,7 +10310,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
                 <input id="builtinFieldEditInput" type="text" value="${_storedLabel ? _storedLabel.replace(/^\S+\s*/, '') : f.label.replace(/^\S+\s*/, '')}" maxlength="20"
                   style="flex:1;height:38px;padding:0 10px;border:1.5px solid #e9ecef;border-radius:8px;font-size:0.9em;outline:none;box-sizing:border-box;"
                   onkeydown="if(event.key==='Enter')saveBuiltinFieldLabel('${f.key}')">
-                <button onclick="saveBuiltinFieldLabel('${f.key}')" style="height:38px;box-sizing:border-box;background:#ff9500;color:white;border:none;border-radius:8px;padding:0 12px;font-size:0.85em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Save</button>
+                <button onclick="saveBuiltinFieldLabel('${f.key}')" style="height:38px;box-sizing:border-box;background:var(--brand-primary);color:white;border:none;border-radius:8px;padding:0 12px;font-size:0.85em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Save</button>
                 <button onclick="cancelBuiltinFieldEdit()" style="height:38px;box-sizing:border-box;background:#e9ecef;color:#495057;border:none;border-radius:8px;padding:0 10px;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">✕</button>
               </div>
               <div id="editEmojiPickerGrid" style="display:none;flex-wrap:wrap;gap:2px;padding:6px;background:#f8f9fa;border-radius:8px;max-height:120px;overflow-y:auto;">${_bEmojiGrid}</div>
@@ -10358,7 +10358,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
               <input id="customFieldEditInput" type="text" value="${f.label}" maxlength="15"
                 style="flex:1;height:38px;padding:0 10px;border:1.5px solid #e9ecef;border-radius:8px;font-size:0.9em;outline:none;box-sizing:border-box;"
                 onkeydown="if(event.key==='Enter')saveCustomFieldEdit()">
-              <button onclick="saveCustomFieldEdit()" style="height:38px;box-sizing:border-box;background:#ff9500;color:white;border:none;border-radius:8px;padding:0 12px;font-size:0.85em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Save</button>
+              <button onclick="saveCustomFieldEdit()" style="height:38px;box-sizing:border-box;background:var(--brand-primary);color:white;border:none;border-radius:8px;padding:0 12px;font-size:0.85em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Save</button>
               <button onclick="cancelCustomFieldEdit()" style="height:38px;box-sizing:border-box;background:#e9ecef;color:#495057;border:none;border-radius:8px;padding:0 10px;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">✕</button>
             </div>
             <div id="editEmojiPickerGrid" style="display:none;flex-wrap:wrap;gap:2px;padding:4px 2px;background:#f0f0f0;border-radius:8px;">
@@ -10386,7 +10386,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
           <input id="customFieldInput" type="text" placeholder="Field name… (max 15)" maxlength="15"
             style="flex:1;height:38px;padding:0 10px;border:1.5px solid #e9ecef;border-radius:8px;font-size:0.9em;outline:none;box-sizing:border-box;"
             onkeydown="if(event.key==='Enter')addCustomField()">
-          <button onclick="addCustomField()" style="height:38px;box-sizing:border-box;background:#ff9500;color:white;border:none;border-radius:8px;padding:0 12px;font-size:0.85em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Add</button>
+          <button onclick="addCustomField()" style="height:38px;box-sizing:border-box;background:var(--brand-primary);color:white;border:none;border-radius:8px;padding:0 12px;font-size:0.85em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Add</button>
         </div>
         <div id="emojiPickerGrid" style="display:none;flex-wrap:wrap;gap:2px;padding:4px 2px;background:#f8f9fa;border-radius:8px;">
           ${emojiPickerGrid}
@@ -10958,7 +10958,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       localStorage.setItem('bbMedHintDone', '1');
       document.getElementById('medHintEl')?.remove();
       const _mb = document.getElementById('manageMedsBtn');
-      if (_mb) _mb.style.color = '#ff9500';
+      if (_mb) _mb.style.color = 'var(--brand-primary)';
       _applyJournalOnboardingGating();
     }
     window._dismissMedHint = _dismissMedHint;
@@ -11198,7 +11198,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       const StatusBar = getPlugin('StatusBar');
       if (!StatusBar) return;
       try {
-        await StatusBar.setBackgroundColor({ color: '#ff9500' });
+        await StatusBar.setBackgroundColor({ color: 'var(--brand-primary)' });
         await StatusBar.setStyle({ style: 'DARK' }); // dark icons on orange bg
         await StatusBar.setOverlaysWebView({ overlay: false });
         console.log('✅ StatusBar configured');
@@ -11299,7 +11299,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
             },
             sound: 'default',
             smallIcon: 'ic_notification',
-            iconColor: '#ff9500'
+            iconColor: 'var(--brand-primary)'
           }]
         });
 
@@ -11347,7 +11347,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
               allowWhileIdle: true
             },
             smallIcon: 'ic_notification',
-            iconColor: '#ff9500'
+            iconColor: 'var(--brand-primary)'
           }]
         });
       } catch (e) { console.warn('Weekly summary schedule error:', e); }
@@ -11376,7 +11376,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
             body: `You have ${favCount} favourite entr${favCount === 1 ? 'y' : 'ies'} from this date — want to review them?`,
             schedule: { at: schedDate, allowWhileIdle: true },
             smallIcon: 'ic_notification',
-            iconColor: '#ff9500',
+            iconColor: 'var(--brand-primary)',
             extra: { anniversaryMonth: month, anniversaryDay: day }
           }]
         });
@@ -12001,7 +12001,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         bottom: 80px;
         left: 50%;
         transform: translateX(-50%);
-        background: linear-gradient(135deg, #ffaa33 0%, #ff8833 100%);
+        background: linear-gradient(135deg, var(--brand-primary-light) 0%, var(--brand-primary-mid) 100%);
         color: white;
         padding: 15px 20px;
         border-radius: 12px;
@@ -12019,7 +12019,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
           Track offline, faster loading, app-like experience
         </div>
         <div style="display: flex; gap: 10px; justify-content: center;">
-          <button id="pwa-install-btn" style="background: white; color: #ff9500; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">
+          <button id="pwa-install-btn" style="background: white; color: var(--brand-primary); border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">
             Install Now
           </button>
           <button id="pwa-dismiss-btn" style="background: rgba(255,255,255,0.2); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">

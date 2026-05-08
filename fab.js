@@ -163,7 +163,7 @@
     .whatsapp-fab, .placeholder-fab, .coffee-fab, .feedback-fab, .bb-extra-fab {
       position: fixed; bottom: 24px;
       width: 44px; height: 44px; border-radius: 50%;
-      background: rgba(255,149,0,0.13); border: none; color: #ff9500; font-size: 1.2em;
+      background: rgba(255,149,0,0.13); border: none; color: var(--brand-primary); font-size: 1.2em;
       cursor: pointer; display: flex; align-items: center; justify-content: center;
       box-shadow: 0 2px 8px rgba(0,0,0,0.10); z-index: 50;
       -webkit-tap-highlight-color: transparent;
@@ -188,7 +188,7 @@
     .bb-auth-fab {
       position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
       width: 44px; height: 44px; border-radius: 50%;
-      background: white; border: 2px solid #ff9500; color: #ff9500; font-size: 1.15em;
+      background: white; border: 2px solid var(--brand-primary); color: var(--brand-primary); font-size: 1.15em;
       cursor: pointer; display: none; align-items: center; justify-content: center;
       box-shadow: 0 2px 10px rgba(255,149,0,0.25); z-index: 50;
       -webkit-tap-highlight-color: transparent; transition: transform 0.15s;
@@ -224,7 +224,7 @@
       font-weight: 600; font-size: 0.9em; cursor: pointer;
       transition: all 0.2s ease; -webkit-tap-highlight-color: transparent;
     }
-    .bb-fb-type-btn.selected { border-color: #ff9500; background: rgba(255,149,0,0.08); color: #ff9500; }
+    .bb-fb-type-btn.selected { border-color: var(--brand-primary); background: rgba(255,149,0,0.08); color: var(--brand-primary); }
     /* ── Auth modal ── */
     .bb-auth-overlay {
       display: none; position: fixed; inset: 0;
@@ -242,7 +242,7 @@
       border-radius: 10px; font-size: 0.95em; box-sizing: border-box;
       margin-bottom: 10px; outline: none; font-family: inherit; display: block;
     }
-    .bb-auth-input:focus { border-color: #ff9500; }
+    .bb-auth-input:focus { border-color: var(--brand-primary); }
     /* ── Account modal ── */
     .bb-account-overlay {
       display: none; position: fixed; inset: 0;
@@ -292,7 +292,7 @@
             </div>
           </a>
           <div style="display:flex;flex-direction:column;gap:8px;">
-            <button onclick="closeChatModal()" style="padding:12px;background:#ff9500;color:white;border:none;border-radius:12px;font-weight:700;font-size:0.95em;cursor:pointer;">Close</button>
+            <button onclick="closeChatModal()" style="padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:12px;font-weight:700;font-size:0.95em;cursor:pointer;">Close</button>
             <button onclick="closeChatModal();window._showHidePermanently('chat')" style="padding:8px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;">🙈 Hide this button</button>
           </div>
         </div>
@@ -310,7 +310,7 @@
             <p style="margin-bottom:0;"><strong>🛡️ End-to-end encryption</strong> means your data is protected at every step — on your device, in transit, and in storage.</p>
           </div>
           <div style="display:flex;flex-direction:column;gap:10px;">
-            <button onclick="closeSecurityModal()" style="padding:12px;background:#ff9500;color:white;border:none;border-radius:12px;font-weight:700;font-size:0.95em;cursor:pointer;">Got it</button>
+            <button onclick="closeSecurityModal()" style="padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:12px;font-weight:700;font-size:0.95em;cursor:pointer;">Got it</button>
             <button onclick="closeSecurityModal();window._showHidePermanently('quicknote')" style="padding:10px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;">🙈 Hide this button</button>
           </div>
         </div>
@@ -322,10 +322,10 @@
           <div style="font-size:2em;margin-bottom:8px;">☕</div>
           <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:8px;">Keep Bipolar Bear Going</div>
           <p style="font-size:0.88em;color:#6c757d;line-height:1.55;margin-bottom:6px;">Running BipolarBear costs around <strong>£25/month</strong> for servers, hosting and services.</p>
-          <p id="bbCoffeeFundedText" style="font-size:0.82em;color:#ff9500;font-weight:600;margin-bottom:16px;display:none;"></p>
+          <p id="bbCoffeeFundedText" style="font-size:0.82em;color:var(--brand-primary);font-weight:600;margin-bottom:16px;display:none;"></p>
           <div style="display:flex;flex-direction:column;gap:10px;">
             <a href="https://buymeacoffee.com/jamesmarkey" target="_blank" rel="noopener noreferrer" onclick="closeCoffeeModal()"
-              style="display:block;padding:13px;background:#ff9500;color:white;border-radius:12px;text-decoration:none;font-weight:700;font-size:0.95em;text-align:center;">
+              style="display:block;padding:13px;background:var(--brand-primary);color:white;border-radius:12px;text-decoration:none;font-weight:700;font-size:0.95em;text-align:center;">
               ☕ Send me a coffee
             </a>
             <button onclick="window._showHidePermanently('coffee')"
@@ -356,15 +356,15 @@
           <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:0.88em;color:#495057;margin-bottom:18px;user-select:none;">
             Keep me informed about my submission
             <span style="position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;"
-              onclick="var cb=document.getElementById('bbFbNotify');cb.checked=!cb.checked;document.getElementById('bbFbNotifyTrack').style.background=cb.checked?'#ff9500':'#ccc';document.getElementById('bbFbNotifyThumb').style.transform=cb.checked?'translateX(20px)':'translateX(0)';">
+              onclick="var cb=document.getElementById('bbFbNotify');cb.checked=!cb.checked;document.getElementById('bbFbNotifyTrack').style.background=cb.checked?'var(--brand-primary)':'#ccc';document.getElementById('bbFbNotifyThumb').style.transform=cb.checked?'translateX(20px)':'translateX(0)';">
               <input type="checkbox" id="bbFbNotify" checked style="opacity:0;width:0;height:0;position:absolute;pointer-events:none;">
-              <span id="bbFbNotifyTrack" style="position:absolute;inset:0;border-radius:24px;background:#ff9500;transition:background 0.2s;"></span>
+              <span id="bbFbNotifyTrack" style="position:absolute;inset:0;border-radius:24px;background:var(--brand-primary);transition:background 0.2s;"></span>
               <span id="bbFbNotifyThumb" style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:white;box-shadow:0 1px 3px rgba(0,0,0,0.3);transition:transform 0.2s;transform:translateX(20px);"></span>
             </span>
           </label>
           <div id="bbFbError" style="color:#dc3545;font-size:0.85em;margin-bottom:10px;display:none;"></div>
           <div style="display:flex;gap:10px;justify-content:center;">
-            <button onclick="submitFabFeedback()" style="padding:11px 24px;background:#ff9500;color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-size:0.95em;">Send</button>
+            <button onclick="submitFabFeedback()" style="padding:11px 24px;background:var(--brand-primary);color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-size:0.95em;">Send</button>
             <button onclick="closeFabFeedback()" style="padding:11px 24px;background:white;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-weight:600;cursor:pointer;font-size:0.95em;">Cancel</button>
           </div>
           <button onclick="window._showHidePermanently('feedback')"
@@ -407,7 +407,7 @@
           <textarea id="bbQuickNoteInput" placeholder="Something to remember..." style="width:100%;min-height:90px;border:1.5px solid #e9ecef;border-radius:10px;padding:10px 12px;font-size:0.9em;color:#495057;resize:vertical;box-sizing:border-box;font-family:inherit;line-height:1.5;outline:none;"></textarea>
           <div style="display:flex;gap:10px;margin-top:12px;">
             <button onclick="closeQuickNoteModal()" style="flex:1;padding:11px;background:white;color:#adb5bd;border:1.5px solid #e9ecef;border-radius:12px;font-weight:600;font-size:0.9em;cursor:pointer;">Cancel</button>
-            <button onclick="saveQuickNote()" style="flex:1;padding:11px;background:#ff9500;color:white;border:none;border-radius:12px;font-weight:700;font-size:0.9em;cursor:pointer;">Save ✓</button>
+            <button onclick="saveQuickNote()" style="flex:1;padding:11px;background:var(--brand-primary);color:white;border:none;border-radius:12px;font-weight:700;font-size:0.9em;cursor:pointer;">Save ✓</button>
           </div>
           <button onclick="closeQuickNoteModal();window._hideExtraFab('quicknote')" style="display:block;margin:10px auto 0;padding:6px 10px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;">🙈 Hide this button</button>
         </div>
@@ -422,7 +422,7 @@
           <div id="bbCelebField" style="color:#6c757d;font-size:0.85em;margin-bottom:16px;"></div>
           <div style="display:flex;gap:8px;margin-bottom:12px;">
             <button onclick="nextCeleb()" style="flex:1;padding:10px;background:#f8f9fa;color:#495057;border:1.5px solid #e9ecef;border-radius:12px;font-weight:600;font-size:0.9em;cursor:pointer;">Next ›</button>
-            <a id="bbCelebWiki" href="#" target="_blank" rel="noopener noreferrer" style="flex:1;padding:10px;background:#ff9500;color:white;border-radius:12px;font-weight:700;font-size:0.9em;text-decoration:none;display:flex;align-items:center;justify-content:center;">Wikipedia ↗</a>
+            <a id="bbCelebWiki" href="#" target="_blank" rel="noopener noreferrer" style="flex:1;padding:10px;background:var(--brand-primary);color:white;border-radius:12px;font-weight:700;font-size:0.9em;text-decoration:none;display:flex;align-items:center;justify-content:center;">Wikipedia ↗</a>
           </div>
           <div style="display:flex;gap:8px;">
             <button onclick="closeCelebModal()" style="flex:1;padding:10px;background:#f8f9fa;color:#6c757d;border:none;border-radius:12px;font-size:0.85em;cursor:pointer;">Close</button>
@@ -437,8 +437,8 @@
           <div style="font-size:1.8em;text-align:center;margin-bottom:8px;">🎯</div>
           <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:16px;text-align:center;">My Goals</div>
           <div id="bbGoalsList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;"></div>
-          <a href="survival-kit.html#goals" style="display:block;text-align:center;color:#ff9500;font-size:0.88em;text-decoration:none;margin-bottom:14px;padding:10px;border:1.5px solid #ffe0b2;border-radius:10px;">Manage goals in Survival Kit ↗</a>
-          <button onclick="closeGoalsModal()" style="display:block;width:100%;padding:12px;background:#ff9500;color:white;border:none;border-radius:12px;font-weight:700;cursor:pointer;margin-bottom:8px;">Close</button>
+          <a href="survival-kit.html#goals" style="display:block;text-align:center;color:var(--brand-primary);font-size:0.88em;text-decoration:none;margin-bottom:14px;padding:10px;border:1.5px solid #ffe0b2;border-radius:10px;">Manage goals in Survival Kit ↗</a>
+          <button onclick="closeGoalsModal()" style="display:block;width:100%;padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:12px;font-weight:700;cursor:pointer;margin-bottom:8px;">Close</button>
           <button onclick="closeGoalsModal();window._hideExtraFab('goals')" style="display:block;width:100%;padding:8px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;">🙈 Hide this button</button>
         </div>
       </div>
@@ -449,7 +449,7 @@
           <div style="font-size:2em;margin-bottom:8px;">📊</div>
           <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:8px;">Mood Statistics</div>
           <p style="font-size:0.85em;color:#6c757d;margin-bottom:18px;">View your mood patterns, streaks, and trends in the journal.</p>
-          <button onclick="document.getElementById('bbStatsModal').style.display='none';window.location.href='journal.html?openStats=1'" style="display:block;width:100%;padding:12px;background:#ff9500;color:white;border:none;border-radius:12px;font-weight:700;cursor:pointer;margin-bottom:8px;">Open Statistics ↗</button>
+          <button onclick="document.getElementById('bbStatsModal').style.display='none';window.location.href='journal.html?openStats=1'" style="display:block;width:100%;padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:12px;font-weight:700;cursor:pointer;margin-bottom:8px;">Open Statistics ↗</button>
           <button onclick="document.getElementById('bbStatsModal').style.display='none'" style="display:block;width:100%;padding:10px;background:#f8f9fa;color:#6c757d;border:none;border-radius:12px;font-size:0.9em;cursor:pointer;margin-bottom:8px;">Cancel</button>
           <button onclick="document.getElementById('bbStatsModal').style.display='none';window._hideExtraFab('stats')" style="display:block;width:100%;padding:8px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;">🙈 Hide this button</button>
         </div>
@@ -462,9 +462,9 @@
           <div id="bbAuthError" style="display:none;color:#dc3545;font-size:0.85em;padding:8px 12px;background:rgba(220,53,69,0.08);border-radius:8px;margin-bottom:10px;"></div>
           <input type="email" id="bbAuthEmail" class="bb-auth-input" placeholder="Email" autocomplete="email">
           <input type="password" id="bbAuthPassword" class="bb-auth-input" placeholder="Password" autocomplete="current-password">
-          <button id="bbAuthSubmit" style="width:100%;padding:13px;background:#ff9500;color:white;border:none;border-radius:10px;font-weight:700;font-size:0.95em;cursor:pointer;margin-bottom:8px;">Sign In</button>
+          <button id="bbAuthSubmit" style="width:100%;padding:13px;background:var(--brand-primary);color:white;border:none;border-radius:10px;font-weight:700;font-size:0.95em;cursor:pointer;margin-bottom:8px;">Sign In</button>
           <button onclick="window.closeAuthModal()" style="width:100%;padding:11px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:10px;font-size:0.9em;font-weight:600;cursor:pointer;margin-bottom:10px;-webkit-tap-highlight-color:transparent;">Continue as Guest</button>
-          <div id="bbAuthToggle" style="text-align:center;font-size:0.85em;color:#6c757d;cursor:pointer;padding:4px;">Don't have an account? <span style="color:#ff9500;font-weight:600;">Sign up</span></div>
+          <div id="bbAuthToggle" style="text-align:center;font-size:0.85em;color:#6c757d;cursor:pointer;padding:4px;">Don't have an account? <span style="color:var(--brand-primary);font-weight:600;">Sign up</span></div>
           <button onclick="(window._confirmDeleteGuestData||function(){})()" style="display:block;width:100%;margin-top:10px;background:none;border:none;color:#adb5bd;font-size:0.78em;cursor:pointer;padding:4px 8px;-webkit-tap-highlight-color:transparent;text-align:center;">🗑 Delete all guest data</button>
         </div>
       </div>
@@ -481,7 +481,7 @@
               <input type="password" id="bbAccountCurrentPass" placeholder="Current password" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;box-sizing:border-box;margin-bottom:6px;outline:none;font-family:inherit;">
               <input type="password" id="bbAccountNewPass" placeholder="New password" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;box-sizing:border-box;margin-bottom:8px;outline:none;font-family:inherit;">
               <div style="display:flex;gap:8px;">
-                <button onclick="window._bbSubmitPasswordChange()" style="flex:1;padding:10px;background:#ff9500;color:white;border:none;border-radius:8px;font-size:0.9em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Save</button>
+                <button onclick="window._bbSubmitPasswordChange()" style="flex:1;padding:10px;background:var(--brand-primary);color:white;border:none;border-radius:8px;font-size:0.9em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Save</button>
                 <button onclick="document.getElementById('bbAccountPassFields').style.display='none';document.getElementById('bbAccountPassToggleBtn').style.display='';" style="padding:10px 14px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Cancel</button>
               </div>
             </div>
@@ -492,7 +492,7 @@
               <input type="email" id="bbAccountNewEmail" placeholder="New email address" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;box-sizing:border-box;margin-bottom:6px;outline:none;font-family:inherit;">
               <input type="password" id="bbAccountEmailPass" placeholder="Current password" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;box-sizing:border-box;margin-bottom:8px;outline:none;font-family:inherit;">
               <div style="display:flex;gap:8px;">
-                <button onclick="window._bbSubmitEmailChange()" style="flex:1;padding:10px;background:#ff9500;color:white;border:none;border-radius:8px;font-size:0.9em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Save</button>
+                <button onclick="window._bbSubmitEmailChange()" style="flex:1;padding:10px;background:var(--brand-primary);color:white;border:none;border-radius:8px;font-size:0.9em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Save</button>
                 <button onclick="document.getElementById('bbAccountEmailFields').style.display='none';document.getElementById('bbAccountEmailToggleBtn').style.display='';" style="padding:10px 14px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Cancel</button>
               </div>
             </div>
@@ -867,7 +867,7 @@
       if (_goals.length === 0) {
         _list.innerHTML = '<div style="text-align:center;color:#adb5bd;font-size:0.9em;padding:16px 0;">No goals added yet.<br>Add goals in the Survival Kit.</div>';
       } else {
-        _list.innerHTML = _goals.map(g => `<div style="padding:12px 14px;background:#fff3e0;border-radius:12px;font-size:0.9em;color:#333;border-left:3px solid #ff9500;">${g.text || g.title || String(g)}</div>`).join('');
+        _list.innerHTML = _goals.map(g => `<div style="padding:12px 14px;background:#fff3e0;border-radius:12px;font-size:0.9em;color:#333;border-left:3px solid var(--brand-primary);">${g.text || g.title || String(g)}</div>`).join('');
       }
     }
     const _m = document.getElementById('bbGoalsModal');
@@ -998,7 +998,7 @@
     const pw     = document.getElementById('bbAuthPassword');
     if (title)  title.textContent = 'Welcome to Bipolar Bear 🐻';
     if (submit) submit.textContent = 'Sign In';
-    if (toggle) toggle.innerHTML = 'Don\'t have an account? <span style="color:#ff9500;font-weight:600;">Sign up</span>';
+    if (toggle) toggle.innerHTML = 'Don\'t have an account? <span style="color:var(--brand-primary);font-weight:600;">Sign up</span>';
     if (err)    { err.style.display = 'none'; err.textContent = ''; }
     if (email)  email.value = '';
     if (pw)     pw.value = '';
@@ -1165,8 +1165,8 @@
         if (titleEl)  titleEl.textContent  = _bbIsSignUp ? 'Create Account' : 'Welcome to Bipolar Bear 🐻';
         if (submitEl) submitEl.textContent = _bbIsSignUp ? 'Sign Up' : 'Sign In';
         toggle.innerHTML = _bbIsSignUp
-          ? 'Already have an account? <span style="color:#ff9500;font-weight:600;">Sign in</span>'
-          : 'Don\'t have an account? <span style="color:#ff9500;font-weight:600;">Sign up</span>';
+          ? 'Already have an account? <span style="color:var(--brand-primary);font-weight:600;">Sign in</span>'
+          : 'Don\'t have an account? <span style="color:var(--brand-primary);font-weight:600;">Sign up</span>';
         if (errEl) errEl.style.display = 'none';
       });
     }

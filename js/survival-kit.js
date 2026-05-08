@@ -179,7 +179,7 @@ function _esc(s) {
           if (document.getElementById('skWelcomeModal')) return;
           const _modal = document.createElement('div');
           _modal.id = 'skWelcomeModal';
-          _modal.innerHTML = `<div style="background:linear-gradient(135deg,#ff8833,#ffaa33);border-radius:20px;padding:28px 32px;text-align:center;max-width:300px;width:calc(100vw - 64px);box-shadow:0 12px 48px rgba(255,107,0,0.55);">
+          _modal.innerHTML = `<div style="background:linear-gradient(135deg,var(--brand-primary-mid),var(--brand-primary-light));border-radius:20px;padding:28px 32px;text-align:center;max-width:300px;width:calc(100vw - 64px);box-shadow:0 12px 48px rgba(255,107,0,0.55);">
             <div style="font-size:2.6em;margin-bottom:10px;">🧰</div>
             <div style="font-weight:800;font-size:1.1em;color:white;margin-bottom:10px;">Your Survival Kit</div>
             <div style="font-size:0.88em;color:rgba(255,255,255,0.9);line-height:1.5;margin-bottom:16px;">The survival kit is used to personalise your experience and supplement the mood journal. Come check it out later.</div>
@@ -1175,7 +1175,7 @@ function _esc(s) {
               ${_esc(r.title)} <span class="chevron">▼</span>
             </button>
             <div style="display:flex;gap:2px;flex-shrink:0;padding-right:4px;">
-              <button onclick="editReminder(${i})" style="background:none;border:none;cursor:pointer;font-size:1.05em;color:#ff9500;padding:6px 4px;line-height:1;-webkit-tap-highlight-color:transparent;" title="Edit">✏️</button>
+              <button onclick="editReminder(${i})" style="background:none;border:none;cursor:pointer;font-size:1.05em;color:var(--brand-primary);padding:6px 4px;line-height:1;-webkit-tap-highlight-color:transparent;" title="Edit">✏️</button>
               <button onclick="deleteReminder(${i})" style="background:none;border:none;cursor:pointer;font-size:1.1em;color:#ff6b6b;padding:6px 4px;line-height:1;-webkit-tap-highlight-color:transparent;">✕</button>
             </div>
           </div>
@@ -1463,7 +1463,7 @@ function _esc(s) {
       el.innerHTML = list.map((s, i) => `
         <div style="display:flex;align-items:flex-start;gap:8px;padding:8px 10px;background:#f8f9fa;border-radius:8px;margin-bottom:6px;">
           <span style="flex:1;font-size:0.92em;line-height:1.45;">${_esc(s)}</span>
-          <button onclick="openEditCopingModal(${i})" style="background:none;border:none;cursor:pointer;font-size:1em;color:#ff9500;flex-shrink:0;padding:0 2px;line-height:1;-webkit-tap-highlight-color:transparent;">✏️</button>
+          <button onclick="openEditCopingModal(${i})" style="background:none;border:none;cursor:pointer;font-size:1em;color:var(--brand-primary);flex-shrink:0;padding:0 2px;line-height:1;-webkit-tap-highlight-color:transparent;">✏️</button>
           <button onclick="deleteCopingStrategy(${i})" style="background:none;border:none;cursor:pointer;font-size:1.1em;color:#ff6b6b;flex-shrink:0;padding:0 2px;line-height:1;-webkit-tap-highlight-color:transparent;">✕</button>
         </div>
       `).join('');
@@ -1562,9 +1562,9 @@ function _esc(s) {
         el.innerHTML = `
           <div style="background:rgba(255,149,0,0.08);border:1.5px solid rgba(255,149,0,0.3);border-radius:10px;padding:12px 14px;">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-              <span style="font-size:0.75em;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#ff9500;">My Definition</span>
+              <span style="font-size:0.75em;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--brand-primary);">My Definition</span>
               <div style="display:flex;gap:8px;">
-                <button onclick="openMoodDefModal('${mood}')" style="background:none;border:none;cursor:pointer;font-size:0.8em;color:#ff9500;font-weight:600;padding:0;-webkit-tap-highlight-color:transparent;">Edit</button>
+                <button onclick="openMoodDefModal('${mood}')" style="background:none;border:none;cursor:pointer;font-size:0.8em;color:var(--brand-primary);font-weight:600;padding:0;-webkit-tap-highlight-color:transparent;">Edit</button>
                 <button onclick="deleteMoodDefinition('${mood}')" style="background:none;border:none;cursor:pointer;font-size:0.8em;color:#ff6b6b;font-weight:600;padding:0;-webkit-tap-highlight-color:transparent;">Remove</button>
               </div>
             </div>
@@ -1575,7 +1575,7 @@ function _esc(s) {
         if (defWrap) { defWrap.style.display = 'none'; }
       } else {
         el.innerHTML = `
-          <button onclick="openMoodDefModal('${mood}')" style="width:100%;padding:10px;background:none;border:2px dashed #ff9500;border-radius:10px;color:#ff9500;font-weight:600;font-size:0.9em;cursor:pointer;margin-top:4px;-webkit-tap-highlight-color:transparent;">+ Add your definition</button>`;
+          <button onclick="openMoodDefModal('${mood}')" style="width:100%;padding:10px;background:none;border:2px dashed var(--brand-primary);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.9em;cursor:pointer;margin-top:4px;-webkit-tap-highlight-color:transparent;">+ Add your definition</button>`;
         // Show bipolar def expanded when no custom def
         if (defWrap) { defWrap.style.display = ''; }
       }
@@ -1658,7 +1658,7 @@ function _esc(s) {
       toast.innerHTML = `<div style="font-size:2em;margin-bottom:4px;">${emoji}</div><div style="font-weight:700;font-size:0.95em;margin-bottom:2px;">Achievement Unlocked!</div><div style="font-weight:600;font-size:0.88em;">${title}</div><div style="font-size:0.75em;color:rgba(255,255,255,0.8);margin-top:4px;">Tap to dismiss</div>`;
       Object.assign(toast.style, {
         position:'fixed', bottom:'80px', left:'50%', transform:'translateX(-50%) translateY(20px)',
-        background:'linear-gradient(135deg,#ff8833,#ffaa33)', color:'white',
+        background:'linear-gradient(135deg,var(--brand-primary-mid),var(--brand-primary-light))', color:'white',
         borderRadius:'16px', padding:'14px 20px', boxShadow:'0 8px 32px rgba(255,107,0,0.45)',
         zIndex:'9999', textAlign:'center', maxWidth:'280px', width:'90%',
         cursor:'pointer', transition:'transform 0.35s cubic-bezier(.34,1.56,.64,1), opacity 0.35s ease',
@@ -2412,7 +2412,7 @@ function _esc(s) {
         const StatusBar = window.Capacitor.Plugins.StatusBar;
         if (StatusBar) {
           await StatusBar.setStyle({ style: 'LIGHT' });
-          await StatusBar.setBackgroundColor({ color: '#ff6b00' });
+          await StatusBar.setBackgroundColor({ color: 'var(--brand-primary-dark)' });
         }
       } catch (e) { /* ignore */ }
     });

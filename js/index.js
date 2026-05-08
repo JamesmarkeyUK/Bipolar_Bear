@@ -358,7 +358,7 @@ const journalFeatures = [
       if (document.getElementById('tutorialCompleteModal')) return;
       const overlay = document.createElement('div');
       overlay.id = 'tutorialCompleteModal';
-      overlay.innerHTML = `<div style="background:linear-gradient(135deg,#ff8833,#ffaa33);border-radius:20px;padding:28px 32px;text-align:center;max-width:300px;width:calc(100vw - 64px);box-shadow:0 12px 48px rgba(255,107,0,0.55);">
+      overlay.innerHTML = `<div style="background:linear-gradient(135deg,var(--brand-primary-mid),var(--brand-primary-light));border-radius:20px;padding:28px 32px;text-align:center;max-width:300px;width:calc(100vw - 64px);box-shadow:0 12px 48px rgba(255,107,0,0.55);">
         <div style="font-size:2.6em;margin-bottom:10px;">🎓</div>
         <div style="font-weight:800;font-size:1.1em;color:white;margin-bottom:6px;">Tutorial Complete!</div>
         <div style="font-size:0.88em;color:rgba(255,255,255,0.9);line-height:1.5;margin-bottom:16px;">Done for now! There will be a few more hints as you progress.</div>
@@ -887,7 +887,7 @@ const journalFeatures = [
               <div style="font-size:0.88em;color:#666;line-height:1.55;margin-bottom:18px;">This will restore all hidden dock buttons back to their default positions.</div>
               <div style="display:flex;gap:10px;">
                 <button id="_dockCancelBtn" style="flex:1;padding:11px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-weight:600;font-size:0.9em;cursor:pointer;">Cancel</button>
-                <button id="_dockConfirmBtn" style="flex:1;padding:11px;background:#ff9500;color:white;border:none;border-radius:10px;font-weight:600;font-size:0.9em;cursor:pointer;">Reset</button>
+                <button id="_dockConfirmBtn" style="flex:1;padding:11px;background:var(--brand-primary);color:white;border:none;border-radius:10px;font-weight:600;font-size:0.9em;cursor:pointer;">Reset</button>
               </div>
             </div>`;
             Object.assign(_confirmOverlay.style, {
@@ -901,7 +901,7 @@ const journalFeatures = [
               ['bbWaFabHidden','bbQuickNoteFabHidden','bbCoffeeFabHidden','bbFeedbackFabHidden','bbFabSlot_1','bbFabSlot_2','bbFabSlot_3','bbFabSlot_4'].forEach(k => localStorage.removeItem(k));
               _applyOnboardingGating();
               const _t = document.createElement('div');
-              Object.assign(_t.style, { position:'fixed', top:'calc(env(safe-area-inset-top,0px) + 12px)', left:'50%', transform:'translateX(-50%)', background:'#ff9500', color:'white', padding:'10px 20px', borderRadius:'20px', fontWeight:'700', fontSize:'0.9em', zIndex:'9999', whiteSpace:'nowrap', boxShadow:'0 4px 16px rgba(0,0,0,0.2)', pointerEvents:'none' });
+              Object.assign(_t.style, { position:'fixed', top:'calc(env(safe-area-inset-top,0px) + 12px)', left:'50%', transform:'translateX(-50%)', background:'var(--brand-primary)', color:'white', padding:'10px 20px', borderRadius:'20px', fontWeight:'700', fontSize:'0.9em', zIndex:'9999', whiteSpace:'nowrap', boxShadow:'0 4px 16px rgba(0,0,0,0.2)', pointerEvents:'none' });
               _t.textContent = '✅ Dock reset';
               document.body.appendChild(_t);
               setTimeout(() => _t.remove(), 2000);
@@ -922,7 +922,7 @@ const journalFeatures = [
             ].forEach(k => localStorage.setItem(k, '1'));
             _applyOnboardingGating();
             const _t = document.createElement('div');
-            Object.assign(_t.style, { position:'fixed', top:'calc(env(safe-area-inset-top,0px) + 12px)', left:'50%', transform:'translateX(-50%)', background:'#ff9500', color:'white', padding:'10px 20px', borderRadius:'20px', fontWeight:'700', fontSize:'0.9em', zIndex:'9999', whiteSpace:'nowrap', boxShadow:'0 4px 16px rgba(0,0,0,0.2)', pointerEvents:'none' });
+            Object.assign(_t.style, { position:'fixed', top:'calc(env(safe-area-inset-top,0px) + 12px)', left:'50%', transform:'translateX(-50%)', background:'var(--brand-primary)', color:'white', padding:'10px 20px', borderRadius:'20px', fontWeight:'700', fontSize:'0.9em', zIndex:'9999', whiteSpace:'nowrap', boxShadow:'0 4px 16px rgba(0,0,0,0.2)', pointerEvents:'none' });
             _t.textContent = '✅ Tutorial skipped — enjoy the app!';
             document.body.appendChild(_t);
             setTimeout(() => _t.remove(), 2800);
@@ -1102,15 +1102,15 @@ const journalFeatures = [
             logoImg.style.transition = '';
             logoImg.style.transform = '';
             // Celebration
-            launchConfetti(18, ['#ff9500', '#ff6b00', '#ffd43b', '#ffffff', '#ff8c42']);
-            if (_firstFind) showToast('🎨 Easter egg found!', '#ff9500');
+            launchConfetti(18, ['var(--brand-primary)', 'var(--brand-primary-dark)', '#ffd43b', '#ffffff', '#ff8c42']);
+            if (_firstFind) showToast('🎨 Easter egg found!', 'var(--brand-primary)');
           }, 200);
         }, 300);
       }
 
-      const _journalColors  = ['#ff9500','#ff6b00','#ffd43b','#ffec99','#ff8c42','#fab005'];
+      const _journalColors  = ['var(--brand-primary)','var(--brand-primary-dark)','#ffd43b','#ffec99','#ff8c42','#fab005'];
       const _survivalColors = ['#51cf66','#339af0','#20c997','#74c0fc','#63e6be','#4dabf7'];
-      const _bothColors     = ['#ff9500','#ff6b00','#51cf66','#339af0','#f06595','#ffd43b','#a9e34b','#cc5de8'];
+      const _bothColors     = ['var(--brand-primary)','var(--brand-primary-dark)','#51cf66','#339af0','#f06595','#ffd43b','#a9e34b','#cc5de8'];
 
       // Survival toast fires only once ever (localStorage); journal + combined fire every launch
       let _bothFired = false;
@@ -1120,16 +1120,16 @@ const journalFeatures = [
           if (_bothFired) return;
           _bothFired = true;
           launchConfetti(90, _bothColors);
-          showToast('🎉 All done today — great work!', 'linear-gradient(135deg,#ffaa33,#ff8833)');
+          showToast('🎉 All done today — great work!', 'linear-gradient(135deg,var(--brand-primary-light),var(--brand-primary-mid))');
         } else if (type === 'journal') {
           if (_bothFired) return; // combined already fired, skip individual
           launchConfetti(45, _journalColors);
-          showToast('📔 Journal up to date!', 'linear-gradient(135deg,#ffaa33,#ff8833)');
+          showToast('📔 Journal up to date!', 'linear-gradient(135deg,var(--brand-primary-light),var(--brand-primary-mid))');
         } else if (type === 'survival') {
           if (localStorage.getItem('bbSurvivalCelebDone') === '1') return;
           localStorage.setItem('bbSurvivalCelebDone', '1');
           launchConfetti(45, _survivalColors);
-          showToast('🆘 Survival kit filled in!', 'linear-gradient(135deg,#ffaa33,#ff8833)');
+          showToast('🆘 Survival kit filled in!', 'linear-gradient(135deg,var(--brand-primary-light),var(--brand-primary-mid))');
         }
       }
 
@@ -1218,7 +1218,7 @@ function _handleIndexJournalNav() {
       if (document.getElementById('bbWelcomeModal')) return;
       const overlay = document.createElement('div');
       overlay.id = 'bbWelcomeModal';
-      overlay.innerHTML = `<div style="background:linear-gradient(135deg,#ff8833,#ffaa33);border-radius:20px;padding:28px 28px 24px;text-align:center;max-width:300px;width:calc(100vw - 64px);box-shadow:0 12px 48px rgba(255,107,0,0.55);">
+      overlay.innerHTML = `<div style="background:linear-gradient(135deg,var(--brand-primary-mid),var(--brand-primary-light));border-radius:20px;padding:28px 28px 24px;text-align:center;max-width:300px;width:calc(100vw - 64px);box-shadow:0 12px 48px rgba(255,107,0,0.55);">
         <div style="font-size:2.4em;margin-bottom:10px;">🐻</div>
         <div style="font-weight:800;font-size:1.05em;color:white;margin-bottom:10px;line-height:1.4;">Welcome to your BipolarBear.app!</div>
         <div style="font-size:0.88em;color:rgba(255,255,255,0.92);line-height:1.55;margin-bottom:18px;">This will be your mood journal and personalised survival kit going forward.<br><br>I'm here to help you get started. Let's go!</div>

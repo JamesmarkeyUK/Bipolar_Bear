@@ -48,7 +48,12 @@
 //     blocks and <meta theme-color> values intentionally still use hex
 //     literals (one can't see :root tokens at parse time, the other
 //     isn't CSS).
-const CACHE_NAME = 'bipolarbear-v15';
+// v16: complete the Phase 2 sweep across js/{index,journal,survival-kit,
+//     anonymous}.js and fab.js. Brand hex literals in template-literal
+//     style="..." strings, .style.X assignments, Object.assign({style,
+//     background, color}), and confetti/toast colour arrays now resolve
+//     via var(--brand-*). All five files still parse via `node --check`.
+const CACHE_NAME = 'bipolarbear-v16';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
