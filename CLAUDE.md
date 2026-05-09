@@ -63,6 +63,8 @@ on the catch.
 
 ## Native build flow
 
+### BipolarBear app (`com.bipolarbear.app`)
+
 ```bash
 # In the repo (working copy):
 git pull
@@ -70,12 +72,37 @@ git pull
 # Sync to the Capacitor project:
 rsync -av --delete \
   --exclude='.git' --exclude='.claude' --exclude='.DS_Store' \
+  --exclude='www-anonymous' --exclude='scripts' --exclude='functions/node_modules' \
   ./ ~/bipolarbear-native/www/
 
 # Then open native IDE:
 cd ~/bipolarbear-native && npx cap sync
 npx cap open ios       # or: npx cap open android
 ```
+
+### Bipolar Anonymous app (`com.bipolaranonymous.app`)
+
+A second native project, fed from a built bundle rather than the repo
+root — only the files the anon page actually uses get copied, and
+`anonymous.html` is renamed to `index.html` so the WebView opens it
+on launch.
+
+```bash
+git pull
+
+# Build the bundle (idempotent — wipes www-anonymous/ each run):
+node scripts/build-anonymous.js
+
+# Sync into the separate native project:
+rsync -av --delete ./www-anonymous/ ~/bipolaranonymous-native/www/
+cd ~/bipolaranonymous-native && npx cap sync
+npx cap open ios       # or: npx cap open android
+```
+
+The build script also flips `BB_BRAND.bundle` from `'main'` to
+`'anonymous'` in the copied `brand-config.js`, which is what
+`BB.isAnonymousApp()` reads in the native shell (the public-domain
+check can't fire there — `location.hostname` is `localhost`).
 
 ## Firestore collections
 

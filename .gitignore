@@ -21,3 +21,7 @@ test_write.txt
 !.dev.vars.example
 .env*
 !.env.example
+
+# Capacitor build output for the standalone Bipolar Anonymous app.
+# Produced by scripts/build-anonymous.js — regenerated on every build.
+www-anonymous/
