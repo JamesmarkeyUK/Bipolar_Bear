@@ -19,6 +19,14 @@ window.BB_BRAND = {
   // Slug used by storage prefixes, cache names, and build artefacts.
   id: 'bipolarbear',
 
+  // Bundle context — 'main' for the BipolarBear app, 'anonymous' for the
+  // standalone Bipolar Anonymous app. scripts/build-anonymous.js flips
+  // this to 'anonymous' in the www-anonymous/ copy of this file. Read
+  // through BB.isAnonymousApp() rather than touching this directly:
+  // native bundles can't rely on location.hostname, so this flag is the
+  // only signal there.
+  bundle: 'main',
+
   // Human-readable condition label, lowercase ("bipolar", "anxiety").
   condition: 'bipolar',
 
@@ -95,4 +103,27 @@ window.BB.storage = {
       // ignore
     }
   },
+};
+
+/**
+ * True when the current page is acting as the standalone "Bipolar
+ * Anonymous" app — either served from the anonymous web domain or
+ * running inside the dedicated Capacitor bundle (where the build script
+ * has set BB_BRAND.bundle to 'anonymous').
+ *
+ * Native shells use a localhost / file: scheme so a hostname-only check
+ * misses them. Anything that should differ between the BB-bear app and
+ * the anon-only app (e.g. hiding the "← Back to Bipolar Bear" button,
+ * skipping a redirect to index.html) should branch on this.
+ */
+window.BB.isAnonymousApp = function () {
+  try {
+    if (window.BB_BRAND && window.BB_BRAND.bundle === 'anonymous') return true;
+    var d = (window.BB_BRAND && window.BB_BRAND.domainAnonymous) || '';
+    if (!d) return false;
+    var h = location.hostname;
+    return h === d || h === 'www.' + d;
+  } catch (_) {
+    return false;
+  }
 };

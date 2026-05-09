@@ -70,7 +70,13 @@
 //     fab.js so the "🗑 Delete all guest data" button in the shared auth
 //     modal works on /journal and /survival-kit too (was a silent no-op
 //     because window._confirmDeleteGuestData was only defined on /).
-const CACHE_NAME = 'bipolarbear-v20';
+// v21: brand-config.js gains BB_BRAND.bundle + BB.isAnonymousApp() so the
+//     standalone Bipolar Anonymous app can detect itself when running
+//     natively (where location.hostname is 'localhost' and the existing
+//     domain check missed). js/anonymous.js sweeps onto the helper. The
+//     precached brand-config.js content changed, so old clients must
+//     drop their v20 cache.
+const CACHE_NAME = 'bipolarbear-v21';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

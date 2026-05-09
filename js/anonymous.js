@@ -39,7 +39,10 @@ const YELLOW      = 'var(--brand-secondary)';
 const YELLOW_DARK = '#c49e00';
 const YELLOW_LT   = '#ffe566';
 const ADMIN_EMAIL = 'inbox@jamesmarkey.co.uk';
-const _isAnonDomain = ['bipolaranonymous.app','www.bipolaranonymous.app'].includes(location.hostname);
+// True for both the anon web domain and the dedicated Capacitor bundle.
+// See BB.isAnonymousApp() in js/shared/brand-config.js — native shells
+// can't be detected by hostname alone.
+const _isAnonymousApp = BB.isAnonymousApp();
 
 const COLOR_PRESETS = [
   { key: 'orange', g1: '#ffb340', g2: '#e07800' },
@@ -215,14 +218,15 @@ function openAbout() { openOv('ov-about'); }
 document.getElementById('about-close').addEventListener('click', () => closeOv('ov-about'));
 
 // _goHome() is called from inline onclick attributes on onboarding screens
-// and the board logo. Navigates appropriately for the current domain.
+// and the board logo. Navigates appropriately for the current bundle.
 function _goHome() {
   if (_bbUser) {
     // In the native app navigate within the app; on the web go to the public homepage
     if (window.Capacitor || location.protocol === 'file:') { location.replace('index.html'); }
     else { location.href = 'https://bipolarbear.app'; }
-  } else if (!_isAnonDomain) { location.replace('index.html'); }
-  // standalone users on anon domain: do nothing
+  } else if (!_isAnonymousApp) { location.replace('index.html'); }
+  // standalone users in the anonymous app (web or native): do nothing —
+  // they're already at the only "home" their bundle has.
 }
 
 function _updateLogoCursor() {
@@ -1551,7 +1555,7 @@ document.getElementById('ms-signout').addEventListener('click', () => {
   boot(null);
 });
 const _msHomeBtn = document.getElementById('ms-home');
-if (_isAnonDomain) {
+if (_isAnonymousApp) {
   // "Discover BipolarBear" is already in the info popup — don't duplicate it here.
   _msHomeBtn.style.display = 'none';
 } else {
