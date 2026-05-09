@@ -131,14 +131,19 @@ exports.sendAnonCode = onCall(
       attempts:  0,
     });
 
-    const resend = new Resend(process.env.RESEND_API_KEY);
-    await resend.emails.send({
+    const resend = new Resend(RESEND_API_KEY.value());
+    const { error: resendError } = await resend.emails.send({
       from:    FROM_ADDRESS,
       to:      email,
       subject: `${code} is your Bipolar Anonymous code`,
       html:    emailHtml(code),
       text:    `Your Bipolar Anonymous verification code is: ${code}\n\nThis code expires in 10 minutes. Never share it with anyone.`,
     });
+
+    if (resendError) {
+      console.error('[sendAnonCode] Resend error:', JSON.stringify(resendError));
+      throw new HttpsError('internal', 'Failed to send verification email. Please try again.');
+    }
 
     return { sessionId };
   }
