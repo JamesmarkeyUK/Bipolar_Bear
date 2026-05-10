@@ -205,6 +205,10 @@ async function boot(user) {
     }
   } else if (profile.verified && profile.monika) {
     // Standalone verified (email code path, not signed in to main app)
+    // Refresh stats from Firestore on every visit so stableStreak / joinedAt
+    // stay current without requiring a fresh email verification.
+    const savedEmail = BB.storage.get('Anon_email');
+    if (savedEmail) await _anonRestoreProfile(savedEmail);
     showScreen('board');
     initBoard();
   } else if (profile.verified) {
@@ -322,6 +326,7 @@ function _birthdayCompact(iso) {
   const ms = Date.now() - new Date(iso).getTime();
   if (isNaN(ms) || ms < 0) return '';
   const days = Math.floor(ms / 86400000);
+  if (days < 1) return '';
   const years = Math.floor(days / 365);
   const rem = days - years * 365;
   return years > 0 ? `${years}y ${rem}d` : `${days}d`;
@@ -557,6 +562,8 @@ function setupVerify() {
                 (Date.now() - new Date(stableSince).getTime()) / 86400000
               ));
               BB.storage.set('Anon_stableStreak', String(stableStreak || days));
+              // First-time BB stats pull — auto-show the badge so it's visible
+              BB.storage.set('Anon_showStable', 'true');
             }
             if (accountCreatedAt) {
               const existing = BB.storage.get('Anon_joinedAt');
@@ -834,7 +841,12 @@ async function _bbRestoreProfile(uid) {
     if (ap.colorKey)                 BB.storage.set('Anon_colorKey',    ap.colorKey);
     if (ap.customInit !== undefined) BB.storage.set('Anon_initials',    ap.customInit || '');
     if (ap.showMeds   !== undefined) BB.storage.set('Anon_showMeds',    ap.showMeds   ? 'true' : 'false');
-    if (ap.showStable !== undefined) BB.storage.set('Anon_showStable',  ap.showStable ? 'true' : 'false');
+    if (ap.showStable !== undefined) {
+      BB.storage.set('Anon_showStable', ap.showStable ? 'true' : 'false');
+    } else if (typeof d.stableStreak === 'number' && d.stableStreak > 0 && !BB.storage.get('Anon_showStable')) {
+      // Not yet configured via anon board — auto-show since BB account has a streak
+      BB.storage.set('Anon_showStable', 'true');
+    }
     // Fall back to the journal-computed stableStreakStart when the anon profile
     // hasn't stored its own stableSince yet (e.g. first visit to the board).
     const resolvedStableSince = ap.stableSince || d.stableStreakStart || null;
@@ -1531,13 +1543,14 @@ function renderPost(p) {
   const commentBtn   = !p.isSeed
     ? `<button class="comment-btn" data-comment="${esc(p.id)}" title="View comments">💬${commentCount > 0 ? ` <span>${commentCount}</span>` : ''}</button>` : '';
   const pinnedBadge  = p.pinned ? '<div class="pinned-badge">📌 Pinned</div>' : '';
+  const postBday     = _birthdayCompact(p.joinedAt || '');
   return `<div class="post-card${p.pinned ? ' post-pinned' : ''}">
     ${pinnedBadge}
     <div class="post-header">
       <div class="post-avatar">
         <div class="post-av-circle" style="background:linear-gradient(135deg,${g1},${g2});">${esc(av)}</div>
         <div>
-          <div class="post-name">[${esc(p.name)}]${adminBadge} 🔥 ${p.streak || 1}d${showStable ? ` 🧘 ${p.stable}d` : ''}${p.joinedAt ? ` 🎂 ${_birthdayCompact(p.joinedAt)}` : ''}</div>
+          <div class="post-name">[${esc(p.name)}]${adminBadge} 🔥 ${p.streak || 1}d${showStable ? ` 🧘 ${p.stable}d` : ''}${postBday ? ` 🎂 ${postBday}` : ''}</div>
           ${showMed ? `<div class="post-med">💊 ${esc(p.med)}</div>` : ''}
         </div>
       </div>
