@@ -55,12 +55,20 @@ const COLOR_PRESETS = [
 
 let db = null;
 let currentTab      = 'general';
-let unsubPosts      = null;
+let unsubTabListeners = { announcements: null, general: null };
+let postsByTab        = { announcements: [], general: [] };
+// Millisecond timestamp of when the user last had each tab open
+const lastSeenMs = {
+  announcements: parseInt(BB.storage.get('Anon_lastSeen_announcements') || '0', 10),
+  general:       parseInt(BB.storage.get('Anon_lastSeen_general')       || '0', 10),
+};
 let localPosts      = [];
 let sosTargetName   = '';
 let reportTargetId  = '';
-let adminDeleteId   = '';
-let selfDeleteId    = '';
+let adminDeleteId    = '';
+let selfDeleteId     = '';
+let commentTargetId  = '';
+let currentThreadUnsub = null;
 let _bbUser         = null; // Firebase-auth verified user (BB App path)
 let _boardSetupDone = false; // initBoard's one-time handler wiring (compose, FAB, tabs, overlays)
 
@@ -137,7 +145,7 @@ function initFirebase() {
       if (!isReal && BB.storage.get('Anon_verified') === 'true' && !BB.storage.get('Anon_email')) {
         BB.storage.remove('Anon_verified');
         BB.storage.remove('Anon_isAdmin');
-        if (unsubPosts) { unsubPosts(); unsubPosts = null; }
+        stopAllListeners();
         boot(null);
       }
     });
@@ -249,6 +257,10 @@ function _updateLogoCursor() {
   document.getElementById(id).addEventListener('click', e => {
     if (e.target === document.getElementById(id)) closeOv(id);
   });
+});
+// Thread overlay needs special handling to also unsubscribe the comments listener
+document.getElementById('ov-thread').addEventListener('click', e => {
+  if (e.target === document.getElementById('ov-thread')) closeThread();
 });
 
 // ─────────────────────────────────────────────────────────────────
@@ -1002,10 +1014,12 @@ function initBoard() {
     setupTabs();
     setupFAB();
     setupCompose();
+    setupThread();
     setupOverlayActions();
     _boardSetupDone = true;
   }
   setTab('general');
+  listenPosts(); // starts both tab listeners; setTab no longer does this
   cleanOldPosts();
   _anonSaveProfile(); _bbSaveProfile(); // persist profile to Firestore
 }
@@ -1035,22 +1049,63 @@ function setupTabs() {
   });
 }
 
+// ── Unseen-message helpers ─────────────────────────────────────────
+function stopAllListeners() {
+  ['announcements', 'general'].forEach(tab => {
+    if (unsubTabListeners[tab]) { unsubTabListeners[tab](); unsubTabListeners[tab] = null; }
+  });
+}
+
+function saveLastSeen(tab) {
+  lastSeenMs[tab] = Date.now();
+  BB.storage.set('Anon_lastSeen_' + tab, String(lastSeenMs[tab]));
+}
+
+function tabHasUnseen(tab) {
+  const seen = lastSeenMs[tab];
+  return postsByTab[tab].some(p => {
+    if (p.isSystem || p.isSeed || p.isAnnouncement || p.deleted) return false;
+    const la = p.lastActivity?.toMillis?.() ?? 0;
+    const ts = p.timestamp?.toMillis?.()    ?? 0;
+    return Math.max(la, ts) > seen;
+  });
+}
+
+function renderTabBadges() {
+  ['announcements', 'general'].forEach(tab => {
+    const btn = document.querySelector(`.board-tab[data-tab="${tab}"]`);
+    if (btn) btn.classList.toggle('has-badge', tab !== currentTab && tabHasUnseen(tab));
+  });
+}
+// ──────────────────────────────────────────────────────────────────
+
 function setTab(tab) {
   currentTab = tab;
+  saveLastSeen(tab);
   document.querySelectorAll('.board-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   document.getElementById('fab-ann').classList.toggle('active', tab === 'announcements');
   document.getElementById('fab-gen').classList.toggle('active', tab === 'general');
-  listenPosts();
+  // Render from the already-running listener's cached data (no listener restart)
+  localPosts = postsByTab[tab] || [];
+  renderPosts(tab === 'general'
+    ? assembleGeneralPosts(localPosts)
+    : (localPosts.length ? sortPosts(localPosts) : announcementPosts()));
+  renderTabBadges();
 }
 
 // ─────────────────────────────────────────────────────────────────
 // Posts — Firestore real-time listener
 // ─────────────────────────────────────────────────────────────────
 function sortPosts(posts) {
+  const getTime = p => {
+    const la = p.lastActivity?.toMillis?.() ?? (p.lastActivity instanceof Date ? p.lastActivity.getTime() : 0);
+    const ts = p.timestamp?.toMillis?.()    ?? (p.timestamp    instanceof Date ? p.timestamp.getTime()    : 0);
+    return Math.max(la, ts);
+  };
   return [...posts].sort((a, b) => {
-    const ta = a.timestamp?.toMillis?.() ?? (a.timestamp instanceof Date ? a.timestamp.getTime() : 0);
-    const tb = b.timestamp?.toMillis?.() ?? (b.timestamp instanceof Date ? b.timestamp.getTime() : 0);
-    return tb - ta;
+    if (a.pinned && !b.pinned) return -1;
+    if (!a.pinned && b.pinned) return 1;
+    return getTime(b) - getTime(a);
   });
 }
 
@@ -1076,7 +1131,8 @@ function assembleGeneralPosts(realPosts) {
 }
 
 function listenPosts() {
-  if (unsubPosts) { unsubPosts(); unsubPosts = null; }
+  stopAllListeners();
+  postsByTab = { announcements: [], general: [] };
   localPosts = [];
 
   if (!db) {
@@ -1087,21 +1143,30 @@ function listenPosts() {
   document.getElementById('post-list').innerHTML =
     '<div class="empty-state">Loading…</div>';
 
-  unsubPosts = db.collection(BB_BRAND.collections.posts)
-    .where('tab', '==', currentTab)
-    .limit(60)
-    .onSnapshot(snap => {
-      localPosts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      renderPosts(currentTab === 'general'
-        ? assembleGeneralPosts(localPosts)
-        : sortPosts(localPosts));
-    }, err => {
-      console.error('[Anonymous] posts error', err);
-      // Keep whatever we had; only reset if truly empty
-      renderPosts(currentTab === 'general'
-        ? assembleGeneralPosts(localPosts)
-        : (localPosts.length ? sortPosts(localPosts) : announcementPosts()));
-    });
+  // Run one listener per tab simultaneously so badge counts stay live
+  // even when the user is looking at the other tab.
+  ['announcements', 'general'].forEach(tab => {
+    unsubTabListeners[tab] = db.collection(BB_BRAND.collections.posts)
+      .where('tab', '==', tab)
+      .limit(60)
+      .onSnapshot(snap => {
+        postsByTab[tab] = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        if (tab === currentTab) {
+          localPosts = postsByTab[tab];
+          renderPosts(tab === 'general'
+            ? assembleGeneralPosts(localPosts)
+            : sortPosts(localPosts));
+        }
+        renderTabBadges();
+      }, err => {
+        console.error('[Anonymous] posts error', tab, err);
+        if (tab === currentTab) {
+          renderPosts(currentTab === 'general'
+            ? assembleGeneralPosts(localPosts)
+            : (localPosts.length ? sortPosts(localPosts) : announcementPosts()));
+        }
+      });
+  });
 }
 
 function announcementPosts() {
@@ -1122,17 +1187,188 @@ async function cleanOldPosts() {
   if (!db) return;
   const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   try {
+    // Query posts whose original timestamp is past the cutoff; we then
+    // check lastActivity client-side to preserve posts kept alive by comments.
     const snap = await db.collection(BB_BRAND.collections.posts)
       .where('timestamp', '<', cutoff)
       .get();
     if (snap.empty) return;
     const batch = db.batch();
     snap.docs.forEach(doc => {
-      if (!doc.data().reported) batch.delete(doc.ref);
+      const data = doc.data();
+      if (data.reported || data.pinned) return;
+      // Preserve if a comment was added within the 7-day window
+      if (data.lastActivity) {
+        const laMs = data.lastActivity.toMillis
+          ? data.lastActivity.toMillis()
+          : (data.lastActivity instanceof Date ? data.lastActivity.getTime() : 0);
+        if (laMs >= cutoff.getTime()) return;
+      }
+      batch.delete(doc.ref);
     });
     await batch.commit();
   } catch (e) {
     console.warn('[Anonymous] cleanOldPosts:', e);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Comment threads
+// ─────────────────────────────────────────────────────────────────
+function openThread(postId) {
+  const post = localPosts.find(p => p.id === postId);
+  if (!post || post.isSeed) return;
+  commentTargetId = postId;
+
+  document.getElementById('thread-original-post').innerHTML = renderThreadHeader(post);
+  document.getElementById('thread-comments-list').innerHTML =
+    '<div class="empty-state" style="padding:24px 0;">Loading comments…</div>';
+
+  const ta = document.getElementById('thread-ta');
+  ta.value = '';
+  document.getElementById('thread-send').disabled = true;
+
+  openOv('ov-thread');
+  setTimeout(() => ta.focus(), 220);
+
+  if (currentThreadUnsub) { currentThreadUnsub(); currentThreadUnsub = null; }
+  if (!db) {
+    document.getElementById('thread-comments-list').innerHTML =
+      '<div class="empty-state" style="padding:24px 0 16px;">No comments yet — be the first! 💛</div>';
+    return;
+  }
+
+  currentThreadUnsub = db.collection(BB_BRAND.collections.posts).doc(postId)
+    .collection('comments')
+    .orderBy('timestamp', 'asc')
+    .onSnapshot(snap => {
+      const comments = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const el = document.getElementById('thread-comments-list');
+      if (!comments.length) {
+        el.innerHTML = '<div class="empty-state" style="padding:24px 0 16px;">No comments yet — be the first! 💛</div>';
+        return;
+      }
+      el.innerHTML = comments.map(renderComment).join('');
+    }, err => console.warn('[Thread] comments listener error', err));
+}
+
+function closeThread() {
+  if (currentThreadUnsub) { currentThreadUnsub(); currentThreadUnsub = null; }
+  closeOv('ov-thread');
+  commentTargetId = '';
+}
+
+function renderThreadHeader(p) {
+  const g1 = p.grad1 || YELLOW_LT;
+  const g2 = p.grad2 || YELLOW_DARK;
+  const av = p.initials || initials(p.name);
+  const adminBadge = p.isAdmin ? '<span class="admin-badge">ADMIN</span>' : '';
+  const showMed    = profile.showMeds && p.med;
+  const showStable = (p.stable || 0) > 0;
+  return `<div class="thread-orig-post">
+    <div class="post-header">
+      <div class="post-avatar">
+        <div class="post-av-circle" style="background:linear-gradient(135deg,${g1},${g2});">${esc(av)}</div>
+        <div>
+          <div class="post-name">[${esc(p.name)}]${adminBadge} 🔥 ${p.streak || 1}d${showStable ? ` 🧘 ${p.stable}d` : ''}</div>
+          ${showMed ? `<div class="post-med">💊 ${esc(p.med)}</div>` : ''}
+        </div>
+      </div>
+      <span class="post-time">${p.timestamp ? timeAgo(p.timestamp) : 'now'}</span>
+    </div>
+    <div class="post-text">${esc(p.text)}</div>
+  </div>`;
+}
+
+function renderComment(c) {
+  const g1 = c.grad1 || YELLOW_LT;
+  const g2 = c.grad2 || YELLOW_DARK;
+  const av = c.initials || initials(c.name);
+  const adminBadge = c.isAdmin ? '<span class="admin-badge">ADMIN</span>' : '';
+  return `<div class="comment-card">
+    <div class="comment-header">
+      <div class="post-av-circle" style="width:28px;height:28px;font-size:11px;flex-shrink:0;background:linear-gradient(135deg,${g1},${g2});">${esc(av)}</div>
+      <div style="flex:1;min-width:0;">
+        <span class="post-name" style="font-size:12px;">[${esc(c.name)}]${adminBadge}</span>
+        <span style="font-size:11px;color:var(--muted);margin-left:6px;">${c.timestamp ? timeAgo(c.timestamp) : 'now'}</span>
+      </div>
+    </div>
+    <div class="comment-text">${esc(c.text)}</div>
+  </div>`;
+}
+
+function setupThread() {
+  const ta      = document.getElementById('thread-ta');
+  const sendBtn = document.getElementById('thread-send');
+
+  ta.addEventListener('input', () => { sendBtn.disabled = !ta.value.trim(); });
+  document.getElementById('thread-close').addEventListener('click', closeThread);
+
+  let _sending = false;
+  sendBtn.addEventListener('click', async () => {
+    if (_sending) return;
+    const text = ta.value.trim();
+    if (!text || !commentTargetId) return;
+    _sending = true;
+    sendBtn.disabled = true;
+    ta.value = '';
+
+    const comment = {
+      name:      profile.monika,
+      text,
+      streak:    profile.streak,
+      initials:  profile.avatarInitials(),
+      grad1:     profile.grad1,
+      grad2:     profile.grad2,
+      isAdmin:   profile.isAdmin,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    };
+
+    if (db) {
+      try {
+        const postRef = db.collection(BB_BRAND.collections.posts).doc(commentTargetId);
+        await postRef.collection('comments').add(comment);
+        // Bump the parent post to the top of the board and update count
+        await postRef.update({
+          lastActivity: firebase.firestore.FieldValue.serverTimestamp(),
+          commentCount: firebase.firestore.FieldValue.increment(1),
+        });
+      } catch (e) {
+        console.error('[Thread] comment failed', e);
+      }
+    }
+    _sending = false;
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Admin: pin/unpin post
+// ─────────────────────────────────────────────────────────────────
+async function handlePin(postId, tab) {
+  if (!db || !profile.isAdmin) return;
+  const post = localPosts.find(p => p.id === postId);
+  if (!post) return;
+  const isPinned = !!post.pinned;
+
+  try {
+    if (!isPinned) {
+      // Unpin any existing pinned post in this tab first (one pin per tab)
+      const existing = await db.collection(BB_BRAND.collections.posts)
+        .where('tab', '==', tab)
+        .where('pinned', '==', true)
+        .get();
+      const batch = db.batch();
+      existing.docs.forEach(doc => batch.update(doc.ref, { pinned: false }));
+      batch.update(db.collection(BB_BRAND.collections.posts).doc(postId), { pinned: true });
+      await batch.commit();
+      showHint('Post pinned 📌');
+    } else {
+      await db.collection(BB_BRAND.collections.posts).doc(postId).update({ pinned: false });
+      showHint('Post unpinned');
+    }
+  } catch (e) {
+    console.error('[Admin] pin failed', e);
+    showHint('Failed to update pin');
   }
 }
 
@@ -1196,6 +1432,14 @@ function renderPosts(posts) {
       openOv('ov-admin-delete');
     });
   });
+  // Comment thread buttons
+  list.querySelectorAll('[data-comment]').forEach(btn => {
+    btn.addEventListener('click', () => openThread(btn.dataset.comment));
+  });
+  // Admin pin buttons
+  list.querySelectorAll('[data-pin]').forEach(btn => {
+    btn.addEventListener('click', () => handlePin(btn.dataset.pin, btn.dataset.tab));
+  });
 }
 
 function renderSystem(p) {
@@ -1220,19 +1464,26 @@ function renderPost(p) {
   if (p.deleted) {
     return `<div class="post-card"><div class="post-deleted">🛡️ This post was deleted by an admin</div></div>`;
   }
-  const liked      = likedPosts.has(p.id);
-  const likes      = p.likes || 0;
-  const showMed    = profile.showMeds && p.med;
-  const showStable = (p.stable || 0) > 0;
-  const g1      = p.grad1 || YELLOW_LT;
-  const g2      = p.grad2 || YELLOW_DARK;
-  const av      = p.initials || initials(p.name);
+  const liked        = likedPosts.has(p.id);
+  const likes        = p.likes || 0;
+  const commentCount = p.commentCount || 0;
+  const showMed      = profile.showMeds && p.med;
+  const showStable   = (p.stable || 0) > 0;
+  const g1           = p.grad1 || YELLOW_LT;
+  const g2           = p.grad2 || YELLOW_DARK;
+  const av           = p.initials || initials(p.name);
   const adminBadge   = p.isAdmin ? '<span class="admin-badge">ADMIN</span>' : '';
   const deleteBtn    = profile.isAdmin && !p.isSeed
     ? `<button class="icon-btn" data-delete="${esc(p.id)}" title="Delete post (admin)">🗑️</button>` : '';
+  const pinBtn       = profile.isAdmin && !p.isSeed
+    ? `<button class="icon-btn${p.pinned ? ' pin-active' : ''}" data-pin="${esc(p.id)}" data-tab="${esc(p.tab || currentTab)}" title="${p.pinned ? 'Unpin post' : 'Pin to top'}">📌</button>` : '';
   const selfDeleteBtn = !p.isSeed && !profile.isAdmin && p.name === profile.monika && isSelfDeleteEligible(p)
     ? `<button class="icon-btn" data-selfdelete="${esc(p.id)}" title="Remove your post" style="opacity:0.4;">🗑️</button>` : '';
-  return `<div class="post-card">
+  const commentBtn   = !p.isSeed
+    ? `<button class="comment-btn" data-comment="${esc(p.id)}" title="View comments">💬 <span>${commentCount}</span></button>` : '';
+  const pinnedBadge  = p.pinned ? '<div class="pinned-badge">📌 Pinned</div>' : '';
+  return `<div class="post-card${p.pinned ? ' post-pinned' : ''}">
+    ${pinnedBadge}
     <div class="post-header">
       <div class="post-avatar">
         <div class="post-av-circle" style="background:linear-gradient(135deg,${g1},${g2});">${esc(av)}</div>
@@ -1248,8 +1499,10 @@ function renderPost(p) {
       <button class="like-btn ${liked ? 'liked' : ''}" data-id="${esc(p.id)}" data-likes="${likes}" data-author="${esc(p.name)}"${p.name === profile.monika ? ' data-self="true" style="opacity:0.35;cursor:default;" title="You cannot like your own post"' : ''}>
         💛 <span>${likes}</span>
       </button>
+      ${commentBtn}
       <div style="flex:1"></div>
       ${selfDeleteBtn}
+      ${pinBtn}
       ${deleteBtn}
       ${p.name !== profile.monika ? `<button class="icon-btn" data-sos="${esc(p.name)}" title="Send SOS flag">🆘</button>` : ''}
       ${p.name !== profile.monika ? `<button class="icon-btn" data-report="${esc(p.id)}" title="Report post">🚨</button>` : ''}
@@ -1641,7 +1894,7 @@ document.getElementById('ms-signout').addEventListener('click', () => {
   Object.keys(localStorage)
     .filter(k => k === 'bbAnonLastVisit' || k === 'bbAnonVisitDate' || k.startsWith('bbAnon_'))
     .forEach(k => localStorage.removeItem(k));
-  if (unsubPosts) { unsubPosts(); unsubPosts = null; }
+  stopAllListeners();
   closeOv('ov-monika');
   boot(null);
 });
