@@ -1480,7 +1480,7 @@ function renderPost(p) {
   const selfDeleteBtn = !p.isSeed && !profile.isAdmin && p.name === profile.monika && isSelfDeleteEligible(p)
     ? `<button class="icon-btn" data-selfdelete="${esc(p.id)}" title="Remove your post" style="opacity:0.4;">🗑️</button>` : '';
   const commentBtn   = !p.isSeed
-    ? `<button class="comment-btn" data-comment="${esc(p.id)}" title="View comments">💬 <span>${commentCount}</span></button>` : '';
+    ? `<button class="comment-btn" data-comment="${esc(p.id)}" title="View comments">💬${commentCount > 0 ? ` <span>${commentCount}</span>` : ''}</button>` : '';
   const pinnedBadge  = p.pinned ? '<div class="pinned-badge">📌 Pinned</div>' : '';
   return `<div class="post-card${p.pinned ? ' post-pinned' : ''}">
     ${pinnedBadge}
