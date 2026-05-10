@@ -76,7 +76,23 @@
 //     domain check missed). js/anonymous.js sweeps onto the helper. The
 //     precached brand-config.js content changed, so old clients must
 //     drop their v20 cache.
-const CACHE_NAME = 'bipolarbear-v21';
+// v23: js/anonymous.js — hide the "0" comment count on posts with no
+//     comments yet (only the 💬 emoji shows; count appears once > 0).
+// v24: v1.0 — fix stale signed-out home stats and the signed-in journal
+//     redirect loop on native; show app version in the profile FAB popup
+//     (window._APP_VERSION = '1.0'). Touches js/index.js, fab.js,
+//     js/shared/brand-config.js, journal.html, survival-kit.html — every
+//     old client must drop v23.
+// v25: anonymous.html / css / js — surface app version (window._APP_VERSION)
+//     in the About overlay footer, and drop the 52px top-padding floor on
+//     .board-header so mobile Safari (where env(safe-area-inset-top) is 0)
+//     no longer renders an empty yellow spacer above the board header. The
+//     Capacitor shell + PWA standalone still get the inset because the rule
+//     is now calc(16px + env(safe-area-inset-top)).
+// v26: js/anonymous.js — stack the ADMIN chip on its own line beneath the
+//     monika in the board header pill so the streak + birthday badges no
+//     longer overflow off the right edge of the bar for admin accounts.
+const CACHE_NAME = 'bipolarbear-v26';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

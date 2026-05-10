@@ -285,6 +285,12 @@
       </div>
     </div>
 
+    <!-- Bipolar Bear birthday — populated by openMonikaSettings() -->
+    <div id="ms-birthday" style="display:none;background:var(--yellow-bg);border-radius:12px;padding:12px 14px;margin-bottom:16px;">
+      <div style="font-size:13px;font-weight:700;color:var(--dark);margin-bottom:2px;">🎂 Bipolar Bear birthday: <span id="ms-birthday-date"></span></div>
+      <div style="font-size:11px;color:var(--muted);" id="ms-birthday-age"></div>
+    </div>
+
     <!-- Medication quick-access -->
     <button id="ms-med-btn" style="width:100%;text-align:left;background:var(--yellow-bg);border:1.5px solid rgba(245,200,0,0.18);border-radius:12px;padding:11px 14px;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;gap:10px;font-family:inherit;">
       <span style="font-size:20px;">💊</span>
@@ -470,7 +476,8 @@
       <a href="https://bipolarbear.app" target="_blank" rel="noopener" style="display:block;background:var(--yellow);color:var(--dark);font-weight:700;font-size:13px;border-radius:10px;padding:11px;text-align:center;text-decoration:none;" data-i18n="anon.about.discover">🐻 Discover BipolarBear →</a>
     </div>
 
-    <button id="about-close" class="btn-secondary" style="width:100%;" data-i18n="anon.about.close">Close</button>
+    <button id="about-close" class="btn-secondary" style="width:100%;">Close</button>
+    <div id="about-version" style="text-align:center;font-size:11px;color:var(--muted);margin-top:14px;letter-spacing:0.3px;"></div>
   </div>
 </div>
 

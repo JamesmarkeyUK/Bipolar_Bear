@@ -8,7 +8,12 @@
   <!-- Beta gate: must be first — fires before any render -->
   <style>body{background:linear-gradient(135deg,#ffaa33 0%,#ff8833 100%)}</style>
   <script>if(!window.Capacitor&&location.protocol!=='file:'&&localStorage.getItem('bbWebUnlocked')!=='true'){location.replace('beta.html');}
-  {const _np=window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()&&localStorage.getItem('bbNativePinEnabled')==='1';if((localStorage.getItem('bbGuestPinSalt')||_np)&&sessionStorage.getItem('bbPinUnlocked')!=='1'){location.replace('index.html');}}</script>
+  // Native PIN gate. Signed-in users use account-derived encryption, not the
+  // guest PIN, so a stale `bbGuestPinSalt` (left over from a guest session
+  // before they signed in) must NOT redirect them away from journal.html —
+  // otherwise they bounce back to index.html every time they tap Journal
+  // and never reach the journal.js cleanup that would clear it.
+  {const _np=window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()&&localStorage.getItem('bbNativePinEnabled')==='1';let _signed=false;try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('firebase:authUser:')===0&&localStorage.getItem(k)){_signed=true;break;}}}catch(_){}const _gp=!_signed&&localStorage.getItem('bbGuestPinSalt');if((_gp||_np)&&sessionStorage.getItem('bbPinUnlocked')!=='1'){location.replace('index.html');}}</script>
 
   <!-- Shared helpers: load before any inline script that depends on isNative()/window.BB_FIREBASE_CONFIG/BB.onboarding/BB.storage. brand-config.js must come first so the BB.storage helper is available before debug.js + onboarding.js try to read localStorage through it. -->
   <script src="js/shared/brand-config.js"></script>

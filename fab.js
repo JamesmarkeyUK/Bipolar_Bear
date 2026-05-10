@@ -519,6 +519,7 @@
           <button onclick="window.closeAuthModal()" style="width:100%;padding:11px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:10px;font-size:0.9em;font-weight:600;cursor:pointer;margin-bottom:10px;-webkit-tap-highlight-color:transparent;">Continue as Guest</button>
           <div id="bbAuthToggle" style="text-align:center;font-size:0.85em;color:#6c757d;cursor:pointer;padding:4px;">Don't have an account? <span style="color:var(--brand-primary);font-weight:600;">Sign up</span></div>
           <button onclick="(window._confirmDeleteGuestData||function(){})()" style="display:block;width:100%;margin-top:10px;background:none;border:none;color:#adb5bd;font-size:0.78em;cursor:pointer;padding:4px 8px;-webkit-tap-highlight-color:transparent;text-align:center;">🗑 Delete all guest data</button>
+          <div id="bbAuthVersion" style="margin-top:8px;text-align:center;font-size:0.7em;color:#adb5bd;letter-spacing:0.02em;"></div>
         </div>
       </div>
 
@@ -568,6 +569,7 @@
           </div>
           <button onclick="(window._fabOpenPersonalInfo||function(){})()" style="width:100%;padding:12px;background:white;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;margin-bottom:10px;-webkit-tap-highlight-color:transparent;">👤 Personal information</button>
           <button onclick="window.closeAccountModal()" style="width:100%;padding:10px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:10px;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="common.cancel">Cancel</button>
+          <div id="bbAccountVersion" style="margin-top:10px;text-align:center;font-size:0.7em;color:#adb5bd;letter-spacing:0.02em;"></div>
         </div>
       </div>
     `;
@@ -1072,6 +1074,8 @@
     if (err)    { err.style.display = 'none'; err.textContent = ''; }
     if (email)  email.value = '';
     if (pw)     pw.value = '';
+    const verEl = document.getElementById('bbAuthVersion');
+    if (verEl) verEl.textContent = _bbVersionLabel();
     const modal = document.getElementById('bbAuthModal');
     if (modal) modal.classList.add('active');
     if (typeof window._fabOnShowAuth === 'function') window._fabOnShowAuth();
@@ -1116,10 +1120,35 @@
     if (emailPassEl) emailPassEl.value = '';
     const langSel = document.getElementById('bbLangSelect');
     if (langSel && window.BB && window.BB.i18n) langSel.value = window.BB.i18n.getLang();
+    const verEl = document.getElementById('bbAccountVersion');
+    if (verEl) verEl.textContent = _bbVersionLabel();
     const modal = document.getElementById('bbAccountModal');
     if (modal) modal.classList.add('active');
     if (typeof window._fabOnShowAuth === 'function') window._fabOnShowAuth();
   };
+
+  /**
+   * Build the "v0.99 · web" / "v0.99 · iOS" footer string for the auth and
+   * account modals. Reads `window._APP_VERSION` (set in brand-config.js so
+   * every page has it without depending on js/index.js loading first).
+   * Returns an empty string if the version is somehow missing rather than
+   * showing a misleading "v" placeholder.
+   * @returns {string}
+   */
+  function _bbVersionLabel() {
+    const v = window._APP_VERSION;
+    if (!v) return '';
+    let suffix = ' · web';
+    try {
+      if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
+        const plat = window.Capacitor.getPlatform ? window.Capacitor.getPlatform() : '';
+        suffix = plat === 'ios' ? ' · iOS' : (plat === 'android' ? ' · Android' : ' · native');
+      } else if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
+        suffix = ' · PWA';
+      }
+    } catch (_) {}
+    return 'v' + v + suffix;
+  }
 
   /** Hide the account modal. */
   window.closeAccountModal = function () {

@@ -15,6 +15,14 @@
  *
  * @file js/shared/brand-config.js
  */
+/**
+ * Web app version. Surfaced in the auth/account modal footer (so users can
+ * report which version they're on) and as `window._APP_VERSION` for the
+ * what's-new popup, fab.js feedback metadata, and any page that needs it
+ * without depending on js/index.js loading first.
+ */
+window._APP_VERSION = '1.0';
+
 window.BB_BRAND = {
   // Slug used by storage prefixes, cache names, and build artefacts.
   id: 'bipolarbear',

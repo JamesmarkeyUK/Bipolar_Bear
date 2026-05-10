@@ -98,6 +98,9 @@ const profile = {
   avatarInitials()  { return this.customInit || initials(this.monika); },
   // Pull streak from journal if available, else default to 1
   get streak()      { return parseInt(BB.storage.get('Anon_streak') || '1', 10); },
+  // ISO timestamp of "Bipolar Bear birthday" — earliest of BB account
+  // creation and anon profile creation. Resolved by _resolveJoinedAt().
+  get joinedAt()    { return BB.storage.get('Anon_joinedAt')   || ''; },
 };
 
 // Liked posts set (persisted)
@@ -225,6 +228,12 @@ function closeOv(id) { document.getElementById(id).classList.add('hidden'); }
 function openAbout() { openOv('ov-about'); }
 document.getElementById('about-close').addEventListener('click', () => closeOv('ov-about'));
 
+// Stamp the shared web app version (from brand-config.js) into the About footer.
+(function () {
+  const el = document.getElementById('about-version');
+  if (el && window._APP_VERSION) el.textContent = 'v' + window._APP_VERSION;
+})();
+
 // _goHome() is called from inline onclick attributes on onboarding screens
 // and the board logo. Navigates appropriately for the current bundle.
 function _goHome() {
@@ -277,6 +286,69 @@ function timeAgo(ts) {
   if (s < 3600)  return Math.floor(s / 60) + 'm';
   if (s < 86400) return Math.floor(s / 3600) + 'h';
   return Math.floor(s / 86400) + 'd';
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Bipolar Bear birthday — joined-date resolution + formatting
+// ─────────────────────────────────────────────────────────────────
+// Picks the earliest known join date between the BB Firebase Auth
+// account (metadata.creationTime) and any previously-stored anon
+// profile date. First-time standalone users get "today". The result
+// is cached in localStorage and mirrored to Firestore via the
+// profile-save helpers.
+function _resolveJoinedAt() {
+  const candidates = [];
+  const stored = BB.storage.get('Anon_joinedAt');
+  if (stored) candidates.push(stored);
+  if (_bbUser && _bbUser.metadata && _bbUser.metadata.creationTime) {
+    const ct = new Date(_bbUser.metadata.creationTime);
+    if (!isNaN(ct.getTime())) candidates.push(ct.toISOString());
+  }
+  let earliest;
+  if (candidates.length) {
+    candidates.sort();
+    earliest = candidates[0];
+  } else {
+    earliest = new Date().toISOString();
+  }
+  if (earliest !== stored) BB.storage.set('Anon_joinedAt', earliest);
+  return earliest;
+}
+
+// Compact "Xy Yd" / "Yd" used on the user pill and post header.
+function _birthdayCompact(iso) {
+  if (!iso) return '';
+  const ms = Date.now() - new Date(iso).getTime();
+  if (isNaN(ms) || ms < 0) return '';
+  const days = Math.floor(ms / 86400000);
+  const years = Math.floor(days / 365);
+  const rem = days - years * 365;
+  return years > 0 ? `${years}y ${rem}d` : `${days}d`;
+}
+
+// Verbose "1 year, 23 days old" used in the Monika overlay.
+function _birthdayVerbose(iso) {
+  if (!iso) return '';
+  const ms = Date.now() - new Date(iso).getTime();
+  if (isNaN(ms) || ms < 0) return '';
+  const days = Math.floor(ms / 86400000);
+  const years = Math.floor(days / 365);
+  const rem = days - years * 365;
+  const yPart = years === 1 ? '1 year' : `${years} years`;
+  const dPart = rem === 1 ? '1 day'   : `${rem} days`;
+  return years > 0 ? `${yPart}, ${dPart} old` : `${dPart} old`;
+}
+
+// Localised "10 May 2026" for the Monika overlay row.
+function _birthdayDateLabel(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  try {
+    return d.toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' });
+  } catch (_) {
+    return d.toISOString().slice(0, 10);
+  }
 }
 
 function getLatestRealPost(tab) {
@@ -658,6 +730,7 @@ async function _anonSaveProfile() {
       stableStreak: profile.stableStreak,
       visitStreak:  parseInt(BB.storage.get('Anon_streak') || '0', 10),
       visitDate:    BB.storage.get('AnonVisitDate') || null,
+      joinedAt:     profile.joinedAt    || null,
       updatedAt:    firebase.firestore.FieldValue.serverTimestamp(),
     }, { merge: true });
   } catch(e) { console.warn('[Anonymous] profile save failed', e); }
@@ -688,6 +761,7 @@ async function _anonRestoreProfile(email) {
     }
     if (typeof d.visitStreak === 'number') BB.storage.set('Anon_streak',  String(d.visitStreak));
     if (d.visitDate)                       BB.storage.set('AnonVisitDate', d.visitDate);
+    if (d.joinedAt)                        BB.storage.set('Anon_joinedAt', d.joinedAt);
     return !!d.monika;
   } catch(e) {
     console.warn('[Anonymous] profile restore failed', e);
@@ -742,6 +816,7 @@ async function _bbRestoreProfile(uid) {
     }
     if (typeof ap.visitStreak === 'number') BB.storage.set('Anon_streak',     String(ap.visitStreak));
     if (ap.visitDate)                       BB.storage.set('AnonVisitDate',    ap.visitDate);
+    if (ap.joinedAt)                        BB.storage.set('Anon_joinedAt',    ap.joinedAt);
     // Mirror restored profile to anonProfiles so standalone email-code path
     // can restore it on a fresh browser/device without needing Firebase Auth.
     if (ap.monika && _bbUser && _bbUser.email) {
@@ -756,6 +831,7 @@ async function _bbRestoreProfile(uid) {
           stableSince: ap.stableSince || null,
           visitStreak: ap.visitStreak || 0,
           visitDate:   ap.visitDate   || null,
+          joinedAt:    ap.joinedAt    || null,
           updatedAt:   firebase.firestore.FieldValue.serverTimestamp(),
         }, { merge: true })
       ).catch(() => {});
@@ -778,6 +854,7 @@ function _bbSaveProfile() {
     stableSince: profile.stableSince || null,
     visitStreak: parseInt(BB.storage.get('Anon_streak') || '0', 10),
     visitDate:   BB.storage.get('AnonVisitDate') || null,
+    joinedAt:    profile.joinedAt   || null,
     verified:    BB.storage.get('Anon_verified') === 'true',
   };
   db.collection('userSettings').doc(_bbUser.uid).set(
@@ -933,6 +1010,7 @@ function _updateAnonStreak() {
 function initBoard() {
   BB.storage.set('AnonLastVisit', Date.now());
   _updateAnonStreak();
+  _resolveJoinedAt();
   renderUserPill();
   // One-time DOM handler wiring. initBoard() is reachable from multiple paths
   // (boot, verify success, meds yes/no) — re-running setup* would attach
@@ -958,14 +1036,18 @@ function renderUserPill() {
   const g1 = profile.grad1;
   const g2 = profile.grad2;
   const av = profile.avatarInitials();
+  const bday = _birthdayCompact(profile.joinedAt);
   document.getElementById('board-user-pill').innerHTML = `
     <div style="display:flex;align-items:center;gap:5px;">
       <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,${g1},${g2});display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:11px;flex-shrink:0;">${esc(av)}</div>
-      <span style="font-size:12px;color:rgba(0,0,0,0.75);font-weight:600;">[${esc(m)}]</span>
-      ${profile.isAdmin ? '<span style="background:rgba(0,0,0,0.55);color:#fff;font-size:9px;font-weight:800;border-radius:4px;padding:1px 5px;">ADMIN</span>' : ''}
+      <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0;">
+        <span style="font-size:12px;color:rgba(0,0,0,0.75);font-weight:600;">[${esc(m)}]</span>
+        ${profile.isAdmin ? '<span style="background:rgba(0,0,0,0.55);color:#fff;font-size:9px;font-weight:800;border-radius:4px;padding:1px 5px;line-height:1.2;">ADMIN</span>' : ''}
+      </div>
       <span>🔥</span>
       <span style="font-size:11px;color:rgba(0,0,0,0.6);">${s}d</span>
       ${profile.showStable && profile.stableStreak > 0 ? `<span>🧘</span><span style="font-size:11px;color:rgba(0,0,0,0.6);">${profile.stableStreak}d</span>` : ''}
+      ${bday ? `<span title="Bipolar Bear birthday">🎂</span><span style="font-size:11px;color:rgba(0,0,0,0.6);">${bday}</span>` : ''}
     </div>`;
 }
 
@@ -1175,7 +1257,11 @@ function openThread(postId) {
         return;
       }
       el.innerHTML = comments.map(renderComment).join('');
-    }, err => console.warn('[Thread] comments listener error', err));
+    }, err => {
+      console.warn('[Thread] comments listener error', err);
+      const el = document.getElementById('thread-comments-list');
+      if (el) el.innerHTML = '<div class="empty-state" style="padding:24px 0 16px;">No comments yet — be the first! 💛</div>';
+    });
 }
 
 function closeThread() {
@@ -1406,7 +1492,7 @@ function renderPost(p) {
   const selfDeleteBtn = !p.isSeed && !profile.isAdmin && p.name === profile.monika && isSelfDeleteEligible(p)
     ? `<button class="icon-btn" data-selfdelete="${esc(p.id)}" title="Remove your post" style="opacity:0.4;">🗑️</button>` : '';
   const commentBtn   = !p.isSeed
-    ? `<button class="comment-btn" data-comment="${esc(p.id)}" title="View comments">💬 <span>${commentCount}</span></button>` : '';
+    ? `<button class="comment-btn" data-comment="${esc(p.id)}" title="View comments">💬${commentCount > 0 ? ` <span>${commentCount}</span>` : ''}</button>` : '';
   const pinnedBadge  = p.pinned ? '<div class="pinned-badge">📌 Pinned</div>' : '';
   return `<div class="post-card${p.pinned ? ' post-pinned' : ''}">
     ${pinnedBadge}
@@ -1414,7 +1500,7 @@ function renderPost(p) {
       <div class="post-avatar">
         <div class="post-av-circle" style="background:linear-gradient(135deg,${g1},${g2});">${esc(av)}</div>
         <div>
-          <div class="post-name">[${esc(p.name)}]${adminBadge} 🔥 ${p.streak || 1}d${showStable ? ` 🧘 ${p.stable}d` : ''}</div>
+          <div class="post-name">[${esc(p.name)}]${adminBadge} 🔥 ${p.streak || 1}d${showStable ? ` 🧘 ${p.stable}d` : ''}${p.joinedAt ? ` 🎂 ${_birthdayCompact(p.joinedAt)}` : ''}</div>
           ${showMed ? `<div class="post-med">💊 ${esc(p.med)}</div>` : ''}
         </div>
       </div>
@@ -1541,6 +1627,7 @@ function setupCompose() {
       text,
       med:      profile.showMeds   ? profile.med          : '',
       stable:   profile.showStable ? profile.stableStreak : 0,
+      joinedAt: profile.joinedAt   || null,
       tab:      currentTab,
       likes:    0,
       isSystem: false,
@@ -1748,6 +1835,22 @@ function openMonikaSettings() {
       msStableStatus.textContent = streak > 0
         ? (profile.showStable ? `${streak}d · Visible on posts` : `${streak}d · Private`)
         : (profile.showStable ? 'Visible on posts' : 'Private');
+    }
+  }
+
+  // Bipolar Bear birthday — date joined + age. Resolved lazily here so
+  // users opening settings before initBoard() still see something.
+  const joinedISO = profile.joinedAt || _resolveJoinedAt();
+  const msBday    = document.getElementById('ms-birthday');
+  if (msBday) {
+    const dateLabel = _birthdayDateLabel(joinedISO);
+    const ageLabel  = _birthdayVerbose(joinedISO);
+    if (dateLabel) {
+      document.getElementById('ms-birthday-date').textContent = dateLabel;
+      document.getElementById('ms-birthday-age').textContent  = ageLabel;
+      msBday.style.display = '';
+    } else {
+      msBday.style.display = 'none';
     }
   }
 
