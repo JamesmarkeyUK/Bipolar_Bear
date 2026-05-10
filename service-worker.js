@@ -78,7 +78,11 @@
 //     drop their v20 cache.
 // v23: js/anonymous.js — hide the "0" comment count on posts with no
 //     comments yet (only the 💬 emoji shows; count appears once > 0).
-const CACHE_NAME = 'bipolarbear-v23';
+// v24: v0.99 — fix stale signed-out home stats and the signed-in journal
+//     redirect loop on native; show app version in the profile FAB popup.
+//     Touches js/index.js, fab.js, js/shared/brand-config.js,
+//     journal.html, survival-kit.html — every old client must drop v23.
+const CACHE_NAME = 'bipolarbear-v24';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

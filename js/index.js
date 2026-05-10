@@ -290,6 +290,22 @@ const journalFeatures = [
           const _pdHint = document.getElementById('personalDetailsHint');
           if (_pdHint) _pdHint.style.display = 'none';
           window._fabOpenAuth = window.showAuthModal;
+          // Hide stats from a previous account when Firebase fires with no
+          // user (token expiry, sign-out via another tab, or just a signed-
+          // out visit). logout() already clears these on the in-app Sign Out
+          // path, but if the session lapsed without that hook running, the
+          // streak/anon badges otherwise display stale values from the
+          // last-signed-in account. Guests with their own guest-PIN
+          // localStorage data keep their badges — those are real local
+          // stats, not residue from a sync.
+          if (!BB.storage.get('GuestPinSalt')) {
+            const _jb = document.getElementById('journalStreakBadge');
+            if (_jb) _jb.style.display = 'none';
+            const _ab = document.getElementById('anonStreakBadge');
+            if (_ab) _ab.style.display = 'none';
+            const _amb = document.getElementById('anonMessagesBadge');
+            if (_amb) _amb.style.display = 'none';
+          }
           if (typeof window._applyFabDock === 'function') window._applyFabDock();
         }
       });
@@ -591,7 +607,32 @@ const journalFeatures = [
         }
       }
     }
-    _updateStreakBadge();
+    /**
+     * Synchronous test for "is/was there a Firebase user logged in here".
+     * Firebase v8 persists auth state under `firebase:authUser:<apiKey>:...`
+     * in localStorage; that key disappears on sign-out. We use it to skip
+     * the initial streak-badge render when the user is signed out, so the
+     * previous account's stats don't flash on screen before the (async)
+     * auth listener resolves and hides them.
+     */
+    function _hasCachedFbUser() {
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && k.indexOf('firebase:authUser:') === 0) {
+            const v = localStorage.getItem(k);
+            if (v && v !== 'null' && v.length > 5) return true;
+          }
+        }
+      } catch (_) {}
+      return false;
+    }
+    // Only render the cached streak/anon badges if the user is plausibly
+    // signed in, or is a real guest (has guest-PIN data of their own). The
+    // auth listener re-runs this once auth resolves.
+    if (_hasCachedFbUser() || BB.storage.get('GuestPinSalt')) {
+      _updateStreakBadge();
+    }
 
     /**
      * Recompute the journal streak by reading the user's entries collection
@@ -1269,9 +1310,11 @@ function _handleIndexJournalNav() {
     })();
 
     // ── What's New popup ──
-    const _APP_VERSION = '0.98';
-    window._APP_VERSION = _APP_VERSION;
+    // window._APP_VERSION is set in js/shared/brand-config.js so every page
+    // (and fab.js) reads the same value without depending on this script.
+    const _APP_VERSION = window._APP_VERSION;
     const _WHATS_NEW_HEADLINES = {
+      '0.99': 'Signed-out home no longer shows the previous account’s stats, and signed-in users skip the guest PIN gate',
       '0.98': 'Streaks, achievements & FAB dock now sync across your devices when you sign in',
       '0.97': 'Reminders & weekly summary now save instantly and sync across your devices',
       '0.89': 'Sign in & account management now shared across all pages — one place for everything',
@@ -1318,7 +1361,12 @@ function _handleIndexJournalNav() {
 // ── App-wide PIN lock (guest encryption PIN or native logged-in PIN) ──
     (function() {
       const _isNat = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
-      const hasGuestPin = !!BB.storage.get('GuestPinSalt');
+      // Signed-in users use account-derived encryption, not the guest PIN —
+      // a stale bbGuestPinSalt from a pre-sign-in guest session shouldn't
+      // gate them out of the home screen with an unenterable PIN dialog.
+      // The native app PIN (bbNativePinEnabled) is independent and still
+      // applies even when signed in.
+      const hasGuestPin = !_hasCachedFbUser() && !!BB.storage.get('GuestPinSalt');
       const hasNativePin = _isNat && BB.storage.get('NativePinEnabled') === '1';
       if (!hasGuestPin && !hasNativePin) return;
 
