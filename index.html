@@ -15,6 +15,7 @@
   <script src="js/shared/debug.js"></script>
   <script src="js/shared/firebase-config.js"></script>
   <script src="js/shared/onboarding.js"></script>
+  <script src="js/shared/i18n.js"></script>
   <meta name="description" content="Checkin with the Bear. Free mood journal and survival kit for people living with bipolar disorder. Track mood, energy, sleep and medication daily.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://www.bipolarbear.app/">
@@ -87,14 +88,14 @@
         <path d="M 12,20 Q 8,10 12,2" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" fill="none"/>
         <polyline points="7,6 12,1 17,6" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
       </svg>
-      <span id="logoHintText">🐻 psst… click me!</span>
+      <span id="logoHintText" data-i18n="home.logoHint">🐻 psst… click me!</span>
     </div>
 
     <div class="buttons">
       <div class="btn-container" id="journalContainer">
         <a href="journal.html" onclick="event.preventDefault(); localStorage.setItem('bbPrivacyNoteDismissed','1'); const _pn=document.getElementById('privacyNote'); if(_pn)_pn.style.display='none'; location.replace('journal.html')" class="btn btn-journal" id="journalBtn" style="position:relative;">
           <span class="icon">📔</span>
-          <span>Mood Journal</span>
+          <span data-i18n="nav.journal">Mood Journal</span>
           <span id="journalEntryTick" class="entry-tick" data-done="false">
             <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </span>
@@ -107,13 +108,13 @@
           <path d="M 12,20 Q 8,10 12,2" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" fill="none"/>
           <polyline points="7,6 12,1 17,6" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         </svg>
-        <span style="font-size:0.78em;font-weight:700;font-style:italic;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);white-space:nowrap;font-family:'Georgia',serif;letter-spacing:0.01em;">🐻 Click here to get started!</span>
+        <span style="font-size:0.78em;font-weight:700;font-style:italic;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);white-space:nowrap;font-family:'Georgia',serif;letter-spacing:0.01em;" data-i18n="home.journalHint">🐻 Click here to get started!</span>
       </div>
 
       <div class="btn-container" id="survivalContainer">
         <a href="survival-kit.html" onclick="event.preventDefault(); _advanceOnboardingStep(12); location.replace('survival-kit.html');" class="btn btn-survival" id="survivalBtn" style="position:relative;">
           <span class="icon">🆘</span>
-          <span>Your Survival Kit</span>
+          <span data-i18n="nav.survivalKit">Your Survival Kit</span>
           <span id="survivalTick" class="entry-tick" data-done="false">
             <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </span>
@@ -125,15 +126,15 @@
           <path d="M 12,20 Q 8,10 12,2" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" fill="none"/>
           <polyline points="7,6 12,1 17,6" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         </svg>
-        <span style="font-size:0.72em;font-weight:700;font-style:italic;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-family:'Georgia',serif;letter-spacing:0.01em;text-align:center;max-width:200px;line-height:1.4;">🐻 Click here to learn and share more about your bipolar</span>
+        <span style="font-size:0.72em;font-weight:700;font-style:italic;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-family:'Georgia',serif;letter-spacing:0.01em;text-align:center;max-width:200px;line-height:1.4;" data-i18n="home.survivalHint">🐻 Click here to learn and share more about your bipolar</span>
       </div>
 
       <div class="btn-container" id="anonymousContainer">
         <a href="anonymous.html" class="btn btn-anonymous locked" id="anonymousBtn">
           <span class="icon">💬</span>
-          <span>Bipolar Anonymous</span>
+          <span data-i18n="nav.anonymous">Bipolar Anonymous</span>
         </a>
-        <div id="anonymousSignInNote" class="btn-subnote-muted">Sign in to join the community</div>
+        <div id="anonymousSignInNote" class="btn-subnote-muted" data-i18n="home.signInNote">Sign in to join the community</div>
         <div id="anonMessagesBadge" class="btn-subnote"></div>
         <div id="anonStreakBadge" class="btn-subnote"></div>
       </div>
@@ -142,18 +143,18 @@
     <div class="features" id="features">
       <div class="feature">
         <div class="feature-icon">📈</div>
-        <div class="feature-title">Visual Insights</div>
-        <div class="feature-desc">See your mood patterns over time with charts</div>
+        <div class="feature-title" data-i18n="home.features.insightsTitle">Visual Insights</div>
+        <div class="feature-desc" data-i18n="home.features.insightsDesc">See your mood patterns over time with charts</div>
       </div>
       <div class="feature">
         <div class="feature-icon">🔒</div>
-        <div class="feature-title">Private & Secure</div>
-        <div class="feature-desc">Your data stays safe with you</div>
+        <div class="feature-title" data-i18n="home.features.privateTitle">Private & Secure</div>
+        <div class="feature-desc" data-i18n="home.features.privateDesc">Your data stays safe with you</div>
       </div>
       <div class="feature">
         <div class="feature-icon">🎯</div>
-        <div class="feature-title">Stay On Track</div>
-        <div class="feature-desc">Build healthy habits with streaks</div>
+        <div class="feature-title" data-i18n="home.features.trackTitle">Stay On Track</div>
+        <div class="feature-desc" data-i18n="home.features.trackDesc">Build healthy habits with streaks</div>
       </div>
     </div>
 
@@ -171,8 +172,8 @@
   <!-- Auth hint (shown at step 4: save progress) -->
   <div id="signinHint" style="display:none; position:fixed; bottom:76px; left:50%; transform:translateX(-50%); flex-direction:column; align-items:center; gap:4px; pointer-events:none; z-index:51;">
     <div id="signinHintInner" style="animation:signinHintPulse 1.6s ease-in-out infinite; display:flex; flex-direction:column; align-items:center; gap:4px;">
-      <span style="color:white; font-size:0.72em; text-shadow:0 1px 3px rgba(0,0,0,0.3);">Stored securely in Firebase</span>
-      <span id="signinHintLabel" class="fab-hint-label">🐻 Save your progress here</span>
+      <span style="color:white; font-size:0.72em; text-shadow:0 1px 3px rgba(0,0,0,0.3);" data-i18n="home.signinHintStored">Stored securely in Firebase</span>
+      <span id="signinHintLabel" class="fab-hint-label" data-i18n="home.signinHintLabel">🐻 Save your progress here</span>
       <svg width="16" height="18" viewBox="0 0 16 18" fill="none"><line x1="8" y1="1" x2="8" y2="14" stroke="rgba(255,255,255,0.85)" stroke-width="2" stroke-linecap="round"/><polyline points="3,9 8,15 13,9" stroke="rgba(255,255,255,0.85)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
     </div>
   </div>
@@ -189,8 +190,8 @@
         </div>
       </div>
       <div style="display:flex;gap:8px;margin-top:14px;">
-        <button onclick="_dismissWhatsNew()" style="flex:1;padding:10px;background:#f8f9fa;color:#6c757d;border:none;border-radius:10px;font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Got it</button>
-        <button onclick="_openFullChangelog()" style="flex:1;padding:10px;background:var(--brand-primary);color:white;border:none;border-radius:10px;font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Full changelog ↗</button>
+        <button onclick="_dismissWhatsNew()" style="flex:1;padding:10px;background:#f8f9fa;color:#6c757d;border:none;border-radius:10px;font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="home.whatsNew.gotIt">Got it</button>
+        <button onclick="_openFullChangelog()" style="flex:1;padding:10px;background:var(--brand-primary);color:white;border:none;border-radius:10px;font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="home.whatsNew.changelog">Full changelog ↗</button>
       </div>
     </div>
   </div>
@@ -199,20 +200,20 @@
   <div class="wa-modal" id="waModal" onclick="if(event.target===this)_closeWaModal();">
     <div class="wa-modal-box">
       <div style="font-size:2em;margin-bottom:12px;">💬</div>
-      <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:8px;">Join Bipolar Anonymous</div>
-      <p style="font-size:0.9em;color:#6c757d;line-height:1.5;margin-bottom:20px;">Would you like to join our WhatsApp group Bipolar Anonymous?</p>
+      <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:8px;" data-i18n="home.wa.title">Join Bipolar Anonymous</div>
+      <p style="font-size:0.9em;color:#6c757d;line-height:1.5;margin-bottom:20px;" data-i18n="home.wa.body">Would you like to join our WhatsApp group Bipolar Anonymous?</p>
       <div style="display:flex;flex-direction:column;gap:10px;">
         <a href="https://chat.whatsapp.com/Crsfo0x9u887tnTiQUpAvy" target="_blank" rel="noopener noreferrer"
           onclick="_closeWaModal(); localStorage.setItem('bbWaJoined','1');"
           style="display:block;padding:13px;background:#25D366;color:white;border-radius:12px;text-decoration:none;font-weight:700;font-size:0.95em;text-align:center;">
-          ✅ Join Group
+          <span data-i18n="home.wa.join">✅ Join Group</span>
         </a>
         <button onclick="_closeWaModal(); document.activeElement && document.activeElement.blur();"
-          style="padding:12px;background:white;color:#495057;border:2px solid #e9ecef;border-radius:12px;font-weight:600;font-size:0.95em;cursor:pointer;">
+          style="padding:12px;background:white;color:#495057;border:2px solid #e9ecef;border-radius:12px;font-weight:600;font-size:0.95em;cursor:pointer;" data-i18n="home.wa.cancel">
           Cancel
         </button>
         <button onclick="_showHidePermanently('wa')"
-          style="padding:10px;background:none;border:none;color:#6c757d;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+          style="padding:10px;background:none;border:none;color:#6c757d;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="home.wa.hide">
           🙈 Hide this button
         </button>
       </div>
@@ -223,23 +224,23 @@
   <!-- Personal Details Modal -->
   <div class="overlay-modal" id="personalDetailsModal" onclick="if(event.target===this)closePersonalDetailsModal()">
     <div class="modal-box" style="max-height:85dvh;overflow-y:auto;">
-      <h3 style="margin-bottom:8px;">👤 Personal Details</h3>
-      <p style="color:#6c757d;font-size:0.82em;margin-bottom:16px;font-style:italic;">All fields optional. Appears on exported PDF reports for your healthcare provider.</p>
+      <h3 style="margin-bottom:8px;" data-i18n="pd.title">👤 Personal Details</h3>
+      <p style="color:#6c757d;font-size:0.82em;margin-bottom:16px;font-style:italic;" data-i18n="pd.subtitle">All fields optional. Appears on exported PDF reports for your healthcare provider.</p>
       <div style="display:grid;gap:10px;">
-        <input type="text"  id="pdName"      placeholder="Name"                                       style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;">
-        <input type="text"  id="pdDOB"       placeholder="Date of Birth (e.g. 15 Jan 1990)"           style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;">
-        <input type="text"  id="pdMedNum"    placeholder="Medical # / NHS Number"                     style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;">
-        <input type="text"  id="pdDiagnosis" placeholder="Diagnosed as (e.g. Bipolar I, Bipolar II)"  style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;">
-        <input type="text"  id="pdDiagDate"  placeholder="Diagnosis Date (e.g. March 2020)"           style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;">
-        <input type="text"  id="pdAddress"   placeholder="Address"                                    style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;">
-        <input type="tel"   id="pdMobile"    placeholder="Mobile Number"                              style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;">
-        <input type="email" id="pdEmail"     placeholder="Email"                                      style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;">
-        <input type="text"  id="pdEmergency" placeholder="Emergency Contact (name & number)"          style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;">
-        <textarea           id="pdNotes"     placeholder="Notes (optional)" rows="3"                  style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;resize:vertical;font-family:inherit;"></textarea>
+        <input type="text"  id="pdName"      placeholder="Name"                                       style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;" data-i18n-placeholder="pd.name">
+        <input type="text"  id="pdDOB"       placeholder="Date of Birth (e.g. 15 Jan 1990)"           style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;" data-i18n-placeholder="pd.dob">
+        <input type="text"  id="pdMedNum"    placeholder="Medical # / NHS Number"                     style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;" data-i18n-placeholder="pd.medNum">
+        <input type="text"  id="pdDiagnosis" placeholder="Diagnosed as (e.g. Bipolar I, Bipolar II)"  style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;" data-i18n-placeholder="pd.diagnosis">
+        <input type="text"  id="pdDiagDate"  placeholder="Diagnosis Date (e.g. March 2020)"           style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;" data-i18n-placeholder="pd.diagDate">
+        <input type="text"  id="pdAddress"   placeholder="Address"                                    style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;" data-i18n-placeholder="pd.address">
+        <input type="tel"   id="pdMobile"    placeholder="Mobile Number"                              style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;" data-i18n-placeholder="pd.mobile">
+        <input type="email" id="pdEmail"     placeholder="Email"                                      style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;" data-i18n-placeholder="pd.email">
+        <input type="text"  id="pdEmergency" placeholder="Emergency Contact (name & number)"          style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;" data-i18n-placeholder="pd.emergency">
+        <textarea           id="pdNotes"     placeholder="Notes (optional)" rows="3"                  style="padding:8px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;resize:vertical;font-family:inherit;" data-i18n-placeholder="pd.notes"></textarea>
       </div>
       <div style="display:flex;gap:10px;margin-top:20px;">
-        <button onclick="savePersonalDetails()" style="flex:1;padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;">Save</button>
-        <button onclick="closePersonalDetailsModal()" style="padding:12px 18px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;cursor:pointer;">Close</button>
+        <button onclick="savePersonalDetails()" style="flex:1;padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;" data-i18n="common.save">Save</button>
+        <button onclick="closePersonalDetailsModal()" style="padding:12px 18px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;cursor:pointer;" data-i18n="common.close">Close</button>
       </div>
     </div>
   </div>
@@ -274,16 +275,16 @@
   <div id="guestPinOverlay" style="display:none;position:fixed;inset:0;background:linear-gradient(135deg,var(--brand-primary-light) 0%,var(--brand-primary-mid) 100%);z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:24px;">
     <img src="icons/AppIcon.png" width="72" height="72" style="border-radius:18px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
     <h2 style="color:white;margin-bottom:6px;font-size:1.3em;">Bipolar Bear</h2>
-    <p style="color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-size:0.88em;margin-bottom:12px;">Enter your PIN to continue</p>
-    <button onclick="document.getElementById('pinE2eeModal').style.display='flex'" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:white;border-radius:20px;padding:5px 14px;font-size:0.78em;cursor:pointer;margin-bottom:22px;-webkit-tap-highlight-color:transparent;">🔐 More info</button>
+    <p style="color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-size:0.88em;margin-bottom:12px;" data-i18n="pin.title">Enter your PIN to continue</p>
+    <button onclick="document.getElementById('pinE2eeModal').style.display='flex'" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:white;border-radius:20px;padding:5px 14px;font-size:0.78em;cursor:pointer;margin-bottom:22px;-webkit-tap-highlight-color:transparent;" data-i18n="pin.moreInfo">🔐 More info</button>
     <!-- E2EE info sub-modal (inside overlay so z-index works automatically) -->
     <div id="pinE2eeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:10001;align-items:center;justify-content:center;padding:24px;" onclick="if(event.target===this)this.style.display='none'">
       <div style="background:white;border-radius:20px;padding:24px;max-width:300px;width:100%;text-align:left;box-shadow:0 10px 40px rgba(0,0,0,0.25);">
-        <div style="font-weight:700;color:#212529;margin-bottom:12px;font-size:1em;text-align:center;">🔐 Why is there a PIN?</div>
+        <div style="font-weight:700;color:#212529;margin-bottom:12px;font-size:1em;text-align:center;" data-i18n="pin.whyTitle">🔐 Why is there a PIN?</div>
         <p style="font-size:0.85em;color:#495057;line-height:1.6;margin-bottom:10px;">Your journal entries are <strong>end-to-end encrypted</strong> — scrambled before they leave your device. Only you can read them. Not even we can.</p>
         <p style="font-size:0.85em;color:#495057;line-height:1.6;margin-bottom:10px;">Think of it like a locked diary that only unlocks with your combination — your <strong>password + PIN together</strong> form that key.</p>
         <p style="font-size:0.85em;color:#495057;line-height:1.6;margin-bottom:16px;">For personal and mental health data, this level of privacy really matters. Your entries stay private, always.</p>
-        <button onclick="document.getElementById('pinE2eeModal').style.display='none'" style="width:100%;padding:11px;background:var(--brand-primary);color:white;border:none;border-radius:12px;font-weight:700;cursor:pointer;font-size:0.9em;">Got it</button>
+        <button onclick="document.getElementById('pinE2eeModal').style.display='none'" style="width:100%;padding:11px;background:var(--brand-primary);color:white;border:none;border-radius:12px;font-weight:700;cursor:pointer;font-size:0.9em;" data-i18n="pin.gotIt">Got it</button>
       </div>
     </div>
     <div id="idxPinDots" style="display:flex;gap:12px;margin-bottom:24px;">
@@ -307,12 +308,12 @@
       <button onclick="idxPinKey('0')" style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.2);border:none;color:white;font-size:1.5em;font-weight:600;cursor:pointer;">0</button>
       <button onclick="idxPinDel()" style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.2);border:none;color:white;font-size:1.2em;cursor:pointer;">⌫</button>
     </div>
-    <button onclick="idxPinForgot()" style="background:none;border:none;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-size:0.78em;cursor:pointer;margin-top:8px;padding:4px 12px;text-decoration:underline;">Forgot PIN?</button>
+    <button onclick="idxPinForgot()" style="background:none;border:none;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-size:0.78em;cursor:pointer;margin-top:8px;padding:4px 12px;text-decoration:underline;" data-i18n="pin.forgot">Forgot PIN?</button>
   </div>
 
   <!-- Screen dimmer: fades in after 3 min idle on PIN page to save battery -->
   <div id="pinSleepOverlay" style="display:none;position:fixed;inset:0;background:#000;z-index:10002;align-items:center;justify-content:center;cursor:pointer;" onclick="_wakePinDimmer()">
-    <span style="color:rgba(255,255,255,0.55);font-size:0.85em;user-select:none;">Tap to wake</span>
+    <span style="color:rgba(255,255,255,0.55);font-size:0.85em;user-select:none;" data-i18n="pin.tapToWake">Tap to wake</span>
   </div>
 
   

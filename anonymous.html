@@ -19,6 +19,7 @@
   <script src="js/shared/platform.js"></script>
   <script src="js/shared/debug.js"></script>
   <script src="js/shared/firebase-config.js"></script>
+  <script src="js/shared/i18n.js"></script>
   <link rel="stylesheet" href="css/theme.css">
   <link rel="stylesheet" href="css/anonymous.css">
 </head>
@@ -32,22 +33,22 @@
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <div id="screen-verify" class="screen">
   <div class="onboard-bg">
-    <button id="verify-back-btn" class="board-back-btn" onclick="_goHome()" style="display:none;align-self:flex-start;margin-bottom:20px;">← Home</button>
+    <button id="verify-back-btn" class="board-back-btn" onclick="_goHome()" style="display:none;align-self:flex-start;margin-bottom:20px;" data-i18n="anon.verify.back">← Home</button>
     <div class="onboard-logo">
       <img src="icons/AppIcon_anonymous.png" alt="Bipolar Anonymous">
       <h1>BipolarBear</h1>
       <p>Anonymous</p>
     </div>
     <div class="card">
-      <div class="card-title">Welcome 👋</div>
-      <div class="card-sub">Verify your email to join the community. Your identity stays private — we'll never share it.</div>
+      <div class="card-title" data-i18n="anon.verify.welcome">Welcome 👋</div>
+      <div class="card-sub" data-i18n="anon.verify.sub">Verify your email to join the community. Your identity stays private — we'll never share it.</div>
 
       <!-- Shared error display for both steps -->
       <div id="verify-error" style="display:none;margin-bottom:12px;padding:10px 14px;background:rgba(220,53,69,0.08);border:1.5px solid rgba(220,53,69,0.25);border-radius:10px;font-size:13px;color:#dc3545;line-height:1.45;"></div>
 
       <div id="step-email">
         <input id="email-input" type="email" class="bb-input" placeholder="your@email.com" autocomplete="email">
-        <button id="send-code-btn" class="btn-primary" disabled>Send Verification Code</button>
+        <button id="send-code-btn" class="btn-primary" disabled data-i18n="anon.verify.sendCode">Send Verification Code</button>
       </div>
 
       <div id="step-code" style="display:none">
@@ -58,10 +59,10 @@
           <input class="code-box" type="tel" maxlength="1" inputmode="numeric">
           <input class="code-box" type="tel" maxlength="1" inputmode="numeric">
         </div>
-        <button id="verify-btn" class="btn-primary" disabled>Verify →</button>
+        <button id="verify-btn" class="btn-primary" disabled data-i18n="anon.verify.verify">Verify →</button>
         <div style="display:flex;justify-content:space-between;margin-top:14px;">
-          <button id="back-to-email-btn" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;">← Change email</button>
-          <button id="resend-btn" style="background:none;border:none;color:var(--yellow-dark);font-size:13px;font-weight:700;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;text-decoration:underline;">Resend code</button>
+          <button id="back-to-email-btn" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;" data-i18n="anon.verify.changeEmail">← Change email</button>
+          <button id="resend-btn" style="background:none;border:none;color:var(--yellow-dark);font-size:13px;font-weight:700;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;text-decoration:underline;" data-i18n="anon.verify.resend">Resend code</button>
         </div>
       </div>
     </div>
@@ -73,24 +74,24 @@
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <div id="screen-monika" class="screen">
   <div class="onboard-bg">
-    <button id="monika-back-btn" class="board-back-btn" onclick="_goHome()" style="display:none;align-self:flex-start;margin-bottom:20px;">← Home</button>
+    <button id="monika-back-btn" class="board-back-btn" onclick="_goHome()" style="display:none;align-self:flex-start;margin-bottom:20px;" data-i18n="anon.verify.back">← Home</button>
     <div class="card">
       <div class="card-icon">✅</div>
-      <div class="card-title center">Email Verified!</div>
-      <div class="card-sub center">Now choose your <strong>Monika</strong> — your anonymous community name. Max 10 characters.</div>
+      <div class="card-title center" data-i18n="anon.monika.verified">Email Verified!</div>
+      <div class="card-sub center" data-i18n-html="anon.monika.chooseSub">Now choose your <strong>Monika</strong> — your anonymous community name. Max 10 characters.</div>
       <div class="input-wrap">
-        <input id="monika-input" type="text" class="bb-input" placeholder="e.g. SunnyDaze" maxlength="10">
+        <input id="monika-input" type="text" class="bb-input" placeholder="e.g. SunnyDaze" maxlength="10" data-i18n-placeholder="anon.monika.placeholder">
         <span class="input-counter" id="monika-counter">0/10</span>
       </div>
       <div class="monika-preview" id="monika-preview">
         <div class="avatar" id="monika-av"></div>
         <div>
           <div style="font-size:13px;font-weight:700;color:var(--dark);" id="monika-preview-name"></div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px;">Your posts will look like this</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;" data-i18n="anon.monika.postPreview">Your posts will look like this</div>
         </div>
       </div>
       <div id="monika-error" style="display:none;margin-bottom:12px;padding:10px 14px;background:rgba(220,53,69,0.08);border:1.5px solid rgba(220,53,69,0.25);border-radius:10px;font-size:13px;color:#dc3545;line-height:1.45;"></div>
-      <button id="monika-btn" class="btn-primary" disabled>That's me →</button>
+      <button id="monika-btn" class="btn-primary" disabled data-i18n="anon.monika.btn">That's me →</button>
     </div>
   </div>
 </div>
@@ -102,20 +103,20 @@
   <div class="onboard-bg">
     <div class="card">
       <div class="card-icon">💊</div>
-      <div class="card-title center">Medication Visibility</div>
-      <div class="card-sub center">Would you like to show your current medication alongside your posts? You can change this anytime in settings.</div>
+      <div class="card-title center" data-i18n="anon.meds.title">Medication Visibility</div>
+      <div class="card-sub center" data-i18n="anon.meds.sub">Would you like to show your current medication alongside your posts? You can change this anytime in settings.</div>
       <button class="med-opt" id="meds-yes">
         <span class="med-opt-icon">✅</span>
         <div>
-          <div class="med-opt-label">Yes, show my medication</div>
-          <div class="med-opt-sub">Others can see your current med — helps people feel less alone</div>
+          <div class="med-opt-label" data-i18n="anon.meds.yesLabel">Yes, show my medication</div>
+          <div class="med-opt-sub" data-i18n="anon.meds.yesSub">Others can see your current med — helps people feel less alone</div>
         </div>
       </button>
       <button class="med-opt" id="meds-no">
         <span class="med-opt-icon">🔒</span>
         <div>
-          <div class="med-opt-label">No, keep it private</div>
-          <div class="med-opt-sub">Only your Monika &amp; streak will show</div>
+          <div class="med-opt-label" data-i18n="anon.meds.noLabel">No, keep it private</div>
+          <div class="med-opt-sub" data-i18n="anon.meds.noSub">Only your Monika &amp; streak will show</div>
         </div>
       </button>
     </div>
@@ -129,16 +130,16 @@
   <div class="onboard-bg">
     <div class="card">
       <div class="card-icon">💊</div>
-      <div class="card-title center">Your Medication</div>
-      <div id="med-define-sub" class="card-sub center">Add your current medications. Only the name will be visible on posts — dosage stays private.</div>
+      <div class="card-title center" data-i18n="anon.medDefine.title">Your Medication</div>
+      <div id="med-define-sub" class="card-sub center" data-i18n="anon.medDefine.sub">Add your current medications. Only the name will be visible on posts — dosage stays private.</div>
       <div id="anon-med-list-wrap" style="min-height:36px;margin-bottom:10px;"></div>
       <div class="med-input-row">
-        <input id="anon-med-name" type="text" class="bb-input" placeholder="Medication name" autocomplete="off">
-        <input id="anon-med-dose" type="text" class="bb-input" placeholder="Dosage (optional)" autocomplete="off">
+        <input id="anon-med-name" type="text" class="bb-input" placeholder="Medication name" autocomplete="off" data-i18n-placeholder="anon.medDefine.namePlaceholder">
+        <input id="anon-med-dose" type="text" class="bb-input" placeholder="Dosage (optional)" autocomplete="off" data-i18n-placeholder="anon.medDefine.dosePlaceholder">
       </div>
-      <button id="anon-med-add" class="btn-outline" style="width:100%;margin-bottom:20px;">+ Add</button>
-      <button id="anon-med-continue" class="btn-primary">Continue →</button>
-      <button id="anon-med-skip" style="background:none;border:none;color:var(--muted);font-size:13px;margin-top:12px;cursor:pointer;width:100%;padding:8px;font-family:inherit;">Skip for now</button>
+      <button id="anon-med-add" class="btn-outline" style="width:100%;margin-bottom:20px;" data-i18n="anon.medDefine.addBtn">+ Add</button>
+      <button id="anon-med-continue" class="btn-primary" data-i18n="anon.medDefine.continueBtn">Continue →</button>
+      <button id="anon-med-skip" style="background:none;border:none;color:var(--muted);font-size:13px;margin-top:12px;cursor:pointer;width:100%;padding:8px;font-family:inherit;" data-i18n="anon.medDefine.skipBtn">Skip for now</button>
     </div>
   </div>
 </div>
@@ -160,8 +161,8 @@
       <button id="board-user-pill" onclick="openMonikaSettings()" title="Your monika settings" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:20px;transition:background 0.15s;" onmouseenter="this.style.background='rgba(255,255,255,0.15)'" onmouseleave="this.style.background='none'"></button>
     </div>
     <div class="board-tabs">
-      <button class="board-tab" id="tab-ann" data-tab="announcements">📢 Announcements</button>
-      <button class="board-tab active" id="tab-gen" data-tab="general">💬 General</button>
+      <button class="board-tab" id="tab-ann" data-tab="announcements" data-i18n="anon.board.announcements">📢 Announcements</button>
+      <button class="board-tab active" id="tab-gen" data-tab="general" data-i18n="anon.board.general">💬 General</button>
     </div>
   </div>
 
@@ -188,10 +189,10 @@
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <div id="ov-compose" class="overlay hidden">
   <div class="sheet">
-    <textarea id="compose-ta" class="compose-ta" placeholder="Share with the community…" rows="4"></textarea>
+    <textarea id="compose-ta" class="compose-ta" placeholder="Share with the community…" rows="4" data-i18n-placeholder="anon.compose.placeholder"></textarea>
     <div class="btn-row">
-      <button class="btn-secondary" id="compose-cancel" style="flex:1">Cancel</button>
-      <button class="btn-primary"   id="compose-post"   style="flex:2" disabled>Post 🐻</button>
+      <button class="btn-secondary" id="compose-cancel" style="flex:1" data-i18n="anon.compose.cancel">Cancel</button>
+      <button class="btn-primary"   id="compose-post"   style="flex:2" disabled data-i18n="anon.compose.post">Post 🐻</button>
     </div>
   </div>
 </div>
@@ -202,10 +203,10 @@
 <div id="ov-firstpost" class="overlay hidden">
   <div class="sheet">
     <div class="sheet-icon">🎉</div>
-    <div class="sheet-title" style="font-size:20px;font-weight:800;">Thanks for posting!</div>
-    <div class="sheet-sub">Your post is now live for the community. Keep being you 💛</div>
-    <button class="btn-primary" id="fp-yes" style="margin-bottom:8px;">Awesome 🐻</button>
-    <button class="btn-secondary" id="fp-no" style="width:100%;">Close</button>
+    <div class="sheet-title" style="font-size:20px;font-weight:800;" data-i18n="anon.firstPost.title">Thanks for posting!</div>
+    <div class="sheet-sub" data-i18n="anon.firstPost.sub">Your post is now live for the community. Keep being you 💛</div>
+    <button class="btn-primary" id="fp-yes" style="margin-bottom:8px;" data-i18n="anon.firstPost.awesome">Awesome 🐻</button>
+    <button class="btn-secondary" id="fp-no" style="width:100%;" data-i18n="anon.firstPost.close">Close</button>
   </div>
 </div>
 
@@ -215,11 +216,11 @@
 <div id="ov-sos" class="overlay hidden">
   <div class="sheet">
     <div class="sheet-icon">🆘</div>
-    <div class="sheet-title">Send SOS Flag</div>
-    <div class="sheet-sub" id="sos-body">Are you worried about this user? A moderator will be notified to check in. Only use this if genuinely concerned.</div>
+    <div class="sheet-title" data-i18n="anon.sos.title">Send SOS Flag</div>
+    <div class="sheet-sub" id="sos-body" data-i18n="anon.sos.body">Are you worried about this user? A moderator will be notified to check in. Only use this if genuinely concerned.</div>
     <div class="btn-row">
-      <button class="btn-secondary" id="sos-cancel"  style="flex:1">Cancel</button>
-      <button class="btn-danger"    id="sos-confirm">Send SOS 🆘</button>
+      <button class="btn-secondary" id="sos-cancel"  style="flex:1" data-i18n="anon.sos.cancel">Cancel</button>
+      <button class="btn-danger"    id="sos-confirm" data-i18n="anon.sos.confirm">Send SOS 🆘</button>
     </div>
   </div>
 </div>
@@ -230,13 +231,13 @@
 <div id="ov-report" class="overlay hidden">
   <div class="sheet">
     <div class="sheet-icon">🚨</div>
-    <div class="sheet-title">Report this post?</div>
-    <div class="sheet-sub">Why are you reporting this?</div>
-    <button class="report-opt" data-reason="Unkind or rude">Unkind or rude</button>
-    <button class="report-opt" data-reason="Misinformation">Misinformation</button>
-    <button class="report-opt" data-reason="Spam">Spam</button>
-    <button class="report-opt" data-reason="Other">Other concern</button>
-    <div class="sheet-note">Bans are temporary — everyone deserves another chance 💛</div>
+    <div class="sheet-title" data-i18n="anon.report.title">Report this post?</div>
+    <div class="sheet-sub" data-i18n="anon.report.why">Why are you reporting this?</div>
+    <button class="report-opt" data-reason="Unkind or rude" data-i18n="anon.report.unkind">Unkind or rude</button>
+    <button class="report-opt" data-reason="Misinformation" data-i18n="anon.report.misinfo">Misinformation</button>
+    <button class="report-opt" data-reason="Spam" data-i18n="anon.report.spam">Spam</button>
+    <button class="report-opt" data-reason="Other" data-i18n="anon.report.other">Other concern</button>
+    <div class="sheet-note" data-i18n="anon.report.note">Bans are temporary — everyone deserves another chance 💛</div>
   </div>
 </div>
 
@@ -246,13 +247,13 @@
 <div id="ov-e2ee" class="overlay hidden">
   <div class="sheet">
     <div class="sheet-icon">🔒</div>
-    <div class="sheet-title" style="font-size:20px;font-weight:800;">End-to-End Encrypted</div>
-    <div class="sheet-sub">BipolarBear Anonymous is built with your privacy at its core:</div>
-    <div class="e2ee-row"><span class="e2ee-row-icon">🔐</span><div><div class="e2ee-row-title">Messages are encrypted</div><div class="e2ee-row-sub">Only community members can read posts — no third parties, ever.</div></div></div>
-    <div class="e2ee-row"><span class="e2ee-row-icon">👤</span><div><div class="e2ee-row-title">No identity stored</div><div class="e2ee-row-sub">Your email is verified then discarded. Your Monika is all we hold.</div></div></div>
-    <div class="e2ee-row"><span class="e2ee-row-icon">🚫</span><div><div class="e2ee-row-title">Zero data selling</div><div class="e2ee-row-sub">We will never sell, share or monetise your data.</div></div></div>
-    <div class="e2ee-row"><span class="e2ee-row-icon">🛡️</span><div><div class="e2ee-row-title">Secure by design</div><div class="e2ee-row-sub">Built on industry-standard encryption protocols from the ground up.</div></div></div>
-    <button class="btn-primary" onclick="closeOv('ov-e2ee')" style="margin-top:6px;">Got it 👍</button>
+    <div class="sheet-title" style="font-size:20px;font-weight:800;" data-i18n="anon.e2ee.title">End-to-End Encrypted</div>
+    <div class="sheet-sub" data-i18n="anon.e2ee.sub">BipolarBear Anonymous is built with your privacy at its core:</div>
+    <div class="e2ee-row"><span class="e2ee-row-icon">🔐</span><div><div class="e2ee-row-title" data-i18n="anon.e2ee.messagesTitle">Messages are encrypted</div><div class="e2ee-row-sub" data-i18n="anon.e2ee.messagesSub">Only community members can read posts — no third parties, ever.</div></div></div>
+    <div class="e2ee-row"><span class="e2ee-row-icon">👤</span><div><div class="e2ee-row-title" data-i18n="anon.e2ee.identityTitle">No identity stored</div><div class="e2ee-row-sub" data-i18n="anon.e2ee.identitySub">Your email is verified then discarded. Your Monika is all we hold.</div></div></div>
+    <div class="e2ee-row"><span class="e2ee-row-icon">🚫</span><div><div class="e2ee-row-title" data-i18n="anon.e2ee.noSellTitle">Zero data selling</div><div class="e2ee-row-sub" data-i18n="anon.e2ee.noSellSub">We will never sell, share or monetise your data.</div></div></div>
+    <div class="e2ee-row"><span class="e2ee-row-icon">🛡️</span><div><div class="e2ee-row-title" data-i18n="anon.e2ee.secureTitle">Secure by design</div><div class="e2ee-row-sub" data-i18n="anon.e2ee.secureSub">Built on industry-standard encryption protocols from the ground up.</div></div></div>
+    <button class="btn-primary" onclick="closeOv('ov-e2ee')" style="margin-top:6px;" data-i18n="anon.e2ee.gotIt">Got it 👍</button>
   </div>
 </div>
 
@@ -262,25 +263,25 @@
 <div id="ov-monika" class="overlay hidden">
   <div class="sheet">
     <div class="sheet-icon">🐻</div>
-    <div class="sheet-title">Your Monika</div>
+    <div class="sheet-title" data-i18n="anon.monikaSettings.title">Your Monika</div>
 
-    <span class="sheet-label">Monika Name</span>
+    <span class="sheet-label" data-i18n="anon.monikaSettings.monikaName">Monika Name</span>
     <div class="input-wrap" style="margin-bottom:16px;">
       <input id="ms-monika" type="text" class="bb-input" maxlength="10" style="margin-bottom:0;">
       <span class="input-counter" id="ms-monika-counter">0/10</span>
     </div>
 
-    <span class="sheet-label">Initials (2 letters, leave blank for auto)</span>
-    <input id="ms-initials" type="text" class="bb-input" maxlength="2" placeholder="Auto" style="text-transform:uppercase;">
+    <span class="sheet-label" data-i18n="anon.monikaSettings.initials">Initials (2 letters, leave blank for auto)</span>
+    <input id="ms-initials" type="text" class="bb-input" maxlength="2" placeholder="Auto" style="text-transform:uppercase;" data-i18n-placeholder="anon.monikaSettings.initialsPlaceholder">
 
-    <span class="sheet-label">Avatar Colour</span>
+    <span class="sheet-label" data-i18n="anon.monikaSettings.color">Avatar Colour</span>
     <div id="ms-colors" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;"></div>
 
     <div id="ms-preview" style="display:flex;align-items:center;gap:10px;background:var(--yellow-bg);border-radius:12px;padding:12px 14px;margin-bottom:16px;">
       <div id="ms-av" class="avatar"></div>
       <div>
         <div id="ms-av-name" style="font-size:13px;font-weight:700;color:var(--dark);"></div>
-        <div style="font-size:11px;color:var(--muted);margin-top:2px;">Preview</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;" data-i18n="anon.monikaSettings.preview">Preview</div>
       </div>
     </div>
 
@@ -294,8 +295,8 @@
     <button id="ms-med-btn" style="width:100%;text-align:left;background:var(--yellow-bg);border:1.5px solid rgba(245,200,0,0.18);border-radius:12px;padding:11px 14px;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;gap:10px;font-family:inherit;">
       <span style="font-size:20px;">💊</span>
       <div style="flex:1;">
-        <div style="font-size:13px;font-weight:700;color:var(--dark);">Medication</div>
-        <div id="ms-med-status" style="font-size:11px;color:var(--muted);margin-top:1px;">Loading…</div>
+        <div style="font-size:13px;font-weight:700;color:var(--dark);" data-i18n="anon.monikaSettings.medication">Medication</div>
+        <div id="ms-med-status" style="font-size:11px;color:var(--muted);margin-top:1px;" data-i18n="anon.monikaSettings.loading">Loading…</div>
       </div>
       <span style="color:var(--muted);font-size:16px;font-weight:300;">›</span>
     </button>
@@ -304,21 +305,21 @@
     <button id="ms-stable-btn" style="width:100%;text-align:left;background:var(--yellow-bg);border:1.5px solid rgba(245,200,0,0.18);border-radius:12px;padding:11px 14px;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-family:inherit;">
       <span style="font-size:20px;">🧘</span>
       <div style="flex:1;">
-        <div style="font-size:13px;font-weight:700;color:var(--dark);">Stability Counter</div>
-        <div id="ms-stable-status" style="font-size:11px;color:var(--muted);margin-top:1px;">Loading…</div>
+        <div style="font-size:13px;font-weight:700;color:var(--dark);" data-i18n="anon.monikaSettings.stability">Stability Counter</div>
+        <div id="ms-stable-status" style="font-size:11px;color:var(--muted);margin-top:1px;" data-i18n="anon.monikaSettings.loading">Loading…</div>
       </div>
       <span style="color:var(--muted);font-size:16px;font-weight:300;">›</span>
     </button>
 
     <div class="btn-row" style="margin-bottom:10px;">
-      <button class="btn-secondary" id="ms-cancel" style="flex:1;">Cancel</button>
-      <button class="btn-primary"   id="ms-save"   style="flex:2;">Save Changes ✓</button>
+      <button class="btn-secondary" id="ms-cancel" style="flex:1;" data-i18n="anon.monikaSettings.cancel">Cancel</button>
+      <button class="btn-primary"   id="ms-save"   style="flex:2;" data-i18n="anon.monikaSettings.save">Save Changes ✓</button>
     </div>
-    <button class="btn-secondary" id="ms-home" style="width:100%;text-align:center;">← Back to Bipolar Bear</button>
+    <button class="btn-secondary" id="ms-home" style="width:100%;text-align:center;" data-i18n="anon.monikaSettings.back">← Back to Bipolar Bear</button>
     <!-- Standalone-only: sign out clears the email-code session. Hidden
          when the user signed in via the BipolarBear app — they sign out
          from the main app instead. -->
-    <button id="ms-signout" style="display:none;width:100%;margin-top:10px;background:transparent;color:#dc3545;border:1.5px solid rgba(220,53,69,0.35);border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Sign Out</button>
+    <button id="ms-signout" style="display:none;width:100%;margin-top:10px;background:transparent;color:#dc3545;border:1.5px solid rgba(220,53,69,0.35);border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;" data-i18n="anon.monikaSettings.signOut">Sign Out</button>
   </div>
 </div>
 
@@ -328,30 +329,30 @@
 <div id="ov-med" class="overlay hidden">
   <div class="sheet">
     <div class="sheet-icon">💊</div>
-    <div class="sheet-title">Your Medication</div>
+    <div class="sheet-title" data-i18n="anon.medOv.title">Your Medication</div>
 
-    <span class="sheet-label">Visibility on posts</span>
+    <span class="sheet-label" data-i18n="anon.medOv.visibility">Visibility on posts</span>
     <div style="display:flex;gap:8px;margin-bottom:18px;">
-      <button id="med-ov-show" class="med-toggle-btn">✅ Show on posts</button>
-      <button id="med-ov-hide" class="med-toggle-btn">🔒 Private</button>
+      <button id="med-ov-show" class="med-toggle-btn" data-i18n="anon.medOv.showOnPosts">✅ Show on posts</button>
+      <button id="med-ov-hide" class="med-toggle-btn" data-i18n="anon.medOv.private">🔒 Private</button>
     </div>
 
-    <span class="sheet-label">Your Medications</span>
+    <span class="sheet-label" data-i18n="anon.medOv.yourMeds">Your Medications</span>
     <div id="med-ov-list" style="min-height:32px;margin-bottom:10px;"></div>
 
     <div class="med-input-row">
-      <input id="med-ov-name" type="text" class="bb-input" placeholder="Medication name" autocomplete="off">
-      <input id="med-ov-dose" type="text" class="bb-input" placeholder="Dosage (optional)" autocomplete="off">
+      <input id="med-ov-name" type="text" class="bb-input" placeholder="Medication name" autocomplete="off" data-i18n-placeholder="anon.medOv.namePlaceholder">
+      <input id="med-ov-dose" type="text" class="bb-input" placeholder="Dosage (optional)" autocomplete="off" data-i18n-placeholder="anon.medOv.dosePlaceholder">
     </div>
-    <button id="med-ov-add" class="btn-outline" style="width:100%;margin-bottom:18px;">+ Add</button>
+    <button id="med-ov-add" class="btn-outline" style="width:100%;margin-bottom:18px;" data-i18n="anon.medOv.add">+ Add</button>
 
-    <div id="med-ov-bb-note" style="display:none;font-size:12px;color:var(--muted);background:var(--yellow-bg);border-radius:8px;padding:8px 10px;margin-bottom:14px;line-height:1.5;">
+    <div id="med-ov-bb-note" style="display:none;font-size:12px;color:var(--muted);background:var(--yellow-bg);border-radius:8px;padding:8px 10px;margin-bottom:14px;line-height:1.5;" data-i18n="anon.medOv.bbNote">
       💡 You're signed in to BipolarBear — saving will also update your medication in the main app.
     </div>
 
     <div class="btn-row">
-      <button class="btn-secondary" id="med-ov-cancel" style="flex:1;">Cancel</button>
-      <button class="btn-primary"   id="med-ov-save"   style="flex:2;">Save ✓</button>
+      <button class="btn-secondary" id="med-ov-cancel" style="flex:1;" data-i18n="anon.medOv.cancel">Cancel</button>
+      <button class="btn-primary"   id="med-ov-save"   style="flex:2;" data-i18n="anon.medOv.save">Save ✓</button>
     </div>
   </div>
 </div>
@@ -362,32 +363,32 @@
 <div id="ov-stable" class="overlay hidden">
   <div class="sheet">
     <div class="sheet-icon">🧘</div>
-    <div class="sheet-title">Stability Counter</div>
+    <div class="sheet-title" data-i18n="anon.stableOv.title">Stability Counter</div>
 
-    <span class="sheet-label">Visibility on posts</span>
+    <span class="sheet-label" data-i18n="anon.stableOv.visibility">Visibility on posts</span>
     <div style="display:flex;gap:8px;margin-bottom:18px;">
-      <button id="stable-ov-show" class="med-toggle-btn">✅ Show on posts</button>
-      <button id="stable-ov-hide" class="med-toggle-btn">🔒 Private</button>
+      <button id="stable-ov-show" class="med-toggle-btn" data-i18n="anon.stableOv.showOnPosts">✅ Show on posts</button>
+      <button id="stable-ov-hide" class="med-toggle-btn" data-i18n="anon.stableOv.private">🔒 Private</button>
     </div>
 
     <!-- BB App users: streak computed automatically from journal -->
     <div id="stable-ov-bb-section" style="display:none;">
       <div style="background:var(--yellow-bg);border-radius:10px;padding:12px 14px;margin-bottom:14px;line-height:1.6;">
         <div style="font-size:13px;font-weight:700;color:var(--dark);margin-bottom:4px;">🧘 <span id="stable-ov-bb-count">0</span> consecutive stable days</div>
-        <div style="font-size:12px;color:var(--muted);">Automatically calculated from your BipolarBear journal — consecutive days where you logged Stable mood up to your most recent entry.</div>
+        <div style="font-size:12px;color:var(--muted);" data-i18n="anon.stableOv.bbAuto">Automatically calculated from your BipolarBear journal — consecutive days where you logged Stable mood up to your most recent entry.</div>
       </div>
     </div>
 
     <!-- Standalone users: manual "stable since" date -->
     <div id="stable-ov-manual-section" style="display:none;">
-      <span class="sheet-label">Stable since</span>
+      <span class="sheet-label" data-i18n="anon.stableOv.stableSince">Stable since</span>
       <input id="stable-ov-date" type="date" class="bb-input" style="margin-bottom:6px;">
-      <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">Enter the date your current stable period started. Your counter will show days since that date.</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:16px;" data-i18n="anon.stableOv.stableSinceDesc">Enter the date your current stable period started. Your counter will show days since that date.</div>
     </div>
 
     <div class="btn-row">
-      <button class="btn-secondary" id="stable-ov-cancel" style="flex:1;">Cancel</button>
-      <button class="btn-primary"   id="stable-ov-save"   style="flex:2;">Save ✓</button>
+      <button class="btn-secondary" id="stable-ov-cancel" style="flex:1;" data-i18n="anon.stableOv.cancel">Cancel</button>
+      <button class="btn-primary"   id="stable-ov-save"   style="flex:2;" data-i18n="anon.stableOv.save">Save ✓</button>
     </div>
   </div>
 </div>
@@ -398,11 +399,11 @@
 <div id="ov-self-delete" class="overlay hidden">
   <div class="sheet">
     <div class="sheet-icon">🗑️</div>
-    <div class="sheet-title">Remove your post?</div>
-    <div class="sheet-sub">This will permanently delete your post. This can't be undone.</div>
+    <div class="sheet-title" data-i18n="anon.selfDelete.title">Remove your post?</div>
+    <div class="sheet-sub" data-i18n="anon.selfDelete.sub">This will permanently delete your post. This can't be undone.</div>
     <div class="btn-row">
-      <button class="btn-secondary" id="sdel-cancel" style="flex:1;">Keep it</button>
-      <button class="btn-danger"    id="sdel-confirm">Remove post</button>
+      <button class="btn-secondary" id="sdel-cancel" style="flex:1;" data-i18n="anon.selfDelete.keep">Keep it</button>
+      <button class="btn-danger"    id="sdel-confirm" data-i18n="anon.selfDelete.remove">Remove post</button>
     </div>
   </div>
 </div>
@@ -413,11 +414,11 @@
 <div id="ov-admin-delete" class="overlay hidden">
   <div class="sheet">
     <div class="sheet-icon">🛡️</div>
-    <div class="sheet-title">Delete Post?</div>
-    <div class="sheet-sub">This post will be replaced with "deleted by admin" and can't be undone.</div>
+    <div class="sheet-title" data-i18n="anon.adminDelete.title">Delete Post?</div>
+    <div class="sheet-sub" data-i18n="anon.adminDelete.sub">This post will be replaced with "deleted by admin" and can't be undone.</div>
     <div class="btn-row">
-      <button class="btn-secondary" id="adel-cancel" style="flex:1;">Cancel</button>
-      <button class="btn-danger"    id="adel-confirm">Delete 🗑️</button>
+      <button class="btn-secondary" id="adel-cancel" style="flex:1;" data-i18n="anon.adminDelete.cancel">Cancel</button>
+      <button class="btn-danger"    id="adel-confirm" data-i18n="anon.adminDelete.delete">Delete 🗑️</button>
     </div>
   </div>
 </div>
@@ -450,10 +451,10 @@
     <div style="text-align:center;margin-bottom:18px;">
       <img src="icons/AppIcon_anonymous.png" alt="Bipolar Anonymous" style="width:60px;height:60px;border-radius:14px;box-shadow:0 4px 16px rgba(0,0,0,0.15);margin-bottom:10px;">
       <div style="font-size:18px;font-weight:800;color:var(--dark);">Bipolar Anonymous</div>
-      <div style="font-size:13px;color:var(--muted);margin-top:3px;">A safe space for people living with bipolar</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:3px;" data-i18n="anon.about.subtitle">A safe space for people living with bipolar</div>
     </div>
 
-    <p style="font-size:13px;color:var(--dark);line-height:1.65;margin-bottom:16px;">
+    <p style="font-size:13px;color:var(--dark);line-height:1.65;margin-bottom:16px;" data-i18n="anon.about.body">
       This is an anonymous peer community for people living with bipolar disorder. You join with a chosen name — your real identity is never stored or shared.
     </p>
 
@@ -469,10 +470,10 @@
 
     <div style="border-top:1px solid #f0f0f0;padding-top:16px;margin-bottom:16px;">
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Powered by BipolarBear</div>
-      <p style="font-size:13px;color:var(--dark);line-height:1.6;margin-bottom:12px;">
+      <p style="font-size:13px;color:var(--dark);line-height:1.6;margin-bottom:12px;" data-i18n="anon.about.poweredBody">
         BipolarBear is a free mood journal and survival kit for people with bipolar disorder — track mood, energy, sleep and medication daily.
       </p>
-      <a href="https://bipolarbear.app" target="_blank" rel="noopener" style="display:block;background:var(--yellow);color:var(--dark);font-weight:700;font-size:13px;border-radius:10px;padding:11px;text-align:center;text-decoration:none;">🐻 Discover BipolarBear →</a>
+      <a href="https://bipolarbear.app" target="_blank" rel="noopener" style="display:block;background:var(--yellow);color:var(--dark);font-weight:700;font-size:13px;border-radius:10px;padding:11px;text-align:center;text-decoration:none;" data-i18n="anon.about.discover">🐻 Discover BipolarBear →</a>
     </div>
 
     <button id="about-close" class="btn-secondary" style="width:100%;">Close</button>
