@@ -1314,7 +1314,7 @@ function _handleIndexJournalNav() {
     // (and fab.js) reads the same value without depending on this script.
     const _APP_VERSION = window._APP_VERSION;
     const _WHATS_NEW_HEADLINES = {
-      '0.99': 'Signed-out home no longer shows the previous account’s stats, and signed-in users skip the guest PIN gate',
+      '1.0': 'Signed-out home no longer shows the previous account’s stats, and signed-in users skip the guest PIN gate',
       '0.98': 'Streaks, achievements & FAB dock now sync across your devices when you sign in',
       '0.97': 'Reminders & weekly summary now save instantly and sync across your devices',
       '0.89': 'Sign in & account management now shared across all pages — one place for everything',
