@@ -1,9 +1,9 @@
 # BipolarBear Changelog
 
-## v0.99
+## v1.0
 - 🐛 Fix: Signed-out home no longer shows the previous account's streak/anon stats. The auth listener's no-user branch now hides `journalStreakBadge`, `anonStreakBadge`, and `anonMessagesBadge` for users without their own guest-PIN data, and the synchronous initial `_updateStreakBadge()` is gated on a cached Firebase user (any `firebase:authUser:*` key in localStorage) or on `bbGuestPinSalt` so the previous account's badges never flash before the auth listener resolves
 - 🐛 Fix: On mobile, tapping Journal/Survival Kit while signed in no longer bounces back to the home page when stale `bbGuestPinSalt` localStorage is present. The synchronous PIN gate at the top of `journal.html` and `survival-kit.html` now skips the guest-PIN check for users with a cached Firebase auth user — signed-in users use account-derived encryption, not the guest PIN, so the stale salt was redirecting them away from journal.js's own cleanup path. The `guestPinOverlay` IIFE in `js/index.js` got the same treatment so they aren't trapped on an unenterable PIN dialog on the home screen either. The native-app PIN gate (`bbNativePinEnabled`) still applies regardless of sign-in state
-- ✨ App version is now displayed in the auth and account modals (the profile FAB popup) — handy for bug reports. Format: "v0.99 · web" (or "iOS" / "Android" / "PWA"). `window._APP_VERSION` moved from `js/index.js` into `js/shared/brand-config.js` so every page (and `fab.js`) reads the same value without depending on index.js loading first
+- ✨ App version is now displayed in the auth and account modals (the profile FAB popup) — handy for bug reports. Format: "v1.0 · web" (or "iOS" / "Android" / "PWA"). `window._APP_VERSION` moved from `js/index.js` into `js/shared/brand-config.js` so every page (and `fab.js`) reads the same value without depending on index.js loading first
 
 ## v0.98
 - 🐛 Fix: After signing in on a new device, journal streak (`bbCurrentStreak`) and stability (`bbStableStreak`) now load from Firestore (`userSettings.currentStreak`) immediately on the home page — previously the streak badge under the Journal button stayed hidden until the user opened the journal page (where `loadEntries()` recalculated and saved the streak)
