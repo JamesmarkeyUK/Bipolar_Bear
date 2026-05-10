@@ -92,7 +92,9 @@
 // v26: js/anonymous.js — stack the ADMIN chip on its own line beneath the
 //     monika in the board header pill so the streak + birthday badges no
 //     longer overflow off the right edge of the bar for admin accounts.
-const CACHE_NAME = 'bipolarbear-v26';
+// v27: v1.1 — pull BipolarBear stability streak and account creation date
+//     into the Anonymous board when signing in with a linked BB email.
+const CACHE_NAME = 'bipolarbear-v27';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

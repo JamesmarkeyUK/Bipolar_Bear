@@ -1,5 +1,9 @@
 # BipolarBear Changelog
 
+## v1.1
+- ✨ Signing into Bipolar Anonymous with a BipolarBear email now pulls your stability streak and account birthday from BipolarBear automatically — no need to have visited the board while logged into BB first. A new `getBBStats` Cloud Function looks up the linked account server-side after email-code verification and pre-fills `Anon_stableSince`, `Anon_stableStreak`, and `Anon_joinedAt` where those values are absent
+- 🐛 Fix: BipolarBear users' stability streak (`stableStreakStart`) now propagates to the `anonProfiles` mirror on first board visit, so the standalone email-code path sees the correct stable-since date on a fresh device
+
 ## v1.0
 - 🐛 Fix: Signed-out home no longer shows the previous account's streak/anon stats. The auth listener's no-user branch now hides `journalStreakBadge`, `anonStreakBadge`, and `anonMessagesBadge` for users without their own guest-PIN data, and the synchronous initial `_updateStreakBadge()` is gated on a cached Firebase user (any `firebase:authUser:*` key in localStorage) or on `bbGuestPinSalt` so the previous account's badges never flash before the auth listener resolves
 - 🐛 Fix: On mobile, tapping Journal/Survival Kit while signed in no longer bounces back to the home page when stale `bbGuestPinSalt` localStorage is present. The synchronous PIN gate at the top of `journal.html` and `survival-kit.html` now skips the guest-PIN check for users with a cached Firebase auth user — signed-in users use account-derived encryption, not the guest PIN, so the stale salt was redirecting them away from journal.js's own cleanup path. The `guestPinOverlay` IIFE in `js/index.js` got the same treatment so they aren't trapped on an unenterable PIN dialog on the home screen either. The native-app PIN gate (`bbNativePinEnabled`) still applies regardless of sign-in state
