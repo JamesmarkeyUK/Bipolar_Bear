@@ -198,3 +198,53 @@ exports.verifyAnonCode = onCall(
     return { success: true };
   }
 );
+
+// ── getBBStats ───────────────────────────────────────────────────────────────
+// Called by the standalone anonymous path after email-code verification to
+// pull stability streak and account creation date from the linked BipolarBear
+// account (if one exists with the same email). Requires a verified sessionId.
+exports.getBBStats = onCall(
+  { region: REGION, invoker: 'public' },
+  async (request) => {
+    const { sessionId } = request.data || {};
+    if (!sessionId) {
+      throw new HttpsError('invalid-argument', 'sessionId is required.');
+    }
+
+    const snap = await db.collection('anonVerify').doc(sessionId).get();
+    if (!snap.exists) {
+      throw new HttpsError('not-found', 'Session not found.');
+    }
+    const session = snap.data();
+    if (!session.verified) {
+      throw new HttpsError('permission-denied', 'Session not verified.');
+    }
+    // Allow up to 24 hours after verification (covers slow onboarding flows)
+    const verifiedAt = session.verifiedAt ? session.verifiedAt.toMillis() : 0;
+    if (Date.now() - verifiedAt > 24 * 60 * 60 * 1000) {
+      throw new HttpsError('deadline-exceeded', 'Session expired.');
+    }
+
+    const email = session.email;
+    try {
+      const userRecord = await admin.auth().getUserByEmail(email);
+      const uid = userRecord.uid;
+      const accountCreatedAt = userRecord.metadata.creationTime || null;
+
+      const settingsDoc = await db.collection('userSettings').doc(uid).get();
+      const settings = settingsDoc.exists ? settingsDoc.data() : {};
+
+      return {
+        bbLinked:        true,
+        stableStreak:    settings.stableStreak     || 0,
+        stableSince:     settings.stableStreakStart || null,
+        accountCreatedAt,
+      };
+    } catch (e) {
+      if (e.code === 'auth/user-not-found') {
+        return { bbLinked: false };
+      }
+      throw e;
+    }
+  }
+);

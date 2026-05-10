@@ -127,6 +127,7 @@ function initFirebase() {
     const _fns = firebase.app().functions('europe-west1');
     window._anonSendCode   = _fns.httpsCallable('sendAnonCode');
     window._anonVerifyCode = _fns.httpsCallable('verifyAnonCode');
+    window._anonGetBBStats = _fns.httpsCallable('getBBStats');
 
     // Auth state handler — routes on first load, handles sign-out while on board
     let _anonInitialBoot = false;
@@ -541,6 +542,32 @@ function setupVerify() {
       // _bbUser is set, so safe to call unconditionally.
       const _restored = await _anonRestoreProfile(_pendingEmail);
 
+      // If the verified email belongs to a BipolarBear account, pull the
+      // stability streak and account creation date so they show up on the
+      // anonymous board even if the user has never visited while logged into BB.
+      // Only fills gaps — never overwrites data already restored above.
+      if (!_bbUser && window._anonGetBBStats) {
+        try {
+          const bbRes = await window._anonGetBBStats({ sessionId: _sessionId });
+          if (bbRes.data && bbRes.data.bbLinked) {
+            const { stableStreak, stableSince, accountCreatedAt } = bbRes.data;
+            if (stableSince && !BB.storage.get('Anon_stableSince')) {
+              BB.storage.set('Anon_stableSince', stableSince);
+              const days = Math.max(0, Math.floor(
+                (Date.now() - new Date(stableSince).getTime()) / 86400000
+              ));
+              BB.storage.set('Anon_stableStreak', String(stableStreak || days));
+            }
+            if (accountCreatedAt) {
+              const existing = BB.storage.get('Anon_joinedAt');
+              if (!existing || accountCreatedAt < existing) {
+                BB.storage.set('Anon_joinedAt', accountCreatedAt);
+              }
+            }
+          }
+        } catch (_) { /* best-effort — BB stats are supplemental */ }
+      }
+
       if (profile.monika || _restored) {
         showScreen('board');
         initBoard();
@@ -808,7 +835,10 @@ async function _bbRestoreProfile(uid) {
     if (ap.customInit !== undefined) BB.storage.set('Anon_initials',    ap.customInit || '');
     if (ap.showMeds   !== undefined) BB.storage.set('Anon_showMeds',    ap.showMeds   ? 'true' : 'false');
     if (ap.showStable !== undefined) BB.storage.set('Anon_showStable',  ap.showStable ? 'true' : 'false');
-    if (ap.stableSince)              BB.storage.set('Anon_stableSince', ap.stableSince);
+    // Fall back to the journal-computed stableStreakStart when the anon profile
+    // hasn't stored its own stableSince yet (e.g. first visit to the board).
+    const resolvedStableSince = ap.stableSince || d.stableStreakStart || null;
+    if (resolvedStableSince) BB.storage.set('Anon_stableSince', resolvedStableSince);
     const medList = ap.medList && ap.medList.length ? ap.medList : (d.currentMedList || []);
     if (medList.length) {
       BB.storage.set('Anon_medList', JSON.stringify(medList));
@@ -816,7 +846,14 @@ async function _bbRestoreProfile(uid) {
     }
     if (typeof ap.visitStreak === 'number') BB.storage.set('Anon_streak',     String(ap.visitStreak));
     if (ap.visitDate)                       BB.storage.set('AnonVisitDate',    ap.visitDate);
-    if (ap.joinedAt)                        BB.storage.set('Anon_joinedAt',    ap.joinedAt);
+    // Use the earliest of anonProfile.joinedAt and the BB account creation date
+    // so the birthday always reflects when the user first joined BipolarBear.
+    let resolvedJoinedAt = ap.joinedAt || null;
+    if (_bbUser && _bbUser.metadata && _bbUser.metadata.creationTime) {
+      const creationISO = new Date(_bbUser.metadata.creationTime).toISOString();
+      if (!resolvedJoinedAt || creationISO < resolvedJoinedAt) resolvedJoinedAt = creationISO;
+    }
+    if (resolvedJoinedAt)  BB.storage.set('Anon_joinedAt', resolvedJoinedAt);
     // Mirror restored profile to anonProfiles so standalone email-code path
     // can restore it on a fresh browser/device without needing Firebase Auth.
     if (ap.monika && _bbUser && _bbUser.email) {
@@ -828,10 +865,10 @@ async function _bbRestoreProfile(uid) {
           showMeds:    !!ap.showMeds,
           medList:     medList,
           showStable:  !!ap.showStable,
-          stableSince: ap.stableSince || null,
+          stableSince: resolvedStableSince,
           visitStreak: ap.visitStreak || 0,
           visitDate:   ap.visitDate   || null,
-          joinedAt:    ap.joinedAt    || null,
+          joinedAt:    resolvedJoinedAt,
           updatedAt:   firebase.firestore.FieldValue.serverTimestamp(),
         }, { merge: true })
       ).catch(() => {});
