@@ -76,7 +76,7 @@
 //     domain check missed). js/anonymous.js sweeps onto the helper. The
 //     precached brand-config.js content changed, so old clients must
 //     drop their v20 cache.
-const CACHE_NAME = 'bipolarbear-v22';
+const CACHE_NAME = 'bipolarbear-v23';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
