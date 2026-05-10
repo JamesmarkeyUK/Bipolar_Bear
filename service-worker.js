@@ -83,7 +83,13 @@
 //     (window._APP_VERSION = '1.0'). Touches js/index.js, fab.js,
 //     js/shared/brand-config.js, journal.html, survival-kit.html — every
 //     old client must drop v23.
-const CACHE_NAME = 'bipolarbear-v24';
+// v25: anonymous.html / css / js — surface app version (window._APP_VERSION)
+//     in the About overlay footer, and drop the 52px top-padding floor on
+//     .board-header so mobile Safari (where env(safe-area-inset-top) is 0)
+//     no longer renders an empty yellow spacer above the board header. The
+//     Capacitor shell + PWA standalone still get the inset because the rule
+//     is now calc(16px + env(safe-area-inset-top)).
+const CACHE_NAME = 'bipolarbear-v25';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

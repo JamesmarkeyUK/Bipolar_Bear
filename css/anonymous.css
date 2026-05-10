@@ -306,7 +306,10 @@
 
     .board-header {
       background: var(--yellow);
-      padding: max(52px, env(safe-area-inset-top, 16px)) 16px 0;
+      /* Match the main app pattern: no fixed floor on web (env resolves to 0
+         in mobile Safari tabs and on desktop), but still clears the
+         translucent iOS status bar in the Capacitor shell and PWA standalone. */
+      padding: calc(16px + env(safe-area-inset-top, 0px)) 16px 0;
       flex-shrink: 0;
     }
     .board-header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }

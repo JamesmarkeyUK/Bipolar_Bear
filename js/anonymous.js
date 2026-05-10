@@ -228,6 +228,12 @@ function closeOv(id) { document.getElementById(id).classList.add('hidden'); }
 function openAbout() { openOv('ov-about'); }
 document.getElementById('about-close').addEventListener('click', () => closeOv('ov-about'));
 
+// Stamp the shared web app version (from brand-config.js) into the About footer.
+(function () {
+  const el = document.getElementById('about-version');
+  if (el && window._APP_VERSION) el.textContent = 'v' + window._APP_VERSION;
+})();
+
 // _goHome() is called from inline onclick attributes on onboarding screens
 // and the board logo. Navigates appropriately for the current bundle.
 function _goHome() {
