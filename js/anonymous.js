@@ -228,6 +228,12 @@ function closeOv(id) { document.getElementById(id).classList.add('hidden'); }
 function openAbout() { openOv('ov-about'); }
 document.getElementById('about-close').addEventListener('click', () => closeOv('ov-about'));
 
+// Stamp the shared web app version (from brand-config.js) into the About footer.
+(function () {
+  const el = document.getElementById('about-version');
+  if (el && window._APP_VERSION) el.textContent = 'v' + window._APP_VERSION;
+})();
+
 // _goHome() is called from inline onclick attributes on onboarding screens
 // and the board logo. Navigates appropriately for the current bundle.
 function _goHome() {
@@ -1034,8 +1040,10 @@ function renderUserPill() {
   document.getElementById('board-user-pill').innerHTML = `
     <div style="display:flex;align-items:center;gap:5px;">
       <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,${g1},${g2});display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:11px;flex-shrink:0;">${esc(av)}</div>
-      <span style="font-size:12px;color:rgba(0,0,0,0.75);font-weight:600;">[${esc(m)}]</span>
-      ${profile.isAdmin ? '<span style="background:rgba(0,0,0,0.55);color:#fff;font-size:9px;font-weight:800;border-radius:4px;padding:1px 5px;">ADMIN</span>' : ''}
+      <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0;">
+        <span style="font-size:12px;color:rgba(0,0,0,0.75);font-weight:600;">[${esc(m)}]</span>
+        ${profile.isAdmin ? '<span style="background:rgba(0,0,0,0.55);color:#fff;font-size:9px;font-weight:800;border-radius:4px;padding:1px 5px;line-height:1.2;">ADMIN</span>' : ''}
+      </div>
       <span>🔥</span>
       <span style="font-size:11px;color:rgba(0,0,0,0.6);">${s}d</span>
       ${profile.showStable && profile.stableStreak > 0 ? `<span>🧘</span><span style="font-size:11px;color:rgba(0,0,0,0.6);">${profile.stableStreak}d</span>` : ''}
@@ -1249,7 +1257,11 @@ function openThread(postId) {
         return;
       }
       el.innerHTML = comments.map(renderComment).join('');
-    }, err => console.warn('[Thread] comments listener error', err));
+    }, err => {
+      console.warn('[Thread] comments listener error', err);
+      const el = document.getElementById('thread-comments-list');
+      if (el) el.innerHTML = '<div class="empty-state" style="padding:24px 0 16px;">No comments yet — be the first! 💛</div>';
+    });
 }
 
 function closeThread() {
