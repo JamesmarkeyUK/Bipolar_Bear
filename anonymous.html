@@ -417,6 +417,26 @@
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- OVERLAY: Comment thread                                        -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="ov-thread" class="overlay hidden">
+  <div class="sheet thread-sheet">
+    <div class="thread-header">
+      <button id="thread-close" class="thread-close-btn">✕</button>
+      <div class="sheet-title" style="margin:0;flex:1;text-align:left;font-size:16px;">Comments</div>
+    </div>
+    <div class="thread-scroll">
+      <div id="thread-original-post"></div>
+      <div id="thread-comments-list"></div>
+    </div>
+    <div class="thread-compose">
+      <textarea id="thread-ta" class="compose-ta" placeholder="Add a comment…" rows="2" style="min-height:56px;margin-bottom:8px;"></textarea>
+      <button id="thread-send" class="btn-primary" disabled>Send 💛</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
 <!-- OVERLAY: About Bipolar Anonymous                               -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <div id="ov-about" class="overlay hidden">

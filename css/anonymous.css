@@ -326,9 +326,23 @@
       flex: 1; padding: 10px 0; border-radius: 12px 12px 0 0; border: none;
       cursor: pointer; font-weight: 700; font-size: 13px; font-family: inherit;
       background: rgba(0,0,0,0.1); color: var(--dark);
-      transition: all 0.15s;
+      transition: all 0.15s; position: relative;
     }
     .board-tab.active { background: var(--cream); color: var(--dark); }
+
+    /* Unseen-message badge dot */
+    .board-tab.has-badge::after {
+      content: '';
+      position: absolute; top: 7px; right: 12px;
+      width: 8px; height: 8px;
+      background: #e53935;
+      border-radius: 50%;
+      animation: badge-pulse 1.4s ease-in-out infinite;
+    }
+    @keyframes badge-pulse {
+      0%, 100% { opacity: 1;   transform: scale(1);   }
+      50%       { opacity: 0.4; transform: scale(1.5); }
+    }
 
     /* Posts */
     #post-list { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 12px 12px 110px; }
@@ -403,3 +417,52 @@
     .e2ee-row-sub   { font-size: 12px; color: var(--muted); line-height: 1.5; }
 
     .empty-state { text-align: center; padding: 48px 20px; color: var(--muted); font-size: 14px; line-height: 1.7; }
+
+    /* ── Pinned posts ── */
+    .post-pinned { background: #fffde7; border: 1.5px solid rgba(245,200,0,0.45); }
+    .pinned-badge { font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 8px; letter-spacing: 0.2px; }
+    .pin-active { opacity: 1 !important; color: var(--yellow-dark); }
+
+    /* ── Comment button ── */
+    .comment-btn {
+      display: flex; align-items: center; gap: 4px;
+      background: #f5f5f5; border: 1px solid transparent; border-radius: 20px;
+      padding: 6px 12px; cursor: pointer; font-size: 13px; color: var(--muted);
+      font-family: inherit; transition: all 0.15s;
+    }
+    .comment-btn:active { background: var(--yellow-bg); }
+
+    /* ── Thread overlay ── */
+    .thread-sheet {
+      display: flex; flex-direction: column;
+      max-height: 90vh; padding: 20px 20px 0; overflow: hidden;
+    }
+    .thread-header {
+      display: flex; align-items: center; gap: 12px;
+      padding-bottom: 14px; border-bottom: 1px solid #f0f0f0; margin-bottom: 14px; flex-shrink: 0;
+    }
+    .thread-close-btn {
+      background: #f0f0f0; border: none; border-radius: 50%;
+      width: 32px; height: 32px; font-size: 14px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .thread-scroll {
+      flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+      padding: 0 0 12px; overscroll-behavior: contain;
+    }
+    .thread-orig-post {
+      background: var(--yellow-bg); border-radius: 14px;
+      padding: 14px 16px; margin-bottom: 14px;
+      border: 1px solid rgba(245,200,0,0.3);
+    }
+    .thread-compose {
+      flex-shrink: 0; padding: 10px 0 calc(20px + env(safe-area-inset-bottom, 0px));
+      border-top: 1px solid #f0f0f0;
+    }
+    .thread-compose .compose-ta { margin-bottom: 8px; min-height: 56px; }
+
+    /* ── Comment cards ── */
+    .comment-card { padding: 10px 0; border-bottom: 1px solid #f5f5f5; }
+    .comment-card:last-child { border-bottom: none; }
+    .comment-header { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+    .comment-text { font-size: 13px; color: var(--dark); line-height: 1.55; padding-left: 36px; }
