@@ -89,7 +89,10 @@
 //     no longer renders an empty yellow spacer above the board header. The
 //     Capacitor shell + PWA standalone still get the inset because the rule
 //     is now calc(16px + env(safe-area-inset-top)).
-const CACHE_NAME = 'bipolarbear-v25';
+// v26: js/anonymous.js — stack the ADMIN chip on its own line beneath the
+//     monika in the board header pill so the streak + birthday badges no
+//     longer overflow off the right edge of the bar for admin accounts.
+const CACHE_NAME = 'bipolarbear-v26';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
