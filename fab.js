@@ -528,7 +528,7 @@
           <div style="font-size:1.6em;margin-bottom:4px;text-align:center;">👤</div>
           <div id="bbAccountEmail" style="font-size:0.85em;color:#6c757d;margin-bottom:16px;word-break:break-all;text-align:center;"></div>
           <div id="bbAccountMsg" style="font-size:0.85em;margin-bottom:12px;display:none;padding:8px 12px;border-radius:8px;"></div>
-          <button onclick="window._bbAccountLogout()" style="width:100%;padding:12px;background:white;color:#dc3545;border:2px solid #dc3545;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;margin-bottom:10px;-webkit-tap-highlight-color:transparent;">Sign out</button>
+          <button onclick="window._bbAccountLogout()" style="width:100%;padding:12px;background:white;color:#dc3545;border:2px solid #dc3545;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;margin-bottom:10px;-webkit-tap-highlight-color:transparent;" data-i18n="account.signOut">Sign out</button>
           <div id="bbAccountPassSection" style="margin-bottom:10px;">
             <div id="bbAccountPassFields" style="display:none;margin-bottom:8px;">
               <input type="password" id="bbAccountCurrentPass" placeholder="Current password" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;box-sizing:border-box;margin-bottom:6px;outline:none;font-family:inherit;">
@@ -551,8 +551,23 @@
             </div>
             <button id="bbAccountEmailToggleBtn" onclick="document.getElementById('bbAccountEmailFields').style.display='';document.getElementById('bbAccountEmailToggleBtn').style.display='none';document.getElementById('bbAccountNewEmail').focus();" style="width:100%;padding:12px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Change email</button>
           </div>
+          <div style="margin-bottom:10px;">
+            <div style="font-size:0.78em;font-weight:600;color:#6c757d;margin-bottom:6px;" data-i18n="account.language">Language</div>
+            <select id="bbLangSelect" onchange="window.BB&&window.BB.i18n&&window.BB.i18n.setLanguage(this.value)" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;font-family:inherit;color:#495057;background:white;cursor:pointer;-webkit-appearance:none;appearance:none;">
+              <option value="en">🇬🇧 English</option>
+              <option value="es">🇪🇸 Español</option>
+              <option value="fr">🇫🇷 Français</option>
+              <option value="de">🇩🇪 Deutsch</option>
+              <option value="it">🇮🇹 Italiano</option>
+              <option value="pt">🇵🇹 Português</option>
+              <option value="nl">🇳🇱 Nederlands</option>
+              <option value="pl">🇵🇱 Polski</option>
+              <option value="sv">🇸🇪 Svenska</option>
+              <option value="zh">🇨🇳 中文</option>
+            </select>
+          </div>
           <button onclick="(window._fabOpenPersonalInfo||function(){})()" style="width:100%;padding:12px;background:white;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;margin-bottom:10px;-webkit-tap-highlight-color:transparent;">👤 Personal information</button>
-          <button onclick="window.closeAccountModal()" style="width:100%;padding:10px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:10px;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Cancel</button>
+          <button onclick="window.closeAccountModal()" style="width:100%;padding:10px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:10px;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="common.cancel">Cancel</button>
         </div>
       </div>
     `;
@@ -560,6 +575,8 @@
     while (_wrap.firstChild) _target.appendChild(_wrap.firstChild);
     // Defer until after layout so #app-shell.offsetWidth is valid
     requestAnimationFrame(() => requestAnimationFrame(() => _applyFabDock()));
+    // Apply translations to freshly-injected HTML
+    if (window.BB && window.BB.i18n) window.BB.i18n.applyAll();
     // Wire auth modal listeners now that elements are in the DOM
     _bbWireAuthListeners();
   }
@@ -1097,6 +1114,8 @@
     if (emailToggle) emailToggle.style.display = '';
     if (newEmailEl)  newEmailEl.value  = '';
     if (emailPassEl) emailPassEl.value = '';
+    const langSel = document.getElementById('bbLangSelect');
+    if (langSel && window.BB && window.BB.i18n) langSel.value = window.BB.i18n.getLang();
     const modal = document.getElementById('bbAccountModal');
     if (modal) modal.classList.add('active');
     if (typeof window._fabOnShowAuth === 'function') window._fabOnShowAuth();
