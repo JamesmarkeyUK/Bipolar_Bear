@@ -1257,7 +1257,11 @@ function openThread(postId) {
         return;
       }
       el.innerHTML = comments.map(renderComment).join('');
-    }, err => console.warn('[Thread] comments listener error', err));
+    }, err => {
+      console.warn('[Thread] comments listener error', err);
+      const el = document.getElementById('thread-comments-list');
+      if (el) el.innerHTML = '<div class="empty-state" style="padding:24px 0 16px;">No comments yet — be the first! 💛</div>';
+    });
 }
 
 function closeThread() {
