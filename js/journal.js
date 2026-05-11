@@ -1041,7 +1041,7 @@ window.addEventListener('pageshow', () => {
 
     function togglePdfHide() {
       setPdfHide(!selectedPdfHide);
-      if (selectedPdfHide) _showFeatureHint('🕵️', 'Private mode on — this entry won\'t appear on your medical record PDF', 'bbPrivateHintSeen');
+      if (selectedPdfHide) _showFeatureHint('🕵️', BB.t('journal.hint.privateMode'), 'bbPrivateHintSeen');
       scheduleDraftSave();
     }
     window.togglePdfHide = togglePdfHide;
@@ -1142,7 +1142,7 @@ window.addEventListener('pageshow', () => {
     function toggleFavourite() {
       selectedFavourite = !selectedFavourite;
       _updateFavouriteBtn();
-      if (selectedFavourite) _showFeatureHint('★', 'Marked as a favourite — find it anytime in All-Time Stats', 'bbFavouriteHintSeen');
+      if (selectedFavourite) _showFeatureHint('★', BB.t('journal.hint.favourite'), 'bbFavouriteHintSeen');
       scheduleDraftSave();
     }
     function _updateFavouriteBtn() {
@@ -1639,7 +1639,7 @@ window.addEventListener('pageshow', () => {
           const _ch = document.createElement('div');
           _ch.id = '_fmMoodInfoCloseHintEl';
           _ch.style.cssText = 'display:flex;flex-direction:row;align-items:center;gap:4px;margin-right:8px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;';
-          _ch.innerHTML = `<span style="font-size:0.72em;font-weight:700;font-style:italic;color:var(--brand-primary);font-family:'Georgia',serif;letter-spacing:0.01em;">🐻 Close to continue</span><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><line x1="2" y1="8" x2="13" y2="8" stroke="var(--brand-primary)" stroke-width="2" stroke-linecap="round"/><polyline points="8,3 13,8 8,13" stroke="var(--brand-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
+          _ch.innerHTML = `<span style="font-size:0.72em;font-weight:700;font-style:italic;color:var(--brand-primary);font-family:'Georgia',serif;letter-spacing:0.01em;">${BB.t('journal.hint.closeToContinue')}</span><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><line x1="2" y1="8" x2="13" y2="8" stroke="var(--brand-primary)" stroke-width="2" stroke-linecap="round"/><polyline points="8,3 13,8 8,13" stroke="var(--brand-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
           _confirmBtns.insertBefore(_ch, _confirmBtns.firstChild);
           const _closeBtn = _confirmBtns.querySelector('.confirm-btn-no');
           if (_closeBtn) _closeBtn.style.zIndex = '1001';
@@ -1749,7 +1749,7 @@ window.addEventListener('pageshow', () => {
           if (jc && jc.style.display !== 'none' && jc.style.display !== '') {
             jc.style.display = 'none';
             const toggleBtn = document.getElementById('journalToggleBtn');
-            if (toggleBtn) toggleBtn.textContent = '📔 Open Journal';
+            if (toggleBtn) toggleBtn.textContent = BB.t('journal.btn.openJournal');
           }
         }, { capture: true, passive: true });
       }
@@ -3861,7 +3861,7 @@ window.addEventListener('pageshow', () => {
       const _jtb = document.getElementById('journalToggleBtn');
       if (_jc && _jc.style.display !== 'none') {
         _jc.style.display = 'none';
-        if (_jtb) _jtb.innerHTML = '📔 Open Journal';
+        if (_jtb) _jtb.innerHTML = BB.t('journal.btn.openJournal');
       }
       document.getElementById('entryFormCard').style.display = 'none';
       document.getElementById('todayCompleteSection').style.display = 'none';
@@ -4161,14 +4161,14 @@ window.addEventListener('pageshow', () => {
               <path d="M 12,20 Q 8,10 12,2" stroke="rgba(255,149,0,0.7)" stroke-width="2" stroke-linecap="round" fill="none"/>
               <polyline points="7,6 12,1 17,6" stroke="rgba(255,149,0,0.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
             </svg>
-            <span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,149,0,0.9);white-space:nowrap;font-family:'Georgia',serif;letter-spacing:0.01em;">🐻 Choose a mood to get started</span>
+            <span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,149,0,0.9);white-space:nowrap;font-family:'Georgia',serif;letter-spacing:0.01em;">${BB.t('journal.hint.chooseMood')}</span>
           </div>` : ''}
           ${_showFmTip ? `<div id="_fmTapHoldHintEl" style="display:flex;flex-direction:column;align-items:center;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-top:12px;">
             <svg width="24" height="22" viewBox="0 0 24 22" fill="none">
               <path d="M 12,20 Q 8,10 12,2" stroke="rgba(255,149,0,0.7)" stroke-width="2" stroke-linecap="round" fill="none"/>
               <polyline points="7,6 12,1 17,6" stroke="rgba(255,149,0,0.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
             </svg>
-            <span style="font-size:0.78em;font-weight:700;font-style:italic;color:rgba(255,149,0,0.9);white-space:nowrap;font-family:'Georgia',serif;letter-spacing:0.01em;">🐻 👆 Tap &amp; Hold a mood to learn more</span>
+            <span style="font-size:0.78em;font-weight:700;font-style:italic;color:rgba(255,149,0,0.9);white-space:nowrap;font-family:'Georgia',serif;letter-spacing:0.01em;">${BB.t('journal.hint.tapHold').replace(/&/g, '&amp;')}</span>
           </div>` : ''}`;
         }
 
@@ -4287,7 +4287,7 @@ window.addEventListener('pageshow', () => {
           return `${medListHtml}
             <div style="text-align:center;margin-bottom:${_medHintDone ? '14' : '4'}px;">
               <button id="manageMedsBtn" onclick="_dismissMedHint();showMedicationList()" style="background:none;border:none;color:${_medHintDone ? 'var(--brand-primary)' : 'rgba(255,255,255,0.9)'};font-size:0.8em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;text-decoration:underline;text-underline-offset:2px;">✏️ Manage medications</button>
-              ${_medHintDone ? '' : `<div id="medHintEl" style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:4px;margin-bottom:10px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="8" y1="13" x2="8" y2="2" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round"/><polyline points="3,7 8,2 13,7" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,255,255,0.9);font-family:'Georgia',serif;letter-spacing:0.01em;text-shadow:0 1px 4px rgba(0,0,0,0.5);">🐻 Log your medication here</span></div>`}
+              ${_medHintDone ? '' : `<div id="medHintEl" style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:4px;margin-bottom:10px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="8" y1="13" x2="8" y2="2" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round"/><polyline points="3,7 8,2 13,7" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,255,255,0.9);font-family:'Georgia',serif;letter-spacing:0.01em;text-shadow:0 1px 4px rgba(0,0,0,0.5);">${BB.t('journal.hint.logMed')}</span></div>`}
             </div>
             <button class="fm-opt fm-hover-orange ${selectedMedication==='not-taken'?'sel':''}"
               onclick="selectedMedication='not-taken'; _fmAdvance();" style="border-left:4px solid var(--brand-primary);">
@@ -6662,7 +6662,7 @@ window.addEventListener('pageshow', () => {
       const _jtb = document.getElementById('journalToggleBtn');
       if (_jc && _jc.style.display !== 'none') {
         _jc.style.display = 'none';
-        if (_jtb) _jtb.innerHTML = '📔 Open Journal';
+        if (_jtb) _jtb.innerHTML = BB.t('journal.btn.openJournal');
       }
       editingEntry = null;
       _editFieldOverrides = null;
@@ -8204,7 +8204,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
           const toggleBtn = document.getElementById('journalToggleBtn');
           if (journalCard && journalCard.style.display === 'none') {
             journalCard.style.display = 'block';
-            if (toggleBtn) toggleBtn.innerHTML = '📕 Close Journal';
+            if (toggleBtn) toggleBtn.innerHTML = BB.t('journal.btn.closeJournal');
           }
           await loadEntries();
           const settingsNote = settings ? ' Settings restored.' : '';
@@ -8334,7 +8334,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
           const tBtn = document.getElementById('journalToggleBtn');
           if (jCard && jCard.style.display === 'none') {
             jCard.style.display = 'block';
-            if (tBtn) tBtn.innerHTML = '📕 Close Journal';
+            if (tBtn) tBtn.innerHTML = BB.t('journal.btn.closeJournal');
           }
           await loadEntries();
           alert(`Successfully imported ${imported} Daylio entries! 🎉\n\nNote: Energy, sleep, and medication data set to default values.`);
@@ -8863,7 +8863,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       
       if (journalCard.style.display === 'none') {
         journalCard.style.display = 'block';
-        toggleBtn.innerHTML = '📕 Close Journal';
+        toggleBtn.innerHTML = BB.t('journal.btn.closeJournal');
         // Advance onboarding step 1→2 when user first opens journal (hint 2 fulfilled)
         _advanceOnboardingStep(2);
         // Do NOT call loadEntries() here — the init load already ran before this button
@@ -8879,7 +8879,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         });
       } else {
         journalCard.style.display = 'none';
-        toggleBtn.innerHTML = '📔 Open Journal';
+        toggleBtn.innerHTML = BB.t('journal.btn.openJournal');
         // Advance step 2→3 when user closes journal (close journal hint fulfilled)
         _advanceOnboardingStep(3);
         // Scroll back to top of page smoothly
@@ -9124,7 +9124,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       const journalToggleBtn = document.getElementById('journalToggleBtn');
       if (journalCard && journalCard.style.display !== 'none') {
         journalCard.style.display = 'none';
-        if (journalToggleBtn) journalToggleBtn.innerHTML = '📔 Open Journal';
+        if (journalToggleBtn) journalToggleBtn.innerHTML = BB.t('journal.btn.openJournal');
       }
 
       // Always ensure the form is visible when editing (today-complete banner may be hiding it)
@@ -11075,7 +11075,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         BB.storage.set('AdvancedTutorialToastShown', '1');
         BB.storage.set('AdvancedBadgePending', '1');
         BB.storage.set('_fmTapHoldHintPending', '1'); // activates tap & hold hint on the NEXT entry
-        setTimeout(() => _showFeatureHint('🎉', "Advanced tutorial complete. You're all set now!", '_bbAdvancedTutorialToast'), 400);
+        setTimeout(() => _showFeatureHint('🎉', BB.t('journal.hint.tutorialDone'), '_bbAdvancedTutorialToast'), 400);
       }
     }
 
