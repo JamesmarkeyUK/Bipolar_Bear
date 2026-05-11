@@ -101,7 +101,8 @@
 // v30: v1.2 — wire mood-form heading and view-entry label through i18n (was hardcoded English).
 // v31: v1.2 — translate focused-mode wizard step titles, date phrases, and tracking field labels.
 // v32: v1.2 — translate submit buttons, save-confirm modal, edit button states, draft status.
-const CACHE_NAME = 'bipolarbear-v32';
+// v33: v1.2 — translate calendar entry rows and delete-field-confirm modal.
+const CACHE_NAME = 'bipolarbear-v33';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

@@ -988,11 +988,13 @@ window.addEventListener('pageshow', () => {
 
     let _pendingDeleteBuiltinKey = null;
     function deleteBuiltinField(key) {
-      const _labels = { trackExercise:'Exercise', trackOutside:'Gone outside', trackAnxiety:'Emotions', trackAlcohol:'Alcohol' };
+      const _t = (k, vars) => (window.BB && BB.t) ? BB.t(k, vars) : k;
+      const _labelKey = { trackExercise:'journal.label.exercise', trackOutside:'journal.label.goneOutside', trackAnxiety:'journal.label.emotions', trackAlcohol:'journal.label.alcohol' }[key];
+      const _fieldLabel = _labelKey ? _t(_labelKey) : 'field';
       _pendingDeleteBuiltinKey = key;
-      document.getElementById('confirmModalTitle').textContent = `Remove ${_labels[key] || 'field'}?`;
-      document.getElementById('confirmModalBody').textContent = 'This will hide it from your form and tracking. You can re-add it later.';
-      document.getElementById('confirmModalBtn').textContent = 'Remove';
+      document.getElementById('confirmModalTitle').textContent = _t('journal.confirm.removeFieldTitle', { field: _fieldLabel });
+      document.getElementById('confirmModalBody').textContent = _t('journal.confirm.removeFieldBody');
+      document.getElementById('confirmModalBtn').textContent = _t('journal.confirm.removeBtn');
       document.getElementById('confirmModal').classList.add('active');
     }
     function _doDeleteBuiltinField(key) {
@@ -6475,7 +6477,20 @@ window.addEventListener('pageshow', () => {
       const entry = moodByDate[key];
 
       const moodEmojis = { terrible: '😞', bad: '😔', okay: '😐', good: '🙂', great: '😄' };
-      const medLabels = { taken: '✅ Taken', missed: '❌ Missed', skipped: '⏭️ Skipped' };
+      const _t = (k) => (window.BB && BB.t) ? BB.t(k) : k;
+      const _tVal = (v) => {
+        if (!v) return '';
+        const _map = { yes:'journal.value.yes', no:'journal.value.no', good:'journal.value.good', ok:'journal.value.ok', bad:'journal.value.bad', high:'journal.value.high', medium:'journal.value.medium', low:'journal.value.low' };
+        if (_map[v] && window.BB && BB.t) return BB.t(_map[v]);
+        return v.charAt(0).toUpperCase() + v.slice(1);
+      };
+      const _tMood = (m) => {
+        if (!m) return '';
+        const _map = { manic:'mood.manic', elevated:'mood.elevated', good:'mood.good', low:'mood.low', depressed:'mood.depressed' };
+        if (_map[m] && window.BB && BB.t) return BB.t(_map[m]);
+        return m.charAt(0).toUpperCase() + m.slice(1);
+      };
+      const medLabels = { taken: _t('journal.med.taken'), missed: _t('journal.med.missed'), skipped: _t('journal.med.skipped') };
       const cap = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
 
       let html = `<div style="font-weight:700;color:#495057;margin-bottom:14px;font-size:0.95em;">🗓️ ${dateStr}</div>`;
@@ -6487,21 +6502,21 @@ window.addEventListener('pageshow', () => {
           </div>`;
       } else {
         const color = moodColors[entry.mood] || '#adb5bd';
-        html += `<div style="background:${color};color:white;border-radius:10px;padding:10px 14px;font-weight:700;font-size:1em;margin-bottom:10px;">${moodEmojis[entry.mood] || ''} ${cap(entry.mood)}</div>`;
+        html += `<div style="background:${color};color:white;border-radius:10px;padding:10px 14px;font-weight:700;font-size:1em;margin-bottom:10px;">${moodEmojis[entry.mood] || ''} ${_tMood(entry.mood)}</div>`;
         html += `<div>`;
         if (entry.energy !== undefined) {
           const _stepsStr = entry.steps != null ? ` | 🏃 ${entry.steps >= 1000 ? Math.round(entry.steps/1000)+'k' : entry.steps}` : '';
-          html += _calRow('⚡', 'Energy', `${entry.energy}/10${_stepsStr}`);
+          html += _calRow('⚡', _t('journal.label.energy'), `${entry.energy}/10${_stepsStr}`);
         }
-        if (entry.sleep  !== undefined) html += _calRow('😴', 'Sleep',  `${entry.sleep}h`);
-        if (entry.sleepQuality) html += _calRow(entry.sleepQuality === 'good' ? '😊' : entry.sleepQuality === 'bad' ? '😴' : '😐', 'Sleep quality', entry.sleepQuality === 'good' ? 'Good' : entry.sleepQuality === 'bad' ? 'Bad' : 'OK');
-        if (entry.medication) html += _calRow('💊', 'Medication', medLabels[entry.medication] || cap(entry.medication));
-        if (entry.anxiety)     html += _calRow('😰', 'Anxiety',     cap(entry.anxiety));
-        if (entry.stress)      html += _calRow('😓', 'Stress',      cap(entry.stress));
-        if (entry.irritability)html += _calRow('😤', 'Irritability', cap(entry.irritability));
-        if (entry.alcohol)     html += _calRow('🍺', 'Alcohol',     cap(entry.alcohol));
-        if (entry.smoking)     html += _calRow('🚬', 'Smoked',      cap(entry.smoking));
-        if (entry.drugs)       html += _calRow('💊', 'Drugs',       cap(entry.drugs));
+        if (entry.sleep  !== undefined) html += _calRow('😴', _t('journal.label.sleep'),  `${entry.sleep}h`);
+        if (entry.sleepQuality) html += _calRow(entry.sleepQuality === 'good' ? '😊' : entry.sleepQuality === 'bad' ? '😴' : '😐', _t('journal.label.sleepQuality'), _tVal(entry.sleepQuality));
+        if (entry.medication) html += _calRow('💊', _t('journal.label.medication'), medLabels[entry.medication] || cap(entry.medication));
+        if (entry.anxiety)     html += _calRow('😰', _t('journal.label.anxiety'),     _tVal(entry.anxiety));
+        if (entry.stress)      html += _calRow('😓', _t('journal.label.stress'),      _tVal(entry.stress));
+        if (entry.irritability)html += _calRow('😤', _t('journal.label.irritability'), _tVal(entry.irritability));
+        if (entry.alcohol)     html += _calRow('🍺', _t('journal.label.alcohol'),     _tVal(entry.alcohol));
+        if (entry.smoking)     html += _calRow('🚬', _t('journal.label.smoked'),      _tVal(entry.smoking));
+        if (entry.drugs)       html += _calRow('💊', _t('journal.label.drugs'),       _tVal(entry.drugs));
         if (entry.customFields) {
           getCustomFields().forEach(f => {
             const val = entry.customFields[f.id];
