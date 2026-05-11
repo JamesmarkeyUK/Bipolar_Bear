@@ -1,5 +1,8 @@
 # BipolarBear Changelog
 
+## v1.2
+- ✨ Settings & auth FAB now appears after your first journal entry — no need to complete the full tutorial before you can sign in or access settings
+
 ## v1.1
 - ✨ Signing into Bipolar Anonymous with a BipolarBear email now pulls your stability streak and account birthday from BipolarBear automatically — no need to have visited the board while logged into BB first. A new `getBBStats` Cloud Function looks up the linked account server-side after email-code verification and pre-fills `Anon_stableSince`, `Anon_stableStreak`, and `Anon_joinedAt` where those values are absent
 - 🐛 Fix: BipolarBear users' stability streak (`stableStreakStart`) now propagates to the `anonProfiles` mirror on first board visit, so the standalone email-code path sees the correct stable-since date on a fresh device
