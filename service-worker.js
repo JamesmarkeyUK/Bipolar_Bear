@@ -97,7 +97,8 @@
 // v28: js/index.js — unlock the settings/auth FAB the moment the onboarding
 //     tutorial reaches step 12, instead of waiting for the user to dismiss
 //     the "Tutorial Complete!" popup.
-const CACHE_NAME = 'bipolarbear-v28';
+// v29: v1.2 — settings/auth FAB unlocks after first journal entry (not tutorial completion).
+const CACHE_NAME = 'bipolarbear-v29';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

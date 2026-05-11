@@ -85,6 +85,10 @@ window.addEventListener('pageshow', () => {
       if (typeof currentUser !== 'undefined' && currentUser && typeof db !== 'undefined' && db) {
         db.collection('userSettings').doc(currentUser.uid).set({ onboardingStep: to }, { merge: true }).catch(() => {});
       }
+      if (to >= 1) {
+        BB.storage.set('FabsUnlocked', '1');
+        if (typeof window._applyFabDock === 'function') window._applyFabDock();
+      }
       _applyJournalOnboardingGating();
     }
 
