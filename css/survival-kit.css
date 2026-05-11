@@ -787,10 +787,7 @@
     * { touch-action: manipulation; }
     /* Prevent iOS Safari auto-zoom on input focus (triggered when font-size < 16px) */
     input, select, textarea { font-size: 16px; }
-    /* Hide WhatsApp button on desktop */
-    @media (min-width: 768px) { .btn-whatsapp { display: none !important; } }
-
-    /* Force light mode — prevent OS dark mode from affecting colours */
+/* Force light mode — prevent OS dark mode from affecting colours */
     :root { color-scheme: light; }
     html { background-color: var(--brand-primary-dark); }
 
