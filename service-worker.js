@@ -99,7 +99,8 @@
 //     the "Tutorial Complete!" popup.
 // v29: v1.2 — settings/auth FAB unlocks after first journal entry (not tutorial completion).
 // v30: v1.2 — wire mood-form heading and view-entry label through i18n (was hardcoded English).
-const CACHE_NAME = 'bipolarbear-v30';
+// v31: v1.2 — translate focused-mode wizard step titles, date phrases, and tracking field labels.
+const CACHE_NAME = 'bipolarbear-v31';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
