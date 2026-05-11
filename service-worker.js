@@ -94,7 +94,10 @@
 //     longer overflow off the right edge of the bar for admin accounts.
 // v27: v1.1 — pull BipolarBear stability streak and account creation date
 //     into the Anonymous board when signing in with a linked BB email.
-const CACHE_NAME = 'bipolarbear-v27';
+// v28: js/index.js — unlock the settings/auth FAB the moment the onboarding
+//     tutorial reaches step 12, instead of waiting for the user to dismiss
+//     the "Tutorial Complete!" popup.
+const CACHE_NAME = 'bipolarbear-v28';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
