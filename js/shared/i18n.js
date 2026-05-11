@@ -378,6 +378,21 @@
           linkMood: '🔗 Link mood',
           linkMoodCaption: 'Select as primary, then tap another mood',
         },
+        banner: {
+          missingEntries: {
+            zero: 'No missing entries ✓',
+            one: '{count} missing entry ↗',
+            other: '{count} missing entries ↗',
+          },
+          streak: {
+            one: '🔥 {count} day streak',
+            other: '🔥 {count} days streak',
+          },
+          last24Done: '📅 Last 24hrs ✓',
+          last24Log: '+ 📅 Log last 24hrs',
+        },
+        calendar: { noEntry: 'No entry logged for this day.', addEntry: '+ Add entry' },
+        chip: { more: 'More', normal: 'Normal', less: 'Less' },
         nav: { home: '← Home' },
       },
     },
@@ -601,6 +616,21 @@
           linkMood: '🔗 Vincular estado',
           linkMoodCaption: 'Selecciona como principal, luego toca otro estado',
         },
+        banner: {
+          missingEntries: {
+            zero: 'Sin entradas faltantes ✓',
+            one: '{count} entrada faltante ↗',
+            other: '{count} entradas faltantes ↗',
+          },
+          streak: {
+            one: '🔥 {count} día seguido',
+            other: '🔥 {count} días seguidos',
+          },
+          last24Done: '📅 Últimas 24h ✓',
+          last24Log: '+ 📅 Registrar últimas 24h',
+        },
+        calendar: { noEntry: 'No hay entrada registrada para este día.', addEntry: '+ Añadir entrada' },
+        chip: { more: 'Más', normal: 'Normal', less: 'Menos' },
         nav: { home: '← Inicio' },
       },
     },
@@ -775,6 +805,21 @@
           linkMood: '🔗 Lier humeur',
           linkMoodCaption: 'Choisissez comme principale, puis touchez une autre humeur',
         },
+        banner: {
+          missingEntries: {
+            zero: 'Aucune entrée manquante ✓',
+            one: '{count} entrée manquante ↗',
+            other: '{count} entrées manquantes ↗',
+          },
+          streak: {
+            one: '🔥 série de {count} jour',
+            other: '🔥 série de {count} jours',
+          },
+          last24Done: '📅 24h passées ✓',
+          last24Log: '+ 📅 Enregistrer les 24h passées',
+        },
+        calendar: { noEntry: 'Aucune entrée pour ce jour.', addEntry: '+ Ajouter une entrée' },
+        chip: { more: 'Plus', normal: 'Normal', less: 'Moins' },
         nav: { home: '← Accueil' },
       },
     },
@@ -949,6 +994,21 @@
           linkMood: '🔗 Stimmung verknüpfen',
           linkMoodCaption: 'Als primär wählen, dann eine andere Stimmung antippen',
         },
+        banner: {
+          missingEntries: {
+            zero: 'Keine fehlenden Einträge ✓',
+            one: '{count} fehlender Eintrag ↗',
+            other: '{count} fehlende Einträge ↗',
+          },
+          streak: {
+            one: '🔥 {count} Tag Serie',
+            other: '🔥 {count} Tage Serie',
+          },
+          last24Done: '📅 Letzte 24 Std. ✓',
+          last24Log: '+ 📅 Letzte 24 Std. eintragen',
+        },
+        calendar: { noEntry: 'Kein Eintrag für diesen Tag.', addEntry: '+ Eintrag hinzufügen' },
+        chip: { more: 'Mehr', normal: 'Normal', less: 'Weniger' },
         nav: { home: '← Startseite' },
       },
     },
@@ -1123,6 +1183,21 @@
           linkMood: '🔗 Collega umore',
           linkMoodCaption: "Seleziona come primario, poi tocca un altro umore",
         },
+        banner: {
+          missingEntries: {
+            zero: 'Nessuna voce mancante ✓',
+            one: '{count} voce mancante ↗',
+            other: '{count} voci mancanti ↗',
+          },
+          streak: {
+            one: '🔥 serie di {count} giorno',
+            other: '🔥 serie di {count} giorni',
+          },
+          last24Done: '📅 Ultime 24 ore ✓',
+          last24Log: '+ 📅 Registra ultime 24 ore',
+        },
+        calendar: { noEntry: 'Nessuna voce registrata per questo giorno.', addEntry: '+ Aggiungi voce' },
+        chip: { more: 'Più', normal: 'Normale', less: 'Meno' },
         nav: { home: '← Home' },
       },
     },
@@ -1297,6 +1372,21 @@
           linkMood: '🔗 Vincular humor',
           linkMoodCaption: 'Selecione como principal, depois toque em outro humor',
         },
+        banner: {
+          missingEntries: {
+            zero: 'Sem entradas faltando ✓',
+            one: '{count} entrada faltando ↗',
+            other: '{count} entradas faltando ↗',
+          },
+          streak: {
+            one: '🔥 sequência de {count} dia',
+            other: '🔥 sequência de {count} dias',
+          },
+          last24Done: '📅 Últimas 24h ✓',
+          last24Log: '+ 📅 Registrar últimas 24h',
+        },
+        calendar: { noEntry: 'Nenhuma entrada registrada para este dia.', addEntry: '+ Adicionar entrada' },
+        chip: { more: 'Mais', normal: 'Normal', less: 'Menos' },
         nav: { home: '← Início' },
       },
     },
@@ -1471,6 +1561,21 @@
           linkMood: '🔗 Stemming koppelen',
           linkMoodCaption: 'Kies als hoofd, tik dan op een andere stemming',
         },
+        banner: {
+          missingEntries: {
+            zero: 'Geen ontbrekende invoer ✓',
+            one: '{count} ontbrekende invoer ↗',
+            other: '{count} ontbrekende invoeren ↗',
+          },
+          streak: {
+            one: '🔥 {count} dag reeks',
+            other: '🔥 {count} dagen reeks',
+          },
+          last24Done: '📅 Laatste 24 uur ✓',
+          last24Log: '+ 📅 Laatste 24 uur loggen',
+        },
+        calendar: { noEntry: 'Geen invoer voor deze dag.', addEntry: '+ Invoer toevoegen' },
+        chip: { more: 'Meer', normal: 'Normaal', less: 'Minder' },
         nav: { home: '← Startpagina' },
       },
     },
@@ -1645,6 +1750,25 @@
           linkMood: '🔗 Powiąż nastrój',
           linkMoodCaption: 'Wybierz jako główny, następnie stuknij inny nastrój',
         },
+        banner: {
+          missingEntries: {
+            zero: 'Brak brakujących wpisów ✓',
+            one: '{count} brakujący wpis ↗',
+            few: '{count} brakujące wpisy ↗',
+            many: '{count} brakujących wpisów ↗',
+            other: '{count} brakujących wpisów ↗',
+          },
+          streak: {
+            one: '🔥 seria {count} dnia',
+            few: '🔥 seria {count} dni',
+            many: '🔥 seria {count} dni',
+            other: '🔥 seria {count} dni',
+          },
+          last24Done: '📅 Ostatnie 24h ✓',
+          last24Log: '+ 📅 Zapisz ostatnie 24h',
+        },
+        calendar: { noEntry: 'Brak wpisu na ten dzień.', addEntry: '+ Dodaj wpis' },
+        chip: { more: 'Więcej', normal: 'Normalnie', less: 'Mniej' },
         nav: { home: '← Strona główna' },
       },
     },
@@ -1819,6 +1943,21 @@
           linkMood: '🔗 Länka stämning',
           linkMoodCaption: 'Välj som primär, tryck sedan på en annan stämning',
         },
+        banner: {
+          missingEntries: {
+            zero: 'Inga saknade anteckningar ✓',
+            one: '{count} saknad anteckning ↗',
+            other: '{count} saknade anteckningar ↗',
+          },
+          streak: {
+            one: '🔥 {count} dag svit',
+            other: '🔥 {count} dagar svit',
+          },
+          last24Done: '📅 Senaste 24h ✓',
+          last24Log: '+ 📅 Logga senaste 24h',
+        },
+        calendar: { noEntry: 'Ingen anteckning loggad för den här dagen.', addEntry: '+ Lägg till anteckning' },
+        chip: { more: 'Mer', normal: 'Normalt', less: 'Mindre' },
         nav: { home: '← Hem' },
       },
     },
@@ -1993,6 +2132,19 @@
           linkMood: '🔗 关联心情',
           linkMoodCaption: '选为主要心情，然后点击另一个心情',
         },
+        banner: {
+          missingEntries: {
+            zero: '没有缺失记录 ✓',
+            other: '{count}条缺失记录 ↗',
+          },
+          streak: {
+            other: '🔥 连续{count}天',
+          },
+          last24Done: '📅 过去24小时 ✓',
+          last24Log: '+ 📅 记录过去24小时',
+        },
+        calendar: { noEntry: '这一天没有记录。', addEntry: '+ 添加记录' },
+        chip: { more: '更多', normal: '正常', less: '更少' },
         nav: { home: '← 首页' },
       },
     },
@@ -2025,12 +2177,36 @@
       if (!cur || typeof cur !== 'object') return null;
       cur = cur[parts[i]];
     }
-    return typeof cur === 'string' ? cur : null;
+    // Return strings (leaf translation) or plain plural-form objects (e.g. { one, other }).
+    // Caller t() picks the right plural via Intl.PluralRules.
+    if (typeof cur === 'string') return cur;
+    if (cur && typeof cur === 'object' && !Array.isArray(cur)) return cur;
+    return null;
   }
 
   function t(key, vars) {
     var locale = _locales[_lang] || _locales['en'];
-    var val = _resolve(locale, key) || _resolve(_locales['en'], key) || key;
+    var val = _resolve(locale, key);
+    if (val == null) val = _resolve(_locales['en'], key);
+    if (val == null) val = key;
+    // Pluralization: if the resolved value is an object and vars.count is a number,
+    // pick the right plural form via Intl.PluralRules. Recognised forms:
+    // zero (when count === 0 and a .zero form exists), one, two, few, many, other.
+    if (val && typeof val === 'object' && !Array.isArray(val) && vars && typeof vars.count === 'number') {
+      var form;
+      if (vars.count === 0 && val.zero) {
+        form = 'zero';
+      } else {
+        try {
+          var pr = new Intl.PluralRules(_lang === 'zh' ? 'zh-Hans' : _lang);
+          form = pr.select(vars.count);
+        } catch (_) {
+          form = vars.count === 1 ? 'one' : 'other';
+        }
+      }
+      val = val[form] || val.other || val.one || '';
+    }
+    if (typeof val !== 'string') val = String(val || '');
     if (vars) {
       Object.keys(vars).forEach(function (k) {
         val = val.replace(new RegExp('\\{' + k + '\\}', 'g'), String(vars[k]));

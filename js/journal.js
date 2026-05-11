@@ -4629,16 +4629,19 @@ window.addEventListener('pageshow', () => {
               : { text:`<span style="color:#adb5bd;">💊 Medication: —</span>`, step:'medication' },
             (()=>{
               const _G='#2ECC40',_R='#FF4136',_N='#adb5bd';
+              const _tc = (k) => (window.BB && BB.t) ? BB.t(k) : k;
+              const _yes = _tc('journal.value.yes'), _no = _tc('journal.value.no');
+              const _more = _tc('journal.chip.more'), _normal = _tc('journal.chip.normal'), _less = _tc('journal.chip.less');
               const _chips=[];
-              if(selectedGoals)        _chips.push([`🏅 ${selectedGoals==='some'?'Yes':'No'}`, selectedGoals==='some'?_G:_R]);
-              if(selectedBudget)       _chips.push([`💰 ${selectedBudget==='yes'?'Yes':'No'}`, selectedBudget==='yes'?_G:_R]);
-              if(selectedExercise)     _chips.push([`🏋️ ${selectedExercise==='yes'?'Yes':'No'}`, selectedExercise==='yes'?_G:_R]);
-              if(selectedOutside)      _chips.push([`🌤️ ${selectedOutside==='yes'?'Yes':'No'}`, selectedOutside==='yes'?_G:_R]);
-              if(selectedAnxiety)      _chips.push([`😰 ${selectedAnxiety==='high'?'More':selectedAnxiety==='medium'?'Normal':'Less'}`, selectedAnxiety==='low'?_G:selectedAnxiety==='medium'?_N:_R]);
-              if(selectedStress)       _chips.push([`😓 ${selectedStress==='high'?'More':selectedStress==='medium'?'Normal':'Less'}`, selectedStress==='low'?_G:selectedStress==='medium'?_N:_R]);
-              if(selectedIrritability) _chips.push([`😤 ${selectedIrritability==='yes'?'More':selectedIrritability==='medium'?'Normal':'Less'}`, selectedIrritability==='no'?_G:selectedIrritability==='medium'?_N:_R]);
-              if(selectedAlcohol)      _chips.push([`🍺 ${selectedAlcohol==='yes'?'Yes':'No'}`, selectedAlcohol==='no'?_G:_R]);
-              getCustomFields().filter(f=>selectedCustom[f.id]).forEach(f=>{const _cv=selectedCustom[f.id];const _cc=f.positive==='no'?(_cv==='yes'?_R:_G):_N;_chips.push([`${f.emoji||'•'} ${_cv==='yes'?'Yes':'No'}`,_cc]);});
+              if(selectedGoals)        _chips.push([`🏅 ${selectedGoals==='some'?_yes:_no}`, selectedGoals==='some'?_G:_R]);
+              if(selectedBudget)       _chips.push([`💰 ${selectedBudget==='yes'?_yes:_no}`, selectedBudget==='yes'?_G:_R]);
+              if(selectedExercise)     _chips.push([`🏋️ ${selectedExercise==='yes'?_yes:_no}`, selectedExercise==='yes'?_G:_R]);
+              if(selectedOutside)      _chips.push([`🌤️ ${selectedOutside==='yes'?_yes:_no}`, selectedOutside==='yes'?_G:_R]);
+              if(selectedAnxiety)      _chips.push([`😰 ${selectedAnxiety==='high'?_more:selectedAnxiety==='medium'?_normal:_less}`, selectedAnxiety==='low'?_G:selectedAnxiety==='medium'?_N:_R]);
+              if(selectedStress)       _chips.push([`😓 ${selectedStress==='high'?_more:selectedStress==='medium'?_normal:_less}`, selectedStress==='low'?_G:selectedStress==='medium'?_N:_R]);
+              if(selectedIrritability) _chips.push([`😤 ${selectedIrritability==='yes'?_more:selectedIrritability==='medium'?_normal:_less}`, selectedIrritability==='no'?_G:selectedIrritability==='medium'?_N:_R]);
+              if(selectedAlcohol)      _chips.push([`🍺 ${selectedAlcohol==='yes'?_yes:_no}`, selectedAlcohol==='no'?_G:_R]);
+              getCustomFields().filter(f=>selectedCustom[f.id]).forEach(f=>{const _cv=selectedCustom[f.id];const _cc=f.positive==='no'?(_cv==='yes'?_R:_G):_N;_chips.push([`${f.emoji||'•'} ${_cv==='yes'?_yes:_no}`,_cc]);});
               const _html=_chips.map(([t,c])=>`<span style="color:${c};font-weight:600">${t}</span>`).join('<span style="color:#dee2e6">  </span>');
               const _mdNoteKeys = ['goals','budget','exercise','outside','anxiety','stress','irritability','alcohol',...getCustomFields().map(f=>f.id)];
               const _mdNotes = _elabOn ? _mdNoteKeys.map(k=>_sn(k)?`${_STEP_NOTE_LABELS[k]||k}: ${_sn(k)}`:null).filter(Boolean).join(' · ') : null;
@@ -5933,16 +5936,17 @@ window.addEventListener('pageshow', () => {
       const note = document.getElementById('missingEntriesNote');
 
       if (currentDone) {
+        const _t = (k, vars) => (window.BB && BB.t) ? BB.t(k, vars) : k;
         // Show action pills below the complete banner
         if (missingAction) {
           if (missingCount > 0) {
-            missingAction.textContent = `${missingCount} missing ${missingCount === 1 ? 'entry' : 'entries'} ↗`;
+            missingAction.textContent = _t('journal.banner.missingEntries', { count: missingCount });
             missingAction.style.background = 'rgba(255,149,0,0.9)';
             missingAction.style.color = 'white';
             missingAction.style.border = 'none';
             missingAction.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
           } else {
-            missingAction.textContent = 'No missing entries ✓';
+            missingAction.textContent = _t('journal.banner.missingEntries', { count: 0 });
             missingAction.style.background = 'rgba(255,255,255,0.1)';
             missingAction.style.color = 'rgba(255,255,255,0.6)';
             missingAction.style.border = '1.5px solid rgba(255,255,255,0.2)';
@@ -5954,7 +5958,7 @@ window.addEventListener('pageshow', () => {
           if (!useToday) {
             // Yesterday mode: show streak in place of "Log today" button
             const _streak = window._currentStreak || 0;
-            otherBtn.textContent = `🔥 ${_streak} day${_streak === 1 ? '' : 's'} streak`;
+            otherBtn.textContent = _t('journal.banner.streak', { count: _streak });
             otherBtn.style.background = 'rgba(255,255,255,0.1)';
             otherBtn.style.color = 'rgba(255,255,255,0.75)';
             otherBtn.style.border = '1.5px solid rgba(255,255,255,0.2)';
@@ -5962,7 +5966,7 @@ window.addEventListener('pageshow', () => {
             otherBtn.style.cursor = 'default';
             otherBtn.onclick = null;
           } else if (otherDone) {
-            otherBtn.textContent = '📅 Last 24hrs ✓';
+            otherBtn.textContent = _t('journal.banner.last24Done');
             otherBtn.style.background = 'rgba(255,255,255,0.1)';
             otherBtn.style.color = 'rgba(255,255,255,0.6)';
             otherBtn.style.border = '1.5px solid rgba(255,255,255,0.2)';
@@ -5970,7 +5974,7 @@ window.addEventListener('pageshow', () => {
             otherBtn.style.cursor = 'pointer';
             otherBtn.onclick = reviewOtherEntry;
           } else {
-            otherBtn.textContent = '+ 📅 Log last 24hrs';
+            otherBtn.textContent = _t('journal.banner.last24Log');
             otherBtn.style.background = 'rgba(255,149,0,0.9)';
             otherBtn.style.color = 'white';
             otherBtn.style.border = 'none';
@@ -6518,9 +6522,9 @@ window.addEventListener('pageshow', () => {
       let html = `<div style="font-weight:700;color:#495057;margin-bottom:14px;font-size:0.95em;">🗓️ ${dateStr}</div>`;
 
       if (!entry) {
-        html += `<div style="color:#adb5bd;text-align:center;padding:10px 0 12px;font-size:0.9em;">No entry logged for this day.</div>
+        html += `<div style="color:#adb5bd;text-align:center;padding:10px 0 12px;font-size:0.9em;">${_t('journal.calendar.noEntry')}</div>
           <div style="text-align:center;">
-            <button onclick="openFormForNewEntry('${key}')" class="confirm-btn confirm-btn-no" style="font-size:0.85em;">+ Add entry</button>
+            <button onclick="openFormForNewEntry('${key}')" class="confirm-btn confirm-btn-no" style="font-size:0.85em;">${_t('journal.calendar.addEntry')}</button>
           </div>`;
       } else {
         const color = moodColors[entry.mood] || '#adb5bd';

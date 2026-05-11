@@ -103,7 +103,8 @@
 // v32: v1.2 — translate submit buttons, save-confirm modal, edit button states, draft status.
 // v33: v1.2 — translate calendar entry rows and delete-field-confirm modal.
 // v34: v1.2 — translate mood-info modal labels, Bipolar UK toggle, and mood-linking buttons.
-const CACHE_NAME = 'bipolarbear-v34';
+// v35: v1.2 — translate missing-entries banner (with pluralization), calendar empty state, focused-mode preview chips.
+const CACHE_NAME = 'bipolarbear-v35';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
