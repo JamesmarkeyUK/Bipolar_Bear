@@ -122,14 +122,14 @@
     <header>
       <div style="display:flex; justify-content:flex-start; align-items:center; margin-bottom:16px;">
         <div style="display:flex;flex-direction:column;align-items:flex-start;gap:0;">
-          <a id="homeLink" href="index.html" onclick="event.preventDefault(); _advanceOnboardingStep(4); location.replace('index.html')" class="home-link-journal">← Home</a>
+          <a id="homeLink" href="index.html" onclick="event.preventDefault(); _advanceOnboardingStep(4); location.replace('index.html')" class="home-link-journal" data-i18n="journal.nav.home">← Home</a>
           <!-- Onboarding hint 3: step 2 — points up at home button -->
           <div id="journalHint3" style="display:none;flex-direction:column;align-items:flex-start;gap:2px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-top:2px;">
             <svg width="24" height="22" viewBox="0 0 24 22" fill="none" style="transform:rotate(0deg);">
               <path d="M12,20 Q8,10 12,2" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" fill="none"/>
               <polyline points="7,6 12,1 17,6" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
             </svg>
-            <span style="font-size:0.72em;font-weight:700;font-style:italic;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-family:'Georgia',serif;letter-spacing:0.01em;white-space:nowrap;">🐻 Go back here</span>
+            <span style="font-size:0.72em;font-weight:700;font-style:italic;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-family:'Georgia',serif;letter-spacing:0.01em;white-space:nowrap;" data-i18n="journal.hint.goBack">🐻 Go back here</span>
           </div>
         </div>
         <div style="margin-left:auto;position:relative;">
@@ -412,14 +412,14 @@
     <!-- Journal Toggle Button (hidden until initial load completes) -->
     <!-- Onboarding hint 2: step 1 — points down to the journal toggle button -->
     <div id="journalHint2" style="display:none;flex-direction:column;align-items:center;gap:2px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-bottom:-6px;">
-      <span style="font-size:0.78em;font-weight:700;font-style:italic;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-family:'Georgia',serif;letter-spacing:0.01em;text-align:center;max-width:220px;line-height:1.4;">🐻 Click to open your past entries and statistics</span>
+      <span style="font-size:0.78em;font-weight:700;font-style:italic;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-family:'Georgia',serif;letter-spacing:0.01em;text-align:center;max-width:220px;line-height:1.4;" data-i18n="journal.hint.openEntries">🐻 Click to open your past entries and statistics</span>
       <svg width="24" height="22" viewBox="0 0 24 22" fill="none">
         <path d="M12,2 Q8,12 12,20" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" fill="none"/>
         <polyline points="7,16 12,21 17,16" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
       </svg>
     </div>
     <div id="journalToggleSection" style="display:none; text-align: center; margin: 20px 0;">
-      <button onclick="toggleJournal()" id="journalToggleBtn" class="journal-toggle-btn" style="padding: 15px 30px; background: rgba(255,255,255,0.2); color: white; text-shadow: 0 1px 4px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.6); border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 1.1em; backdrop-filter: blur(10px); -webkit-tap-highlight-color:transparent;">
+      <button onclick="toggleJournal()" id="journalToggleBtn" class="journal-toggle-btn" style="padding: 15px 30px; background: rgba(255,255,255,0.2); color: white; text-shadow: 0 1px 4px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.6); border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 1.1em; backdrop-filter: blur(10px); -webkit-tap-highlight-color:transparent;" data-i18n="journal.btn.openJournal">
         📔 Open Journal
       </button>
     </div>
@@ -429,7 +429,7 @@
         <path d="M12,20 Q8,10 12,2" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" fill="none"/>
         <polyline points="7,6 12,1 17,6" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
       </svg>
-      <span style="font-size:0.78em;font-weight:700;font-style:italic;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-family:'Georgia',serif;letter-spacing:0.01em;text-align:center;max-width:220px;line-height:1.4;">🐻 Close the journal again here</span>
+      <span style="font-size:0.78em;font-weight:700;font-style:italic;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-family:'Georgia',serif;letter-spacing:0.01em;text-align:center;max-width:220px;line-height:1.4;" data-i18n="journal.hint.closeJournal">🐻 Close the journal again here</span>
     </div>
 
     <div class="card" id="journalCard" style="display: none;">
@@ -1161,7 +1161,7 @@
 
           <div id="customiseFormWrap" style="margin-bottom:16px;position:relative;">
           <div id="customiseFormHintEl" style="display:none;flex-direction:column;align-items:flex-end;gap:2px;margin-bottom:4px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;">
-            <span style="font-size:0.72em;font-weight:700;font-style:italic;color:var(--brand-primary);font-family:'Georgia',serif;letter-spacing:0.01em;">🐻 Click here</span>
+            <span style="font-size:0.72em;font-weight:700;font-style:italic;color:var(--brand-primary);font-family:'Georgia',serif;letter-spacing:0.01em;" data-i18n="journal.hint.clickHere">🐻 Click here</span>
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><line x1="8" y1="2" x2="8" y2="13" stroke="var(--brand-primary)" stroke-width="2" stroke-linecap="round"/><polyline points="3,8 8,13 13,8" stroke="var(--brand-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
           </div>
           <details id="customiseFormDetails" ontoggle="if(this.open){_onCustomiseDetailsOpen();localStorage.removeItem('bbCustomiseFormCollapsed');}else{localStorage.setItem('bbCustomiseFormCollapsed','1');}">
@@ -1180,7 +1180,7 @@
           <button onclick="showAchievementsPanel()" style="background: none; border: none; color: #6c757d; font-size: 0.82em; cursor: pointer; padding: 4px 8px; letter-spacing: 0.02em;">🏅 Achievements</button>
           <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
             <div id="advancedSettingsBadgeHint" style="display:none;flex-direction:row;align-items:center;gap:3px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-bottom:2px;">
-              <span style="font-size:0.78em;font-weight:700;font-style:italic;color:var(--brand-primary);font-family:'Georgia',serif;">🐻 Click here</span>
+              <span style="font-size:0.78em;font-weight:700;font-style:italic;color:var(--brand-primary);font-family:'Georgia',serif;" data-i18n="journal.hint.clickHere">🐻 Click here</span>
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><line x1="8" y1="2" x2="8" y2="13" stroke="var(--brand-primary)" stroke-width="2.5" stroke-linecap="round"/><polyline points="3,8 8,13 13,8" stroke="var(--brand-primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
             </div>
             <button id="advancedSettingsBtn" onclick="openAdvancedSettings()" style="background: none; border: none; color: #6c757d; font-size: 0.82em; cursor: pointer; padding: 4px 8px; letter-spacing: 0.02em;">🛠️ Advanced ▸</button>
