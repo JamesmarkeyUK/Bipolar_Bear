@@ -1170,11 +1170,12 @@ window.addEventListener('pageshow', () => {
       const els = [document.getElementById('draftStatus'), document.getElementById('fmDraftStatus')];
       els.forEach(el => {
         if (!el) return;
+        const _t = (k) => (window.BB && BB.t) ? BB.t(k) : k;
         if (state === 'saving') {
-          el.textContent = 'Saving draft…';
+          el.textContent = _t('journal.draft.saving');
           el.style.opacity = '1';
         } else if (state === 'saved') {
-          el.textContent = '✓ Draft saved';
+          el.textContent = _t('journal.draft.saved');
           el.style.opacity = '1';
           clearTimeout(el._fadeTimer);
           el._fadeTimer = setTimeout(() => { el.style.opacity = '0'; }, 2500);
@@ -2817,9 +2818,10 @@ window.addEventListener('pageshow', () => {
       if (summary) summary.innerHTML = _fmRenderContent({ id: 'done' });
       const _isEditing = !!editingEntry;
       const titleEl = document.getElementById('saveConfirmTitle');
-      if (titleEl) titleEl.textContent = _isEditing ? 'Update entry? ✏️' : 'Ready to save? ✨';
+      const _t = (k) => (window.BB && BB.t) ? BB.t(k) : k;
+      if (titleEl) titleEl.textContent = _isEditing ? _t('journal.save.confirmTitleEdit') : _t('journal.save.confirmTitleNew');
       const saveBtnEl = document.getElementById('saveConfirmSaveBtn');
-      if (saveBtnEl) saveBtnEl.textContent = _isEditing ? 'Update entry ✏️' : 'Save ✨';
+      if (saveBtnEl) saveBtnEl.textContent = _isEditing ? _t('journal.save.confirmBtnEdit') : _t('journal.save.confirmBtnNew');
       document.getElementById('saveConfirmModal').classList.add('active');
     }
     function closeSaveConfirmModal() {
@@ -4040,12 +4042,13 @@ window.addEventListener('pageshow', () => {
         nextRow.style.display = 'flex';
       }
       const _accent = (selectedMood && _FM_MOOD_COLORS[selectedMood]) || 'var(--brand-primary)';
+      const _t = (k) => (window.BB && BB.t) ? BB.t(k) : k;
       if (step.id === 'done') {
         const _noChanges = editingEntry && !_hasEditChanges();
-        nextBtn.textContent = !selectedMood ? '😊 Select a mood →' : (_noChanges ? 'Close' : (editingEntry ? '✏️ Update entry' : '💾 Save Entry'));
+        nextBtn.textContent = !selectedMood ? _t('journal.save.fmSelectMood') : (_noChanges ? _t('journal.save.fmClose') : (editingEntry ? _t('journal.save.fmEdit') : _t('journal.save.fmSave')));
         nextBtn.style.background = (_noChanges || !selectedMood) ? '#adb5bd' : _accent;
       } else {
-        nextBtn.textContent = 'Next →';
+        nextBtn.textContent = _t('common.next') + ' →';
         nextBtn.style.background = _accent;
       }
       if (delBtn) delBtn.style.display = step.id === 'done' ? '' : 'none';
@@ -5964,9 +5967,10 @@ window.addEventListener('pageshow', () => {
 
     // Show section with toggle (new entry — date defaults to today, picker hidden)
     function newEntryBtnLabel() {
+      const _t = (k) => (window.BB && BB.t) ? BB.t(k) : k;
       return localStorage.getItem('journalDefaultToday') === 'true'
-        ? "Save Today's Entry ✨"
-        : "📅 Log last 24hrs ✨";
+        ? _t('journal.save.submitToday')
+        : _t('journal.save.submitLast24');
     }
 
     function showDatePickerForNew() {
@@ -6190,13 +6194,14 @@ window.addEventListener('pageshow', () => {
       if (!editingEntry) return;
       const btn = document.getElementById('submitBtn');
       if (!btn) return;
+      const _t = (k) => (window.BB && BB.t) ? BB.t(k) : k;
       if (_hasEditChanges()) {
-        btn.textContent = 'Update entry ✏️';
+        btn.textContent = _t('journal.save.confirmBtnEdit');
         btn.style.background = '';
         btn.style.color = '';
         btn.style.border = '';
       } else {
-        btn.textContent = 'Close';
+        btn.textContent = _t('journal.save.fmClose');
         btn.style.background = '#adb5bd';
         btn.style.color = 'white';
         btn.style.border = '2px solid #adb5bd';
@@ -6228,7 +6233,7 @@ window.addEventListener('pageshow', () => {
       const now = new Date(); now.setHours(0,0,0,0);
       const toKey = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
       const btn = document.getElementById('submitBtn');
-      if (btn) btn.textContent = dateStr === toKey(now) ? "Save Today's Entry ✨" : "Log Yesterday's Entry ✨";
+      if (btn) btn.textContent = (window.BB && BB.t) ? BB.t(dateStr === toKey(now) ? 'journal.save.submitToday' : 'journal.save.submitYesterday') : (dateStr === toKey(now) ? "Save Today's Entry ✨" : "Log Yesterday's Entry ✨");
       const _sodeCard = document.getElementById('entryFormCard');
       if (_sodeCard) setTimeout(() => { const _r = _sodeCard.getBoundingClientRect(); window.scrollTo({ top: Math.max(0, _r.top + window.scrollY - Math.max(16, (window.innerHeight - _r.height) / 2)), behavior: 'smooth' }); }, 80);
       _maybeFocusedModeAfterFormShown();
@@ -9733,7 +9738,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       const _now = new Date(); _now.setHours(0,0,0,0);
       const _todayKey = `${_now.getFullYear()}-${String(_now.getMonth()+1).padStart(2,'0')}-${String(_now.getDate()).padStart(2,'0')}`;
       const _btn = document.getElementById('submitBtn');
-      if (_btn) _btn.textContent = dateValue === _todayKey ? "Save Today's Entry ✨" : "Log Entry ✨";
+      if (_btn) _btn.textContent = (window.BB && BB.t) ? BB.t(dateValue === _todayKey ? 'journal.save.submitToday' : 'journal.save.submitOther') : (dateValue === _todayKey ? "Save Today's Entry ✨" : "Log Entry ✨");
       checkMissingEntry(document.getElementById('entryDate'));
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -9752,7 +9757,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         const now = new Date(); now.setHours(0,0,0,0);
         const todayKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
         const btn = document.getElementById('submitBtn');
-        if (btn) btn.textContent = input.value === todayKey ? "Save Today's Entry ✨" : "Log Entry ✨";
+        if (btn) btn.textContent = (window.BB && BB.t) ? BB.t(input.value === todayKey ? 'journal.save.submitToday' : 'journal.save.submitOther') : (input.value === todayKey ? "Save Today's Entry ✨" : "Log Entry ✨");
       }
     }
     window.onEntryDateChange = onEntryDateChange;

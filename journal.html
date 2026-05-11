@@ -365,7 +365,7 @@
       <div style="display:flex; gap:10px; align-items:stretch; margin-top:12px;">
         <button id="editDeleteBtn" onclick="deleteEditingEntry()" style="display:none; min-width:52px; background:white; color:#ff6b6b; border:none; border-radius:10px; font-size:1.3em; cursor:pointer; box-shadow:0 3px 12px rgba(0,0,0,0.15); transition:all 0.3s ease; -webkit-tap-highlight-color:transparent;">🗑️</button>
         <button id="draftClearBtn" onclick="clearDraftWithConfirm()" class="hidden-until-mood" style="min-width:52px; background:white; color:#ff6b6b; border:none; border-radius:10px; font-size:1.3em; cursor:pointer; box-shadow:0 3px 12px rgba(0,0,0,0.15); transition:all 0.3s ease; -webkit-tap-highlight-color:transparent;">🗑️</button>
-        <button class="submit-btn hidden-until-mood" id="submitBtn" onclick="showSaveConfirmModal()" style="flex:1; min-width:0; width:auto;">Save Today's Entry ✨</button>
+        <button class="submit-btn hidden-until-mood" id="submitBtn" data-i18n="journal.save.submitToday" onclick="showSaveConfirmModal()" style="flex:1; min-width:0; width:auto;">Save Today's Entry ✨</button>
       </div>
       <div id="draftStatus" style="text-align:center; font-size:0.78em; color:#6c757d; margin-top:6px; min-height:1.1em; transition:opacity 0.5s ease; opacity:0;"></div>
     </div>
@@ -764,13 +764,13 @@
   <div class="confirm-modal" id="saveConfirmModal" onclick="if(event.target===this)closeSaveConfirmModal()">
     <div class="confirm-content" style="max-width:500px;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-        <h3 id="saveConfirmTitle" style="margin:0;">Ready to save? ✨</h3>
+        <h3 id="saveConfirmTitle" data-i18n="journal.save.confirmTitleNew" style="margin:0;">Ready to save? ✨</h3>
         <button onclick="closeSaveConfirmModal()" style="background:none;border:none;font-size:1.4em;cursor:pointer;color:#6c757d;line-height:1;padding:2px 4px;-webkit-tap-highlight-color:transparent;">✕</button>
       </div>
       <div id="saveConfirmSummary" style="margin-bottom:16px;"></div>
       <div class="confirm-buttons">
-        <button class="confirm-btn confirm-btn-no" onclick="closeSaveConfirmModal()">← Edit</button>
-        <button id="saveConfirmSaveBtn" class="confirm-btn confirm-btn-yes" onclick="closeSaveConfirmModal(); saveAndOpenJournal()" style="color:var(--brand-primary);border-color:var(--brand-primary);">Save ✨</button>
+        <button class="confirm-btn confirm-btn-no" data-i18n="journal.save.confirmCancel" onclick="closeSaveConfirmModal()">← Edit</button>
+        <button id="saveConfirmSaveBtn" class="confirm-btn confirm-btn-yes" data-i18n="journal.save.confirmBtnNew" onclick="closeSaveConfirmModal(); saveAndOpenJournal()" style="color:var(--brand-primary);border-color:var(--brand-primary);">Save ✨</button>
       </div>
     </div>
   </div>
