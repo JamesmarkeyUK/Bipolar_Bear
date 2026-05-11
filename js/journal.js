@@ -3552,19 +3552,30 @@ window.addEventListener('pageshow', () => {
       { val:11,  label:'💤 10+h',  color:'#7B68EE' },
     ];
 
+    function _fmFormatPromptDate(d) {
+      const lang = (window.BB && BB.i18n && BB.i18n.getLang && BB.i18n.getLang()) || 'en';
+      if (lang === 'en') {
+        const day = d.getDate();
+        const ord = day % 10 === 1 && day !== 11 ? 'st' : day % 10 === 2 && day !== 12 ? 'nd' : day % 10 === 3 && day !== 13 ? 'rd' : 'th';
+        const month = d.toLocaleDateString('en-GB', { month: 'short' });
+        return `${day}${ord} ${month}`;
+      }
+      const localeMap = { zh: 'zh-Hans' };
+      try { return d.toLocaleDateString(localeMap[lang] || lang, { day: 'numeric', month: 'short' }); }
+      catch (_) { return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); }
+    }
+
     function _fmMoodTitle() {
       const val = document.getElementById('entryDate')?.value;
-      if (!val) return 'How did you feel?';
+      const _t = (k, vars) => (window.BB && BB.t) ? BB.t(k, vars) : k;
+      if (!val) return _t('journal.prompt.howFallback');
       const now = new Date(); now.setHours(0,0,0,0);
       const toKey = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
       const yesterday = new Date(now); yesterday.setDate(now.getDate() - 1);
-      if (val === toKey(now)) return 'How is today going?';
-      if (val === toKey(yesterday)) return 'How was yesterday?';
+      if (val === toKey(now)) return _t('journal.prompt.howToday');
+      if (val === toKey(yesterday)) return _t('journal.prompt.howYesterday');
       const d = new Date(val + 'T00:00:00');
-      const day = d.getDate();
-      const ord = day % 10 === 1 && day !== 11 ? 'st' : day % 10 === 2 && day !== 12 ? 'nd' : day % 10 === 3 && day !== 13 ? 'rd' : 'th';
-      const month = d.toLocaleDateString('en-GB', { month: 'short' });
-      return `How was ${day}${ord} ${month}?`;
+      return _t('journal.prompt.howDate', { date: _fmFormatPromptDate(d) });
     }
 
     function _fmIsTracking(key, legacy) {
@@ -5829,7 +5840,9 @@ window.addEventListener('pageshow', () => {
       }
       document.getElementById('todayCompleteSection').style.display = currentDone ? '' : 'none';
       const label = document.getElementById('entryCompleteLabel');
-      if (label) label.textContent = useToday ? "View today's entry" : "View yesterday's entry";
+      if (label) label.textContent = (window.BB && BB.t)
+        ? BB.t(useToday ? 'journal.prompt.viewTodayEntry' : 'journal.prompt.viewYesterdayEntry')
+        : (useToday ? "View today's entry" : "View yesterday's entry");
 
       const otherKey = useToday ? toKey(yesterday) : todayKey;
       const otherDone = entryDates.has(otherKey);
@@ -9736,16 +9749,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       if (!h) return;
       const val = document.getElementById('entryDate')?.value;
       if (!val) return;
-      const now = new Date(); now.setHours(0,0,0,0);
-      const toKey = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-      const yesterday = new Date(now); yesterday.setDate(now.getDate() - 1);
-      if (val === toKey(now)) { h.textContent = 'How is today going?'; return; }
-      if (val === toKey(yesterday)) { h.textContent = 'How was yesterday?'; return; }
-      const d = new Date(val + 'T00:00:00');
-      const day = d.getDate();
-      const ord = day % 10 === 1 && day !== 11 ? 'st' : day % 10 === 2 && day !== 12 ? 'nd' : day % 10 === 3 && day !== 13 ? 'rd' : 'th';
-      const month = d.toLocaleDateString('en-GB', { month: 'short' });
-      h.textContent = `How was ${day}${ord} ${month}?`;
+      h.textContent = (typeof _fmMoodTitle === 'function') ? _fmMoodTitle() : h.textContent;
     }
 
     // Function to set date picker to today
