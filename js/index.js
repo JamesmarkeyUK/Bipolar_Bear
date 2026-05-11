@@ -338,6 +338,11 @@ const journalFeatures = [
       if (typeof currentUser !== 'undefined' && currentUser && typeof db !== 'undefined' && db) {
         db.collection('userSettings').doc(currentUser.uid).set({ onboardingStep: to }, { merge: true }).catch(() => {});
       }
+      // Unlock the FAB dock (incl. the settings/auth FAB) the moment tutorial completes,
+      // so it appears immediately at step 12 — not only after the "Tutorial Complete!"
+      // popup is dismissed. Must run before _applyOnboardingGating so the gating pass
+      // below picks it up.
+      if (to >= 12) BB.storage.set('FabsUnlocked', '1');
       _applyOnboardingGating();
       // Show tutorial complete popup the first time step reaches 12
       if (to >= 12 && BB.storage.get('TutorialToastShown') !== '1') {
@@ -386,9 +391,6 @@ const journalFeatures = [
       });
       overlay.addEventListener('click', () => {
         overlay.remove();
-        // Unlock FABs now that tutorial popup is dismissed
-        BB.storage.set('FabsUnlocked', '1');
-        _applyOnboardingGating();
       });
       document.body.appendChild(overlay);
       overlay.style.opacity = '0';
