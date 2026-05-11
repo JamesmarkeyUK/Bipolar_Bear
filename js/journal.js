@@ -3585,18 +3585,30 @@ window.addEventListener('pageshow', () => {
       return key === 'trackBudget'; // trackBudget on by default
     }
 
+    function _fmFormatLongDate(d) {
+      const lang = (window.BB && BB.i18n && BB.i18n.getLang && BB.i18n.getLang()) || 'en';
+      if (lang === 'en') {
+        const day = d.getDate();
+        const ord = day % 10 === 1 && day !== 11 ? 'st' : day % 10 === 2 && day !== 12 ? 'nd' : day % 10 === 3 && day !== 13 ? 'rd' : 'th';
+        const month = d.toLocaleDateString('en-GB', { month: 'long' });
+        return `${day}${ord} ${month}`;
+      }
+      const localeMap = { zh: 'zh-Hans' };
+      try { return d.toLocaleDateString(localeMap[lang] || lang, { day: 'numeric', month: 'long' }); }
+      catch (_) { return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' }); }
+    }
+
     function _fmDateHelper() {
       const val = document.getElementById('entryDate')?.value;
+      const _t = (k, vars) => (window.BB && BB.t) ? BB.t(k, vars) : k;
       const now = new Date(); now.setHours(0,0,0,0);
       const toKey = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
       const yesterday = new Date(now); yesterday.setDate(now.getDate() - 1);
       const isYest = !val || val === toKey(yesterday);
-      if (isYest) return { isYest: true, dayPhrase: 'yesterday', nightPhrase: 'last night' };
+      if (isYest) return { isYest: true, dayPhrase: _t('journal.phrase.yesterday'), nightPhrase: _t('journal.phrase.lastNight') };
       const d = new Date(val + 'T00:00:00');
-      const day = d.getDate();
-      const ord = day % 10 === 1 && day !== 11 ? 'st' : day % 10 === 2 && day !== 12 ? 'nd' : day % 10 === 3 && day !== 13 ? 'rd' : 'th';
-      const month = d.toLocaleDateString('en-GB', { month: 'long' });
-      return { isYest: false, dayPhrase: `on ${day}${ord} ${month}`, nightPhrase: `the night of ${day}${ord} ${month}` };
+      const longDate = _fmFormatLongDate(d);
+      return { isYest: false, dayPhrase: _t('journal.phrase.onDate', { date: longDate }), nightPhrase: _t('journal.phrase.nightOfDate', { date: longDate }) };
     }
 
     function _buildFocusedSteps() {
@@ -3606,37 +3618,38 @@ window.addEventListener('pageshow', () => {
       try { const _ml = JSON.parse(localStorage.getItem('currentMedList') || '[]'); _medListLen = Array.isArray(_ml) ? _ml.length : 0; } catch(e) {}
       const hasMeds = _medListLen > 0 || !!selectedMedication;
       const _dh = _fmDateHelper();
+      const _t = (k, vars) => (window.BB && BB.t) ? BB.t(k, vars) : k;
       const steps = [
         { id:'mood', title:_fmMoodTitle(), subtitle:'', auto:true },
       ];
       if (!_disSteps.includes('energy'))
-        steps.push({ id:'energy', title:'Energy level?', subtitle:`How much energy did you have ${_dh.dayPhrase}?`, auto:true });
+        steps.push({ id:'energy', title:_t('journal.fm.energyTitle'), subtitle:_t('journal.fm.energySub', { phrase: _dh.dayPhrase }), auto:true });
       if (!_disSteps.includes('sleep')) {
-        steps.push({ id:'sleep', title: _dh.isYest ? 'How was last night\'s sleep?' : `How did you sleep ${_dh.nightPhrase}?`, subtitle:'Tap a range or sync from Health', auto:true });
+        steps.push({ id:'sleep', title: _dh.isYest ? _t('journal.fm.sleepTitleYest') : _t('journal.fm.sleepTitleOther', { phrase: _dh.nightPhrase }), subtitle:_t('journal.fm.sleepSub'), auto:true });
       }
       // sleepQuality step is always included — only shown when user long-presses a sleep range
-      steps.push({ id:'sleepQuality', title:'Sleep quality?', subtitle:'', auto:true });
+      steps.push({ id:'sleepQuality', title:_t('journal.fm.sleepQualityTitle'), subtitle:'', auto:true });
       if (!_disSteps.includes('medication'))
-        steps.push({ id:'medication', title:`Did you take your medication ${_dh.nightPhrase}?`, subtitle:'', auto:true });
+        steps.push({ id:'medication', title:_t('journal.fm.medsTitle', { phrase: _dh.nightPhrase }), subtitle:'', auto:true });
       // More data step — all activated tracking fields shown together (order mirrors field picker)
       const _extras = [];
       if (_fmIsTracking('trackGoals'))
-        _extras.push({ id:'goals',    label:'🏅 Goals' });
+        _extras.push({ id:'goals',    label:_t('journal.field.goals') });
       if (_fmIsTracking('trackBudget'))
-        _extras.push({ id:'budget',   label:'💰 Budget' });
+        _extras.push({ id:'budget',   label:_t('journal.field.budget') });
       if (_fmIsTracking('trackExercise') && !_delBuiltinSteps.includes('trackExercise'))
-        _extras.push({ id:'exercise', label:'🏋️ Exercise' });
+        _extras.push({ id:'exercise', label:_t('journal.field.exercise') });
       if (_fmIsTracking('trackOutside') && !_delBuiltinSteps.includes('trackOutside'))
-        _extras.push({ id:'outside',  label:'🌤️ Outside' });
+        _extras.push({ id:'outside',  label:_t('journal.field.outside') });
       if (_fmIsTracking('trackAnxiety', 'trackEmotions') && !_delBuiltinSteps.includes('trackAnxiety'))
-        _extras.push({ id:'anxiety',  label:'😰 Emotions, stress & irritability' });
+        _extras.push({ id:'anxiety',  label:_t('journal.field.anxiety') });
       if (_fmIsTracking('trackAlcohol') && !_delBuiltinSteps.includes('trackAlcohol'))
-        _extras.push({ id:'alcohol',  label:'🍺 Alcohol' });
+        _extras.push({ id:'alcohol',  label:_t('journal.field.alcohol') });
       if (!_disSteps.includes('more_data'))
-        steps.push({ id:'more_data', title:'Additional tracking', subtitle: _extras.length ? 'Answer any that apply' : '', auto:false, extras:_extras });
+        steps.push({ id:'more_data', title:_t('journal.fm.moreDataTitle'), subtitle: _extras.length ? _t('journal.fm.moreDataSub') : '', auto:false, extras:_extras });
       if (!_disSteps.includes('notes'))
-        steps.push({ id:'notes', title:'Any notes?', subtitle:'Optional — skip if nothing to add', auto:false });
-      steps.push({ id:'done',  title:'Ready to save', subtitle:'Your entry at a glance',            auto:false });
+        steps.push({ id:'notes', title:_t('journal.fm.notesTitle'), subtitle:_t('journal.fm.notesSub'), auto:false });
+      steps.push({ id:'done',  title:_t('journal.fm.doneTitle'), subtitle:_t('journal.fm.doneSub'), auto:false });
       return steps;
     }
 
