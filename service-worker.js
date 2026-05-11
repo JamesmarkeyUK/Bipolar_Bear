@@ -98,7 +98,8 @@
 //     tutorial reaches step 12, instead of waiting for the user to dismiss
 //     the "Tutorial Complete!" popup.
 // v29: v1.2 — settings/auth FAB unlocks after first journal entry (not tutorial completion).
-const CACHE_NAME = 'bipolarbear-v29';
+// v30: v1.2 — wire mood-form heading and view-entry label through i18n (was hardcoded English).
+const CACHE_NAME = 'bipolarbear-v30';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

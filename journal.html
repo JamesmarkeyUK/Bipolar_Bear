@@ -195,7 +195,7 @@
     <div id="todayCompleteSection" style="display:none; text-align:center; margin-bottom:16px;">
       <div id="editTodayBtn" onclick="viewTodayEntry()" style="background:rgba(255,255,255,0.1); border:1.5px solid rgba(255,255,255,0.2); border-radius:16px; padding:12px 18px; display:inline-flex; align-items:center; gap:10px; cursor:pointer; -webkit-tap-highlight-color:transparent;">
         <span style="font-size:1.2em;">✅</span>
-        <span id="entryCompleteLabel" style="color:#fff; text-shadow:0 1px 3px rgba(0,0,0,0.3); font-weight:600; font-size:0.9em;">View yesterday's entry</span>
+        <span id="entryCompleteLabel" data-i18n="journal.prompt.viewYesterdayEntry" style="color:#fff; text-shadow:0 1px 3px rgba(0,0,0,0.3); font-weight:600; font-size:0.9em;">View yesterday's entry</span>
       </div>
       <div id="completionActionsRow" style="display:none; justify-content:center; gap:8px; flex-wrap:wrap; margin-top:8px;">
         <button id="missingEntriesAction" onclick="showMissingDates()" style="display:none; background:rgba(255,149,0,0.9); color:white; border:none; border-radius:20px; padding:7px 16px; font-size:0.85em; font-weight:600; cursor:pointer; -webkit-tap-highlight-color:transparent; box-shadow:0 2px 8px rgba(0,0,0,0.15);"></button>
@@ -207,7 +207,7 @@
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
         <button id="editCancelBtn" onclick="cancelEdit()" style="display:none;background:none;border:none;color:#6c757d;font-size:0.82em;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;">← Back</button>
         <button id="formCalendarBtn" onclick="toggleDatePicker()" style="background:none;border:none;font-size:1.5em;cursor:pointer;padding:4px;line-height:1;-webkit-tap-highlight-color:transparent;flex-shrink:0;" title="Change date">🗓️</button>
-        <h2 id="entryFormHeading" style="margin:0;flex:1;text-align:center;">How was yesterday?</h2>
+        <h2 id="entryFormHeading" data-i18n="journal.prompt.howYesterday" style="margin:0;flex:1;text-align:center;">How was yesterday?</h2>
         <button id="favouriteBtn" onclick="toggleFavourite()" style="background:none;border:none;font-size:1.5em;cursor:pointer;padding:4px;line-height:1;color:#6c757d;-webkit-tap-highlight-color:transparent;flex-shrink:0;" title="Favourite">☆</button>
       </div>
       
