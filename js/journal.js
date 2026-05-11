@@ -1461,7 +1461,7 @@ window.addEventListener('pageshow', () => {
         const _tipEl = document.getElementById('moodSelectorTip');
         if (_tipEl && !window.Capacitor && !BB.storage.get('_moodTipShown')) {
           BB.storage.set('_moodTipShown', '1');
-          _tipEl.textContent = '💡 Click again for more info';
+          _tipEl.textContent = (window.BB && BB.t) ? BB.t('journal.moodInfo.clickAgainTip') : '💡 Click again for more info';
           _tipEl.style.display = '';
           setTimeout(() => { _tipEl.style.opacity = '0'; _tipEl.style.transition = 'opacity 0.5s'; setTimeout(() => { _tipEl.style.display = 'none'; _tipEl.style.opacity = ''; _tipEl.style.transition = ''; }, 500); }, 3000);
         }
@@ -1490,7 +1490,10 @@ window.addEventListener('pageshow', () => {
     function showMoodInfo(mood) {
       const def = moodDefinitions[mood];
       if (!def) return;
-      const label = mood.charAt(0).toUpperCase() + mood.slice(1);
+      const _t = (k, vars) => (window.BB && BB.t) ? BB.t(k, vars) : k;
+      const _moodKeyMap = { manic:'mood.manic', elevated:'mood.elevated', stable:'mood.good', good:'mood.good', low:'mood.low', depressed:'mood.depressed' };
+      const _moodKey = _moodKeyMap[mood];
+      const label = (_moodKey && window.BB && BB.t) ? BB.t(_moodKey) : (mood.charAt(0).toUpperCase() + mood.slice(1));
       document.getElementById('moodInfoHeader').style.background = def.color;
       document.getElementById('moodInfoIcon').src = `images/moods/${mood}.png`;
       document.getElementById('moodInfoIcon').alt = label;
@@ -1504,10 +1507,13 @@ window.addEventListener('pageshow', () => {
         _personalDef = _defs[_defKey] || '';
       } catch(e) {}
 
-      // Show bipolar UK definition — collapse it behind a toggle when personal def exists
-      const _bipolarHtml = `${def.text}<br><a href="${_bipolarUkUrl}" target="_blank" style="color:var(--brand-primary);font-size:0.82em;white-space:nowrap;">Full definition — Bipolar UK ↗</a>`;
+      // Bipolar UK definition text is kept in English — it's sourced from Bipolar UK
+      // and translating it would produce unofficial medical content. The UI chrome
+      // around it (toggle button, link label) is translated below.
+      const _bipolarHtml = `${def.text}<br><a href="${_bipolarUkUrl}" target="_blank" style="color:var(--brand-primary);font-size:0.82em;white-space:nowrap;">${_t('journal.moodInfo.bipolarUkLink')}</a>`;
       if (_personalDef) {
-        document.getElementById('moodInfoBody').innerHTML = `<button onclick="const b=document.getElementById('_moodBipBody');const open=b.style.display!=='none';b.style.display=open?'none':'';this.textContent=open?'Bipolar UK Definition — click here':'Bipolar UK Definition';" style="background:none;border:none;color:#adb5bd;font-size:0.82em;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px;-webkit-tap-highlight-color:transparent;">Bipolar UK Definition — click here</button><div id="_moodBipBody" style="display:none;margin-top:6px;font-size:0.9em;color:#495057;line-height:1.65;">${_bipolarHtml}</div>`;
+        // Initial state: body collapsed → button shows the "click here" prompt.
+        document.getElementById('moodInfoBody').innerHTML = `<button onclick="window._toggleBipolarDef(this)" style="background:none;border:none;color:#adb5bd;font-size:0.82em;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px;-webkit-tap-highlight-color:transparent;">${_t('journal.moodInfo.bipolarUkToggleOpen')}</button><div id="_moodBipBody" style="display:none;margin-top:6px;font-size:0.9em;color:#495057;line-height:1.65;">${_bipolarHtml}</div>`;
       } else {
         document.getElementById('moodInfoBody').innerHTML = _bipolarHtml;
       }
@@ -1567,7 +1573,11 @@ window.addEventListener('pageshow', () => {
       const _linkBtn = document.getElementById('moodInfoLinkBtn');
       const _linkCaption = document.getElementById('moodInfoLinkCaption');
       if (_linkRow && _linkBtn) {
-        const _cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+        const _tMoodName = (m) => {
+          const _map = { manic:'mood.manic', elevated:'mood.elevated', stable:'mood.good', good:'mood.good', low:'mood.low', depressed:'mood.depressed' };
+          if (_map[m] && window.BB && BB.t) return BB.t(_map[m]);
+          return m.charAt(0).toUpperCase() + m.slice(1);
+        };
         const _moodLinkingOn = localStorage.getItem('moodLinkingEnabled') === '1';
         const _isPrimary = selectedMood && mood === selectedMood;
         const _isDifferent = selectedMood && mood !== selectedMood;
@@ -1575,7 +1585,7 @@ window.addEventListener('pageshow', () => {
           // Long-pressed own mood — offer to open secondary picker
           _linkRow.style.display = '';
           if (selectedLinkedMood) {
-            _linkBtn.textContent = `✕ Remove linked ${_cap(selectedLinkedMood)}`;
+            _linkBtn.textContent = _t('journal.moodInfo.removeLinkedWithMood', { mood: _tMoodName(selectedLinkedMood) });
             _linkCaption.style.display = 'none';
             _linkBtn.onclick = () => {
               selectedLinkedMood = null;
@@ -1585,7 +1595,7 @@ window.addEventListener('pageshow', () => {
               scheduleDraftSave();
             };
           } else {
-            _linkBtn.textContent = '🔗 Add secondary mood';
+            _linkBtn.textContent = _t('journal.moodInfo.addSecondary');
             _linkCaption.style.display = '';
             _linkBtn.onclick = () => {
               _fmLinkMoodPickerOpen = true;
@@ -1597,7 +1607,7 @@ window.addEventListener('pageshow', () => {
           // Long-pressed a different mood — offer to link it directly
           _linkRow.style.display = '';
           if (selectedLinkedMood === mood) {
-            _linkBtn.textContent = '✕ Remove linked mood';
+            _linkBtn.textContent = _t('journal.moodInfo.removeLinked');
             _linkCaption.style.display = 'none';
             _linkBtn.onclick = () => {
               selectedLinkedMood = null;
@@ -1606,7 +1616,7 @@ window.addEventListener('pageshow', () => {
               scheduleDraftSave();
             };
           } else {
-            _linkBtn.textContent = `🔗 Link ${_cap(mood)} as secondary`;
+            _linkBtn.textContent = _t('journal.moodInfo.linkAsSecondary', { mood: _tMoodName(mood) });
             _linkCaption.style.display = '';
             _linkBtn.onclick = () => {
               selectedLinkedMood = mood;
@@ -1622,8 +1632,8 @@ window.addEventListener('pageshow', () => {
         } else if (!selectedMood && _moodLinkingOn && typeof _fmActive !== 'undefined' && _fmActive) {
           // No primary selected yet in focus mode — offer to select this as primary and enter link mode
           _linkRow.style.display = '';
-          _linkBtn.textContent = '🔗 Link mood';
-          _linkCaption.textContent = 'Select as primary, then tap another mood';
+          _linkBtn.textContent = _t('journal.moodInfo.linkMood');
+          _linkCaption.textContent = _t('journal.moodInfo.linkMoodCaption');
           _linkCaption.style.display = '';
           _linkBtn.onclick = () => {
             selectedMood = mood;
@@ -1672,6 +1682,18 @@ window.addEventListener('pageshow', () => {
 
     window.closeMoodInfo = closeMoodInfo;
     window.showMoodInfo = showMoodInfo;
+    // Toggle the collapsed/expanded Bipolar UK definition body inside the mood-info modal.
+    // Key naming is inverted from intuition: bipolarUkToggleOpen is the "click here" prompt
+    // shown when the body is collapsed; bipolarUkToggleClosed is the plain label shown when
+    // it's expanded. Don't rename without updating all 10 locales.
+    window._toggleBipolarDef = function(btn) {
+      const _t = (k) => (window.BB && BB.t) ? BB.t(k) : k;
+      const body = document.getElementById('_moodBipBody');
+      if (!body) return;
+      const wasOpen = body.style.display !== 'none';
+      body.style.display = wasOpen ? 'none' : '';
+      btn.textContent = _t(wasOpen ? 'journal.moodInfo.bipolarUkToggleOpen' : 'journal.moodInfo.bipolarUkToggleClosed');
+    };
 
     // Don't set default selection - user must choose
     // const goodBtn = document.querySelector('[data-mood="good"]');
