@@ -492,36 +492,48 @@
         overflow: visible;
         padding-bottom: 0;
       }
+      /* Both rows are independently scrollable. JS toggles
+         .can-scroll-left / .can-scroll-right based on scroll position so
+         we fade the edge that has more content to reveal. */
       .wiki-pill-row {
         display: block;
-        overflow: hidden;
         width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        transition: -webkit-mask-image 0.15s ease, mask-image 0.15s ease;
       }
-      .wiki-pill-row.active-row { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .wiki-pill-row::-webkit-scrollbar { display: none; }
+      .wiki-pill-row.can-scroll-right:not(.can-scroll-left) {
+        -webkit-mask-image: linear-gradient(to right, black 0, black calc(100% - 28px), transparent 100%);
+                mask-image: linear-gradient(to right, black 0, black calc(100% - 28px), transparent 100%);
+      }
+      .wiki-pill-row.can-scroll-left:not(.can-scroll-right) {
+        -webkit-mask-image: linear-gradient(to right, transparent 0, black 28px, black 100%);
+                mask-image: linear-gradient(to right, transparent 0, black 28px, black 100%);
+      }
+      .wiki-pill-row.can-scroll-left.can-scroll-right {
+        -webkit-mask-image: linear-gradient(to right, transparent 0, black 28px, black calc(100% - 28px), transparent 100%);
+                mask-image: linear-gradient(to right, transparent 0, black 28px, black calc(100% - 28px), transparent 100%);
+      }
       .wiki-pill-track {
         display: flex;
         gap: 6px;
         width: max-content;
-        will-change: transform;
       }
-      /* When the non-active row overflows, JS clones the pills into the same
-         track and adds .marquee. Margin-right (incl. last child) gives the
-         duplicated half the same lead-in spacing, so translateX(-50%) loops
-         seamlessly. */
-      .wiki-pill-row.marquee .wiki-pill-track {
-        gap: 0;
-        animation: wiki-marquee 28s linear infinite;
+      /* One-time peek nudge on first wiki open per session: each
+         overflowing row slides left, then back, so the user sees the
+         affordance without an infinite marquee. */
+      @keyframes wiki-peek {
+        0%   { transform: translateX(0); }
+        35%  { transform: translateX(-32px); }
+        70%  { transform: translateX(0); }
+        100% { transform: translateX(0); }
       }
-      .wiki-pill-row.marquee .wiki-pill-track > .wiki-pill { margin-right: 6px; }
-      .wiki-pill-row.marquee:hover .wiki-pill-track,
-      .wiki-pill-row.marquee:active .wiki-pill-track { animation-play-state: paused; }
-      .wiki-pill.wiki-pill--ghost { pointer-events: none; }
-      @keyframes wiki-marquee {
-        from { transform: translateX(0); }
-        to   { transform: translateX(-50%); }
-      }
+      .wiki-pill-track.peek { animation: wiki-peek 900ms ease-in-out; }
       @media (prefers-reduced-motion: reduce) {
-        .wiki-pill-row.marquee .wiki-pill-track { animation: none; }
+        .wiki-pill-track.peek { animation: none; }
       }
     }
     .wiki-body { padding-bottom: 20px; }
