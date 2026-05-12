@@ -540,3 +540,18 @@
     }
     .wiki-wisdom-text { font-size: 14px; color: var(--dark); line-height: 1.6; }
     .wiki-wisdom-attr { font-size: 12px; color: var(--muted); margin-top: 8px; font-style: italic; }
+    .wiki-search-bar {
+      display: flex; gap: 8px; align-items: center;
+      margin-bottom: 12px;
+    }
+    .wiki-search-bar input[type="search"] {
+      flex: 1; border: 1.5px solid var(--yellow); border-radius: 12px;
+      padding: 10px 12px; font-size: 14px; font-family: inherit; outline: none;
+      background: #fff;
+    }
+    .wiki-search-bar input[type="search"]:focus { border-color: var(--yellow-dark); }
+    .wiki-search-close {
+      background: #f0f0f0; border: none; border-radius: 50%;
+      width: 32px; height: 32px; font-size: 12px; cursor: pointer; flex-shrink: 0;
+    }
+    .wiki-search-close:active { background: var(--yellow-bg); }
