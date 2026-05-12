@@ -1,5 +1,9 @@
 # BipolarBear Changelog
 
+## v1.3
+- 🔒 Security: Bipolar Anonymous email-code verification hardened — the wrong-attempt counter now runs inside a Firestore transaction, so a parallel burst can no longer slip past the 5-attempt budget. Codes widened from 4 to 6 digits and switched to `crypto.randomInt` (1,000,000 keyspace, cryptographically random) with a constant-time comparison. The verify screen now shows 6 input boxes.
+- 🔒 Security: Anonymous community board renderers (`renderPost`, `renderThreadHeader`, `renderComment`, `renderSystem`) now whitelist gradient colours and number-coerce streak/stable/likes before HTML interpolation — previously a Firestore-stored post could break out of the inline `style` attribute and run JS in other viewers' sessions.
+
 ## v1.2
 - ✨ Settings & auth FAB now appears after your first journal entry — no need to complete the full tutorial before you can sign in or access settings
 
