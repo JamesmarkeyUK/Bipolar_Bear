@@ -1190,6 +1190,58 @@ let _wikiSection = 'meds';
 const _wikiCache = { groups: null, posts: null };
 function _wt(key) { return (window.BB && window.BB.t) ? window.BB.t(key) : key; }
 
+// Map hostnames to friendly source names shown next to wiki links.
+const _WIKI_SOURCE_NAMES = {
+  'nhs.uk':                       'NHS.uk',
+  'england.nhs.uk':               'NHS England',
+  'bipolaruk.org':                'Bipolar UK',
+  'mind.org.uk':                  'Mind',
+  'gov.uk':                       'GOV.UK',
+  'acas.org.uk':                  'ACAS',
+  'samaritans.org':               'Samaritans',
+  'talktofrank.com':              'FRANK',
+  'rcpsych.ac.uk':                'Royal College of Psychiatrists',
+  'carersuk.org':                 'Carers UK',
+  'rethink.org':                  'Rethink Mental Illness',
+  'breastfeedingnetwork.org.uk':  'Breastfeeding Network',
+  'app-network.org':              'APP Network',
+  'en.wikipedia.org':             'Wikipedia',
+  'guilford.com':                 'Guilford Press',
+};
+function _wikiSourceName(url) {
+  if (!url) return '';
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, '').toLowerCase();
+    if (_WIKI_SOURCE_NAMES[host]) return _WIKI_SOURCE_NAMES[host];
+    // Fallback — registrable-ish: keep last two labels.
+    const parts = host.split('.');
+    return parts.length >= 2 ? parts.slice(-2).join('.') : host;
+  } catch (_) {
+    return '';
+  }
+}
+// Small sparkles SVG used to flag AI-summarised content.
+const _WIKI_AI_SVG = '<svg class="wiki-ai-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M6 1.5l1.1 2.4L9.5 5l-2.4 1.1L6 8.5 4.9 6.1 2.5 5l2.4-1.1L6 1.5zm6 5l.7 1.6 1.6.7-1.6.7-.7 1.6-.7-1.6L9.7 8.8l1.6-.7L12 6.5zm-3 4l.8 1.7 1.7.8-1.7.8L9 15.5l-.8-1.7-1.7-.8 1.7-.8L9 10.5z" fill="currentColor"/></svg>';
+// Renders the source-attribution row sitting above the wiki link button.
+// `sourceType` is 'ai' (default — body text is an AI summary) or 'direct'
+// (body is taken verbatim from the linked source).
+function _wikiSourceMetaHtml(url, sourceType) {
+  if (!url) return '';
+  const name = _wikiSourceName(url);
+  if (!name) return '';
+  const isDirect = sourceType === 'direct';
+  const badge = isDirect
+    ? `<span class="wiki-source-badge wiki-source-badge--direct">${esc(_wt('anon.wiki.directBadge'))}</span>`
+    : `<span class="wiki-source-badge wiki-source-badge--ai">${_WIKI_AI_SVG}${esc(_wt('anon.wiki.aiSummaryBadge'))}</span>`;
+  return `<div class="wiki-source-meta">${badge}<span class="wiki-source-name">${esc(_wt('anon.wiki.sourceLabel'))} <strong>${esc(name)}</strong></span></div>`;
+}
+function _wikiLinkLabel(url, fallback) {
+  const name = _wikiSourceName(url);
+  return name
+    ? _wt('anon.wiki.readOn').replace('{site}', name)
+    : fallback;
+}
+
 function renderWiki() {
   const wiki = document.getElementById('wiki-section');
   if (!wiki) return;
@@ -1944,14 +1996,17 @@ function _renderWikiSimpleCards(items, disclaimerKey, defaultLinkLabelKey) {
   body.innerHTML = disclaimer + items.map(c => {
     const search = (c.title + ' ' + c.body + ' ' + (c.keys || []).join(' ')).toLowerCase();
     const link = c.link || c.nhs;
+    const sourceMeta = _wikiSourceMetaHtml(link, c.source);
+    const linkLabel = c.linkLabel || _wikiLinkLabel(link, defaultLabel);
     const linkHtml = link
-      ? `<a href="${esc(link)}" target="_blank" rel="noopener" class="wiki-link-btn">${esc(c.linkLabel || defaultLabel)}</a>`
+      ? `<a href="${esc(link)}" target="_blank" rel="noopener" class="wiki-link-btn">${esc(linkLabel)}</a>`
       : '';
     return `
       <details class="wiki-card" data-wiki-search="${esc(search)}">
         <summary>${esc(c.title)}<span class="wiki-chev">▼</span></summary>
         <div class="wiki-card-body">
           <p>${esc(c.body)}</p>
+          ${sourceMeta}
           ${linkHtml}
         </div>
       </details>`;
@@ -1976,12 +2031,15 @@ function renderWikiConditions() {
     <div class="wiki-disclaimer">${esc(_wt('anon.wiki.conditionsDisclaimer'))}</div>
     ${_CONDITIONS.map(c => {
       const search = (c.title + ' ' + c.body + ' ' + (c.keys || []).join(' ')).toLowerCase();
+      const sourceMeta = _wikiSourceMetaHtml(c.nhs, c.source);
+      const linkLabel = _wikiLinkLabel(c.nhs, _wt('anon.wiki.nhsInfo'));
       return `
         <details class="wiki-card" data-wiki-search="${esc(search)}">
           <summary>${esc(c.title)}<span class="wiki-chev">▼</span></summary>
           <div class="wiki-card-body">
             <p>${esc(c.body)}</p>
-            <a href="${esc(c.nhs)}" target="_blank" rel="noopener" class="wiki-link-btn">${esc(_wt('anon.wiki.nhsInfo'))}</a>
+            ${sourceMeta}
+            <a href="${esc(c.nhs)}" target="_blank" rel="noopener" class="wiki-link-btn">${esc(linkLabel)}</a>
           </div>
         </details>`;
     }).join('')}
@@ -1997,12 +2055,15 @@ function renderWikiMeds() {
     <div class="wiki-disclaimer">${esc(_wt('anon.wiki.medsDisclaimer'))}</div>
     ${meds.map(m => {
       const search = (m.title + ' ' + m.body + ' ' + (m.keys || []).join(' ')).toLowerCase();
+      const sourceMeta = _wikiSourceMetaHtml(m.nhs, m.source);
+      const linkLabel = _wikiLinkLabel(m.nhs, _wt('anon.wiki.nhsInfo'));
       return `
         <details class="wiki-card" data-wiki-search="${esc(search)}">
           <summary>${esc(m.title)}<span class="wiki-chev">▼</span></summary>
           <div class="wiki-card-body">
             <p>${esc(m.body)}</p>
-            <a href="${esc(m.nhs)}" target="_blank" rel="noopener" class="wiki-link-btn">${esc(_wt('anon.wiki.nhsInfo'))}</a>
+            ${sourceMeta}
+            <a href="${esc(m.nhs)}" target="_blank" rel="noopener" class="wiki-link-btn">${esc(linkLabel)}</a>
           </div>
         </details>`;
     }).join('')}
@@ -2050,7 +2111,7 @@ async function renderWikiGroups() {
                 ${g.contactPhone ? ` <a href="tel:${esc(g.contactPhone)}">${esc(g.contactPhone)}</a>` : ''}
               </div>` : ''}
               ${g.notes ? `<p class="wiki-notes">${esc(g.notes)}</p>` : ''}
-              ${g.link  ? `<a href="${esc(g.link)}" target="_blank" rel="noopener" class="wiki-link-btn">${esc(_wt('anon.wiki.moreInfo'))}</a>` : ''}
+              ${g.link  ? `<a href="${esc(g.link)}" target="_blank" rel="noopener" class="wiki-link-btn">${esc(_wikiLinkLabel(g.link, _wt('anon.wiki.moreInfo')))}</a>` : ''}
             </div>
           </details>`;
       }).join('')}

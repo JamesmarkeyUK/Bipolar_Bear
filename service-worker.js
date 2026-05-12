@@ -121,7 +121,8 @@
 // v50: Wiki — drop the auto-marquee (broken in Firefox; conflicted with manual scroll). Both pill rows are now independently scrollable; CSS mask-image fades the edge that has more content; first wiki open per session triggers a one-time peek nudge so the user sees the rows can be swiped.
 // v51: Mobile UX — `touch-action: manipulation` on anonymous/beta/privacy pages kills the 300ms double-tap-zoom delay; tapping a wiki pill now smooth-scrolls the pill to the left edge of its row to reveal more pills.
 // v52: v1.4 — version bump for the Wiki release. Refreshes precached brand-config.js (_APP_VERSION='1.4') and js/index.js (new _WHATS_NEW_HEADLINES['1.4'] entry).
-const CACHE_NAME = 'bipolarbear-v52';
+// v53: Wiki — each card now shows the source website (e.g. "NHS.uk", "Mind", "Bipolar UK") and an "AI summary" / "Direct quote" badge above the link button; link button text now reads "Read on {site} ↗".
+const CACHE_NAME = 'bipolarbear-v53';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

@@ -571,6 +571,28 @@
       color: var(--dark); text-decoration: none;
     }
     .wiki-link-btn:active { background: var(--yellow); }
+    .wiki-source-meta {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px;
+      margin-top: 10px; font-size: 11px; line-height: 1.4; color: var(--muted);
+    }
+    .wiki-source-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 999px;
+      font-size: 10.5px; font-weight: 700; letter-spacing: 0.2px;
+      text-transform: uppercase;
+    }
+    .wiki-source-badge--ai {
+      background: var(--yellow-bg); color: var(--yellow-dark);
+      border: 1px solid var(--yellow);
+    }
+    .wiki-source-badge--direct {
+      background: #e8f3ec; color: #2e6b3d;
+      border: 1px solid #c4dfca;
+    }
+    .wiki-ai-icon {
+      width: 11px; height: 11px; flex-shrink: 0;
+    }
+    .wiki-source-name strong { color: var(--dark); font-weight: 700; }
     .wiki-region-heading {
       font-size: 13px; font-weight: 700; color: var(--muted);
       text-transform: uppercase; letter-spacing: 0.5px;
