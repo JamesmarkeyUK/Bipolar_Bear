@@ -1362,6 +1362,48 @@ const _CONDITIONS = [
     title: 'Rapid Cycling',
     body: 'Not a separate diagnosis but a course specifier that can apply to Bipolar I or II: four or more mood episodes (manic, hypomanic, or depressive) within a 12-month period, each separated by partial or full remission, or by a switch to the opposite pole. Ultra-rapid (days) and ultra-ultra-rapid / ultradian (within a single day) cycling are sometimes described too, though they sit outside the formal DSM definition. Rapid cycling is more common in Bipolar II, in women, and can be triggered or worsened by antidepressants taken without a mood stabiliser, thyroid problems, sleep disruption, or substance use. It tends to respond less well to lithium alone — clinicians often try valproate, lamotrigine, or atypical antipsychotics, and look hard for reversible triggers.',
     nhs: 'https://www.nhs.uk/mental-health/conditions/bipolar-disorder/symptoms/'
+  },
+  {
+    keys: ['mixed features', 'mixed episode', 'mixed state', 'dysphoric mania', 'agitated depression'],
+    title: 'Mixed Features',
+    body: 'Manic/hypomanic and depressive symptoms occurring at the same time — for example, depressed mood with racing thoughts and agitation, or elevated energy paired with hopelessness. Used to be called "mixed episodes"; the DSM-5 reframed it as a "with mixed features" specifier that can attach to any mood episode in Bipolar I, II, or major depression. Often experienced as the most painful state in bipolar — the energy to act on suicidal thoughts is higher than in pure depression — and is a recognised high-risk window. Antidepressants alone tend to make it worse; mood stabilisers and atypical antipsychotics are first-line.',
+    nhs: 'https://www.nhs.uk/mental-health/conditions/bipolar-disorder/symptoms/'
+  },
+  {
+    keys: ['seasonal', 'sad', 'seasonal affective', 'winter depression', 'summer mania', 'seasonal pattern'],
+    title: 'Seasonal Pattern',
+    body: 'A specifier (not a separate diagnosis) for people whose mood episodes follow the seasons in a reliable, multi-year pattern — most commonly winter depression and spring/summer hypomania or mania, though the reverse occurs. Light therapy and dawn simulators can help the winter-depression side; for the manic side they can actually trigger a switch, so timing and clinician supervision matter. Sleep hygiene, blackout curtains during light months, and pre-emptive medication adjustments around the equinoxes are common strategies.',
+    nhs: 'https://www.nhs.uk/mental-health/conditions/seasonal-affective-disorder-sad/'
+  },
+  {
+    keys: ['mdd', 'major depression', 'major depressive', 'depression', 'unipolar', 'unipolar depression', 'clinical depression'],
+    title: 'Major Depressive Disorder',
+    body: 'Recurrent depressive episodes without any history of mania or hypomania. Symptoms overlap heavily with bipolar depression — low mood, loss of interest, fatigue, sleep and appetite changes, hopelessness, suicidal thoughts — but the absence of "up" episodes is the key distinction. Because hypomania can feel pleasant or simply productive, Bipolar II is misdiagnosed as MDD for an average of around 10 years. If antidepressants trigger agitation, insomnia, or a sudden mood lift, ask your prescriber to revisit the diagnosis: that pattern can unmask bipolarity.',
+    nhs: 'https://www.nhs.uk/mental-health/conditions/clinical-depression/'
+  },
+  {
+    keys: ['anxiety', 'gad', 'panic', 'panic disorder', 'social anxiety', 'phobia', 'anxiety disorder'],
+    title: 'Anxiety Disorders',
+    body: 'An umbrella covering Generalised Anxiety Disorder (persistent worry across many areas of life), Panic Disorder (sudden physical surges of fear), Social Anxiety, specific phobias, and others. Anxiety disorders co-occur with bipolar more often than not — estimates run between 50% and 75% — and can mimic or mask hypomania, since agitation and racing thoughts feature in both. SSRIs are standard for primary anxiety but need caution in bipolar because of switch risk; CBT, mindfulness-based approaches, and short-term beta-blockers for performance situations are common adjuncts.',
+    nhs: 'https://www.nhs.uk/mental-health/conditions/generalised-anxiety-disorder/'
+  },
+  {
+    keys: ['adhd', 'add', 'attention deficit', 'hyperactive', 'hyperactivity'],
+    title: 'ADHD',
+    body: 'A neurodevelopmental condition involving difficulty sustaining attention, impulsivity, and (for many) hyperactivity, present since childhood. Roughly 1 in 5 adults with bipolar also meet ADHD criteria, and the symptom overlap with hypomania — talkativeness, distractibility, restlessness, sleep disruption — makes diagnosis tricky. The key distinction is duration: ADHD is a lifelong baseline trait, while hypomania is episodic and a clear change from your normal. Stimulants treat ADHD effectively but can destabilise unmedicated bipolar, so most clinicians stabilise mood first; atomoxetine and guanfacine are non-stimulant alternatives.',
+    nhs: 'https://www.nhs.uk/conditions/attention-deficit-hyperactivity-disorder-adhd/'
+  },
+  {
+    keys: ['bpd', 'eupd', 'borderline', 'borderline personality', 'emotionally unstable'],
+    title: 'Borderline Personality Disorder (BPD / EUPD)',
+    body: 'A personality disorder marked by intense, rapidly-shifting emotions (typically minutes-to-hours, rarely full days), fear of abandonment, unstable self-image and relationships, impulsivity, and self-harming or suicidal behaviour. Frequently misdiagnosed as bipolar — and vice versa — because both feature mood swings, but the timescale and triggers differ: BPD shifts are usually reactive to interpersonal events, while bipolar episodes last days-to-weeks and arise more autonomously. Dialectical Behaviour Therapy (DBT) is the gold-standard treatment; medication plays a supporting, not primary, role. The two conditions can also co-exist.',
+    nhs: 'https://www.nhs.uk/mental-health/conditions/borderline-personality-disorder/'
+  },
+  {
+    keys: ['schizophrenia', 'psychosis', 'schizoaffective', 'psychotic'],
+    title: 'Schizophrenia & Schizoaffective',
+    body: 'Schizophrenia is a chronic condition involving positive symptoms (hallucinations, delusions, disorganised thinking), negative symptoms (flattened affect, reduced motivation, social withdrawal), and cognitive symptoms. It is not "split personality" and it is not the same as Bipolar I with psychotic features — in bipolar, psychosis appears during mood episodes and resolves with them; in schizophrenia, psychotic symptoms persist independently of mood. Schizoaffective disorder sits between the two: full mood episodes plus periods of psychosis when mood is stable for at least two weeks. Antipsychotics are the mainstay of treatment, with long-acting injectables as an option for adherence; psychosocial support and family-based approaches matter just as much as medication.',
+    nhs: 'https://www.nhs.uk/mental-health/conditions/schizophrenia/'
   }
 ];
 

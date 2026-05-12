@@ -114,7 +114,8 @@
 // v43: Wiki — add 🧠 Conditions pill with peer-friendly definitions of Bipolar I, Bipolar II, Cyclothymia, and Other Specified Bipolar (NOS). Single disclaimer at top, NHS link per card. i18n keys pillConditions + conditionsDisclaimer added to English.
 // v44: Wiki — stack pill chips across two rows on mobile (<520px), and slowly rotate the row that doesn't contain the active pill when its content overflows the screen.
 // v45: Wiki — add Rapid Cycling card to the Conditions section (course specifier, not a separate diagnosis).
-const CACHE_NAME = 'bipolarbear-v45';
+// v46: Wiki — broaden the Conditions section with Mixed Features, Seasonal Pattern, Major Depressive Disorder, Anxiety Disorders, ADHD, BPD/EUPD, and Schizophrenia & Schizoaffective. Each card has an NHS info link.
+const CACHE_NAME = 'bipolarbear-v46';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
