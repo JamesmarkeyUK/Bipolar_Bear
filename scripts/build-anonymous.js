@@ -128,6 +128,11 @@ fs.writeFileSync(brandPath, brand);
 // from anything that probes /favicon.ico.
 copyDir('icons');
 
+// ─── 7b. Wiki data ──────────────────────────────────────────────────
+// JSON files fetched at runtime by the Wiki tab renderers in
+// js/anonymous.js (renderWikiGroups / renderWikiWisdom).
+copyDir('data');
+
 // ─── 8. Done ────────────────────────────────────────────────────────
 console.log(`Built ${OUT}`);
 console.log('Next: rsync ./www-anonymous/ → ~/bipolaranonymous-native/www/');

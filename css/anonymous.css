@@ -470,3 +470,73 @@
     .comment-card:last-child { border-bottom: none; }
     .comment-header { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
     .comment-text { font-size: 13px; color: var(--dark); line-height: 1.55; padding-left: 36px; }
+
+    /* ── Wiki tab ── */
+    #wiki-section { padding: 12px 12px 110px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
+    .wiki-pills { display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 2px; }
+    .wiki-pill {
+      flex-shrink: 0;
+      background: #f5f5f5; border: 1.5px solid transparent;
+      border-radius: 20px; padding: 7px 14px; font-size: 13px; font-weight: 600;
+      color: var(--muted); cursor: pointer; font-family: inherit; transition: all 0.15s;
+    }
+    .wiki-pill.active { background: var(--yellow); border-color: var(--yellow-dark); color: var(--dark); }
+    .wiki-pill:active { transform: scale(0.96); }
+    .wiki-body { padding-bottom: 20px; }
+    .wiki-disclaimer {
+      background: var(--yellow-bg); border-left: 3px solid var(--yellow-dark);
+      border-radius: 8px; padding: 10px 12px; margin-bottom: 14px;
+      font-size: 12px; color: var(--muted); line-height: 1.5;
+    }
+    .wiki-card {
+      background: #fff; border: 1px solid #eee; border-radius: 12px;
+      margin-bottom: 8px; overflow: hidden;
+    }
+    .wiki-card summary {
+      list-style: none;
+      padding: 12px 14px; cursor: pointer; font-size: 14px; font-weight: 600;
+      color: var(--dark); display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    }
+    .wiki-card summary::-webkit-details-marker { display: none; }
+    .wiki-chev { font-size: 10px; color: var(--muted); transition: transform 0.2s; flex-shrink: 0; }
+    .wiki-card[open] .wiki-chev { transform: rotate(180deg); }
+    .wiki-card-body {
+      padding: 0 14px 14px; font-size: 13px; color: var(--dark); line-height: 1.6;
+    }
+    .wiki-card-body p { margin-bottom: 10px; }
+    .wiki-card-body p:last-child { margin-bottom: 0; }
+    .wiki-meta { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .wiki-meta strong { color: var(--dark); }
+    .wiki-meta a { color: var(--yellow-dark); text-decoration: none; }
+    .wiki-meta a:hover { text-decoration: underline; }
+    .wiki-notes { font-style: italic; color: var(--muted); margin-top: 6px; }
+    .wiki-link-btn {
+      display: inline-block; margin-top: 6px;
+      background: var(--yellow-bg); border: 1.5px solid var(--yellow);
+      border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600;
+      color: var(--dark); text-decoration: none;
+    }
+    .wiki-link-btn:active { background: var(--yellow); }
+    .wiki-region-heading {
+      font-size: 13px; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin: 12px 0 8px;
+    }
+    .wiki-region-heading:first-child { margin-top: 0; }
+    .wiki-loading, .wiki-empty {
+      padding: 20px 12px; text-align: center; color: var(--muted);
+      font-size: 13px; line-height: 1.6;
+    }
+    .wiki-empty a { color: var(--yellow-dark); }
+    .wiki-wisdom-card {
+      background: var(--yellow-bg); border-radius: 14px;
+      padding: 14px 16px; margin-bottom: 10px;
+      border: 1px solid rgba(245,200,0,0.3);
+    }
+    .wiki-wisdom-topic {
+      display: inline-block; background: var(--yellow); color: var(--dark);
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.5px; padding: 2px 8px; border-radius: 10px; margin-bottom: 8px;
+    }
+    .wiki-wisdom-text { font-size: 14px; color: var(--dark); line-height: 1.6; }
+    .wiki-wisdom-attr { font-size: 12px; color: var(--muted); margin-top: 8px; font-style: italic; }
