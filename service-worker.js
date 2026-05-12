@@ -112,7 +112,8 @@
 // v41: Wiki feature Phase 3 — populate wiki section with sub-section pills (Medications / Support Groups / Community Wisdom), renderers in anonymous.js, wiki CSS, and precache wiki JSON data.
 // v42: Wiki feature Phase 4 — add 🔍 search FAB that toggles an inline search bar in the wiki tab (per-section substring filter); convert wiki strings to i18n keys (English populated, other locales fall back).
 // v43: Wiki — add 🧠 Conditions pill with peer-friendly definitions of Bipolar I, Bipolar II, Cyclothymia, and Other Specified Bipolar (NOS). Single disclaimer at top, NHS link per card. i18n keys pillConditions + conditionsDisclaimer added to English.
-const CACHE_NAME = 'bipolarbear-v43';
+// v44: Wiki — stack pill chips across two rows on mobile (<520px), and slowly rotate the row that doesn't contain the active pill when its content overflows the screen.
+const CACHE_NAME = 'bipolarbear-v44';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
