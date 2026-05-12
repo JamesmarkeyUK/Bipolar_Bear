@@ -122,7 +122,8 @@
 // v51: Mobile UX — `touch-action: manipulation` on anonymous/beta/privacy pages kills the 300ms double-tap-zoom delay; tapping a wiki pill now smooth-scrolls the pill to the left edge of its row to reveal more pills.
 // v52: v1.4 — version bump for the Wiki release. Refreshes precached brand-config.js (_APP_VERSION='1.4') and js/index.js (new _WHATS_NEW_HEADLINES['1.4'] entry).
 // v53: Wiki — each card now shows the source website (e.g. "NHS.uk", "Mind", "Bipolar UK") and an "AI summary" / "Direct quote" badge above the link button; link button text now reads "Read on {site} ↗".
-const CACHE_NAME = 'bipolarbear-v53';
+// v54: Wiki Books & Films — each media card now reserves a 72×108 cover slot (book jacket / film poster) at images/wiki-media/<slug>.jpg. Missing files hide themselves so unfilled entries render the same as before.
+const CACHE_NAME = 'bipolarbear-v54';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

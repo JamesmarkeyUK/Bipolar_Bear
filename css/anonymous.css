@@ -593,6 +593,19 @@
       width: 11px; height: 11px; flex-shrink: 0;
     }
     .wiki-source-name strong { color: var(--dark); font-weight: 700; }
+    .wiki-media-row {
+      display: flex; gap: 12px; align-items: flex-start;
+      margin-bottom: 10px;
+    }
+    .wiki-media-cover {
+      width: 72px; height: 108px; flex-shrink: 0;
+      object-fit: cover; border-radius: 6px;
+      background: var(--yellow-bg);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+    }
+    .wiki-media-text { flex: 1; margin: 0; }
+    /* If the image fails to load, drop it from layout — body text reflows full-width. */
+    .wiki-media-row--no-cover .wiki-media-cover { display: none; }
     .wiki-region-heading {
       font-size: 13px; font-weight: 700; color: var(--muted);
       text-transform: uppercase; letter-spacing: 0.5px;

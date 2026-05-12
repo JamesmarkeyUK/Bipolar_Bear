@@ -1865,73 +1865,85 @@ const _MEDIA = [
     keys: ['unquiet mind', 'jamison', 'kay redfield', 'kay jamison', 'book'],
     title: 'An Unquiet Mind — Kay Redfield Jamison (book)',
     body: 'The defining memoir of bipolar I, written by a clinical psychologist who has the illness herself. Published 1995 and still the first book most newly-diagnosed people are recommended. Beautifully written, unflinching about the manic highs as well as the costs. Pairs well with her later book Touched with Fire on the link between mood disorders and creativity.',
-    link: 'https://en.wikipedia.org/wiki/An_Unquiet_Mind'
+    link: 'https://en.wikipedia.org/wiki/An_Unquiet_Mind',
+    cover: 'images/wiki-media/an-unquiet-mind.jpg'
   },
   {
     keys: ['madness', 'hornbacher', 'marya', 'book'],
     title: 'Madness: A Bipolar Life — Marya Hornbacher (book)',
     body: 'The younger, rawer, more chaotic counterpoint to Jamison — Hornbacher\'s memoir covers rapid cycling, substance use, eating disorders, and years of misdiagnosis before finding the right meds. Some readers find it triggering; others find it the only book that names what their life has felt like. Honest about how long it can take to find stability.',
-    link: 'https://en.wikipedia.org/wiki/Madness:_A_Bipolar_Life'
+    link: 'https://en.wikipedia.org/wiki/Madness:_A_Bipolar_Life',
+    cover: 'images/wiki-media/madness-bipolar-life.jpg'
   },
   {
     keys: ['miklowitz', 'survival guide', 'bipolar survival', 'book'],
     title: 'The Bipolar Disorder Survival Guide — David Miklowitz (book)',
     body: 'The standard "what to actually do" handbook by one of the world\'s leading bipolar researchers (and developer of Family-Focused Therapy). Practical chapters on mood charting, prodrome work, talking to family, choosing therapy, managing meds. Now in its 4th edition. Less literary than the memoirs but the one to give a partner or parent.',
-    link: 'https://www.guilford.com/books/The-Bipolar-Disorder-Survival-Guide/David-Miklowitz/9781462553624'
+    link: 'https://www.guilford.com/books/The-Bipolar-Disorder-Survival-Guide/David-Miklowitz/9781462553624',
+    cover: 'images/wiki-media/bipolar-survival-guide.jpg'
   },
   {
     keys: ['electroboy', 'behrman', 'ect memoir', 'book'],
     title: 'Electroboy — Andy Behrman (book)',
     body: 'A wild memoir of New York art-world mania, fraud, and ultimately ECT (electroconvulsive therapy) — which Behrman credits with saving his life. Unusual for being honest about ECT working when nothing else did. Hard, often uncomfortable, and very funny in places.',
-    link: 'https://en.wikipedia.org/wiki/Electroboy'
+    link: 'https://en.wikipedia.org/wiki/Electroboy',
+    cover: 'images/wiki-media/electroboy.jpg'
   },
   {
     keys: ['manic', 'terri cheney', 'cheney', 'book'],
     title: 'Manic — Terri Cheney (book)',
     body: 'A non-chronological memoir of life with treatment-resistant bipolar I, structured as discrete mood-driven episodes rather than a linear story. Cheney is a former entertainment lawyer; the writing is sharp and the structure mirrors the disorder itself. Her New York Times essay later became the Modern Love TV episode below.',
-    link: 'https://en.wikipedia.org/wiki/Terri_Cheney'
+    link: 'https://en.wikipedia.org/wiki/Terri_Cheney',
+    cover: 'images/wiki-media/manic-cheney.jpg'
   },
   {
     keys: ['silver linings', 'silver linings playbook', 'cooper', 'lawrence', 'film'],
     title: 'Silver Linings Playbook (2012) — film',
     body: 'Bradley Cooper plays a recently-discharged bipolar I man trying to rebuild after a manic episode. The first big mainstream film to portray bipolar with sympathy and humour. Slightly oversimplifies the recovery arc, but the depiction of mood swings, family dynamics, and the dance between mania and grief lands well. Based on Matthew Quick\'s novel.',
-    link: 'https://en.wikipedia.org/wiki/Silver_Linings_Playbook'
+    link: 'https://en.wikipedia.org/wiki/Silver_Linings_Playbook',
+    cover: 'images/wiki-media/silver-linings-playbook.jpg'
   },
   {
     keys: ['touched with fire', 'paul dalio', 'film 2015'],
     title: 'Touched with Fire (2015) — film',
     body: 'Two poets with bipolar meet in a psychiatric hospital and fall into a relationship that swings between transcendence and disaster. Written and directed by Paul Dalio, who has bipolar himself, with Kay Redfield Jamison consulting. Slow and sometimes uneven, but honest about the seductive pull of mania and the impossible choice between medication and intensity.',
-    link: 'https://en.wikipedia.org/wiki/Touched_with_Fire_(film)'
+    link: 'https://en.wikipedia.org/wiki/Touched_with_Fire_(film)',
+    cover: 'images/wiki-media/touched-with-fire.jpg'
   },
   {
     keys: ['mr jones', 'richard gere', 'figgis', 'film'],
     title: 'Mr Jones (1993) — film',
     body: 'Richard Gere plays a man with untreated bipolar disorder; Lena Olin is the psychiatrist who treats him. Of its era — the diagnostic language is dated, the romance subplot is dubious — but the manic sequences (particularly the conductor scene) remain one of the most accurate depictions of mania on screen.',
-    link: 'https://en.wikipedia.org/wiki/Mr._Jones_(1993_film)'
+    link: 'https://en.wikipedia.org/wiki/Mr._Jones_(1993_film)',
+    cover: 'images/wiki-media/mr-jones.jpg'
   },
   {
     keys: ['polar bear', 'infinitely polar bear', 'maya forbes', 'mark ruffalo', 'film'],
     title: 'Infinitely Polar Bear (2014) — film',
     body: 'Mark Ruffalo plays a father with bipolar disorder caring for his two young daughters in 1970s Boston while his wife trains in another city. Based on writer/director Maya Forbes\'s own childhood. Gentle, funny, accurate about the texture of living with a parent who has bipolar — without sanitising it.',
-    link: 'https://en.wikipedia.org/wiki/Infinitely_Polar_Bear'
+    link: 'https://en.wikipedia.org/wiki/Infinitely_Polar_Bear',
+    cover: 'images/wiki-media/infinitely-polar-bear.jpg'
   },
   {
     keys: ['modern love', 'anne hathaway', 'whoever i am', 'tv'],
     title: 'Modern Love S1E3 — "Take Me as I Am" (TV)',
     body: 'Anne Hathaway plays a successful lawyer hiding bipolar I — and the swing-of-the-pendulum mid-episode is one of the most accessible portrayals of bipolar on screen. Adapted from Terri Cheney\'s New York Times essay (Cheney also wrote Manic). 30 minutes. Worth showing to family who want to understand.',
-    link: 'https://en.wikipedia.org/wiki/Modern_Love_(TV_series)'
+    link: 'https://en.wikipedia.org/wiki/Modern_Love_(TV_series)',
+    cover: 'images/wiki-media/modern-love-take-me-as-i-am.jpg'
   },
   {
     keys: ['stephen fry', 'manic depressive', 'documentary'],
     title: 'Stephen Fry: The Secret Life of the Manic Depressive (2006) — documentary',
     body: 'BBC documentary in which Stephen Fry — who has bipolar I — interviews celebrities, clinicians, and ordinary people about the illness. The language is slightly dated now but it holds up as a humane, intelligent introduction. The 2016 follow-up The Not So Secret Life of the Manic Depressive: 10 Years On picks up where it left off.',
-    link: 'https://en.wikipedia.org/wiki/Stephen_Fry:_The_Secret_Life_of_the_Manic_Depressive'
+    link: 'https://en.wikipedia.org/wiki/Stephen_Fry:_The_Secret_Life_of_the_Manic_Depressive',
+    cover: 'images/wiki-media/stephen-fry-secret-life.jpg'
   },
   {
     keys: ['bipolar podcast', 'bipolar uk podcast', 'inside bipolar', 'podcast'],
     title: 'Bipolar Podcasts — Bipolar UK / Inside Bipolar / MIHH',
     body: 'A range of bipolar-focused podcasts exist. The Bipolar UK Podcast is the UK peer-led option; Inside Bipolar (Psych Central) is an honest US-based show co-hosted by people with and treating the condition; Mental Illness Happy Hour by Paul Gilmartin covers a wider mental-health landscape with frequent bipolar episodes. All free on major podcast apps.',
-    link: 'https://www.bipolaruk.org/'
+    link: 'https://www.bipolaruk.org/',
+    cover: 'images/wiki-media/bipolar-podcasts.jpg'
   }
 ];
 
@@ -2001,11 +2013,19 @@ function _renderWikiSimpleCards(items, disclaimerKey, defaultLinkLabelKey) {
     const linkHtml = link
       ? `<a href="${esc(link)}" target="_blank" rel="noopener" class="wiki-link-btn">${esc(linkLabel)}</a>`
       : '';
+    // Cover thumbnail (e.g. book cover / film poster). Hides itself on
+    // load error so a missing file just looks like a no-cover card.
+    const bodyHtml = c.cover
+      ? `<div class="wiki-media-row">
+          <img class="wiki-media-cover" src="${esc(c.cover)}" alt="" loading="lazy" onerror="this.closest('.wiki-media-row').classList.add('wiki-media-row--no-cover')">
+          <p class="wiki-media-text">${esc(c.body)}</p>
+        </div>`
+      : `<p>${esc(c.body)}</p>`;
     return `
       <details class="wiki-card" data-wiki-search="${esc(search)}">
         <summary>${esc(c.title)}<span class="wiki-chev">▼</span></summary>
         <div class="wiki-card-body">
-          <p>${esc(c.body)}</p>
+          ${bodyHtml}
           ${sourceMeta}
           ${linkHtml}
         </div>
