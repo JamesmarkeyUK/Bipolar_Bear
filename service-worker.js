@@ -104,7 +104,8 @@
 // v33: v1.2 — translate calendar entry rows and delete-field-confirm modal.
 // v34: v1.2 — translate mood-info modal labels, Bipolar UK toggle, and mood-linking buttons.
 // v35: v1.2 — translate missing-entries banner (with pluralization), calendar empty state, focused-mode preview chips.
-const CACHE_NAME = 'bipolarbear-v35';
+// v36: v1.2 — fix syntax error in index.js (smart quotes in _WHATS_NEW_HEADLINES broke home page: hint, logo tap, profile button, anon link, survival kit nav).
+const CACHE_NAME = 'bipolarbear-v36';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

@@ -1314,9 +1314,9 @@ function _handleIndexJournalNav() {
     // (and fab.js) reads the same value without depending on this script.
     const _APP_VERSION = window._APP_VERSION;
     const _WHATS_NEW_HEADLINES = {
-      ‘1.2’: ‘Settings & sign-in button now appears after your first journal entry — no need to finish the tutorial first’,
-      ‘1.1’: ‘Signing in to Bipolar Anonymous with your BipolarBear email now automatically imports your stability streak and account birthday’,
-      ‘1.0’: ‘Signed-out home no longer shows the previous account’s stats, and signed-in users skip the guest PIN gate’,
+      '1.2': 'Settings & sign-in button now appears after your first journal entry — no need to finish the tutorial first',
+      '1.1': 'Signing in to Bipolar Anonymous with your BipolarBear email now automatically imports your stability streak and account birthday',
+      '1.0': 'Signed-out home no longer shows the previous account’s stats, and signed-in users skip the guest PIN gate',
       '0.98': 'Streaks, achievements & FAB dock now sync across your devices when you sign in',
       '0.97': 'Reminders & weekly summary now save instantly and sync across your devices',
       '0.89': 'Sign in & account management now shared across all pages — one place for everything',
