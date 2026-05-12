@@ -1202,6 +1202,7 @@ function renderWiki() {
       </div>
       <div class="wiki-pills">
         <button class="wiki-pill active" data-wiki="meds">${esc(_wt('anon.wiki.pillMeds'))}</button>
+        <button class="wiki-pill" data-wiki="conditions">${esc(_wt('anon.wiki.pillConditions'))}</button>
         <button class="wiki-pill" data-wiki="groups">${esc(_wt('anon.wiki.pillGroups'))}</button>
         <button class="wiki-pill" data-wiki="wisdom">${esc(_wt('anon.wiki.pillWisdom'))}</button>
       </div>
@@ -1274,9 +1275,57 @@ function setWikiSection(section) {
   _wikiSection = section;
   document.querySelectorAll('.wiki-pill').forEach(b =>
     b.classList.toggle('active', b.dataset.wiki === section));
-  if (section === 'meds')        renderWikiMeds();
-  else if (section === 'groups') renderWikiGroups();
-  else if (section === 'wisdom') renderWikiWisdom();
+  if (section === 'meds')            renderWikiMeds();
+  else if (section === 'conditions') renderWikiConditions();
+  else if (section === 'groups')     renderWikiGroups();
+  else if (section === 'wisdom')     renderWikiWisdom();
+}
+
+const _CONDITIONS = [
+  {
+    keys: ['bipolar 1', 'bipolar one', 'bp1', 'bpi', 'mania', 'manic'],
+    title: 'Bipolar I',
+    body: 'Defined by at least one manic episode lasting 7+ days (or any length if it required hospital). Mania involves elevated or irritable mood, racing thoughts, reduced need for sleep, risky behaviour, and sometimes psychosis. Most people with Bipolar I also experience major depressive episodes between manic ones.',
+    nhs: 'https://www.nhs.uk/mental-health/conditions/bipolar-disorder/'
+  },
+  {
+    keys: ['bipolar 2', 'bipolar two', 'bp2', 'bpii', 'hypomania', 'hypomanic'],
+    title: 'Bipolar II',
+    body: 'At least one hypomanic episode (4+ days, less severe than full mania — no hospitalisation, no psychosis) and at least one major depressive episode. Hypomania can feel productive or even pleasant, which is why Bipolar II is often misdiagnosed as depression for years before the pattern is recognised.',
+    nhs: 'https://www.nhs.uk/mental-health/conditions/bipolar-disorder/'
+  },
+  {
+    keys: ['cyclothymia', 'cyclothymic'],
+    title: 'Cyclothymia',
+    body: 'Chronic, fluctuating mood swings lasting at least 2 years in adults (1 year in under-18s), with periods of hypomanic and depressive symptoms that don\'t quite meet the threshold for a full episode. Less severe but persistent — and it can develop into Bipolar I or II over time.',
+    nhs: 'https://www.nhs.uk/mental-health/conditions/bipolar-disorder/'
+  },
+  {
+    keys: ['nos', 'other specified', 'unspecified', 'bipolar nos'],
+    title: 'Other Specified Bipolar (NOS)',
+    body: 'A diagnosis used when symptoms clearly fit a bipolar pattern but don\'t meet the strict criteria for I, II, or cyclothymia — for example, hypomanic episodes shorter than 4 days, or depressive episodes alongside subthreshold hypomanic symptoms. Just as real and just as worth treating.',
+    nhs: 'https://www.nhs.uk/mental-health/conditions/bipolar-disorder/'
+  }
+];
+
+function renderWikiConditions() {
+  const body = document.getElementById('wiki-body');
+  if (!body) return;
+  body.innerHTML = `
+    <div class="wiki-disclaimer">${esc(_wt('anon.wiki.conditionsDisclaimer'))}</div>
+    ${_CONDITIONS.map(c => {
+      const search = (c.title + ' ' + c.body + ' ' + (c.keys || []).join(' ')).toLowerCase();
+      return `
+        <details class="wiki-card" data-wiki-search="${esc(search)}">
+          <summary>${esc(c.title)}<span class="wiki-chev">▼</span></summary>
+          <div class="wiki-card-body">
+            <p>${esc(c.body)}</p>
+            <a href="${esc(c.nhs)}" target="_blank" rel="noopener" class="wiki-link-btn">${esc(_wt('anon.wiki.nhsInfo'))}</a>
+          </div>
+        </details>`;
+    }).join('')}
+  `;
+  applyWikiFilter();
 }
 
 function renderWikiMeds() {
