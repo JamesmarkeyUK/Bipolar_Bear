@@ -283,6 +283,21 @@ function esc(str) {
   return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+// Whitelist a hex colour for inline `style=` interpolation. Anything that
+// doesn't match a plain `#rgb`/`#rrggbb`/`#rrggbbaa` falls back to the
+// default — prevents Firestore-stored gradients from breaking out of the
+// style attribute.
+function safeColor(c, fallback) {
+  return (typeof c === 'string' && /^#[0-9a-fA-F]{3,8}$/.test(c)) ? c : fallback;
+}
+
+// Coerce a Firestore value to a finite number for safe HTML interpolation.
+// Strings, NaN, Infinity, etc. all fall back to `fallback`.
+function num(n, fallback) {
+  const x = Number(n);
+  return Number.isFinite(x) ? x : fallback;
+}
+
 function timeAgo(ts) {
   if (!ts) return 'now';
   const ms = ts.toMillis ? ts.toMillis() : (ts instanceof Date ? ts.getTime() : ts);
@@ -490,7 +505,7 @@ function setupVerify() {
       box.value = v ? v[0] : '';
       box.classList.toggle('filled', !!box.value);
       if (box.value && boxes[i + 1]) boxes[i + 1].focus();
-      verifyBtn.disabled = getCode().length < 4;
+      verifyBtn.disabled = getCode().length < boxes.length;
       clearError();
     });
     box.addEventListener('keydown', e => {
@@ -501,11 +516,11 @@ function setupVerify() {
         verifyBtn.disabled = true;
       }
     });
-    // Paste 4 digits at once
+    // Paste the full code at once
     box.addEventListener('paste', e => {
       e.preventDefault();
       const digits = (e.clipboardData || window.clipboardData)
-        .getData('text').replace(/\D/g, '').slice(0, 4);
+        .getData('text').replace(/\D/g, '').slice(0, boxes.length);
       if (!digits) return;
       boxes.forEach((b, j) => {
         b.value = digits[j] || '';
@@ -513,13 +528,13 @@ function setupVerify() {
       });
       const nextIdx = Math.min(digits.length, boxes.length - 1);
       boxes[nextIdx].focus();
-      verifyBtn.disabled = getCode().length < 4;
+      verifyBtn.disabled = getCode().length < boxes.length;
     });
   });
 
   verifyBtn.addEventListener('click', async () => {
     const code = getCode();
-    if (code.length < 4 || !_sessionId) return;
+    if (code.length < boxes.length || !_sessionId) return;
     clearError();
     verifyBtn.disabled  = true;
     const origText = verifyBtn.textContent;
@@ -1320,18 +1335,20 @@ function closeThread() {
 }
 
 function renderThreadHeader(p) {
-  const g1 = p.grad1 || YELLOW_LT;
-  const g2 = p.grad2 || YELLOW_DARK;
+  const g1 = safeColor(p.grad1, YELLOW_LT);
+  const g2 = safeColor(p.grad2, YELLOW_DARK);
   const av = p.initials || initials(p.name);
   const adminBadge = p.isAdmin ? '<span class="admin-badge">ADMIN</span>' : '';
   const showMed    = profile.showMeds && p.med;
-  const showStable = (p.stable || 0) > 0;
+  const streakNum  = num(p.streak, 1);
+  const stableNum  = num(p.stable, 0);
+  const showStable = stableNum > 0;
   return `<div class="thread-orig-post">
     <div class="post-header">
       <div class="post-avatar">
         <div class="post-av-circle" style="background:linear-gradient(135deg,${g1},${g2});">${esc(av)}</div>
         <div>
-          <div class="post-name">[${esc(p.name)}]${adminBadge} 🔥 ${p.streak || 1}d${showStable ? ` 🧘 ${p.stable}d` : ''}</div>
+          <div class="post-name">[${esc(p.name)}]${adminBadge} 🔥 ${streakNum}d${showStable ? ` 🧘 ${stableNum}d` : ''}</div>
           ${showMed ? `<div class="post-med">💊 ${esc(p.med)}</div>` : ''}
         </div>
       </div>
@@ -1342,8 +1359,8 @@ function renderThreadHeader(p) {
 }
 
 function renderComment(c) {
-  const g1 = c.grad1 || YELLOW_LT;
-  const g2 = c.grad2 || YELLOW_DARK;
+  const g1 = safeColor(c.grad1, YELLOW_LT);
+  const g2 = safeColor(c.grad2, YELLOW_DARK);
   const av = c.initials || initials(c.name);
   const adminBadge = c.isAdmin ? '<span class="admin-badge">ADMIN</span>' : '';
   return `<div class="comment-card">
@@ -1505,9 +1522,9 @@ function renderPosts(posts) {
 
 function renderSystem(p) {
   return `<div class="sys-card">
-    <div class="sys-emoji">${p.icon || '☀️'}</div>
+    <div class="sys-emoji">${esc(p.icon) || '☀️'}</div>
     <div class="sys-text">${esc(p.text)}</div>
-    <div class="sys-meta">BipolarBear${p.time ? ' · ' + p.time : (p.timestamp ? ' · ' + timeAgo(p.timestamp) : '')}</div>
+    <div class="sys-meta">BipolarBear${p.time ? ' · ' + esc(p.time) : (p.timestamp ? ' · ' + timeAgo(p.timestamp) : '')}</div>
   </div>`;
 }
 
@@ -1526,12 +1543,14 @@ function renderPost(p) {
     return `<div class="post-card"><div class="post-deleted">🛡️ This post was deleted by an admin</div></div>`;
   }
   const liked        = likedPosts.has(p.id);
-  const likes        = p.likes || 0;
-  const commentCount = p.commentCount || 0;
+  const likes        = num(p.likes, 0);
+  const commentCount = num(p.commentCount, 0);
   const showMed      = profile.showMeds && p.med;
-  const showStable   = (p.stable || 0) > 0;
-  const g1           = p.grad1 || YELLOW_LT;
-  const g2           = p.grad2 || YELLOW_DARK;
+  const streakNum    = num(p.streak, 1);
+  const stableNum    = num(p.stable, 0);
+  const showStable   = stableNum > 0;
+  const g1           = safeColor(p.grad1, YELLOW_LT);
+  const g2           = safeColor(p.grad2, YELLOW_DARK);
   const av           = p.initials || initials(p.name);
   const adminBadge   = p.isAdmin ? '<span class="admin-badge">ADMIN</span>' : '';
   const deleteBtn    = profile.isAdmin && !p.isSeed
@@ -1550,7 +1569,7 @@ function renderPost(p) {
       <div class="post-avatar">
         <div class="post-av-circle" style="background:linear-gradient(135deg,${g1},${g2});">${esc(av)}</div>
         <div>
-          <div class="post-name">[${esc(p.name)}]${adminBadge} 🔥 ${p.streak || 1}d${showStable ? ` 🧘 ${p.stable}d` : ''}${postBday ? ` 🎂 ${postBday}` : ''}</div>
+          <div class="post-name">[${esc(p.name)}]${adminBadge} 🔥 ${streakNum}d${showStable ? ` 🧘 ${stableNum}d` : ''}${postBday ? ` 🎂 ${postBday}` : ''}</div>
           ${showMed ? `<div class="post-med">💊 ${esc(p.med)}</div>` : ''}
         </div>
       </div>

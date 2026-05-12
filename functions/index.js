@@ -3,6 +3,7 @@
 const { onCall, HttpsError } = require('firebase-functions/v2/https');
 const { defineSecret }       = require('firebase-functions/params');
 const admin                  = require('firebase-admin');
+const crypto                 = require('crypto');
 const { Resend }             = require('resend');
 
 admin.initializeApp();
@@ -15,6 +16,14 @@ const FROM_ADDRESS    = 'Bipolar Anonymous <bipolar@unisim.co.uk>';
 const CODE_TTL_MS     = 10 * 60 * 1000; // 10 minutes
 const RATE_LIMIT      = 3;              // max codes per email per window
 const MAX_ATTEMPTS    = 5;             // wrong-code attempts before lockout
+const CODE_DIGITS     = 6;              // 6-digit codes → 1,000,000 keyspace
+const CODE_KEYSPACE   = 10 ** CODE_DIGITS;
+
+// 6-digit cryptographically-random verification code, zero-padded so
+// every value from 000000 to 999999 is reachable.
+function generateCode() {
+  return String(crypto.randomInt(0, CODE_KEYSPACE)).padStart(CODE_DIGITS, '0');
+}
 
 // ── Colours matching the Bipolar Anonymous yellow theme ──────────────────────
 const YELLOW      = '#f5c800';
@@ -64,7 +73,7 @@ function emailHtml(code) {
               <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
                 <tr>
                   <td align="center" style="background:${YELLOW_BG};border:2px solid ${YELLOW};border-radius:14px;padding:24px;">
-                    <span style="font-size:48px;font-weight:800;letter-spacing:16px;color:${DARK};font-variant-numeric:tabular-nums;">${code}</span>
+                    <span style="font-size:44px;font-weight:800;letter-spacing:10px;color:${DARK};font-variant-numeric:tabular-nums;">${code}</span>
                   </td>
                 </tr>
               </table>
@@ -119,7 +128,7 @@ exports.sendAnonCode = onCall(
       throw new HttpsError('resource-exhausted', 'Too many code requests. Please wait 10 minutes and try again.');
     }
 
-    const code      = String(Math.floor(1000 + Math.random() * 9000));
+    const code      = generateCode();
     const sessionId = db.collection('anonVerify').doc().id;
 
     await db.collection('anonVerify').doc(sessionId).set({
@@ -150,52 +159,76 @@ exports.sendAnonCode = onCall(
 );
 
 // ── verifyAnonCode ───────────────────────────────────────────────────────────
+// The whole check runs inside a Firestore transaction so concurrent
+// attempts can't race past the MAX_ATTEMPTS budget. The attempts counter
+// is incremented BEFORE the code comparison and on EVERY attempt — even
+// successful ones — so a parallel burst of guesses can't slip a verified
+// write through without first exhausting attempts.
 exports.verifyAnonCode = onCall(
   { region: REGION, invoker: 'public' },
   async (request) => {
     const { sessionId, code } = request.data || {};
-    if (!sessionId || !code) {
+    if (typeof sessionId !== 'string' || !sessionId ||
+        (typeof code !== 'string' && typeof code !== 'number')) {
       throw new HttpsError('invalid-argument', 'sessionId and code are required.');
     }
-
-    const ref  = db.collection('anonVerify').doc(sessionId);
-    const snap = await ref.get();
-
-    if (!snap.exists) {
-      throw new HttpsError('not-found', 'Verification session not found. Please start again.');
+    const submitted = String(code);
+    if (submitted.length === 0 || submitted.length > 16) {
+      throw new HttpsError('invalid-argument', 'Invalid code.');
     }
 
-    const data    = snap.data();
-    const now     = Date.now();
-    const elapsed = now - data.createdAt.toMillis();
+    const ref = db.collection('anonVerify').doc(sessionId);
+    const now = Date.now();
 
-    if (elapsed > CODE_TTL_MS) {
-      throw new HttpsError('deadline-exceeded', 'This code has expired. A new one is on its way.');
-    }
+    const outcome = await db.runTransaction(async (tx) => {
+      const snap = await tx.get(ref);
+      if (!snap.exists) return { kind: 'not-found' };
 
-    if (data.verified) {
-      return { success: true };
-    }
+      const data = snap.data();
+      if (now - data.createdAt.toMillis() > CODE_TTL_MS) return { kind: 'expired' };
+      if (data.verified) return { kind: 'already-verified' };
 
-    const attempts = (data.attempts || 0) + 1;
+      const prevAttempts = data.attempts || 0;
+      if (prevAttempts >= MAX_ATTEMPTS) return { kind: 'locked' };
 
-    if (data.code !== String(code)) {
-      await ref.update({ attempts });
-      const remaining = MAX_ATTEMPTS - attempts;
-      if (remaining <= 0) {
-        throw new HttpsError('resource-exhausted', 'Too many incorrect attempts. Please request a new code.');
+      const attempts = prevAttempts + 1;
+      const expected = String(data.code || '');
+      const match =
+        submitted.length === expected.length &&
+        crypto.timingSafeEqual(Buffer.from(submitted), Buffer.from(expected));
+
+      if (!match) {
+        tx.update(ref, { attempts });
+        return { kind: 'mismatch', remaining: Math.max(0, MAX_ATTEMPTS - attempts) };
       }
-      throw new HttpsError('unauthenticated', `Incorrect code. ${remaining} attempt${remaining === 1 ? '' : 's'} remaining.`);
-    }
 
-    await ref.update({
-      verified:  true,
-      attempts,
-      uid:       request.auth ? request.auth.uid : (data.uid || null),
-      verifiedAt: admin.firestore.Timestamp.fromMillis(now),
+      tx.update(ref, {
+        verified:   true,
+        attempts,
+        uid:        request.auth ? request.auth.uid : (data.uid || null),
+        verifiedAt: admin.firestore.Timestamp.fromMillis(now),
+      });
+      return { kind: 'verified' };
     });
 
-    return { success: true };
+    switch (outcome.kind) {
+      case 'verified':
+      case 'already-verified':
+        return { success: true };
+      case 'not-found':
+        throw new HttpsError('not-found', 'Verification session not found. Please start again.');
+      case 'expired':
+        throw new HttpsError('deadline-exceeded', 'This code has expired. A new one is on its way.');
+      case 'locked':
+        throw new HttpsError('resource-exhausted', 'Too many incorrect attempts. Please request a new code.');
+      case 'mismatch':
+        if (outcome.remaining <= 0) {
+          throw new HttpsError('resource-exhausted', 'Too many incorrect attempts. Please request a new code.');
+        }
+        throw new HttpsError('unauthenticated', `Incorrect code. ${outcome.remaining} attempt${outcome.remaining === 1 ? '' : 's'} remaining.`);
+      default:
+        throw new HttpsError('internal', 'Verification failed.');
+    }
   }
 );
 

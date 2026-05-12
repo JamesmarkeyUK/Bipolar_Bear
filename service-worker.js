@@ -105,7 +105,8 @@
 // v34: v1.2 — translate mood-info modal labels, Bipolar UK toggle, and mood-linking buttons.
 // v35: v1.2 — translate missing-entries banner (with pluralization), calendar empty state, focused-mode preview chips.
 // v36: v1.2 — fix syntax error in index.js (smart quotes in _WHATS_NEW_HEADLINES broke home page: hint, logo tap, profile button, anon link, survival kit nav).
-const CACHE_NAME = 'bipolarbear-v36';
+// v37: security — escape Firestore-sourced gradient/streak/icon fields in anonymous-board renderers; 6-digit code boxes.
+const CACHE_NAME = 'bipolarbear-v37';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
