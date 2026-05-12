@@ -1153,16 +1153,41 @@ function renderTabBadges() {
 
 function setTab(tab) {
   currentTab = tab;
-  saveLastSeen(tab);
   document.querySelectorAll('.board-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   document.getElementById('fab-ann').classList.toggle('active', tab === 'announcements');
   document.getElementById('fab-gen').classList.toggle('active', tab === 'general');
+
+  const postList    = document.getElementById('post-list');
+  const wikiSection = document.getElementById('wiki-section');
+  const fabCompose  = document.getElementById('fab-compose');
+  const isWiki      = tab === 'wiki';
+  if (postList)    postList.style.display    = isWiki ? 'none'  : '';
+  if (wikiSection) wikiSection.style.display = isWiki ? 'block' : 'none';
+  // Compose makes no sense on the read-only Wiki tab. Phase 4 replaces it with a search button.
+  if (fabCompose)  fabCompose.style.display  = isWiki ? 'none'  : '';
+
+  if (isWiki) {
+    renderWiki();
+    renderTabBadges();
+    return;
+  }
+
+  saveLastSeen(tab);
   // Render from the already-running listener's cached data (no listener restart)
   localPosts = postsByTab[tab] || [];
   renderPosts(tab === 'general'
     ? assembleGeneralPosts(localPosts)
     : (localPosts.length ? sortPosts(localPosts) : announcementPosts()));
   renderTabBadges();
+}
+
+// Wiki tab renderer — populated in Phase 3.
+function renderWiki() {
+  const wiki = document.getElementById('wiki-section');
+  if (!wiki) return;
+  if (wiki.dataset.rendered === '1') return;
+  wiki.dataset.rendered = '1';
+  wiki.innerHTML = '<div class="empty-state" style="padding:24px 16px;">Wiki content coming soon.</div>';
 }
 
 // ─────────────────────────────────────────────────────────────────

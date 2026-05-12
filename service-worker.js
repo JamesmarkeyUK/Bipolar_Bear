@@ -108,7 +108,8 @@
 // v37: security — escape Firestore-sourced gradient/streak/icon fields in anonymous-board renderers; 6-digit code boxes.
 // v38: v1.3 — version bump for the security release; refresh precached brand-config.js (_APP_VERSION='1.3') and js/index.js (new _WHATS_NEW_HEADLINES entry).
 // v39: Wiki feature Phase 1 — extract KNOWN_MEDS from survival-kit.js into shared js/shared/medications.js so the anonymous-board Wiki tab (forthcoming) and survival-kit read the same source.
-const CACHE_NAME = 'bipolarbear-v39';
+// v40: Wiki feature Phase 2 — add 📖 Wiki tab + hidden wiki-section to anonymous.html; setTab in anonymous.js routes wiki tab (hides post list, hides compose FAB). i18n 'anon.board.wiki' added across 10 locales.
+const CACHE_NAME = 'bipolarbear-v40';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

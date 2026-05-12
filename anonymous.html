@@ -20,6 +20,7 @@
   <script src="js/shared/debug.js"></script>
   <script src="js/shared/firebase-config.js"></script>
   <script src="js/shared/i18n.js"></script>
+  <script src="js/shared/medications.js"></script>
   <link rel="stylesheet" href="css/theme.css">
   <link rel="stylesheet" href="css/anonymous.css">
 </head>
@@ -165,12 +166,16 @@
     <div class="board-tabs">
       <button class="board-tab" id="tab-ann" data-tab="announcements" data-i18n="anon.board.announcements">📢 Announcements</button>
       <button class="board-tab active" id="tab-gen" data-tab="general" data-i18n="anon.board.general">💬 General</button>
+      <button class="board-tab" id="tab-wiki" data-tab="wiki" data-i18n="anon.board.wiki">📖 Wiki</button>
     </div>
   </div>
 
   <div id="post-list">
     <div class="empty-state">Loading posts…</div>
   </div>
+
+  <!-- Wiki tab content. Populated in Phase 3. -->
+  <div id="wiki-section" style="display:none;"></div>
 
   <!-- FAB Footer -->
   <div class="fab-footer">

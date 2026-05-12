@@ -102,6 +102,7 @@ const SHARED_MODULES = [
   'js/shared/brand-config.js',
   'js/shared/firebase-config.js',
   'js/shared/i18n.js',
+  'js/shared/medications.js',
 ];
 for (const f of SHARED_MODULES) copy(f);
 
