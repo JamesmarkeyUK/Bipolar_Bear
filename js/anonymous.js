@@ -1209,11 +1209,11 @@ function renderWiki() {
             <button class="wiki-pill" data-wiki="sideEffects">${esc(_wt('anon.wiki.pillSideEffects'))}</button>
             <button class="wiki-pill" data-wiki="lifestyle">${esc(_wt('anon.wiki.pillLifestyle'))}</button>
             <button class="wiki-pill" data-wiki="warningSigns">${esc(_wt('anon.wiki.pillWarningSigns'))}</button>
+            <button class="wiki-pill" data-wiki="hospital">${esc(_wt('anon.wiki.pillHospital'))}</button>
           </div>
         </div>
         <div class="wiki-pill-row" data-pill-row="1">
           <div class="wiki-pill-track">
-            <button class="wiki-pill" data-wiki="hospital">${esc(_wt('anon.wiki.pillHospital'))}</button>
             <button class="wiki-pill" data-wiki="workplace">${esc(_wt('anon.wiki.pillWorkplace'))}</button>
             <button class="wiki-pill" data-wiki="pregnancy">${esc(_wt('anon.wiki.pillPregnancy'))}</button>
             <button class="wiki-pill" data-wiki="media">${esc(_wt('anon.wiki.pillMedia'))}</button>

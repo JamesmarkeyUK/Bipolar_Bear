@@ -117,7 +117,8 @@
 // v46: Wiki — broaden the Conditions section with Mixed Features, Seasonal Pattern, Major Depressive Disorder, Anxiety Disorders, ADHD, BPD/EUPD, and Schizophrenia & Schizoaffective. Each card has an NHS info link.
 // v47: Wiki — add 8 new sections: Therapies, Lifestyle, Warning Signs, Side Effects, Hospital, Workplace, Pregnancy, and Books & Films. New shared _renderWikiSimpleCards helper. i18n keys for pill labels + per-section disclaimers added to English locale.
 // v48: Wiki — add For Loved Ones section (partners, family, carers): early signs, what to say, helping during mania / depression, hospital admissions, carer wellbeing, carer rights, and when to call for help.
-const CACHE_NAME = 'bipolarbear-v48';
+// v49: Wiki — rebalance pill rows 7/6 (was 6/7). Hospital moves from row 1 to row 0 alongside the rest of the clinical group.
+const CACHE_NAME = 'bipolarbear-v49';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
