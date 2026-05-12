@@ -1314,6 +1314,7 @@ function _handleIndexJournalNav() {
     // (and fab.js) reads the same value without depending on this script.
     const _APP_VERSION = window._APP_VERSION;
     const _WHATS_NEW_HEADLINES = {
+      '1.3': 'Security: hardened the Bipolar Anonymous email-code verification and post-rendering ahead of opening up the codebase',
       '1.2': 'Settings & sign-in button now appears after your first journal entry — no need to finish the tutorial first',
       '1.1': 'Signing in to Bipolar Anonymous with your BipolarBear email now automatically imports your stability streak and account birthday',
       '1.0': 'Signed-out home no longer shows the previous account’s stats, and signed-in users skip the guest PIN gate',
