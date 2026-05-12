@@ -1356,6 +1356,12 @@ const _CONDITIONS = [
     title: 'Other Specified Bipolar (NOS)',
     body: 'A diagnosis used when symptoms clearly fit a bipolar pattern but don\'t meet the strict criteria for I, II, or cyclothymia — for example, hypomanic episodes shorter than 4 days, or depressive episodes alongside subthreshold hypomanic symptoms. Just as real and just as worth treating.',
     nhs: 'https://www.nhs.uk/mental-health/conditions/bipolar-disorder/'
+  },
+  {
+    keys: ['rapid cycling', 'rapid-cycling', 'rapid cycler', 'cycling'],
+    title: 'Rapid Cycling',
+    body: 'Not a separate diagnosis but a course specifier that can apply to Bipolar I or II: four or more mood episodes (manic, hypomanic, or depressive) within a 12-month period, each separated by partial or full remission, or by a switch to the opposite pole. Ultra-rapid (days) and ultra-ultra-rapid / ultradian (within a single day) cycling are sometimes described too, though they sit outside the formal DSM definition. Rapid cycling is more common in Bipolar II, in women, and can be triggered or worsened by antidepressants taken without a mood stabiliser, thyroid problems, sleep disruption, or substance use. It tends to respond less well to lithium alone — clinicians often try valproate, lamotrigine, or atypical antipsychotics, and look hard for reversible triggers.',
+    nhs: 'https://www.nhs.uk/mental-health/conditions/bipolar-disorder/symptoms/'
   }
 ];
 
