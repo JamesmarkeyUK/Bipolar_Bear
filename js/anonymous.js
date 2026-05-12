@@ -1201,10 +1201,18 @@ function renderWiki() {
         <button id="wiki-search-close" class="wiki-search-close" aria-label="Close search">✕</button>
       </div>
       <div class="wiki-pills">
-        <button class="wiki-pill active" data-wiki="meds">${esc(_wt('anon.wiki.pillMeds'))}</button>
-        <button class="wiki-pill" data-wiki="conditions">${esc(_wt('anon.wiki.pillConditions'))}</button>
-        <button class="wiki-pill" data-wiki="groups">${esc(_wt('anon.wiki.pillGroups'))}</button>
-        <button class="wiki-pill" data-wiki="wisdom">${esc(_wt('anon.wiki.pillWisdom'))}</button>
+        <div class="wiki-pill-row" data-pill-row="0">
+          <div class="wiki-pill-track">
+            <button class="wiki-pill active" data-wiki="meds">${esc(_wt('anon.wiki.pillMeds'))}</button>
+            <button class="wiki-pill" data-wiki="conditions">${esc(_wt('anon.wiki.pillConditions'))}</button>
+          </div>
+        </div>
+        <div class="wiki-pill-row" data-pill-row="1">
+          <div class="wiki-pill-track">
+            <button class="wiki-pill" data-wiki="groups">${esc(_wt('anon.wiki.pillGroups'))}</button>
+            <button class="wiki-pill" data-wiki="wisdom">${esc(_wt('anon.wiki.pillWisdom'))}</button>
+          </div>
+        </div>
       </div>
       <div id="wiki-body" class="wiki-body"></div>
     `;
@@ -1214,6 +1222,9 @@ function renderWiki() {
     document.getElementById('wiki-search-input').addEventListener('input', applyWikiFilter);
     document.getElementById('wiki-search-close').addEventListener('click', closeWikiSearch);
     setWikiSection(_wikiSection);
+  } else {
+    // Re-evaluate marquee state in case viewport size changed while hidden.
+    _updateWikiMarquees();
   }
 }
 
@@ -1274,12 +1285,52 @@ function applyWikiFilter() {
 function setWikiSection(section) {
   _wikiSection = section;
   document.querySelectorAll('.wiki-pill').forEach(b =>
-    b.classList.toggle('active', b.dataset.wiki === section));
+    b.classList.toggle('active', !b.classList.contains('wiki-pill--ghost') && b.dataset.wiki === section));
+  _updateWikiMarquees();
   if (section === 'meds')            renderWikiMeds();
   else if (section === 'conditions') renderWikiConditions();
   else if (section === 'groups')     renderWikiGroups();
   else if (section === 'wisdom')     renderWikiWisdom();
 }
+
+// Two-line pill layout: stack rows on mobile, animate the row without the
+// active pill as a continuous marquee when its content overflows the screen.
+function _updateWikiMarquees() {
+  const wiki = document.getElementById('wiki-section');
+  if (!wiki || wiki.style.display === 'none') return;
+  const rows = wiki.querySelectorAll('.wiki-pill-row');
+  if (!rows.length) return;
+  const isMobile = window.matchMedia('(max-width: 519px)').matches;
+  rows.forEach(row => {
+    const track = row.querySelector('.wiki-pill-track');
+    if (!track) return;
+    track.querySelectorAll('.wiki-pill--ghost').forEach(g => g.remove());
+    row.classList.remove('marquee');
+    const hasActive = !!track.querySelector('.wiki-pill.active');
+    row.classList.toggle('active-row', hasActive);
+    if (!isMobile || hasActive) return;
+    const originals = Array.from(track.children);
+    if (!originals.length) return;
+    const trackWidth = track.scrollWidth;
+    const rowWidth   = row.clientWidth;
+    if (trackWidth <= rowWidth + 1) return;
+    originals.forEach(el => {
+      const clone = el.cloneNode(true);
+      clone.classList.add('wiki-pill--ghost');
+      clone.classList.remove('active');
+      clone.setAttribute('aria-hidden', 'true');
+      clone.setAttribute('tabindex', '-1');
+      track.appendChild(clone);
+    });
+    row.classList.add('marquee');
+  });
+}
+
+let _wikiMarqueeResizeT = 0;
+window.addEventListener('resize', () => {
+  clearTimeout(_wikiMarqueeResizeT);
+  _wikiMarqueeResizeT = setTimeout(_updateWikiMarquees, 120);
+});
 
 const _CONDITIONS = [
   {

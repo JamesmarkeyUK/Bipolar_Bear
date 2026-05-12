@@ -474,6 +474,9 @@
     /* ── Wiki tab ── */
     #wiki-section { padding: 12px 12px 110px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
     .wiki-pills { display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 2px; }
+    /* Default (>=520px): row+track wrappers collapse so pills sit in the same
+       flex line as before. The mobile @media block below stacks them. */
+    .wiki-pill-row, .wiki-pill-track { display: contents; }
     .wiki-pill {
       flex-shrink: 0;
       background: #f5f5f5; border: 1.5px solid transparent;
@@ -482,6 +485,45 @@
     }
     .wiki-pill.active { background: var(--yellow); border-color: var(--yellow-dark); color: var(--dark); }
     .wiki-pill:active { transform: scale(0.96); }
+    @media (max-width: 519px) {
+      .wiki-pills {
+        flex-direction: column;
+        gap: 6px;
+        overflow: visible;
+        padding-bottom: 0;
+      }
+      .wiki-pill-row {
+        display: block;
+        overflow: hidden;
+        width: 100%;
+      }
+      .wiki-pill-row.active-row { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .wiki-pill-track {
+        display: flex;
+        gap: 6px;
+        width: max-content;
+        will-change: transform;
+      }
+      /* When the non-active row overflows, JS clones the pills into the same
+         track and adds .marquee. Margin-right (incl. last child) gives the
+         duplicated half the same lead-in spacing, so translateX(-50%) loops
+         seamlessly. */
+      .wiki-pill-row.marquee .wiki-pill-track {
+        gap: 0;
+        animation: wiki-marquee 28s linear infinite;
+      }
+      .wiki-pill-row.marquee .wiki-pill-track > .wiki-pill { margin-right: 6px; }
+      .wiki-pill-row.marquee:hover .wiki-pill-track,
+      .wiki-pill-row.marquee:active .wiki-pill-track { animation-play-state: paused; }
+      .wiki-pill.wiki-pill--ghost { pointer-events: none; }
+      @keyframes wiki-marquee {
+        from { transform: translateX(0); }
+        to   { transform: translateX(-50%); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .wiki-pill-row.marquee .wiki-pill-track { animation: none; }
+      }
+    }
     .wiki-body { padding-bottom: 20px; }
     .wiki-disclaimer {
       background: var(--yellow-bg); border-left: 3px solid var(--yellow-dark);
