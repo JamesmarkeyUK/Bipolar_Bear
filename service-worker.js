@@ -119,7 +119,8 @@
 // v48: Wiki — add For Loved Ones section (partners, family, carers): early signs, what to say, helping during mania / depression, hospital admissions, carer wellbeing, carer rights, and when to call for help.
 // v49: Wiki — rebalance pill rows 7/6 (was 6/7). Hospital moves from row 1 to row 0 alongside the rest of the clinical group.
 // v50: Wiki — drop the auto-marquee (broken in Firefox; conflicted with manual scroll). Both pill rows are now independently scrollable; CSS mask-image fades the edge that has more content; first wiki open per session triggers a one-time peek nudge so the user sees the rows can be swiped.
-const CACHE_NAME = 'bipolarbear-v50';
+// v51: Mobile UX — `touch-action: manipulation` on anonymous/beta/privacy pages kills the 300ms double-tap-zoom delay; tapping a wiki pill now smooth-scrolls the pill to the left edge of its row to reveal more pills.
+const CACHE_NAME = 'bipolarbear-v51';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

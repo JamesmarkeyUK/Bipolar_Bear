@@ -1226,7 +1226,10 @@ function renderWiki() {
       <div id="wiki-body" class="wiki-body"></div>
     `;
     wiki.querySelectorAll('.wiki-pill').forEach(btn => {
-      btn.addEventListener('click', () => setWikiSection(btn.dataset.wiki));
+      btn.addEventListener('click', () => {
+        setWikiSection(btn.dataset.wiki);
+        _slideWikiPillLeft(btn);
+      });
     });
     wiki.querySelectorAll('.wiki-pill-row').forEach(row => {
       row.addEventListener('scroll', _updateWikiFades, { passive: true });
@@ -1314,6 +1317,23 @@ function setWikiSection(section) {
   else if (section === 'lovedOnes')    renderWikiLovedOnes();
   else if (section === 'groups')       renderWikiGroups();
   else if (section === 'wisdom')       renderWikiWisdom();
+}
+
+// Slide the tapped pill so it aligns with the left edge of its scrollable
+// row, revealing more pills to the right. No-op when the row isn't
+// overflowing (e.g. desktop where the rows render as `display: contents`
+// and don't scroll).
+function _slideWikiPillLeft(pill) {
+  if (!pill) return;
+  const row = pill.closest('.wiki-pill-row');
+  if (!row) return;
+  if (row.scrollWidth <= row.clientWidth + 1) return;
+  const target = pill.offsetLeft;
+  if (typeof row.scrollTo === 'function') {
+    row.scrollTo({ left: target, behavior: 'smooth' });
+  } else {
+    row.scrollLeft = target;
+  }
 }
 
 // Both pill rows are independently scrollable on mobile. We fade the edge
