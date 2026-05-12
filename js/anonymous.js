@@ -1205,10 +1205,18 @@ function renderWiki() {
           <div class="wiki-pill-track">
             <button class="wiki-pill active" data-wiki="meds">${esc(_wt('anon.wiki.pillMeds'))}</button>
             <button class="wiki-pill" data-wiki="conditions">${esc(_wt('anon.wiki.pillConditions'))}</button>
+            <button class="wiki-pill" data-wiki="therapies">${esc(_wt('anon.wiki.pillTherapies'))}</button>
+            <button class="wiki-pill" data-wiki="sideEffects">${esc(_wt('anon.wiki.pillSideEffects'))}</button>
+            <button class="wiki-pill" data-wiki="lifestyle">${esc(_wt('anon.wiki.pillLifestyle'))}</button>
+            <button class="wiki-pill" data-wiki="warningSigns">${esc(_wt('anon.wiki.pillWarningSigns'))}</button>
           </div>
         </div>
         <div class="wiki-pill-row" data-pill-row="1">
           <div class="wiki-pill-track">
+            <button class="wiki-pill" data-wiki="hospital">${esc(_wt('anon.wiki.pillHospital'))}</button>
+            <button class="wiki-pill" data-wiki="workplace">${esc(_wt('anon.wiki.pillWorkplace'))}</button>
+            <button class="wiki-pill" data-wiki="pregnancy">${esc(_wt('anon.wiki.pillPregnancy'))}</button>
+            <button class="wiki-pill" data-wiki="media">${esc(_wt('anon.wiki.pillMedia'))}</button>
             <button class="wiki-pill" data-wiki="groups">${esc(_wt('anon.wiki.pillGroups'))}</button>
             <button class="wiki-pill" data-wiki="wisdom">${esc(_wt('anon.wiki.pillWisdom'))}</button>
           </div>
@@ -1287,10 +1295,18 @@ function setWikiSection(section) {
   document.querySelectorAll('.wiki-pill').forEach(b =>
     b.classList.toggle('active', !b.classList.contains('wiki-pill--ghost') && b.dataset.wiki === section));
   _updateWikiMarquees();
-  if (section === 'meds')            renderWikiMeds();
-  else if (section === 'conditions') renderWikiConditions();
-  else if (section === 'groups')     renderWikiGroups();
-  else if (section === 'wisdom')     renderWikiWisdom();
+  if (section === 'meds')              renderWikiMeds();
+  else if (section === 'conditions')   renderWikiConditions();
+  else if (section === 'therapies')    renderWikiTherapies();
+  else if (section === 'lifestyle')    renderWikiLifestyle();
+  else if (section === 'warningSigns') renderWikiWarningSigns();
+  else if (section === 'sideEffects')  renderWikiSideEffects();
+  else if (section === 'hospital')     renderWikiHospital();
+  else if (section === 'workplace')    renderWikiWorkplace();
+  else if (section === 'pregnancy')    renderWikiPregnancy();
+  else if (section === 'media')        renderWikiMedia();
+  else if (section === 'groups')       renderWikiGroups();
+  else if (section === 'wisdom')       renderWikiWisdom();
 }
 
 // Two-line pill layout: stack rows on mobile, animate the row without the
@@ -1406,6 +1422,472 @@ const _CONDITIONS = [
     nhs: 'https://www.nhs.uk/mental-health/conditions/schizophrenia/'
   }
 ];
+
+const _THERAPIES = [
+  {
+    keys: ['cbt', 'cognitive', 'cognitive behavioural', 'cognitive behavioral'],
+    title: 'CBT — Cognitive Behavioural Therapy',
+    body: 'The most widely-offered talking therapy on the NHS. CBT works on the loop between thoughts, feelings, and behaviours — for bipolar it focuses on catching distorted thinking in depression and challenging the "I don\'t need sleep / I can do anything" cognitions early in hypomania. Usually 8–20 weekly sessions. Bipolar-adapted CBT includes mood charting and prodromal-symptom work; standard CBT alone is more useful for the depressive phase.',
+    link: 'https://www.nhs.uk/mental-health/talking-therapies-medicine-treatments/talking-therapies-and-counselling/cognitive-behavioural-therapy-cbt/'
+  },
+  {
+    keys: ['dbt', 'dialectical', 'mindfulness skills'],
+    title: 'DBT — Dialectical Behaviour Therapy',
+    body: 'Originally developed for borderline personality disorder, DBT combines CBT with mindfulness and acceptance skills. Four skill modules: mindfulness, distress tolerance, emotion regulation, interpersonal effectiveness. Useful in bipolar where mood swings include self-harm urges or intense interpersonal pain. Usually delivered as weekly individual therapy plus weekly skills group for 6–12 months. NHS access is patchier than CBT — often via specialist services.',
+    link: 'https://www.nhs.uk/mental-health/talking-therapies-medicine-treatments/talking-therapies-and-counselling/'
+  },
+  {
+    keys: ['ipsrt', 'social rhythm', 'interpersonal', 'rhythm therapy'],
+    title: 'IPSRT — Interpersonal & Social Rhythm Therapy',
+    body: 'Bipolar-specific therapy targeting the disrupted body-clock side of the illness. You map your daily routines — wake time, first contact with people, meals, sleep — and work on stabilising them, on the theory that disrupted rhythms trigger mood episodes. The "IP" half addresses relationship grief, role transitions, and conflicts that often precede an episode. Strong evidence for relapse prevention; rarely offered on the NHS but worth asking about privately.',
+    link: 'https://www.bipolaruk.org/'
+  },
+  {
+    keys: ['mbct', 'mindfulness', 'mindfulness based'],
+    title: 'MBCT — Mindfulness-Based Cognitive Therapy',
+    body: 'An 8-week group programme combining mindfulness meditation with CBT principles. NICE recommends it specifically for preventing recurrence in depression. For bipolar it can help with rumination in depression and noticing early agitation in hypomania — though some people find prolonged meditation destabilising during a mood episode, so timing matters. Free apps exist; structured NHS courses are increasingly available via Talking Therapies.',
+    link: 'https://www.nhs.uk/mental-health/self-help/tips-and-support/mindfulness/'
+  },
+  {
+    keys: ['fft', 'family focused', 'family therapy', 'family-focused'],
+    title: 'Family-Focused Therapy (FFT)',
+    body: 'Designed specifically for bipolar disorder, FFT brings the patient and close family or partners together for 12–21 sessions. Covers psychoeducation about the illness, communication skills, and problem-solving. Strong evidence for reducing relapse and hospital admission, especially in young people newly diagnosed. Rarely on the standard NHS pathway — usually only via research clinics or specialist mood-disorder units.',
+    link: 'https://www.bipolaruk.org/'
+  },
+  {
+    keys: ['emdr', 'eye movement', 'trauma therapy', 'ptsd therapy'],
+    title: 'EMDR — Eye Movement Desensitisation & Reprocessing',
+    body: 'A trauma-focused therapy where you recall distressing memories while following the therapist\'s finger (or tapping/tones) in alternating left-right patterns. NICE-recommended for PTSD. Relevant for bipolar because trauma is a common co-occurring issue and unprocessed trauma can act as a relapse trigger. NHS access is via specialist trauma services; eight to twelve sessions is typical.',
+    link: 'https://www.nhs.uk/mental-health/talking-therapies-medicine-treatments/talking-therapies-and-counselling/'
+  },
+  {
+    keys: ['psychoeducation', 'education', 'learning about bipolar'],
+    title: 'Psychoeducation',
+    body: 'Structured teaching about your condition — early warning signs, medication, lifestyle, when to seek help. Sounds basic but the evidence is strong: structured group psychoeducation (the Barcelona programme is the most famous, 21 weekly sessions) cuts relapse rates significantly. NHS CMHTs sometimes run bipolar psychoeducation groups; Bipolar UK\'s "Living with Bipolar" courses are a peer-led alternative.',
+    link: 'https://www.bipolaruk.org/'
+  },
+  {
+    keys: ['counselling', 'counseling', 'psychotherapy', 'therapy difference'],
+    title: 'Counselling vs Psychotherapy',
+    body: 'Counselling is usually shorter (6–12 weeks), focused on a specific issue (grief, work stress), and centred on listening and reflection. Psychotherapy is longer (months to years), goes deeper into patterns, and can be psychodynamic, person-centred, or integrative. Neither is bipolar-specific, but both can support the wider work alongside CBT/DBT/IPSRT. The NHS offers brief counselling via Talking Therapies; longer psychotherapy is usually private or via specialist services.',
+    link: 'https://www.nhs.uk/mental-health/talking-therapies-medicine-treatments/talking-therapies-and-counselling/'
+  }
+];
+
+const _LIFESTYLE = [
+  {
+    keys: ['sleep', 'circadian', 'insomnia', 'sleep hygiene', 'jet lag'],
+    title: 'Sleep & Circadian Rhythm',
+    body: 'Probably the single most powerful lifestyle factor in bipolar. Reduced sleep is both a symptom and a trigger of mania — losing one night can switch some people. Aim for a fixed sleep window (7–9 hours), a consistent wake time even on weekends, no screens for an hour before bed, and a dark cool room. Travel across time zones, shift work, and all-nighters are high-risk; talk to your prescriber about pre-emptive sleep meds for unavoidable disruptions.',
+    link: 'https://www.nhs.uk/live-well/sleep-and-tiredness/'
+  },
+  {
+    keys: ['alcohol', 'drinking', 'booze', 'wine', 'beer'],
+    title: 'Alcohol',
+    body: 'Alcohol depresses mood the day after, disrupts sleep architecture (even when it helps you fall asleep), and interacts with most psychiatric meds — lithium and lamotrigine both have significant cautions. Heavy use roughly doubles relapse risk and worsens treatment response. If you drink, ideally low and slow, with food, never alone, never to manage symptoms; the UK low-risk guideline is ≤14 units/week spread over 3+ days. Mocktails and 0% beers are now everywhere.',
+    link: 'https://www.nhs.uk/live-well/alcohol-advice/'
+  },
+  {
+    keys: ['caffeine', 'coffee', 'tea', 'energy drinks'],
+    title: 'Caffeine',
+    body: 'A stimulant — speeds up the heart, raises anxiety, delays sleep onset (over a 6-hour half-life), and at high doses can fuel hypomania. Worth tracking how much you actually consume: a Starbucks grande is around 310mg, the upper-end NHS guideline is 400mg/day, and many bipolar specialists suggest dropping under 200mg if you\'re sensitive. Cut gradually to avoid headaches; switch to decaf or matcha (lower dose, slower release) after lunch.',
+    link: 'https://www.nhs.uk/live-well/eat-well/food-types/the-effects-of-caffeine-on-your-health/'
+  },
+  {
+    keys: ['exercise', 'gym', 'running', 'walking', 'cardio', 'strength'],
+    title: 'Exercise',
+    body: '150 minutes of moderate activity per week has antidepressant effects comparable to some SSRIs in mild-to-moderate depression. For bipolar specifically, the catch is that intense or novel training can also trigger hypomania — so the pattern is "regular and moderate", not "bursts of new training plans". Walking, swimming, yoga, and weight training all count; team sports add the social-rhythm bonus.',
+    link: 'https://www.nhs.uk/live-well/exercise/'
+  },
+  {
+    keys: ['light', 'dark', 'sunlight', 'blackout', 'morning light', 'lightbox'],
+    title: 'Light & Dark',
+    body: 'Bright morning light shifts your body clock earlier and lifts depressed mood; evening light delays sleep and can fuel mania. Useful tactics: a 20-minute morning walk or a 10,000-lux lightbox for winter depression; blackout curtains and amber glasses after 9pm during summer or in manic phases. "Dark therapy" (deliberate 14-hour darkness) has small-trial evidence for stopping early mania.',
+    link: 'https://www.nhs.uk/mental-health/conditions/seasonal-affective-disorder-sad/treatment/'
+  },
+  {
+    keys: ['routine', 'schedule', 'social rhythm', 'structure'],
+    title: 'Routine & Social Rhythms',
+    body: 'Bipolar brains are particularly sensitive to routine disruption. Anchoring a few daily fixed points — wake time, first meal, first social contact, evening wind-down — gives the body clock something to lock onto. Big life events (new job, baby, bereavement, breakups) disrupt rhythms predictably; building extra support around them rather than relying on willpower is the standard advice.',
+    link: 'https://www.bipolaruk.org/'
+  },
+  {
+    keys: ['diet', 'food', 'nutrition', 'omega', 'mediterranean', 'vitamin d'],
+    title: 'Diet & Nutrition',
+    body: 'No "bipolar diet" exists, but a few patterns matter: blood-sugar swings can amplify mood swings (regular meals, less ultra-processed food), omega-3s have small adjunctive evidence, vitamin D deficiency is common and worth checking, and several mood stabilisers (lithium especially) drive weight gain — early conversations with a dietitian beat trying to claw it back later. Avoid grapefruit on some antipsychotics (it interferes with metabolism).',
+    link: 'https://www.nhs.uk/live-well/eat-well/'
+  },
+  {
+    keys: ['cannabis', 'weed', 'marijuana', 'mdma', 'cocaine', 'recreational drugs', 'psychedelics'],
+    title: 'Cannabis & Recreational Drugs',
+    body: 'Cannabis is the most-used and most-studied: regular use roughly doubles psychosis risk in bipolar and worsens episode length and severity. Stimulants (cocaine, MDMA, amphetamine) can directly trigger manic switches; psychedelics (LSD, psilocybin) carry similar risk and limited evidence in bipolar, despite the depression research in unipolar populations. Talk to your prescriber honestly — they\'ve heard it all and need the full picture to dose your meds.',
+    link: 'https://www.talktofrank.com/'
+  }
+];
+
+const _WARNING_SIGNS = [
+  {
+    keys: ['mania prodrome', 'early mania', 'manic warning', 'hypomania signs', 'prodrome'],
+    title: 'Early Signs of Mania / Hypomania',
+    body: 'Common early shifts (often 1–4 weeks before a full episode): sleep dropping by an hour or two with no fatigue; new projects appearing out of nowhere; speech speeding up or thoughts feeling crowded; spending or sexual impulses rising; irritability with people who "don\'t get it"; religious or grandiose ideas creeping in; reduced need for food. If others around you have started asking "are you OK?" — that itself is a warning sign.',
+    link: 'https://www.nhs.uk/mental-health/conditions/bipolar-disorder/symptoms/'
+  },
+  {
+    keys: ['depression prodrome', 'early depression', 'depressive warning'],
+    title: 'Early Signs of Depression',
+    body: 'Often: sleep increasing or fragmenting (early morning waking); appetite changes; replies to texts getting shorter or stopping; reduced enjoyment in things you usually like; physical heaviness; concentration dropping; a creeping sense of dread or self-criticism. Some people first notice it as a loss of music — songs that used to move you stop landing.',
+    link: 'https://www.nhs.uk/mental-health/conditions/bipolar-disorder/symptoms/'
+  },
+  {
+    keys: ['mixed warning', 'mixed prodrome', 'dysphoric early signs'],
+    title: 'Early Signs of Mixed States',
+    body: 'Mixed states often start with the worst of both poles: tired but unable to sleep, slowed-down body with racing thoughts, hopeless mood with agitated energy, or irritability that swings between tears and rage within hours. Suicide risk is elevated because energy is present even when motivation isn\'t. If this pattern shows up, call your CMHT or crisis team — don\'t wait it out.',
+    link: 'https://www.nhs.uk/mental-health/conditions/bipolar-disorder/symptoms/'
+  },
+  {
+    keys: ['relapse signature', 'warning signs list', 'personal warning'],
+    title: 'Building Your Relapse Signature',
+    body: 'A relapse signature is a personalised checklist of your earliest, most reliable warning signs — usually 5–10 items, ordered from "subtle" to "obvious". Build it by reviewing past episodes with a clinician, a family member, or your journal. Share it with one or two trusted people who can flag changes you might miss. Update it after every episode, since the signature can drift over years.',
+    link: 'https://www.bipolaruk.org/'
+  },
+  {
+    keys: ['when to call', 'cmht', 'gp', 'help', 'who to call'],
+    title: 'When to Call Your CMHT or GP',
+    body: 'Call your CMHT (Community Mental Health Team) or care coordinator if: warning signs are clearly building over more than a few days, you\'ve missed doses or sleep, you\'ve started spending or risk-taking, or family are concerned. Call your GP if you don\'t have a CMHT, or for changes that are uncomfortable but not yet urgent. They can refer or fast-track you. Earlier always beats later — there\'s no "wasting their time".',
+    link: 'https://www.nhs.uk/nhs-services/mental-health-services/'
+  },
+  {
+    keys: ['crisis line', 'samaritans', 'shout', 'crisis', '111'],
+    title: 'When to Call a Crisis Line',
+    body: 'For active distress, suicidal thoughts, or "I don\'t know what to do right now": Samaritans 116 123 (free, 24/7, any reason), Shout text 85258 (text-based, 24/7), NHS 111 option 2 (urgent mental health), or your local CMHT\'s crisis line if you have one. Bipolar UK\'s eCommunity and peer support line are also worth saving in your phone before you need them.',
+    link: 'https://www.samaritans.org/'
+  },
+  {
+    keys: ['a&e', 'emergency', '999', 'er', 'urgent'],
+    title: 'When to Go to A&E or Call 999',
+    body: 'Go to A&E or call 999 if: you are about to act on suicidal thoughts, you\'ve taken an overdose or harmed yourself seriously, you are experiencing psychosis or losing touch with reality, or you cannot keep yourself safe. A&E mental-health liaison teams can assess and refer; if there is risk to life, ambulance or police can help under Section 136 in public or Section 135 with a warrant at home.',
+    link: 'https://www.nhs.uk/nhs-services/urgent-and-emergency-care-services/when-to-go-to-ae/'
+  }
+];
+
+const _SIDE_EFFECTS = [
+  {
+    keys: ['weight gain', 'metabolic', 'diabetes', 'olanzapine weight', 'quetiapine weight'],
+    title: 'Weight Gain & Metabolic Effects',
+    body: 'Common with most antipsychotics (olanzapine and quetiapine in particular), lithium, and valproate. Mechanism is mixed: appetite increase, slower metabolism, fluid retention, sedation cutting exercise. Annual blood tests for HbA1c, lipids, and weight are standard. Mitigations: pre-emptive dietitian referral, weight-neutral alternatives (aripiprazole, lurasidone), metformin add-on, and not assuming "willpower" alone can outpace the drug.',
+    link: 'https://www.nhs.uk/mental-health/conditions/bipolar-disorder/treatment/'
+  },
+  {
+    keys: ['tremor', 'shaking', 'lithium tremor'],
+    title: 'Tremor',
+    body: 'Fine hand tremor is common with lithium (especially at higher levels) and valproate. Worsens with caffeine, anxiety, and high doses. Usually mild and stable — if it suddenly worsens, ask for a lithium level (could be toxicity). Mitigations: split the dose, drop caffeine, propranolol 10–40mg as needed, or a small dose reduction with your prescriber.',
+    link: 'https://www.nhs.uk/conditions/lithium-medicine/side-effects-of-lithium/'
+  },
+  {
+    keys: ['brain fog', 'cognitive', 'dulling', 'slow thinking', 'word finding'],
+    title: 'Cognitive Dulling / Brain Fog',
+    body: 'A real and under-acknowledged side effect of lithium, valproate, topiramate (nicknamed "dopamax"), and some antipsychotics. Word-finding lapses, slower recall, less creative momentum. Some of it is the medication, some is residual depression, some is sleep meds carrying over. Worth distinguishing before assuming — and worth raising with your prescriber, as switching agents can help.',
+    link: 'https://www.bipolaruk.org/'
+  },
+  {
+    keys: ['sedation', 'grogginess', 'tired', 'sleepy', 'med hangover'],
+    title: 'Sedation & Morning Grogginess',
+    body: 'Often the first side effect of antipsychotics, mirtazapine, and some mood stabilisers. Frequently eases over 2–4 weeks. If not: shift the dose to earlier in the evening, split it, or ask about switching. Heavy "med hangover" until midday is not something to push through silently — it\'s usually fixable.',
+    link: 'https://www.nhs.uk/mental-health/conditions/bipolar-disorder/treatment/'
+  },
+  {
+    keys: ['libido', 'sexual', 'sex drive', 'erectile', 'anorgasmia'],
+    title: 'Libido & Sexual Function',
+    body: 'SSRIs are the worst offenders (low libido, delayed orgasm, anorgasmia); antipsychotics and mood stabilisers can also reduce desire or contribute to erectile dysfunction. Often under-reported because patients are too embarrassed to mention it. Tell your prescriber — switching agents (bupropion, mirtazapine, aripiprazole), dose tweaks, and short drug holidays under guidance can all help.',
+    link: 'https://www.nhs.uk/conditions/ssri-antidepressants/side-effects/'
+  },
+  {
+    keys: ['akathisia', 'restlessness', 'cant sit still', 'inner restlessness'],
+    title: 'Akathisia',
+    body: 'An inner, agonising restlessness — usually pacing, jiggling legs, unable to stay still — caused by antipsychotics (haloperidol, aripiprazole, risperidone, and others). Easy to mistake for anxiety or agitation. Distressing enough that it can drive suicidal thoughts on its own. Tell your prescriber urgently: a dose reduction, switch, or addition of propranolol or a short-term benzodiazepine usually helps.',
+    link: 'https://www.bipolaruk.org/'
+  },
+  {
+    keys: ['blood test', 'lithium level', 'valproate level', 'monitoring', 'tdm'],
+    title: 'Blood Tests (Lithium & Valproate)',
+    body: 'Lithium needs 12-hour-post-dose blood levels — weekly when starting, then 3–6 monthly once stable; therapeutic range 0.4–1.0 mmol/L. Plus kidney function (U&Es), thyroid function (TFTs), and calcium annually. Valproate doesn\'t strictly require level monitoring but liver function and platelets are checked at baseline and periodically. Skipping bloods is the single biggest cause of avoidable toxicity.',
+    link: 'https://www.nhs.uk/conditions/lithium-medicine/'
+  },
+  {
+    keys: ['dry mouth', 'thirst', 'polydipsia'],
+    title: 'Dry Mouth & Thirst',
+    body: 'Lithium increases thirst by affecting kidney water handling; antipsychotics and antidepressants cause dry mouth via anticholinergic effects. Heavy thirst (over 3L water/day, frequent night urination) on lithium needs investigating — could be early lithium-induced diabetes insipidus, which is reversible if caught. Sugar-free gum, frequent sips, and humidifiers help dry mouth; bedside water is fine, gallons of fluid is not.',
+    link: 'https://www.nhs.uk/conditions/lithium-medicine/side-effects-of-lithium/'
+  },
+  {
+    keys: ['constipation', 'gi', 'gut', 'nausea', 'diarrhoea', 'clozapine bowel'],
+    title: 'Constipation & GI Effects',
+    body: 'Clozapine famously causes severe constipation (occasionally fatal — take laxatives proactively). Lithium and valproate often cause nausea or loose stools, usually settling within 2 weeks. Take meds with food, split doses, and use enteric-coated or slow-release versions if available. New or severe abdominal pain on clozapine is urgent — go to A&E.',
+    link: 'https://www.nhs.uk/mental-health/conditions/bipolar-disorder/treatment/'
+  }
+];
+
+const _HOSPITAL = [
+  {
+    keys: ['voluntary', 'informal admission', 'admission'],
+    title: 'Voluntary (Informal) Admission',
+    body: 'You agree to come in for treatment and can in principle leave whenever you want — though staff may ask you to stay and consider sectioning if they think it\'s needed. Most hospital admissions for bipolar are informal. You keep the same rights as any patient: refusing specific medications, having visitors, leaving the ward for a walk. Bring photo ID, charging cable, basic toiletries — phones are usually allowed.',
+    link: 'https://www.mind.org.uk/information-support/legal-rights/mental-health-act-1983/about-the-mha-1983/'
+  },
+  {
+    keys: ['section 2', 's2', 'assessment section'],
+    title: 'Section 2 — Assessment (28 days)',
+    body: 'Up to 28 days, for assessment with or without treatment. Needs two doctors and one Approved Mental Health Professional (AMHP). You have the right to apply to a tribunal in the first 14 days, free legal representation, and an Independent Mental Health Advocate (IMHA). Cannot be renewed — must be discharged, converted to Section 3, or you stay on informally.',
+    link: 'https://www.mind.org.uk/information-support/legal-rights/sectioning/section-2/'
+  },
+  {
+    keys: ['section 3', 's3', 'treatment section'],
+    title: 'Section 3 — Treatment (up to 6 months)',
+    body: 'Up to 6 months, renewable for another 6, then yearly. Same two-doctor + AMHP requirement; the nearest relative must be consulted and can object. Treatment can be given without consent in the first 3 months (with some exceptions like ECT). Same tribunal and advocate rights. Discharge can also come from the responsible clinician or the hospital managers.',
+    link: 'https://www.mind.org.uk/information-support/legal-rights/sectioning/section-3/'
+  },
+  {
+    keys: ['section 5(2)', 's5(2)', '52', 'holding power'],
+    title: 'Section 5(2) — Doctor\'s Holding Power (72 hours)',
+    body: 'A short-term hold used when you\'ve gone in voluntarily but want to leave and the doctor thinks you need detaining. Lasts up to 72 hours while a full Section 2 or 3 assessment is arranged. Nurses have a similar 6-hour power under Section 5(4). Cannot be used in A&E — only on an inpatient ward.',
+    link: 'https://www.mind.org.uk/information-support/legal-rights/sectioning/section-5/'
+  },
+  {
+    keys: ['section 136', 's136', '136', 'police section'],
+    title: 'Section 136 — Police Powers in Public',
+    body: 'Police can take someone from a public place to a "place of safety" (usually a hospital 136 suite) for up to 24 hours (extendable to 36) when they appear to need urgent mental-health care. You haven\'t been arrested — it\'s a protective power. The clock starts when you arrive at the place of safety. You\'ll be assessed by a doctor and AMHP and either released, kept informally, or moved to Section 2 or 3.',
+    link: 'https://www.mind.org.uk/information-support/legal-rights/police-and-mental-health/'
+  },
+  {
+    keys: ['rights', 'imha', 'advocate', 'tribunal', 'patient rights'],
+    title: 'Your Rights as a Sectioned Patient',
+    body: 'Even when sectioned you keep the right to: free legal aid for tribunals, an Independent Mental Health Advocate (IMHA), have your care plan explained, receive visitors (within reason), correspondence in and out, complain via PALS, refuse most treatments (Section 3 has limits), and have a named nearest relative who can request your discharge. Mind and Rethink both run advocacy services.',
+    link: 'https://www.mind.org.uk/information-support/legal-rights/'
+  },
+  {
+    keys: ['what to pack', 'hospital bag', 'admission pack'],
+    title: 'What to Pack',
+    body: 'Comfortable clothes (drawstring trousers — belts and laces are restricted on some wards), pyjamas, slippers, toiletries (some items may be locked in), phone and charger (cable rules vary), books, ear plugs, eye mask, paper and pens, a written list of your meds and doses, photo ID, glasses if you wear them, and a small amount of cash. Leave valuables and razors at home — the ward will provide alternatives.',
+    link: 'https://www.bipolaruk.org/'
+  },
+  {
+    keys: ['discharge', 'section 117', 'aftercare', 's117'],
+    title: 'Discharge & Section 117 Aftercare',
+    body: 'After Section 3 (and some other sections), you\'re entitled to free aftercare under Section 117 — typically a care coordinator, follow-up appointments, support with housing or benefits, and any community treatment needs. This can\'t legally be charged for. Push for a clear discharge plan in writing before you leave: who your care coordinator is, when the first appointment is, what to do if you start declining again.',
+    link: 'https://www.mind.org.uk/information-support/legal-rights/leaving-hospital/'
+  }
+];
+
+const _WORKPLACE = [
+  {
+    keys: ['equality act', 'disability', 'discrimination', 'protected characteristic'],
+    title: 'Equality Act 2010 & Disability Status',
+    body: 'Bipolar disorder (and most long-term mental health conditions) usually counts as a "disability" under the Equality Act 2010 — meaning a substantial and long-term effect on day-to-day life. That triggers protection from discrimination, harassment, and victimisation at work, plus a positive duty on employers to make reasonable adjustments. You don\'t need a formal employer-side diagnosis; documentation from your GP or psychiatrist is enough.',
+    link: 'https://www.gov.uk/definition-of-disability-under-equality-act-2010'
+  },
+  {
+    keys: ['reasonable adjustments', 'adjustments', 'workplace accommodations'],
+    title: 'Reasonable Adjustments',
+    body: 'Adjustments your employer should consider include: phased return after sickness, flexible hours around medication side effects, working from home some days, a quieter workspace, written instructions instead of verbal, regular 1:1s, swapping client-facing tasks during episodes, time off for appointments. Request them in writing; "I am asking for a reasonable adjustment under the Equality Act" makes it clear. Refusal needs a justifiable business reason.',
+    link: 'https://www.acas.org.uk/reasonable-adjustments'
+  },
+  {
+    keys: ['access to work', 'atw', 'aw scheme'],
+    title: 'Access to Work Scheme',
+    body: 'A UK government grant that pays for support to start or stay in work — covering coaching, assistive tech, taxis if you can\'t use transport, or a mental-health support worker. Apply online; an assessor talks through what helps. The employer doesn\'t pay (small employers receive 100% of costs, larger ones pay a share above a threshold). One of the most under-used resources in mental-health employment.',
+    link: 'https://www.gov.uk/access-to-work'
+  },
+  {
+    keys: ['sick note', 'fit note', 'med3', 'doctor note'],
+    title: 'Sick Notes / Fit Notes',
+    body: 'After 7 days off sick you need a "fit note" from your GP (formerly called a sick note). It can say "not fit for work" or "may be fit with adjustments" (phased return, reduced hours, altered duties). You can self-certify for the first 7 days. Fit notes are confidential — your employer doesn\'t need the diagnosis, only the work capacity. They can also be issued by psychiatrists, nurses, OTs, and pharmacists.',
+    link: 'https://www.gov.uk/taking-sick-leave'
+  },
+  {
+    keys: ['disclosure', 'telling employer', 'disclose', 'tell work'],
+    title: 'Disclosure: To Tell or Not',
+    body: 'No legal duty to disclose at application or interview unless asked directly about a relevant condition (and "relevant" is narrow). Pros of disclosing: triggers Equality Act protection, unlocks adjustments, removes the secret. Cons: real-world stigma still exists in some sectors. A common pattern is to disclose later (not at interview) — once probation passes, in a 1:1 with HR, with a written summary of what you need.',
+    link: 'https://www.mind.org.uk/workplace/'
+  },
+  {
+    keys: ['pip', 'personal independence', 'disability benefit'],
+    title: 'PIP — Personal Independence Payment',
+    body: 'A non-means-tested benefit for people with long-term conditions affecting daily living or mobility — including mental health. Two parts (daily living, mobility), two rates (standard, enhanced). The form is long and the descriptors don\'t fit mental health well; charities (Mind, Citizens Advice, Bipolar UK) provide free help with applications and appeals. Many successful claims are won at tribunal, so don\'t take a first refusal as final.',
+    link: 'https://www.gov.uk/pip'
+  },
+  {
+    keys: ['universal credit', 'uc', 'limited capability', 'lcw', 'lcwra'],
+    title: 'Universal Credit & Limited Capability',
+    body: 'If you can\'t work or can only work limited hours, the "limited capability for work" (LCW) or "limited capability for work and work-related activity" (LCWRA) elements of Universal Credit add money and remove the work-search requirement. Triggered by a work capability assessment after sustained fit notes. Plan around the timing — there\'s usually a 3-month wait before payments start.',
+    link: 'https://www.gov.uk/universal-credit'
+  },
+  {
+    keys: ['return to work', 'phased return', 'after episode'],
+    title: 'Returning to Work After an Episode',
+    body: 'A phased return — reduced hours building back over 2–4 weeks — is the standard pattern, agreed between you, your GP, and HR or Occupational Health. Ask for: a return-to-work meeting before day one, an agreed first-day workload, time excluded from on-call rotas, regular check-ins for 4–6 weeks, and a clear plan if things slip. Many people relapse on return because they go too fast — slower is safer.',
+    link: 'https://www.acas.org.uk/returning-to-work-after-absence'
+  }
+];
+
+const _PREGNANCY = [
+  {
+    keys: ['preconception', 'pre-conception', 'planning pregnancy', 'trying to conceive'],
+    title: 'Pre-Conception Planning',
+    body: 'Ideally start the conversation 6–12 months before trying to conceive. Topics: which meds are safest to continue (lamotrigine, some antipsychotics, lithium with monitoring), which to taper off (valproate is contraindicated for pregnancy in most circumstances), folic acid 5mg daily, perinatal mental-health team referral, contingency plan for relapse, and partner involvement. Coming off all meds for pregnancy almost always relapses; informed continuation is the usual safer path.',
+    link: 'https://www.rcpsych.ac.uk/mental-health/mental-illnesses-and-mental-health-problems/planning-a-pregnancy'
+  },
+  {
+    keys: ['lithium pregnancy', 'lithium baby', 'ebstein'],
+    title: 'Lithium in Pregnancy',
+    body: 'Once thought catastrophic; current evidence is more nuanced — there\'s a small increase in cardiac malformations (Ebstein\'s anomaly) when used in the first trimester (around 0.6% vs 0.18% background), and risk of neonatal complications around delivery. Levels can shift dramatically because of changing fluid volumes and kidney function — monthly bloods through pregnancy, weekly near delivery, and held briefly around labour. Often a reasonable continuation for high-relapse-risk patients.',
+    link: 'https://www.nhs.uk/conditions/lithium-medicine/pregnancy-and-breastfeeding/'
+  },
+  {
+    keys: ['valproate pregnancy', 'sodium valproate', 'epilim', 'pregnancy prevention'],
+    title: 'Valproate & the Pregnancy Prevention Programme',
+    body: 'Valproate carries roughly a 10% risk of major birth defects and a 30–40% risk of developmental disorder when taken in pregnancy — the highest of any commonly-used psychiatric drug. Since 2018 it\'s banned in pregnancy in the UK except in extreme circumstances, and people of childbearing potential must be on the Pregnancy Prevention Programme (annual specialist review plus reliable contraception). Talk to your prescriber about switching if you might become pregnant.',
+    link: 'https://www.gov.uk/government/publications/valproate-use-by-women-and-girls'
+  },
+  {
+    keys: ['medications pregnancy', 'antipsychotic pregnancy', 'lamotrigine pregnancy'],
+    title: 'Other Medications in Pregnancy',
+    body: 'Lamotrigine has the most reassuring data among mood stabilisers and is generally considered safer. Olanzapine and quetiapine have moderate data; gestational diabetes risk is the main flag. SSRIs are widely used in pregnancy with small absolute risks. Benzodiazepines and z-drugs are avoided where possible. Always weigh against the harm of an untreated episode, which carries real risk to both parent and baby.',
+    link: 'https://www.rcpsych.ac.uk/mental-health/mental-illnesses-and-mental-health-problems/mental-health-in-pregnancy'
+  },
+  {
+    keys: ['perinatal team', 'perinatal mental health', 'pmh team'],
+    title: 'Perinatal Mental Health Teams',
+    body: 'NHS specialist teams that look after pregnant and recently-postpartum people with serious mental illness. Available in most parts of England (less consistent elsewhere in the UK). Referrals from GP, midwife, or self-referral via the trust. They liaise with your obstetric team, monitor mood through pregnancy, plan delivery, and arrange postpartum support. Ask your midwife about local services as soon as pregnancy is confirmed.',
+    link: 'https://www.england.nhs.uk/mental-health/perinatal/'
+  },
+  {
+    keys: ['postpartum psychosis', 'puerperal psychosis', 'pp'],
+    title: 'Postpartum Psychosis',
+    body: 'A psychiatric emergency affecting 1 in 1000 births overall, but 25–50% of births in women with bipolar I. Onset is usually in the first 2 weeks postpartum, often abrupt. Symptoms: confusion, paranoia, mania, hallucinations, severe insomnia. Treatable but always needs immediate admission, ideally to a Mother & Baby Unit. Pre-emptive lithium or antipsychotic prophylaxis is standard for high-risk patients in the week after birth.',
+    link: 'https://www.app-network.org/'
+  },
+  {
+    keys: ['breastfeeding', 'nursing', 'lactation', 'breast milk meds'],
+    title: 'Breastfeeding & Medication',
+    body: 'Many psychiatric meds pass into breast milk but at much lower doses than in pregnancy. Lithium is generally avoided (high transfer, infant blood monitoring needed if used). Lamotrigine and sertraline are commonly considered compatible. Olanzapine and quetiapine carry sedation risk for the baby. The Breastfeeding Network drug factsheets and the LactMed database are the best references; perinatal teams can advise on individual decisions.',
+    link: 'https://www.breastfeedingnetwork.org.uk/detailed-information/drugs-factsheets/'
+  },
+  {
+    keys: ['mother and baby unit', 'mbu', 'inpatient mother', 'mother baby'],
+    title: 'Mother & Baby Units (MBUs)',
+    body: 'Specialist NHS inpatient wards where a mother with severe perinatal mental illness can be admitted with her baby (under 12 months, sometimes older). Outcomes are far better than separating mother and infant. There are around 22 MBUs across the UK — sometimes admission means travelling. Action on Postpartum Psychosis (APP) maintains a current map and a peer-support network for mothers who have been through PP.',
+    link: 'https://www.app-network.org/what-is-pp/getting-help/mbus/'
+  }
+];
+
+const _MEDIA = [
+  {
+    keys: ['unquiet mind', 'jamison', 'kay redfield', 'kay jamison', 'book'],
+    title: 'An Unquiet Mind — Kay Redfield Jamison (book)',
+    body: 'The defining memoir of bipolar I, written by a clinical psychologist who has the illness herself. Published 1995 and still the first book most newly-diagnosed people are recommended. Beautifully written, unflinching about the manic highs as well as the costs. Pairs well with her later book Touched with Fire on the link between mood disorders and creativity.',
+    link: 'https://en.wikipedia.org/wiki/An_Unquiet_Mind'
+  },
+  {
+    keys: ['madness', 'hornbacher', 'marya', 'book'],
+    title: 'Madness: A Bipolar Life — Marya Hornbacher (book)',
+    body: 'The younger, rawer, more chaotic counterpoint to Jamison — Hornbacher\'s memoir covers rapid cycling, substance use, eating disorders, and years of misdiagnosis before finding the right meds. Some readers find it triggering; others find it the only book that names what their life has felt like. Honest about how long it can take to find stability.',
+    link: 'https://en.wikipedia.org/wiki/Madness:_A_Bipolar_Life'
+  },
+  {
+    keys: ['miklowitz', 'survival guide', 'bipolar survival', 'book'],
+    title: 'The Bipolar Disorder Survival Guide — David Miklowitz (book)',
+    body: 'The standard "what to actually do" handbook by one of the world\'s leading bipolar researchers (and developer of Family-Focused Therapy). Practical chapters on mood charting, prodrome work, talking to family, choosing therapy, managing meds. Now in its 4th edition. Less literary than the memoirs but the one to give a partner or parent.',
+    link: 'https://www.guilford.com/books/The-Bipolar-Disorder-Survival-Guide/David-Miklowitz/9781462553624'
+  },
+  {
+    keys: ['electroboy', 'behrman', 'ect memoir', 'book'],
+    title: 'Electroboy — Andy Behrman (book)',
+    body: 'A wild memoir of New York art-world mania, fraud, and ultimately ECT (electroconvulsive therapy) — which Behrman credits with saving his life. Unusual for being honest about ECT working when nothing else did. Hard, often uncomfortable, and very funny in places.',
+    link: 'https://en.wikipedia.org/wiki/Electroboy'
+  },
+  {
+    keys: ['manic', 'terri cheney', 'cheney', 'book'],
+    title: 'Manic — Terri Cheney (book)',
+    body: 'A non-chronological memoir of life with treatment-resistant bipolar I, structured as discrete mood-driven episodes rather than a linear story. Cheney is a former entertainment lawyer; the writing is sharp and the structure mirrors the disorder itself. Her New York Times essay later became the Modern Love TV episode below.',
+    link: 'https://en.wikipedia.org/wiki/Terri_Cheney'
+  },
+  {
+    keys: ['silver linings', 'silver linings playbook', 'cooper', 'lawrence', 'film'],
+    title: 'Silver Linings Playbook (2012) — film',
+    body: 'Bradley Cooper plays a recently-discharged bipolar I man trying to rebuild after a manic episode. The first big mainstream film to portray bipolar with sympathy and humour. Slightly oversimplifies the recovery arc, but the depiction of mood swings, family dynamics, and the dance between mania and grief lands well. Based on Matthew Quick\'s novel.',
+    link: 'https://en.wikipedia.org/wiki/Silver_Linings_Playbook'
+  },
+  {
+    keys: ['touched with fire', 'paul dalio', 'film 2015'],
+    title: 'Touched with Fire (2015) — film',
+    body: 'Two poets with bipolar meet in a psychiatric hospital and fall into a relationship that swings between transcendence and disaster. Written and directed by Paul Dalio, who has bipolar himself, with Kay Redfield Jamison consulting. Slow and sometimes uneven, but honest about the seductive pull of mania and the impossible choice between medication and intensity.',
+    link: 'https://en.wikipedia.org/wiki/Touched_with_Fire_(film)'
+  },
+  {
+    keys: ['mr jones', 'richard gere', 'figgis', 'film'],
+    title: 'Mr Jones (1993) — film',
+    body: 'Richard Gere plays a man with untreated bipolar disorder; Lena Olin is the psychiatrist who treats him. Of its era — the diagnostic language is dated, the romance subplot is dubious — but the manic sequences (particularly the conductor scene) remain one of the most accurate depictions of mania on screen.',
+    link: 'https://en.wikipedia.org/wiki/Mr._Jones_(1993_film)'
+  },
+  {
+    keys: ['polar bear', 'infinitely polar bear', 'maya forbes', 'mark ruffalo', 'film'],
+    title: 'Infinitely Polar Bear (2014) — film',
+    body: 'Mark Ruffalo plays a father with bipolar disorder caring for his two young daughters in 1970s Boston while his wife trains in another city. Based on writer/director Maya Forbes\'s own childhood. Gentle, funny, accurate about the texture of living with a parent who has bipolar — without sanitising it.',
+    link: 'https://en.wikipedia.org/wiki/Infinitely_Polar_Bear'
+  },
+  {
+    keys: ['modern love', 'anne hathaway', 'whoever i am', 'tv'],
+    title: 'Modern Love S1E3 — "Take Me as I Am" (TV)',
+    body: 'Anne Hathaway plays a successful lawyer hiding bipolar I — and the swing-of-the-pendulum mid-episode is one of the most accessible portrayals of bipolar on screen. Adapted from Terri Cheney\'s New York Times essay (Cheney also wrote Manic). 30 minutes. Worth showing to family who want to understand.',
+    link: 'https://en.wikipedia.org/wiki/Modern_Love_(TV_series)'
+  },
+  {
+    keys: ['stephen fry', 'manic depressive', 'documentary'],
+    title: 'Stephen Fry: The Secret Life of the Manic Depressive (2006) — documentary',
+    body: 'BBC documentary in which Stephen Fry — who has bipolar I — interviews celebrities, clinicians, and ordinary people about the illness. The language is slightly dated now but it holds up as a humane, intelligent introduction. The 2016 follow-up The Not So Secret Life of the Manic Depressive: 10 Years On picks up where it left off.',
+    link: 'https://en.wikipedia.org/wiki/Stephen_Fry:_The_Secret_Life_of_the_Manic_Depressive'
+  },
+  {
+    keys: ['bipolar podcast', 'bipolar uk podcast', 'inside bipolar', 'podcast'],
+    title: 'Bipolar Podcasts — Bipolar UK / Inside Bipolar / MIHH',
+    body: 'A range of bipolar-focused podcasts exist. The Bipolar UK Podcast is the UK peer-led option; Inside Bipolar (Psych Central) is an honest US-based show co-hosted by people with and treating the condition; Mental Illness Happy Hour by Paul Gilmartin covers a wider mental-health landscape with frequent bipolar episodes. All free on major podcast apps.',
+    link: 'https://www.bipolaruk.org/'
+  }
+];
+
+function _renderWikiSimpleCards(items, disclaimerKey, defaultLinkLabelKey) {
+  const body = document.getElementById('wiki-body');
+  if (!body) return;
+  const disclaimer = disclaimerKey
+    ? `<div class="wiki-disclaimer">${esc(_wt(disclaimerKey))}</div>`
+    : '';
+  const defaultLabel = _wt(defaultLinkLabelKey || 'anon.wiki.moreInfo');
+  body.innerHTML = disclaimer + items.map(c => {
+    const search = (c.title + ' ' + c.body + ' ' + (c.keys || []).join(' ')).toLowerCase();
+    const link = c.link || c.nhs;
+    const linkHtml = link
+      ? `<a href="${esc(link)}" target="_blank" rel="noopener" class="wiki-link-btn">${esc(c.linkLabel || defaultLabel)}</a>`
+      : '';
+    return `
+      <details class="wiki-card" data-wiki-search="${esc(search)}">
+        <summary>${esc(c.title)}<span class="wiki-chev">▼</span></summary>
+        <div class="wiki-card-body">
+          <p>${esc(c.body)}</p>
+          ${linkHtml}
+        </div>
+      </details>`;
+  }).join('');
+  applyWikiFilter();
+}
+
+function renderWikiTherapies()     { _renderWikiSimpleCards(_THERAPIES,     'anon.wiki.therapiesDisclaimer'); }
+function renderWikiLifestyle()     { _renderWikiSimpleCards(_LIFESTYLE,     'anon.wiki.lifestyleDisclaimer'); }
+function renderWikiWarningSigns()  { _renderWikiSimpleCards(_WARNING_SIGNS, 'anon.wiki.warningSignsDisclaimer'); }
+function renderWikiSideEffects()   { _renderWikiSimpleCards(_SIDE_EFFECTS,  'anon.wiki.sideEffectsDisclaimer'); }
+function renderWikiHospital()      { _renderWikiSimpleCards(_HOSPITAL,      'anon.wiki.hospitalDisclaimer'); }
+function renderWikiWorkplace()     { _renderWikiSimpleCards(_WORKPLACE,     'anon.wiki.workplaceDisclaimer'); }
+function renderWikiPregnancy()     { _renderWikiSimpleCards(_PREGNANCY,     'anon.wiki.pregnancyDisclaimer'); }
+function renderWikiMedia()         { _renderWikiSimpleCards(_MEDIA,         'anon.wiki.mediaDisclaimer'); }
 
 function renderWikiConditions() {
   const body = document.getElementById('wiki-body');

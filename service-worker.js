@@ -115,7 +115,8 @@
 // v44: Wiki — stack pill chips across two rows on mobile (<520px), and slowly rotate the row that doesn't contain the active pill when its content overflows the screen.
 // v45: Wiki — add Rapid Cycling card to the Conditions section (course specifier, not a separate diagnosis).
 // v46: Wiki — broaden the Conditions section with Mixed Features, Seasonal Pattern, Major Depressive Disorder, Anxiety Disorders, ADHD, BPD/EUPD, and Schizophrenia & Schizoaffective. Each card has an NHS info link.
-const CACHE_NAME = 'bipolarbear-v46';
+// v47: Wiki — add 8 new sections: Therapies, Lifestyle, Warning Signs, Side Effects, Hospital, Workplace, Pregnancy, and Books & Films. New shared _renderWikiSimpleCards helper. i18n keys for pill labels + per-section disclaimers added to English locale.
+const CACHE_NAME = 'bipolarbear-v47';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
