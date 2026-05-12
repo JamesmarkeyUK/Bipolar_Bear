@@ -118,7 +118,8 @@
 // v47: Wiki — add 8 new sections: Therapies, Lifestyle, Warning Signs, Side Effects, Hospital, Workplace, Pregnancy, and Books & Films. New shared _renderWikiSimpleCards helper. i18n keys for pill labels + per-section disclaimers added to English locale.
 // v48: Wiki — add For Loved Ones section (partners, family, carers): early signs, what to say, helping during mania / depression, hospital admissions, carer wellbeing, carer rights, and when to call for help.
 // v49: Wiki — rebalance pill rows 7/6 (was 6/7). Hospital moves from row 1 to row 0 alongside the rest of the clinical group.
-const CACHE_NAME = 'bipolarbear-v49';
+// v50: Wiki — drop the auto-marquee (broken in Firefox; conflicted with manual scroll). Both pill rows are now independently scrollable; CSS mask-image fades the edge that has more content; first wiki open per session triggers a one-time peek nudge so the user sees the rows can be swiped.
+const CACHE_NAME = 'bipolarbear-v50';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

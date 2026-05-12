@@ -1228,12 +1228,18 @@ function renderWiki() {
     wiki.querySelectorAll('.wiki-pill').forEach(btn => {
       btn.addEventListener('click', () => setWikiSection(btn.dataset.wiki));
     });
+    wiki.querySelectorAll('.wiki-pill-row').forEach(row => {
+      row.addEventListener('scroll', _updateWikiFades, { passive: true });
+    });
     document.getElementById('wiki-search-input').addEventListener('input', applyWikiFilter);
     document.getElementById('wiki-search-close').addEventListener('click', closeWikiSearch);
     setWikiSection(_wikiSection);
+    _updateWikiFades();
+    _peekWikiRows();
   } else {
-    // Re-evaluate marquee state in case viewport size changed while hidden.
-    _updateWikiMarquees();
+    // Re-evaluate fades in case viewport size changed while hidden.
+    _updateWikiFades();
+    _peekWikiRows();
   }
 }
 
@@ -1294,8 +1300,7 @@ function applyWikiFilter() {
 function setWikiSection(section) {
   _wikiSection = section;
   document.querySelectorAll('.wiki-pill').forEach(b =>
-    b.classList.toggle('active', !b.classList.contains('wiki-pill--ghost') && b.dataset.wiki === section));
-  _updateWikiMarquees();
+    b.classList.toggle('active', b.dataset.wiki === section));
   if (section === 'meds')              renderWikiMeds();
   else if (section === 'conditions')   renderWikiConditions();
   else if (section === 'therapies')    renderWikiTherapies();
@@ -1311,43 +1316,44 @@ function setWikiSection(section) {
   else if (section === 'wisdom')       renderWikiWisdom();
 }
 
-// Two-line pill layout: stack rows on mobile, animate the row without the
-// active pill as a continuous marquee when its content overflows the screen.
-function _updateWikiMarquees() {
+// Both pill rows are independently scrollable on mobile. We fade the edge
+// of each row where there's more content to reveal, so the user knows the
+// row can be swiped.
+function _updateWikiFades() {
   const wiki = document.getElementById('wiki-section');
   if (!wiki || wiki.style.display === 'none') return;
-  const rows = wiki.querySelectorAll('.wiki-pill-row');
-  if (!rows.length) return;
-  const isMobile = window.matchMedia('(max-width: 519px)').matches;
-  rows.forEach(row => {
-    const track = row.querySelector('.wiki-pill-track');
-    if (!track) return;
-    track.querySelectorAll('.wiki-pill--ghost').forEach(g => g.remove());
-    row.classList.remove('marquee');
-    const hasActive = !!track.querySelector('.wiki-pill.active');
-    row.classList.toggle('active-row', hasActive);
-    if (!isMobile || hasActive) return;
-    const originals = Array.from(track.children);
-    if (!originals.length) return;
-    const trackWidth = track.scrollWidth;
-    const rowWidth   = row.clientWidth;
-    if (trackWidth <= rowWidth + 1) return;
-    originals.forEach(el => {
-      const clone = el.cloneNode(true);
-      clone.classList.add('wiki-pill--ghost');
-      clone.classList.remove('active');
-      clone.setAttribute('aria-hidden', 'true');
-      clone.setAttribute('tabindex', '-1');
-      track.appendChild(clone);
-    });
-    row.classList.add('marquee');
+  wiki.querySelectorAll('.wiki-pill-row').forEach(row => {
+    const canRight = row.scrollLeft + row.clientWidth < row.scrollWidth - 1;
+    const canLeft  = row.scrollLeft > 0;
+    row.classList.toggle('can-scroll-right', canRight);
+    row.classList.toggle('can-scroll-left',  canLeft);
   });
 }
 
-let _wikiMarqueeResizeT = 0;
+// First wiki open per session: nudge each overflowing row so the user
+// sees the chips can move. Persistent affordance (the edge fade) takes
+// over after that.
+function _peekWikiRows() {
+  try { if (sessionStorage.getItem('bbWikiPeeked') === '1') return; } catch (e) {}
+  let didPeek = false;
+  document.querySelectorAll('.wiki-pill-row').forEach(row => {
+    const track = row.querySelector('.wiki-pill-track');
+    if (!track) return;
+    if (row.scrollWidth > row.clientWidth + 1) {
+      track.classList.add('peek');
+      didPeek = true;
+      setTimeout(() => track.classList.remove('peek'), 1000);
+    }
+  });
+  if (didPeek) {
+    try { sessionStorage.setItem('bbWikiPeeked', '1'); } catch (e) {}
+  }
+}
+
+let _wikiFadesResizeT = 0;
 window.addEventListener('resize', () => {
-  clearTimeout(_wikiMarqueeResizeT);
-  _wikiMarqueeResizeT = setTimeout(_updateWikiMarquees, 120);
+  clearTimeout(_wikiFadesResizeT);
+  _wikiFadesResizeT = setTimeout(_updateWikiFades, 120);
 });
 
 const _CONDITIONS = [
