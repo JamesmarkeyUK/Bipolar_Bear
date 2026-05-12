@@ -107,7 +107,11 @@
 // v36: v1.2 — fix syntax error in index.js (smart quotes in _WHATS_NEW_HEADLINES broke home page: hint, logo tap, profile button, anon link, survival kit nav).
 // v37: security — escape Firestore-sourced gradient/streak/icon fields in anonymous-board renderers; 6-digit code boxes.
 // v38: v1.3 — version bump for the security release; refresh precached brand-config.js (_APP_VERSION='1.3') and js/index.js (new _WHATS_NEW_HEADLINES entry).
-const CACHE_NAME = 'bipolarbear-v38';
+// v39: Wiki feature Phase 1 — extract KNOWN_MEDS from survival-kit.js into shared js/shared/medications.js so the anonymous-board Wiki tab (forthcoming) and survival-kit read the same source.
+// v40: Wiki feature Phase 2 — add 📖 Wiki tab + hidden wiki-section to anonymous.html; setTab in anonymous.js routes wiki tab (hides post list, hides compose FAB). i18n 'anon.board.wiki' added across 10 locales.
+// v41: Wiki feature Phase 3 — populate wiki section with sub-section pills (Medications / Support Groups / Community Wisdom), renderers in anonymous.js, wiki CSS, and precache wiki JSON data.
+// v42: Wiki feature Phase 4 — add 🔍 search FAB that toggles an inline search bar in the wiki tab (per-section substring filter); convert wiki strings to i18n keys (English populated, other locales fall back).
+const CACHE_NAME = 'bipolarbear-v42';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
@@ -136,6 +140,7 @@ const STATIC_ASSETS = [
   './js/shared/brand-config.js',
   './js/shared/firebase-config.js',
   './js/shared/onboarding.js',
+  './js/shared/medications.js',
 
   // Shared theme tokens (loaded before page-specific CSS).
   './css/theme.css',
@@ -152,6 +157,10 @@ const STATIC_ASSETS = [
   // own image cache handles them adequately.
   './manifest.json',
   './manifest-anonymous.json',
+
+  // Wiki tab data (fetched by js/anonymous.js renderers).
+  './data/wiki-support-groups.json',
+  './data/wiki-posts.json',
 ];
 
 /**

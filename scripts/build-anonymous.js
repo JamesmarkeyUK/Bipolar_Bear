@@ -102,6 +102,7 @@ const SHARED_MODULES = [
   'js/shared/brand-config.js',
   'js/shared/firebase-config.js',
   'js/shared/i18n.js',
+  'js/shared/medications.js',
 ];
 for (const f of SHARED_MODULES) copy(f);
 
@@ -126,6 +127,11 @@ fs.writeFileSync(brandPath, brand);
 // favicons subset is harmless to include and saves on surprise 404s
 // from anything that probes /favicon.ico.
 copyDir('icons');
+
+// ─── 7b. Wiki data ──────────────────────────────────────────────────
+// JSON files fetched at runtime by the Wiki tab renderers in
+// js/anonymous.js (renderWikiGroups / renderWikiWisdom).
+copyDir('data');
 
 // ─── 8. Done ────────────────────────────────────────────────────────
 console.log(`Built ${OUT}`);

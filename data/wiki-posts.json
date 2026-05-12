@@ -1,0 +1,4 @@
+{
+  "_comment": "Admin-curated highlights from the anonymous community board. Hand-populated — copy great posts here when you spot them. Schema per entry: text (string, the post body), monika (string, the original poster's monika), topic (string, used to group/filter — e.g. 'Medication', 'Coping', 'Mania', 'Depression', 'Relationships', 'Work'), addedAt (ISO 8601 string).",
+  "entries": []
+}

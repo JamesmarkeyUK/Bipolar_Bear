@@ -1153,16 +1153,233 @@ function renderTabBadges() {
 
 function setTab(tab) {
   currentTab = tab;
-  saveLastSeen(tab);
   document.querySelectorAll('.board-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   document.getElementById('fab-ann').classList.toggle('active', tab === 'announcements');
   document.getElementById('fab-gen').classList.toggle('active', tab === 'general');
+
+  const postList    = document.getElementById('post-list');
+  const wikiSection = document.getElementById('wiki-section');
+  const fabCompose  = document.getElementById('fab-compose');
+  const fabSearch   = document.getElementById('fab-search');
+  const isWiki      = tab === 'wiki';
+  if (postList)    postList.style.display    = isWiki ? 'none'  : '';
+  if (wikiSection) wikiSection.style.display = isWiki ? 'block' : 'none';
+  if (fabCompose)  fabCompose.style.display  = isWiki ? 'none'  : '';
+  if (fabSearch)   fabSearch.style.display   = isWiki ? ''      : 'none';
+  if (!isWiki) closeWikiSearch();
+
+  if (isWiki) {
+    renderWiki();
+    renderTabBadges();
+    return;
+  }
+
+  saveLastSeen(tab);
   // Render from the already-running listener's cached data (no listener restart)
   localPosts = postsByTab[tab] || [];
   renderPosts(tab === 'general'
     ? assembleGeneralPosts(localPosts)
     : (localPosts.length ? sortPosts(localPosts) : announcementPosts()));
   renderTabBadges();
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Wiki tab
+// ─────────────────────────────────────────────────────────────────
+let _wikiSection = 'meds';
+const _wikiCache = { groups: null, posts: null };
+function _wt(key) { return (window.BB && window.BB.t) ? window.BB.t(key) : key; }
+
+function renderWiki() {
+  const wiki = document.getElementById('wiki-section');
+  if (!wiki) return;
+  if (wiki.dataset.rendered !== '1') {
+    wiki.dataset.rendered = '1';
+    wiki.innerHTML = `
+      <div id="wiki-search-bar" class="wiki-search-bar" style="display:none;">
+        <input id="wiki-search-input" type="search" placeholder="${esc(_wt('anon.wiki.searchPlaceholder'))}" autocomplete="off" />
+        <button id="wiki-search-close" class="wiki-search-close" aria-label="Close search">✕</button>
+      </div>
+      <div class="wiki-pills">
+        <button class="wiki-pill active" data-wiki="meds">${esc(_wt('anon.wiki.pillMeds'))}</button>
+        <button class="wiki-pill" data-wiki="groups">${esc(_wt('anon.wiki.pillGroups'))}</button>
+        <button class="wiki-pill" data-wiki="wisdom">${esc(_wt('anon.wiki.pillWisdom'))}</button>
+      </div>
+      <div id="wiki-body" class="wiki-body"></div>
+    `;
+    wiki.querySelectorAll('.wiki-pill').forEach(btn => {
+      btn.addEventListener('click', () => setWikiSection(btn.dataset.wiki));
+    });
+    document.getElementById('wiki-search-input').addEventListener('input', applyWikiFilter);
+    document.getElementById('wiki-search-close').addEventListener('click', closeWikiSearch);
+    setWikiSection(_wikiSection);
+  }
+}
+
+function toggleWikiSearch() {
+  const bar = document.getElementById('wiki-search-bar');
+  if (!bar) return;
+  if (bar.style.display === 'none') {
+    bar.style.display = 'flex';
+    const input = document.getElementById('wiki-search-input');
+    if (input) { input.value = ''; setTimeout(() => input.focus(), 50); }
+  } else {
+    closeWikiSearch();
+  }
+}
+
+function closeWikiSearch() {
+  const bar = document.getElementById('wiki-search-bar');
+  if (!bar) return;
+  bar.style.display = 'none';
+  const input = document.getElementById('wiki-search-input');
+  if (input) input.value = '';
+  applyWikiFilter();
+}
+
+function applyWikiFilter() {
+  const input = document.getElementById('wiki-search-input');
+  const body  = document.getElementById('wiki-body');
+  if (!body) return;
+  const q = input ? input.value.trim().toLowerCase() : '';
+  const cards = body.querySelectorAll('[data-wiki-search]');
+  let visibleCount = 0;
+  cards.forEach(c => {
+    const match = !q || (c.dataset.wikiSearch || '').includes(q);
+    c.style.display = match ? '' : 'none';
+    if (match) visibleCount++;
+  });
+  // Region headings (groups view): hide if all groups under them are filtered out.
+  body.querySelectorAll('[data-wiki-region]').forEach(h => {
+    const region = h.dataset.wikiRegion;
+    const anyVisible = Array.from(body.querySelectorAll(`[data-wiki-region-card="${CSS.escape(region)}"]`))
+      .some(el => el.style.display !== 'none');
+    h.style.display = anyVisible ? '' : 'none';
+  });
+  // No-results state.
+  let noResults = body.querySelector('.wiki-no-results');
+  if (q && visibleCount === 0) {
+    if (!noResults) {
+      noResults = document.createElement('div');
+      noResults.className = 'wiki-empty wiki-no-results';
+      noResults.textContent = _wt('anon.wiki.noResults');
+      body.appendChild(noResults);
+    }
+  } else if (noResults) {
+    noResults.remove();
+  }
+}
+
+function setWikiSection(section) {
+  _wikiSection = section;
+  document.querySelectorAll('.wiki-pill').forEach(b =>
+    b.classList.toggle('active', b.dataset.wiki === section));
+  if (section === 'meds')        renderWikiMeds();
+  else if (section === 'groups') renderWikiGroups();
+  else if (section === 'wisdom') renderWikiWisdom();
+}
+
+function renderWikiMeds() {
+  const body = document.getElementById('wiki-body');
+  if (!body) return;
+  const meds = (window.BB && window.BB.medications && window.BB.medications.list) || [];
+  body.innerHTML = `
+    <div class="wiki-disclaimer">${esc(_wt('anon.wiki.medsDisclaimer'))}</div>
+    ${meds.map(m => {
+      const search = (m.title + ' ' + m.body + ' ' + (m.keys || []).join(' ')).toLowerCase();
+      return `
+        <details class="wiki-card" data-wiki-search="${esc(search)}">
+          <summary>${esc(m.title)}<span class="wiki-chev">▼</span></summary>
+          <div class="wiki-card-body">
+            <p>${esc(m.body)}</p>
+            <a href="${esc(m.nhs)}" target="_blank" rel="noopener" class="wiki-link-btn">${esc(_wt('anon.wiki.nhsInfo'))}</a>
+          </div>
+        </details>`;
+    }).join('')}
+  `;
+  applyWikiFilter();
+}
+
+async function renderWikiGroups() {
+  const body = document.getElementById('wiki-body');
+  if (!body) return;
+  body.innerHTML = `<div class="wiki-loading">${esc(_wt('anon.wiki.loadingGroups'))}</div>`;
+  try {
+    if (!_wikiCache.groups) {
+      const res = await fetch('data/wiki-support-groups.json', { cache: 'no-cache' });
+      _wikiCache.groups = await res.json();
+    }
+    // Drop the placeholder example entry shipped in the seed file.
+    const groups = (_wikiCache.groups.groups || []).filter(g => !/Example/i.test(g.name || ''));
+    if (groups.length === 0) {
+      // emptyGroups contains a link (HTML); render via innerHTML.
+      body.innerHTML = `<div class="wiki-empty">${_wt('anon.wiki.emptyGroups')}</div>`;
+      return;
+    }
+    const byRegion = {};
+    groups.forEach(g => {
+      const r = g.region || 'Other';
+      (byRegion[r] = byRegion[r] || []).push(g);
+    });
+    body.innerHTML = Object.keys(byRegion).sort().map(region => `
+      <h3 class="wiki-region-heading" data-wiki-region="${esc(region)}">${esc(region)}</h3>
+      ${byRegion[region].map(g => {
+        const search = [g.name, g.region, g.format, g.when, g.location,
+                        g.contactName, g.contactEmail, g.contactPhone, g.notes]
+                        .filter(Boolean).join(' ').toLowerCase();
+        return `
+          <details class="wiki-card" data-wiki-search="${esc(search)}" data-wiki-region-card="${esc(region)}">
+            <summary>${esc(g.name)}<span class="wiki-chev">▼</span></summary>
+            <div class="wiki-card-body">
+              ${g.format   ? `<div class="wiki-meta"><strong>${esc(_wt('anon.wiki.format'))}</strong> ${esc(g.format)}</div>` : ''}
+              ${g.when     ? `<div class="wiki-meta"><strong>${esc(_wt('anon.wiki.when'))}</strong> ${esc(g.when)}</div>` : ''}
+              ${g.location ? `<div class="wiki-meta"><strong>${esc(_wt('anon.wiki.where'))}</strong> ${esc(g.location)}</div>` : ''}
+              ${(g.contactName || g.contactEmail || g.contactPhone) ? `<div class="wiki-meta"><strong>${esc(_wt('anon.wiki.contact'))}</strong>
+                ${g.contactName  ? ' ' + esc(g.contactName) : ''}
+                ${g.contactEmail ? ` <a href="mailto:${esc(g.contactEmail)}">${esc(g.contactEmail)}</a>` : ''}
+                ${g.contactPhone ? ` <a href="tel:${esc(g.contactPhone)}">${esc(g.contactPhone)}</a>` : ''}
+              </div>` : ''}
+              ${g.notes ? `<p class="wiki-notes">${esc(g.notes)}</p>` : ''}
+              ${g.link  ? `<a href="${esc(g.link)}" target="_blank" rel="noopener" class="wiki-link-btn">${esc(_wt('anon.wiki.moreInfo'))}</a>` : ''}
+            </div>
+          </details>`;
+      }).join('')}
+    `).join('');
+    applyWikiFilter();
+  } catch (err) {
+    console.error('[Wiki] support groups fetch failed', err);
+    body.innerHTML = `<div class="wiki-empty">${esc(_wt('anon.wiki.errorGroups'))}</div>`;
+  }
+}
+
+async function renderWikiWisdom() {
+  const body = document.getElementById('wiki-body');
+  if (!body) return;
+  body.innerHTML = `<div class="wiki-loading">${esc(_wt('anon.wiki.loadingGeneric'))}</div>`;
+  try {
+    if (!_wikiCache.posts) {
+      const res = await fetch('data/wiki-posts.json', { cache: 'no-cache' });
+      _wikiCache.posts = await res.json();
+    }
+    const entries = _wikiCache.posts.entries || [];
+    if (entries.length === 0) {
+      body.innerHTML = `<div class="wiki-empty">${esc(_wt('anon.wiki.emptyWisdom'))}</div>`;
+      return;
+    }
+    body.innerHTML = entries.map(e => {
+      const search = [e.text, e.topic, e.monika].filter(Boolean).join(' ').toLowerCase();
+      return `
+        <div class="wiki-wisdom-card" data-wiki-search="${esc(search)}">
+          ${e.topic ? `<div class="wiki-wisdom-topic">${esc(e.topic)}</div>` : ''}
+          <p class="wiki-wisdom-text">${esc(e.text)}</p>
+          ${e.monika ? `<div class="wiki-wisdom-attr">— ${esc(e.monika)}</div>` : ''}
+        </div>`;
+    }).join('');
+    applyWikiFilter();
+  } catch (err) {
+    console.error('[Wiki] posts fetch failed', err);
+    body.innerHTML = `<div class="wiki-empty">${esc(_wt('anon.wiki.errorWisdom'))}</div>`;
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -1662,6 +1879,9 @@ function setupFAB() {
   document.getElementById('fab-e2ee').addEventListener('click', () => openOv('ov-e2ee'));
 
   document.getElementById('fab-home').addEventListener('click', openAbout);
+
+  const searchBtn = document.getElementById('fab-search');
+  if (searchBtn) searchBtn.addEventListener('click', toggleWikiSearch);
 }
 
 // ─────────────────────────────────────────────────────────────────
