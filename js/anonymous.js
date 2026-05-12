@@ -1217,6 +1217,7 @@ function renderWiki() {
             <button class="wiki-pill" data-wiki="workplace">${esc(_wt('anon.wiki.pillWorkplace'))}</button>
             <button class="wiki-pill" data-wiki="pregnancy">${esc(_wt('anon.wiki.pillPregnancy'))}</button>
             <button class="wiki-pill" data-wiki="media">${esc(_wt('anon.wiki.pillMedia'))}</button>
+            <button class="wiki-pill" data-wiki="lovedOnes">${esc(_wt('anon.wiki.pillLovedOnes'))}</button>
             <button class="wiki-pill" data-wiki="groups">${esc(_wt('anon.wiki.pillGroups'))}</button>
             <button class="wiki-pill" data-wiki="wisdom">${esc(_wt('anon.wiki.pillWisdom'))}</button>
           </div>
@@ -1305,6 +1306,7 @@ function setWikiSection(section) {
   else if (section === 'workplace')    renderWikiWorkplace();
   else if (section === 'pregnancy')    renderWikiPregnancy();
   else if (section === 'media')        renderWikiMedia();
+  else if (section === 'lovedOnes')    renderWikiLovedOnes();
   else if (section === 'groups')       renderWikiGroups();
   else if (section === 'wisdom')       renderWikiWisdom();
 }
@@ -1855,6 +1857,57 @@ const _MEDIA = [
   }
 ];
 
+const _LOVED_ONES = [
+  {
+    keys: ['spot warning', 'early signs partner', 'noticing change', 'family warning'],
+    title: 'Spotting the Early Signs',
+    body: 'You\'ll often see prodromal symptoms before your loved one does — they\'re sometimes the last to notice. Common changes: sleep patterns shifting, irritability creeping up, spending or risk-taking rising, withdrawal from texts and plans, or unusual energy and grandiose ideas. Ask in a calm moment to be told what you should look out for, write it down together, and agree how you\'ll raise it when you see it. A pre-agreed phrase ("can we check the warning list?") is less inflammatory in the moment than "I think you\'re manic".',
+    link: 'https://www.bipolaruk.org/Pages/Category/family-and-friends'
+  },
+  {
+    keys: ['what to say', 'language', 'how to talk', 'comfort', 'communication'],
+    title: 'What to Say (and What Not to Say)',
+    body: 'Helpful: "I\'m here, what do you need right now?", "I noticed you haven\'t slept much — how are you doing?", "I love you. This is the illness, not you." Unhelpful: "Just snap out of it", "Cheer up", or "Have you taken your meds?" used as a constant question. Validate first, problem-solve later. Don\'t argue with delusions during mania — neither agreeing nor pushing back works; redirecting to safety usually does.',
+    link: 'https://www.mind.org.uk/information-support/helping-someone-else/'
+  },
+  {
+    keys: ['mania help', 'manic episode', 'helping mania', 'partner mania'],
+    title: 'Helping During a Manic Episode',
+    body: 'Mania can feel like watching someone you love drive at speed with no brakes. Practical anchors: limit credit-card or banking access if agreed in advance, reduce stimulating environments, protect sleep, avoid escalation arguments (the brain isn\'t fully online), and call the CMHT or crisis team before things require A&E. Keep a written record of what you observe and when — clinicians find timestamped notes invaluable. Don\'t try to do it alone; bring in other family or friends in shifts.',
+    link: 'https://www.bipolaruk.org/Pages/Category/family-and-friends'
+  },
+  {
+    keys: ['depression help', 'depressive episode', 'helping depression', 'partner depression'],
+    title: 'Helping During a Depressive Episode',
+    body: 'Depression often steals the ability to ask for help. Small, low-demand acts beat grand gestures: drop off food, sit nearby without expectation, suggest one small walk, handle one piece of admin. Avoid pressuring "you need to get out more" — agency is part of what\'s broken. Watch for hopelessness, giving away possessions, or sudden calm after distress — those can signal active suicide risk. Ask directly about suicidal thoughts; asking does not "plant the idea", and the evidence on this is clear.',
+    link: 'https://www.samaritans.org/how-we-can-help/if-youre-worried-about-someone-else/'
+  },
+  {
+    keys: ['hospital partner', 'admission carer', 'visiting hospital', 'inpatient support'],
+    title: 'Supporting Through a Hospital Admission',
+    body: 'Visit regularly even if conversations are short; bring familiar things (favourite snacks, photos, a familiar jumper) within the ward\'s rules. Ask to be involved in care-planning meetings — as a "nearest relative" under the Mental Health Act you have specific rights, including the right to be consulted about a Section 3 and to apply for discharge. Keep your own life going where you can; visiting is a marathon, not a sprint, and the recovery period after discharge is often harder than the admission itself.',
+    link: 'https://www.rethink.org/advice-and-information/carers-hub/'
+  },
+  {
+    keys: ['carer wellbeing', 'caregiver burnout', 'looking after yourself', 'compassion fatigue', 'self care carer'],
+    title: 'Looking After Yourself',
+    body: 'Carer burnout is real and predictable. The cycle is exhausting — episodes, recovery, fear of the next one — and trying to be the sole safety net is unsustainable. Keep at least one space that\'s just yours (a sport, a friendship, your own therapy), accept help when offered, and don\'t let care duties absorb every relationship. You can\'t pour from an empty cup, and a burned-out carer is no good to anyone. Carers UK runs a free helpline; Bipolar UK has a dedicated peer line for family and friends.',
+    link: 'https://www.carersuk.org/help-and-advice/'
+  },
+  {
+    keys: ['carer rights', 'carers assessment', 'carer act', 'nearest relative', 'carers allowance'],
+    title: 'Your Rights as a Carer',
+    body: 'In the UK, anyone providing unpaid care is entitled to a free Carer\'s Assessment via the local authority — covering practical, financial, and emotional support. Carer\'s Allowance is means-tested but worth checking. Under the Mental Health Act, the "nearest relative" (a specific legal role, not always the closest person) has standing including the right to apply for discharge from Section 2 or 3 and to be consulted about admissions. The Carers Act 2014 places duties on local councils to support carers in their own right.',
+    link: 'https://www.gov.uk/carers-assessment'
+  },
+  {
+    keys: ['when to call', 'crisis carer', 'urgent help', 'emergency family', 'calling 999'],
+    title: 'When to Call for Help',
+    body: 'Call the CMHT or crisis team if warning signs are building, sleep is being lost, or your loved one is talking about harm. Call 999 or take them to A&E if they are about to act on suicidal thoughts, have harmed themselves seriously, are out of touch with reality, or you can\'t keep them safe. As a carer in your own right, Samaritans (116 123), Bipolar UK\'s Family Line, and your own GP are available to you separately — you don\'t need to be the patient to make the call.',
+    link: 'https://www.nhs.uk/mental-health/advice-for-life-situations-and-events/help-for-suicidal-thoughts/'
+  }
+];
+
 function _renderWikiSimpleCards(items, disclaimerKey, defaultLinkLabelKey) {
   const body = document.getElementById('wiki-body');
   if (!body) return;
@@ -1888,6 +1941,7 @@ function renderWikiHospital()      { _renderWikiSimpleCards(_HOSPITAL,      'ano
 function renderWikiWorkplace()     { _renderWikiSimpleCards(_WORKPLACE,     'anon.wiki.workplaceDisclaimer'); }
 function renderWikiPregnancy()     { _renderWikiSimpleCards(_PREGNANCY,     'anon.wiki.pregnancyDisclaimer'); }
 function renderWikiMedia()         { _renderWikiSimpleCards(_MEDIA,         'anon.wiki.mediaDisclaimer'); }
+function renderWikiLovedOnes()     { _renderWikiSimpleCards(_LOVED_ONES,    'anon.wiki.lovedOnesDisclaimer'); }
 
 function renderWikiConditions() {
   const body = document.getElementById('wiki-body');
