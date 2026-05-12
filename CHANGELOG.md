@@ -1,5 +1,13 @@
 # BipolarBear Changelog
 
+## v1.4
+- ✨ **Wiki** — new 📖 tab on the Bipolar Anonymous board with peer-friendly reference material. Sub-section pills: **Medications**, **Support Groups**, **Community Wisdom**, **Conditions** (Bipolar I/II, Cyclothymia, NOS, Rapid Cycling, Mixed Features, Seasonal Pattern, MDD, Anxiety Disorders, ADHD, BPD/EUPD, Schizophrenia & Schizoaffective), **Therapies**, **Lifestyle**, **Warning Signs**, **Side Effects**, **Hospital**, **Workplace**, **Pregnancy**, **Books & Films**, and **For Loved Ones** (early signs, what to say, helping through mania / depression, carer wellbeing, carer rights, when to call for help). Medication data is now extracted to a shared `js/shared/medications.js` so the survival kit and Anonymous Wiki read from one source
+- ✨ Wiki **search FAB** — 🔍 toggles an inline search bar that filters cards within the active sub-section. Wiki strings are wired through the i18n system (English populated; other locales fall back gracefully)
+- 🎨 Wiki pill chips stack across two rows on mobile (<520px); both rows are independently scrollable with an edge-fade mask indicating more pills off-screen. First open per session triggers a one-time peek nudge so the rows are clearly swipeable
+- 🎨 Tapping a wiki pill now smooth-scrolls the pill to the left edge of its row to reveal more pills
+- ✨ Mobile UX: `touch-action: manipulation` on the anonymous, beta, and privacy pages eliminates the 300 ms double-tap-zoom delay, making buttons feel instant
+- 📄 Privacy policy section 7 (Account Deletion) expanded into a Google Play–compliant guide covering in-app deletion, what's removed vs retained, and contact paths for guest users
+
 ## v1.3
 - 🔒 Security: Bipolar Anonymous email-code verification hardened — the wrong-attempt counter now runs inside a Firestore transaction, so a parallel burst can no longer slip past the 5-attempt budget. Codes widened from 4 to 6 digits and switched to `crypto.randomInt` (1,000,000 keyspace, cryptographically random) with a constant-time comparison. The verify screen now shows 6 input boxes.
 - 🔒 Security: Anonymous community board renderers (`renderPost`, `renderThreadHeader`, `renderComment`, `renderSystem`) now whitelist gradient colours and number-coerce streak/stable/likes before HTML interpolation — previously a Firestore-stored post could break out of the inline `style` attribute and run JS in other viewers' sessions.
