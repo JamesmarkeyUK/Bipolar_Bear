@@ -1,0 +1,17 @@
+{
+  "_comment": "Bipolar UK peer support groups. Replace the example entry below with real groups from https://www.bipolaruk.org/find-a-support-group . Schema: name (string), region (string, used to group entries in the UI), format ('in-person' | 'online' | 'hybrid'), when (string, free-form schedule), location (string, address or 'Online'), contactName (string, optional), contactEmail (string, optional), contactPhone (string, optional), link (string, optional URL to Bipolar UK page or group page), notes (string, optional).",
+  "groups": [
+    {
+      "name": "Example Group — replace with real data",
+      "region": "London",
+      "format": "in-person",
+      "when": "First Tuesday of the month, 19:00–21:00",
+      "location": "Example Community Centre, 1 Example Street, London EC1A 1AA",
+      "contactName": "Group Coordinator",
+      "contactEmail": "example@bipolaruk.org",
+      "contactPhone": "",
+      "link": "https://www.bipolaruk.org/find-a-support-group",
+      "notes": "Placeholder entry showing the expected shape. Delete this object once real groups are added."
+    }
+  ]
+}

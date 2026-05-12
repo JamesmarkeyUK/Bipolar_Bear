@@ -536,56 +536,9 @@ function _esc(s) {
     }
 
     // ── MEDICATION ACCORDION DATA ──
-    const KNOWN_MEDS = [
-      {
-        keys: ['lithium'],
-        title: 'Lithium (Mood Stabiliser)',
-        body: 'One of the most effective long-term treatments for bipolar disorder. Helps reduce the frequency and severity of mood episodes and lowers suicide risk. Requires regular blood tests to monitor levels and kidney/thyroid function. Common side effects include thirst, tremor, and increased urination.',
-        nhs: 'https://www.nhs.uk/medicines/lithium/'
-      },
-      {
-        keys: ['lamotrigine', 'lamictal'],
-        title: 'Lamotrigine / Lamictal (Mood Stabiliser)',
-        body: 'Particularly effective for preventing depressive episodes in bipolar disorder. Must be started at a low dose and increased slowly to avoid a rare but serious skin rash (Stevens-Johnson syndrome). Generally well tolerated. Less effective for mania prevention.',
-        nhs: 'https://www.nhs.uk/medicines/lamotrigine/'
-      },
-      {
-        keys: ['quetiapine', 'seroquel'],
-        title: 'Quetiapine / Seroquel (Antipsychotic)',
-        body: 'Used for both manic and depressive episodes, and as a maintenance treatment. Often causes sedation, which can be useful at night. Common side effects include weight gain, dry mouth, and dizziness. One of the most commonly prescribed medications for bipolar disorder.',
-        nhs: 'https://www.nhs.uk/medicines/quetiapine/'
-      },
-      {
-        keys: ['valproate', 'sodium valproate', 'depakote', 'epilim'],
-        title: 'Valproate / Sodium Valproate (Mood Stabiliser)',
-        body: 'Effective for mania and as a long-term mood stabiliser, particularly for rapid cycling. Requires blood tests to monitor levels and liver function. Not recommended during pregnancy. Side effects can include weight gain, hair loss, and sedation.',
-        nhs: 'https://www.nhs.uk/medicines/sodium-valproate/'
-      },
-      {
-        keys: ['olanzapine', 'zyprexa'],
-        title: 'Olanzapine / Zyprexa (Antipsychotic)',
-        body: 'Effective for acute mania and as a maintenance treatment. Can cause significant weight gain and metabolic changes (raised blood sugar, cholesterol). Often combined with lithium or valproate. Sedating, which can help with sleep during episodes.',
-        nhs: 'https://www.nhs.uk/medicines/olanzapine/'
-      },
-      {
-        keys: ['aripiprazole', 'abilify'],
-        title: 'Aripiprazole / Abilify (Antipsychotic)',
-        body: 'Used for mania and as a maintenance treatment. Less likely to cause weight gain or sedation than other antipsychotics. Side effects can include restlessness (akathisia), nausea, and insomnia. Also available as a long-acting injection (monthly or every 6 weeks).',
-        nhs: 'https://www.nhs.uk/medicines/aripiprazole/'
-      },
-      {
-        keys: ['risperidone', 'risperdal'],
-        title: 'Risperidone / Risperdal (Antipsychotic)',
-        body: 'Effective for acute manic and mixed episodes. Can cause movement-related side effects (extrapyramidal symptoms), weight gain, and raised prolactin levels. Available as a long-acting injection for maintenance treatment.',
-        nhs: 'https://www.nhs.uk/medicines/risperidone/'
-      },
-      {
-        keys: ['antidepressant', 'sertraline', 'fluoxetine', 'escitalopram', 'venlafaxine', 'duloxetine', 'citalopram', 'mirtazapine', 'paroxetine'],
-        title: 'Antidepressants — use with caution',
-        body: 'Antidepressants (SSRIs, SNRIs) are generally used cautiously in bipolar disorder as they can trigger mania or rapid cycling, especially without a mood stabiliser. When used, they are usually prescribed alongside a mood stabiliser. Always discuss the risks with your psychiatrist.',
-        nhs: 'https://www.nhs.uk/conditions/antidepressants/'
-      }
-    ];
+    // Source of truth lives in js/shared/medications.js (also consumed by
+    // the anonymous-board Wiki tab). Falls back to [] defensively.
+    const KNOWN_MEDS = (window.BB && window.BB.medications && window.BB.medications.list) || [];
 
     function buildAccordionHTML(med) {
       return `<div class="accordion">
@@ -598,8 +551,7 @@ function _esc(s) {
     }
 
     function matchMedToKnown(name) {
-      const lower = name.toLowerCase();
-      return KNOWN_MEDS.find(m => m.keys.some(k => lower.includes(k)));
+      return (window.BB && window.BB.medications && window.BB.medications.match(name)) || null;
     }
 
     function updateMedicationAccordions() {
