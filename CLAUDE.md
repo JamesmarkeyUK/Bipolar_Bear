@@ -104,6 +104,77 @@ The build script also flips `BB_BRAND.bundle` from `'main'` to
 `BB.isAnonymousApp()` reads in the native shell (the public-domain
 check can't fire there — `location.hostname` is `localhost`).
 
+The script is platform-agnostic — it only produces the `www-anonymous/`
+bundle. The same bundle feeds both the iOS and Android targets inside
+`~/bipolaranonymous-native/`.
+
+### Android first-time setup (Bipolar Anonymous)
+
+Only needed once per machine. After this, the normal build flow above
+covers both platforms.
+
+```bash
+cd ~/bipolaranonymous-native
+npx cap add android
+```
+
+Then in `android/app/build.gradle` confirm:
+
+- `applicationId "com.bipolaranonymous.app"`
+- `versionCode 1` / `versionName "1.0"` — bump both for every Play release
+
+Per-release in Android Studio:
+
+1. **Build → Generate Signed App Bundle / APK → Android App Bundle**
+2. First release: create a **new keystore** dedicated to
+   `com.bipolaranonymous.app`. Do **not** reuse the BipolarBear keystore
+   — Play treats the two apps as independent and a shared keystore is a
+   blast-radius footgun. Store the `.jks` + passwords somewhere durable
+   (keystore loss = app permanently un-updateable).
+3. Pick **release** variant → Finish. Signed `.aab` lands in
+   `android/app/release/`.
+
+### Firebase wiring for the Android anonymous app
+
+The anonymous app reads/writes the same Firestore project as the main
+build. It needs to be registered as a **separate Android app** in that
+project so auth/Firestore accept its package ID:
+
+1. Firebase Console → Project settings → **Add app** → Android
+2. Package name: `com.bipolaranonymous.app`
+3. SHA-1: from Android Studio's Gradle panel → `:app → Tasks → android
+   → signingReport` (use the **release** SHA-1, not debug)
+4. Download `google-services.json` → drop into
+   `~/bipolaranonymous-native/android/app/google-services.json`
+   (overwrites the placeholder Capacitor scaffolded)
+
+The existing Firestore security rules already allow writes from any
+authenticated user, so no rules changes are required.
+
+### Google Play Console: creating the second app
+
+`com.bipolaranonymous.app` is a separate Play listing — it does NOT
+share a console entry with Bipolar Bear.
+
+1. Play Console → **All apps → Create app**
+2. App name: `Bipolar Anonymous`; defaults: Free, App (not Game)
+3. Work through **Set up your app** checklist:
+   - Privacy policy URL (point at the `privacy.html` on the live domain)
+   - Data safety form — declare what the anonymous board collects
+     (posts, monika, anonProfile email hash). Posts are plaintext on
+     Firestore, NOT E2E encrypted — be honest about that.
+   - Content rating, target audience, ads declaration
+   - Main store listing: icon, feature graphic, screenshots (yellow
+     theme), short + full description
+4. **Test and release → Testing → Internal testing → Create new release**
+   → upload `.aab` → release notes → Save → Review → Start rollout
+5. **Testers** tab → create email list → save → copy opt-in URL → email
+   it out manually (Play does not send invites automatically)
+
+Initial Play review for a brand-new app can take a few hours before
+internal testers can actually install — the upload itself is instant
+but the listing isn't live until review clears.
+
 ## Firestore collections
 
 ```
