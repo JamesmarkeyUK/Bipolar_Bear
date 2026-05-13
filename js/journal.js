@@ -4806,7 +4806,9 @@ window.addEventListener('pageshow', () => {
     function _fmNextTarget(fromIdx) {
       const _doneIdx = _fmSteps.length - 1;
       for (let _i = fromIdx + 1; _i < _doneIdx; _i++) {
-        if (!_fmStepIsAnswered(_fmSteps[_i])) return _i;
+        const _s = _fmSteps[_i];
+        if (_s.id === 'sleepQuality' && !_fmWantsSleepQuality) continue;
+        if (!_fmStepIsAnswered(_s)) return _i;
       }
       return _doneIdx;
     }
