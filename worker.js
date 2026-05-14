@@ -2,10 +2,14 @@
  * Cloudflare Worker that fronts the static assets.
  *
  * One Pages deployment can serve multiple per-condition variants
- * (BipolarBear, AnxietyAnt, …) routed by hostname. The HOST_LANDING_MAP
- * decides what `/` resolves to per host:
- *   - bipolaranonymous.app, www.bipolaranonymous.app → /anonymous.html
- *   - everything else (default) → /beta.html
+ * (BipolarBear, AnxietyAnt, …) routed by hostname. Per-host overrides in
+ * HOST_LANDING_MAP issue a 301 redirect from `/` to a canonical path so the
+ * URL bar reflects the served page:
+ *   - bipolaranonymous.app, www.bipolaranonymous.app → 301 → /anonymous
+ *
+ * Hosts without an override get DEFAULT_LANDING served at `/` via an
+ * internal rewrite (URL bar stays as `/`):
+ *   - everything else → /beta.html
  *
  * Adding a new variant pair (e.g. "Anxiety Ant" + "Anxiety Anonymous") is
  * just two new entries below; no other code changes here.
@@ -21,21 +25,21 @@
  */
 
 /**
- * Per-hostname landing-page override. Bare host and `www.` variant must
- * be listed separately. Hosts not present here fall through to the
- * default landing.
+ * Per-hostname canonical landing path. Bare host and `www.` variant must
+ * be listed separately. Requests to `/` on these hosts get a 301 redirect
+ * to the configured path (URL bar updates), preserving the query string.
  *
  * Add new variant hosts here when expanding to additional condition apps.
  */
 const HOST_LANDING_MAP = {
   // Bipolar variant
-  'bipolaranonymous.app':     '/anonymous.html',
-  'www.bipolaranonymous.app': '/anonymous.html',
+  'bipolaranonymous.app':     '/anonymous',
+  'www.bipolaranonymous.app': '/anonymous',
 };
 
 /**
- * Landing page used when the requested hostname has no override entry.
- * Currently the BipolarBear beta-gate landing.
+ * Landing page served at `/` when the requested hostname has no override.
+ * Internal rewrite (URL bar stays as `/`).
  */
 const DEFAULT_LANDING = '/beta.html';
 
@@ -50,14 +54,18 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // Root request → swap in the appropriate landing page based on hostname.
     if (url.pathname === '/' || url.pathname === '') {
+      const override = HOST_LANDING_MAP[url.hostname];
+      if (override) {
+        const target = new URL(url);
+        target.pathname = override;
+        return Response.redirect(target.toString(), 301);
+      }
       const target = new URL(url);
-      target.pathname = HOST_LANDING_MAP[url.hostname] || DEFAULT_LANDING;
+      target.pathname = DEFAULT_LANDING;
       return env.ASSETS.fetch(new Request(target.toString(), request));
     }
 
-    // Everything else: serve the asset directly.
     return env.ASSETS.fetch(request);
   },
 };
