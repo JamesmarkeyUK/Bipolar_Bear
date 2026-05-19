@@ -406,6 +406,17 @@
             <input type="email" id="bbFbEmail" placeholder="Your email (optional)"
               style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;box-sizing:border-box;font-family:inherit;">
           </div>
+          <div style="margin-bottom:12px;">
+            <label id="bbFbScreenshotLabel" style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.88em;color:#6c757d;padding:8px 12px;border:2px dashed #e9ecef;border-radius:10px;">
+              <span style="font-size:1.2em;">📎</span>
+              <span>Attach a screenshot (optional)</span>
+              <input type="file" id="bbFbScreenshot" accept="image/*" style="display:none;" onchange="_onFbScreenshotChange(this)">
+            </label>
+            <div id="bbFbScreenshotPreview" style="display:none;margin-top:8px;position:relative;display:none;">
+              <img id="bbFbScreenshotThumb" style="max-width:100%;max-height:120px;border-radius:8px;border:1px solid #e9ecef;object-fit:contain;" alt="">
+              <button onclick="_clearFbScreenshot()" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.55);color:white;border:none;border-radius:50%;width:22px;height:22px;font-size:0.8em;cursor:pointer;line-height:1;padding:0;">✕</button>
+            </div>
+          </div>
           <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:0.88em;color:#495057;margin-bottom:18px;user-select:none;">
             Keep me informed about my submission
             <span style="position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;"
@@ -827,6 +838,74 @@
 
   /** Currently-selected feedback type ('bug' | 'comment' | 'idea') or null. */
   let _fbType = null;
+  /** Base64-encoded compressed screenshot, or null. */
+  let _fbScreenshotData = null;
+
+  /**
+   * Compress an image File to a base64 JPEG (max 900px on longest side,
+   * quality 0.65) using an off-screen canvas.
+   * @param {File} file
+   * @returns {Promise<string>} data-URL string
+   */
+  function _compressFbImage(file) {
+    return new Promise(function (resolve, reject) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = new Image();
+        img.onload = function () {
+          const MAX = 900;
+          let w = img.width, h = img.height;
+          if (w > MAX || h > MAX) {
+            if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+            else       { w = Math.round(w * MAX / h); h = MAX; }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', 0.65));
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  window._onFbScreenshotChange = async function (input) {
+    const file = input.files && input.files[0];
+    if (!file) return;
+    const preview = document.getElementById('bbFbScreenshotPreview');
+    const thumb   = document.getElementById('bbFbScreenshotThumb');
+    const errEl   = document.getElementById('bbFbError');
+    try {
+      const dataUrl = await _compressFbImage(file);
+      // Firestore document limit ~1MB; base64 JPEG should be well under that.
+      // Guard anyway: ~750 KB of base64 ≈ 1MB binary.
+      if (dataUrl.length > 768000) {
+        if (errEl) { errEl.textContent = 'Screenshot is too large — please crop or resize it first.'; errEl.style.display = ''; }
+        input.value = '';
+        return;
+      }
+      _fbScreenshotData = dataUrl;
+      if (thumb) thumb.src = dataUrl;
+      if (preview) preview.style.display = '';
+    } catch (_) {
+      if (errEl) { errEl.textContent = 'Could not read image — please try a different file.'; errEl.style.display = ''; }
+      input.value = '';
+    }
+  };
+
+  window._clearFbScreenshot = function () {
+    _fbScreenshotData = null;
+    const input   = document.getElementById('bbFbScreenshot');
+    const preview = document.getElementById('bbFbScreenshotPreview');
+    const thumb   = document.getElementById('bbFbScreenshotThumb');
+    if (input)   input.value = '';
+    if (thumb)   thumb.src = '';
+    if (preview) preview.style.display = 'none';
+  };
 
   /**
    * Open the feedback modal, resetting type selection and message field, and
@@ -846,6 +925,7 @@
       const _ver = window._APP_VERSION ? ' · v' + window._APP_VERSION : '';
       _meta.textContent = _page + _ver;
     }
+    window._clearFbScreenshot();
     if (_modal) _modal.classList.add('open');
   };
   /**
@@ -894,6 +974,7 @@
       email: (_emailEl && _emailEl.value.trim()) ? _emailEl.value.trim() : (window.currentUser ? window.currentUser.email || null : null),
       uid: window.currentUser ? window.currentUser.uid : null,
       ts: Date.now(),
+      screenshot: _fbScreenshotData || null,
     };
     try {
       const _db = window.db || (window.firebase && window.firebase.firestore ? window.firebase.firestore() : null);

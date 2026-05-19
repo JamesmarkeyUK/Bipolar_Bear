@@ -658,12 +658,12 @@ window.addEventListener('pageshow', () => {
       const btn = document.getElementById('signinBtn');
       if (!btn || btn.style.display === 'none') return;
       if (!online) {
-        btn.textContent = 'Offline';
+        btn.textContent = BB.t('common.offline');
         btn.disabled = true;
         btn.style.opacity = '0.55';
         btn.onclick = null;
       } else {
-        btn.textContent = 'Sign In / Up';
+        btn.textContent = BB.t('common.signIn');
         btn.disabled = false;
         btn.style.opacity = '';
         btn.onclick = () => window.showAuthModal();
@@ -1372,7 +1372,7 @@ window.addEventListener('pageshow', () => {
       // Show "restored" indicator briefly
       const el = document.getElementById('draftStatus');
       if (el) {
-        el.textContent = '✓ Draft restored';
+        el.textContent = BB.t('journal.draft.restored');
         el.style.opacity = '1';
         clearTimeout(el._fadeTimer);
         el._fadeTimer = setTimeout(() => { el.style.opacity = '0'; }, 3000);
@@ -2364,7 +2364,7 @@ window.addEventListener('pageshow', () => {
         const toggleBtn = document.getElementById('statsToggleBtn');
         const toggleLabel = document.getElementById('statsToggleLabel');
         if (toggleBtn) {
-          if (toggleLabel) toggleLabel.textContent = statsTimeframe === 'all' ? 'Showing All-Time' : `Showing ${statsTimeframe}d`;
+          if (toggleLabel) toggleLabel.textContent = statsTimeframe === 'all' ? BB.t('journal.stats.showingAll') : BB.t('journal.stats.showingDays', { n: statsTimeframe });
           toggleBtn.style.display = _allEntries.length >= 30 ? '' : 'none';
         }
 
@@ -2625,19 +2625,19 @@ window.addEventListener('pageshow', () => {
               </div>` : ''}
             </div>
           </div>
-          <div class="stat-label">Most Common (${timeframeLabel})</div>
+          <div class="stat-label">${BB.t('journal.stats.mostCommon', { period: timeframeLabel })}</div>
         </div>
         <div class="stat-card" style="${cardStyle}" onclick="showStatDetail('energy')">
           <div class="stat-number">${avgEnergy}</div>
-          <div class="stat-label">Avg Energy (${timeframeLabel})</div>
+          <div class="stat-label">${BB.t('journal.stats.avgEnergy', { period: timeframeLabel })}</div>
         </div>
         <div class="stat-card" style="${cardStyle}" onclick="showStatDetail('sleep')">
           <div class="stat-number">${avgSleep}h</div>
-          <div class="stat-label">Avg Sleep (${timeframeLabel})</div>
+          <div class="stat-label">${BB.t('journal.stats.avgSleep', { period: timeframeLabel })}</div>
         </div>
         <div class="stat-card" style="${cardStyle}" onclick="showStatDetail('medication')">
           <div class="stat-number">${medAdherence}%</div>
-          <div class="stat-label">Medication Taken (${timeframeLabel})</div>
+          <div class="stat-label">${BB.t('journal.stats.medTaken', { period: timeframeLabel })}</div>
         </div>
         <div class="stat-card" style="${cardStyle}" onclick="showFavouritesModal()">
           <div class="stat-number">${statsEntries.filter(e => e.favourite).length}</div>
@@ -2674,26 +2674,26 @@ window.addEventListener('pageshow', () => {
       };
 
       if (type === 'energy') {
-        title.textContent = '⚡ Energy — Daily Breakdown';
+        title.textContent = BB.t('journal.stats.energyChart');
         body.innerHTML = sorted.map(e => {
           const d = new Date(e.date).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
           return row(d, `${e.energy}/10`, e.energy/10, 'var(--brand-primary)');
         }).join('');
       } else if (type === 'sleep') {
-        title.textContent = '😴 Sleep — Daily Breakdown';
+        title.textContent = BB.t('journal.stats.sleepChart');
         body.innerHTML = sorted.map(e => {
           const d = new Date(e.date).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
           return row(d, `${e.sleep}h`, e.sleep/12, '#667eea');
         }).join('');
       } else if (type === 'mood') {
-        title.textContent = '🧠 Mood — Daily Breakdown';
+        title.textContent = BB.t('journal.stats.moodChart');
         body.innerHTML = sorted.map(e => {
           const d = new Date(e.date).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
           const _mLbl = { manic:'Manic', elevated:'Elevated', stable:'Stable', good:'Stable', low:'Low', depressed:'Depressed' };
           return row(d, `${moodImg(e.mood)} ${_mLbl[e.mood] || (e.mood ? e.mood.charAt(0).toUpperCase() + e.mood.slice(1) : '')}`);
         }).join('');
       } else if (type === 'medication') {
-        title.textContent = '💊 Medication — Daily Breakdown';
+        title.textContent = BB.t('journal.stats.medChart');
         body.innerHTML = sorted.map(e => {
           const d = new Date(e.date).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
           const taken = e.medication === 'taken' || !e.medication;
@@ -2734,7 +2734,7 @@ window.addEventListener('pageshow', () => {
       } else if (type === 'total') {
         const _moodColors = { manic:'#FF4136', elevated:'#FF851B', stable:'#2ECC40', good:'#2ECC40', low:'#0074D9', depressed:'#7B68EE' };
         const _moodLabels = { manic:'Manic', elevated:'Elevated', stable:'Stable', good:'Stable', low:'Low', depressed:'Depressed' };
-        title.textContent = '🗓️ Tracked Days';
+        title.textContent = BB.t('journal.stats.trackedDays');
         body.innerHTML = sorted.map(e => {
           const d = new Date(e.date).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
           const c = _moodColors[e.mood] || 'var(--brand-primary)';
@@ -6127,9 +6127,9 @@ window.addEventListener('pageshow', () => {
         return;
       }
       pendingDraftClear = true;
-      document.getElementById('confirmModalTitle').textContent = 'Clear Draft?';
-      document.getElementById('confirmModalBody').textContent = 'Clear everything you\'ve entered? This can\'t be undone.';
-      document.getElementById('confirmModalBtn').textContent = 'Clear';
+      document.getElementById('confirmModalTitle').textContent = BB.t('journal.clearDraft.title');
+      document.getElementById('confirmModalBody').textContent = BB.t('journal.clearDraft.body');
+      document.getElementById('confirmModalBtn').textContent = BB.t('journal.clearDraft.btn');
       document.getElementById('confirmModal').classList.add('active');
     }
     window.clearDraftWithConfirm = clearDraftWithConfirm;
@@ -8432,9 +8432,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       pendingDraftClear = false;
       _pendingDeleteBuiltinKey = null;
       // Restore default modal text for next use
-      document.getElementById('confirmModalTitle').textContent = 'Delete Entry?';
-      document.getElementById('confirmModalBody').textContent = "Are you sure you want to delete this mood entry? This can't be undone.";
-      document.getElementById('confirmModalBtn').textContent = 'Delete';
+      document.getElementById('confirmModalTitle').textContent = BB.t('journal.delete.title');
+      document.getElementById('confirmModalBody').textContent = BB.t('journal.delete.body');
+      document.getElementById('confirmModalBtn').textContent = BB.t('journal.delete.btn');
     }
 
     function deleteEditingEntry() {
@@ -8858,7 +8858,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
 
     function _tfUpdateLabel() {
       const lbl = document.getElementById('statsToggleLabel');
-      if (lbl) lbl.textContent = statsTimeframe === 'all' ? 'Showing All-Time' : `Showing ${statsTimeframe}d`;
+      if (lbl) lbl.textContent = statsTimeframe === 'all' ? BB.t('journal.stats.showingAll') : BB.t('journal.stats.showingDays', { n: statsTimeframe });
     }
 
     function _showTimeframePicker() {
