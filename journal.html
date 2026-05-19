@@ -434,7 +434,7 @@
 
     <div class="card" id="journalCard" style="display: none;">
       <div class="entries-header">
-        <h2>Your Journey</h2>
+        <h2 data-i18n="journal.stats.heading">Your Journey</h2>
         <div style="display: flex; gap: 10px;">
           <div id="timeframePickerWrapper" style="position:relative;">
             <button id="statsToggleBtn" class="stats-toggle-btn"
@@ -458,7 +458,7 @@
 
       <div id="entriesLoading" style="display:none; text-align:center; padding: 30px 0;">
         <div style="display:inline-block; width:36px; height:36px; border:4px solid #f0e6d3; border-top-color:var(--brand-primary); border-radius:50%; animation:spin 0.8s linear infinite;"></div>
-        <div style="margin-top:12px; color:#6c757d; font-size:0.95em;">Loading your journal...</div>
+        <div style="margin-top:12px; color:#6c757d; font-size:0.95em;" data-i18n="journal.stats.loading">Loading your journal...</div>
       </div>
       <div id="entries"></div>
     </div>
@@ -478,11 +478,11 @@
   <!-- Hide Mood Suggestion Modal -->
   <div class="confirm-modal" id="hideSuggestionModal" style="z-index:1200;" onclick="if(event.target===this)document.getElementById('hideSuggestionModal').classList.remove('active')">
     <div class="confirm-content">
-      <h3>Never show suggested mood again?</h3>
-      <p style="color:#6c757d;font-size:0.9em;">The suggested mood will no longer appear on the save screen. You can re-enable this in Settings.</p>
+      <h3 data-i18n="journal.hideSuggestion.title">Never show suggested mood again?</h3>
+      <p style="color:#6c757d;font-size:0.9em;" data-i18n="journal.hideSuggestion.body">The suggested mood will no longer appear on the save screen. You can re-enable this in Settings.</p>
       <div class="confirm-buttons">
-        <button class="confirm-btn confirm-btn-no" onclick="document.getElementById('hideSuggestionModal').classList.remove('active')">Cancel</button>
-        <button class="confirm-btn confirm-btn-yes" onclick="_doHideMoodSuggestion()">Yes, hide it</button>
+        <button class="confirm-btn confirm-btn-no" onclick="document.getElementById('hideSuggestionModal').classList.remove('active')" data-i18n="common.cancel">Cancel</button>
+        <button class="confirm-btn confirm-btn-yes" onclick="_doHideMoodSuggestion()" data-i18n="journal.hideSuggestion.confirm">Yes, hide it</button>
       </div>
     </div>
   </div>
