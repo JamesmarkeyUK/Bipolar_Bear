@@ -460,7 +460,11 @@ const journalFeatures = [
       if (_siHint) _siHint.style.display = 'none';
 
       // ── Hint overlay ──
-      const _blockingSteps = new Set([5]);
+      // Step 5 (logo hint) was previously blocking — it intercepted all clicks so
+      // users had to click the logo. But if someone quit mid-tutorial and returned,
+      // every portal button was silently dead. The logo hint still shows at step 5;
+      // it just no longer hard-gates navigation.
+      const _blockingSteps = new Set([]);
       const _isBlocking = _blockingSteps.has(step);
       const _overlay = document.getElementById('bbHintOverlay');
       if (_overlay) _overlay.style.display = _isBlocking ? '' : 'none';
@@ -512,9 +516,10 @@ const journalFeatures = [
     // ── Onboarding page lock ──
     (function() {
       // step → [targetId, hintId]
+      // Step 5 removed: the logo-click easter egg hint is now non-blocking so
+      // returning users aren't trapped with dead portal buttons.
       const _isNatLock = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
       const _map = {
-        5:  ['.logo-img',       'logoHint'],
       };
       function _getTarget(s) { const e = _map[s]; if (!e) return null; const id = e[0]; return id.startsWith('.') ? document.querySelector(id) : document.getElementById(id); }
       function _getHint(s)   { const e = _map[s]; if (!e) return null; return document.getElementById(e[1]); }
