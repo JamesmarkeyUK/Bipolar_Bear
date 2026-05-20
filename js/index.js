@@ -108,6 +108,8 @@ const journalFeatures = [
                 if (!_lastVisit) {
                   _badge.textContent  = '💬 Tap to join the community';
                   _badge.style.display = 'block';
+                } else if (!navigator.onLine) {
+                  // Offline — skip the live count, badge remains hidden
                 } else {
                   db.collection(BB_BRAND.collections.posts)
                     .where('timestamp', '>', firebase.firestore.Timestamp.fromMillis(_lastVisit))
@@ -256,8 +258,10 @@ const journalFeatures = [
             }
             _applyOnboardingGating();
           }).catch(() => {});
-          // Check Firestore for the current entry if the local cache is missing or stale
+          // Check Firestore for the current entry if the local cache is missing or stale.
+          // Skip entirely when offline — the cached tick state is good enough.
           (function() {
+            if (!navigator.onLine) return;
             const useToday = localStorage.getItem('journalDefaultToday') === 'true';
             const target = new Date(); target.setHours(0, 0, 0, 0);
             if (!useToday) target.setDate(target.getDate() - 1);
@@ -442,8 +446,14 @@ const journalFeatures = [
       const _h1 = document.getElementById('journalStartHint');
       if (_h1) _h1.style.display = step === 0 ? 'flex' : 'none';
 
-      // Logo hint: step 5 only
+      // Logo hint: step 5 only, and only on iOS (logo tap easter egg not implemented on Android)
       const _logoHint = document.getElementById('logoHint');
+      const _isAndroid = window.BB && window.BB.platform && window.BB.platform.isAndroid();
+      if (_isAndroid && step === 5) {
+        // Skip the logo easter egg step on Android — advance straight to step 6
+        _advanceOnboardingStep(6);
+        return;
+      }
       if (_logoHint) _logoHint.style.display = step === 5 ? '' : 'none';
 
       // Survival kit hint removed — user finds it freely
@@ -549,11 +559,14 @@ const journalFeatures = [
       }, true);
     })();
 
-    // Show "Offline" instead of Sign In when there's no network
+    // Show offline banner + disable sign-in when there's no network
     function updateOnlineStatus() {
+      const online = navigator.onLine;
+      const banner = document.getElementById('offlineBanner');
+      if (banner) banner.style.display = online ? 'none' : '';
       const btn = document.getElementById('signinBtn');
       if (!btn || btn.style.display === 'none') return; // signed in — don't touch
-      if (!navigator.onLine) {
+      if (!online) {
         btn.disabled = true;
         btn.style.opacity = '0.35';
         btn.onclick = null;
@@ -656,6 +669,7 @@ const journalFeatures = [
      */
     async function _recomputeStreakFromEntries(user) {
       if (!db || !user) return;
+      if (!navigator.onLine) { _updateStreakBadge(); return; }
       const _fmt = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
       try {
         const snap = await db.collection('entries')

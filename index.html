@@ -92,6 +92,10 @@
     </div>
 
     <div class="buttons">
+      <div id="offlineBanner" style="display:none;background:rgba(0,0,0,0.72);color:rgba(255,255,255,0.92);border-radius:12px;padding:10px 14px;font-size:0.82em;line-height:1.45;text-align:center;margin-bottom:14px;backdrop-filter:blur(4px);">
+        📶 <strong>Offline mode</strong> — Journal and Survival Kit still work.<br>
+        <span style="opacity:0.8;">Your data will sync automatically when you reconnect.</span>
+      </div>
       <div class="btn-container" id="journalContainer">
         <a href="journal.html" onclick="event.preventDefault(); localStorage.setItem('bbPrivacyNoteDismissed','1'); const _pn=document.getElementById('privacyNote'); if(_pn)_pn.style.display='none'; location.replace('journal.html')" class="btn btn-journal" id="journalBtn" style="position:relative;">
           <span class="icon">📔</span>
