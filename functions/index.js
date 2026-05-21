@@ -1,10 +1,11 @@
 'use strict';
 
-const { onCall, HttpsError } = require('firebase-functions/v2/https');
-const { defineSecret }       = require('firebase-functions/params');
-const admin                  = require('firebase-admin');
-const crypto                 = require('crypto');
-const { Resend }             = require('resend');
+const { onCall, HttpsError }   = require('firebase-functions/v2/https');
+const { onDocumentCreated }    = require('firebase-functions/v2/firestore');
+const { defineSecret }         = require('firebase-functions/params');
+const admin                    = require('firebase-admin');
+const crypto                   = require('crypto');
+const { Resend }               = require('resend');
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -13,6 +14,7 @@ const RESEND_API_KEY = defineSecret('RESEND_API_KEY');
 
 const REGION          = 'europe-west1';
 const FROM_ADDRESS    = 'Bipolar Anonymous <bipolar@unisim.co.uk>';
+const FEEDBACK_TO     = 'ai2.colonial994@passmail.com';
 const CODE_TTL_MS     = 10 * 60 * 1000; // 10 minutes
 const RATE_LIMIT      = 3;              // max codes per email per window
 const MAX_ATTEMPTS    = 5;             // wrong-code attempts before lockout
@@ -278,6 +280,99 @@ exports.getBBStats = onCall(
         return { bbLinked: false };
       }
       throw e;
+    }
+  }
+);
+
+// ── onFeedbackSubmitted ──────────────────────────────────────────────────────
+// Fires whenever a document is created in feedback/{docId} and emails a
+// summary to FEEDBACK_TO via Resend.
+const ORANGE      = '#ff9500';
+const ORANGE_DARK = '#c97900';
+const ORANGE_BG   = '#fff8ee';
+
+function feedbackEmailHtml(d) {
+  const TYPE_EMOJI = { bug: '🐛', comment: '💬', idea: '💡' };
+  const typeLabel = d.type ? `${TYPE_EMOJI[d.type] || '📣'} ${d.type}` : '📣 unknown';
+  const ts = d.ts ? new Date(d.ts).toUTCString() : 'unknown';
+  const rows = [
+    ['Type',     typeLabel],
+    ['Message',  d.message || '(empty)'],
+    ['Page',     d.page    || '—'],
+    ['Platform', d.platform || '—'],
+    ['Version',  d.version  || '—'],
+    ['UID',      d.uid      || '(guest)'],
+    ['User email', d.email  || '—'],
+    ['Notify me?', d.notify ? 'Yes' : 'No'],
+    ['Submitted', ts],
+  ];
+
+  const rowsHtml = rows.map(([label, value]) => `
+    <tr>
+      <td style="padding:8px 12px;font-size:13px;font-weight:600;color:${MUTED};white-space:nowrap;vertical-align:top;">${label}</td>
+      <td style="padding:8px 12px;font-size:13px;color:${DARK};word-break:break-word;">${String(value).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
+    </tr>`).join('');
+
+  const screenshotHtml = d.screenshot
+    ? `<p style="margin:20px 0 8px;font-size:13px;font-weight:600;color:${MUTED};">Screenshot</p>
+       <img src="${d.screenshot}" alt="screenshot" style="max-width:100%;border-radius:10px;border:1px solid #e5e7eb;">`
+    : '';
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>New feedback — BipolarBear</title></head>
+<body style="margin:0;padding:0;background:#f4f4f4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f4;padding:40px 0;">
+    <tr><td align="center">
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;margin:0 auto;">
+
+        <tr><td align="center" style="padding-bottom:24px;">
+          <table cellpadding="0" cellspacing="0"><tr>
+            <td style="background:${ORANGE};border-radius:16px;padding:12px 20px;">
+              <span style="font-size:20px;font-weight:800;color:#fff;letter-spacing:-0.5px;">🐻 BipolarBear — New Feedback</span>
+            </td>
+          </tr></table>
+        </td></tr>
+
+        <tr><td style="background:#fff;border-radius:20px;padding:32px;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+          <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border:1px solid #f0f0f0;border-radius:10px;overflow:hidden;">
+            ${rowsHtml}
+          </table>
+          ${screenshotHtml}
+        </td></tr>
+
+        <tr><td align="center" style="padding-top:20px;">
+          <p style="margin:0;font-size:12px;color:${MUTED};">
+            <a href="https://console.firebase.google.com" style="color:${ORANGE_DARK};text-decoration:none;font-weight:600;">Open Firestore console</a>
+          </p>
+        </td></tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}
+
+exports.onFeedbackSubmitted = onDocumentCreated(
+  { document: 'feedback/{docId}', region: REGION, secrets: [RESEND_API_KEY] },
+  async (event) => {
+    const d = event.data.data();
+    const typeLabel = d.type || 'feedback';
+    const subject = `[BipolarBear] New ${typeLabel} from ${d.email || d.uid || 'guest'}`;
+
+    const resend = new Resend(RESEND_API_KEY.value());
+    const { error } = await resend.emails.send({
+      from:    FROM_ADDRESS,
+      to:      FEEDBACK_TO,
+      subject,
+      html:    feedbackEmailHtml(d),
+      text:    `Type: ${typeLabel}\nMessage: ${d.message || ''}\nPage: ${d.page || ''}\nPlatform: ${d.platform || ''}\nUID: ${d.uid || 'guest'}\nUser email: ${d.email || '—'}\nNotify: ${d.notify ? 'yes' : 'no'}\nTime: ${d.ts ? new Date(d.ts).toUTCString() : 'unknown'}`,
+    });
+
+    if (error) {
+      console.error('[onFeedbackSubmitted] Resend error:', JSON.stringify(error));
     }
   }
 );
