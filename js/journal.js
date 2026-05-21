@@ -11771,8 +11771,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
           showNoData(); return;
         }
 
-        // Use wall-clock duration — value sums all source segments and double-counts when multiple sources (e.g. Watch + iPhone) log the same sleep
-        const hours = (result.endTimestamp - result.timestamp) / (1000 * 60 * 60);
+        // result.value is time asleep in minutes (asleep stages only — plugin filters out InBed/Awake)
+        const hours = result.value / 60;
 
         // Guard against invalid/zero timestamps returning nonsense duration
         if (!hours || hours <= 0 || isNaN(hours)) { showNoData(); return; }
