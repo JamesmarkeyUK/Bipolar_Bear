@@ -14,7 +14,7 @@ const RESEND_API_KEY = defineSecret('RESEND_API_KEY');
 
 const REGION          = 'europe-west1';
 const FROM_ADDRESS    = 'Bipolar Anonymous <bipolar@unisim.co.uk>';
-const FEEDBACK_TO     = 'ai2.colonial994@passmail.com';
+const FEEDBACK_TO     = 'jpm@jamesmarkey.co.uk';
 const CODE_TTL_MS     = 10 * 60 * 1000; // 10 minutes
 const RATE_LIMIT      = 3;              // max codes per email per window
 const MAX_ATTEMPTS    = 5;             // wrong-code attempts before lockout
