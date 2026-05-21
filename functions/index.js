@@ -376,3 +376,76 @@ exports.onFeedbackSubmitted = onDocumentCreated(
     }
   }
 );
+
+// ── onBetaSignup ─────────────────────────────────────────────────────────────
+// Fires whenever a document is created in betaSignups/{docId} and emails a
+// notification to FEEDBACK_TO via Resend.
+function betaSignupEmailHtml(d) {
+  const ts = d.timestamp ? new Date(d.timestamp.toMillis()).toUTCString() : 'unknown';
+  const rows = [
+    ['Email',    d.email    || '—'],
+    ['Platform', d.platform || '—'],
+    ['Source',   d.source   || '—'],
+    ['Time',     ts],
+  ];
+
+  const rowsHtml = rows.map(([label, value]) => `
+    <tr>
+      <td style="padding:8px 12px;font-size:13px;font-weight:600;color:${MUTED};white-space:nowrap;vertical-align:top;">${label}</td>
+      <td style="padding:8px 12px;font-size:13px;color:${DARK};word-break:break-word;">${String(value).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
+    </tr>`).join('');
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>New beta signup — BipolarBear</title></head>
+<body style="margin:0;padding:0;background:#f4f4f4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f4;padding:40px 0;">
+    <tr><td align="center">
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;margin:0 auto;">
+
+        <tr><td align="center" style="padding-bottom:24px;">
+          <table cellpadding="0" cellspacing="0"><tr>
+            <td style="background:${ORANGE};border-radius:16px;padding:12px 20px;">
+              <span style="font-size:20px;font-weight:800;color:#fff;letter-spacing:-0.5px;">🐻 BipolarBear — New Beta Signup</span>
+            </td>
+          </tr></table>
+        </td></tr>
+
+        <tr><td style="background:#fff;border-radius:20px;padding:32px;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+          <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border:1px solid #f0f0f0;border-radius:10px;overflow:hidden;">
+            ${rowsHtml}
+          </table>
+        </td></tr>
+
+        <tr><td align="center" style="padding-top:20px;">
+          <p style="margin:0;font-size:12px;color:${MUTED};">
+            <a href="https://console.firebase.google.com" style="color:${ORANGE_DARK};text-decoration:none;font-weight:600;">Open Firestore console</a>
+          </p>
+        </td></tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}
+
+exports.onBetaSignup = onDocumentCreated(
+  { document: 'betaSignups/{docId}', region: REGION, secrets: [RESEND_API_KEY] },
+  async (event) => {
+    const d = event.data.data();
+    const resend = new Resend(RESEND_API_KEY.value());
+    const { error } = await resend.emails.send({
+      from:    FROM_ADDRESS,
+      to:      FEEDBACK_TO,
+      subject: `[BipolarBear] New beta signup — ${d.email || 'unknown'} (${d.platform || '?'})`,
+      html:    betaSignupEmailHtml(d),
+      text:    `New beta signup\nEmail: ${d.email || '—'}\nPlatform: ${d.platform || '—'}\nSource: ${d.source || '—'}\nTime: ${d.timestamp ? new Date(d.timestamp.toMillis()).toUTCString() : 'unknown'}`,
+    });
+
+    if (error) {
+      console.error('[onBetaSignup] Resend error:', JSON.stringify(error));
+    }
+  }
+);
