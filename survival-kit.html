@@ -823,6 +823,16 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
       <h3 style="text-align:center; margin-bottom:6px;">My Medications</h3>
       <p style="text-align:center; color:#6c757d; font-size:0.9em; margin-bottom:16px;">Track your current medications and dosages</p>
       <div id="medInfoList" style="margin-bottom:16px;"></div>
+      <!-- Quick-add chips for the most commonly prescribed bipolar meds.
+           Tapping fills the name input and focuses the dosage field. -->
+      <div class="med-chip-row">
+        <button type="button" class="med-chip" onclick="_fillMedName('Lithium')">Lithium</button>
+        <button type="button" class="med-chip" onclick="_fillMedName('Quetiapine')">Quetiapine</button>
+        <button type="button" class="med-chip" onclick="_fillMedName('Lamotrigine')">Lamotrigine</button>
+        <button type="button" class="med-chip" onclick="_fillMedName('Sodium Valproate')">Sodium Valproate</button>
+        <button type="button" class="med-chip" onclick="_fillMedName('Olanzapine')">Olanzapine</button>
+        <button type="button" class="med-chip" onclick="_fillMedName('Aripiprazole')">Aripiprazole</button>
+      </div>
       <input type="text" id="medNameInput" class="modal-input" placeholder="Medication name">
       <input type="text" id="medDosageInput" class="modal-input" placeholder="Dosage (e.g., 10mg, twice daily)">
       <button onclick="addMedication()" class="modal-btn modal-btn-primary">Add Medication</button>
