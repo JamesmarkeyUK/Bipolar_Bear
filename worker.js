@@ -66,6 +66,18 @@ export default {
       return env.ASSETS.fetch(new Request(target.toString(), request));
     }
 
+    // /version.json drives the in-app "update available" banner. It must
+    // be CORS-readable (Capacitor WebViews fetch it cross-origin from
+    // capacitor://localhost or https://localhost) and never cached at the
+    // edge (a stale value defeats the whole point of the check).
+    if (url.pathname === '/version.json') {
+      const res = await env.ASSETS.fetch(request);
+      const headers = new Headers(res.headers);
+      headers.set('Access-Control-Allow-Origin', '*');
+      headers.set('Cache-Control', 'no-store, max-age=0');
+      return new Response(res.body, { status: res.status, headers });
+    }
+
     return env.ASSETS.fetch(request);
   },
 };

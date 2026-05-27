@@ -16,6 +16,7 @@
   <script src="js/shared/firebase-config.js"></script>
   <script src="js/shared/onboarding.js"></script>
   <script src="js/shared/i18n.js"></script>
+  <script src="js/shared/version-check.js"></script>
   <meta name="description" content="Checkin with the Bear. Free mood journal and survival kit for people living with bipolar disorder. Track mood, energy, sleep and medication daily.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://www.bipolarbear.app/">
@@ -80,6 +81,8 @@
     <div id="userInfo" style="display:none; flex-direction:row; align-items:center; pointer-events:auto;">
       <button onclick="window.showAccountModal()" style="width:44px;height:44px;min-width:44px;background:var(--brand-primary);color:white;border:none;border-radius:50%;cursor:pointer;font-size:1.15em;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 10px rgba(255,149,0,0.35);">👤</button>
     </div>
+    <!-- Version chip — populated by BB.versionLabel() in version-check.js -->
+    <span id="bbHomeVersion" style="position:absolute;top:calc(100% + 4px);left:50%;transform:translateX(-50%);font-size:0.62em;font-weight:600;color:rgba(255,255,255,0.6);letter-spacing:0.04em;text-shadow:0 1px 2px rgba(0,0,0,0.18);white-space:nowrap;pointer-events:none;"></span>
   </div>
   <div class="container">
     <div class="logo-bounce-wrapper"><img src="images/logos/good_logo.png" alt="My Bipolar Bear" class="logo-img" draggable="false" oncontextmenu="return false;"></div>
@@ -105,7 +108,7 @@
           </span>
         </a>
         <div id="journalTutorialProgress" style="text-align:center;font-size:0.7em;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);margin-top:4px;font-style:italic;display:none;"></div>
-        <div id="journalStreakBadge" class="btn-subnote"></div>
+        <div id="journalStreakBadge" class="btn-subnote bb-skeleton">🔥 0 days  🧘 0d</div>
       </div>
       <div id="journalStartHint" style="display:none; flex-direction:column; align-items:center; gap:2px; pointer-events:none; animation:hintFade 2.4s ease-in-out infinite; margin-top:-4px;">
         <svg width="24" height="22" viewBox="0 0 24 22" fill="none">
@@ -123,7 +126,7 @@
             <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </span>
         </a>
-        <div id="survivalProgress" class="btn-subnote"></div>
+        <div id="survivalProgress" class="btn-subnote bb-skeleton">0 / 13 sections complete</div>
       </div>
       <div id="survivalKitHint" style="display:none; flex-direction:column; align-items:center; gap:2px; pointer-events:none; animation:hintFade 2.4s ease-in-out infinite; margin-top:-4px;">
         <svg width="24" height="22" viewBox="0 0 24 22" fill="none">
@@ -139,9 +142,34 @@
           <span data-i18n="nav.anonymous">Bipolar Anonymous</span>
         </a>
         <div id="anonymousSignInNote" class="btn-subnote-muted" data-i18n="home.signInNote">Sign in to join the community</div>
-        <div id="anonMessagesBadge" class="btn-subnote"></div>
-        <div id="anonStreakBadge" class="btn-subnote"></div>
+        <div id="anonMessagesBadge" class="btn-subnote bb-skeleton">💬 0 new messages</div>
+        <div id="anonStreakBadge" class="btn-subnote bb-skeleton">👋 monika  ·  💬 0 days streak</div>
       </div>
+      <!-- If the user has no signed-in account and no guest PIN, no badges
+           are expected — drop the skeletons synchronously so they don't
+           briefly paint before js/index.js can hide them. Runs immediately
+           after the badge divs so the class is gone before first paint. -->
+      <script>
+        (function () {
+          try {
+            var hasUser = false;
+            for (var i = 0; i < localStorage.length; i++) {
+              var k = localStorage.key(i);
+              if (k && k.indexOf('firebase:authUser:') === 0) {
+                var v = localStorage.getItem(k);
+                if (v && v !== 'null' && v.length > 5) { hasUser = true; break; }
+              }
+            }
+            if (hasUser || localStorage.getItem('bbGuestPinSalt')) return;
+            var ids = ['journalStreakBadge', 'survivalProgress',
+                       'anonMessagesBadge', 'anonStreakBadge'];
+            for (var j = 0; j < ids.length; j++) {
+              var el = document.getElementById(ids[j]);
+              if (el) el.classList.remove('bb-skeleton');
+            }
+          } catch (_) {}
+        })();
+      </script>
     </div>
 
     <div class="features" id="features">

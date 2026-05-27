@@ -123,7 +123,8 @@
 // v52: v1.4 — version bump for the Wiki release. Refreshes precached brand-config.js (_APP_VERSION='1.4') and js/index.js (new _WHATS_NEW_HEADLINES['1.4'] entry).
 // v53: Wiki — each card now shows the source website (e.g. "NHS.uk", "Mind", "Bipolar UK") and an "AI summary" / "Direct quote" badge above the link button; link button text now reads "Read on {site} ↗".
 // v54: Wiki Books & Films — each media card now reserves a 72×108 cover slot (book jacket / film poster) at images/wiki-media/<slug>.jpg. Missing files hide themselves so unfilled entries render the same as before.
-const CACHE_NAME = 'bipolarbear-v54';
+// v55: add js/shared/version-check.js — fetches /version.json and shows a top banner when a newer release is available (web → refresh, native → open store). New <script> tag added to index/journal/survival-kit/anonymous.html. Also: index.html shows a "v1.4 · iOS" chip below the auth FAB (populated by BB.versionLabel()); four home-page badges (journal streak, survival progress, anon messages, anon streak) get blurred-text skeleton placeholders that reserve their layout row until js/index.js swaps in real values — kills the empty-to-populated layout jump on the home screen for signed-in / guest-PIN users. fab.js now delegates its version label to BB.versionLabel() (single source of truth). Old v54 caches must drop so the new shared script, HTML, CSS, and JS all land together.
+const CACHE_NAME = 'bipolarbear-v55';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
@@ -153,6 +154,11 @@ const STATIC_ASSETS = [
   './js/shared/firebase-config.js',
   './js/shared/onboarding.js',
   './js/shared/medications.js',
+  './js/shared/version-check.js',
+
+  // NOTE: /version.json is deliberately NOT precached. It must always be
+  // fetched fresh so a new release reaches stale clients on next page load
+  // — see worker.js for the no-store header.
 
   // Shared theme tokens (loaded before page-specific CSS).
   './css/theme.css',

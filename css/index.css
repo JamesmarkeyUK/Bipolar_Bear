@@ -219,6 +219,21 @@
       margin-top: 4px;
       letter-spacing: 0.1px;
       text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      transition: filter 0.25s ease, opacity 0.25s ease;
+    }
+    /* Skeleton placeholder — reserves vertical space and blurs the
+       placeholder text so layout doesn't jump when js/index.js swaps in
+       real values (streak, sections, new messages). Added by index.html
+       for users who have account context; removed inline for fresh
+       devices, and removed by js/index.js once each badge is populated
+       (or explicitly hidden when there's no data to show). */
+    .btn-subnote.bb-skeleton {
+      display: block;
+      min-height: 1.1em;
+      filter: blur(4px);
+      opacity: 0.55;
+      pointer-events: none;
+      user-select: none;
     }
     .btn-subnote-muted {
       display: block;

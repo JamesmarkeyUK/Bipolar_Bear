@@ -52,6 +52,25 @@ const journalFeatures = [
       { icon: '🤝', title: 'Support', desc: 'Resources and tools for crisis moments' }
     ];
 
+// ── Skeleton safety net ──
+// Every populate site below removes `.bb-skeleton` from its badge as it
+// fills in. This is the backstop: if a path is missed, or a Firestore
+// query never resolves, this clears any remaining skeleton placeholders
+// after 5 seconds so the user isn't stuck staring at blurred text.
+setTimeout(function () {
+  try {
+    var skel = document.querySelectorAll('.btn-subnote.bb-skeleton');
+    for (var i = 0; i < skel.length; i++) {
+      skel[i].classList.remove('bb-skeleton');
+      // If the badge is still empty, hide it — its skeleton was reserving
+      // a row that doesn't correspond to any real data we resolved.
+      if (!skel[i].textContent || !skel[i].textContent.trim()) {
+        skel[i].style.display = 'none';
+      }
+    }
+  } catch (_) {}
+}, 5000);
+
 // ── BLOCK 2: Firebase init + auth listener + onboarding helpers ──
 // ── Beta gate (web only) ──
     if (!window.Capacitor && location.protocol !== 'file:' && BB.storage.get('WebUnlocked') !== 'true') {
@@ -106,10 +125,14 @@ const journalFeatures = [
               const _lastVisit = parseInt(BB.storage.get('AnonLastVisit') || '0', 10);
               if (_badge) {
                 if (!_lastVisit) {
+                  _badge.classList.remove('bb-skeleton');
                   _badge.textContent  = '💬 Tap to join the community';
                   _badge.style.display = 'block';
                 } else if (!navigator.onLine) {
-                  // Offline — skip the live count, badge remains hidden
+                  // Offline — skip the live count and drop the skeleton row;
+                  // we'll re-check next time the page loads online.
+                  _badge.classList.remove('bb-skeleton');
+                  _badge.style.display = 'none';
                 } else {
                   db.collection(BB_BRAND.collections.posts)
                     .where('timestamp', '>', firebase.firestore.Timestamp.fromMillis(_lastVisit))
@@ -118,6 +141,7 @@ const journalFeatures = [
                     .then(snap => {
                       const _myMonika  = BB.storage.get('Anon_monika') || '';
                   const _newCount = snap.docs.filter(d => !d.data().deleted && (_myMonika ? d.data().name !== _myMonika : true)).length;
+                      _badge.classList.remove('bb-skeleton');
                       _badge.textContent   = _newCount > 0
                         ? '💬 ' + _newCount + ' new message' + (_newCount === 1 ? '' : 's')
                         : '✓ No new messages';
@@ -231,12 +255,14 @@ const journalFeatures = [
                   .limit(5).get().then(snap => {
                     const _myMonika = BB.storage.get('Anon_monika') || '';
                     const _newCount = snap.docs.filter(dd => !dd.data().deleted && (_myMonika ? dd.data().name !== _myMonika : true)).length;
+                    _badge2.classList.remove('bb-skeleton');
                     _badge2.textContent = _newCount > 0
                       ? '💬 ' + _newCount + ' new message' + (_newCount === 1 ? '' : 's')
                       : '✓ No new messages';
                     _badge2.style.display = 'block';
                   }).catch(() => {});
               } else if (_badge2 && !_lastVisit2) {
+                _badge2.classList.remove('bb-skeleton');
                 _badge2.textContent = '💬 Tap to join the community';
                 _badge2.style.display = 'block';
               }
@@ -304,11 +330,11 @@ const journalFeatures = [
           // stats, not residue from a sync.
           if (!BB.storage.get('GuestPinSalt')) {
             const _jb = document.getElementById('journalStreakBadge');
-            if (_jb) _jb.style.display = 'none';
+            if (_jb) { _jb.classList.remove('bb-skeleton'); _jb.style.display = 'none'; }
             const _ab = document.getElementById('anonStreakBadge');
-            if (_ab) _ab.style.display = 'none';
+            if (_ab) { _ab.classList.remove('bb-skeleton'); _ab.style.display = 'none'; }
             const _amb = document.getElementById('anonMessagesBadge');
-            if (_amb) _amb.style.display = 'none';
+            if (_amb) { _amb.classList.remove('bb-skeleton'); _amb.style.display = 'none'; }
           }
           if (typeof window._applyFabDock === 'function') window._applyFabDock();
         }
@@ -594,16 +620,25 @@ const journalFeatures = [
 
       // Journal badge: 🔥 + 🧘
       const badge = document.getElementById('journalStreakBadge');
-      if (badge && streak > 0) {
-        const stablePart = stable > 0 ? ` &nbsp;🧘 ${stable}d` : '';
-        badge.innerHTML     = `🔥 ${streak} day${streak === 1 ? '' : 's'}` + stablePart;
-        badge.style.display = 'block';
-        badge.style.cursor  = 'pointer';
+      if (badge) {
+        badge.classList.remove('bb-skeleton');
+        if (streak > 0) {
+          const stablePart = stable > 0 ? ` &nbsp;🧘 ${stable}d` : '';
+          badge.innerHTML     = `🔥 ${streak} day${streak === 1 ? '' : 's'}` + stablePart;
+          badge.style.display = 'block';
+          badge.style.cursor  = 'pointer';
+        } else {
+          // No streak yet — hide the badge so its reserved skeleton row
+          // collapses (otherwise the blurred placeholder would never go away
+          // for a brand-new signed-in user).
+          badge.style.display = 'none';
+        }
       }
 
       // Anonymous badge: 👋 monika + 💬 streak
       const anonBadge = document.getElementById('anonStreakBadge');
       if (anonBadge) {
+        anonBadge.classList.remove('bb-skeleton');
         if (hasAnon && anon > 0) {
           // _monika is user-supplied (Bipolar Anonymous nickname) — escape it
           // before splicing into innerHTML so a tampered localStorage value
@@ -795,14 +830,14 @@ const journalFeatures = [
 
       // Hide streak / anon badges so old account's stats don't linger on the home page
       const _jBadge = document.getElementById('journalStreakBadge');
-      if (_jBadge) _jBadge.style.display = 'none';
+      if (_jBadge) { _jBadge.classList.remove('bb-skeleton'); _jBadge.style.display = 'none'; }
       const _aBadge = document.getElementById('anonStreakBadge');
-      if (_aBadge) _aBadge.style.display = 'none';
+      if (_aBadge) { _aBadge.classList.remove('bb-skeleton'); _aBadge.style.display = 'none'; }
       const _amBadge = document.getElementById('anonMessagesBadge');
-      if (_amBadge) _amBadge.style.display = 'none';
+      if (_amBadge) { _amBadge.classList.remove('bb-skeleton'); _amBadge.style.display = 'none'; }
       // Reset survival kit progress count to default (4 always-complete sections + 1 anon = 5/13)
       const _sp = document.getElementById('survivalProgress');
-      if (_sp) _sp.textContent = '5 / 13 sections complete';
+      if (_sp) { _sp.classList.remove('bb-skeleton'); _sp.textContent = '5 / 13 sections complete'; }
 
       if (auth) auth.signOut();
     }
@@ -1069,6 +1104,7 @@ const journalFeatures = [
       // Survival kit progress counter
       const _prog = document.getElementById('survivalProgress');
       if (_prog) {
+        _prog.classList.remove('bb-skeleton');
         const _arr = k => { try { const v = JSON.parse(localStorage.getItem(k)||'[]'); return Array.isArray(v) && v.length > 0; } catch(e){ return false; } };
         const _obj = k => { try { const v = JSON.parse(localStorage.getItem(k)||'{}'); return Object.values(v).some(a => Array.isArray(a) && a.length > 0); } catch(e){ return false; } };
         let _c = 4; // mood-scale, books, media, spiritual — always complete
