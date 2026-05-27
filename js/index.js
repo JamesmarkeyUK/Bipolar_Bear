@@ -66,7 +66,7 @@ const journalFeatures = [
 //
 // 5-second safety net at the bottom handles any badge no populate path
 // touched (e.g. signed-in user who isn't verified for Anonymous).
-var SKELETON_MIN_VISIBLE_MS = 150;
+var SKELETON_MIN_VISIBLE_MS = 450;
 var _skelStart = Date.now();
 
 function _revealBadge(el, finalDisplay) {

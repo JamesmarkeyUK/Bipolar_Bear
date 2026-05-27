@@ -219,11 +219,12 @@
       margin-top: 4px;
       letter-spacing: 0.1px;
       text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-      /* Smooth unblur when the skeleton class is removed (~250ms). Combined
-         with the 150ms minimum-visible delay enforced in js/index.js this
-         gives a consistent ~400ms "loading" feel even when data was already
-         cached in localStorage and resolved instantly. */
-      transition: filter 0.25s ease, opacity 0.25s ease;
+      /* Smooth unblur when the skeleton class is removed (~350ms). Combined
+         with the 450ms minimum-visible delay enforced in js/index.js this
+         gives a consistent ~800ms "loading" feel — long enough to register
+         visually even when data was already cached in localStorage and
+         resolved instantly. */
+      transition: filter 0.35s ease, opacity 0.35s ease;
     }
     /* Skeleton placeholder — reserves vertical space and blurs the
        placeholder text so layout doesn't jump when js/index.js swaps in
@@ -234,8 +235,12 @@
     .btn-subnote.bb-skeleton {
       display: block;
       min-height: 1.1em;
+      /* blur(4px) keeps the rough text shape visible (so users see a
+         "blurred number / streak / message count" in the right place)
+         while the longer min-display time + slower transition in
+         js/index.js make the loading state clearly perceptible. */
       filter: blur(4px);
-      opacity: 0.55;
+      opacity: 0.5;
       pointer-events: none;
       user-select: none;
     }
