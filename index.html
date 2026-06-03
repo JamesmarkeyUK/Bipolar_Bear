@@ -5,9 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
   <title>Bipolar Bear – Mood &amp; Mental Health Tracker</title>
-  <!-- Beta gate: must be first — fires before any render -->
+  <!-- Paint-blocking critical CSS: paints the brand gradient before the stylesheet loads. -->
   <style>body{background:linear-gradient(135deg,#ffaa33 0%,#ff8833 100%)}</style>
-  <script>if(!window.Capacitor&&location.protocol!=='file:'&&localStorage.getItem('bbWebUnlocked')!=='true'){location.replace('beta.html');}</script>
 
   <!-- Shared helpers: load before any inline script that depends on isNative()/window.BB_FIREBASE_CONFIG/BB.onboarding/BB.storage. brand-config.js must come first so the BB.storage helper is available before debug.js + onboarding.js try to read localStorage through it. -->
   <script src="js/shared/brand-config.js"></script>
@@ -33,15 +32,18 @@
   <meta property="og:site_name" content="Bipolar Bear">
   <meta property="og:title" content="Bipolar Bear – Mood &amp; Mental Health Tracker">
   <meta property="og:description" content="Free mood journal and survival kit for people living with bipolar disorder. Track mood, energy, sleep and medication daily.">
-  <meta property="og:image" content="https://www.bipolarbear.app/icons/favicons/web-app-manifest-512x512.png">
-  <meta property="og:image:width" content="512">
-  <meta property="og:image:height" content="512">
+  <meta property="og:locale" content="en_GB">
+  <meta property="og:image" content="https://www.bipolarbear.app/images/og-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Bipolar Bear — a free mood journal and survival kit for living with bipolar disorder.">
 
   <!-- Twitter / X Card -->
-  <meta name="twitter:card" content="summary">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Bipolar Bear – Mood &amp; Mental Health Tracker">
   <meta name="twitter:description" content="Free mood journal and survival kit for people living with bipolar disorder. Track mood, energy, sleep and medication daily.">
-  <meta name="twitter:image" content="https://www.bipolarbear.app/icons/favicons/web-app-manifest-512x512.png">
+  <meta name="twitter:image" content="https://www.bipolarbear.app/images/og-card.png">
+  <meta name="twitter:image:alt" content="Bipolar Bear — a free mood journal and survival kit for living with bipolar disorder.">
 
   <!-- Structured data -->
   <script type="application/ld+json">

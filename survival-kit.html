@@ -5,9 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
   <title>Bipolar Survival Kit – Bipolar Bear</title>
-  <!-- Beta gate: must be first — fires before any render -->
+  <!-- Native PIN gate: must be first — fires before any render -->
   <style>body{background:linear-gradient(135deg,#ffaa33 0%,#ff8833 100%)}</style>
-  <script>if(!window.Capacitor&&location.protocol!=='file:'&&localStorage.getItem('bbWebUnlocked')!=='true'){location.replace('beta.html');}
+  <script>
   // See journal.html: signed-in users skip the stale-bbGuestPinSalt redirect
   // so they aren't trapped on index.html when they tap Survival Kit.
   {const _np=window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()&&localStorage.getItem('bbNativePinEnabled')==='1';let _signed=false;try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('firebase:authUser:')===0&&localStorage.getItem(k)){_signed=true;break;}}}catch(_){}const _gp=!_signed&&localStorage.getItem('bbGuestPinSalt');if((_gp||_np)&&sessionStorage.getItem('bbPinUnlocked')!=='1'){location.replace('index.html');}}</script>
@@ -34,15 +34,18 @@
   <meta property="og:site_name" content="Bipolar Bear">
   <meta property="og:title" content="Bipolar Survival Kit – Bipolar Bear">
   <meta property="og:description" content="Your personal bipolar survival kit — mood scale, coping strategies, resources and community support.">
-  <meta property="og:image" content="https://www.bipolarbear.app/icons/favicons/web-app-manifest-512x512.png">
-  <meta property="og:image:width" content="512">
-  <meta property="og:image:height" content="512">
+  <meta property="og:locale" content="en_GB">
+  <meta property="og:image" content="https://www.bipolarbear.app/images/og-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Bipolar Bear — a free mood journal and survival kit for living with bipolar disorder.">
 
   <!-- Twitter / X Card -->
-  <meta name="twitter:card" content="summary">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Bipolar Survival Kit – Bipolar Bear">
   <meta name="twitter:description" content="Your personal bipolar survival kit — mood scale, coping strategies, resources and community support.">
-  <meta name="twitter:image" content="https://www.bipolarbear.app/icons/favicons/web-app-manifest-512x512.png">
+  <meta name="twitter:image" content="https://www.bipolarbear.app/images/og-card.png">
+  <meta name="twitter:image:alt" content="Bipolar Bear — a free mood journal and survival kit for living with bipolar disorder.">
 
   <!-- Theme colors -->
   <meta name="theme-color" content="#ff9500">

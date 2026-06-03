@@ -9,7 +9,7 @@
  *
  * Hosts without an override get DEFAULT_LANDING served at `/` via an
  * internal rewrite (URL bar stays as `/`):
- *   - everything else → /beta.html
+ *   - everything else → /index.html
  *
  * Adding a new variant pair (e.g. "Anxiety Ant" + "Anxiety Anonymous") is
  * just two new entries below; no other code changes here.
@@ -41,7 +41,7 @@ const HOST_LANDING_MAP = {
  * Landing page served at `/` when the requested hostname has no override.
  * Internal rewrite (URL bar stays as `/`).
  */
-const DEFAULT_LANDING = '/beta.html';
+const DEFAULT_LANDING = '/index.html';
 
 export default {
   /**
