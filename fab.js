@@ -43,8 +43,7 @@
 
   /**
    * Wipe every localStorage + sessionStorage key for this origin and reload
-   * the page. Preserves the `WebUnlocked` beta-gate flag so the user isn't
-   * bounced to /beta.html after the wipe.
+   * the page.
    *
    * Lives in fab.js (not js/index.js) so the "🗑 Delete all guest data"
    * button in the shared auth modal works identically on every page that
@@ -55,17 +54,7 @@
    * @returns {void}
    */
   function _nukeGuestData() {
-    const _webUnlocked = window.BB && window.BB.storage
-      ? window.BB.storage.get('WebUnlocked')
-      : localStorage.getItem('bbWebUnlocked');
     localStorage.clear();
-    if (_webUnlocked) {
-      if (window.BB && window.BB.storage) {
-        window.BB.storage.set('WebUnlocked', _webUnlocked);
-      } else {
-        localStorage.setItem('bbWebUnlocked', _webUnlocked);
-      }
-    }
     sessionStorage.clear();
     location.replace(location.pathname);
   }

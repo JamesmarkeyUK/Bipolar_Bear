@@ -26,13 +26,6 @@
  */
 
 // ─────────────────────────────────────────────────────────────────
-// Beta gate (web only) — keep in sync with other pages
-// ─────────────────────────────────────────────────────────────────
-if (!window.Capacitor && location.protocol !== 'file:' && BB.storage.get('WebUnlocked') !== 'true') {
-  location.replace('beta.html');
-}
-
-// ─────────────────────────────────────────────────────────────────
 // Constants & state
 // ─────────────────────────────────────────────────────────────────
 const YELLOW      = 'var(--brand-secondary)';

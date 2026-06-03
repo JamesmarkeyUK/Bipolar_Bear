@@ -1876,11 +1876,6 @@ function _esc(s) {
     }
 
 // ── BLOCK 3 ──
-// ── Beta gate (web only) ──
-    if (!window.Capacitor && location.protocol !== 'file:' && BB.storage.get('WebUnlocked') !== 'true') {
-      location.replace('beta.html');
-    }
-
     // ── Firebase init ──
     // Config lives in js/shared/firebase-config.js so every page reads the
     // same source of truth.

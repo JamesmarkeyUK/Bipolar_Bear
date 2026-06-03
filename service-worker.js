@@ -125,7 +125,8 @@
 // v54: Wiki Books & Films — each media card now reserves a 72×108 cover slot (book jacket / film poster) at images/wiki-media/<slug>.jpg. Missing files hide themselves so unfilled entries render the same as before.
 // v55: add js/shared/version-check.js — fetches /version.json and shows a top banner when a newer release is available (web → refresh, native → open store). New <script> tag added to index/journal/survival-kit/anonymous.html. Also: index.html shows a "v1.4 · iOS" chip below the auth FAB (populated by BB.versionLabel()); four home-page badges (journal streak, survival progress, anon messages, anon streak) get blurred-text skeleton placeholders that reserve their layout row until js/index.js swaps in real values — kills the empty-to-populated layout jump on the home screen for signed-in / guest-PIN users. fab.js now delegates its version label to BB.versionLabel() (single source of truth). Old v54 caches must drop so the new shared script, HTML, CSS, and JS all land together.
 // v56: survival-kit.html / .css / .js — add 6 quick-add medication chips (Lithium, Quetiapine, Lamotrigine, Sodium Valproate, Olanzapine, Aripiprazole) in the My Medications modal. Tapping a chip fills the name input and focuses the dosage field.
-const CACHE_NAME = 'bipolarbear-v56';
+// v57: remove the beta landing page / web access gate — `/` now serves index.html directly (worker.js), and the inline + js beta-gate redirects are gone. Dropped beta.html, css/beta.css, js/beta.js from the precache. Also: fixed the broken social-share image (og:image now points at the new haloed bear via images/og-card.png instead of a 404'd favicons path), added a real 1200×630 share card, fixed site.webmanifest, and added robots.txt + sitemap.xml.
+const CACHE_NAME = 'bipolarbear-v57';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
@@ -137,7 +138,6 @@ const STATIC_ASSETS = [
   './journal.html',
   './survival-kit.html',
   './anonymous.html',
-  './beta.html',
   './privacy.html',
 
   // FAB dock + page-specific JS (extracted from inline scripts in Phase 4).
@@ -146,7 +146,6 @@ const STATIC_ASSETS = [
   './js/journal.js',
   './js/survival-kit.js',
   './js/anonymous.js',
-  './js/beta.js',
 
   // Shared modules — small, loaded by every page.
   './js/shared/platform.js',
@@ -169,7 +168,6 @@ const STATIC_ASSETS = [
   './css/journal.css',
   './css/survival-kit.css',
   './css/anonymous.css',
-  './css/beta.css',
 
   // Manifests. Icons are deliberately not precached — they're served from
   // /icons/favicons/ (referenced in <link rel="icon">) and the browser's
