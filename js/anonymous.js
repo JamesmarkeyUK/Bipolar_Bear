@@ -2454,6 +2454,22 @@ async function handlePin(postId, tab) {
 // ─────────────────────────────────────────────────────────────────
 // Render
 // ─────────────────────────────────────────────────────────────────
+let _tombstoneSweepTimer = null;
+
+// Re-render once the soonest-expiring visible tombstone passes the 1-hour mark,
+// so it disappears even when no Firestore snapshot fires in the meantime.
+function scheduleTombstoneSweep(nextExpiry, now) {
+  if (_tombstoneSweepTimer) { clearTimeout(_tombstoneSweepTimer); _tombstoneSweepTimer = null; }
+  if (!nextExpiry) return;
+  const delay = Math.max(0, nextExpiry - now) + 1000; // +1s cushion past the boundary
+  _tombstoneSweepTimer = setTimeout(() => {
+    _tombstoneSweepTimer = null;
+    renderPosts(currentTab === 'general'
+      ? assembleGeneralPosts(localPosts)
+      : sortPosts(localPosts));
+  }, delay);
+}
+
 function renderPosts(posts) {
   const list = document.getElementById('post-list');
   if (!posts.length) {
@@ -2464,13 +2480,26 @@ function renderPosts(posts) {
   // Posts are sorted newest-first (sortPosts), so the first deleted in iteration is
   // the most recent. Prevents a wall of "post was deleted" entries when an admin
   // removes several spam posts in a row.
+  // The "deleted by an admin" tombstone is also short-lived: once an hour has
+  // passed since deletedAt, the post drops out of the feed entirely.
+  const DELETED_TOMBSTONE_MS = 60 * 60 * 1000; // show "deleted by admin" for max 1 hour
+  const _now = Date.now();
   let _keptDeletedTombstone = false;
+  let _nextTombstoneExpiry = 0;
   posts = posts.filter(p => {
     if (!p.deleted) return true;
+    // Expire the tombstone an hour after deletion. Missing deletedAt (legacy
+    // deletes, or a serverTimestamp not yet resolved) keeps it visible.
+    const delMs = p.deletedAt?.toMillis?.() ?? (p.deletedAt instanceof Date ? p.deletedAt.getTime() : 0);
+    if (delMs && (_now - delMs) > DELETED_TOMBSTONE_MS) return false;
     if (_keptDeletedTombstone) return false;
     _keptDeletedTombstone = true;
+    _nextTombstoneExpiry = delMs ? delMs + DELETED_TOMBSTONE_MS : _nextTombstoneExpiry;
     return true;
   });
+  // On an idle page no snapshot fires to re-render, so a still-visible tombstone
+  // would linger past the hour. Schedule a re-render for when it expires.
+  scheduleTombstoneSweep(_nextTombstoneExpiry, _now);
   list.innerHTML = posts.map(p => {
     if (p.isSystem)       return renderSystem(p);
     if (p.isAnnouncement) return renderAnnouncement(p);
