@@ -19,6 +19,7 @@ const screens = [
   ['screen4-anonymous.html',   '03-anonymous'],   // swapped → #3
   ['screen3-patterns.html',    '04-patterns'],     // swapped → #4
   ['screen5-survivalkit.html', '05-survivalkit'],
+  ['screen6-pin.html',         '06-pin'],
 ];
 // dir, render W, H, extra canvas class
 const targets = [

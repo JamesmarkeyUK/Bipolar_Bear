@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../fonts.css">
+<link rel="stylesheet" href="shared.css">
+<style>
+  .stage{ --dev-w:566px; }
+  .device{ left:50%; top:606px; transform:translateX(-50%); }
+
+  /* The real app PIN overlay is full-bleed orange (no status bar / chrome),
+     gradient matching index.html #guestPinOverlay. */
+  .pinui{ position:absolute; inset:0;
+    background:linear-gradient(135deg, var(--orange-light) 0%, var(--orange-mid) 100%);
+    display:flex; flex-direction:column; align-items:center;
+    padding:96px 44px 56px; color:#fff; }
+
+  .pin-icon{ width:120px; height:120px; border-radius:30px; display:block;
+    box-shadow:0 10px 28px rgba(0,0,0,.22); }
+  .pin-app{ font-family:'Nunito',sans-serif; font-weight:900; font-size:46px;
+    margin-top:22px; letter-spacing:-.01em; }
+  .pin-sub{ font-weight:700; font-size:30px; margin-top:10px;
+    text-shadow:0 1px 3px rgba(0,0,0,.28); }
+  .pin-info{ margin-top:24px; display:inline-flex; align-items:center; gap:10px;
+    background:rgba(255,255,255,.22); border:2px solid rgba(255,255,255,.45);
+    color:#fff; border-radius:999px; padding:12px 26px; font-weight:800; font-size:26px; }
+
+  .pin-dots{ display:flex; gap:22px; margin:44px 0 40px; }
+  .pin-dots i{ width:30px; height:30px; border-radius:50%;
+    border:3px solid rgba(255,255,255,.9); background:rgba(255,255,255,.35); }
+  .pin-dots i.on{ background:#fff; }
+
+  .pin-pad{ display:grid; grid-template-columns:repeat(3,128px); gap:24px; }
+  .pin-pad button{ width:128px; height:128px; border-radius:50%; border:none;
+    background:rgba(255,255,255,.2); color:#fff; font-weight:700;
+    font-size:56px; line-height:1; display:flex; align-items:center; justify-content:center; }
+  .pin-pad .del{ font-size:44px; }
+  .pin-pad .blank{ background:transparent; }
+
+  .pin-forgot{ margin-top:auto; font-weight:700; font-size:26px;
+    text-decoration:underline; text-shadow:0 1px 3px rgba(0,0,0,.28); opacity:.96; }
+</style>
+</head>
+<body>
+<div class="canvas bg-orange on-orange">
+<div class="stage">
+
+  <!-- copy -->
+  <div class="copy" style="top:0;height:606px;display:flex;flex-direction:column;justify-content:center;">
+    <div class="headline sm">Locked behind<br>your&nbsp;PIN</div>
+  </div>
+
+  <!-- iPhone showing the PIN lock screen -->
+  <div class="device">
+    <div class="screen">
+      <div class="island"></div>
+      <div class="pinui">
+        <img class="pin-icon" src="REPO/icons/AppIcon.png" alt="">
+        <div class="pin-app">Bipolar Bear</div>
+        <div class="pin-sub">Enter your PIN to continue</div>
+        <div class="pin-info">🔐 More info</div>
+        <div class="pin-dots"><i class="on"></i><i class="on"></i><i></i><i></i></div>
+        <div class="pin-pad">
+          <button>1</button><button>2</button><button>3</button>
+          <button>4</button><button>5</button><button>6</button>
+          <button>7</button><button>8</button><button>9</button>
+          <span class="blank"></span><button>0</button><button class="del">⌫</button>
+        </div>
+        <div class="pin-forgot">Forgot PIN?</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footnote">End-to-end encrypted — not even we can read your entries</div>
+
+</div>
+</div>
+</body>
+</html>
