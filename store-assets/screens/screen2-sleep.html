@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../fonts.css">
+<link rel="stylesheet" href="shared.css">
+<style>
+  .stage{ --dev-w:566px; }
+  .device{ left:50%; top:606px; transform:translateX(-50%); }
+
+  /* ── App sleep step ── */
+  .sleepcard{ padding:54px 44px 40px; display:flex; flex-direction:column; height:100%; }
+  .step-eyebrow{ font-family:'Nunito',sans-serif; font-weight:900; letter-spacing:.18em;
+    text-transform:uppercase; color:var(--orange-dark); font-size:26px; text-align:center; }
+  .step-q{ font-family:'Nunito',sans-serif; font-weight:800; font-size:48px; color:var(--ink);
+    text-align:center; line-height:1.12; margin-top:18px; }
+  .moon{ font-size:118px; text-align:center; margin:30px 0 6px; line-height:1; }
+  .hours{ font-family:'Nunito',sans-serif; font-weight:900; font-size:104px; color:var(--ink);
+    text-align:center; line-height:1; letter-spacing:-.01em; }
+  .hours small{ font-size:54px; font-weight:800; color:var(--muted); }
+  .synced{ margin:26px auto 0; display:flex; align-items:center; gap:13px; white-space:nowrap;
+    background:#e9f9ee; color:#1c8a44; font-weight:800; font-size:27px;
+    padding:14px 26px; border-radius:999px; }
+  .synced .tick{ width:34px;height:34px;border-radius:50%;background:#22a356;color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:21px; flex-shrink:0; }
+  .ranges{ display:flex; gap:14px; margin-top:auto; padding-top:42px; }
+  .rng{ flex:1; text-align:center; padding:26px 0; border-radius:20px; background:#f1f3f6;
+    color:var(--ink-2); font-weight:800; font-size:30px; }
+  .rng.sel{ background:var(--sleep-79); color:#fff; box-shadow:0 12px 24px -8px rgba(253,126,20,.6); }
+  .rng .sub{ display:block; font-size:22px; font-weight:700; opacity:.85; margin-top:4px; }
+  .hint{ text-align:center; color:var(--muted); font-weight:700; font-size:24px; margin-top:24px; }
+
+  /* ── Watches ── */
+  .watch-row{ position:absolute; left:0; right:0; top:1882px; height:560px; }
+  .watch{ position:absolute; display:flex; flex-direction:column; align-items:center; gap:22px; }
+  .watch .label{ font-weight:800; font-size:32px; color:#fff; opacity:.96; letter-spacing:.01em; }
+
+  /* Apple Watch (squircle) */
+  .aw-body{ width:300px; height:368px; border-radius:96px; position:relative;
+    background:linear-gradient(150deg,#3a3a3e,#101013);
+    box-shadow:0 30px 60px -18px rgba(60,20,0,.55), inset 0 2px 4px rgba(255,255,255,.18); }
+  .aw-crown{ position:absolute; right:-14px; top:120px; width:20px; height:74px; border-radius:10px;
+    background:linear-gradient(90deg,#5a5a60,#2a2a2e); }
+  .aw-btn{ position:absolute; right:-10px; top:210px; width:14px; height:96px; border-radius:8px;
+    background:#2a2a2e; }
+  .aw-screen{ position:absolute; inset:18px; border-radius:80px; background:#000;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; }
+
+  /* Wear OS (circle) */
+  .wos-body{ width:344px; height:344px; border-radius:50%; position:relative;
+    background:linear-gradient(150deg,#3a3a3e,#101013);
+    box-shadow:0 30px 60px -18px rgba(60,20,0,.55), inset 0 2px 4px rgba(255,255,255,.18); }
+  .wos-crown{ position:absolute; right:-12px; top:120px; width:18px; height:64px; border-radius:9px;
+    background:linear-gradient(90deg,#5a5a60,#2a2a2e); }
+  .wos-screen{ position:absolute; inset:16px; border-radius:50%; background:#000;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; }
+
+  .wface{ display:flex; flex-direction:column; align-items:center; }
+  .wface .wmoon{ font-size:46px; line-height:1; }
+  .wface .whrs{ font-weight:900; font-size:52px; color:#fff; margin-top:6px; letter-spacing:-.01em; }
+  .wface .wlbl{ font-weight:800; font-size:22px; letter-spacing:.18em; color:var(--orange-light);
+    text-transform:uppercase; margin-top:6px; }
+
+  .footer-badge{ position:absolute; left:0; right:0; bottom:96px; text-align:center;
+    color:#fff; font-weight:800; font-size:32px; opacity:.95; }
+  .footer-badge .small{ display:block; font-size:25px; letter-spacing:.16em; text-transform:uppercase;
+    opacity:.8; margin-bottom:12px; font-weight:800; }
+</style>
+</head>
+<body>
+<div class="canvas bg-orange on-orange">
+<div class="stage">
+
+  <!-- copy -->
+  <div class="copy" style="top:0;height:606px;display:flex;flex-direction:column;justify-content:center;">
+    <div class="headline sm">Sync your sleep<br>from your watch</div>
+  </div>
+
+  <!-- sync connectors (drawn behind watches, over background) -->
+  <svg width="100%" height="100%" viewBox="0 0 1290 2796" preserveAspectRatio="none"
+       style="position:absolute;inset:0;">
+    <path d="M360,1980 C360,1840 470,1820 560,1772" fill="none"
+          stroke="#ffffff" stroke-width="6" stroke-dasharray="4 22" stroke-linecap="round" opacity="0.7"/>
+    <path d="M952,1980 C952,1840 842,1820 752,1772" fill="none"
+          stroke="#ffffff" stroke-width="6" stroke-dasharray="4 22" stroke-linecap="round" opacity="0.7"/>
+  </svg>
+
+  <!-- iPhone -->
+  <div class="device">
+    <div class="screen appui">
+      <div class="island"></div>
+      <div class="statusbar"><span>9:41</span>
+        <svg width="148" height="30" viewBox="0 0 148 30" fill="#1f2430">
+          <rect x="0"  y="18" width="6" height="11" rx="1.5"/>
+          <rect x="9"  y="13" width="6" height="16" rx="1.5"/>
+          <rect x="18" y="8"  width="6" height="21" rx="1.5"/>
+          <rect x="27" y="3"  width="6" height="26" rx="1.5"/>
+          <g transform="translate(44,3)" fill="none" stroke="#1f2430" stroke-width="3.5" stroke-linecap="round">
+            <path d="M2,8 a15,15 0 0 1 26,0"/><path d="M7,14 a8,8 0 0 1 16,0"/>
+          </g>
+          <circle cx="61" cy="25" r="2.6"/>
+          <rect x="92" y="6" width="48" height="22" rx="6" fill="none" stroke="#1f2430" stroke-width="2.6" opacity="0.5"/>
+          <rect x="143" y="13" width="4" height="9" rx="2" opacity="0.5"/>
+          <rect x="95" y="9" width="42" height="16" rx="3.5"/>
+        </svg>
+      </div>
+      <div class="sleepcard">
+        <div class="step-eyebrow">Sleep</div>
+        <div class="step-q">How did you sleep?</div>
+        <div class="moon">😴</div>
+        <div class="hours">7<small>h</small> 32<small>m</small></div>
+        <div class="synced"><span class="tick">✓</span> Synced from Apple Health</div>
+        <div class="ranges">
+          <div class="rng">≤5</div>
+          <div class="rng">6-7</div>
+          <div class="rng sel">7-9<span class="sub">7.5h</span></div>
+          <div class="rng">9-10</div>
+          <div class="rng">10+</div>
+        </div>
+        <div class="hint">Auto-filled · long-press to rate quality</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- watches -->
+  <div class="watch-row">
+    <div class="watch" style="left:212px; top:14px;">
+      <div class="aw-body">
+        <div class="aw-crown"></div><div class="aw-btn"></div>
+        <div class="aw-screen">
+          <div class="wface">
+            <div class="wmoon">🌙</div>
+            <div class="whrs">7h 32m</div>
+            <div class="wlbl">Sleep</div>
+          </div>
+        </div>
+      </div>
+      <div class="label">Apple Watch</div>
+    </div>
+
+    <div class="watch" style="right:206px; top:26px;">
+      <div class="wos-body">
+        <div class="wos-crown"></div>
+        <div class="wos-screen">
+          <div class="wface">
+            <div class="wmoon">🌙</div>
+            <div class="whrs">7h 32m</div>
+            <div class="wlbl">Sleep</div>
+          </div>
+        </div>
+      </div>
+      <div class="label">Wear OS</div>
+    </div>
+  </div>
+
+  <div class="footer-badge">
+    <span class="small">Works with</span>
+    Apple Health&nbsp;&nbsp;·&nbsp;&nbsp;Google Health Connect
+  </div>
+
+</div>
+</div>
+</body>
+</html>

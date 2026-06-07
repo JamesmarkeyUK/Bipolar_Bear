@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../fonts.css">
+<link rel="stylesheet" href="shared.css">
+<style>
+  .stage{ --dev-w:646px; }
+  .device{ left:50%; top:556px; transform:translateX(-50%); }
+
+  .pcard{ padding:30px 38px 30px; display:flex; flex-direction:column; height:100%; }
+  .ph-head{ display:flex; flex-direction:column; align-items:center; text-align:center; }
+  .ph-head img{ width:76px; height:76px; }
+  .ph-title{ font-weight:800; font-size:40px; color:var(--ink); margin-top:4px; }
+  .ph-sub{ font-weight:700; font-size:23px; color:var(--muted); margin-top:4px; }
+
+  /* mini mood chart */
+  .chart{ margin:22px 0 4px; }
+  .chart-box{ position:relative; height:160px;
+    display:flex; align-items:flex-end; gap:11px; padding:0 4px; }
+  .bar{ flex:1; border-radius:8px 8px 4px 4px; min-width:0; }
+  .chart svg{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+  .chart-axis{ display:flex; justify-content:space-between; margin-top:12px;
+    font-size:21px; font-weight:700; color:var(--muted); }
+
+  .seclabel{ font-weight:900; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--orange-dark); font-size:25px; margin:18px 2px 14px; }
+
+  .insight{ display:flex; gap:20px; align-items:flex-start; padding:24px 26px;
+    margin-bottom:16px; border-radius:18px; background:#f6f7f9; border-left:8px solid #adb5bd; }
+  .insight .ic{ font-size:46px; line-height:1; flex-shrink:0; }
+  .insight .it{ font-weight:800; font-size:30px; color:var(--ink); margin-bottom:6px; }
+  .insight .ib{ font-size:27px; color:#495057; line-height:1.42; }
+  .insight .id{ margin-top:10px; font-size:23px; color:#8a8f98; line-height:1.35; }
+
+  .insight.feature{ background:#fff3f3; border-left-color:#ff5a5a;
+    box-shadow:0 14px 30px -16px rgba(255,80,80,.45); padding:30px 30px; }
+  .insight.feature .it{ font-size:34px; }
+  .insight.feature .ib{ font-size:30px; color:#3f4248; }
+  .insight.green{ border-left-color:#51cf66; }
+  .insight.purple{ border-left-color:#667eea; }
+</style>
+</head>
+<body>
+<div class="canvas bg-orange on-orange">
+<div class="stage">
+
+  <div class="copy" style="top:0;height:556px;display:flex;flex-direction:column;justify-content:center;">
+    <div class="headline sm">Spot your patterns</div>
+  </div>
+
+  <div class="device">
+    <div class="screen appui">
+      <div class="island"></div>
+      <div class="statusbar"><span>9:41</span>
+        <svg width="148" height="30" viewBox="0 0 148 30" fill="currentColor">
+          <rect x="0" y="18" width="6" height="11" rx="1.5"/><rect x="9" y="13" width="6" height="16" rx="1.5"/>
+          <rect x="18" y="8" width="6" height="21" rx="1.5"/><rect x="27" y="3" width="6" height="26" rx="1.5"/>
+          <g transform="translate(44,3)" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round">
+            <path d="M2,8 a15,15 0 0 1 26,0"/><path d="M7,14 a8,8 0 0 1 16,0"/></g>
+          <circle cx="61" cy="25" r="2.6"/>
+          <rect x="92" y="6" width="48" height="22" rx="6" fill="none" stroke="currentColor" stroke-width="2.6" opacity="0.5"/>
+          <rect x="143" y="13" width="4" height="9" rx="2" opacity="0.5"/>
+          <rect x="95" y="9" width="42" height="16" rx="3.5"/>
+        </svg>
+      </div>
+
+      <div class="pcard">
+        <div class="ph-head">
+          <img src="REPO/images/moods/AI_Bear.png" alt="">
+          <div class="ph-title">Personalised Feedback</div>
+          <div class="ph-sub">From your last 90 days</div>
+        </div>
+
+        <div class="chart">
+          <div class="chart-box">
+            <div class="bar" style="height:104px;background:#51cf66"></div>
+            <div class="bar" style="height:132px;background:#d2be00"></div>
+            <div class="bar" style="height:104px;background:#51cf66"></div>
+            <div class="bar" style="height:150px;background:#ff6b6b"></div>
+            <div class="bar" style="height:132px;background:#d2be00"></div>
+            <div class="bar" style="height:78px;background:#845ef7"></div>
+            <div class="bar" style="height:104px;background:#51cf66"></div>
+            <div class="bar" style="height:132px;background:#d2be00"></div>
+            <div class="bar" style="height:104px;background:#51cf66"></div>
+            <div class="bar" style="height:78px;background:#845ef7"></div>
+            <div class="bar" style="height:132px;background:#d2be00"></div>
+            <div class="bar" style="height:104px;background:#51cf66"></div>
+            <div class="bar" style="height:78px;background:#845ef7"></div>
+            <div class="bar" style="height:104px;background:#51cf66"></div>
+            <svg viewBox="0 0 460 190" preserveAspectRatio="none">
+              <polyline points="20,108 52,107 85,106 117,106 149,105 182,104 214,103 246,102 278,101 311,100 343,99 375,98 408,97 440,96"
+                fill="none" stroke="#ff6b6b" stroke-width="4" stroke-dasharray="9 9" opacity="0.65" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="chart-axis"><span>Depressed</span><span>14-day mood</span><span>Manic</span></div>
+        </div>
+
+        <div class="seclabel">What we noticed</div>
+
+        <div class="insight feature">
+          <div class="ic">🍺</div>
+          <div>
+            <div class="it">Alcohol &amp; Next-Day Mood</div>
+            <div class="ib">There's a strong correlation between drinking alcohol and your mood the next day.</div>
+            <div class="id">After drinking: next-day avg <b>2.3 (Low)</b>&nbsp; · &nbsp;Sober days: <b>3.7 (Elevated)</b></div>
+          </div>
+        </div>
+
+        <div class="insight green">
+          <div class="ic">😴</div>
+          <div>
+            <div class="it">Sleep &amp; Next-Day Mood</div>
+            <div class="ib">More sleep tends to lift your mood the following day.</div>
+          </div>
+        </div>
+
+        <div class="insight purple">
+          <div class="ic">💫</div>
+          <div>
+            <div class="it">Energy &amp; Mood</div>
+            <div class="ib">Your energy and mood rise and fall together.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="deck" style="top:1992px;">
+    <div class="dlabel">Correlates everything you track</div>
+    <div class="chips">
+      <span class="chip hot"><span class="e">🍺</span>Alcohol</span>
+      <span class="chip"><span class="e">😴</span>Sleep</span>
+      <span class="chip"><span class="e">☕</span>Caffeine</span>
+      <span class="chip"><span class="e">🏃</span>Exercise</span>
+      <span class="chip"><span class="e">💊</span>Meds</span>
+      <span class="chip"><span class="e">👟</span>Steps</span>
+      <span class="chip"><span class="e">😰</span>Anxiety</span>
+    </div>
+  </div>
+
+  <div class="footnote">Insights stay private — computed on your device</div>
+
+</div>
+</div>
+</body>
+</html>

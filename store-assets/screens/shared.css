@@ -1,0 +1,176 @@
+/* ─────────────────────────────────────────────────────────────
+   Bipolar Bear — App Store / Play Store screenshot design system
+   Canvas authored to fill the render viewport (set via --window-size).
+   Primary target: iPhone 6.9"  1290 × 2796.
+   ───────────────────────────────────────────────────────────── */
+
+:root{
+  /* Brand (from css/theme.css) */
+  --orange:        #ff9500;
+  --orange-dark:   #ff6b00;
+  --orange-mid:    #ff8833;
+  --orange-light:  #ffaa33;
+  --orange-tint:   #fff8f0;
+  --yellow:        #f5c800;
+  --yellow-tint:   #fff8e6;
+
+  /* Neutrals for app UI */
+  --ink:    #1f2430;
+  --ink-2:  #495057;
+  --muted:  #8a94a6;
+  --line:   #eceef2;
+  --card:   #ffffff;
+
+  --sleep-79: #fd7e14;   /* real app sleep colour, 7-9h */
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+html,body{ width:100%; height:100%; }
+body{
+  font-family:'Nunito','Segoe UI',system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:geometricPrecision;
+}
+
+/* Outer render canvas — carries the full-bleed gradient, fills the export size. */
+.canvas{
+  position:relative;
+  width:100vw;
+  height:100vh;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  --fit:1;            /* overridden per export size by the build (iPhone=1, Android≈0.69) */
+}
+/* Inner design stage — authored at iPhone 6.9" (1290×2796) and uniformly scaled to fit. */
+.stage{
+  position:relative;
+  width:1290px;
+  height:2796px;
+  flex:0 0 auto;
+  transform:scale(var(--fit));
+  transform-origin:center center;
+}
+
+/* Warm brand background used by UI-feature screens (2–5 main app) */
+.bg-orange{
+  background:
+    radial-gradient(120% 80% at 50% -10%, #ffc266 0%, rgba(255,194,102,0) 55%),
+    linear-gradient(160deg, var(--orange-light) 0%, var(--orange-mid) 42%, var(--orange-dark) 100%);
+}
+/* Yellow community background (Anonymous) */
+.bg-yellow{
+  background:
+    radial-gradient(120% 80% at 50% -10%, #ffe680 0%, rgba(255,230,128,0) 55%),
+    linear-gradient(160deg, #ffd84d 0%, var(--yellow) 50%, #e0b400 100%);
+}
+/* Dark, moody background for the hero/cover screen */
+.bg-dark{
+  background:
+    radial-gradient(90% 50% at 50% 78%, #3a2640 0%, rgba(58,38,64,0) 60%),
+    linear-gradient(180deg, #15121d 0%, #1c1726 55%, #241a2c 100%);
+}
+
+/* Soft paper texture / noise can be added later; kept clean for now. */
+
+/* ── Marketing copy ─────────────────────────────────────────── */
+.copy{ position:absolute; left:0; right:0; text-align:center; padding:0 70px; }
+
+.eyebrow{
+  font-weight:800; letter-spacing:.22em; text-transform:uppercase;
+  font-size:30px; opacity:.92;
+}
+.headline{
+  font-weight:900; line-height:1.04; letter-spacing:-.015em;
+  font-size:104px;
+}
+.headline.sm{ font-size:108px; }
+.subhead{
+  font-weight:700; line-height:1.32; font-size:40px; opacity:.95;
+  margin-top:28px;
+}
+.on-orange{ color:#fff; }
+.on-orange .subhead{ color:#fff8ef; }
+.on-yellow{ color:#3d2c00; }
+.on-yellow .subhead{ color:#5c4500; }
+.on-dark .headline{ color:#fff; }
+.on-dark .subhead{ color:#cdbfe0; }
+
+/* Accent underline swoosh used under a key word */
+.hl{ color:#fff; position:relative; white-space:nowrap; }
+
+/* ── iPhone device frame ────────────────────────────────────── */
+.device{
+  position:absolute;
+  width:var(--dev-w,604px);
+  /* 19.5:9 screen ratio inside frame */
+  border-radius:74px;
+  background:#0b0b0d;
+  padding:18px;
+  box-shadow:
+    0 2px 0 2px rgba(255,255,255,.08) inset,
+    0 60px 120px -30px rgba(40,16,0,.55),
+    0 24px 50px -20px rgba(0,0,0,.45);
+}
+.device .screen{
+  position:relative;
+  border-radius:58px;
+  overflow:hidden;
+  background:#f4f5f7;
+  width:100%;
+  /* fixed height (iPhone 19.5:9) so every phone is identical regardless of content */
+  height:calc((var(--dev-w) - 36px) * 2.1679);
+}
+.device .island{
+  position:absolute; top:20px; left:50%; transform:translateX(-50%);
+  width:118px; height:34px; border-radius:20px; background:#08080a; z-index:30;
+}
+
+/* Generic in-app status bar */
+.statusbar{
+  position:relative; z-index:20;
+  height:74px; display:flex; align-items:center; justify-content:space-between;
+  padding:18px 40px 0; font-family:'Segoe UI',system-ui,sans-serif;
+  font-weight:700; font-size:30px; color:var(--ink);
+}
+.statusbar .icns{ display:flex; gap:12px; align-items:center; font-size:26px; }
+
+/* App content uses the real app's system font for authenticity */
+.appui{ font-family:'Segoe UI',system-ui,sans-serif; color:var(--ink); }
+
+/* Branded footnote anchoring the bottom of feature screens */
+.footnote{ position:absolute; left:0; right:0; bottom:96px; text-align:center;
+  font-weight:800; font-size:32px; letter-spacing:.01em; padding:0 80px; }
+.on-orange .footnote{ color:#fff; opacity:.9; }
+.on-yellow .footnote{ color:#3d2c00; opacity:.8; }
+
+/* ── "Below-the-phone" supporting deck (chips / avatars) ── */
+.deck{ position:absolute; left:0; right:0; text-align:center; padding:0 70px; }
+.deck .dlabel{ font-weight:800; font-size:36px; margin-bottom:34px; letter-spacing:.01em; }
+.on-orange .deck .dlabel{ color:#fff; opacity:.95; }
+.on-yellow .deck .dlabel{ color:#3d2c00; opacity:.9; }
+
+.chips{ display:flex; flex-wrap:wrap; justify-content:center; gap:20px; }
+.chip{ display:inline-flex; align-items:center; gap:14px; background:#fff; color:#2d2d2d;
+  border-radius:999px; padding:20px 32px; font-weight:800; font-size:31px;
+  box-shadow:0 16px 34px -14px rgba(120,50,0,.55); }
+.chip .e{ font-size:36px; line-height:1; }
+.chip.hot{ background:#fff0f0; color:#d8362f; box-shadow:0 16px 34px -12px rgba(216,54,47,.5); }
+
+/* overlapping community avatars */
+.avrow{ display:flex; justify-content:center; align-items:center; }
+.avrow .ava{ width:118px; height:118px; border-radius:50%; margin-left:-26px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:40px;
+  background:linear-gradient(135deg,#ffe566,#a07e00); border:7px solid #FFFBF5;
+  box-shadow:0 12px 24px -8px rgba(120,90,0,.45); }
+.avrow .ava:first-child{ margin-left:0; }
+.avrow .more{ background:#1a1500; }
+
+/* Android export: the design is scaled down to fit 9:16, so enlarge the
+   below-the-phone deck + footnote there to keep them legible. */
+.android .deck .dlabel{ font-size:50px; margin-bottom:40px; }
+.android .chip{ font-size:43px; padding:28px 44px; gap:18px; border-radius:999px; }
+.android .chip .e{ font-size:50px; }
+.android .avrow .ava{ width:166px; height:166px; font-size:56px; border-width:10px; margin-left:-34px; }
+.android .footnote{ font-size:44px; bottom:120px; }

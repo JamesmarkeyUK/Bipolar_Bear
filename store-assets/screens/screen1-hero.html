@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../fonts.css">
+<link rel="stylesheet" href="shared.css">
+<style>
+  .bear{ position:absolute; width:214px; height:214px;
+    filter:drop-shadow(0 20px 24px rgba(140,55,0,.34)); }
+
+  .wordmark{ position:absolute; left:0; right:0; bottom:228px;
+    display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .wordmark img{ width:372px; height:372px; margin-bottom:12px;
+    filter:drop-shadow(0 24px 38px rgba(140,55,0,.45)); }
+  .wordmark .name{ font-weight:900; font-size:158px; line-height:1; color:#fff;
+    letter-spacing:-.02em; white-space:nowrap; }
+  .wordmark .tag{ font-weight:800; font-size:46px; color:#fff; opacity:.85;
+    letter-spacing:.04em; margin-top:20px; }
+</style>
+</head>
+<body>
+<div class="canvas bg-orange on-orange">
+<div class="stage">
+
+  <!-- depth: glow, rings, mood-wave -->
+  <svg width="100%" height="100%" viewBox="0 0 1290 2796" preserveAspectRatio="xMidYMid slice"
+       style="position:absolute;inset:0;overflow:visible;">
+    <defs>
+      <radialGradient id="centerGlow" cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0"   stop-color="#ffffff" stop-opacity="0.55"/>
+        <stop offset="0.55" stop-color="#ffffff" stop-opacity="0.12"/>
+        <stop offset="1"   stop-color="#ffffff" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="waveFill" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0"   stop-color="#ffffff" stop-opacity="0.28"/>
+        <stop offset="1"   stop-color="#ffffff" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+
+    <!-- soft central light -->
+    <ellipse cx="645" cy="1640" rx="900" ry="760" fill="url(#centerGlow)"/>
+    <!-- faint ripple rings -->
+    <g fill="none" stroke="#ffffff" stroke-opacity="0.12" stroke-width="3">
+      <circle cx="645" cy="1640" r="540"/>
+      <circle cx="645" cy="1640" r="780"/>
+      <circle cx="645" cy="1640" r="1020"/>
+    </g>
+    <!-- floating bokeh -->
+    <g fill="#ffffff">
+      <circle cx="180" cy="980"  r="14" opacity="0.35"/>
+      <circle cx="1080" cy="900" r="20" opacity="0.30"/>
+      <circle cx="1160" cy="1180" r="11" opacity="0.4"/>
+      <circle cx="120" cy="1300" r="10" opacity="0.4"/>
+      <circle cx="980" cy="2080" r="16" opacity="0.28"/>
+      <circle cx="300" cy="2160" r="12" opacity="0.32"/>
+    </g>
+
+    <!-- faint chart gridlines behind the wave -->
+    <g stroke="#ffffff" stroke-opacity="0.10" stroke-width="2.5" stroke-dasharray="2 18" stroke-linecap="round">
+      <line x1="70" y1="1380" x2="1220" y2="1380"/>
+      <line x1="70" y1="1540" x2="1220" y2="1540"/>
+      <line x1="70" y1="1700" x2="1220" y2="1700"/>
+      <line x1="70" y1="1860" x2="1220" y2="1860"/>
+    </g>
+
+    <!-- mood wave -->
+    <path d="M-280,3000 C-160,2680 60,1860 180,1772 C261,1772 291,1556 372,1556 C453,1556 483,1664 564,1664 C645,1664 675,1432 756,1432 C837,1432 867,1548 948,1548 C1016,1548 1042,1300 1110,1300 C1230,1180 1360,560 1480,-260"
+          fill="none" stroke="#ffffff" stroke-opacity="0.95" stroke-width="14" stroke-linecap="round"
+          style="filter:drop-shadow(0 0 26px rgba(255,255,255,.65));"/>
+    <!-- grounding shadows + nodes under each bear -->
+    <g>
+      <ellipse cx="105"  cy="1912" rx="78" ry="18" fill="#a23c00" opacity="0.20"/>
+      <ellipse cx="372"  cy="1580" rx="78" ry="18" fill="#a23c00" opacity="0.20"/>
+      <ellipse cx="564"  cy="1688" rx="78" ry="18" fill="#a23c00" opacity="0.20"/>
+      <ellipse cx="756"  cy="1456" rx="78" ry="18" fill="#a23c00" opacity="0.20"/>
+      <ellipse cx="948"  cy="1572" rx="78" ry="18" fill="#a23c00" opacity="0.20"/>
+      <ellipse cx="1205" cy="1119" rx="78" ry="18" fill="#a23c00" opacity="0.20"/>
+    </g>
+    <g fill="#ffffff">
+      <circle cx="105"  cy="1888" r="13"/>
+      <circle cx="372"  cy="1556" r="13"/>
+      <circle cx="564"  cy="1664" r="13"/>
+      <circle cx="756"  cy="1432" r="13"/>
+      <circle cx="948"  cy="1548" r="13"/>
+      <circle cx="1205" cy="1095" r="13"/>
+    </g>
+  </svg>
+
+  <!-- mood bears riding the wave (depressed → manic) -->
+  <img class="bear" src="REPO/images/moods/depressed.png" style="left:-2px;  top:1695px;">
+  <img class="bear" src="REPO/images/moods/low.png"       style="left:265px; top:1363px;">
+  <img class="bear" src="REPO/images/moods/stable.png"    style="left:457px; top:1471px;">
+  <img class="bear" src="REPO/images/moods/good.png"      style="left:649px; top:1239px;">
+  <img class="bear" src="REPO/images/moods/elevated.png"  style="left:841px; top:1355px;">
+  <img class="bear" src="REPO/images/moods/manic.png"     style="left:1098px;top:902px;">
+
+  <!-- copy -->
+  <div class="copy" style="top:0;height:1060px;display:flex;flex-direction:column;justify-content:center;">
+    <div class="headline" style="font-size:158px;">Every high.<br><span style="color:#3a2d8c;">Every low.</span></div>
+  </div>
+
+  <!-- brand -->
+  <div class="wordmark">
+    <img src="REPO/icons/favicons/android-chrome-512x512.png" alt="">
+    <div class="name">Bipolar Bear</div>
+    <div class="tag">Your mind, in your pocket</div>
+  </div>
+
+</div>
+</div>
+</body>
+</html>
