@@ -1,0 +1,39 @@
+<!doctype html><meta charset="utf-8">
+<title>seed</title>
+<script>
+  // Seed onboarding flags + realistic demo content so the app opens straight
+  // onto a populated screen, then hand off to ?to= (default index.html).
+  // Same-origin → localStorage carries to the target page.
+  // Used only for capturing real-app iPad store screenshots; not shipped.
+  function S(k, v){ try{ localStorage.setItem(k, typeof v==='string'?v:JSON.stringify(v)); }catch(e){} }
+  // Safety: this harness seeds demo data, so it must only ever run on a local
+  // dev server. On any real host it bounces straight to the home page, untouched.
+  if (!/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)) {
+    location.replace('/index.html');
+  } else try {
+    // --- dismiss every first-run coach/overlay (prefix 'bb') ---
+    S('bbLanguage','en');
+    S('bbWelcomeShown','1');
+    S('bbFabFirstRunDone','1');
+    S('bbWaFabHidden','1');
+    S('bbSurvivalKitVisited','1');
+    S('bbMoodDefHintDone','1');
+    S('bbMedHintDone','1');
+    S('bbPersonalHintDone','1');
+    S('bbTutorialToastShown','1');
+
+    // --- survival-kit demo content ---
+    S('currentMedList', [{name:'Lithium',dosage:'800mg'},{name:'Quetiapine',dosage:'200mg'}]);
+    S('dailyGoals', ['Walk for 20 minutes','Message one friend today','Lights out by 11pm']);
+    S('survivalGratitude', ['My morning coffee','A check-in text from mum','Getting through a hard week']);
+    S('rememberThis', "This feeling is temporary. I've got through every low before — and I will again.");
+    S('copingStrategies', {
+      low:['Get outside for a 10-minute walk','Call my sister, even just to say hi','Play a game to break the spiral'],
+      depressed:['Open the curtains and let the light in','Drink a full glass of water','Text my crisis contact'],
+      manic:['Step away from any big decisions','No new purchases today','Call my care team']
+    });
+    S('moodDefinitions', { low:'Quiet, low energy — everything feels heavier than usual.' });
+  } catch (e) {}
+  var to = new URLSearchParams(location.search).get('to') || 'index.html';
+  location.replace('/' + to);
+</script>

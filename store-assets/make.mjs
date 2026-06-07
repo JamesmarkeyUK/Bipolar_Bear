@@ -11,7 +11,9 @@ const src = readFileSync(inFile, 'utf8').replaceAll('REPO/', REPO);
 const built = path.join(path.dirname(inFile), '_' + path.basename(inFile, '.html') + '.built.html');
 writeFileSync(built, src);
 
-const CHROME = 'C:/Program Files/Google/Chrome/Application/chrome.exe';
+const CHROME = process.platform === 'darwin'
+  ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+  : 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const args = ['--headless', '--disable-gpu', '--hide-scrollbars', '--no-sandbox',
   '--force-device-scale-factor=1', '--virtual-time-budget=8000',
   `--window-size=${w},${h}`, `--screenshot=${path.resolve(outFile)}`,

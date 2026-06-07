@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../fonts.css">
+<link rel="stylesheet" href="shared.css">
+<style>
+  html,body{margin:0;padding:0;}
+  /* Social sharing card — 1200×630 (Open Graph / Twitter summary_large_image).
+     Reuses the Play Store feature-graphic design, reflowed to the 1.91:1 safe area:
+     the 1024×500 artwork is scaled to fill the width and centred, so the orange
+     gradient bleeds seamlessly into the slim top/bottom bands. */
+  .ogcard{ position:relative; width:1200px; height:630px; overflow:hidden;
+       font-family:'Nunito','Segoe UI',sans-serif; }
+
+  /* 1024×500 artwork block, transparent, scaled to fill the 1200px width and centred. */
+  .fgwrap{ position:absolute; left:50%; top:50%; width:1024px; height:500px;
+    transform:translate(-50%,-50%) scale(1.171875); transform-origin:center center; }
+
+  .fbear{ position:absolute; width:92px; height:92px;
+    filter:drop-shadow(0 0 16px rgba(255,150,45,.5)) drop-shadow(0 8px 12px rgba(140,55,0,.5)); }
+
+  .lockup{ position:absolute; left:60px; top:0; height:500px; width:400px;
+    display:flex; flex-direction:column; justify-content:center; align-items:flex-start; gap:16px; z-index:5; }
+  .lockup img{ width:118px; height:118px;
+    filter:drop-shadow(0 10px 20px rgba(140,55,0,.45)); }
+  .lockup .name{ font-weight:900; font-size:62px; line-height:1; color:#fff; letter-spacing:-.02em;
+    text-shadow:0 3px 14px rgba(140,55,0,.35); }
+  .lockup .tag{ font-weight:800; font-size:25px; line-height:1.3; color:#fff; opacity:.95; }
+</style>
+</head>
+<body>
+<div class="ogcard bg-orange">
+<div class="fgwrap">
+
+  <svg width="1024" height="500" viewBox="0 0 1024 500" style="position:absolute;inset:0;overflow:visible;">
+    <defs>
+      <radialGradient id="fgGlow" cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0" stop-color="#ffffff" stop-opacity="0.5"/>
+        <stop offset="0.55" stop-color="#ffffff" stop-opacity="0.1"/>
+        <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <ellipse cx="720" cy="250" rx="430" ry="330" fill="url(#fgGlow)"/>
+    <g fill="none" stroke="#ffffff" stroke-opacity="0.12" stroke-width="2">
+      <circle cx="720" cy="250" r="250"/>
+      <circle cx="720" cy="250" r="370"/>
+    </g>
+    <g fill="#ffffff">
+      <circle cx="500" cy="90"  r="6" opacity="0.35"/>
+      <circle cx="980" cy="120" r="9" opacity="0.30"/>
+      <circle cx="900" cy="420" r="7" opacity="0.32"/>
+      <circle cx="610" cy="430" r="5" opacity="0.35"/>
+    </g>
+    <!-- mood wave -->
+    <path d="M-40,486 C76,486 120,462 235,462 C350,462 394,360 510,360 C548,360 562,278 600,278 C638,278 652,320 690,320 C728,320 742,226 780,226 C818,226 832,268 870,268 C908,268 922,168 960,168 C1008,168 1027,116 1075,116"
+          fill="none" stroke="#ffffff" stroke-opacity="0.92" stroke-width="8" stroke-linecap="round"
+          style="filter:drop-shadow(0 0 14px rgba(255,255,255,.6));"/>
+    <g fill="#ffffff">
+      <circle cx="510" cy="360" r="7"/><circle cx="600" cy="278" r="7"/><circle cx="690" cy="320" r="7"/>
+      <circle cx="780" cy="226" r="7"/><circle cx="870" cy="268" r="7"/><circle cx="960" cy="168" r="7"/>
+    </g>
+  </svg>
+
+  <!-- mood bears riding the wave (depressed → manic) -->
+  <img class="fbear" src="REPO/images/moods/depressed.png" style="left:464px; top:314px;">
+  <img class="fbear" src="REPO/images/moods/low.png"       style="left:554px; top:232px;">
+  <img class="fbear" src="REPO/images/moods/stable.png"    style="left:644px; top:274px;">
+  <img class="fbear" src="REPO/images/moods/good.png"      style="left:734px; top:180px;">
+  <img class="fbear" src="REPO/images/moods/elevated.png"  style="left:824px; top:222px;">
+  <img class="fbear" src="REPO/images/moods/manic.png"     style="left:914px; top:122px;">
+
+  <!-- brand lockup -->
+  <div class="lockup">
+    <img src="REPO/icons/favicons/android-chrome-512x512.png" alt="">
+    <div class="name">Bipolar<br>Bear</div>
+    <div class="tag">Track your moods.<br>Understand your mind.</div>
+  </div>
+
+</div>
+</div>
+</body>
+</html>

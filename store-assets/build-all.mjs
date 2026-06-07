@@ -11,7 +11,9 @@ import { pathToFileURL } from 'node:url';
 import path from 'node:path';
 
 const REPO = pathToFileURL(path.resolve('..')).href + '/';
-const CHROME = 'C:/Program Files/Google/Chrome/Application/chrome.exe';
+const CHROME = process.platform === 'darwin'
+  ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+  : 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 
 const screens = [
   ['screen1-hero.html',        '01-hero'],
@@ -22,6 +24,9 @@ const screens = [
   ['screen6-pin.html',         '06-pin'],
 ];
 // dir, render W, H, extra canvas class
+// NOTE: 13" iPad screenshots are NOT produced here — the marketing/promo style
+// (phone art on an iPad canvas) risks an App Store 2.3.3 flag. Real iPad shots of
+// the live app are captured separately via capture-cdp.mjs → out/ipad-real/.
 const targets = [
   ['iphone',   1290, 2796, ''],
   ['android2x', 2160, 3840, 'android'],   // 2× supersample → build-post downsizes to 1080×1920

@@ -1,0 +1,3 @@
+# Transient build artifacts written by the render scripts (make.mjs, build-all.mjs)
+screens/_build.html
+screens/_*.built.html
