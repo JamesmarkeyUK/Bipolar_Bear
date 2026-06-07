@@ -2456,7 +2456,7 @@ async function handlePin(postId, tab) {
 // ─────────────────────────────────────────────────────────────────
 let _tombstoneSweepTimer = null;
 
-// Re-render once the soonest-expiring visible tombstone passes the 1-hour mark,
+// Re-render once the soonest-expiring visible tombstone passes the 24-hour mark,
 // so it disappears even when no Firestore snapshot fires in the meantime.
 function scheduleTombstoneSweep(nextExpiry, now) {
   if (_tombstoneSweepTimer) { clearTimeout(_tombstoneSweepTimer); _tombstoneSweepTimer = null; }
@@ -2480,9 +2480,9 @@ function renderPosts(posts) {
   // Posts are sorted newest-first (sortPosts), so the first deleted in iteration is
   // the most recent. Prevents a wall of "post was deleted" entries when an admin
   // removes several spam posts in a row.
-  // The "deleted by an admin" tombstone is also short-lived: once an hour has
+  // The "deleted by an admin" tombstone is also short-lived: once 24 hours have
   // passed since deletedAt, the post drops out of the feed entirely.
-  const DELETED_TOMBSTONE_MS = 60 * 60 * 1000; // show "deleted by admin" for max 1 hour
+  const DELETED_TOMBSTONE_MS = 24 * 60 * 60 * 1000; // show "deleted by admin" for max 24h
   const _now = Date.now();
   let _keptDeletedTombstone = false;
   let _nextTombstoneExpiry = 0;
