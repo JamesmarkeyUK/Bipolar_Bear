@@ -286,11 +286,6 @@ window.addEventListener('pageshow', () => {
       }, true);
     })();
 
-    // ── Beta gate (web only) ──
-    if (!window.Capacitor && location.protocol !== 'file:' && BB.storage.get('WebUnlocked') !== 'true') {
-      location.replace('beta.html');
-    }
-
     // Wait for Firebase to load
     function initializeApp() {
       // Config lives in js/shared/firebase-config.js so every page reads the

@@ -843,6 +843,32 @@
       .modal-btn-primary:hover { background: var(--brand-primary-dark); }
       .modal-btn-secondary:hover { background: #e9ecef; }
     }
+    /* Quick-add chips inside the My Medications modal — tapping a chip
+       fills the name input so the user only has to type the dosage. */
+    .med-chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+    .med-chip {
+      padding: 6px 12px;
+      background: var(--brand-tint);
+      color: var(--brand-primary-dark);
+      border: 1.5px solid var(--brand-primary);
+      border-radius: 16px;
+      font-size: 0.82em;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+    }
+    .med-chip:active { transform: scale(0.96); }
+    @media (hover: hover) and (pointer: fine) {
+      .med-chip:hover { background: var(--brand-primary); color: white; }
+    }
     .modal-toggle { text-align: center; font-size: 0.9em; color: #6c757d; margin-top: 4px; }
     .modal-toggle span { color: var(--brand-primary); cursor: pointer; font-weight: 600; }
     .modal-error { color: #ff6b6b; font-size: 0.9em; margin-bottom: 10px; display: none; }

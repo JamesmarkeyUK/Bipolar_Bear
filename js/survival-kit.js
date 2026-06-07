@@ -739,6 +739,20 @@ function _esc(s) {
     }
     window.addMedication = addMedication;
 
+    /**
+     * Quick-add chip handler. Fills the medication name input and moves
+     * focus to the dosage field so the user can finish in one tap.
+     * Wired to the .med-chip buttons in survival-kit.html.
+     */
+    function _fillMedName(name) {
+      const nameInput = document.getElementById('medNameInput');
+      if (!nameInput) return;
+      nameInput.value = name;
+      const dosageInput = document.getElementById('medDosageInput');
+      if (dosageInput) dosageInput.focus();
+    }
+    window._fillMedName = _fillMedName;
+
     function deleteMedication(index) {
       const list = getMedList();
       list.splice(index, 1);
@@ -1862,11 +1876,6 @@ function _esc(s) {
     }
 
 // ── BLOCK 3 ──
-// ── Beta gate (web only) ──
-    if (!window.Capacitor && location.protocol !== 'file:' && BB.storage.get('WebUnlocked') !== 'true') {
-      location.replace('beta.html');
-    }
-
     // ── Firebase init ──
     // Config lives in js/shared/firebase-config.js so every page reads the
     // same source of truth.

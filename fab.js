@@ -43,8 +43,7 @@
 
   /**
    * Wipe every localStorage + sessionStorage key for this origin and reload
-   * the page. Preserves the `WebUnlocked` beta-gate flag so the user isn't
-   * bounced to /beta.html after the wipe.
+   * the page.
    *
    * Lives in fab.js (not js/index.js) so the "🗑 Delete all guest data"
    * button in the shared auth modal works identically on every page that
@@ -55,17 +54,7 @@
    * @returns {void}
    */
   function _nukeGuestData() {
-    const _webUnlocked = window.BB && window.BB.storage
-      ? window.BB.storage.get('WebUnlocked')
-      : localStorage.getItem('bbWebUnlocked');
     localStorage.clear();
-    if (_webUnlocked) {
-      if (window.BB && window.BB.storage) {
-        window.BB.storage.set('WebUnlocked', _webUnlocked);
-      } else {
-        localStorage.setItem('bbWebUnlocked', _webUnlocked);
-      }
-    }
     sessionStorage.clear();
     location.replace(location.pathname);
   }
@@ -1156,7 +1145,7 @@
     if (email)  email.value = '';
     if (pw)     pw.value = '';
     const verEl = document.getElementById('bbAuthVersion');
-    if (verEl) verEl.textContent = _bbVersionLabel();
+    if (verEl) verEl.textContent = (window.BB && window.BB.versionLabel) ? window.BB.versionLabel() : '';
     const modal = document.getElementById('bbAuthModal');
     if (modal) modal.classList.add('active');
     if (typeof window._fabOnShowAuth === 'function') window._fabOnShowAuth();
@@ -1202,34 +1191,15 @@
     const langSel = document.getElementById('bbLangSelect');
     if (langSel && window.BB && window.BB.i18n) langSel.value = window.BB.i18n.getLang();
     const verEl = document.getElementById('bbAccountVersion');
-    if (verEl) verEl.textContent = _bbVersionLabel();
+    if (verEl) verEl.textContent = (window.BB && window.BB.versionLabel) ? window.BB.versionLabel() : '';
     const modal = document.getElementById('bbAccountModal');
     if (modal) modal.classList.add('active');
     if (typeof window._fabOnShowAuth === 'function') window._fabOnShowAuth();
   };
 
-  /**
-   * Build the "v0.99 · web" / "v0.99 · iOS" footer string for the auth and
-   * account modals. Reads `window._APP_VERSION` (set in brand-config.js so
-   * every page has it without depending on js/index.js loading first).
-   * Returns an empty string if the version is somehow missing rather than
-   * showing a misleading "v" placeholder.
-   * @returns {string}
-   */
-  function _bbVersionLabel() {
-    const v = window._APP_VERSION;
-    if (!v) return '';
-    let suffix = ' · web';
-    try {
-      if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
-        const plat = window.Capacitor.getPlatform ? window.Capacitor.getPlatform() : '';
-        suffix = plat === 'ios' ? ' · iOS' : (plat === 'android' ? ' · Android' : ' · native');
-      } else if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
-        suffix = ' · PWA';
-      }
-    } catch (_) {}
-    return 'v' + v + suffix;
-  }
+  // (Version label string is built by BB.versionLabel() in
+  // js/shared/version-check.js — single source of truth shared with the
+  // home-screen version chip.)
 
   /** Hide the account modal. */
   window.closeAccountModal = function () {

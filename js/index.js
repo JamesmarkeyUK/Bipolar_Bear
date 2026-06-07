@@ -52,12 +52,47 @@ const journalFeatures = [
       { icon: '🤝', title: 'Support', desc: 'Resources and tools for crisis moments' }
     ];
 
-// ── BLOCK 2: Firebase init + auth listener + onboarding helpers ──
-// ── Beta gate (web only) ──
-    if (!window.Capacitor && location.protocol !== 'file:' && BB.storage.get('WebUnlocked') !== 'true') {
-      location.replace('beta.html');
-    }
+// ── Skeleton minimum-display-time + reveal helper ──
+// Every populate site below sets its text/content immediately (still under
+// the blur), then calls `_revealBadge(el, finalDisplay)` instead of clearing
+// the skeleton class directly. The helper enforces a minimum visible time
+// for the skeleton so users always perceive a brief "loading" state, even
+// when data resolved instantly from localStorage. After the minimum elapses
+// the skeleton class is removed; CSS handles the unblur via transition.
+//
+// For the 0-data case ("signed in but no streak yet") the helper also
+// deferrs the display:none switch, so the skeleton row doesn't flash and
+// vanish before the user can see it.
+//
+// 5-second safety net at the bottom handles any badge no populate path
+// touched (e.g. signed-in user who isn't verified for Anonymous).
+var SKELETON_MIN_VISIBLE_MS = 450;
+var _skelStart = Date.now();
 
+function _revealBadge(el, finalDisplay) {
+  if (!el) return;
+  var remaining = Math.max(0, SKELETON_MIN_VISIBLE_MS - (Date.now() - _skelStart));
+  var apply = function () {
+    el.classList.remove('bb-skeleton');
+    if (finalDisplay !== undefined) el.style.display = finalDisplay;
+  };
+  if (remaining === 0) apply();
+  else setTimeout(apply, remaining);
+}
+
+setTimeout(function () {
+  try {
+    var skel = document.querySelectorAll('.btn-subnote.bb-skeleton');
+    for (var i = 0; i < skel.length; i++) {
+      skel[i].classList.remove('bb-skeleton');
+      if (!skel[i].textContent || !skel[i].textContent.trim()) {
+        skel[i].style.display = 'none';
+      }
+    }
+  } catch (_) {}
+}, 5000);
+
+// ── BLOCK 2: Firebase init + auth listener + onboarding helpers ──
     // ── Firebase init ──
     // Config lives in js/shared/firebase-config.js so every page reads the
     // same source of truth.
@@ -107,9 +142,11 @@ const journalFeatures = [
               if (_badge) {
                 if (!_lastVisit) {
                   _badge.textContent  = '💬 Tap to join the community';
-                  _badge.style.display = 'block';
+                  _revealBadge(_badge, 'block');
                 } else if (!navigator.onLine) {
-                  // Offline — skip the live count, badge remains hidden
+                  // Offline — skip the live count, hide the row after the
+                  // skeleton min-time; we'll re-check next time we're online.
+                  _revealBadge(_badge, 'none');
                 } else {
                   db.collection(BB_BRAND.collections.posts)
                     .where('timestamp', '>', firebase.firestore.Timestamp.fromMillis(_lastVisit))
@@ -121,7 +158,7 @@ const journalFeatures = [
                       _badge.textContent   = _newCount > 0
                         ? '💬 ' + _newCount + ' new message' + (_newCount === 1 ? '' : 's')
                         : '✓ No new messages';
-                      _badge.style.display = 'block';
+                      _revealBadge(_badge, 'block');
                     })
                     .catch(() => {});
                 }
@@ -234,11 +271,11 @@ const journalFeatures = [
                     _badge2.textContent = _newCount > 0
                       ? '💬 ' + _newCount + ' new message' + (_newCount === 1 ? '' : 's')
                       : '✓ No new messages';
-                    _badge2.style.display = 'block';
+                    _revealBadge(_badge2, 'block');
                   }).catch(() => {});
               } else if (_badge2 && !_lastVisit2) {
                 _badge2.textContent = '💬 Tap to join the community';
-                _badge2.style.display = 'block';
+                _revealBadge(_badge2, 'block');
               }
             }
             // Re-run the survival tick check now that localStorage is populated
@@ -303,12 +340,9 @@ const journalFeatures = [
           // localStorage data keep their badges — those are real local
           // stats, not residue from a sync.
           if (!BB.storage.get('GuestPinSalt')) {
-            const _jb = document.getElementById('journalStreakBadge');
-            if (_jb) _jb.style.display = 'none';
-            const _ab = document.getElementById('anonStreakBadge');
-            if (_ab) _ab.style.display = 'none';
-            const _amb = document.getElementById('anonMessagesBadge');
-            if (_amb) _amb.style.display = 'none';
+            _revealBadge(document.getElementById('journalStreakBadge'), 'none');
+            _revealBadge(document.getElementById('anonStreakBadge'),    'none');
+            _revealBadge(document.getElementById('anonMessagesBadge'),  'none');
           }
           if (typeof window._applyFabDock === 'function') window._applyFabDock();
         }
@@ -594,11 +628,17 @@ const journalFeatures = [
 
       // Journal badge: 🔥 + 🧘
       const badge = document.getElementById('journalStreakBadge');
-      if (badge && streak > 0) {
-        const stablePart = stable > 0 ? ` &nbsp;🧘 ${stable}d` : '';
-        badge.innerHTML     = `🔥 ${streak} day${streak === 1 ? '' : 's'}` + stablePart;
-        badge.style.display = 'block';
-        badge.style.cursor  = 'pointer';
+      if (badge) {
+        if (streak > 0) {
+          const stablePart = stable > 0 ? ` &nbsp;🧘 ${stable}d` : '';
+          badge.innerHTML    = `🔥 ${streak} day${streak === 1 ? '' : 's'}` + stablePart;
+          badge.style.cursor = 'pointer';
+          _revealBadge(badge, 'block');
+        } else {
+          // No streak yet — hide the badge after the skeleton min-time so
+          // its reserved row collapses cleanly.
+          _revealBadge(badge, 'none');
+        }
       }
 
       // Anonymous badge: 👋 monika + 💬 streak
@@ -610,18 +650,18 @@ const journalFeatures = [
           // can't inject markup. The rest of the template is static.
           const _monika = _escHtml(BB.storage.get('Anon_monika') || '');
           const _monikaStr = _monika ? `👋 ${_monika} &nbsp;·&nbsp; ` : '';
-          anonBadge.innerHTML     = `${_monikaStr}💬 ${anon} day${anon === 1 ? '' : 's'} streak`;
-          anonBadge.style.display = 'block';
+          anonBadge.innerHTML = `${_monikaStr}💬 ${anon} day${anon === 1 ? '' : 's'} streak`;
+          _revealBadge(anonBadge, 'block');
         } else if (hasAnon) {
           const _monika = _escHtml(BB.storage.get('Anon_monika') || '');
           if (_monika) {
-            anonBadge.innerHTML     = `👋 ${_monika}`;
-            anonBadge.style.display = 'block';
+            anonBadge.innerHTML = `👋 ${_monika}`;
+            _revealBadge(anonBadge, 'block');
           } else {
-            anonBadge.style.display = 'none';
+            _revealBadge(anonBadge, 'none');
           }
         } else {
-          anonBadge.style.display = 'none';
+          _revealBadge(anonBadge, 'none');
         }
       }
     }
@@ -793,16 +833,18 @@ const journalFeatures = [
       const sTick = document.getElementById('survivalTick');
       if (sTick) sTick.setAttribute('data-done', 'false');
 
-      // Hide streak / anon badges so old account's stats don't linger on the home page
+      // Hide streak / anon badges so old account's stats don't linger on the home page.
+      // Sign-out is a user-driven action, not a page-load load state — call apply
+      // immediately rather than going through the skeleton min-time gate.
       const _jBadge = document.getElementById('journalStreakBadge');
-      if (_jBadge) _jBadge.style.display = 'none';
+      if (_jBadge) { _jBadge.classList.remove('bb-skeleton'); _jBadge.style.display = 'none'; }
       const _aBadge = document.getElementById('anonStreakBadge');
-      if (_aBadge) _aBadge.style.display = 'none';
+      if (_aBadge) { _aBadge.classList.remove('bb-skeleton'); _aBadge.style.display = 'none'; }
       const _amBadge = document.getElementById('anonMessagesBadge');
-      if (_amBadge) _amBadge.style.display = 'none';
+      if (_amBadge) { _amBadge.classList.remove('bb-skeleton'); _amBadge.style.display = 'none'; }
       // Reset survival kit progress count to default (4 always-complete sections + 1 anon = 5/13)
       const _sp = document.getElementById('survivalProgress');
-      if (_sp) _sp.textContent = '5 / 13 sections complete';
+      if (_sp) { _sp.classList.remove('bb-skeleton'); _sp.textContent = '5 / 13 sections complete'; }
 
       if (auth) auth.signOut();
     }
@@ -1081,13 +1123,10 @@ const journalFeatures = [
         if (_arr('myCommitments')) _c++;
         if (_arr('customReminders')) _c++;
         _c++; // bipolar-anon section is always complete (info section)
-        if (_c >= 13) {
-          _prog.textContent = '✓ All sections completed';
-          _prog.style.display = 'block';
-        } else {
-          _prog.textContent = _c + ' / 13 sections complete';
-          _prog.style.display = 'block';
-        }
+        _prog.textContent = _c >= 13
+          ? '✓ All sections completed'
+          : _c + ' / 13 sections complete';
+        _revealBadge(_prog, 'block');
       }
     })();
 

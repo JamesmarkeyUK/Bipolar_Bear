@@ -2,7 +2,7 @@
  * Shared Firebase Web SDK configuration for every BipolarBear page.
  *
  * Exposes `window.BB_FIREBASE_CONFIG` so the inline `<script>` blocks in
- * index.html, journal.html, survival-kit.html, beta.html and anonymous.html
+ * index.html, journal.html, survival-kit.html and anonymous.html
  * can call `firebase.initializeApp(window.BB_FIREBASE_CONFIG)` instead of
  * each redeclaring the same literal.
  *

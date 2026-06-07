@@ -9,7 +9,7 @@
  *
  * Hosts without an override get DEFAULT_LANDING served at `/` via an
  * internal rewrite (URL bar stays as `/`):
- *   - everything else → /beta.html
+ *   - everything else → /index.html
  *
  * Adding a new variant pair (e.g. "Anxiety Ant" + "Anxiety Anonymous") is
  * just two new entries below; no other code changes here.
@@ -41,7 +41,7 @@ const HOST_LANDING_MAP = {
  * Landing page served at `/` when the requested hostname has no override.
  * Internal rewrite (URL bar stays as `/`).
  */
-const DEFAULT_LANDING = '/beta.html';
+const DEFAULT_LANDING = '/index.html';
 
 export default {
   /**
@@ -64,6 +64,18 @@ export default {
       const target = new URL(url);
       target.pathname = DEFAULT_LANDING;
       return env.ASSETS.fetch(new Request(target.toString(), request));
+    }
+
+    // /version.json drives the in-app "update available" banner. It must
+    // be CORS-readable (Capacitor WebViews fetch it cross-origin from
+    // capacitor://localhost or https://localhost) and never cached at the
+    // edge (a stale value defeats the whole point of the check).
+    if (url.pathname === '/version.json') {
+      const res = await env.ASSETS.fetch(request);
+      const headers = new Headers(res.headers);
+      headers.set('Access-Control-Allow-Origin', '*');
+      headers.set('Cache-Control', 'no-store, max-age=0');
+      return new Response(res.body, { status: res.status, headers });
     }
 
     return env.ASSETS.fetch(request);
