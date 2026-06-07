@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../fonts.css">
+<link rel="stylesheet" href="shared.css">
+<style>
+  .stage{ --dev-w:646px; }
+  .device{ left:50%; top:556px; transform:translateX(-50%); }
+
+  .mk{ height:100%; font-family:'Segoe UI',system-ui,sans-serif;
+    background:radial-gradient(120% 60% at 50% -5%, #ffe680 0%, rgba(255,230,128,0) 55%), #f5c800;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 44px; }
+  .mk-card{ background:#fff; border-radius:36px; padding:54px 46px; width:100%;
+    box-shadow:0 24px 60px -18px rgba(140,110,0,.5); text-align:center; }
+  .mk-check{ font-size:78px; line-height:1; }
+  .mk-h{ font-weight:800; font-size:46px; color:#1a1500; margin-top:18px; }
+  .mk-sub{ font-size:27px; color:#5c5018; line-height:1.5; margin-top:14px; }
+  .mk-sub strong{ color:#a07e00; }
+  .mk-input{ margin-top:34px; border:3px solid #f5c800; border-radius:20px;
+    padding:26px 28px; display:flex; align-items:center; justify-content:space-between;
+    background:#fffdf4; }
+  .mk-input .val{ font-weight:800; font-size:34px; color:#1a1500; }
+  .mk-input .count{ font-weight:700; font-size:26px; color:#9a8a3a; }
+  .mk-prev-label{ margin-top:30px; font-size:24px; font-weight:700; color:#9a8a3a;
+    text-transform:uppercase; letter-spacing:.08em; }
+  .mk-prev{ margin-top:16px; background:#fffde7; border-radius:22px; padding:24px 26px;
+    display:flex; align-items:center; gap:18px; text-align:left; }
+  .mk-prev .av{ width:74px; height:74px; border-radius:50%; flex-shrink:0;
+    background:linear-gradient(135deg,#ffb340,#e07800); color:#fff; font-weight:800; font-size:30px;
+    display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(245,200,0,.4); }
+  .mk-prev .pl{ font-weight:800; font-size:28px; color:#1a1500; }
+  .mk-prev .pm{ font-size:23px; color:#5c5018; margin-top:4px; }
+  .mk-btn{ margin-top:36px; background:linear-gradient(135deg,#ffd84d,#f5c800);
+    border-radius:20px; padding:28px; font-weight:800; font-size:32px; color:#1a1500;
+    box-shadow:0 12px 26px -10px rgba(245,200,0,.8); }
+</style>
+</head>
+<body>
+<div class="canvas bg-yellow on-yellow">
+<div class="stage">
+
+  <div class="copy" style="top:0;height:556px;display:flex;flex-direction:column;justify-content:center;">
+    <div class="headline sm">Pick a monika.<br>Stay anonymous.</div>
+  </div>
+
+  <div class="device">
+    <div class="screen">
+      <div class="island"></div>
+      <div class="mk">
+        <div class="mk-card">
+          <div class="mk-check">✅</div>
+          <div class="mk-h">Email verified!</div>
+          <div class="mk-sub">Now choose your <strong>Monika</strong> — your anonymous community name. Max 10 characters.</div>
+
+          <div class="mk-input">
+            <span class="val">SunnyDaze</span>
+            <span class="count">9/10</span>
+          </div>
+
+          <div class="mk-prev-label">Your posts will look like this</div>
+          <div class="mk-prev">
+            <div class="av">SU</div>
+            <div>
+              <div class="pl">SunnyDaze</div>
+              <div class="pm">🔥 1d · just now</div>
+            </div>
+          </div>
+
+          <div class="mk-btn">That's me →</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="deck" style="top:2010px;">
+    <div class="dlabel">No sign-up trail, no real name</div>
+    <div class="chips">
+      <span class="chip"><span class="e">🙈</span>Anonymous handle</span>
+      <span class="chip"><span class="e">🚫</span>No profile to maintain</span>
+      <span class="chip"><span class="e">📱</span>Recognised across devices</span>
+    </div>
+  </div>
+
+  <div class="footnote">Your email is only ever stored as a hash</div>
+
+</div>
+</div>
+</body>
+</html>

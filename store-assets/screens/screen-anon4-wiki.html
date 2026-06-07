@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../fonts.css">
+<link rel="stylesheet" href="shared.css">
+<style>
+  .stage{ --dev-w:646px; }
+  .device{ left:50%; top:556px; transform:translateX(-50%); }
+
+  .board{ height:100%; background:#FFFBF5; font-family:'Segoe UI',system-ui,sans-serif; }
+  .board-head{ background:#f5c800; padding:14px 30px 0; }
+  .bh-top{ display:flex; align-items:center; justify-content:space-between; padding-bottom:18px; }
+  .bh-logo{ display:flex; align-items:center; gap:16px; }
+  .bh-logo img{ width:64px; height:64px; border-radius:14px; }
+  .bh-name{ font-weight:800; font-size:34px; color:#1a1500; line-height:1; }
+  .bh-sub{ font-weight:800; font-size:18px; letter-spacing:.12em; text-transform:uppercase; color:#1a1500; opacity:.7; margin-top:3px; }
+  .tabs{ display:flex; gap:12px; }
+  .tab{ font-weight:700; font-size:24px; color:#1a1500; padding:16px 22px;
+    border-radius:18px 18px 0 0; background:rgba(0,0,0,.10); }
+  .tab.active{ background:#FFFBF5; }
+
+  .wbody{ padding:26px 28px; }
+  .pills{ display:flex; gap:14px; flex-wrap:wrap; margin-bottom:24px; }
+  .pill{ background:#fff; border:2px solid #eee; border-radius:999px; padding:14px 24px;
+    font-weight:700; font-size:24px; color:#5c5018; }
+  .pill.active{ background:#fff7c2; border-color:#f0d54a; color:#1a1500; }
+
+  .disc{ background:#fffde7; border-left:8px solid #f5c800; border-radius:14px;
+    padding:22px 26px; font-size:24px; color:#7a6a20; line-height:1.5; margin-bottom:24px; }
+
+  .wcard{ background:#fff; border:1px solid #eee; border-radius:22px; padding:0;
+    margin-bottom:20px; box-shadow:0 2px 12px rgba(0,0,0,.05); overflow:hidden; }
+  .wsum{ display:flex; align-items:center; justify-content:space-between; gap:16px;
+    padding:30px 30px; font-weight:800; font-size:29px; color:#1a1500; }
+  .wsum .chev{ color:#c9b94a; font-size:26px; }
+  .wcard.open .wsum{ border-bottom:1px solid #f2eccc; }
+  .wans{ padding:26px 30px 30px; font-size:26px; color:#3a3318; line-height:1.55; }
+  .src{ display:inline-block; margin-top:18px; background:#e6f4ea; color:#1f7a3d;
+    font-weight:800; font-size:20px; letter-spacing:.06em; border-radius:8px; padding:7px 14px; }
+  .readmore{ display:inline-block; margin-top:18px; margin-left:12px; background:#fff7c2;
+    color:#8a6d00; font-weight:800; font-size:22px; border-radius:12px; padding:12px 22px; }
+</style>
+</head>
+<body>
+<div class="canvas bg-yellow on-yellow">
+<div class="stage">
+
+  <div class="copy" style="top:0;height:556px;display:flex;flex-direction:column;justify-content:center;">
+    <div class="headline sm">Common questions,<br>answered</div>
+  </div>
+
+  <div class="device">
+    <div class="screen">
+      <div class="island"></div>
+      <div class="board">
+        <div class="statusbar light" style="position:absolute;left:0;right:0;background:#f5c800;"><span>9:41</span>
+          <svg width="148" height="30" viewBox="0 0 148 30" fill="currentColor">
+            <rect x="0" y="18" width="6" height="11" rx="1.5"/><rect x="9" y="13" width="6" height="16" rx="1.5"/>
+            <rect x="18" y="8" width="6" height="21" rx="1.5"/><rect x="27" y="3" width="6" height="26" rx="1.5"/>
+            <g transform="translate(44,3)" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round">
+              <path d="M2,8 a15,15 0 0 1 26,0"/><path d="M7,14 a8,8 0 0 1 16,0"/></g>
+            <circle cx="61" cy="25" r="2.6"/>
+            <rect x="92" y="6" width="48" height="22" rx="6" fill="none" stroke="currentColor" stroke-width="2.6" opacity="0.5"/>
+            <rect x="143" y="13" width="4" height="9" rx="2" opacity="0.5"/>
+            <rect x="95" y="9" width="42" height="16" rx="3.5"/>
+          </svg>
+        </div>
+
+        <div class="board-head" style="padding-top:88px;">
+          <div class="bh-top">
+            <div class="bh-logo">
+              <img src="REPO/icons/AppIcon_anonymous.png" alt="">
+              <div><div class="bh-name">Community Wiki</div><div class="bh-sub">Bipolar Anonymous</div></div>
+            </div>
+          </div>
+          <div class="tabs">
+            <div class="tab">📢 Announcements</div>
+            <div class="tab">💬 General</div>
+            <div class="tab active">📖 Wiki</div>
+          </div>
+        </div>
+
+        <div class="wbody">
+          <div class="pills">
+            <span class="pill active">💊 Medications</span>
+            <span class="pill">🏥 Conditions</span>
+            <span class="pill">🧘 Therapies</span>
+            <span class="pill">⚠️ Warning Signs</span>
+          </div>
+
+          <div class="disc">This wiki is informational only — it's not medical advice. Always talk to your GP about your situation.</div>
+
+          <div class="wcard open">
+            <div class="wsum">Spotting the early warning signs <span class="chev">▲</span></div>
+            <div class="wans">Changes in sleep, spending, speed of thought or energy often come before a full episode. Tracking them early gives you and your care team time to act.
+              <span class="src">✓ DIRECT</span><span class="readmore">NHS info →</span></div>
+          </div>
+
+          <div class="wcard">
+            <div class="wsum">What does a mood stabiliser actually do? <span class="chev">▼</span></div>
+          </div>
+
+          <div class="wcard">
+            <div class="wsum">Talking to work about bipolar <span class="chev">▼</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="deck" style="top:2010px;">
+    <div class="dlabel">Plain-English answers you can trust</div>
+    <div class="chips">
+      <span class="chip"><span class="e">💊</span>Medications</span>
+      <span class="chip"><span class="e">🏥</span>Conditions</span>
+      <span class="chip"><span class="e">🧘</span>Therapies</span>
+      <span class="chip"><span class="e">⚠️</span>Warning signs</span>
+      <span class="chip"><span class="e">👨‍👩‍👧</span>Loved ones</span>
+    </div>
+  </div>
+
+  <div class="footnote">Sourced, signposted and jargon-free</div>
+
+</div>
+</div>
+</body>
+</html>

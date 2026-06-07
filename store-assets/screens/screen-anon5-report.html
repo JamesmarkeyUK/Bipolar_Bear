@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../fonts.css">
+<link rel="stylesheet" href="shared.css">
+<style>
+  .stage{ --dev-w:646px; }
+  .device{ left:50%; top:556px; transform:translateX(-50%); }
+
+  .board{ height:100%; background:#FFFBF5; font-family:'Segoe UI',system-ui,sans-serif; position:relative; }
+  .board-head{ background:#f5c800; padding:88px 30px 22px; }
+  .bh-name{ font-weight:800; font-size:34px; color:#1a1500; }
+  .bh-sub{ font-weight:800; font-size:18px; letter-spacing:.12em; text-transform:uppercase; color:#1a1500; opacity:.7; margin-top:3px; }
+
+  /* dimmed feed behind the sheet */
+  .feed{ padding:26px 28px; filter:saturate(.85); opacity:.55; }
+  .post{ background:#fff; border-radius:22px; padding:26px 28px; margin-bottom:22px; box-shadow:0 2px 12px rgba(0,0,0,.06); }
+  .pa{ display:flex; align-items:center; gap:16px; margin-bottom:14px; }
+  .av{ width:60px; height:60px; border-radius:50%; color:#fff; font-weight:800; font-size:24px;
+    display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#bdbdbd,#7a7a7a); }
+  .pname{ font-weight:800; font-size:26px; color:#1a1500; }
+  .ptime{ font-size:21px; color:#5c5018; }
+  .ptext{ font-size:27px; color:#1a1500; line-height:1.5; }
+
+  .scrim{ position:absolute; inset:0; background:rgba(20,16,0,.42); }
+
+  /* report bottom sheet */
+  .sheet{ position:absolute; left:0; right:0; bottom:0; background:#fff;
+    border-radius:40px 40px 0 0; padding:44px 40px 56px; box-shadow:0 -20px 50px rgba(0,0,0,.3); }
+  .sheet .grip{ width:120px; height:9px; border-radius:6px; background:#e6e2d2; margin:0 auto 30px; }
+  .rp-ic{ text-align:center; font-size:64px; line-height:1; }
+  .rp-h{ text-align:center; font-weight:800; font-size:42px; color:#1a1500; margin-top:14px; }
+  .rp-sub{ text-align:center; font-size:27px; color:#5c5018; margin-top:10px; margin-bottom:30px; }
+  .reason{ background:#fffde7; border-radius:18px; padding:26px 28px; font-weight:700; font-size:30px;
+    color:#1a1500; margin-bottom:16px; display:flex; align-items:center; gap:18px; }
+  .reason .e{ font-size:30px; }
+  .rp-note{ text-align:center; font-size:24px; color:#9a8a3a; margin-top:18px; line-height:1.5; }
+</style>
+</head>
+<body>
+<div class="canvas bg-yellow on-yellow">
+<div class="stage">
+
+  <div class="copy" style="top:0;height:556px;display:flex;flex-direction:column;justify-content:center;">
+    <div class="headline sm">Report a post.<br>Help arrives fast.</div>
+  </div>
+
+  <div class="device">
+    <div class="screen">
+      <div class="island"></div>
+      <div class="board">
+        <div class="board-head">
+          <div class="bh-name">💬 General</div>
+          <div class="bh-sub">Bipolar Anonymous</div>
+        </div>
+
+        <div class="feed">
+          <div class="post">
+            <div class="pa">
+              <div class="av">??</div>
+              <div><div class="pname">Anon</div><div class="ptime">just now</div></div>
+            </div>
+            <div class="ptext">A post that breaks the community guidelines…</div>
+          </div>
+          <div class="post">
+            <div class="pa">
+              <div class="av">??</div>
+              <div><div class="pname">Anon</div><div class="ptime">5m ago</div></div>
+            </div>
+            <div class="ptext">…and another that needs a moderator's eyes.</div>
+          </div>
+        </div>
+
+        <div class="scrim"></div>
+
+        <div class="sheet">
+          <div class="grip"></div>
+          <div class="rp-ic">🚨</div>
+          <div class="rp-h">Report this post?</div>
+          <div class="rp-sub">Why are you reporting this?</div>
+
+          <div class="reason"><span class="e">🙁</span> Unkind or rude</div>
+          <div class="reason"><span class="e">❗</span> Misinformation</div>
+          <div class="reason"><span class="e">🚫</span> Spam</div>
+          <div class="reason"><span class="e">💬</span> Other concern</div>
+
+          <div class="rp-note">Worried about someone? Send an 🆘 SOS flag and a moderator checks in.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="deck" style="top:2010px;">
+    <div class="dlabel">A moderated, safer space</div>
+    <div class="chips">
+      <span class="chip"><span class="e">🚨</span>Report in one tap</span>
+      <span class="chip"><span class="e">🆘</span>SOS flag for crises</span>
+      <span class="chip"><span class="e">🛡️</span>Mods review everything</span>
+    </div>
+  </div>
+
+  <div class="footnote">Every report is reviewed — help is never far away</div>
+
+</div>
+</div>
+</body>
+</html>
