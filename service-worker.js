@@ -127,7 +127,8 @@
 // v56: survival-kit.html / .css / .js — add 6 quick-add medication chips (Lithium, Quetiapine, Lamotrigine, Sodium Valproate, Olanzapine, Aripiprazole) in the My Medications modal. Tapping a chip fills the name input and focuses the dosage field.
 // v57: remove the beta landing page / web access gate — `/` now serves index.html directly (worker.js), and the inline + js beta-gate redirects are gone. Dropped beta.html, css/beta.css, js/beta.js from the precache. Also: fixed the broken social-share image (og:image now points at the new haloed bear via images/og-card.png instead of a 404'd favicons path), added a real 1200×630 share card, fixed site.webmanifest, and added robots.txt + sitemap.xml.
 // v58: extend "deleted by admin" tombstone visibility from 1 hour to 24 hours on the anonymous board.
-const CACHE_NAME = 'bipolarbear-v58';
+// v59: in-app confirmation popup before enabling notifications/health sync on native (consent gate that survives account deletion, since OS permission grants can't be revoked programmatically); journal settings version label now reads the canonical window._APP_VERSION instead of a hardcoded 1.2, so it stays in sync with the home page.
+const CACHE_NAME = 'bipolarbear-v59';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

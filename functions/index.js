@@ -13,7 +13,7 @@ const db = admin.firestore();
 const RESEND_API_KEY = defineSecret('RESEND_API_KEY');
 
 const REGION          = 'europe-west1';
-const FROM_ADDRESS    = 'Bipolar Anonymous <bipolar@unisim.co.uk>';
+const FROM_ADDRESS    = 'Bipolar Anonymous <bipolar@mail.unisim.co.uk>';
 const FEEDBACK_TO     = 'jpm@jamesmarkey.co.uk';
 const CODE_TTL_MS     = 10 * 60 * 1000; // 10 minutes
 const RATE_LIMIT      = 3;              // max codes per email per window

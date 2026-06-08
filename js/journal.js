@@ -3702,7 +3702,18 @@ window.addEventListener('pageshow', () => {
 
     function _toggleHealthSync() {
       const chk = document.getElementById('healthSyncToggle');
-      const val = chk && chk.checked ? '1' : '0';
+      let on = !!(chk && chk.checked);
+      // When enabling on a device, confirm in-app first. The OS health grant
+      // survives account deletion and Apple's HealthKit never re-prompts (nor
+      // exposes a revoke API), so this popup is the consent gate the next user
+      // sees before any sleep/step data is read on their behalf.
+      if (on && isNative()) {
+        if (!confirm("Allow BipolarBear to read your sleep and step data from your phone's health app?\n\nYou can turn this off any time.")) {
+          on = false;
+          if (chk) chk.checked = false;
+        }
+      }
+      const val = on ? '1' : '0';
       BB.storage.set('HealthSyncEnabled', val);
       if (window.db && window.currentUser) {
         window.db.collection('userSettings').doc(window.currentUser.uid)
@@ -9997,6 +10008,12 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       const _cfDetails = document.getElementById('customiseFormDetails');
       if (_cfDetails) _cfDetails.open = BB.storage.get('CustomiseFormCollapsed') !== '1';
 
+      // Version label — driven by the canonical window._APP_VERSION (set in
+      // js/shared/brand-config.js) so it can never drift from the home page.
+      if (window._APP_VERSION) {
+        document.querySelectorAll('.settings-version-info').forEach(el => el.textContent = 'Version: ' + window._APP_VERSION);
+      }
+
       // If not native, show download prompt instead of native settings
       if (!isNative()) {
         document.getElementById('settingsModal').classList.add('active');
@@ -10915,7 +10932,18 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       if (!LocalNotifications) return true;
       try {
         let { display } = await LocalNotifications.checkPermissions();
-        if (display !== 'granted') {
+        if (display === 'granted') {
+          // OS permission is already granted, so requestPermissions() would
+          // return silently without showing anything. That grant survives
+          // account deletion (the OS never re-prompts and there's no API to
+          // revoke it), so this in-app confirmation is the consent gate the
+          // next user on the device actually sees before notifications resume.
+          if (!confirm('Turn on notifications?\n\nBipolarBear will send reminders to this device.')) {
+            const el = document.getElementById(toggleId);
+            if (el) el.checked = false;
+            return false;
+          }
+        } else {
           const r = await LocalNotifications.requestPermissions();
           display = r.display;
         }
