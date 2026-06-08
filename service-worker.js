@@ -128,7 +128,8 @@
 // v57: remove the beta landing page / web access gate — `/` now serves index.html directly (worker.js), and the inline + js beta-gate redirects are gone. Dropped beta.html, css/beta.css, js/beta.js from the precache. Also: fixed the broken social-share image (og:image now points at the new haloed bear via images/og-card.png instead of a 404'd favicons path), added a real 1200×630 share card, fixed site.webmanifest, and added robots.txt + sitemap.xml.
 // v58: extend "deleted by admin" tombstone visibility from 1 hour to 24 hours on the anonymous board.
 // v59: in-app confirmation popup before enabling notifications/health sync on native (consent gate that survives account deletion, since OS permission grants can't be revoked programmatically); journal settings version label now reads the canonical window._APP_VERSION instead of a hardcoded 1.2, so it stays in sync with the home page.
-const CACHE_NAME = 'bipolarbear-v59';
+// v60: permission-prompt fixes (journal.js). Notifications no longer prompt at startup/during the tutorial — initNotifications() now uses the non-prompting checkPermissions() and only re-schedules if already granted, so the OS notification sheet is raised solely by the reminder/weekly toggles. Health-sync toggle now actually requests OS Health access at the moment it's enabled (it previously only set a flag, so users saw "Not yet authorised" and were never asked); auto-sync on mood/focused-mode steps is gated behind checkHealthPermissions so a Firestore-rehydrated flag after reinstall can't pop a surprise sheet from ordinary navigation. When iOS suppresses the Health sheet (stuck grant after reinstall), the toggle offers a deep-link to Apple Health settings. iOS health status label no longer over-promises "Authorised" (read grants are opaque on iOS) — Android wording unchanged.
+const CACHE_NAME = 'bipolarbear-v60';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

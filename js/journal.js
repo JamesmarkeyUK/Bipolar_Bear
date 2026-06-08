@@ -1466,10 +1466,12 @@ window.addEventListener('pageshow', () => {
           el.classList.remove('hidden-until-mood');
           el.classList.add('show-after-mood');
         });
-        // Auto-sync health data if setting is ON
+        // Auto-sync health data if setting is ON. Pass isAuto=true so these
+        // never raise the OS permission sheet from an ordinary mood tap — they
+        // only run when access was already granted (see importStepsFromHealth).
         if (BB.storage.get('HealthSyncEnabled') === '1') {
-          importStepsFromHealth();
-          importSleepFromHealth();
+          importStepsFromHealth(true);
+          importSleepFromHealth(true);
         }
 
         // Smooth scroll to top of tracker card after form appears
@@ -3700,7 +3702,7 @@ window.addEventListener('pageshow', () => {
     }
     window._toggleMoodSuggestion = _toggleMoodSuggestion;
 
-    function _toggleHealthSync() {
+    async function _toggleHealthSync() {
       const chk = document.getElementById('healthSyncToggle');
       let on = !!(chk && chk.checked);
       // When enabling on a device, confirm in-app first. The OS health grant
@@ -3719,8 +3721,78 @@ window.addEventListener('pageshow', () => {
         window.db.collection('userSettings').doc(window.currentUser.uid)
           .set({ healthSyncEnabled: val === '1' }, { merge: true }).catch(() => {});
       }
+      // Enabling on a native device: ask the OS for Health access NOW, bound to
+      // this deliberate tap — instead of waiting for a later mood entry to fire
+      // the sheet unexpectedly. Previously the toggle only set a flag, so users
+      // saw "Not yet authorised" and were never asked when they flipped it on.
+      if (on && isNative()) {
+        await _requestHealthAccessInteractive();
+      }
     }
     window._toggleHealthSync = _toggleHealthSync;
+
+    // Request Health read access in response to a deliberate user action, then
+    // reflect the result in the settings label. Detects the iOS "sheet was
+    // suppressed" case — status still .notDetermined after a request, which
+    // happens when a prior grant is stuck (classically after delete+reinstall) —
+    // and offers a deep-link to the Health app, the only place it can be cleared.
+    async function _requestHealthAccessInteractive() {
+      const Health = getPlugin('HealthPlugin');
+      if (!Health) return;
+      try {
+        const { available } = await Health.isHealthAvailable();
+        if (!available) return;
+
+        // "never asked" state before requesting? (checkHealthPermissions returns
+        // false for read types only when iOS status is .notDetermined.)
+        let before = null;
+        try {
+          const pre = await Health.checkHealthPermissions({ permissions: ['READ_SLEEP', 'READ_STEPS'] });
+          before = !!(pre?.permissions?.READ_SLEEP || pre?.permissions?.READ_STEPS);
+        } catch (e) {}
+
+        skipNextResume = true; // the permission sheet backgrounds the app
+        await Health.requestHealthPermissions({ permissions: ['READ_SLEEP', 'READ_STEPS'] });
+        skipNextResume = false;
+
+        let after = null;
+        try {
+          const post = await Health.checkHealthPermissions({ permissions: ['READ_SLEEP', 'READ_STEPS'] });
+          after = !!(post?.permissions?.READ_SLEEP || post?.permissions?.READ_STEPS);
+        } catch (e) {}
+
+        // Still .notDetermined before AND after a request → no sheet appeared and
+        // nothing was decided. The OS silently suppressed it; guide to Settings.
+        if (before === false && after === false) {
+          _offerHealthSettingsRecovery();
+        }
+
+        if (document.getElementById('settingsModal')?.classList.contains('active')) {
+          _refreshHealthAuthDisplay().catch(() => {});
+        }
+      } catch (e) {
+        skipNextResume = false;
+        console.warn('Health permission request failed:', e);
+      }
+    }
+    window._requestHealthAccessInteractive = _requestHealthAccessInteractive;
+
+    function _offerHealthSettingsRecovery() {
+      const Health = getPlugin('HealthPlugin');
+      if (!Health) return;
+      const msg = isAndroid()
+        ? "Health access couldn't be requested automatically.\n\nOpen Health Connect to grant Sleep and Steps access, then try again?"
+        : "iOS didn't show the Health permission sheet — this usually means access was set before (for example, before reinstalling the app).\n\nOpen Apple Health → Profile → Apps → BipolarBear and turn on Sleep and Steps. Open Health settings now?";
+      if (!confirm(msg)) return;
+      try {
+        if (isAndroid() && typeof Health.openHealthConnectSettings === 'function') {
+          Health.openHealthConnectSettings();
+        } else if (typeof Health.openAppleHealthSettings === 'function') {
+          Health.openAppleHealthSettings();
+        }
+      } catch (e) { console.warn('Open health settings failed:', e); }
+    }
+    window._offerHealthSettingsRecovery = _offerHealthSettingsRecovery;
 
     function _toggleFocusedMode() {
       const chk = document.getElementById('focusModeToggle');
@@ -4092,9 +4164,9 @@ window.addEventListener('pageshow', () => {
       // Auto-sync health data if setting is ON
       if (BB.storage.get('HealthSyncEnabled') === '1') {
         if (step.id === 'energy' && _fmStepsResult === null && !window._healthSyncInProgress) {
-          setTimeout(() => importStepsFromHealth(), 0);
+          setTimeout(() => importStepsFromHealth(true), 0);
         } else if (step.id === 'sleep' && _fmSleepImported === null && !window._healthSyncInProgress && !_fmSleepAutoSyncDone) {
-          setTimeout(() => importSleepFromHealth(), 0);
+          setTimeout(() => importSleepFromHealth(true), 0);
         }
       }
       // Elaborate Responses — per-step notes
@@ -9952,7 +10024,20 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
             const sleepOk = result?.permissions?.READ_SLEEP === true;
             const stepsOk = result?.permissions?.READ_STEPS === true;
             const granted = sleepOk && stepsOk;
-            _setHealthInfo(`Health data: ${granted ? '✅ Authorised' : sleepOk || stepsOk ? '⚠️ Partially authorised' : '⚠️ Not yet authorised'}`);
+            const asked = sleepOk || stepsOk;
+            if (isIOS()) {
+              // iOS deliberately hides whether READ access was actually granted —
+              // checkHealthPermissions can only tell "never asked" (.notDetermined)
+              // from "asked at some point". So don't over-promise "Authorised":
+              // report whether we've asked, and always point at Apple Health where
+              // the grant truly lives (and can be turned back on if sync is empty).
+              _setHealthInfo(asked
+                ? 'Health data: Requested · manage in Apple Health'
+                : 'Health data: ⚠️ Not yet authorised — enable the toggle above');
+            } else {
+              // Android (Health Connect) reports the real granted set accurately.
+              _setHealthInfo(`Health data: ${granted ? '✅ Authorised' : asked ? '⚠️ Partially authorised' : '⚠️ Not yet authorised'}`);
+            }
           }
         } catch(e) {
           _setHealthInfo('Health data: ❓ Unknown');
@@ -11349,15 +11434,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       const LocalNotifications = getPlugin('LocalNotifications');
       if (!LocalNotifications) return;
       try {
-        const { display } = await LocalNotifications.requestPermissions();
-        if (display !== 'granted') {
-          console.log('Notification permission denied');
-          return;
-        }
-        // Schedule using saved time (default 8pm)
-        await scheduleReminder();
-
-        // Listen for anniversary notification taps
+        // Register the anniversary-tap listener UNCONDITIONALLY — it needs no
+        // permission (only fires when a delivered notification is tapped) and
+        // must keep working regardless of the current grant state.
         LocalNotifications.addListener('localNotificationActionPerformed', (action) => {
           const id = action.notification.id;
           if (id >= 10000) {
@@ -11366,6 +11445,17 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
             if (month > 0 && day > 0) showFavAnniversaryModal(month, day);
           }
         });
+
+        // NEVER prompt at startup. Use the non-prompting checkPermissions() to
+        // inspect the existing grant only. The OS notification prompt is raised
+        // solely by the reminder/weekly toggles (_ensureNotifPermission), on a
+        // deliberate user action — so it can no longer surface during onboarding.
+        const { display } = await LocalNotifications.checkPermissions();
+        if (display === 'granted') {
+          // Already opted in on a previous launch — reschedule. scheduleReminder()
+          // itself no-ops unless reminderEnabled === 'true'.
+          await scheduleReminder();
+        }
       } catch (e) { console.warn('Notifications error:', e); }
     }
 
@@ -11631,7 +11721,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         setTimeout(() => { window._healthSyncInProgress = false; }, 800);
       }
     }
-    async function importStepsFromHealth() {
+    async function importStepsFromHealth(isAuto) {
       const btnText = document.getElementById('healthEnergyBtnText');
       const originalText = btnText ? btnText.textContent : '⚡ Energy Level';
       function showFail()   { if (btnText) { btnText.textContent = '❌';   setTimeout(() => { btnText.textContent = originalText; }, 2000); } }
@@ -11646,11 +11736,21 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         const { available } = await Health.isHealthAvailable();
         if (!available) { showFail(); return; }
 
-        skipNextResume = true;
-        await Health.requestHealthPermissions({ permissions: ['READ_STEPS'] });
-        skipNextResume = false;
-        if (document.getElementById('settingsModal')?.classList.contains('active')) {
-          _refreshHealthAuthDisplay().catch(() => {});
+        if (isAuto) {
+          // Auto-sync (mood tap / focused-mode step): never raise the OS sheet
+          // from ordinary navigation. Only proceed if access is already granted;
+          // otherwise leave requesting to a deliberate tap (toggle / Import button).
+          try {
+            const _ck = await Health.checkHealthPermissions({ permissions: ['READ_STEPS'] });
+            if (!_ck?.permissions?.READ_STEPS) { if (btnText) btnText.textContent = originalText; return; }
+          } catch (e) { if (btnText) btnText.textContent = originalText; return; }
+        } else {
+          skipNextResume = true;
+          await Health.requestHealthPermissions({ permissions: ['READ_STEPS'] });
+          skipNextResume = false;
+          if (document.getElementById('settingsModal')?.classList.contains('active')) {
+            _refreshHealthAuthDisplay().catch(() => {});
+          }
         }
 
         const _dateVal = document.getElementById('entryDate')?.value;
@@ -11725,7 +11825,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     window.doStepsAndSleepSync = doStepsAndSleepSync;
     window.importStepsFromHealth = importStepsFromHealth;
 
-    async function importSleepFromHealth() {
+    async function importSleepFromHealth(isAuto) {
       const btn = document.getElementById('healthSleepBtn');
       const originalText = btn.textContent;
 
@@ -11759,12 +11859,22 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         const { available } = await Health.isHealthAvailable();
         if (!available) { showFail(); return; }
 
-        skipNextResume = true; // health permission dialog may background the app
-        await Health.requestHealthPermissions({ permissions: ['READ_SLEEP', 'READ_STEPS'] });
-        skipNextResume = false;
-        // Refresh auth display in settings if modal is still open
-        if (document.getElementById('settingsModal')?.classList.contains('active')) {
-          _refreshHealthAuthDisplay().catch(() => {});
+        if (isAuto) {
+          // Auto-sync (mood tap / focused-mode step): never raise the OS sheet
+          // from ordinary navigation. Only proceed if sleep access is already
+          // granted; otherwise leave requesting to a deliberate tap.
+          try {
+            const _ck = await Health.checkHealthPermissions({ permissions: ['READ_SLEEP'] });
+            if (!_ck?.permissions?.READ_SLEEP) { btn.textContent = originalText; btn.disabled = false; return; }
+          } catch (e) { btn.textContent = originalText; btn.disabled = false; return; }
+        } else {
+          skipNextResume = true; // health permission dialog may background the app
+          await Health.requestHealthPermissions({ permissions: ['READ_SLEEP', 'READ_STEPS'] });
+          skipNextResume = false;
+          // Refresh auth display in settings if modal is still open
+          if (document.getElementById('settingsModal')?.classList.contains('active')) {
+            _refreshHealthAuthDisplay().catch(() => {});
+          }
         }
 
         // Determine target date — use the actual date in the form picker
