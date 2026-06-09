@@ -146,7 +146,13 @@
 //      fix. _APP_VERSION='1.5' (brand-config.js), version.json web=1.5
 //      (app stays 1.4 until the native build ships), new _WHATS_NEW_HEADLINES
 //      ['1.5'] entry in js/index.js.
-const CACHE_NAME = 'bipolarbear-v65';
+// v66: re-version onto the unified scheme — display = "1." + build number
+//      (zero-padded). The journal.js permission fix ships as build 9, so
+//      _APP_VERSION='1.09', version.json web=1.09 (app stays 1.4 until the
+//      native 1.09 / build 9 build is live). Native: MARKETING_VERSION 1.09,
+//      CURRENT_PROJECT_VERSION 9 (iOS app+widget); versionName 1.09,
+//      versionCode 9 (Android).
+const CACHE_NAME = 'bipolarbear-v66';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
