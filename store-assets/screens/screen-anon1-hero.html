@@ -5,139 +5,116 @@
 <link rel="stylesheet" href="../fonts.css">
 <link rel="stylesheet" href="shared.css">
 <style>
-  .stage{ --dev-w:646px; }
-  .device{ left:50%; top:556px; transform:translateX(-50%); }
+  /* Phone-less art hero for Bipolar Anonymous — mirrors the Bipolar Bear
+     hero (screen1-hero.html): full-bleed yellow art that conveys the app
+     (an anonymous peer community) through floating chat bubbles + monika
+     avatars, with the wordmark anchored at the bottom. No device frame. */
 
-  /* Anonymous board (yellow) */
-  .board{ height:100%; background:#FFFBF5; font-family:'Segoe UI',system-ui,sans-serif; }
-  .board-head{ background:#f5c800; padding:14px 30px 0; }
-  .bh-top{ display:flex; align-items:center; justify-content:space-between; padding-bottom:18px; }
-  .bh-logo{ display:flex; align-items:center; gap:16px; }
-  .bh-logo img{ width:64px; height:64px; border-radius:14px; }
-  .bh-name{ font-weight:800; font-size:34px; color:#1a1500; line-height:1; }
-  .bh-sub{ font-weight:800; font-size:18px; letter-spacing:.12em; text-transform:uppercase; color:#1a1500; opacity:.7; margin-top:3px; }
-  .bh-pill{ width:64px; height:64px; border-radius:50%;
-    background:linear-gradient(135deg,#ffe566,#a07e00); color:#fff; font-weight:800; font-size:26px;
-    display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(245,200,0,.4); }
-  .tabs{ display:flex; gap:12px; }
-  .tab{ font-weight:700; font-size:24px; color:#1a1500; padding:16px 22px;
-    border-radius:18px 18px 0 0; background:rgba(0,0,0,.10); }
-  .tab.active{ background:#FFFBF5; }
+  .wordmark{ position:absolute; left:0; right:0; bottom:208px;
+    display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .wordmark img{ width:300px; height:300px; border-radius:64px; margin-bottom:18px;
+    filter:drop-shadow(0 24px 38px rgba(120,90,0,.45)); }
+  .wordmark .name{ font-weight:900; font-size:132px; line-height:1; color:#1a1500;
+    letter-spacing:-.02em; white-space:nowrap; }
+  .wordmark .tag{ font-weight:800; font-size:42px; color:#3d2c00; opacity:.8;
+    letter-spacing:.02em; margin-top:22px; }
 
-  .feed{ padding:26px 28px; display:flex; flex-direction:column; }
-  .post{ background:#fff; border-radius:22px; padding:26px 28px; margin-bottom:22px;
-    box-shadow:0 2px 12px rgba(0,0,0,.06); }
-  .post-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
-  .pa{ display:flex; align-items:center; gap:16px; }
-  .av{ width:64px; height:64px; border-radius:50%; color:#fff; font-weight:800; font-size:26px;
-    display:flex; align-items:center; justify-content:center;
-    background:linear-gradient(135deg,#ffb340,#e07800); box-shadow:0 2px 8px rgba(245,200,0,.35); }
-  .pname{ font-weight:800; font-size:27px; color:#1a1500; }
-  .ptime{ font-size:22px; color:#5c5018; }
-  .ptext{ font-size:28px; color:#1a1500; line-height:1.5; }
-  .pacts{ display:flex; gap:14px; margin-top:20px; }
-  .pbtn{ background:#f5f5f5; border-radius:20px; padding:12px 24px; font-size:25px; font-weight:700; color:#5c5018; }
-  .pbtn.liked{ background:#fffde7; color:#a07e00; }
+  /* Floating anonymous post bubbles */
+  .bubble{ position:absolute; background:#fff; border-radius:46px;
+    padding:38px 44px; display:flex; gap:28px; align-items:flex-start;
+    box-shadow:0 30px 60px -22px rgba(120,90,0,.5); }
+  .bubble .av{ flex:0 0 auto; width:104px; height:104px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; color:#fff;
+    font-weight:800; font-size:42px; font-family:'Segoe UI',system-ui,sans-serif;
+    background:linear-gradient(135deg,#ffb340,#e07800);
+    box-shadow:0 8px 18px -6px rgba(120,80,0,.45); }
+  .bubble .who{ font-weight:800; font-size:32px; color:#1a1500; margin-bottom:10px;
+    font-family:'Segoe UI',system-ui,sans-serif; }
+  .bubble .msg{ font-size:38px; color:#2a2200; line-height:1.42;
+    font-family:'Segoe UI',system-ui,sans-serif; }
+  /* little tail */
+  .bubble::after{ content:""; position:absolute; bottom:-22px; left:84px;
+    width:48px; height:48px; background:#fff; border-radius:0 0 0 16px;
+    transform:rotate(45deg); }
 
-  .fab{ position:absolute; right:34px; bottom:34px; height:96px; border-radius:48px;
-    background:#1a1500; color:#fff; font-weight:800; font-size:30px;
-    display:flex; align-items:center; gap:14px; padding:0 38px;
-    box-shadow:0 16px 30px -8px rgba(0,0,0,.5); }
+  /* small standalone avatars floating in the gaps */
+  .floatav{ position:absolute; width:120px; height:120px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; color:#fff;
+    font-weight:800; font-size:44px; font-family:'Segoe UI',system-ui,sans-serif;
+    border:8px solid rgba(255,251,245,.85);
+    box-shadow:0 14px 28px -10px rgba(120,90,0,.4); }
 </style>
 </head>
 <body>
 <div class="canvas bg-yellow on-yellow">
 <div class="stage">
 
-  <div class="copy" style="top:0;height:556px;display:flex;flex-direction:column;justify-content:center;">
-    <div class="headline sm">Share your thoughts,<br>not your identity</div>
+  <!-- depth: glow, rings, dotted community thread, bokeh hearts -->
+  <svg width="100%" height="100%" viewBox="0 0 1290 2796" preserveAspectRatio="xMidYMid slice"
+       style="position:absolute;inset:0;overflow:visible;">
+    <defs>
+      <radialGradient id="cGlow" cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0"    stop-color="#ffffff" stop-opacity="0.55"/>
+        <stop offset="0.55" stop-color="#ffffff" stop-opacity="0.12"/>
+        <stop offset="1"    stop-color="#ffffff" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+
+    <!-- soft central light -->
+    <ellipse cx="645" cy="1560" rx="900" ry="780" fill="url(#cGlow)"/>
+    <!-- faint ripple rings -->
+    <g fill="none" stroke="#ffffff" stroke-opacity="0.16" stroke-width="3">
+      <circle cx="645" cy="1560" r="560"/>
+      <circle cx="645" cy="1560" r="820"/>
+      <circle cx="645" cy="1560" r="1080"/>
+    </g>
+    <!-- dotted thread weaving between the voices -->
+    <path d="M250,1240 C470,1360 760,1360 940,1520 C1090,1660 540,1760 360,1880 C240,1960 700,2010 980,2010"
+          fill="none" stroke="#ffffff" stroke-opacity="0.55" stroke-width="6"
+          stroke-linecap="round" stroke-dasharray="2 28"/>
+    <!-- floating bokeh hearts/dots -->
+    <g fill="#ffffff">
+      <circle cx="150" cy="1120" r="14" opacity="0.4"/>
+      <circle cx="1130" cy="1280" r="20" opacity="0.32"/>
+      <circle cx="1180" cy="1760" r="12" opacity="0.42"/>
+      <circle cx="110" cy="1560" r="11" opacity="0.42"/>
+      <circle cx="1000" cy="2150" r="16" opacity="0.3"/>
+      <circle cx="300" cy="2210" r="12" opacity="0.34"/>
+    </g>
+  </svg>
+
+  <!-- copy -->
+  <div class="copy" style="top:0;height:1000px;display:flex;flex-direction:column;justify-content:center;">
+    <div class="headline" style="font-size:150px;">You're not<br><span style="color:#fff;text-shadow:0 6px 22px rgba(120,90,0,.35);">alone.</span></div>
   </div>
 
-  <div class="device">
-    <div class="screen">
-      <div class="island"></div>
-      <div class="board">
-        <div class="statusbar light" style="position:absolute;left:0;right:0;background:#f5c800;"><span>9:41</span>
-          <svg width="148" height="30" viewBox="0 0 148 30" fill="currentColor">
-            <rect x="0" y="18" width="6" height="11" rx="1.5"/><rect x="9" y="13" width="6" height="16" rx="1.5"/>
-            <rect x="18" y="8" width="6" height="21" rx="1.5"/><rect x="27" y="3" width="6" height="26" rx="1.5"/>
-            <g transform="translate(44,3)" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round">
-              <path d="M2,8 a15,15 0 0 1 26,0"/><path d="M7,14 a8,8 0 0 1 16,0"/></g>
-            <circle cx="61" cy="25" r="2.6"/>
-            <rect x="92" y="6" width="48" height="22" rx="6" fill="none" stroke="currentColor" stroke-width="2.6" opacity="0.5"/>
-            <rect x="143" y="13" width="4" height="9" rx="2" opacity="0.5"/>
-            <rect x="95" y="9" width="42" height="16" rx="3.5"/>
-          </svg>
-        </div>
-
-        <div class="board-head" style="padding-top:88px;">
-          <div class="bh-top">
-            <div class="bh-logo">
-              <img src="REPO/icons/AppIcon_anonymous.png" alt="">
-              <div><div class="bh-name">Anonymous</div><div class="bh-sub">BipolarBear</div></div>
-            </div>
-            <div class="bh-pill">🐻</div>
-          </div>
-          <div class="tabs">
-            <div class="tab">📢 Announcements</div>
-            <div class="tab active">💬 General</div>
-            <div class="tab">📖 Wiki</div>
-          </div>
-        </div>
-
-        <div class="feed">
-          <div class="post">
-            <div class="post-top">
-              <div class="pa">
-                <div class="av">QO</div>
-                <div><div class="pname">QuietOtter</div><div class="ptime">12m ago</div></div>
-              </div>
-            </div>
-            <div class="ptext">Finally told my partner about my diagnosis today. I was terrified — they just hugged me. 💛</div>
-            <div class="pacts"><div class="pbtn liked">💛 47</div><div class="pbtn">💬 12</div></div>
-          </div>
-
-          <div class="post">
-            <div class="post-top">
-              <div class="pa">
-                <div class="av" style="background:linear-gradient(135deg,#81c784,#2e7d32)">SS</div>
-                <div><div class="pname">SunflowerSeed</div><div class="ptime">1h ago</div></div>
-              </div>
-            </div>
-            <div class="ptext">Three days stable after a rough patch. Small wins still count, right?</div>
-            <div class="pacts"><div class="pbtn liked">💛 89</div><div class="pbtn">💬 23</div></div>
-          </div>
-
-          <div class="post">
-            <div class="post-top">
-              <div class="pa">
-                <div class="av" style="background:linear-gradient(135deg,#ce93d8,#7b1fa2)">NW</div>
-                <div><div class="pname">NightWatch</div><div class="ptime">3h ago</div></div>
-              </div>
-            </div>
-            <div class="ptext">Anyone else find mornings the hardest? Looking for routines that actually help.</div>
-            <div class="pacts"><div class="pbtn">💛 34</div><div class="pbtn">💬 31</div></div>
-          </div>
-        </div>
-
-        <div class="fab">✏️ Post 🐻</div>
-      </div>
-    </div>
+  <!-- floating anonymous community voices -->
+  <div class="bubble" style="left:80px; top:1080px; width:780px;">
+    <div class="av">QO</div>
+    <div><div class="who">QuietOtter</div><div class="msg">Told my partner about my diagnosis today — they just hugged me. 💛</div></div>
   </div>
 
-  <div class="deck" style="top:2010px;">
-    <div class="dlabel">People who actually get it</div>
-    <div class="avrow">
-      <span class="ava">QO</span>
-      <span class="ava" style="background:linear-gradient(135deg,#81c784,#2e7d32)">SS</span>
-      <span class="ava" style="background:linear-gradient(135deg,#ce93d8,#7b1fa2)">NW</span>
-      <span class="ava" style="background:linear-gradient(135deg,#64b5f6,#1565c0)">BB</span>
-      <span class="ava" style="background:linear-gradient(135deg,#f48fb1,#c2185b)">JR</span>
-      <span class="ava more" style="font-size:31px;white-space:nowrap;">+ You</span>
-    </div>
+  <div class="bubble" style="left:420px; top:1430px; width:780px;">
+    <div class="av" style="background:linear-gradient(135deg,#81c784,#2e7d32)">SS</div>
+    <div><div class="who">SunflowerSeed</div><div class="msg">Three days stable after a rough patch. Small wins still count.</div></div>
   </div>
 
-  <div class="footnote">No real name required · just people who get it</div>
+  <div class="bubble" style="left:120px; top:1800px; width:740px;">
+    <div class="av" style="background:linear-gradient(135deg,#ce93d8,#7b1fa2)">NW</div>
+    <div><div class="who">NightWatch</div><div class="msg">Anyone else find mornings the hardest? 🌅</div></div>
+  </div>
+
+  <!-- small floating voices -->
+  <div class="floatav" style="left:980px; top:1150px; background:linear-gradient(135deg,#64b5f6,#1565c0)">BB</div>
+  <div class="floatav" style="left:40px; top:1740px; background:linear-gradient(135deg,#f48fb1,#c2185b)">JR</div>
+  <div class="floatav" style="left:980px; top:1980px; width:148px; height:148px; font-size:38px; background:#1a1500">+You</div>
+
+  <!-- brand -->
+  <div class="wordmark">
+    <img src="REPO/icons/AppIcon_anonymous_1024_store.png" alt="">
+    <div class="name">Bipolar Anonymous</div>
+    <div class="tag">Share your thoughts, not your identity</div>
+  </div>
 
 </div>
 </div>
