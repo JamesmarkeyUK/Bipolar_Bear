@@ -5,8 +5,15 @@
  * (BipolarBear, AnxietyAnt, …) routed by hostname. Both the per-host
  * overrides in HOST_LANDING_MAP and the DEFAULT_LANDING are served at `/`
  * AND at `/welcome` via an internal rewrite (URL bar is unchanged):
- *   - bipolaranonymous.app, www.bipolaranonymous.app → /welcome-anonymous.html
- *   - everything else                                → /welcome.html
+ *   - bipolaranonymous.app, www.bipolaranonymous.app → /welcome-anonymous
+ *   - everything else                                → /welcome
+ *
+ * The rewrite targets MUST stay extensionless. The ASSETS binding applies
+ * Cloudflare's default html_handling ("auto-trailing-slash"), which serves
+ * welcome.html at /welcome but answers a request for /welcome.html with a
+ * 307 redirect to /welcome. Since /welcome is in run_worker_first, a
+ * `.html` rewrite target bounces Worker → 307 → Worker forever (the "too
+ * many redirections" outage).
  *
  * `/welcome` is host-aware too (not just `/`) so bipolaranonymous.app/welcome
  * serves the Anonymous landing rather than the Bear one a plain static lookup
@@ -50,8 +57,8 @@
 const HOST_LANDING_MAP = {
   // Bipolar variant — the Anonymous landing page leads with the community
   // and links on to the board at /anonymous.
-  'bipolaranonymous.app':     '/welcome-anonymous.html',
-  'www.bipolaranonymous.app': '/welcome-anonymous.html',
+  'bipolaranonymous.app':     '/welcome-anonymous',
+  'www.bipolaranonymous.app': '/welcome-anonymous',
 };
 
 /**
@@ -61,7 +68,7 @@ const HOST_LANDING_MAP = {
  * still open straight into the app because the manifest start_url is
  * /index.html (see icons/favicons/site.webmanifest), not `/`.
  */
-const DEFAULT_LANDING = '/welcome.html';
+const DEFAULT_LANDING = '/welcome';
 
 export default {
   /**
