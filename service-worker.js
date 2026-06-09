@@ -152,7 +152,12 @@
 //      native 1.09 / build 9 build is live). Native: MARKETING_VERSION 1.09,
 //      CURRENT_PROJECT_VERSION 9 (iOS app+widget); versionName 1.09,
 //      versionCode 9 (Android).
-const CACHE_NAME = 'bipolarbear-v67';
+// v68: root routing fix — wrangler.json now sets assets.run_worker_first so
+//      worker.js actually runs for `/` and serves marketing.html (previously
+//      Cloudflare served index.html directly and the worker was bypassed).
+//      Bumped to drop any stale runtime-cached `/` → app-shell entry so
+//      returning visitors land on the marketing page.
+const CACHE_NAME = 'bipolarbear-v68';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
