@@ -242,6 +242,8 @@
     var n = slides.length;
     if (!n || !track || !viewport) return;
     var idx = 0, timer = null;
+    // One screenshot fills the phone screen; SLIDE is the per-step shift in %.
+    var SLIDE = 100, OFF = 0;
 
     var dots = slides.map(function (_, i) {
       var b = document.createElement('button');
@@ -256,9 +258,10 @@
     function go(i, instant) {
       idx = (i % n + n) % n;
       if (instant) track.classList.add('no-anim');
-      track.style.transform = 'translateX(' + (-idx * 100) + '%)';
+      track.style.transform = 'translateX(' + (OFF - idx * SLIDE) + '%)';
       if (instant) { void track.offsetWidth; track.classList.remove('no-anim'); }
       dots.forEach(function (d, di) { d.classList.toggle('active', di === idx); });
+      slides.forEach(function (s, si) { s.classList.toggle('is-active', si === idx); });
     }
     if (prevBtn) prevBtn.addEventListener('click', function () { go(idx - 1); kick(); });
     if (nextBtn) nextBtn.addEventListener('click', function () { go(idx + 1); kick(); });
@@ -274,7 +277,7 @@
     viewport.addEventListener('pointermove', function (e) {
       if (!down) return;
       dx = e.clientX - startX;
-      track.style.transform = 'translateX(' + (-idx * 100 + (dx / w) * 100) + '%)';
+      track.style.transform = 'translateX(' + (OFF - idx * SLIDE + (dx / w) * 100) + '%)';
     });
     function release() {
       if (!down) return;
@@ -294,16 +297,22 @@
     root.addEventListener('pointerleave', start);
 
     go(0, true);
+    // Slides 2+ are loading="lazy", but the phone screen clips all but the
+    // active slide, so the browser never sees them as visible and they'd stay
+    // blank (black) when swiped to. Force them to fetch once the carousel is
+    // on screen — keeps the lazy benefit until the user gets near it.
+    function loadAll() { slides.forEach(function (s) { if (s.loading === 'lazy') s.loading = 'eager'; }); }
     // Hold on the hero screenshot (slide 1) until the carousel scrolls into
     // view, so visitors always land on it before it starts cycling.
     if ('IntersectionObserver' in window) {
       var io = new IntersectionObserver(function (entries, obs) {
         entries.forEach(function (en) {
-          if (en.isIntersecting) { start(); obs.disconnect(); }
+          if (en.isIntersecting) { loadAll(); start(); obs.disconnect(); }
         });
       }, { threshold: 0.4 });
       io.observe(root);
     } else {
+      loadAll();
       start();
     }
   });

@@ -342,11 +342,24 @@ section{position:relative;}
 .showcase--anon .web-link:hover{border-color:#a8820a;}
 
 /* the device-shaped screenshot carousel that anchors each showcase */
-.carousel{position:relative;justify-self:center;max-width:330px;width:100%;}
+.carousel{position:relative;justify-self:center;max-width:300px;width:100%;}
+/* The screenshot carousel is dressed as a phone: the viewport is the device
+   body (dark bezel via padding + a dynamic-island ::before pill), and the
+   track of screenshots is clipped to the rounded "screen" inside it. One
+   screenshot per screen — swipe / arrows / dots move between them. */
 .carousel-viewport{
-  position:relative;border-radius:34px;overflow:hidden;background:#fff;
-  box-shadow:0 40px 80px -30px rgba(31,35,48,0.5);
+  position:relative;border-radius:46px;overflow:hidden;
+  /* Bezel as a BORDER (not padding) so overflow:hidden clips the screenshot
+     to the rounded inner screen (radius = border-radius − border-width = 33px),
+     letting the frame sit above the screenshot corners. */
+  border:13px solid #1b1e27;
+  background:linear-gradient(160deg,#262a35,#14161d);
+  box-shadow:0 50px 90px -35px rgba(31,35,48,0.55),inset 0 0 0 2px rgba(255,255,255,0.06);
   touch-action:pan-y;cursor:grab;
+}
+.carousel-viewport::before{
+  content:"";position:absolute;z-index:4;top:12px;left:50%;transform:translateX(-50%);
+  width:32%;max-width:104px;height:24px;border-radius:13px;background:#0a0b0e;pointer-events:none;
 }
 .carousel-viewport:active{cursor:grabbing;}
 .carousel-track{display:flex;transition:transform .5s cubic-bezier(.22,.61,.36,1);will-change:transform;}
@@ -363,8 +376,8 @@ section{position:relative;}
 }
 .carousel-arrow:hover{background:#fff;transform:translateY(-50%) scale(1.1);}
 .carousel-arrow:active{transform:translateY(-50%) scale(.95);}
-.carousel-arrow.prev{left:10px;}
-.carousel-arrow.next{right:10px;}
+.carousel-arrow.prev{left:22px;}
+.carousel-arrow.next{right:22px;}
 .carousel-dots{display:flex;justify-content:center;flex-wrap:wrap;gap:9px;margin-top:20px;}
 .carousel-dot{
   width:9px;height:9px;border-radius:50%;border:none;padding:0;cursor:pointer;
