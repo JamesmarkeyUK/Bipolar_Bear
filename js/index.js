@@ -39,6 +39,33 @@ function _escHtml(s) {
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
+/**
+ * Style the dock's single auth FAB (#bbAuthFab, injected by fab.js) for the
+ * current auth state: solid orange "profile" look when signed in, white-outline
+ * "sign in" look when signed out. Click behaviour is wired separately via
+ * window._fabOpenAuth. No-ops if the FAB hasn't been injected yet.
+ * @param {boolean} signedIn
+ * @returns {void}
+ */
+function _setHomeAuthFab(signedIn) {
+  const fab = document.getElementById('bbAuthFab');
+  if (!fab) return;
+  fab.textContent = '👤';
+  if (signedIn) {
+    fab.title = 'Profile';
+    fab.style.background = 'var(--brand-primary)';
+    fab.style.color = 'white';
+    fab.style.border = 'none';
+    fab.style.boxShadow = '0 2px 10px rgba(255,149,0,0.35)';
+  } else {
+    fab.title = 'Profile / Sign in';
+    fab.style.background = 'white';
+    fab.style.color = 'var(--brand-primary)';
+    fab.style.border = '2px solid var(--brand-primary)';
+    fab.style.boxShadow = '0 2px 10px rgba(255,149,0,0.25)';
+  }
+}
+
 // ── BLOCK 1: feature copy used by other blocks for hover cards ──
 const journalFeatures = [
       { icon: '📈', title: 'Visual Insights', desc: 'See your mood patterns over time with charts' },
@@ -178,6 +205,7 @@ setTimeout(function () {
           if (userInfo) { userInfo.style.display = 'flex'; }
           if (userEmail) userEmail.textContent = user.email;
           window._fabOpenAuth = window.showProfileModal;
+          _setHomeAuthFab(true);
           // Email verification is now handled on the Bipolar Anonymous board
           // (anonymous.html) — no need to nag here. If a stale banner from an
           // older client version is still in the DOM, clear it.
@@ -248,10 +276,12 @@ setTimeout(function () {
               });
               if (typeof window._applyFabDock === 'function') window._applyFabDock();
             }
-            // Restore Profile → Customise preferences (home-button + stats visibility)
-            if (typeof d.homeHideSurvival === 'boolean') BB.storage.set('HideSurvivalBtn', d.homeHideSurvival ? '1' : '0');
-            if (typeof d.homeHideAnon     === 'boolean') BB.storage.set('HideAnonBtn',     d.homeHideAnon     ? '1' : '0');
-            if (typeof d.homeHideStats    === 'boolean') BB.storage.set('HideHomeStats',   d.homeHideStats    ? '1' : '0');
+            // Restore Profile → Customise preferences (home-button + stats visibility).
+            // Survival / Anonymous are opt-in: hidden until the user enables them, so the
+            // stored flag means "enabled" ('1'), not "hidden". Stats default to visible.
+            if (typeof d.homeSurvivalEnabled === 'boolean') BB.storage.set('SurvivalBtnEnabled', d.homeSurvivalEnabled ? '1' : '0');
+            if (typeof d.homeAnonEnabled     === 'boolean') BB.storage.set('AnonBtnEnabled',     d.homeAnonEnabled     ? '1' : '0');
+            if (typeof d.homeStatsEnabled    === 'boolean') BB.storage.set('HomeStatsEnabled',   d.homeStatsEnabled    ? '1' : '0');
             if (typeof window._applyOnboardingGating === 'function') window._applyOnboardingGating();
             const _ap = d.anonProfile || {};
             if (typeof _ap.visitStreak === 'number') {
@@ -336,6 +366,7 @@ setTimeout(function () {
           const _pdHint = document.getElementById('personalDetailsHint');
           if (_pdHint) _pdHint.style.display = 'none';
           window._fabOpenAuth = window.showAuthModal;
+          _setHomeAuthFab(false);
           // Hide stats from a previous account when Firebase fires with no
           // user (token expiry, sign-out via another tab, or just a signed-
           // out visit). logout() already clears these on the in-app Sign Out
@@ -458,23 +489,24 @@ setTimeout(function () {
         return;
       }
 
-      // Profile → Customise toggles: user can hide the Survival Kit / Bipolar
-      // Anonymous home buttons and the stat badges. Folded in here so this
-      // function stays the single source of truth for home-button visibility.
-      const _hideSurvival = BB.storage.get('HideSurvivalBtn') === '1';
-      const _hideAnon     = BB.storage.get('HideAnonBtn') === '1';
+      // Profile → Customise toggles: the home screen shows only the Mood Journal
+      // by default. Survival Kit / Bipolar Anonymous are opt-in — the user turns
+      // them on from the profile. Folded in here so this function stays the single
+      // source of truth for home-button visibility.
+      const _showSurvival = BB.storage.get('SurvivalBtnEnabled') === '1';
+      const _showAnon     = BB.storage.get('AnonBtnEnabled') === '1';
       const _btnsWrap = document.querySelector('.buttons');
-      if (_btnsWrap) _btnsWrap.classList.toggle('bb-hide-stats', BB.storage.get('HideHomeStats') === '1');
+      if (_btnsWrap) _btnsWrap.classList.toggle('bb-hide-stats', BB.storage.get('HomeStatsEnabled') !== '1');
 
-      // Auth FAB + Anonymous button: hidden until tutorial complete
-      const _authWrap = document.getElementById('authFabWrapper');
-      if (_authWrap) _authWrap.style.display = _fabsUnlocked ? '' : 'none';
+      // Anonymous button: hidden until tutorial complete. (The auth FAB is the
+      // dock's #bbAuthFab, owned entirely by fab.js — it stays visible in every
+      // phase, so it is intentionally not touched here.)
       const _anonContainer = document.getElementById('anonymousContainer');
-      if (_anonContainer) _anonContainer.style.display = (_fabsUnlocked && !_hideAnon) ? '' : 'none';
+      if (_anonContainer) _anonContainer.style.display = (_fabsUnlocked && _showAnon) ? '' : 'none';
 
-      // Survival kit: visible from step 6 (unless hidden via Customise)
+      // Survival kit: opt-in — shown only once enabled (and after step 6 onboarding gate)
       const _survival = document.getElementById('survivalContainer');
-      if (_survival) _survival.style.display = (step < 6 || _hideSurvival) ? 'none' : '';
+      if (_survival) _survival.style.display = (step < 6 || !_showSurvival) ? 'none' : '';
 
       // Footer link: visible from step 12
       const _footerLink = document.querySelector('.footer-link');
@@ -611,16 +643,17 @@ setTimeout(function () {
       const online = navigator.onLine;
       const banner = document.getElementById('offlineBanner');
       if (banner) banner.style.display = online ? 'none' : '';
-      const btn = document.getElementById('signinBtn');
-      if (!btn || btn.style.display === 'none') return; // signed in — don't touch
-      if (!online) {
-        btn.disabled = true;
-        btn.style.opacity = '0.35';
-        btn.onclick = null;
+      // Dim the auth FAB for signed-out users when offline (sign-in needs
+      // Firebase). Signed-in users keep it — the profile modal is local and
+      // works offline.
+      const fab = document.getElementById('bbAuthFab');
+      if (!fab) return;
+      if (!online && !window.currentUser) {
+        fab.style.opacity = '0.35';
+        fab.style.pointerEvents = 'none';
       } else {
-        btn.disabled = false;
-        btn.style.opacity = '';
-        btn.onclick = () => window.showAuthModal();
+        fab.style.opacity = '';
+        fab.style.pointerEvents = '';
       }
     }
     window.addEventListener('online', updateOnlineStatus);
@@ -933,10 +966,13 @@ setTimeout(function () {
     // the signed-in 👤 button and the centre auth FAB (window._fabOpenAuth).
 
     /** Home-button toggle definitions for the Customise panel. */
+    // Survival / Anonymous are opt-in: their flag stores the *enabled* state
+    // ('1' = on). Unset/'0' = off, so the home screen shows only the Journal
+    // until the user activates them here. Journal is always on (locked).
     const _HOME_BTN_TOGGLES = [
       { id: 'journal',  icon: '📔', label: 'Journal', locked: true,  flag: null },
-      { id: 'survival', icon: '🆘', label: 'Survival', locked: false, flag: 'HideSurvivalBtn' },
-      { id: 'anon',     icon: '💬', label: 'Anonymous', locked: false, flag: 'HideAnonBtn' },
+      { id: 'survival', icon: '🆘', label: 'Survival', locked: false, flag: 'SurvivalBtnEnabled' },
+      { id: 'anon',     icon: '💬', label: 'Anonymous', locked: false, flag: 'AnonBtnEnabled' },
     ];
 
     /** Render the active/inactive icon+text toggle buttons (journal style). */
@@ -944,7 +980,7 @@ setTimeout(function () {
       const row = document.getElementById('idxHomeBtnToggles');
       if (!row) return;
       row.innerHTML = _HOME_BTN_TOGGLES.map(t => {
-        const on = t.locked || BB.storage.get(t.flag) !== '1';
+        const on = t.locked || BB.storage.get(t.flag) === '1';
         const _border = on ? 'var(--brand-primary)' : '#dee2e6';
         const _bg     = on ? 'rgba(255,149,0,0.1)' : 'white';
         const _color  = on ? 'var(--brand-primary)' : '#adb5bd';
@@ -959,9 +995,9 @@ setTimeout(function () {
     function _syncHomeCustomise() {
       if (!db || !currentUser) return;
       db.collection('userSettings').doc(currentUser.uid).set({
-        homeHideSurvival: BB.storage.get('HideSurvivalBtn') === '1',
-        homeHideAnon:     BB.storage.get('HideAnonBtn') === '1',
-        homeHideStats:    BB.storage.get('HideHomeStats') === '1',
+        homeSurvivalEnabled: BB.storage.get('SurvivalBtnEnabled') === '1',
+        homeAnonEnabled:     BB.storage.get('AnonBtnEnabled') === '1',
+        homeStatsEnabled:    BB.storage.get('HomeStatsEnabled') === '1',
       }, { merge: true }).catch(() => {});
     }
 
@@ -969,8 +1005,8 @@ setTimeout(function () {
     function _toggleHomeBtn(which) {
       const t = _HOME_BTN_TOGGLES.find(x => x.id === which);
       if (!t || t.locked || !t.flag) return;
-      const nowHidden = BB.storage.get(t.flag) !== '1';
-      BB.storage.set(t.flag, nowHidden ? '1' : '0');
+      const nowEnabled = BB.storage.get(t.flag) !== '1';
+      BB.storage.set(t.flag, nowEnabled ? '1' : '0');
       _renderHomeBtnToggles();
       if (typeof window._applyOnboardingGating === 'function') window._applyOnboardingGating();
       _syncHomeCustomise();
@@ -981,7 +1017,7 @@ setTimeout(function () {
     function _paintShowStatsToggle() {
       const btn = document.getElementById('idxShowStatsToggle');
       if (!btn) return;
-      const on = BB.storage.get('HideHomeStats') !== '1';
+      const on = BB.storage.get('HomeStatsEnabled') === '1';
       btn.style.background = on ? 'var(--brand-primary)' : '#ccc';
       const thumb = btn.querySelector('span');
       if (thumb) thumb.style.left = on ? '23px' : '3px';
@@ -989,8 +1025,8 @@ setTimeout(function () {
 
     /** Toggle the stat badges (streaks / progress) under the home buttons. */
     function _toggleHomeStats() {
-      const nowHidden = BB.storage.get('HideHomeStats') !== '1';
-      BB.storage.set('HideHomeStats', nowHidden ? '1' : '0');
+      const nowEnabled = BB.storage.get('HomeStatsEnabled') !== '1';
+      BB.storage.set('HomeStatsEnabled', nowEnabled ? '1' : '0');
       _paintShowStatsToggle();
       if (typeof window._applyOnboardingGating === 'function') window._applyOnboardingGating();
       _syncHomeCustomise();
@@ -1011,11 +1047,17 @@ setTimeout(function () {
         ['idxCurrentPass', 'idxNewPass', 'idxNewEmail', 'idxEmailPass'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
         const msg = document.getElementById('idxProfileMsg');
         if (msg) { msg.style.display = 'none'; msg.textContent = ''; }
+        // Guests get a stripped Account page: just the delete/reset option.
+        // Account management (password/email/personal info) and the in-profile
+        // sign-in prompt are signed-in only. Guests can still sign in via the
+        // auth FAB on the home screen.
         const signedIn = !!currentUser;
         const si = document.getElementById('idxAccountSignedIn');
         const gu = document.getElementById('idxAccountGuest');
+        const pi = document.getElementById('idxPersonalInfoBtn');
         if (si) si.style.display = signedIn ? '' : 'none';
-        if (gu) gu.style.display = signedIn ? 'none' : '';
+        if (gu) gu.style.display = 'none';
+        if (pi) pi.style.display = signedIn ? '' : 'none';
       }
       if (name === 'danger') {
         const signedIn = !!currentUser;
@@ -1040,6 +1082,9 @@ setTimeout(function () {
       const _e2 = document.getElementById('idxProfileEmail');
       if (_e1) _e1.textContent = email;
       if (_e2) _e2.textContent = email;
+      // Guest-only sign up / in button on the Customise page
+      const _siBtn = document.getElementById('idxCustomiseSignIn');
+      if (_siBtn) _siBtn.style.display = currentUser ? 'none' : '';
       const langSel = document.getElementById('idxLangSelect');
       if (langSel && window.BB && window.BB.i18n) langSel.value = window.BB.i18n.getLang();
       const verEl = document.getElementById('idxProfileVersion');
@@ -1203,7 +1248,7 @@ setTimeout(function () {
          'bbFabSlot_1','bbFabSlot_2','bbFabSlot_3','bbFabSlot_4',
          'bbFabsUnlocked','bbFabFirstRunDone',
          'bbLogoEasterEggFound','bbCustomFieldHintDone',
-         'bbHideSurvivalBtn','bbHideAnonBtn','bbHideHomeStats',
+         'bbSurvivalBtnEnabled','bbAnonBtnEnabled','bbHomeStatsEnabled',
          'personalName','personalDOB','personalMedicalNum','personalDiagnosis',
          'personalDiagnosisDate','personalAddress','personalMobile','personalEmail',
          'personalEmergencyContact','personalNotes',
@@ -1277,7 +1322,7 @@ setTimeout(function () {
               moodDefinitions: {}, copingStrategies: {},
               onboardingStep: 0, helpedVoted: false, healthSyncEnabled: false,
               personalHintDone: false,
-              homeHideSurvival: false, homeHideAnon: false, homeHideStats: false,
+              homeSurvivalEnabled: false, homeAnonEnabled: false, homeStatsEnabled: false,
             }, { merge: true }).catch(() => {});
             db.collection('personalDetails').doc(currentUser.uid).delete().catch(() => {});
           }

@@ -157,7 +157,29 @@
 //      Cloudflare served index.html directly and the worker was bypassed).
 //      Bumped to drop any stale runtime-cached `/` → app-shell entry so
 //      returning visitors land on the marketing page.
-const CACHE_NAME = 'bipolarbear-v68';
+// v69: marketing showcase carousels are now dressed as a phone — the viewport
+//      is a dark device body (bezel + dynamic-island pill) with the screenshot
+//      clipped to the rounded screen inside it (css/marketing.css +
+//      js/marketing.js).
+// v70: home screen is now Journal-only by default. Survival Kit / Bipolar
+//      Anonymous AND the stat badges are opt-in — enabled from Profile →
+//      Customise (flags flipped from "hide" opt-out to "enabled" opt-in:
+//      bbSurvivalBtnEnabled / bbAnonBtnEnabled / bbHomeStatsEnabled + Firestore
+//      homeSurvivalEnabled / homeAnonEnabled / homeStatsEnabled). Account delete
+//      / full reset returns to Journal-only with stats off. Also: Android
+//      hardware/swipe back on journal.html + survival-kit.html now returns to
+//      the home screen instead of exiting the app (js/journal.js,
+//      js/survival-kit.js); and the guest Profile → Account page is stripped to
+//      just the delete/reset option (index.html + js/index.js). Refresh precache.
+// v71: consolidate the home-screen auth FAB. index.html shipped its own
+//      #authFabWrapper (pre-dock auth button) on top of fab.js's #bbAuthFab at
+//      the SAME bottom-centre coordinates — two stacked buttons toggled by
+//      bbFabsUnlocked, with index.js and fab.js setting the wrapper's display
+//      to opposite values (a latent desync). Removed the wrapper; #bbAuthFab is
+//      now the single auth/profile button, always visible (fab.js owns it).
+//      index.js restyles it per auth state + dims it offline; version chip is a
+//      standalone #bbHomeVersion. Touches index.html, js/index.js, fab.js.
+const CACHE_NAME = 'bipolarbear-v71';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

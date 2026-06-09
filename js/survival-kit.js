@@ -2378,6 +2378,22 @@ function _esc(s) {
       } catch (e) { /* ignore */ }
     });
 
+    // ── Android back button: close an open modal, otherwise go to the home
+    //    screen rather than exiting/minimising the app. ──
+    document.addEventListener('DOMContentLoaded', () => {
+      const App = window.Capacitor?.Plugins?.App;
+      const isAndroid = window.Capacitor?.getPlatform?.() === 'android';
+      if (!App || !isAndroid) return;
+      App.addListener('backButton', () => {
+        const openModal = document.querySelector('.overlay-modal.active, .steps-modal.active');
+        if (openModal) {
+          openModal.classList.remove('active');
+        } else {
+          location.replace('index.html');
+        }
+      });
+    });
+
 // ── BLOCK 6 ──
 // ── Guest inactivity relock (5 min) ──
     if (BB.storage.get('GuestPinSalt')) {
