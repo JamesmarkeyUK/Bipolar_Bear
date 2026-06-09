@@ -152,7 +152,7 @@
 //      native 1.09 / build 9 build is live). Native: MARKETING_VERSION 1.09,
 //      CURRENT_PROJECT_VERSION 9 (iOS app+widget); versionName 1.09,
 //      versionCode 9 (Android).
-const CACHE_NAME = 'bipolarbear-v66';
+const CACHE_NAME = 'bipolarbear-v67';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

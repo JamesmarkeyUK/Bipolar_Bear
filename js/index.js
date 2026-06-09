@@ -177,7 +177,7 @@ setTimeout(function () {
           if (signinBtn) signinBtn.style.display = 'none';
           if (userInfo) { userInfo.style.display = 'flex'; }
           if (userEmail) userEmail.textContent = user.email;
-          window._fabOpenAuth = window.showAccountModal;
+          window._fabOpenAuth = window.showProfileModal;
           // Email verification is now handled on the Bipolar Anonymous board
           // (anonymous.html) — no need to nag here. If a stale banner from an
           // older client version is still in the DOM, clear it.
@@ -248,6 +248,11 @@ setTimeout(function () {
               });
               if (typeof window._applyFabDock === 'function') window._applyFabDock();
             }
+            // Restore Profile → Customise preferences (home-button + stats visibility)
+            if (typeof d.homeHideSurvival === 'boolean') BB.storage.set('HideSurvivalBtn', d.homeHideSurvival ? '1' : '0');
+            if (typeof d.homeHideAnon     === 'boolean') BB.storage.set('HideAnonBtn',     d.homeHideAnon     ? '1' : '0');
+            if (typeof d.homeHideStats    === 'boolean') BB.storage.set('HideHomeStats',   d.homeHideStats    ? '1' : '0');
+            if (typeof window._applyOnboardingGating === 'function') window._applyOnboardingGating();
             const _ap = d.anonProfile || {};
             if (typeof _ap.visitStreak === 'number') {
               BB.storage.set('Anon_streak', String(_ap.visitStreak));
@@ -453,15 +458,23 @@ setTimeout(function () {
         return;
       }
 
+      // Profile → Customise toggles: user can hide the Survival Kit / Bipolar
+      // Anonymous home buttons and the stat badges. Folded in here so this
+      // function stays the single source of truth for home-button visibility.
+      const _hideSurvival = BB.storage.get('HideSurvivalBtn') === '1';
+      const _hideAnon     = BB.storage.get('HideAnonBtn') === '1';
+      const _btnsWrap = document.querySelector('.buttons');
+      if (_btnsWrap) _btnsWrap.classList.toggle('bb-hide-stats', BB.storage.get('HideHomeStats') === '1');
+
       // Auth FAB + Anonymous button: hidden until tutorial complete
       const _authWrap = document.getElementById('authFabWrapper');
       if (_authWrap) _authWrap.style.display = _fabsUnlocked ? '' : 'none';
       const _anonContainer = document.getElementById('anonymousContainer');
-      if (_anonContainer) _anonContainer.style.display = _fabsUnlocked ? '' : 'none';
+      if (_anonContainer) _anonContainer.style.display = (_fabsUnlocked && !_hideAnon) ? '' : 'none';
 
-      // Survival kit: visible from step 6
+      // Survival kit: visible from step 6 (unless hidden via Customise)
       const _survival = document.getElementById('survivalContainer');
-      if (_survival) _survival.style.display = step < 6 ? 'none' : '';
+      if (_survival) _survival.style.display = (step < 6 || _hideSurvival) ? 'none' : '';
 
       // Footer link: visible from step 12
       const _footerLink = document.querySelector('.footer-link');
@@ -865,6 +878,7 @@ setTimeout(function () {
     window._fabOnSignOut = logout;
     window._fabOpenPersonalInfo = function () {
       window.closeAccountModal();
+      if (typeof window.closeProfileModal === 'function') window.closeProfileModal();
       showPersonalDetailsModal();
     };
 
@@ -914,6 +928,397 @@ setTimeout(function () {
       }
       closePersonalDetailsModal();
     }
+    // ── Profile / Account modal (multi-panel: Customise → Account → Danger) ──
+    // Replaces the shared fab.js account popup on the home screen. Opened by
+    // the signed-in 👤 button and the centre auth FAB (window._fabOpenAuth).
+
+    /** Home-button toggle definitions for the Customise panel. */
+    const _HOME_BTN_TOGGLES = [
+      { id: 'journal',  icon: '📔', label: 'Journal', locked: true,  flag: null },
+      { id: 'survival', icon: '🆘', label: 'Survival', locked: false, flag: 'HideSurvivalBtn' },
+      { id: 'anon',     icon: '💬', label: 'Anonymous', locked: false, flag: 'HideAnonBtn' },
+    ];
+
+    /** Render the active/inactive icon+text toggle buttons (journal style). */
+    function _renderHomeBtnToggles() {
+      const row = document.getElementById('idxHomeBtnToggles');
+      if (!row) return;
+      row.innerHTML = _HOME_BTN_TOGGLES.map(t => {
+        const on = t.locked || BB.storage.get(t.flag) !== '1';
+        const _border = on ? 'var(--brand-primary)' : '#dee2e6';
+        const _bg     = on ? 'rgba(255,149,0,0.1)' : 'white';
+        const _color  = on ? 'var(--brand-primary)' : '#adb5bd';
+        const _click  = t.locked ? '' : ` onclick="_toggleHomeBtn('${t.id}')"`;
+        const _cursor = t.locked ? 'default' : 'pointer';
+        const _lock   = t.locked ? '<span style="position:absolute;top:4px;right:6px;font-size:0.7em;">🔒</span>' : '';
+        return `<button${_click} style="position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 14px;border-radius:12px;border:1.5px solid ${_border};background:${_bg};color:${_color};cursor:${_cursor};font-size:0.82em;font-weight:600;min-width:64px;-webkit-tap-highlight-color:transparent;">${_lock}<span style="font-size:1.3em;">${t.icon}</span><span>${t.label}</span></button>`;
+      }).join('');
+    }
+
+    /** Sync a freshly-changed boolean customise pref to Firestore (best-effort). */
+    function _syncHomeCustomise() {
+      if (!db || !currentUser) return;
+      db.collection('userSettings').doc(currentUser.uid).set({
+        homeHideSurvival: BB.storage.get('HideSurvivalBtn') === '1',
+        homeHideAnon:     BB.storage.get('HideAnonBtn') === '1',
+        homeHideStats:    BB.storage.get('HideHomeStats') === '1',
+      }, { merge: true }).catch(() => {});
+    }
+
+    /** Toggle a home button's hidden flag, re-render, re-apply, sync. */
+    function _toggleHomeBtn(which) {
+      const t = _HOME_BTN_TOGGLES.find(x => x.id === which);
+      if (!t || t.locked || !t.flag) return;
+      const nowHidden = BB.storage.get(t.flag) !== '1';
+      BB.storage.set(t.flag, nowHidden ? '1' : '0');
+      _renderHomeBtnToggles();
+      if (typeof window._applyOnboardingGating === 'function') window._applyOnboardingGating();
+      _syncHomeCustomise();
+    }
+    window._toggleHomeBtn = _toggleHomeBtn;
+
+    /** Paint the "Show stats" pill toggle to match the current flag. */
+    function _paintShowStatsToggle() {
+      const btn = document.getElementById('idxShowStatsToggle');
+      if (!btn) return;
+      const on = BB.storage.get('HideHomeStats') !== '1';
+      btn.style.background = on ? 'var(--brand-primary)' : '#ccc';
+      const thumb = btn.querySelector('span');
+      if (thumb) thumb.style.left = on ? '23px' : '3px';
+    }
+
+    /** Toggle the stat badges (streaks / progress) under the home buttons. */
+    function _toggleHomeStats() {
+      const nowHidden = BB.storage.get('HideHomeStats') !== '1';
+      BB.storage.set('HideHomeStats', nowHidden ? '1' : '0');
+      _paintShowStatsToggle();
+      if (typeof window._applyOnboardingGating === 'function') window._applyOnboardingGating();
+      _syncHomeCustomise();
+    }
+    window._toggleHomeStats = _toggleHomeStats;
+
+    /** Switch between the Customise / Account / Danger panels. */
+    function _profileShowPanel(name) {
+      const panels = { customise: 'idxProfilePanelCustomise', account: 'idxProfilePanelAccount', danger: 'idxProfilePanelDanger' };
+      Object.entries(panels).forEach(([k, id]) => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = (k === name) ? '' : 'none';
+      });
+      if (name === 'account') {
+        // Reset collapsible sub-forms each time the panel is shown
+        ['idxPassFields', 'idxEmailFields'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+        ['idxPassToggleBtn', 'idxEmailToggleBtn'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = ''; });
+        ['idxCurrentPass', 'idxNewPass', 'idxNewEmail', 'idxEmailPass'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+        const msg = document.getElementById('idxProfileMsg');
+        if (msg) { msg.style.display = 'none'; msg.textContent = ''; }
+        const signedIn = !!currentUser;
+        const si = document.getElementById('idxAccountSignedIn');
+        const gu = document.getElementById('idxAccountGuest');
+        if (si) si.style.display = signedIn ? '' : 'none';
+        if (gu) gu.style.display = signedIn ? 'none' : '';
+      }
+      if (name === 'danger') {
+        const signedIn = !!currentUser;
+        const _t = document.getElementById('idxDangerTitle');
+        const _d = document.getElementById('idxDangerDesc');
+        const _b = document.getElementById('idxDangerBtnLabel');
+        if (_t) _t.textContent = signedIn ? 'Delete Account' : 'Full Reset';
+        if (_d) _d.textContent = signedIn
+          ? 'Permanently delete your account, all journal entries, and reset everything on this device. This cannot be undone.'
+          : 'Permanently delete all journal entries and reset all settings to their defaults on this device. This cannot be undone.';
+        if (_b) _b.textContent = signedIn ? '🗑️ Delete Account & Reset' : '🗑️ Delete All Data & Reset';
+      }
+    }
+    window._profileShowPanel = _profileShowPanel;
+
+    /** Open the profile modal (always starts on the Customise panel). */
+    window.showProfileModal = function () {
+      _renderHomeBtnToggles();
+      _paintShowStatsToggle();
+      const email = (currentUser && currentUser.email) || '';
+      const _e1 = document.getElementById('idxProfileEmailCustomise');
+      const _e2 = document.getElementById('idxProfileEmail');
+      if (_e1) _e1.textContent = email;
+      if (_e2) _e2.textContent = email;
+      const langSel = document.getElementById('idxLangSelect');
+      if (langSel && window.BB && window.BB.i18n) langSel.value = window.BB.i18n.getLang();
+      const verEl = document.getElementById('idxProfileVersion');
+      if (verEl) verEl.textContent = (window.BB && window.BB.versionLabel) ? window.BB.versionLabel() : '';
+      _profileShowPanel('customise');
+      document.getElementById('idxProfileModal').classList.add('active');
+    };
+
+    window.closeProfileModal = function () {
+      const m = document.getElementById('idxProfileModal');
+      if (m) m.classList.remove('active');
+      if (typeof window._fabOnCloseAuth === 'function') window._fabOnCloseAuth();
+    };
+
+    /** Sign-out from the account panel. */
+    window._idxAccountLogout = function () {
+      window.closeProfileModal();
+      logout();
+    };
+
+    /** Show a transient status banner inside the account panel. */
+    function _idxProfileShowMsg(text, ok) {
+      const msg = document.getElementById('idxProfileMsg');
+      if (!msg) return;
+      msg.textContent = text;
+      msg.style.color = ok ? '#2ECC40' : '#dc3545';
+      msg.style.background = ok ? 'rgba(46,204,64,0.08)' : 'rgba(220,53,69,0.08)';
+      msg.style.display = 'block';
+    }
+
+    window._idxSubmitPasswordChange = function () {
+      const user = (firebase && firebase.auth) ? firebase.auth().currentUser : null;
+      if (!user) return;
+      const currentPass = (document.getElementById('idxCurrentPass').value || '').trim();
+      const newPass     = (document.getElementById('idxNewPass').value     || '').trim();
+      if (!currentPass || !newPass) { _idxProfileShowMsg('⚠️ Please fill in both fields.', false); return; }
+      if (newPass.length < 6)       { _idxProfileShowMsg('⚠️ New password must be at least 6 characters.', false); return; }
+      const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPass);
+      user.reauthenticateWithCredential(credential)
+        .then(() => user.updatePassword(newPass))
+        .then(() => {
+          _idxProfileShowMsg('✅ Password updated successfully.', true);
+          document.getElementById('idxPassFields').style.display = 'none';
+          document.getElementById('idxPassToggleBtn').style.display = '';
+          document.getElementById('idxCurrentPass').value = '';
+          document.getElementById('idxNewPass').value = '';
+        })
+        .catch(err => {
+          const wrongPass = err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential';
+          _idxProfileShowMsg('⚠️ ' + (wrongPass ? 'Current password is incorrect.' : (err.message || 'Could not update password.')), false);
+        });
+    };
+
+    window._idxSubmitEmailChange = function () {
+      const user = (firebase && firebase.auth) ? firebase.auth().currentUser : null;
+      if (!user) return;
+      const newEmail = (document.getElementById('idxNewEmail').value  || '').trim();
+      const pass     = (document.getElementById('idxEmailPass').value || '').trim();
+      if (!newEmail || !pass) { _idxProfileShowMsg('⚠️ Please fill in both fields.', false); return; }
+      if (!newEmail.includes('@') || !newEmail.includes('.')) { _idxProfileShowMsg('⚠️ Please enter a valid email address.', false); return; }
+      const credential = firebase.auth.EmailAuthProvider.credential(user.email, pass);
+      user.reauthenticateWithCredential(credential)
+        .then(() => user.updateEmail(newEmail))
+        .then(() => {
+          _idxProfileShowMsg('✅ Email updated to ' + newEmail, true);
+          const _e1 = document.getElementById('idxProfileEmail');
+          const _e2 = document.getElementById('idxProfileEmailCustomise');
+          if (_e1) _e1.textContent = newEmail;
+          if (_e2) _e2.textContent = newEmail;
+          document.getElementById('idxEmailFields').style.display = 'none';
+          document.getElementById('idxEmailToggleBtn').style.display = '';
+          document.getElementById('idxNewEmail').value = '';
+          document.getElementById('idxEmailPass').value = '';
+        })
+        .catch(err => {
+          const wrongPass = err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential';
+          const inUse     = err.code === 'auth/email-already-in-use';
+          _idxProfileShowMsg('⚠️ ' + (wrongPass ? 'Current password is incorrect.' : inUse ? 'That email is already in use.' : (err.message || 'Could not update email.')), false);
+        });
+    };
+
+    // ── Full-reset / account-delete flow (ported from journal.js) ──
+    // Signed in → deletes the Firebase account + all Firestore data + local
+    // wipe. Guest → deletes local entries + resets settings. Either way any
+    // leftover guest data is wiped. Mirrors journal.html's confirmDeleteAll /
+    // deleteAllEntries so the home-screen Delete button behaves identically.
+
+    /** Best-effort count of journal entries cached locally (for the prompts). */
+    function _countLocalEntries() {
+      let n = 0;
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('entry:')) n++;
+      }
+      return n;
+    }
+
+    function confirmDeleteAll() {
+      const isSignedIn = !!currentUser;
+      const count = _countLocalEntries();
+      const countLine = count ? `${count} entries` : 'all entries';
+      const accountLine = isSignedIn ? `Account: ${currentUser.email}\n` : `(Guest mode — browser storage)\n`;
+      const action = isSignedIn
+        ? `permanently delete your BipolarBear account, ${countLine}, and reset everything`
+        : `permanently delete ${countLine} AND reset all settings to defaults`;
+      const message = `⚠️ ${isSignedIn ? 'DELETE ACCOUNT' : 'FULL RESET'}?\n\n${accountLine}\nThis will ${action}.\n\nThis CANNOT be undone! Make sure to export a backup first.`;
+      if (!confirm(message)) return;
+      const finalLine = isSignedIn
+        ? `FINAL WARNING: Permanently delete account ${currentUser.email}?\n\nThis CANNOT be undone.`
+        : `FINAL WARNING: Delete ${countLine} and reset settings for guest?\n\nThis CANNOT be undone.`;
+      if (!confirm(finalLine)) return;
+      deleteAllEntries({ deleteAccount: isSignedIn });
+    }
+    window.confirmDeleteAll = confirmDeleteAll;
+
+    async function deleteAllEntries(opts) {
+      opts = opts || {};
+      const deleteAccount = !!opts.deleteAccount;
+
+      // Re-authenticate upfront for account deletion so a wrong password aborts
+      // before we touch any data.
+      if (deleteAccount && currentUser) {
+        const _pw = prompt('Re-enter your password to confirm account deletion:');
+        if (!_pw) return;
+        try {
+          const _cred = firebase.auth.EmailAuthProvider.credential(currentUser.email, _pw);
+          await currentUser.reauthenticateWithCredential(_cred);
+        } catch (_e) {
+          alert('Wrong password. Account not deleted.');
+          return;
+        }
+      }
+
+      let _accountDeleted = false;
+      let deleted = 0;
+
+      try {
+        if (currentUser) {
+          const snapshot = await db.collection('entries').where('userId', '==', currentUser.uid).get();
+          const batch = db.batch();
+          snapshot.forEach(doc => { batch.delete(doc.ref); deleted++; });
+          await batch.commit();
+        } else {
+          const keysToDelete = [];
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('entry:')) keysToDelete.push(key);
+          }
+          keysToDelete.forEach(key => { localStorage.removeItem(key); deleted++; });
+        }
+
+        // Clear all flags — full reset means truly starting from scratch.
+        ['unlockedAchievements','bbFavAnniShown',
+         'bbPrivateHintSeen','bbFavouriteHintSeen','bb_moodTipShown','bb_fmMoodTipShown',
+         'bb_fmChooseMoodHintDone','bb_fmMoodInfoCloseHintDone',
+         'bbAdvancedBadgePending','bbAdvancedBadgeVisible',
+         'bb_fmTapHoldHintPending','bb_fmTapHoldHintReady',
+         'bbHasEntries','bbOnboardingStep',
+         'bbCurrentStreak','bbStableStreak',
+         'bbFeedbackFabHidden','bbWaFabHidden','bbFooterHidden',
+         'bbFabSlot_1','bbFabSlot_2','bbFabSlot_3','bbFabSlot_4',
+         'bbFabsUnlocked','bbFabFirstRunDone',
+         'bbLogoEasterEggFound','bbCustomFieldHintDone',
+         'bbHideSurvivalBtn','bbHideAnonBtn','bbHideHomeStats',
+         'personalName','personalDOB','personalMedicalNum','personalDiagnosis',
+         'personalDiagnosisDate','personalAddress','personalMobile','personalEmail',
+         'personalEmergencyContact','personalNotes',
+        ].forEach(k => localStorage.removeItem(k));
+
+        BB.storage.remove('_draft');
+        BB.storage.remove('_entryStatus');
+        ['moodDefinitions','copingStrategies','moodMemories','survivalGratitude',
+         'rememberThis','myCommitments','customReminders','currentMedList',
+         'dailyGoals','dailyBudget','logoVariant'].forEach(k => localStorage.removeItem(k));
+
+        localStorage.setItem('focusedModeEnabled', '1');
+        [
+          'fmConfirmStep', 'fmAutoAdvance', 'fmAutoAdvanceMoreData',
+          'elaborateResponsesEnabled', 'intentionEnabled',
+          'incognitoMode', 'pdfHideByDefault',
+          'showMoodSuggestion', 'moreDataOpenByDefault',
+          'achievementToastsEnabled', 'statsStartDate', 'weeklySummaryEnabled',
+          'customiseFormEnabled', 'disabledSteps', 'moodLinkingEnabled',
+          'customTrackingFields', 'deletedDefaultCustomFields', 'deletedBuiltinFields',
+          'bbPinEnabled', 'bbPinCode', 'bbNativePinEnabled',
+          'bbHealthSyncEnabled', 'reminderEnabled', 'reminderTime',
+          'journalDefaultToday', 'bbCoffeeFabHidden', 'bbQuickNoteFabHidden', 'bbSecurityFabHidden', 'bbQuickNotes',
+        ].forEach(k => localStorage.removeItem(k));
+        sessionStorage.removeItem('bbPinUnlocked');
+
+        try {
+          const _notif = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications;
+          if (_notif) _notif.cancel({ notifications: [{ id: 1 }, { id: 2 }] }).catch(() => {});
+        } catch (_) {}
+
+        Object.keys(localStorage).filter(k =>
+          k.startsWith('trackCustom_') || k.startsWith('_labelOverride_') ||
+          ['trackGoals','trackBudget','trackExercise','trackOutside','trackAnxiety','trackEmotions','trackAlcohol'].includes(k)
+        ).forEach(k => localStorage.removeItem(k));
+
+        localStorage.removeItem('bipolarHelpedVoted');
+        ['PersonalHintDone','MedHintDone','SettingsHintDone','CustomiseFormHintDone',
+         'CustomiseAdditionalHintDone','CloseSettingsHintDone','CustomiseFormCollapsed',
+         'AdvancedTutorialToastShown','SurvivalKitVisited','MoodDefHintDone',
+         'PrivacyNoteDismissed','TutorialToastShown','WelcomeShown'].forEach(k => BB.storage.remove(k));
+
+        // Firestore cleanup.
+        if (currentUser && db) {
+          if (deleteAccount) {
+            await db.collection('userSettings').doc(currentUser.uid).delete().catch(() => {});
+            await db.collection('personalDetails').doc(currentUser.uid).delete().catch(() => {});
+            const _monika = BB.storage.get('Anon_monika');
+            if (_monika) {
+              await db.collection(BB_BRAND.collections.monikas).doc(_monika.toLowerCase()).delete().catch(() => {});
+            }
+            const _hashEmail = async (email) => {
+              const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(email.toLowerCase().trim()));
+              return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+            };
+            const _emails = [currentUser.email, BB.storage.get('Anon_email')]
+              .filter(Boolean).filter((e, i, arr) => arr.indexOf(e) === i);
+            for (const _e of _emails) {
+              try {
+                const _hash = await _hashEmail(_e);
+                await db.collection('anonProfiles').doc(_hash).delete().catch(() => {});
+              } catch (_) {}
+            }
+          } else {
+            db.collection('userSettings').doc(currentUser.uid).set({
+              currentMedList: [], dailyGoals: [], dailyBudget: '', logoVariant: 0,
+              focusedModeEnabled: true, fmConfirmStep: false, elaborateResponsesEnabled: false,
+              intentionEnabled: false, incognitoMode: false, moreDataOpenByDefault: false,
+              achievementToastsEnabled: true, showMoodSuggestion: false, moodLinkingEnabled: false,
+              customTrackingFields: [], trackingFields: {}, labelOverrides: {},
+              moodDefinitions: {}, copingStrategies: {},
+              onboardingStep: 0, helpedVoted: false, healthSyncEnabled: false,
+              personalHintDone: false,
+              homeHideSurvival: false, homeHideAnon: false, homeHideStats: false,
+            }, { merge: true }).catch(() => {});
+            db.collection('personalDetails').doc(currentUser.uid).delete().catch(() => {});
+          }
+        }
+
+        // Clear anon-board localStorage so the next user on this browser starts clean.
+        ['Anon_monika','Anon_email','Anon_verified','Anon_isAdmin',
+         'Anon_streak','Anon_med','Anon_medList','Anon_showMeds',
+         'Anon_showStable','Anon_stableSince','Anon_stableStreak',
+         'Anon_colorKey','Anon_initials','Anon_liked','Anon_hasPosted',
+         'AnonLastVisit','AnonVisitDate'].forEach(k => BB.storage.remove(k));
+        if (typeof applyLogoVariant === 'function') applyLogoVariant(0);
+
+        // Final explicit PIN clear before reload.
+        BB.storage.remove('NativePinEnabled');
+        BB.storage.remove('PinEnabled');
+        BB.storage.remove('PinCode');
+        BB.storage.remove('GuestPinSalt');
+        sessionStorage.removeItem('bbPinUnlocked');
+        try { window.Capacitor?.Plugins?.SecureStorage?.removeItem?.('bb_native_pin')?.catch?.(() => {}); } catch (e) {}
+
+        if (deleteAccount && currentUser) {
+          try { await currentUser.delete(); _accountDeleted = true; }
+          catch (_e) { console.error('user.delete failed', _e); }
+        }
+
+        alert(deleteAccount
+          ? (_accountDeleted ? '✅ Account deleted.' : '⚠️ Data deleted but the auth account could not be removed. Please contact support.')
+          : `Successfully deleted ${deleted} entries.`);
+      } catch (error) {
+        console.error('Error deleting all entries:', error);
+        alert('Some cleanup steps failed: ' + error.message + '\n\nThe page will reload so you can start fresh.');
+      } finally {
+        if (!_accountDeleted && auth && currentUser) {
+          auth.signOut().catch(() => {});
+        }
+        location.replace('index.html');
+      }
+    }
+    window.deleteAllEntries = deleteAllEntries;
+
     // ── Logo easter egg with persistence ──
     const logoImg = document.querySelector('.logo-img');
     const srcs = ['images/logos/good_logo.png', 'images/logos/elevated_logo.png', 'images/logos/sad_logo.png'];
