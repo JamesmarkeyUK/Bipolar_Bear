@@ -378,6 +378,9 @@ section{position:relative;}
 .carousel-arrow:active{transform:translateY(-50%) scale(.95);}
 .carousel-arrow.prev{left:22px;}
 .carousel-arrow.next{right:22px;}
+/* Hide the arrows on the hero screenshot (slide 1) — the carousel
+   auto-advances, so they fade in on the next screenshot. */
+.carousel.on-hero .carousel-arrow{opacity:0;pointer-events:none;}
 .carousel-dots{display:flex;justify-content:center;flex-wrap:wrap;gap:9px;margin-top:20px;}
 .carousel-dot{
   width:9px;height:9px;border-radius:50%;border:none;padding:0;cursor:pointer;

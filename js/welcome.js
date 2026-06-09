@@ -262,6 +262,9 @@
       if (instant) { void track.offsetWidth; track.classList.remove('no-anim'); }
       dots.forEach(function (d, di) { d.classList.toggle('active', di === idx); });
       slides.forEach(function (s, si) { s.classList.toggle('is-active', si === idx); });
+      // Keep the hero screenshot clean — arrows only show once the carousel
+      // has moved past slide 1 (auto-advance reveals them naturally).
+      root.classList.toggle('on-hero', idx === 0);
     }
     if (prevBtn) prevBtn.addEventListener('click', function () { go(idx - 1); kick(); });
     if (nextBtn) nextBtn.addEventListener('click', function () { go(idx + 1); kick(); });

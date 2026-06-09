@@ -191,7 +191,10 @@
 //      (_ensureAuthSession) before subscribing/sending; send failures keep
 //      the typed text and show a hint instead of vanishing; listener errors
 //      no longer masquerade as "No comments yet".
-const CACHE_NAME = 'bipolarbear-v73';
+// v74: welcome carousels — hide the prev/next arrows while the hero
+//      screenshot (slide 1) is showing; they fade in once the carousel
+//      auto-advances. Touches js/welcome.js, css/welcome.css.
+const CACHE_NAME = 'bipolarbear-v74';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
