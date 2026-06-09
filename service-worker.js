@@ -142,7 +142,11 @@
 //      until it scrolls into view, instead of auto-advancing from page load.
 // v64: drop the (yellow) Bipolar Anonymous screenshot from the Bipolar Bear
 //      carousel on both marketing pages — it clashed with the orange section.
-const CACHE_NAME = 'bipolarbear-v64';
+// v65: v1.5 — version bump for the permission-prompt / HealthKit-reinstall
+//      fix. _APP_VERSION='1.5' (brand-config.js), version.json web=1.5
+//      (app stays 1.4 until the native build ships), new _WHATS_NEW_HEADLINES
+//      ['1.5'] entry in js/index.js.
+const CACHE_NAME = 'bipolarbear-v65';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
