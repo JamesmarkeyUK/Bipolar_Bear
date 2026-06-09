@@ -179,7 +179,12 @@
 //      now the single auth/profile button, always visible (fab.js owns it).
 //      index.js restyles it per auth state + dims it offline; version chip is a
 //      standalone #bbHomeVersion. Touches index.html, js/index.js, fab.js.
-const CACHE_NAME = 'bipolarbear-v71';
+// v72: rename the landing route /marketing → /welcome. marketing.html →
+//      welcome.html, marketing-anonymous.html → welcome-anonymous.html,
+//      css/marketing.css → css/welcome.css, js/marketing.js → js/welcome.js.
+//      worker.js now serves the host-aware landing at both `/` and `/welcome`
+//      (wrangler run_worker_first gains "/welcome"). Precache paths updated.
+const CACHE_NAME = 'bipolarbear-v72';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
@@ -187,8 +192,8 @@ const CACHE_NAME = 'bipolarbear-v71';
  * picks up everything else as the user navigates.
  */
 const STATIC_ASSETS = [
-  './marketing.html',
-  './marketing-anonymous.html',
+  './welcome.html',
+  './welcome-anonymous.html',
   './index.html',
   './journal.html',
   './survival-kit.html',
@@ -197,7 +202,7 @@ const STATIC_ASSETS = [
 
   // FAB dock + page-specific JS (extracted from inline scripts in Phase 4).
   './fab.js',
-  './js/marketing.js',
+  './js/welcome.js',
   './js/index.js',
   './js/journal.js',
   './js/survival-kit.js',
@@ -220,7 +225,7 @@ const STATIC_ASSETS = [
   './css/theme.css',
 
   // Page-specific stylesheets (extracted from inline <style> in Phase 4).
-  './css/marketing.css',
+  './css/welcome.css',
   './css/index.css',
   './css/journal.css',
   './css/survival-kit.css',

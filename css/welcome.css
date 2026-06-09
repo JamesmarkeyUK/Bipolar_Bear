@@ -1,13 +1,13 @@
 /**
- * Marketing / landing page styles.
+ * Welcome / landing page styles.
  *
- * Standalone promo page (marketing.html) — NOT an app shell, so it
+ * Standalone promo page (welcome.html) — NOT an app shell, so it
  * deliberately skips the #iphone-frame wrapper and shared app chrome.
  * Self-hosts Nunito (the same display font baked into the App Store
  * screenshots) from store-assets/fonts so the page matches store
  * artwork with no external font request.
  *
- * @file css/marketing.css
+ * @file css/welcome.css
  */
 
 /* ───────────────────────── Fonts ───────────────────────── */

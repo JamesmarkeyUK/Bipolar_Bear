@@ -4,11 +4,15 @@
  * One Pages deployment can serve multiple per-condition variants
  * (BipolarBear, AnxietyAnt, …) routed by hostname. Both the per-host
  * overrides in HOST_LANDING_MAP and the DEFAULT_LANDING are served at `/`
- * via an internal rewrite (URL bar stays as `/`):
- *   - bipolaranonymous.app, www.bipolaranonymous.app → /marketing-anonymous.html
- *   - everything else                                → /marketing.html
+ * AND at `/welcome` via an internal rewrite (URL bar is unchanged):
+ *   - bipolaranonymous.app, www.bipolaranonymous.app → /welcome-anonymous.html
+ *   - everything else                                → /welcome.html
  *
- * Each marketing page funnels visitors to the store badges and to its app:
+ * `/welcome` is host-aware too (not just `/`) so bipolaranonymous.app/welcome
+ * serves the Anonymous landing rather than the Bear one a plain static lookup
+ * (/welcome → welcome.html) would give.
+ *
+ * Each landing page funnels visitors to the store badges and to its app:
  * the Bear page → /index.html, the Anonymous page → /anonymous (the board).
  *
  * Adding a new variant pair (e.g. "Anxiety Ant" + "Anxiety Anonymous") is
@@ -21,13 +25,14 @@
  * Configured by wrangler.json. Two settings there are load-bearing — do not
  * remove them or this whole file becomes dead code:
  *   - assets.binding = "ASSETS"          — wires up env.ASSETS (used below).
- *   - assets.run_worker_first = ["/", "/version.json"]
+ *   - assets.run_worker_first = ["/", "/welcome", "/version.json"]
  *         By default Cloudflare serves a matching static asset BEFORE the
  *         Worker, so `/` would resolve straight to index.html (the app) and
- *         this script would never run. run_worker_first forces the Worker to
- *         handle these two paths first, so the `/` → marketing rewrite and
- *         the /version.json CORS headers below actually take effect. Every
- *         other path stays asset-first (no Worker invocation).
+ *         `/welcome` straight to welcome.html (always the Bear page), and this
+ *         script would never run. run_worker_first forces the Worker to handle
+ *         these paths first, so the `/` + `/welcome` → landing rewrite and the
+ *         /version.json CORS headers below actually take effect. Every other
+ *         path stays asset-first (no Worker invocation).
  *
  * Note: this worker runs at the edge — it is unrelated to service-worker.js,
  * which runs in the browser.
@@ -43,20 +48,20 @@
  * Add new variant hosts here when expanding to additional condition apps.
  */
 const HOST_LANDING_MAP = {
-  // Bipolar variant — the Anonymous marketing page leads with the community
+  // Bipolar variant — the Anonymous landing page leads with the community
   // and links on to the board at /anonymous.
-  'bipolaranonymous.app':     '/marketing-anonymous.html',
-  'www.bipolaranonymous.app': '/marketing-anonymous.html',
+  'bipolaranonymous.app':     '/welcome-anonymous.html',
+  'www.bipolaranonymous.app': '/welcome-anonymous.html',
 };
 
 /**
- * Landing page served at `/` when the requested hostname has no override —
- * the Bipolar Bear marketing page. It funnels visitors to the store badges
- * and to the web app (served at /index.html). Installed PWA users still
- * open straight into the app because the manifest start_url is /index.html
- * (see icons/favicons/site.webmanifest), not `/`.
+ * Landing page served at `/` (and `/welcome`) when the requested hostname has
+ * no override — the Bipolar Bear landing page. It funnels visitors to the
+ * store badges and to the web app (served at /index.html). Installed PWA users
+ * still open straight into the app because the manifest start_url is
+ * /index.html (see icons/favicons/site.webmanifest), not `/`.
  */
-const DEFAULT_LANDING = '/marketing.html';
+const DEFAULT_LANDING = '/welcome.html';
 
 export default {
   /**
@@ -69,7 +74,7 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    if (url.pathname === '/' || url.pathname === '') {
+    if (url.pathname === '/' || url.pathname === '' || url.pathname === '/welcome') {
       const landing = HOST_LANDING_MAP[url.hostname] || DEFAULT_LANDING;
       const target = new URL(url);
       target.pathname = landing;

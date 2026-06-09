@@ -1,5 +1,5 @@
 /**
- * Marketing landing page interactivity.
+ * Welcome / landing page interactivity.
  *
  * Centrepiece: an interactive "mood meter" — drag / hover across the
  * wave and the Bear cycles through six mood faces (depressed → manic),
@@ -10,7 +10,7 @@
  * drag-to-scroll galleries. All progressive — the page is fully
  * readable with JS disabled. Honours prefers-reduced-motion.
  *
- * @file js/marketing.js
+ * @file js/welcome.js
  */
 (function () {
   'use strict';
