@@ -11598,7 +11598,10 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
           if (journal && journal.style.display !== 'none') {
             toggleJournal();
           } else {
-            App.exitApp();
+            // Otherwise go back to the home screen rather than exiting the app
+            // (mirrors the "← Home" link, including the onboarding advance).
+            if (typeof _advanceOnboardingStep === 'function') _advanceOnboardingStep(4);
+            location.replace('index.html');
           }
         }
       });
