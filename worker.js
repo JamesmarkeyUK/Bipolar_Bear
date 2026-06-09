@@ -2,14 +2,14 @@
  * Cloudflare Worker that fronts the static assets.
  *
  * One Pages deployment can serve multiple per-condition variants
- * (BipolarBear, AnxietyAnt, …) routed by hostname. Per-host overrides in
- * HOST_LANDING_MAP issue a 301 redirect from `/` to a canonical path so the
- * URL bar reflects the served page:
- *   - bipolaranonymous.app, www.bipolaranonymous.app → 301 → /anonymous
+ * (BipolarBear, AnxietyAnt, …) routed by hostname. Both the per-host
+ * overrides in HOST_LANDING_MAP and the DEFAULT_LANDING are served at `/`
+ * via an internal rewrite (URL bar stays as `/`):
+ *   - bipolaranonymous.app, www.bipolaranonymous.app → /marketing-anonymous.html
+ *   - everything else                                → /marketing.html
  *
- * Hosts without an override get DEFAULT_LANDING served at `/` via an
- * internal rewrite (URL bar stays as `/`):
- *   - everything else → /index.html
+ * Each marketing page funnels visitors to the store badges and to its app:
+ * the Bear page → /index.html, the Anonymous page → /anonymous (the board).
  *
  * Adding a new variant pair (e.g. "Anxiety Ant" + "Anxiety Anonymous") is
  * just two new entries below; no other code changes here.
@@ -25,23 +25,27 @@
  */
 
 /**
- * Per-hostname canonical landing path. Bare host and `www.` variant must
- * be listed separately. Requests to `/` on these hosts get a 301 redirect
- * to the configured path (URL bar updates), preserving the query string.
+ * Per-hostname landing page served at `/`. Bare host and `www.` variant
+ * must be listed separately. Served via internal rewrite (URL bar stays
+ * as `/`).
  *
  * Add new variant hosts here when expanding to additional condition apps.
  */
 const HOST_LANDING_MAP = {
-  // Bipolar variant
-  'bipolaranonymous.app':     '/anonymous',
-  'www.bipolaranonymous.app': '/anonymous',
+  // Bipolar variant — the Anonymous marketing page leads with the community
+  // and links on to the board at /anonymous.
+  'bipolaranonymous.app':     '/marketing-anonymous.html',
+  'www.bipolaranonymous.app': '/marketing-anonymous.html',
 };
 
 /**
- * Landing page served at `/` when the requested hostname has no override.
- * Internal rewrite (URL bar stays as `/`).
+ * Landing page served at `/` when the requested hostname has no override —
+ * the Bipolar Bear marketing page. It funnels visitors to the store badges
+ * and to the web app (served at /index.html). Installed PWA users still
+ * open straight into the app because the manifest start_url is /index.html
+ * (see icons/favicons/site.webmanifest), not `/`.
  */
-const DEFAULT_LANDING = '/index.html';
+const DEFAULT_LANDING = '/marketing.html';
 
 export default {
   /**
@@ -55,14 +59,9 @@ export default {
     const url = new URL(request.url);
 
     if (url.pathname === '/' || url.pathname === '') {
-      const override = HOST_LANDING_MAP[url.hostname];
-      if (override) {
-        const target = new URL(url);
-        target.pathname = override;
-        return Response.redirect(target.toString(), 301);
-      }
+      const landing = HOST_LANDING_MAP[url.hostname] || DEFAULT_LANDING;
       const target = new URL(url);
-      target.pathname = DEFAULT_LANDING;
+      target.pathname = landing;
       return env.ASSETS.fetch(new Request(target.toString(), request));
     }
 

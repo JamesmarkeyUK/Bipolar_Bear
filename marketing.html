@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<!-- Bipolar Bear marketing / landing page © 2026 - All Rights Reserved -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Bipolar Bear &amp; Bipolar Anonymous — mood tracking &amp; anonymous peer support</title>
+  <meta name="description" content="Bipolar Bear is a free, private mood journal and survival kit for living with bipolar disorder. Plus Bipolar Anonymous — an anonymous peer-support community. iOS, Android and web.">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#ff9500">
+  <meta name="color-scheme" content="light">
+
+  <!-- Favicon (reuse the Bear set) -->
+  <link rel="icon" href="/icons/favicons/favicon.ico">
+  <link rel="icon" href="/icons/favicons/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icons/favicons/apple-touch-icon.png">
+
+  <link rel="canonical" href="https://www.bipolarbear.app/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.bipolarbear.app/">
+  <meta property="og:site_name" content="Bipolar Bear">
+  <meta property="og:title" content="Bipolar Bear &amp; Bipolar Anonymous">
+  <meta property="og:description" content="A free mood journal and survival kit for living with bipolar disorder — plus an anonymous peer-support community.">
+  <meta property="og:image" content="https://www.bipolarbear.app/images/og-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://www.bipolarbear.app/images/og-card.png">
+
+  <link rel="stylesheet" href="css/marketing.css">
+</head>
+<body>
+
+<!-- ───────── Reusable SVG sprite: App Store + Google Play badges ─────────
+     Store URLs are added later — see the <a class="store-badge" href="#">
+     wrappers below. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="gpBlue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#00e0ff"/><stop offset="1" stop-color="#00a1ff"/>
+    </linearGradient>
+    <linearGradient id="gpGreen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#00f176"/><stop offset="1" stop-color="#00c853"/>
+    </linearGradient>
+    <linearGradient id="gpRed" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff7a45"/><stop offset="1" stop-color="#ff3d44"/>
+    </linearGradient>
+    <linearGradient id="gpYellow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffd84d"/><stop offset="1" stop-color="#ffbe00"/>
+    </linearGradient>
+  </defs>
+
+  <symbol id="badge-appstore" viewBox="0 0 180 56">
+    <rect class="badge-rect" x="1" y="1" width="178" height="54" rx="12" fill="#000" stroke="rgba(255,255,255,0.22)"/>
+    <path fill="#fff" transform="translate(14,10) scale(1.35)"
+      d="M18.71,19.5C17.88,20.74 17,21.95 15.66,21.97C14.32,22 13.89,21.18 12.37,21.18C10.84,21.18 10.37,21.95 9.1,22C7.79,22.05 6.8,20.68 5.96,19.47C4.25,17 2.94,12.45 4.7,9.39C5.57,7.87 7.13,6.91 8.82,6.88C10.1,6.86 11.32,7.75 12.11,7.75C12.89,7.75 14.37,6.68 15.92,6.84C16.57,6.87 18.39,7.1 19.56,8.82C19.47,8.88 17.39,10.1 17.41,12.63C17.44,15.65 20.06,16.66 20.09,16.67C20.06,16.74 19.67,18.11 18.71,19.5M13,3.5C13.73,2.67 14.94,2.04 15.94,2C16.07,3.17 15.6,4.35 14.9,5.19C14.21,6.04 13.07,6.7 11.95,6.61C11.8,5.46 12.36,4.26 13,3.5Z"/>
+    <text x="56" y="23" fill="#fff" font-family="Nunito,sans-serif" font-size="10" font-weight="600" letter-spacing="0.5">Download on the</text>
+    <text x="55" y="44" fill="#fff" font-family="Nunito,sans-serif" font-size="21" font-weight="800" letter-spacing="-0.3">App Store</text>
+  </symbol>
+
+  <symbol id="badge-googleplay" viewBox="0 0 180 56">
+    <rect class="badge-rect" x="1" y="1" width="178" height="54" rx="12" fill="#000" stroke="rgba(255,255,255,0.22)"/>
+    <g transform="translate(15,13) scale(1.3)">
+      <polygon fill="url(#gpBlue)"   points="4.5,2.2 4.5,12 13.2,12"/>
+      <polygon fill="url(#gpGreen)"  points="4.5,12 4.5,21.8 13.2,12"/>
+      <polygon fill="url(#gpRed)"    points="4.5,2.2 13.2,12 20.5,12"/>
+      <polygon fill="url(#gpYellow)" points="4.5,21.8 13.2,12 20.5,12"/>
+    </g>
+    <text x="56" y="22" fill="#fff" font-family="Nunito,sans-serif" font-size="9" font-weight="700" letter-spacing="1.6">GET IT ON</text>
+    <text x="55" y="44" fill="#fff" font-family="Nunito,sans-serif" font-size="20" font-weight="800" letter-spacing="-0.3">Google Play</text>
+  </symbol>
+</svg>
+
+<!-- ───────────────────────── Nav ───────────────────────── -->
+<nav class="nav" id="nav">
+  <a class="nav-brand" href="#top">
+    <img src="icons/AppIcon.png" alt="Bipolar Bear">
+    <span>Bipolar Bear</span>
+  </a>
+  <div class="nav-links">
+    <a class="nav-hide-sm" href="#bear">Bipolar Bear</a>
+    <a class="nav-hide-sm" href="#anon">Bipolar Anonymous</a>
+    <a class="nav-cta" href="#get">Get the app</a>
+  </div>
+</nav>
+
+<main id="top">
+
+  <!-- ───────────────────────── Hero ───────────────────────── -->
+  <section class="hero" id="hero">
+    <div class="hero-floaties" aria-hidden="true">
+      <img class="floatie f1" src="images/moods/good.png" alt="">
+      <img class="floatie f2" src="images/moods/low.png" alt="">
+      <img class="floatie f3" src="images/moods/elevated.png" alt="">
+      <img class="floatie f4" src="images/moods/manic.png" alt="">
+    </div>
+    <div class="wrap hero-inner">
+      <div class="hero-copy">
+        <span class="eyebrow">🐻 Free · iOS · Android · Web</span>
+        <h1>Every high.<br>Every low.<br><span class="swing">One bear that gets it.</span></h1>
+        <p class="hero-sub">
+          Bipolar Bear is a free, private mood journal and survival kit built for the
+          swing of bipolar disorder. Track mood, energy, sleep and meds — then spot the
+          patterns before they spot you.
+        </p>
+        <div class="hero-cta" id="get">
+          <div class="store-badges">
+            <a class="store-badge" data-store="appstore-bear" href="#" title="App Store link coming soon" aria-label="Download Bipolar Bear on the App Store">
+              <svg viewBox="0 0 180 56"><use href="#badge-appstore"></use></svg>
+            </a>
+            <a class="store-badge" data-store="googleplay-bear" href="#" title="Google Play link coming soon" aria-label="Get Bipolar Bear on Google Play">
+              <svg viewBox="0 0 180 56"><use href="#badge-googleplay"></use></svg>
+            </a>
+          </div>
+          <a class="web-link" href="index.html">
+            Or open the web app straight in your browser →
+          </a>
+        </div>
+        <div class="trust-row">
+          <span>🔒 End-to-end encrypted</span>
+          <span>💷 Free, no ads</span>
+          <span>🐻 Built with the community</span>
+        </div>
+      </div>
+
+      <!-- Interactive mood meter — drag/hover to ride the swing -->
+      <div class="mood-meter" id="moodMeter">
+        <div class="mm-label">
+          <span class="mm-title">Today’s mood</span>
+          <span class="mm-live"><span class="dot"></span>live</span>
+        </div>
+        <div class="mood-stage">
+          <img class="mood-face" data-i="0" src="images/moods/depressed.png" alt="Depressed bear">
+          <img class="mood-face" data-i="1" src="images/moods/low.png" alt="Low bear">
+          <img class="mood-face" data-i="2" src="images/moods/stable.png" alt="Stable bear">
+          <img class="mood-face" data-i="3" src="images/moods/good.png" alt="Good bear">
+          <img class="mood-face" data-i="4" src="images/moods/elevated.png" alt="Elevated bear">
+          <img class="mood-face" data-i="5" src="images/moods/manic.png" alt="Manic bear">
+        </div>
+        <div class="mood-readout">
+          <div class="mood-name" id="moodName">Stable</div>
+          <div class="mood-tag" id="moodTag">Even keel — steady</div>
+        </div>
+        <div class="mood-track" id="moodTrack">
+          <svg class="mood-wave" viewBox="0 0 600 96" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="mmGrad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#7d8a99"/>
+                <stop offset="0.45" stop-color="#ffb347"/>
+                <stop offset="1" stop-color="#ff6b00"/>
+              </linearGradient>
+              <linearGradient id="mmFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#ff9500" stop-opacity="0.55"/>
+                <stop offset="1" stop-color="#ff9500" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path id="moodWaveFill" class="mood-wave-fill" d=""></path>
+            <path id="moodWaveLine" class="mood-wave-line" d=""></path>
+          </svg>
+          <div class="mood-handle" id="moodHandle"></div>
+        </div>
+        <div class="mood-scale"><span>Depressed</span><span>Stable</span><span>Manic</span></div>
+        <div class="mood-hint"><b>Drag</b> the bear along the wave — that’s a month of bipolar in five seconds.</div>
+      </div>
+    </div>
+
+    <div class="hero-wave" aria-hidden="true">
+      <svg viewBox="0 0 1440 70" preserveAspectRatio="none">
+        <path fill="#ffffff" d="M0,40 C240,75 480,5 720,30 C960,55 1200,75 1440,35 L1440,70 L0,70 Z"></path>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ───────────────────────── Features ───────────────────────── -->
+  <section class="features" id="features">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">Why Bipolar Bear</span>
+        <h2>Made for the way bipolar actually feels</h2>
+        <p>Not another generic habit tracker. Every part is shaped around mood that moves.</p>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card reveal">
+          <div class="feature-ic">📔</div>
+          <h3>Daily mood journal</h3>
+          <p>Log mood, energy, sleep, medication and notes in seconds. Your day, captured before it slips.</p>
+        </div>
+        <div class="feature-card reveal d1">
+          <div class="feature-ic">🆘</div>
+          <h3>Your survival kit</h3>
+          <p>Coping strategies, crisis contacts and reasons to stay — built calm, ready for when it isn’t.</p>
+        </div>
+        <div class="feature-card reveal d2">
+          <div class="feature-ic">📈</div>
+          <h3>Spot your patterns</h3>
+          <p>On-device insights link sleep, alcohol and more to how you feel the next day.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-ic">🔒</div>
+          <h3>End-to-end encrypted</h3>
+          <p>Entries are scrambled on your device before they ever leave it. Not even we can read them.</p>
+        </div>
+        <div class="feature-card reveal d1">
+          <div class="feature-ic">🔥</div>
+          <h3>Streaks that stick</h3>
+          <p>Gentle nudges and streaks help the habit hold on the days that are hardest to hold.</p>
+        </div>
+        <div class="feature-card reveal d2">
+          <div class="feature-ic">💬</div>
+          <h3>Never alone</h3>
+          <p>Step into Bipolar Anonymous — an anonymous peer community — right from the app.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────────── Showcase: Bipolar Bear ───────────────── -->
+  <section class="showcase showcase--bear" id="bear">
+    <div class="wrap">
+      <div class="showcase-top">
+        <div class="showcase-copy reveal">
+          <div class="showcase-badge">
+            <img src="icons/AppIcon_1024_store.png" alt="Bipolar Bear app icon">
+            <div>
+              <div class="sb-name">Bipolar Bear</div>
+              <div class="sb-dom">bipolarbear.app</div>
+            </div>
+          </div>
+          <h2>Your mind, in your pocket.</h2>
+          <p>The everyday companion for living well with bipolar — quietly tracking the things that matter so you can see yourself clearly.</p>
+          <ul class="showcase-list">
+            <li><span class="tick">✓</span> Mood, energy, sleep, meds &amp; free-text notes</li>
+            <li><span class="tick">✓</span> Personalised insights, computed privately on your device</li>
+            <li><span class="tick">✓</span> Export a clean PDF to share with your care team</li>
+            <li><span class="tick">✓</span> Works offline — your journal is always there</li>
+          </ul>
+          <div class="store-badges" style="margin-bottom:18px">
+            <a class="store-badge" data-store="appstore-bear" href="#" title="App Store link coming soon" aria-label="Download Bipolar Bear on the App Store">
+              <svg viewBox="0 0 180 56"><use href="#badge-appstore"></use></svg>
+            </a>
+            <a class="store-badge" data-store="googleplay-bear" href="#" title="Google Play link coming soon" aria-label="Get Bipolar Bear on Google Play">
+              <svg viewBox="0 0 180 56"><use href="#badge-googleplay"></use></svg>
+            </a>
+          </div>
+          <a class="web-link" href="index.html">Launch the web app →</a>
+        </div>
+        <div class="carousel reveal d1" data-carousel>
+          <div class="carousel-viewport">
+            <div class="carousel-track">
+              <img class="carousel-slide" src="store-assets/out/iphone/01-hero.png" alt="Bipolar Bear mood timeline" draggable="false">
+              <img class="carousel-slide" src="store-assets/out/iphone/02-sleep.png" alt="Sleep tracking from your watch" loading="lazy" draggable="false">
+              <img class="carousel-slide" src="store-assets/out/iphone/04-patterns.png" alt="Personalised feedback and patterns" loading="lazy" draggable="false">
+              <img class="carousel-slide" src="store-assets/out/iphone/05-survivalkit.png" alt="Build your own survival kit" loading="lazy" draggable="false">
+              <img class="carousel-slide" src="store-assets/out/iphone/06-pin.png" alt="Private PIN lock" loading="lazy" draggable="false">
+            </div>
+            <button class="carousel-arrow prev" type="button" aria-label="Previous screenshot"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+            <button class="carousel-arrow next" type="button" aria-label="Next screenshot"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+          </div>
+          <div class="carousel-dots"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────────── Showcase: Bipolar Anonymous ───────────────── -->
+  <section class="showcase showcase--anon showcase--flip" id="anon">
+    <div class="wrap">
+      <div class="showcase-top">
+        <div class="showcase-copy reveal">
+          <div class="showcase-badge">
+            <img src="icons/AppIcon_anonymous_1024_store.png" alt="Bipolar Anonymous app icon">
+            <div>
+              <div class="sb-name">Bipolar Anonymous</div>
+              <div class="sb-dom">bipolaranonymous.app</div>
+            </div>
+          </div>
+          <h2>Share your thoughts,<br>not your identity.</h2>
+          <p>A separate, standalone app: an anonymous peer community for people living with bipolar. Pick a monika, post what’s real, and find people who actually get it.</p>
+          <ul class="showcase-list">
+            <li><span class="tick">✓</span> No real name — just a monika you choose</li>
+            <li><span class="tick">✓</span> Posts to relate to, not perform for</li>
+            <li><span class="tick">✓</span> Recognised across all your devices</li>
+            <li><span class="tick">✓</span> Your email is only ever stored as a hash</li>
+          </ul>
+          <div class="store-badges" style="margin-bottom:18px">
+            <a class="store-badge" data-store="appstore-anon" href="#" title="App Store link coming soon" aria-label="Download Bipolar Anonymous on the App Store">
+              <svg viewBox="0 0 180 56"><use href="#badge-appstore"></use></svg>
+            </a>
+            <a class="store-badge" data-store="googleplay-anon" href="#" title="Google Play link coming soon" aria-label="Get Bipolar Anonymous on Google Play">
+              <svg viewBox="0 0 180 56"><use href="#badge-googleplay"></use></svg>
+            </a>
+          </div>
+          <a class="web-link" href="https://www.bipolaranonymous.app" target="_blank" rel="noopener noreferrer">Open bipolaranonymous.app →</a>
+        </div>
+        <div class="carousel reveal d1" data-carousel>
+          <div class="carousel-viewport">
+            <div class="carousel-track">
+              <img class="carousel-slide" src="store-assets/out/anonymous/iphone/01-hero.png" alt="Bipolar Anonymous community feed" draggable="false">
+              <img class="carousel-slide" src="store-assets/out/anonymous/iphone/02-monika.png" alt="Pick a monika" loading="lazy" draggable="false">
+              <img class="carousel-slide" src="store-assets/out/anonymous/iphone/03-ask.png" alt="Ask the community" loading="lazy" draggable="false">
+              <img class="carousel-slide" src="store-assets/out/anonymous/iphone/04-wiki.png" alt="Community wiki" loading="lazy" draggable="false">
+              <img class="carousel-slide" src="store-assets/out/anonymous/iphone/05-report.png" alt="Report and keep it safe" loading="lazy" draggable="false">
+            </div>
+            <button class="carousel-arrow prev" type="button" aria-label="Previous screenshot"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+            <button class="carousel-arrow next" type="button" aria-label="Next screenshot"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+          </div>
+          <div class="carousel-dots"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────────────────── Founder ───────────────────────── -->
+  <section class="founder" id="founder">
+    <div class="wrap founder-inner">
+      <div class="founder-photo reveal">
+        <img src="images/marketing/james-markey.jpg" alt="James Markey, founder of Bipolar Bear">
+      </div>
+      <div class="founder-copy reveal d1">
+        <span class="eyebrow">The human behind the bear</span>
+        <h2>Built by James Markey</h2>
+        <p>Bipolar Bear began as one person’s tool for living with bipolar — and grew into a free app for everyone who needs one. James builds in the open and shares the whole journey, highs and lows included.</p>
+        <p class="signoff">No investors. No data harvesting. Just a tool he wished existed.</p>
+        <a class="btn-pill" href="https://www.jamesmarkey.co.uk" target="_blank" rel="noopener noreferrer">
+          Visit jamesmarkey.co.uk →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────────────────── Hosting credit ───────────────────────── -->
+  <section class="hosting">
+    <div class="wrap">
+      <div class="host-label">Proudly hosted for free by</div>
+      <a class="host-card reveal" href="https://www.unisim.co.uk" target="_blank" rel="noopener noreferrer">
+        <img src="images/marketing/unisim-logo.png" alt="UNI SIM">
+        <div class="host-text">
+          <b>UNI SIM</b>
+          <span>Both apps are hosted free of charge by UNI SIM — so every penny goes to the people who need them, not the servers.</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ───────────────────────── Footer ───────────────────────── -->
+  <footer class="foot">
+    <div class="wrap">
+      <div class="foot-grid">
+        <div class="foot-brand">
+          <div class="fb-row">
+            <img src="icons/AppIcon.png" alt="">
+            <b>Bipolar Bear</b>
+          </div>
+          <p>A free, private mood journal and survival kit for living with bipolar disorder — and an anonymous community for the days you’d rather not be alone.</p>
+        </div>
+        <div class="foot-col">
+          <h4>The apps</h4>
+          <a href="index.html">Bipolar Bear · open the web app</a>
+          <a href="https://www.bipolaranonymous.app" target="_blank" rel="noopener noreferrer">Bipolar Anonymous · bipolaranonymous.app</a>
+          <a class="store-badge-text" data-store="appstore-bear" href="#" title="Link coming soon">Download on the App Store</a>
+          <a class="store-badge-text" data-store="googleplay-bear" href="#" title="Link coming soon">Get it on Google Play</a>
+        </div>
+        <div class="foot-col">
+          <h4>More</h4>
+          <a href="privacy.html">Privacy</a>
+          <a href="https://www.jamesmarkey.co.uk" target="_blank" rel="noopener noreferrer">Founder · James Markey</a>
+          <a href="https://www.unisim.co.uk" target="_blank" rel="noopener noreferrer">Hosting · UNI SIM</a>
+        </div>
+      </div>
+      <div class="foot-note">
+        <div class="crisis">
+          <b>Not a crisis service.</b> Bipolar Bear is a self-help tool, not a substitute for professional care. If you’re in crisis, contact your local emergency services or a crisis line right away.
+        </div>
+        <div>© 2026 Bipolar Bear · Built by James Markey · Hosted by UNI SIM</div>
+      </div>
+    </div>
+  </footer>
+
+</main>
+
+<script src="js/marketing.js"></script>
+</body>
+</html>

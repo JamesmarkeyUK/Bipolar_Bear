@@ -129,7 +129,20 @@
 // v58: extend "deleted by admin" tombstone visibility from 1 hour to 24 hours on the anonymous board.
 // v59: in-app confirmation popup before enabling notifications/health sync on native (consent gate that survives account deletion, since OS permission grants can't be revoked programmatically); journal settings version label now reads the canonical window._APP_VERSION instead of a hardcoded 1.2, so it stays in sync with the home page.
 // v60: permission-prompt fixes (journal.js). Notifications no longer prompt at startup/during the tutorial — initNotifications() now uses the non-prompting checkPermissions() and only re-schedules if already granted, so the OS notification sheet is raised solely by the reminder/weekly toggles. Health-sync toggle now actually requests OS Health access at the moment it's enabled (it previously only set a flag, so users saw "Not yet authorised" and were never asked); auto-sync on mood/focused-mode steps is gated behind checkHealthPermissions so a Firestore-rehydrated flag after reinstall can't pop a surprise sheet from ordinary navigation. When iOS suppresses the Health sheet (stuck grant after reinstall), the toggle offers a deep-link to Apple Health settings. iOS health status label no longer over-promises "Authorised" (read grants are opaque on iOS) — Android wording unchanged.
-const CACHE_NAME = 'bipolarbear-v60';
+// v61: add the public marketing/landing page — worker.js now serves
+//      marketing.html at `/` (the web app moved to /index.html). Precache
+//      marketing.html + css/marketing.css + js/marketing.js so the new
+//      homepage works offline. Installed PWAs still open the app directly
+//      (manifest start_url is now /index.html).
+// v62: add the Bipolar Anonymous marketing page — worker.js now serves
+//      marketing-anonymous.html at `/` on bipolaranonymous.app (the board
+//      stays at /anonymous). Precache it; it reuses css/marketing.css +
+//      js/marketing.js, already cached.
+// v63: js/marketing.js — hold each showcase carousel on its hero screenshot
+//      until it scrolls into view, instead of auto-advancing from page load.
+// v64: drop the (yellow) Bipolar Anonymous screenshot from the Bipolar Bear
+//      carousel on both marketing pages — it clashed with the orange section.
+const CACHE_NAME = 'bipolarbear-v64';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
@@ -137,6 +150,8 @@ const CACHE_NAME = 'bipolarbear-v60';
  * picks up everything else as the user navigates.
  */
 const STATIC_ASSETS = [
+  './marketing.html',
+  './marketing-anonymous.html',
   './index.html',
   './journal.html',
   './survival-kit.html',
@@ -145,6 +160,7 @@ const STATIC_ASSETS = [
 
   // FAB dock + page-specific JS (extracted from inline scripts in Phase 4).
   './fab.js',
+  './js/marketing.js',
   './js/index.js',
   './js/journal.js',
   './js/survival-kit.js',
@@ -167,6 +183,7 @@ const STATIC_ASSETS = [
   './css/theme.css',
 
   // Page-specific stylesheets (extracted from inline <style> in Phase 4).
+  './css/marketing.css',
   './css/index.css',
   './css/journal.css',
   './css/survival-kit.css',
