@@ -612,13 +612,13 @@
     const _fabsUnlocked = BB.storage.get('FabsUnlocked') === '1';
     const _footer = document.querySelector('.fab-footer');
 
-    // Center auth FAB: show when dock unlocked
+    // Center auth FAB: always visible. It's the single auth/profile button on
+    // every page — shown during onboarding (when the rest of the dock is still
+    // locked) and after. (index.html used to ship its own pre-dock
+    // #authFabWrapper for the locked phase; that's been removed in favour of
+    // this one to avoid two buttons stacked at the same coordinates.)
     const _authFab = document.getElementById('bbAuthFab');
-    if (_authFab) _authFab.style.display = _fabsUnlocked ? 'flex' : 'none';
-
-    // index.html pre-dock auth wrapper: hide when dock is unlocked (bbAuthFab takes over)
-    const _authWrap = document.getElementById('authFabWrapper');
-    if (_authWrap) _authWrap.style.display = _fabsUnlocked ? 'none' : '';
+    if (_authFab) _authFab.style.display = 'flex';
 
     if (!_fabsUnlocked) {
       if (_footer) _footer.style.display = 'none';
