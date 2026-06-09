@@ -81,7 +81,7 @@
   <div id="authFabWrapper" style="position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:50; pointer-events:none; display:flex; align-items:center; justify-content:center;">
     <button id="signinBtn" onclick="window.showAuthModal()" style="width:44px;height:44px;min-width:44px;background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);border-radius:50%;cursor:pointer;font-size:1.15em;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 10px rgba(255,149,0,0.25);pointer-events:auto;">👤</button>
     <div id="userInfo" style="display:none; flex-direction:row; align-items:center; pointer-events:auto;">
-      <button onclick="window.showAccountModal()" style="width:44px;height:44px;min-width:44px;background:var(--brand-primary);color:white;border:none;border-radius:50%;cursor:pointer;font-size:1.15em;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 10px rgba(255,149,0,0.35);">👤</button>
+      <button onclick="window.showProfileModal()" style="width:44px;height:44px;min-width:44px;background:var(--brand-primary);color:white;border:none;border-radius:50%;cursor:pointer;font-size:1.15em;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 10px rgba(255,149,0,0.35);">👤</button>
     </div>
     <!-- Version chip — populated by BB.versionLabel() in version-check.js -->
     <span id="bbHomeVersion" style="position:absolute;top:calc(100% + 4px);left:50%;transform:translateX(-50%);font-size:0.62em;font-weight:600;color:rgba(255,255,255,0.6);letter-spacing:0.04em;text-shadow:0 1px 2px rgba(0,0,0,0.18);white-space:nowrap;pointer-events:none;"></span>
@@ -276,6 +276,111 @@
         <button onclick="savePersonalDetails()" style="flex:1;padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;" data-i18n="common.save">Save</button>
         <button onclick="closePersonalDetailsModal()" style="padding:12px 18px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;cursor:pointer;" data-i18n="common.close">Close</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Profile / Account Modal (multi-panel: Customise → Account → Danger) -->
+  <div class="overlay-modal" id="idxProfileModal" onclick="if(event.target===this)closeProfileModal()">
+    <div class="modal-box" style="max-width:360px;max-height:88dvh;overflow-y:auto;position:relative;">
+
+      <!-- PANEL 1: Customise -->
+      <div id="idxProfilePanelCustomise">
+        <h3 style="text-align:center;margin-bottom:6px;">👤 Profile</h3>
+        <div id="idxProfileEmailCustomise" style="font-size:0.82em;color:#6c757d;margin-bottom:18px;word-break:break-all;text-align:center;"></div>
+
+        <div style="font-size:0.85em;font-weight:600;color:#495057;margin-bottom:10px;">🏠 Home buttons</div>
+        <div id="idxHomeBtnToggles" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:18px;"></div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding:10px 12px;border:1.5px solid #e9ecef;border-radius:12px;">
+          <div>
+            <div style="font-weight:600;color:#495057;font-size:0.92em;">📊 Show stats</div>
+            <div style="color:#6c757d;font-size:0.8em;margin-top:2px;">Streaks &amp; progress under each button</div>
+          </div>
+          <button id="idxShowStatsToggle" onclick="_toggleHomeStats()" style="position:relative;display:inline-block;width:46px;height:26px;border-radius:13px;border:none;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent;padding:0;transition:background 0.2s;">
+            <span style="position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:white;box-shadow:0 1px 3px rgba(0,0,0,0.3);transition:left 0.2s;"></span>
+          </button>
+        </div>
+
+        <div style="margin-bottom:18px;">
+          <div style="font-size:0.85em;font-weight:600;color:#495057;margin-bottom:6px;" data-i18n="account.language">🌐 Language</div>
+          <select id="idxLangSelect" onchange="window.BB&&window.BB.i18n&&window.BB.i18n.setLanguage(this.value)" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;font-family:inherit;color:#495057;background:white;cursor:pointer;-webkit-appearance:none;appearance:none;">
+            <option value="en">🇬🇧 English</option>
+            <option value="es">🇪🇸 Español</option>
+            <option value="fr">🇫🇷 Français</option>
+            <option value="de">🇩🇪 Deutsch</option>
+            <option value="it">🇮🇹 Italiano</option>
+            <option value="pt">🇵🇹 Português</option>
+            <option value="nl">🇳🇱 Nederlands</option>
+            <option value="pl">🇵🇱 Polski</option>
+            <option value="sv">🇸🇪 Svenska</option>
+            <option value="zh">🇨🇳 中文</option>
+          </select>
+        </div>
+
+        <div style="display:flex;gap:10px;">
+          <button onclick="closeProfileModal()" style="flex:1;padding:11px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:10px;font-size:0.92em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="common.close">Close</button>
+          <button onclick="_profileShowPanel('account')" style="flex:1;padding:11px;background:var(--brand-primary);color:white;border:none;border-radius:10px;font-size:0.92em;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">More →</button>
+        </div>
+        <div id="idxProfileVersion" style="margin-top:12px;text-align:center;font-size:0.7em;color:#adb5bd;letter-spacing:0.02em;"></div>
+      </div>
+
+      <!-- PANEL 2: Account -->
+      <div id="idxProfilePanelAccount" style="display:none;">
+        <h3 style="text-align:center;margin-bottom:6px;">⚙️ Account</h3>
+        <div id="idxProfileEmail" style="font-size:0.82em;color:#6c757d;margin-bottom:14px;word-break:break-all;text-align:center;"></div>
+        <div id="idxProfileMsg" style="font-size:0.85em;margin-bottom:12px;display:none;padding:8px 12px;border-radius:8px;"></div>
+
+        <!-- Signed-in account actions -->
+        <div id="idxAccountSignedIn">
+          <button onclick="_idxAccountLogout()" style="width:100%;padding:12px;background:white;color:#dc3545;border:2px solid #dc3545;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;margin-bottom:10px;-webkit-tap-highlight-color:transparent;" data-i18n="account.signOut">Sign out</button>
+
+          <div style="margin-bottom:10px;">
+            <div id="idxPassFields" style="display:none;margin-bottom:8px;">
+              <input type="password" id="idxCurrentPass" placeholder="Current password" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;box-sizing:border-box;margin-bottom:6px;outline:none;font-family:inherit;">
+              <input type="password" id="idxNewPass" placeholder="New password" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;box-sizing:border-box;margin-bottom:8px;outline:none;font-family:inherit;">
+              <div style="display:flex;gap:8px;">
+                <button onclick="_idxSubmitPasswordChange()" style="flex:1;padding:10px;background:var(--brand-primary);color:white;border:none;border-radius:8px;font-size:0.9em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Save</button>
+                <button onclick="document.getElementById('idxPassFields').style.display='none';document.getElementById('idxPassToggleBtn').style.display='';" style="padding:10px 14px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Cancel</button>
+              </div>
+            </div>
+            <button id="idxPassToggleBtn" onclick="document.getElementById('idxPassFields').style.display='';document.getElementById('idxPassToggleBtn').style.display='none';document.getElementById('idxCurrentPass').focus();" style="width:100%;padding:12px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Change password</button>
+          </div>
+
+          <div style="margin-bottom:10px;">
+            <div id="idxEmailFields" style="display:none;margin-bottom:8px;">
+              <input type="email" id="idxNewEmail" placeholder="New email address" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;box-sizing:border-box;margin-bottom:6px;outline:none;font-family:inherit;">
+              <input type="password" id="idxEmailPass" placeholder="Current password" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;box-sizing:border-box;margin-bottom:8px;outline:none;font-family:inherit;">
+              <div style="display:flex;gap:8px;">
+                <button onclick="_idxSubmitEmailChange()" style="flex:1;padding:10px;background:var(--brand-primary);color:white;border:none;border-radius:8px;font-size:0.9em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Save</button>
+                <button onclick="document.getElementById('idxEmailFields').style.display='none';document.getElementById('idxEmailToggleBtn').style.display='';" style="padding:10px 14px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Cancel</button>
+              </div>
+            </div>
+            <button id="idxEmailToggleBtn" onclick="document.getElementById('idxEmailFields').style.display='';document.getElementById('idxEmailToggleBtn').style.display='none';document.getElementById('idxNewEmail').focus();" style="width:100%;padding:12px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Change email</button>
+          </div>
+        </div>
+
+        <!-- Guest notice (shown when not signed in) -->
+        <div id="idxAccountGuest" style="display:none;margin-bottom:10px;">
+          <p style="font-size:0.85em;color:#6c757d;line-height:1.5;text-align:center;margin-bottom:10px;">You're using Bipolar Bear as a guest. Sign in to save your progress and manage your account.</p>
+          <button onclick="closeProfileModal();window.showAuthModal&&window.showAuthModal()" style="width:100%;padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:10px;font-size:0.95em;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">Sign in</button>
+        </div>
+
+        <button onclick="window._fabOpenPersonalInfo&&window._fabOpenPersonalInfo()" style="width:100%;padding:12px;background:white;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;margin-bottom:10px;-webkit-tap-highlight-color:transparent;">👤 Personal information</button>
+
+        <button onclick="_profileShowPanel('danger')" style="width:100%;padding:12px;background:rgba(201,42,42,0.06);color:#c92a2a;border:1.5px solid #c92a2a;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;margin-bottom:14px;-webkit-tap-highlight-color:transparent;">🗑️ Delete…</button>
+
+        <button onclick="_profileShowPanel('customise')" style="width:100%;padding:10px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:10px;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;">← Back</button>
+      </div>
+
+      <!-- PANEL 3: Danger zone -->
+      <div id="idxProfilePanelDanger" style="display:none;">
+        <h3 style="text-align:center;margin-bottom:16px;">⚠️ Danger Zone</h3>
+        <div style="font-weight:600;margin-bottom:6px;color:#495057;font-size:0.95em;">🗑️ <span id="idxDangerTitle">Delete Account</span></div>
+        <div id="idxDangerDesc" style="color:#6c757d;font-size:0.84em;margin-bottom:14px;line-height:1.5;">Permanently delete your account, all journal entries, and reset everything on this device. This cannot be undone.</div>
+        <button onclick="closeProfileModal(); confirmDeleteAll();" style="width:100%;background:rgba(201,42,42,0.08);border:1.5px solid #c92a2a;color:#c92a2a;font-size:0.92em;cursor:pointer;padding:11px;font-weight:600;border-radius:10px;margin-bottom:14px;-webkit-tap-highlight-color:transparent;"><span id="idxDangerBtnLabel">🗑️ Delete Account &amp; Reset</span></button>
+        <button onclick="_profileShowPanel('account')" style="width:100%;padding:10px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:10px;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;">← Back</button>
+      </div>
+
     </div>
   </div>
 

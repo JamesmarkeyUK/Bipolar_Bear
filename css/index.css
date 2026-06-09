@@ -244,6 +244,10 @@
       pointer-events: none;
       user-select: none;
     }
+    /* "Show stats" toggle off (Profile → Customise) — hide all stat badges
+       (streaks, survival progress, anon messages) under the home buttons.
+       !important overrides the inline display set by _revealBadge(). */
+    .buttons.bb-hide-stats .btn-subnote { display: none !important; }
     .btn-subnote-muted {
       display: block;
       text-align: center;
