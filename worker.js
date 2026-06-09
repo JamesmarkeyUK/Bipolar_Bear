@@ -18,8 +18,19 @@
  * which serves files from `wrangler.json#assets.directory` (currently the
  * repo root).
  *
- * Configured by wrangler.json. Note: this worker runs at the edge — it is
- * unrelated to service-worker.js, which runs in the browser.
+ * Configured by wrangler.json. Two settings there are load-bearing — do not
+ * remove them or this whole file becomes dead code:
+ *   - assets.binding = "ASSETS"          — wires up env.ASSETS (used below).
+ *   - assets.run_worker_first = ["/", "/version.json"]
+ *         By default Cloudflare serves a matching static asset BEFORE the
+ *         Worker, so `/` would resolve straight to index.html (the app) and
+ *         this script would never run. run_worker_first forces the Worker to
+ *         handle these two paths first, so the `/` → marketing rewrite and
+ *         the /version.json CORS headers below actually take effect. Every
+ *         other path stays asset-first (no Worker invocation).
+ *
+ * Note: this worker runs at the edge — it is unrelated to service-worker.js,
+ * which runs in the browser.
  *
  * @file worker.js
  */
