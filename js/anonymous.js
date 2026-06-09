@@ -135,8 +135,10 @@ function initFirebase() {
         return;
       }
 
-      // Subsequent auth changes — sign-out while on board (Firebase-auth path only)
-      if (!isReal && BB.storage.get('Anon_verified') === 'true' && !BB.storage.get('Anon_email')) {
+      // Subsequent auth changes — sign-out while on board (Firebase-auth path only).
+      // Checks !user (not !isReal) so the standalone path's anonymous
+      // sign-in (_ensureAuthSession) doesn't read as a sign-out.
+      if (!user && BB.storage.get('Anon_verified') === 'true' && !BB.storage.get('Anon_email')) {
         BB.storage.remove('Anon_verified');
         BB.storage.remove('Anon_isAdmin');
         stopAllListeners();
@@ -151,6 +153,27 @@ if (typeof firebase !== 'undefined') {
   initFirebase();
 } else {
   window.addEventListener('load', () => { if (typeof firebase !== 'undefined') initFirebase(); });
+}
+
+// Standalone users (email-code path) never sign in to Firebase Auth, but the
+// Firestore rules for the comments subcollection require request.auth — the
+// top-level bbAnonPosts collection is open, which is why posting works while
+// comment threads silently fail. Sign in anonymously so threads work too.
+// No-op when a session (BB account or a previous anonymous one) exists.
+let _anonAuthPromise = null;
+function _ensureAuthSession() {
+  if (!_anonAuthPromise) {
+    _anonAuthPromise = (async () => {
+      try {
+        if (typeof firebase !== 'undefined' && firebase.auth && !firebase.auth().currentUser) {
+          await firebase.auth().signInAnonymously();
+        }
+      } catch (e) {
+        console.warn('[Anonymous] anonymous sign-in failed', e);
+      }
+    })();
+  }
+  return _anonAuthPromise;
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -1081,6 +1104,7 @@ function initBoard() {
     setupOverlayActions();
     _boardSetupDone = true;
   }
+  _ensureAuthSession(); // fire-and-forget; openThread/send await the promise
   setTab('general');
   listenPosts(); // starts both tab listeners; setTab no longer does this
   cleanOldPosts();
@@ -2288,7 +2312,7 @@ async function cleanOldPosts() {
 // ─────────────────────────────────────────────────────────────────
 // Comment threads
 // ─────────────────────────────────────────────────────────────────
-function openThread(postId) {
+async function openThread(postId) {
   const post = localPosts.find(p => p.id === postId);
   if (!post || post.isSeed) return;
   commentTargetId = postId;
@@ -2311,6 +2335,12 @@ function openThread(postId) {
     return;
   }
 
+  // Comments reads require request.auth — make sure the standalone path has
+  // its anonymous session before subscribing, or the listener dies with
+  // permission-denied. Bail if the user closed the thread while waiting.
+  await _ensureAuthSession();
+  if (commentTargetId !== postId) return;
+
   currentThreadUnsub = db.collection(BB_BRAND.collections.posts).doc(postId)
     .collection('comments')
     .orderBy('timestamp', 'asc')
@@ -2325,7 +2355,7 @@ function openThread(postId) {
     }, err => {
       console.warn('[Thread] comments listener error', err);
       const el = document.getElementById('thread-comments-list');
-      if (el) el.innerHTML = '<div class="empty-state" style="padding:24px 0 16px;">No comments yet — be the first! 💛</div>';
+      if (el) el.innerHTML = '<div class="empty-state" style="padding:24px 0 16px;">Couldn\'t load comments — please try again later.</div>';
     });
 }
 
@@ -2390,7 +2420,6 @@ function setupThread() {
     if (!text || !commentTargetId) return;
     _sending = true;
     sendBtn.disabled = true;
-    ta.value = '';
 
     const comment = {
       name:      profile.monika,
@@ -2403,18 +2432,35 @@ function setupThread() {
       timestamp: firebase.firestore.FieldValue.serverTimestamp(),
     };
 
+    let sent = false;
     if (db) {
       try {
+        await _ensureAuthSession(); // comment writes require request.auth
         const postRef = db.collection(BB_BRAND.collections.posts).doc(commentTargetId);
         await postRef.collection('comments').add(comment);
-        // Bump the parent post to the top of the board and update count
-        await postRef.update({
-          lastActivity: firebase.firestore.FieldValue.serverTimestamp(),
-          commentCount: firebase.firestore.FieldValue.increment(1),
-        });
+        sent = true;
+        // Bump the parent post to the top of the board and update count.
+        // Separate try — a failed bump shouldn't read as a failed comment.
+        try {
+          await postRef.update({
+            lastActivity: firebase.firestore.FieldValue.serverTimestamp(),
+            commentCount: firebase.firestore.FieldValue.increment(1),
+          });
+        } catch (e) {
+          console.warn('[Thread] post bump failed', e);
+        }
       } catch (e) {
         console.error('[Thread] comment failed', e);
       }
+    }
+
+    if (sent) {
+      ta.value = '';
+    } else {
+      // Keep the typed text so the user can retry, and say what happened —
+      // previously this failed silently and the comment just vanished.
+      showHint('Comment failed to send — please try again.');
+      sendBtn.disabled = !ta.value.trim();
     }
     _sending = false;
   });

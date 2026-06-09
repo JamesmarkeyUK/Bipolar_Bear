@@ -184,7 +184,14 @@
 //      css/marketing.css → css/welcome.css, js/marketing.js → js/welcome.js.
 //      worker.js now serves the host-aware landing at both `/` and `/welcome`
 //      (wrangler run_worker_first gains "/welcome"). Precache paths updated.
-const CACHE_NAME = 'bipolarbear-v72';
+// v73: js/anonymous.js — fix comment threads for standalone (email-code)
+//      users. Firestore rules require auth on the comments subcollection
+//      while bbAnonPosts itself is open, so posting worked but threads
+//      silently failed. The board now signs in anonymously
+//      (_ensureAuthSession) before subscribing/sending; send failures keep
+//      the typed text and show a hint instead of vanishing; listener errors
+//      no longer masquerade as "No comments yet".
+const CACHE_NAME = 'bipolarbear-v73';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
