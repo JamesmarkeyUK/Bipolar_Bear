@@ -191,10 +191,17 @@ section{position:relative;}
 @keyframes mmPulse{0%{box-shadow:0 0 0 0 rgba(255,149,0,.5)}70%{box-shadow:0 0 0 9px rgba(255,149,0,0)}100%{box-shadow:0 0 0 0 rgba(255,149,0,0)}}
 
 .mood-stage{position:relative;height:172px;display:flex;align-items:center;justify-content:center;margin-bottom:4px;}
+/* Ground shadow lives on a pseudo-element, NOT filter:drop-shadow on the img —
+   iOS Safari rasterizes drop-shadow against the img's bounding box while
+   opacity/transform transitions run, painting a grey rectangle behind it. */
+.mood-stage::after{
+  content:"";position:absolute;left:50%;bottom:8px;width:130px;height:28px;z-index:0;
+  transform:translateX(-50%);border-radius:50%;
+  background:radial-gradient(closest-side,rgba(31,35,48,0.22),rgba(31,35,48,0));
+}
 .mood-face{
-  position:absolute;width:150px;height:150px;object-fit:contain;
+  position:absolute;width:150px;height:150px;object-fit:contain;z-index:1;
   opacity:0;transform:scale(.82);transition:opacity .3s ease,transform .4s cubic-bezier(.2,.8,.3,1.2);
-  filter:drop-shadow(0 16px 26px rgba(31,35,48,0.22));
 }
 .mood-face.active{opacity:1;transform:scale(1);}
 
