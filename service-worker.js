@@ -194,7 +194,10 @@
 // v74: welcome carousels — hide the prev/next arrows while the hero
 //      screenshot (slide 1) is showing; they fade in once the carousel
 //      auto-advances. Touches js/welcome.js, css/welcome.css.
-const CACHE_NAME = 'bipolarbear-v74';
+// v75: mood-meter bear shadow moved off filter:drop-shadow onto a
+//      .mood-stage::after ellipse — iOS Safari painted the drop-shadow as a
+//      grey rectangle behind the transparent PNG. Touches css/welcome.css.
+const CACHE_NAME = 'bipolarbear-v75';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
