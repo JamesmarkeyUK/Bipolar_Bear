@@ -3710,7 +3710,7 @@ window.addEventListener('pageshow', () => {
       // exposes a revoke API), so this popup is the consent gate the next user
       // sees before any sleep/step data is read on their behalf.
       if (on && isNative()) {
-        if (!confirm("Allow BipolarBear to read your sleep and step data from your phone's health app?\n\nYou can turn this off any time.")) {
+        if (!confirm(`Allow BipolarBear to read your sleep and step data from ${_healthServiceName()}?\n\nYou can turn this off any time.`)) {
           on = false;
           if (chk) chk.checked = false;
         }
@@ -3730,6 +3730,26 @@ window.addEventListener('pageshow', () => {
       }
     }
     window._toggleHealthSync = _toggleHealthSync;
+
+    // Apple Guideline 2.5.1: HealthKit functionality must be clearly
+    // identified in the UI, so name the actual platform service instead of
+    // the generic "your phone's health app".
+    function _healthServiceName() {
+      return isIOS() ? 'Apple Health' : isAndroid() ? 'Health Connect' : "your phone's health app";
+    }
+
+    (function _brandHealthSyncUI() {
+      const label = document.getElementById('healthSyncLabel');
+      const desc = document.getElementById('healthSyncDesc');
+      if (!label || !desc) return;
+      if (isIOS()) {
+        label.textContent = '❤️ Apple Health sync';
+        desc.textContent = 'Import steps & sleep hours from Apple Health (HealthKit)';
+      } else if (isAndroid()) {
+        label.textContent = '📱 Health Connect sync';
+        desc.textContent = 'Import steps & sleep hours from Google Health Connect';
+      }
+    })();
 
     // Request Health read access in response to a deliberate user action, then
     // reflect the result in the settings label. Detects the iOS "sheet was
@@ -4332,6 +4352,8 @@ window.addEventListener('pageshow', () => {
           const _autoSyncSleep = BB.storage.get('HealthSyncEnabled') === '1';
           const _syncText = _fmSleepError === 'fail' ? '❌ Sync failed — try again'
             : _fmSleepError === 'nodata' ? '🤷 No sleep data found — try again'
+            : isIOS() ? '📱 Re-sync from Apple Health'
+            : isAndroid() ? '📱 Re-sync from Health Connect'
             : '📱 Re-sync from Health App';
           // Show retry/resync button only when health sync is ON and: there's an error, OR user undid a sync
           const _showSleepSyncBtn = _autoSyncSleep && (_fmSleepError || (_fmSleepAutoSyncDone && !_fmSleepImported && !_sleepHealthSynced));

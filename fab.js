@@ -137,6 +137,15 @@
   // ── Config ────────────────────────────────────────────────────────────────
 
   /**
+   * Apple Guideline 3.1.1: donations towards the app's development must use
+   * In-App Purchase on iOS — external donation links (buymeacoffee) are not
+   * allowed. The coffee FAB is therefore suppressed entirely in the iOS
+   * native shell: never shown in the dock, never offered in the picker.
+   * Web and Android keep it.
+   */
+  const _COFFEE_BLOCKED = !!(window.BB && BB.platform && BB.platform.isIOS());
+
+  /**
    * Default FABs, one per slot. `hiddenKey` is the localStorage flag that
    * removes the FAB from the dock when set to '1'. Reordering this array
    * does not move existing users' FABs — slot persistence is keyed on `id`
@@ -648,7 +657,7 @@
     const _defVis = {
       chat:     BB.storage.get('WaFabHidden')        !== '1',
       e2ee:     BB.storage.get('QuickNoteFabHidden') !== '1',
-      coffee:   BB.storage.get('CoffeeFabHidden')    !== '1',
+      coffee:   !_COFFEE_BLOCKED && BB.storage.get('CoffeeFabHidden') !== '1',
       feedback: BB.storage.get('FeedbackFabHidden')  !== '1',
     };
     const _defEl = {
@@ -723,6 +732,7 @@
     if (!_opts) return;
     _opts.innerHTML = '';
     _FAB_DEFAULTS.forEach(_def => {
+      if (_def.id === 'coffee' && _COFFEE_BLOCKED) return;
       if (localStorage.getItem(_def.hiddenKey) === '1') {
         const _btn = document.createElement('button');
         _btn.style.cssText = 'display:flex;align-items:center;gap:14px;width:100%;padding:13px 14px;background:#f8f9fa;border:1.5px solid #e9ecef;border-radius:14px;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;';

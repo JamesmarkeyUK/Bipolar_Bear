@@ -205,7 +205,12 @@
 // v77: stats-off users no longer see the skeleton placeholders blur-flash on
 //      load — the early-paint script applies bb-hide-stats synchronously when
 //      the Show-stats preference is off. Touches index.html.
-const CACHE_NAME = 'bipolarbear-v77';
+// v78: App Store review fixes — the ☕ donation FAB is suppressed in the iOS
+//      native shell (Guideline 3.1.1: external donation links must use IAP;
+//      web + Android unchanged), and the health-sync UI now names Apple
+//      Health / Health Connect explicitly instead of "your phone's health
+//      app" (Guideline 2.5.1). Touches fab.js, journal.html, js/journal.js.
+const CACHE_NAME = 'bipolarbear-v78';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
