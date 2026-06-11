@@ -43,6 +43,12 @@ plus the auth/account modals. Loaded on `index`, `journal`, `survival-kit`
 - The `<style>body{background:...}</style>` one-liner — paint-blocking critical CSS
 - The beta-gate `<script>` — must redirect before any render
 - The native-PIN-gate one-liner (where present) — same reason
+- The home-stats early-paint `<script>` in `index.html` (right after the badge
+  divs) — renders the streak / stability / survival-progress badges from cached
+  localStorage synchronously, before the four blocking Firebase SDK `<script>`
+  tags. Moving it after them (or into `js/index.js`) reintroduces the ~1s blank
+  badges for returning users. Keep its badge formats in sync with
+  `_updateStreakBadge()` + the survival-progress counter in `js/index.js`
 - `window.Capacitor = window.Capacitor || null` shim (journal only)
 - The "Isolated safety net" 8s timeout in journal.html — must survive errors in the main script body
 - The pre-activation IIFE in anonymous.html — picks the initial screen synchronously before Firebase auth resolves

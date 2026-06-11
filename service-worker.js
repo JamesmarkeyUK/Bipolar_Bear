@@ -197,7 +197,12 @@
 // v75: mood-meter bear shadow moved off filter:drop-shadow onto a
 //      .mood-stage::after ellipse — iOS Safari painted the drop-shadow as a
 //      grey rectangle behind the transparent PNG. Touches css/welcome.css.
-const CACHE_NAME = 'bipolarbear-v75';
+// v76: home buttons vertically centred between the logo and the FAB dock;
+//      home stats (streak/stability/survival progress) now paint instantly
+//      from cache for returning users via an inline early-paint script;
+//      welcome hero gains a faded bear backdrop on mobile. Touches
+//      index.html, css/index.css, welcome.html, css/welcome.css.
+const CACHE_NAME = 'bipolarbear-v76';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

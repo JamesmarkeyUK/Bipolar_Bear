@@ -165,6 +165,10 @@ section{position:relative;}
 .floatie.f4{bottom:12%;right:14%;width:46px;}
 .hero-inner{position:relative;z-index:1;}
 
+/* Mobile-only hero backdrop (see welcome.html). Hidden on desktop, where the
+   floaties + mood-meter already fill the hero. */
+.hero-bg-mobile{display:none;}
+
 /* ────────────────── Interactive mood meter ─────────────── */
 .mood-meter{
   position:relative;
@@ -502,6 +506,14 @@ section{position:relative;}
 @media(max-width:900px){
   .hero{padding:128px 0 90px;}
   .hero-floaties{display:none;} /* decorative bears overlap text once single-column */
+  /* Bare single-column hero gets a faded bear + mood-line backdrop instead. */
+  .hero-bg-mobile{
+    display:block;position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+  }
+  .hero-bg-bear{
+    position:absolute;top:104px;right:-46px;width:228px;opacity:.14;
+    filter:drop-shadow(0 12px 24px rgba(120,50,0,0.25));
+  }
   .hero-inner{grid-template-columns:1fr;gap:40px;}
   .hero-cta{align-items:flex-start;}
   .feature-grid{grid-template-columns:1fr;}

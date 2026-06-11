@@ -173,6 +173,93 @@
           } catch (_) {}
         })();
       </script>
+
+      <!-- Early stats paint. For a returning user (cached Firebase session or
+           a guest PIN) render the streak / stability / survival-kit badges
+           straight from cached localStorage values, synchronously, BEFORE the
+           four blocking Firebase SDK <script> tags near the end of <body>.
+           Without this the badges stay blurred until js/index.js runs — which
+           is gated behind those Firebase downloads plus the 450ms skeleton
+           min-visible delay — so a returning user lands on an empty-looking
+           home for ~1s. The async auth listener in js/index.js still refreshes
+           and corrects these values afterwards.
+           Mirrors _updateStreakBadge() + the survival-progress counter in
+           js/index.js — keep the badge formats in sync if either changes. -->
+      <script>
+        (function () {
+          try {
+            var S = window.BB && window.BB.storage;
+            if (!S) return;
+            // Only paint for a plausible signed-in session or a real guest —
+            // otherwise we'd flash a previous account's stats before the auth
+            // listener resolves and hides them.
+            var hasUser = false;
+            for (var i = 0; i < localStorage.length; i++) {
+              var k = localStorage.key(i);
+              if (k && k.indexOf('firebase:authUser:') === 0) {
+                var v = localStorage.getItem(k);
+                if (v && v !== 'null' && v.length > 5) { hasUser = true; break; }
+              }
+            }
+            if (!hasUser && !S.get('GuestPinSalt')) return;
+            // Respect the "Show stats" preference — mirror the bb-hide-stats
+            // gate in js/index.js (stats are shown only when explicitly on).
+            // Skipping here also avoids painting badges that js/index.js would
+            // immediately hide for users who keep stats off.
+            if (S.get('HomeStatsEnabled') !== '1') return;
+
+            var show = function (el, html) {
+              if (!el) return;
+              el.innerHTML = html;
+              el.classList.remove('bb-skeleton');
+              el.style.display = 'block';
+            };
+            var esc = function (s) {
+              return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+            };
+
+            // Journal streak (🔥) + stability (🧘)
+            var streak = parseInt(S.get('CurrentStreak') || '0', 10);
+            var stable = parseInt(S.get('StableStreak') || '0', 10);
+            var jBadge = document.getElementById('journalStreakBadge');
+            if (jBadge && streak > 0) {
+              var stablePart = stable > 0 ? ' &nbsp;🧘 ' + stable + 'd' : '';
+              show(jBadge, '🔥 ' + streak + ' day' + (streak === 1 ? '' : 's') + stablePart);
+              jBadge.style.cursor = 'pointer';
+            }
+
+            // Anonymous monika (👋) + visit streak (💬)
+            var anon = parseInt(S.get('Anon_streak') || '0', 10);
+            var monika = S.get('Anon_monika') || '';
+            var aBadge = document.getElementById('anonStreakBadge');
+            if (aBadge && monika) {
+              var m = esc(monika);
+              if (anon > 0) show(aBadge, '👋 ' + m + ' &nbsp;·&nbsp; 💬 ' + anon + ' day' + (anon === 1 ? '' : 's') + ' streak');
+              else show(aBadge, '👋 ' + m);
+            }
+
+            // Survival-kit progress counter (mirror js/index.js BLOCK 4)
+            var prog = document.getElementById('survivalProgress');
+            if (prog) {
+              var arr = function (key) { try { var x = JSON.parse(localStorage.getItem(key) || '[]'); return Array.isArray(x) && x.length > 0; } catch (e) { return false; } };
+              var obj = function (key) { try { var x = JSON.parse(localStorage.getItem(key) || '{}'); return Object.values(x).some(function (a) { return Array.isArray(a) && a.length > 0; }); } catch (e) { return false; } };
+              var c = 4; // mood-scale, books, media, spiritual — always complete
+              if (arr('currentMedList')) c++;
+              if (arr('dailyGoals')) c++;
+              if (arr('survivalGratitude')) c++;
+              var rt = localStorage.getItem('rememberThis'); if (rt && rt.trim()) c++;
+              if (obj('copingStrategies')) c++;
+              if (obj('moodMemories')) c++;
+              if (arr('myCommitments')) c++;
+              if (arr('customReminders')) c++;
+              c++; // bipolar-anon info section always complete
+              show(prog, c >= 13 ? '✓ All sections completed' : c + ' / 13 sections complete');
+            }
+          } catch (_) {}
+        })();
+      </script>
     </div>
 
     <div class="features" id="features">

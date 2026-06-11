@@ -34,6 +34,41 @@
       text-align: center;
     }
 
+    /* Returning-user home (onboarding complete): anchor the logo near the top
+       and vertically centre the action buttons in the space between the logo
+       and the bottom nav (FAB dock). The auto margins on .buttons absorb the
+       free space equally above and below, so the credit footer settles just
+       above the nav bar. Scoped with :not(.is-new-user) so the steps 0-3
+       onboarding layout is left untouched.
+
+       At phone / native widths the #iphone-frame wrappers are plain blocks,
+       so the container can't flex-grow off the body — it's given a min-height
+       that fills the viewport minus the top inset and the ~104px reserved for
+       the FAB dock. The ≥920px iPad frame puts the container inside a flex
+       #scroll-view, so there it flex-grows instead (see the media query). */
+    body:not(.is-new-user) {
+      padding-top: max(24px, env(safe-area-inset-top, 0px));
+    }
+    body:not(.is-new-user) .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: calc(100dvh - max(24px, env(safe-area-inset-top, 0px)) - 104px);
+    }
+    body:not(.is-new-user) .buttons {
+      margin-top: auto;
+      margin-bottom: auto;
+    }
+    /* iPad frame: #scroll-view is a flex column, so let the container grow into
+       it rather than forcing a viewport-height min-height (which would overflow
+       the ~96dvh device frame). */
+    @media (min-width: 920px) {
+      body:not(.is-new-user) .container {
+        min-height: 0;
+        flex: 1;
+      }
+    }
+
     .logo-bounce-wrapper {
       display: inline-block;
       animation: logoBounce 2.4s ease-in-out infinite;
