@@ -202,7 +202,10 @@
 //      from cache for returning users via an inline early-paint script;
 //      welcome hero gains a faded bear backdrop on mobile. Touches
 //      index.html, css/index.css, welcome.html, css/welcome.css.
-const CACHE_NAME = 'bipolarbear-v76';
+// v77: stats-off users no longer see the skeleton placeholders blur-flash on
+//      load — the early-paint script applies bb-hide-stats synchronously when
+//      the Show-stats preference is off. Touches index.html.
+const CACHE_NAME = 'bipolarbear-v77';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

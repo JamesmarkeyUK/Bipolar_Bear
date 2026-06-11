@@ -204,9 +204,15 @@
             if (!hasUser && !S.get('GuestPinSalt')) return;
             // Respect the "Show stats" preference — mirror the bb-hide-stats
             // gate in js/index.js (stats are shown only when explicitly on).
-            // Skipping here also avoids painting badges that js/index.js would
-            // immediately hide for users who keep stats off.
-            if (S.get('HomeStatsEnabled') !== '1') return;
+            // Stats off → apply the gate class synchronously too, so the
+            // skeleton placeholders don't blur-flash for ~1s before
+            // _applyOnboardingGating() (gated behind the Firebase SDK
+            // downloads) hides them.
+            if (S.get('HomeStatsEnabled') !== '1') {
+              var wrap = document.querySelector('.buttons');
+              if (wrap) wrap.classList.add('bb-hide-stats');
+              return;
+            }
 
             var show = function (el, html) {
               if (!el) return;
