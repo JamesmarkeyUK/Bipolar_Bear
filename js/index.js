@@ -416,10 +416,10 @@ setTimeout(function () {
       // (step 1), so users can sign in as soon as they've logged something.
       if (to >= 1) BB.storage.set('FabsUnlocked', '1');
       _applyOnboardingGating();
-      // Show tutorial complete popup the first time step reaches 12
+      // Show tutorial finale (account hint, then complete popup) the first time step reaches 12
       if (to >= 12 && BB.storage.get('TutorialToastShown') !== '1') {
         BB.storage.set('TutorialToastShown', '1');
-        setTimeout(_showTutorialCompleteModal, 400);
+        setTimeout(_showTutorialFinale, 400);
       }
     }
     window._getOnboardingStep = _getOnboardingStep;
@@ -468,6 +468,107 @@ setTimeout(function () {
       overlay.style.opacity = '0';
       overlay.style.transition = 'opacity 0.3s ease';
       requestAnimationFrame(() => { overlay.style.opacity = '1'; });
+    }
+
+    /**
+     * Tutorial finale. Before the "Tutorial Complete!" popup, guests get a
+     * blocking hint pointing at the profile FAB — "Create an account to
+     * customise your experience". The dimmer makes everything except the
+     * elevated profile button inert; tapping the dimmer just nudges the
+     * label. One-shot: bbAccountHintShown is set the moment the hint
+     * appears, so quitting mid-hint can never re-block a later visit (the
+     * lesson from the removed step-4/step-5 blocking gates). Skipped for
+     * signed-in users and whenever the profile FAB isn't on screen; the
+     * complete popup follows once the hint resolves.
+     */
+    function _showTutorialFinale(_attempt) {
+      const fab = document.getElementById('bbAuthFab');
+      const hint = document.getElementById('signinHint');
+      // The dock is injected by fab.js, which loads after this script and
+      // after the Firebase SDKs — on a cold load it may not exist yet when
+      // the 400ms finale timer fires. Retry for up to ~4s before giving up.
+      const notReady = !fab || !hint || getComputedStyle(fab).display === 'none';
+      if (notReady && (_attempt || 0) < 16) {
+        setTimeout(() => _showTutorialFinale((_attempt || 0) + 1), 250);
+        return;
+      }
+      const skip = notReady || window.currentUser ||
+        BB.storage.get('AccountHintShown') === '1';
+      if (skip) { _showTutorialCompleteModal(); return; }
+      BB.storage.set('AccountHintShown', '1');
+      window._bbAccountHintActive = true;
+
+      // If the What's New popup beat the hint onto the screen, put it away
+      // and un-mark it so it re-shows on the next visit instead.
+      const _wn = document.getElementById('whatsNewPopup');
+      if (_wn && _wn.style.display === 'block') {
+        _wn.style.display = 'none';
+        BB.storage.remove('LastSeenVersion');
+      }
+
+      const overlay = document.getElementById('bbHintOverlay');
+      const hintInner = document.getElementById('signinHintInner');
+      const hintLabel = document.getElementById('signinHintLabel');
+      const hintStored = hint.querySelector('[data-i18n="home.signinHintStored"]');
+      const prevFabZ = fab.style.zIndex;
+      const prevInnerAnim = hintInner ? hintInner.style.animation : '';
+
+      if (hintStored) hintStored.style.display = 'none';
+      if (hintLabel) {
+        hintLabel.removeAttribute('data-i18n');
+        hintLabel.textContent = '🐻 Create an account to customise your experience';
+        hintLabel.style.whiteSpace = 'normal';
+        hintLabel.style.maxWidth = 'min(280px, calc(100vw - 48px))';
+        hintLabel.style.textAlign = 'center';
+      }
+      hint.style.display = 'flex';
+      hint.style.zIndex = '601';
+      fab.style.zIndex = '601'; // already position:fixed — sits above the 500 dimmer
+
+      if (overlay) {
+        overlay.style.display = '';
+        overlay.style.pointerEvents = 'auto';
+        overlay.onclick = () => {
+          // Not a dismiss — the profile button is the way forward. Nudge the label.
+          if (!hintInner) return;
+          hintInner.style.animation = 'bbHintNudge 0.5s ease';
+          setTimeout(() => { hintInner.style.animation = prevInnerAnim; }, 520);
+        };
+      }
+
+      const _cleanup = () => {
+        window._bbAccountHintActive = false;
+        if (overlay) { overlay.style.display = 'none'; overlay.style.pointerEvents = 'none'; overlay.onclick = null; }
+        hint.style.display = 'none';
+        hint.style.zIndex = '';
+        fab.style.zIndex = prevFabZ;
+        fab.removeEventListener('click', _onFabClick);
+      };
+      const _onFabClick = () => {
+        _cleanup();
+        // Show the complete popup only after the auth modal has been dealt
+        // with, so it never covers the sign-up form. Poll rather than chain
+        // _fabOnCloseAuth: polling also catches the modal never opening.
+        let waited = 0;
+        const _openPoll = setInterval(() => {
+          waited += 200;
+          const m = document.getElementById('bbAuthModal');
+          if (m && m.classList.contains('active')) {
+            clearInterval(_openPoll);
+            const _closePoll = setInterval(() => {
+              const m2 = document.getElementById('bbAuthModal');
+              if (!m2 || !m2.classList.contains('active')) {
+                clearInterval(_closePoll);
+                setTimeout(_showTutorialCompleteModal, 350);
+              }
+            }, 300);
+          } else if (waited >= 1600) {
+            clearInterval(_openPoll); // modal never opened — don't lose the popup
+            _showTutorialCompleteModal();
+          }
+        }, 200);
+      };
+      fab.addEventListener('click', _onFabClick);
     }
 
     function _applyOnboardingGating() {
@@ -544,9 +645,10 @@ setTimeout(function () {
       if (_waLbl) _waLbl.style.display = 'none';
       // Feedback hint: don't force-hide at step 12 — popup dismiss handler shows it
 
-      // Sign-in hint permanently hidden (step 4 removed from tutorial flow)
+      // Sign-in hint hidden (step 4 removed from tutorial flow) — unless the
+      // tutorial-finale account hint is borrowing it right now.
       const _siHint = document.getElementById('signinHint');
-      if (_siHint) _siHint.style.display = 'none';
+      if (_siHint && !window._bbAccountHintActive) _siHint.style.display = 'none';
 
       // ── Hint overlay ──
       // Step 5 (logo hint) was previously blocking — it intercepted all clicks so
@@ -556,7 +658,7 @@ setTimeout(function () {
       const _blockingSteps = new Set([]);
       const _isBlocking = _blockingSteps.has(step);
       const _overlay = document.getElementById('bbHintOverlay');
-      if (_overlay) _overlay.style.display = _isBlocking ? '' : 'none';
+      if (_overlay && !window._bbAccountHintActive) _overlay.style.display = _isBlocking ? '' : 'none';
 
       // Elevate hint + target above overlay when blocking
       document.querySelectorAll('.bb-hint-elevated').forEach(el => {
@@ -1289,7 +1391,7 @@ setTimeout(function () {
         ['PersonalHintDone','MedHintDone','SettingsHintDone','CustomiseFormHintDone',
          'CustomiseAdditionalHintDone','CloseSettingsHintDone','CustomiseFormCollapsed',
          'AdvancedTutorialToastShown','SurvivalKitVisited','MoodDefHintDone',
-         'PrivacyNoteDismissed','TutorialToastShown','WelcomeShown'].forEach(k => BB.storage.remove(k));
+         'PrivacyNoteDismissed','TutorialToastShown','WelcomeShown','AccountHintShown'].forEach(k => BB.storage.remove(k));
 
         // Firestore cleanup.
         if (currentUser && db) {
@@ -1809,7 +1911,7 @@ function _handleIndexJournalNav() {
         _advanceOnboardingStep(12);
         if (BB.storage.get('TutorialToastShown') !== '1') {
           BB.storage.set('TutorialToastShown', '1');
-          setTimeout(_showTutorialCompleteModal, 400);
+          setTimeout(_showTutorialFinale, 400);
         }
       } else if (_s >= 4 && _s < 12 && BB.storage.get('HasEntries') === '1') {
         // User has logged their first entry and returned to home — mark tutorial complete
@@ -1843,8 +1945,10 @@ function _handleIndexJournalNav() {
       if (lastSeen === _APP_VERSION) return;
       const step = _getOnboardingStep();
       if (step < 12 || BB.storage.get('TutorialToastShown') !== '1') return;
-      // Don't show if tutorial complete popup is still on screen
+      // Don't show if tutorial complete popup is still on screen, or while
+      // the tutorial-finale account hint is blocking the page
       if (document.getElementById('tutorialCompleteModal')) return;
+      if (window._bbAccountHintActive) return;
       const headline = _WHATS_NEW_HEADLINES[_APP_VERSION];
       if (!headline) return;
       const popup = document.getElementById('whatsNewPopup');

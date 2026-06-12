@@ -217,7 +217,13 @@
 //      Touches anonymous.html, js/anonymous.js, journal.html, js/journal.js.
 // v80: version bump to 1.11 (build 11) for the App Store resubmission —
 //      _APP_VERSION in brand-config.js + what's-new headline in js/index.js.
-const CACHE_NAME = 'bipolarbear-v80';
+// v81: home polish — logo now vertically centred between the page top and
+//      the Mood Journal button (css/index.css auto margin) so the default
+//      single-button home looks balanced; tutorial finale gains a blocking
+//      "Create an account to customise your experience" hint pointing at the
+//      profile FAB before the complete popup (js/index.js, one-shot via
+//      bbAccountHintShown). Touches css/index.css, js/index.js, js/journal.js.
+const CACHE_NAME = 'bipolarbear-v81';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

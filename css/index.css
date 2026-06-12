@@ -59,6 +59,16 @@
       margin-top: auto;
       margin-bottom: auto;
     }
+    /* Logo: vertically centred between the page top and the first action
+       button rather than pinned to the top — its auto top margin shares the
+       container's free space equally with the .buttons auto margins. Keeps
+       the default home (just the Mood Journal button; Survival Kit and
+       Bipolar Anonymous are opt-in) looking balanced, and degrades to the
+       old top-anchored layout when vertical space runs out (auto margins
+       collapse to 0). */
+    body:not(.is-new-user) .logo-bounce-wrapper {
+      margin-top: auto;
+    }
     /* iPad frame: #scroll-view is a flex column, so let the container grow into
        it rather than forcing a viewport-height min-height (which would overflow
        the ~96dvh device frame). */

@@ -8830,6 +8830,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         BB.storage.remove('PrivacyNoteDismissed');
         BB.storage.remove('TutorialToastShown');
         BB.storage.remove('WelcomeShown');
+        BB.storage.remove('AccountHintShown');
 
         // Firestore cleanup. Two modes:
         //   deleteAccount → wipe every document tied to this user
