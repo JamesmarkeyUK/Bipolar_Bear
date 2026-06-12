@@ -549,6 +549,10 @@ setTimeout(function () {
         // Show the complete popup only after the auth modal has been dealt
         // with, so it never covers the sign-up form. Poll rather than chain
         // _fabOnCloseAuth: polling also catches the modal never opening.
+        // _bbFinaleToastPending lets the post-sign-up profile popup
+        // (_fabOnSignUp) hold back until the toast has actually appeared.
+        window._bbFinaleToastPending = true;
+        const _showToast = () => { window._bbFinaleToastPending = false; _showTutorialCompleteModal(); };
         let waited = 0;
         const _openPoll = setInterval(() => {
           waited += 200;
@@ -559,12 +563,12 @@ setTimeout(function () {
               const m2 = document.getElementById('bbAuthModal');
               if (!m2 || !m2.classList.contains('active')) {
                 clearInterval(_closePoll);
-                setTimeout(_showTutorialCompleteModal, 350);
+                setTimeout(_showToast, 350);
               }
             }, 300);
           } else if (waited >= 1600) {
             clearInterval(_openPoll); // modal never opened — don't lose the popup
-            _showTutorialCompleteModal();
+            _showToast();
           }
         }, 200);
       };
@@ -1077,10 +1081,21 @@ setTimeout(function () {
       { id: 'anon',     icon: '💬', label: 'Anonymous', locked: false, flag: 'AnonBtnEnabled' },
     ];
 
+    /**
+     * Post-sign-up "NEW" hint state for the Survival / Anonymous toggles.
+     * bbCustomiseNewPending is set when a brand-new account is created
+     * (_fabOnSignUp) and cleared once both buttons are enabled or after the
+     * Customise panel has been seen 3 times — so the badge can't nag forever.
+     */
+    function _customiseNewActive() {
+      return BB.storage.get('CustomiseNewPending') === '1';
+    }
+
     /** Render the active/inactive icon+text toggle buttons (journal style). */
     function _renderHomeBtnToggles() {
       const row = document.getElementById('idxHomeBtnToggles');
       if (!row) return;
+      const _newHintOn = _customiseNewActive();
       row.innerHTML = _HOME_BTN_TOGGLES.map(t => {
         const on = t.locked || BB.storage.get(t.flag) === '1';
         const _border = on ? 'var(--brand-primary)' : '#dee2e6';
@@ -1089,7 +1104,9 @@ setTimeout(function () {
         const _click  = t.locked ? '' : ` onclick="_toggleHomeBtn('${t.id}')"`;
         const _cursor = t.locked ? 'default' : 'pointer';
         const _lock   = t.locked ? '<span style="position:absolute;top:4px;right:6px;font-size:0.7em;">🔒</span>' : '';
-        return `<button${_click} style="position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 14px;border-radius:12px;border:1.5px solid ${_border};background:${_bg};color:${_color};cursor:${_cursor};font-size:0.82em;font-weight:600;min-width:64px;-webkit-tap-highlight-color:transparent;">${_lock}<span style="font-size:1.3em;">${t.icon}</span><span>${t.label}</span></button>`;
+        const _isNew  = _newHintOn && !t.locked && !on;
+        const _pill   = _isNew ? '<span class="bb-new-pill">NEW</span>' : '';
+        return `<button${_click}${_isNew ? ' class="bb-new-toggle"' : ''} style="position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 14px;border-radius:12px;border:1.5px solid ${_border};background:${_bg};color:${_color};cursor:${_cursor};font-size:0.82em;font-weight:600;min-width:64px;-webkit-tap-highlight-color:transparent;">${_lock}${_pill}<span style="font-size:1.3em;">${t.icon}</span><span>${t.label}</span></button>`;
       }).join('');
     }
 
@@ -1109,6 +1126,12 @@ setTimeout(function () {
       if (!t || t.locked || !t.flag) return;
       const nowEnabled = BB.storage.get(t.flag) !== '1';
       BB.storage.set(t.flag, nowEnabled ? '1' : '0');
+      // Both opt-in buttons enabled → the NEW hint has done its job
+      if (_customiseNewActive() &&
+          BB.storage.get('SurvivalBtnEnabled') === '1' &&
+          BB.storage.get('AnonBtnEnabled') === '1') {
+        BB.storage.remove('CustomiseNewPending');
+      }
       _renderHomeBtnToggles();
       if (typeof window._applyOnboardingGating === 'function') window._applyOnboardingGating();
       _syncHomeCustomise();
@@ -1177,6 +1200,13 @@ setTimeout(function () {
 
     /** Open the profile modal (always starts on the Customise panel). */
     window.showProfileModal = function () {
+      // NEW-hint wear-out: after the Customise panel has been seen 3 times
+      // the badge stops showing, even if the buttons were never enabled.
+      if (_customiseNewActive()) {
+        const _seen = parseInt(BB.storage.get('CustomiseNewSeen') || '0', 10) + 1;
+        if (_seen > 3) BB.storage.remove('CustomiseNewPending');
+        else BB.storage.set('CustomiseNewSeen', String(_seen));
+      }
       _renderHomeBtnToggles();
       _paintShowStatsToggle();
       const email = (currentUser && currentUser.email) || '';
@@ -1199,6 +1229,29 @@ setTimeout(function () {
       const m = document.getElementById('idxProfileModal');
       if (m) m.classList.remove('active');
       if (typeof window._fabOnCloseAuth === 'function') window._fabOnCloseAuth();
+    };
+
+    /**
+     * fab.js hook: a brand-new account was just created on this page. Arm the
+     * NEW hint on the Survival / Anonymous customise toggles and auto-open
+     * the profile popup — but only once the moment is quiet: currentUser
+     * mirrored (so the email shows), and the tutorial-finale "Tutorial
+     * Complete!" toast (if this sign-up came from the account hint) shown
+     * and dismissed. Gives up silently after ~2 minutes (user wandered off).
+     */
+    window._fabOnSignUp = function () {
+      BB.storage.set('CustomiseNewPending', '1');
+      BB.storage.remove('CustomiseNewSeen');
+      let waited = 0;
+      const _poll = setInterval(() => {
+        waited += 300;
+        if (waited > 120000) { clearInterval(_poll); return; }
+        if (!window.currentUser) return;
+        if (window._bbFinaleToastPending) return;
+        if (document.getElementById('tutorialCompleteModal')) return;
+        clearInterval(_poll);
+        window.showProfileModal();
+      }, 300);
     };
 
     /** Sign-out from the account panel. */
@@ -1351,6 +1404,7 @@ setTimeout(function () {
          'bbFabsUnlocked','bbFabFirstRunDone',
          'bbLogoEasterEggFound','bbCustomFieldHintDone',
          'bbSurvivalBtnEnabled','bbAnonBtnEnabled','bbHomeStatsEnabled',
+         'bbCustomiseNewPending','bbCustomiseNewSeen',
          'personalName','personalDOB','personalMedicalNum','personalDiagnosis',
          'personalDiagnosisDate','personalAddress','personalMobile','personalEmail',
          'personalEmergencyContact','personalNotes',

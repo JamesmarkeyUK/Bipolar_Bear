@@ -15,7 +15,8 @@
  *   - window.currentUser → signed-in Firebase user, or undefined when guest
  *   - window.firebase    → Firebase compat SDK global
  *   - window._fabOnSignOut, window._fabOpenAuth, window._fabBeforeSignIn,
- *     window._fabOpenPersonalInfo, window._onFabFeedbackClose
+ *     window._fabOnSignUp, window._fabOpenPersonalInfo,
+ *     window._onFabFeedbackClose
  *     → optional page-specific hooks.
  *
  * Symbols this module *defines* on window for inline `onclick=` use and
@@ -1345,10 +1346,14 @@
         try {
           if (_bbIsSignUp) {
             await auth.createUserWithEmailAndPassword(email, password);
+            window.closeAuthModal();
+            // Brand-new account: let the page react (index.js opens the
+            // profile popup to surface the customise toggles).
+            if (typeof window._fabOnSignUp === 'function') window._fabOnSignUp();
           } else {
             await auth.signInWithEmailAndPassword(email, password);
+            window.closeAuthModal();
           }
-          window.closeAuthModal();
         } catch (e) {
           if (errEl) { errEl.textContent = e.message; errEl.style.display = 'block'; }
         }

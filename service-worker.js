@@ -223,7 +223,13 @@
 //      "Create an account to customise your experience" hint pointing at the
 //      profile FAB before the complete popup (js/index.js, one-shot via
 //      bbAccountHintShown). Touches css/index.css, js/index.js, js/journal.js.
-const CACHE_NAME = 'bipolarbear-v81';
+// v82: post-sign-up onboarding — creating an account now auto-opens the
+//      profile popup (after the tutorial-complete toast, if any) with the
+//      Survival / Anonymous customise toggles pulsing under a NEW pill
+//      (cleared once both are enabled or after 3 views). New optional
+//      _fabOnSignUp hook in fab.js. Touches fab.js, js/index.js,
+//      css/index.css.
+const CACHE_NAME = 'bipolarbear-v82';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
