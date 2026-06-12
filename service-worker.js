@@ -210,7 +210,12 @@
 //      web + Android unchanged), and the health-sync UI now names Apple
 //      Health / Health Connect explicitly instead of "your phone's health
 //      app" (Guideline 2.5.1). Touches fab.js, journal.html, js/journal.js.
-const CACHE_NAME = 'bipolarbear-v78';
+// v79: App Store hardening round 2 — anonymous board gains a per-user mute
+//      (🙈 on each post, persisted in bbAnon_muted, managed from the About
+//      sheet) to satisfy Apple UGC guideline 1.2's block-user requirement;
+//      all user-facing "BETA" labels renamed "Experimental" (2.3.10 risk).
+//      Touches anonymous.html, js/anonymous.js, journal.html, js/journal.js.
+const CACHE_NAME = 'bipolarbear-v79';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

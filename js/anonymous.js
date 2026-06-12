@@ -58,6 +58,7 @@ const lastSeenMs = {
 let localPosts      = [];
 let sosTargetName   = '';
 let reportTargetId  = '';
+let muteTargetName  = '';
 let adminDeleteId    = '';
 let selfDeleteId     = '';
 let commentTargetId  = '';
@@ -102,6 +103,17 @@ const likedPosts = new Set(
 );
 function saveLiked() {
   BB.storage.set('Anon_liked', JSON.stringify([...likedPosts]));
+}
+
+// Muted users set (persisted, device-local). Posts and comments from these
+// monikas are hidden from the feed on this device only — nothing is written
+// to Firestore. Apple's UGC guideline (1.2) requires a user-level block in
+// addition to per-post reporting.
+const mutedUsers = new Set(
+  JSON.parse(BB.storage.get('Anon_muted') || '[]')
+);
+function saveMuted() {
+  BB.storage.set('Anon_muted', JSON.stringify([...mutedUsers]));
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -246,7 +258,29 @@ function closeOv(id) { document.getElementById(id).classList.add('hidden'); }
 // ─────────────────────────────────────────────────────────────────
 // About overlay + home navigation helper
 // ─────────────────────────────────────────────────────────────────
-function openAbout() { openOv('ov-about'); }
+function openAbout() { renderMutedList(); openOv('ov-about'); }
+
+// "Muted users" section of the About sheet — hidden when nothing is muted.
+function renderMutedList() {
+  const wrap = document.getElementById('about-muted-wrap');
+  const listEl = document.getElementById('about-muted-list');
+  if (!wrap || !listEl) return;
+  if (!mutedUsers.size) { wrap.style.display = 'none'; return; }
+  wrap.style.display = '';
+  listEl.innerHTML = [...mutedUsers].map(n => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;">
+      <span>🙈 [${esc(n)}]</span>
+      <button class="btn-secondary" data-unmute="${esc(n)}" style="padding:4px 12px;font-size:12px;">Unmute</button>
+    </div>`).join('');
+  listEl.querySelectorAll('[data-unmute]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      mutedUsers.delete(btn.dataset.unmute);
+      saveMuted();
+      renderMutedList();
+      renderPosts(currentTab === 'general' ? assembleGeneralPosts(localPosts) : sortPosts(localPosts));
+    });
+  });
+}
 document.getElementById('about-close').addEventListener('click', () => closeOv('ov-about'));
 
 // Stamp the shared web app version (from brand-config.js) into the About footer.
@@ -280,7 +314,7 @@ function _updateLogoCursor() {
 }
 
 // Close on backdrop tap
-['ov-compose','ov-firstpost','ov-sos','ov-report','ov-e2ee','ov-monika','ov-self-delete','ov-admin-delete','ov-med','ov-stable','ov-about'].forEach(id => {
+['ov-compose','ov-firstpost','ov-sos','ov-report','ov-mute','ov-e2ee','ov-monika','ov-self-delete','ov-admin-delete','ov-med','ov-stable','ov-about'].forEach(id => {
   document.getElementById(id).addEventListener('click', e => {
     if (e.target === document.getElementById(id)) closeOv(id);
   });
@@ -2345,7 +2379,8 @@ async function openThread(postId) {
     .collection('comments')
     .orderBy('timestamp', 'asc')
     .onSnapshot(snap => {
-      const comments = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const comments = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+        .filter(c => !c.name || !mutedUsers.has(c.name));
       const el = document.getElementById('thread-comments-list');
       if (!comments.length) {
         el.innerHTML = '<div class="empty-state" style="padding:24px 0 16px;">No comments yet — be the first! 💛</div>';
@@ -2518,6 +2553,9 @@ function scheduleTombstoneSweep(nextExpiry, now) {
 
 function renderPosts(posts) {
   const list = document.getElementById('post-list');
+  // Drop posts from users muted on this device (system/announcement cards
+  // have no name and always pass).
+  posts = posts.filter(p => !p.name || !mutedUsers.has(p.name));
   if (!posts.length) {
     list.innerHTML = '<div class="empty-state">No posts yet — be the first! 🌱</div>';
     return;
@@ -2570,6 +2608,15 @@ function renderPosts(posts) {
     btn.addEventListener('click', () => {
       reportTargetId = btn.dataset.report;
       openOv('ov-report');
+    });
+  });
+  // Mute buttons
+  list.querySelectorAll('[data-mute]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      muteTargetName = btn.dataset.mute;
+      document.getElementById('mute-body').innerHTML =
+        `Hide all posts and comments from <strong>[${esc(muteTargetName)}]</strong> on this device? You can unmute them any time from the About screen.`;
+      openOv('ov-mute');
     });
   });
   // Self-delete buttons
@@ -2663,6 +2710,7 @@ function renderPost(p) {
       ${deleteBtn}
       ${p.name !== profile.monika ? `<button class="icon-btn" data-sos="${esc(p.name)}" title="Send SOS flag">🆘</button>` : ''}
       ${p.name !== profile.monika ? `<button class="icon-btn" data-report="${esc(p.id)}" title="Report post">🚨</button>` : ''}
+      ${p.name !== profile.monika ? `<button class="icon-btn" data-mute="${esc(p.name)}" title="Mute this user">🙈</button>` : ''}
     </div>
   </div>`;
 }
@@ -2907,6 +2955,18 @@ function setupOverlayActions() {
       }
       showHint('Report submitted — thank you 🙏');
     });
+  });
+
+  // Mute
+  document.getElementById('mute-cancel').addEventListener('click', () => closeOv('ov-mute'));
+  document.getElementById('mute-confirm').addEventListener('click', () => {
+    closeOv('ov-mute');
+    if (!muteTargetName) return;
+    mutedUsers.add(muteTargetName);
+    saveMuted();
+    renderPosts(currentTab === 'general' ? assembleGeneralPosts(localPosts) : sortPosts(localPosts));
+    showHint(`[${muteTargetName}] muted — unmute from the About screen 🙈`);
+    muteTargetName = '';
   });
 
   // Self delete

@@ -2648,7 +2648,7 @@ window.addEventListener('pageshow', () => {
       const _pfLimitedNote = statsTimeframe !== 'all' ? `<div style="font-size:0.75em;color:#adb5bd;margin-top:2px;">Based on ${statsTimeframe}d data — limited insights</div>` : '';
       document.getElementById('streakStats').innerHTML = (localStorage.getItem('showMoodSuggestion') === '1' && statsEntries.length > 0)
         ? `<div style="text-align:center;margin:8px 0 16px;">
-            <button onclick="showPersonalisedFeedback()" style="background:none;border:none;color:var(--brand-primary);font-size:0.88em;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:4px 0;"><img src="images/moods/AI_Bear.png" style="max-width: 50px" > <br>Personalised Feedback (BETA)</button><br>
+            <button onclick="showPersonalisedFeedback()" style="background:none;border:none;color:var(--brand-primary);font-size:0.88em;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:4px 0;"><img src="images/moods/AI_Bear.png" style="max-width: 50px" > <br>Personalised Feedback (Experimental)</button><br>
             ${_pfLimitedNote}
            </div>`
         : '';
@@ -4779,7 +4779,7 @@ window.addEventListener('pageshow', () => {
                   ${_mkMoodBtn(_est.mood, _estLabel, _estColor)}
                   ${_est.secondMood ? `<span style="font-size:0.82em;color:#adb5bd;">or</span><span style="font-weight:700;font-size:1em;color:${_est2Color};">${_est2Label}</span>${_mkMoodBtn(_est.secondMood, _est2Label, _est2Color)}` : ''}
                 </div>
-                <div style="font-size:0.72em;color:#adb5bd;line-height:1.4;">BETA: Based on your responses. This is only a rudimentary observation — not a diagnosis.</div>
+                <div style="font-size:0.72em;color:#adb5bd;line-height:1.4;">Experimental: Based on your responses. This is only a rudimentary observation — not a diagnosis.</div>
               </div>
             </div>`;
           const _incogOn = localStorage.getItem('incognitoMode') === 'true';
@@ -6684,7 +6684,7 @@ window.addEventListener('pageshow', () => {
                 <span style="font-weight:700;color:${_estColor};">${_estLabel}</span>
                 ${_est.secondMood ? `<span style="font-size:0.82em;color:#adb5bd;">or</span><img src="images/moods/${_est.secondMood}.png" style="width:26px;height:26px;object-fit:contain;"><span style="font-weight:700;color:${_est2Color};">${_est2Label}</span>` : ''}
               </div>
-              <div style="font-size:0.72em;color:#adb5bd;line-height:1.4;">BETA · Based on logged data. Not a diagnosis.</div>
+              <div style="font-size:0.72em;color:#adb5bd;line-height:1.4;">Experimental · Based on logged data. Not a diagnosis.</div>
             </div>
           </div>`;
         }
@@ -8064,7 +8064,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
 
             // Section header
             doc.setFontSize(9); doc.setFont(undefined, 'bold'); setColor(dark);
-            doc.text('PERSONALISED INSIGHTS (BETA)', margin + 4, y);
+            doc.text('PERSONALISED INSIGHTS (EXPERIMENTAL)', margin + 4, y);
             setDraw(orange); doc.setLineWidth(0.5);
             doc.line(margin + 4, y + 1, pageW - margin - 4, y + 1);
             y += 6;

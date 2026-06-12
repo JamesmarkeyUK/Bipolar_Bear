@@ -271,6 +271,21 @@
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- OVERLAY: Mute user                                             -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="ov-mute" class="overlay hidden">
+  <div class="sheet">
+    <div class="sheet-icon">🙈</div>
+    <div class="sheet-title">Mute this user?</div>
+    <div class="sheet-sub" id="mute-body">All their posts and comments will be hidden on this device. You can unmute them any time from the About screen.</div>
+    <div class="btn-row">
+      <button class="btn-secondary" id="mute-cancel" style="flex:1">Cancel</button>
+      <button class="btn-danger" id="mute-confirm">Mute 🙈</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
 <!-- OVERLAY: E2EE info                                             -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <div id="ov-e2ee" class="overlay hidden">
@@ -493,8 +508,14 @@
         💛 &nbsp;Be kind — everyone here is doing their best<br>
         🔒 &nbsp;Respect others' privacy — don't share personal details<br>
         🆘 &nbsp;Use the SOS flag if you're genuinely worried about someone<br>
-        🚨 &nbsp;Report posts that break the rules — we review everything
+        🚨 &nbsp;Report posts that break the rules — we review everything<br>
+        🙈 &nbsp;Mute anyone you'd rather not hear from — their posts disappear for you
       </div>
+    </div>
+
+    <div id="about-muted-wrap" style="background:var(--yellow-bg);border-radius:12px;padding:14px 16px;margin-bottom:18px;display:none;">
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Muted users</div>
+      <div id="about-muted-list" style="font-size:13px;color:var(--dark);"></div>
     </div>
 
     <div style="border-top:1px solid #f0f0f0;padding-top:16px;margin-bottom:16px;">
