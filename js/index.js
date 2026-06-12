@@ -1822,6 +1822,7 @@ function _handleIndexJournalNav() {
     // (and fab.js) reads the same value without depending on this script.
     const _APP_VERSION = window._APP_VERSION;
     const _WHATS_NEW_HEADLINES = {
+      '1.11': 'Community: mute anyone on the Anonymous board with the new 🙈 button (unmute from the About screen), plus clearer Apple Health / Health Connect labels in journal settings',
       '1.09': 'Smoother permissions — notification and health-sync access is now only requested when you switch each one on, with a more reliable Apple Health reconnection after reinstalling',
       '1.4': 'New 📖 Wiki tab on the Anonymous board — Medications, Conditions, Therapies, Lifestyle, Warning Signs, Hospital, Workplace, Pregnancy, For Loved Ones, and more, with inline search',
       '1.3': 'Security: hardened the Bipolar Anonymous email-code verification and post-rendering ahead of opening up the codebase',

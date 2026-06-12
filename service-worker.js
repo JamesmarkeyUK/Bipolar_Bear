@@ -215,7 +215,9 @@
 //      sheet) to satisfy Apple UGC guideline 1.2's block-user requirement;
 //      all user-facing "BETA" labels renamed "Experimental" (2.3.10 risk).
 //      Touches anonymous.html, js/anonymous.js, journal.html, js/journal.js.
-const CACHE_NAME = 'bipolarbear-v79';
+// v80: version bump to 1.11 (build 11) for the App Store resubmission —
+//      _APP_VERSION in brand-config.js + what's-new headline in js/index.js.
+const CACHE_NAME = 'bipolarbear-v80';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
