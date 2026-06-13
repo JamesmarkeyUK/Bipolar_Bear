@@ -229,7 +229,7 @@
 //      (cleared once both are enabled or after 3 views). New optional
 //      _fabOnSignUp hook in fab.js. Touches fab.js, js/index.js,
 //      css/index.css.
-const CACHE_NAME = 'bipolarbear-v82';
+const CACHE_NAME = 'bipolarbear-v83';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

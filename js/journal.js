@@ -10124,6 +10124,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
 
       // If not native, show download prompt instead of native settings
       if (!isNative()) {
+        const _hsSectionW = document.getElementById('healthSyncSection');
+        if (_hsSectionW) _hsSectionW.style.display = 'none';
         document.getElementById('settingsModal').classList.add('active');
         document.getElementById('settingsWebContent').style.display = 'block';
         const _saveBtnW = document.getElementById('settingsSaveBtn');
@@ -10139,8 +10141,10 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         return;
       }
 
-      // Native — hide web content
+      // Native — hide web content, surface the Apple Health (HealthKit) section
       document.getElementById('settingsWebContent').style.display = 'none';
+      const _hsSectionN = document.getElementById('healthSyncSection');
+      if (_hsSectionN) _hsSectionN.style.display = '';
       const _saveBtnN = document.getElementById('settingsSaveBtn');
       if (_saveBtnN) _saveBtnN.style.display = '';
 
