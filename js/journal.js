@@ -10051,12 +10051,39 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
             if (isIOS()) {
               // iOS deliberately hides whether READ access was actually granted —
               // checkHealthPermissions can only tell "never asked" (.notDetermined)
-              // from "asked at some point". So don't over-promise "Authorised":
-              // report whether we've asked, and always point at Apple Health where
-              // the grant truly lives (and can be turned back on if sync is empty).
-              _setHealthInfo(asked
-                ? 'Health data: Requested · manage in Apple Health'
-                : 'Health data: ⚠️ Not yet authorised — enable the toggle above');
+              // from "asked at some point", and reports the SAME status whether the
+              // user granted or denied a read type. So the flag alone can't confirm
+              // "Authorised". The one reliable signal iOS does give is whether a real
+              // query returns data: if recent steps/sleep come back, read access is
+              // genuinely working, so we can honestly say "Connected".
+              if (!asked) {
+                _setHealthInfo('Health data: ⚠️ Not yet authorised — enable the toggle above');
+              } else {
+                let _connected = false;
+                try {
+                  const _now = new Date();
+                  const _weekAgo = new Date(_now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                  const _steps = await Health.queryAggregated({
+                    dataType: 'steps',
+                    startDate: _weekAgo.toISOString(),
+                    endDate:   _now.toISOString(),
+                    bucket:    'day'
+                  });
+                  _connected = !!(_steps?.aggregatedData?.some(d => d && d.value > 0));
+                  if (!_connected) {
+                    // Steps can be legitimately empty; a sleep sample confirms read access too.
+                    const _sleep = await Health.queryLatestSample({
+                      dataType: 'sleep',
+                      startDate: _weekAgo.toISOString(),
+                      endDate:   _now.toISOString()
+                    });
+                    _connected = !!(_sleep && _sleep.value != null);
+                  }
+                } catch (e) {}
+                _setHealthInfo(_connected
+                  ? 'Health data: ✅ Connected to Apple Health'
+                  : 'Health data: Requested · manage in Apple Health');
+              }
             } else {
               // Android (Health Connect) reports the real granted set accurately.
               _setHealthInfo(`Health data: ${granted ? '✅ Authorised' : asked ? '⚠️ Partially authorised' : '⚠️ Not yet authorised'}`);
