@@ -229,7 +229,13 @@
 //      (cleared once both are enabled or after 3 views). New optional
 //      _fabOnSignUp hook in fab.js. Touches fab.js, js/index.js,
 //      css/index.css.
-const CACHE_NAME = 'bipolarbear-v83';
+// v83: App Store 2.5.1 — surface the Apple Health (HealthKit) sync card at the
+//      top of the journal Settings panel (was buried under Advanced), and
+//      confirm iOS read access by probing real data ("Connected to Apple
+//      Health"). Touches journal.html, js/journal.js.
+// v84: v1.12 — build-12 version bump (_APP_VERSION 1.12). Touches
+//      js/shared/brand-config.js.
+const CACHE_NAME = 'bipolarbear-v84';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
