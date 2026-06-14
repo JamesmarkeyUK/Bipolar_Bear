@@ -253,7 +253,14 @@
 //      quick-note modal, FAB picker, account change-password/email modal +
 //      its success/error messages. Touches js/shared/i18n.js, js/journal.js,
 //      journal.html, fab.js.
-const CACHE_NAME = 'bipolarbear-v86';
+// v87: i18n pass round 3 (EN + FR) — focused-mode step titles (anxiety/
+//      stress/irritability/exercise/outside/alcohol/budget), the full edit-
+//      entry modal (Date/Energy/Sleep/Notes labels, all 8 advanced group
+//      labels + "Not recorded"/option values, Save Changes), the Missing
+//      Entries modal, and the common confirm dialogs (select mood, discard
+//      changes, delete-all-entries). Touches js/shared/i18n.js, js/journal.js,
+//      journal.html.
+const CACHE_NAME = 'bipolarbear-v87';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

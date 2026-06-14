@@ -967,7 +967,7 @@
       <h3>✏️ Edit Entry</h3>
       <input type="hidden" id="editEntryId">
       <div style="margin-bottom: 12px;">
-        <label style="font-weight:600; color:#495057;">Date</label>
+        <label style="font-weight:600; color:#495057;" data-i18n="journal.date">Date</label>
         <input type="date" id="editEntryDate" style="width:100%; padding:8px; border:2px solid #e9ecef; border-radius:8px; margin-top:6px; font-size:1em; box-sizing:border-box;">
       </div>
       <div style="margin-bottom: 12px;">
@@ -981,11 +981,11 @@
         </select>
       </div>
       <div style="margin-bottom: 12px;">
-        <label style="font-weight:600; color:#495057;">Energy (0–10)</label>
+        <label style="font-weight:600; color:#495057;" data-i18n="journal.energyRange">Energy (0–10)</label>
         <input type="number" id="editEntryEnergy" min="0" max="10" step="1" style="width:100%; padding:8px; border:2px solid #e9ecef; border-radius:8px; margin-top:6px; font-size:1em; box-sizing:border-box;">
       </div>
       <div style="margin-bottom: 12px;">
-        <label style="font-weight:600; color:#495057;">Sleep (hours)</label>
+        <label style="font-weight:600; color:#495057;" data-i18n="journal.sleepHours">Sleep (hours)</label>
         <input type="number" id="editEntrySleep" min="0" max="24" step="0.5" style="width:100%; padding:8px; border:2px solid #e9ecef; border-radius:8px; margin-top:6px; font-size:1em; box-sizing:border-box;">
       </div>
       <div style="margin-bottom: 12px;">
@@ -996,94 +996,94 @@
         </select>
       </div>
       <div style="margin-bottom: 12px;">
-        <label style="font-weight:600; color:#495057;">Notes</label>
+        <label style="font-weight:600; color:#495057;" data-i18n="journal.notes">Notes</label>
         <textarea id="editEntryNotes" rows="4" style="width:100%; padding:8px; border:2px solid #e9ecef; border-radius:8px; margin-top:6px; font-size:1em; box-sizing:border-box; resize:vertical;"></textarea>
       </div>
       <div id="editAnxietyGroup" style="margin-bottom: 12px; display:none;">
-        <label style="font-weight:600; color:#495057;">😰 Anxiety</label>
+        <label style="font-weight:600; color:#495057;">😰 <span data-i18n="journal.label.anxiety">Anxiety</span></label>
         <select id="editEntryAnxiety" style="width:100%; padding:8px; border:2px solid #e9ecef; border-radius:8px; margin-top:6px; font-size:1em; box-sizing:border-box;">
-          <option value="">Not recorded</option>
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
+          <option value="" data-i18n="journal.notRecorded">Not recorded</option>
+          <option value="low" data-i18n="journal.value.low">Low</option>
+          <option value="medium" data-i18n="journal.value.medium">Medium</option>
+          <option value="high" data-i18n="journal.value.high">High</option>
         </select>
       </div>
       <div id="editIrritabilityGroup" style="margin-bottom: 12px; display:none;">
-        <label style="font-weight:600; color:#495057;">😤 Irritability</label>
+        <label style="font-weight:600; color:#495057;">😤 <span data-i18n="journal.label.irritability">Irritability</span></label>
         <select id="editEntryIrritability" style="width:100%; padding:8px; border:2px solid #e9ecef; border-radius:8px; margin-top:6px; font-size:1em; box-sizing:border-box;">
-          <option value="">Not recorded</option>
-          <option value="yes">More than usual</option>
-          <option value="medium">Normal</option>
-          <option value="no">Less than usual</option>
+          <option value="" data-i18n="journal.notRecorded">Not recorded</option>
+          <option value="yes" data-i18n="journal.value.moreThanUsual">More than usual</option>
+          <option value="medium" data-i18n="journal.value.normal">Normal</option>
+          <option value="no" data-i18n="journal.value.lessThanUsual">Less than usual</option>
         </select>
       </div>
       <div id="editStressGroup" style="margin-bottom: 12px; display:none;">
-        <label style="font-weight:600; color:#495057;">😓 Stress</label>
+        <label style="font-weight:600; color:#495057;">😓 <span data-i18n="journal.label.stress">Stress</span></label>
         <select id="editEntryStress" style="width:100%; padding:8px; border:2px solid #e9ecef; border-radius:8px; margin-top:6px; font-size:1em; box-sizing:border-box;">
-          <option value="">Not recorded</option>
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
+          <option value="" data-i18n="journal.notRecorded">Not recorded</option>
+          <option value="low" data-i18n="journal.value.low">Low</option>
+          <option value="medium" data-i18n="journal.value.medium">Medium</option>
+          <option value="high" data-i18n="journal.value.high">High</option>
         </select>
       </div>
       <div id="editAlcoholGroup" style="margin-bottom: 12px; display:none;">
-        <label style="font-weight:600; color:#495057;">🍺 Alcohol</label>
+        <label style="font-weight:600; color:#495057;">🍺 <span data-i18n="journal.label.alcohol">Alcohol</span></label>
         <select id="editEntryAlcohol" style="width:100%; padding:8px; border:2px solid #e9ecef; border-radius:8px; margin-top:6px; font-size:1em; box-sizing:border-box;">
-          <option value="">Not recorded</option>
-          <option value="no">No</option>
-          <option value="yes">Yes</option>
+          <option value="" data-i18n="journal.notRecorded">Not recorded</option>
+          <option value="no" data-i18n="journal.value.no">No</option>
+          <option value="yes" data-i18n="journal.value.yes">Yes</option>
         </select>
       </div>
       <div id="editExerciseGroup" style="margin-bottom: 12px; display:none;">
-        <label style="font-weight:600; color:#495057;">🏋️ Exercise</label>
+        <label style="font-weight:600; color:#495057;">🏋️ <span data-i18n="journal.label.exercise">Exercise</span></label>
         <select id="editEntryExercise" style="width:100%; padding:8px; border:2px solid #e9ecef; border-radius:8px; margin-top:6px; font-size:1em; box-sizing:border-box;">
-          <option value="">Not recorded</option>
-          <option value="no">No</option>
-          <option value="yes">Yes</option>
+          <option value="" data-i18n="journal.notRecorded">Not recorded</option>
+          <option value="no" data-i18n="journal.value.no">No</option>
+          <option value="yes" data-i18n="journal.value.yes">Yes</option>
         </select>
       </div>
       <div id="editSmokingGroup" style="margin-bottom: 12px; display:none;">
-        <label style="font-weight:600; color:#495057;">🚬 Smoked</label>
+        <label style="font-weight:600; color:#495057;">🚬 <span data-i18n="journal.label.smoked">Smoked</span></label>
         <select id="editEntrySmoking" style="width:100%; padding:8px; border:2px solid #e9ecef; border-radius:8px; margin-top:6px; font-size:1em; box-sizing:border-box;">
-          <option value="">Not recorded</option>
-          <option value="no">No</option>
-          <option value="yes">Yes</option>
+          <option value="" data-i18n="journal.notRecorded">Not recorded</option>
+          <option value="no" data-i18n="journal.value.no">No</option>
+          <option value="yes" data-i18n="journal.value.yes">Yes</option>
         </select>
       </div>
       <div id="editDrugsGroup" style="margin-bottom: 12px; display:none;">
-        <label style="font-weight:600; color:#495057;">💊 Drugs</label>
+        <label style="font-weight:600; color:#495057;">💊 <span data-i18n="journal.label.drugs">Drugs</span></label>
         <select id="editEntryDrugs" style="width:100%; padding:8px; border:2px solid #e9ecef; border-radius:8px; margin-top:6px; font-size:1em; box-sizing:border-box;">
-          <option value="">Not recorded</option>
-          <option value="no">No</option>
-          <option value="yes">Yes</option>
+          <option value="" data-i18n="journal.notRecorded">Not recorded</option>
+          <option value="no" data-i18n="journal.value.no">No</option>
+          <option value="yes" data-i18n="journal.value.yes">Yes</option>
         </select>
       </div>
       <div id="editOutsideGroup" style="margin-bottom: 16px; display:none;">
-        <label style="font-weight:600; color:#495057;">🌤️ Went outside</label>
+        <label style="font-weight:600; color:#495057;">🌤️ <span data-i18n="journal.label.goneOutside">Went outside</span></label>
         <select id="editEntryOutside" style="width:100%; padding:8px; border:2px solid #e9ecef; border-radius:8px; margin-top:6px; font-size:1em; box-sizing:border-box;">
-          <option value="">Not recorded</option>
-          <option value="no">No</option>
-          <option value="yes">Yes</option>
+          <option value="" data-i18n="journal.notRecorded">Not recorded</option>
+          <option value="no" data-i18n="journal.value.no">No</option>
+          <option value="yes" data-i18n="journal.value.yes">Yes</option>
         </select>
       </div>
       <div class="confirm-buttons">
-        <button class="confirm-btn" onclick="saveEditedEntry()" style="background:white; color:var(--brand-primary); border:2px solid var(--brand-primary);">Save Changes</button>
-        <button class="confirm-btn confirm-btn-no" onclick="closeEditModal()">Cancel</button>
+        <button class="confirm-btn" onclick="saveEditedEntry()" style="background:white; color:var(--brand-primary); border:2px solid var(--brand-primary);" data-i18n="journal.saveChanges">Save Changes</button>
+        <button class="confirm-btn confirm-btn-no" onclick="closeEditModal()" data-i18n="common.cancel">Cancel</button>
       </div>
     </div>
   </div>
   <!-- Missing Dates Modal -->
   <div class="confirm-modal" id="missingDatesModal">
     <div class="confirm-content" style="max-width: 600px; max-height: 80vh; overflow-y: auto;">
-      <h3>Missing Entries</h3>
-      <p style="color: #6c757d; margin-bottom: 20px;">Click on a date to fill in that entry (showing up to 30 days):</p>
+      <h3 data-i18n="journal.missingTitle">Missing Entries</h3>
+      <p style="color: #6c757d; margin-bottom: 20px;" data-i18n="journal.missingSub">Click on a date to fill in that entry (showing up to 30 days):</p>
       
       <div id="missingDatesList" style="margin-bottom: 20px;">
         <!-- Missing dates will be listed here -->
       </div>
       
       <div class="confirm-buttons">
-        <button class="confirm-btn confirm-btn-no" onclick="closeMissingDatesModal()">Close</button>
+        <button class="confirm-btn confirm-btn-no" onclick="closeMissingDatesModal()" data-i18n="common.close">Close</button>
       </div>
     </div>
   </div>

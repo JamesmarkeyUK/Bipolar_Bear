@@ -1783,7 +1783,7 @@ window.addEventListener('pageshow', () => {
 
     async function saveEntry() {
       if (!selectedMood) {
-        alert('Please select your mood! 🌈');
+        alert(BB.t('journal.toast.selectMood'));
         return;
       }
 
@@ -3207,8 +3207,8 @@ window.addEventListener('pageshow', () => {
     }
 
     async function _guestPinForgotReset() {
-      if (!confirm('This will permanently delete all your journal entries and remove your PIN.\n\nThere is no recovery. Continue?')) return;
-      if (!confirm('Last chance — all entries will be deleted. Are you sure?')) return;
+      if (!confirm(BB.t('journal.confirm.deleteAllBody'))) return;
+      if (!confirm(BB.t('journal.confirm.deleteAllLast'))) return;
       const toDelete = [];
       for (let i = 0; i < localStorage.length; i++) {
         const k = localStorage.key(i);
@@ -4138,7 +4138,7 @@ window.addEventListener('pageshow', () => {
         skipBtn.title = 'Close';
         skipBtn.onclick = () => {
           if (!_hasEditChanges()) { cancelEdit(); return; }
-          if (confirm('Discard changes and close?')) cancelEdit();
+          if (confirm(BB.t('journal.toast.discardChanges'))) cancelEdit();
         };
         skipBtn.style.visibility = 'visible';
         skipBtn.style.color = '#adb5bd';
@@ -4970,14 +4970,14 @@ window.addEventListener('pageshow', () => {
     function _syncExtraSteps() {
       const _builtInDefs = {
         anxiety:  [
-          { id:'anxiety',      title:'Anxiety level?',   subtitle:'', auto:true },
-          { id:'stress',       title:'Stress level?',    subtitle:'', auto:true },
-          { id:'irritability', title:'Irritability?',    subtitle:'', auto:true },
+          { id:'anxiety',      title:BB.t('journal.fm.anxietyTitle'),      subtitle:'', auto:true },
+          { id:'stress',       title:BB.t('journal.fm.stressTitle'),       subtitle:'', auto:true },
+          { id:'irritability', title:BB.t('journal.fm.irritabilityTitle'), subtitle:'', auto:true },
         ],
-        exercise: [{ id:'exercise', title:'Did you exercise?',   subtitle:'', auto:true }],
-        outside:  [{ id:'outside',  title:'Did you go outside?', subtitle:'', auto:true }],
-        alcohol:  [{ id:'alcohol',  title:'Any alcohol today?',  subtitle:'', auto:true }],
-        budget:   [{ id:'budget',   title:'Budget on track?',    subtitle:'', auto:true }],
+        exercise: [{ id:'exercise', title:BB.t('journal.fm.exerciseTitle'), subtitle:'', auto:true }],
+        outside:  [{ id:'outside',  title:BB.t('journal.fm.outsideTitle'),  subtitle:'', auto:true }],
+        alcohol:  [{ id:'alcohol',  title:BB.t('journal.fm.alcoholTitle'),  subtitle:'', auto:true }],
+        budget:   [{ id:'budget',   title:BB.t('journal.fm.budgetTitle'),   subtitle:'', auto:true }],
       };
       // Strip any previously-inserted extras (between more_data and notes)
       const moreIdx  = _fmSteps.findIndex(s => s.id === 'more_data');
