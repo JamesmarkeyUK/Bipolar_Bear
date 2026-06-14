@@ -391,24 +391,24 @@
       <button class="feedback-fab" onclick="openFabFeedback()" title="Send feedback">📣</button>
       <div class="bb-feedback-modal" id="bbFabFeedbackModal" onclick="if(event.target===this)closeFabFeedback()">
         <div class="bb-feedback-content">
-          <h3 style="margin-bottom:4px;color:#333;">Share Feedback</h3>
+          <h3 style="margin-bottom:4px;color:#333;" data-i18n="feedback.title">Share Feedback</h3>
           <p id="bbFbMeta" style="font-size:0.78em;color:#adb5bd;margin-bottom:4px;"></p>
-          <p style="font-size:0.85em;color:#6c757d;margin-bottom:16px;">Help us make Bipolar Bear better.</p>
+          <p style="font-size:0.85em;color:#6c757d;margin-bottom:16px;" data-i18n="feedback.subtitle">Help us make Bipolar Bear better.</p>
           <div style="display:flex;gap:8px;margin-bottom:16px;">
-            <button class="bb-fb-type-btn" id="bbFbTypeBug" onclick="selectFabFeedbackType('bug')">🐛 Bug</button>
-            <button class="bb-fb-type-btn" id="bbFbTypeComment" onclick="selectFabFeedbackType('comment')">💬 Comment</button>
-            <button class="bb-fb-type-btn" id="bbFbTypeIdea" onclick="selectFabFeedbackType('idea')">💡 Idea</button>
+            <button class="bb-fb-type-btn" id="bbFbTypeBug" onclick="selectFabFeedbackType('bug')">🐛 <span data-i18n="feedback.typeBug">Bug</span></button>
+            <button class="bb-fb-type-btn" id="bbFbTypeComment" onclick="selectFabFeedbackType('comment')">💬 <span data-i18n="feedback.typeComment">Comment</span></button>
+            <button class="bb-fb-type-btn" id="bbFbTypeIdea" onclick="selectFabFeedbackType('idea')">💡 <span data-i18n="feedback.typeIdea">Idea</span></button>
           </div>
-          <textarea id="bbFbMessage" placeholder="Tell us what's on your mind…" rows="4"
+          <textarea id="bbFbMessage" placeholder="Tell us what's on your mind…" data-i18n-placeholder="feedback.messagePlaceholder" rows="4"
             style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;box-sizing:border-box;resize:none;font-family:inherit;margin-bottom:12px;"></textarea>
           <div id="bbFbEmailRow" style="margin-bottom:12px;display:none;">
-            <input type="email" id="bbFbEmail" placeholder="Your email (optional)"
+            <input type="email" id="bbFbEmail" placeholder="Your email (optional)" data-i18n-placeholder="feedback.emailPlaceholder"
               style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;box-sizing:border-box;font-family:inherit;">
           </div>
           <div style="margin-bottom:12px;">
             <label id="bbFbScreenshotLabel" style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.88em;color:#6c757d;padding:8px 12px;border:2px dashed #e9ecef;border-radius:10px;">
               <span style="font-size:1.2em;">📎</span>
-              <span>Attach a screenshot (optional)</span>
+              <span data-i18n="feedback.screenshotLabel">Attach a screenshot (optional)</span>
               <input type="file" id="bbFbScreenshot" accept="image/*" style="display:none;" onchange="_onFbScreenshotChange(this)">
             </label>
             <div id="bbFbScreenshotPreview" style="display:none;margin-top:8px;position:relative;display:none;">
@@ -417,7 +417,7 @@
             </div>
           </div>
           <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:0.88em;color:#495057;margin-bottom:18px;user-select:none;">
-            Keep me informed about my submission
+            <span data-i18n="feedback.notifyLabel">Keep me informed about my submission</span>
             <span style="position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;"
               onclick="var cb=document.getElementById('bbFbNotify');cb.checked=!cb.checked;document.getElementById('bbFbNotifyTrack').style.background=cb.checked?'var(--brand-primary)':'#ccc';document.getElementById('bbFbNotifyThumb').style.transform=cb.checked?'translateX(20px)':'translateX(0)';">
               <input type="checkbox" id="bbFbNotify" checked style="opacity:0;width:0;height:0;position:absolute;pointer-events:none;">
@@ -427,11 +427,11 @@
           </label>
           <div id="bbFbError" style="color:#dc3545;font-size:0.85em;margin-bottom:10px;display:none;"></div>
           <div style="display:flex;gap:10px;justify-content:center;">
-            <button onclick="submitFabFeedback()" style="padding:11px 24px;background:var(--brand-primary);color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-size:0.95em;">Send</button>
-            <button onclick="closeFabFeedback()" style="padding:11px 24px;background:white;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-weight:600;cursor:pointer;font-size:0.95em;">Cancel</button>
+            <button onclick="submitFabFeedback()" style="padding:11px 24px;background:var(--brand-primary);color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-size:0.95em;" data-i18n="common.send">Send</button>
+            <button onclick="closeFabFeedback()" style="padding:11px 24px;background:white;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-weight:600;cursor:pointer;font-size:0.95em;" data-i18n="common.cancel">Cancel</button>
           </div>
           <button onclick="window._showHidePermanently('feedback')"
-            style="display:block;width:100%;margin-top:12px;padding:8px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+            style="display:block;width:100%;margin-top:12px;padding:8px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="common.hideButton">
             🙈 Hide this button
           </button>
         </div>
@@ -455,9 +455,9 @@
       <!-- FAB picker sheet -->
       <div id="bbFabPickerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:flex-end;justify-content:center;" onclick="if(event.target===this)closeFabPicker();">
         <div style="background:white;border-radius:20px 20px 0 0;padding:24px;max-width:420px;width:100%;box-shadow:0 -4px 32px rgba(0,0,0,0.18);">
-          <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:16px;text-align:center;">Add to dock</div>
+          <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:16px;text-align:center;" data-i18n="fabPicker.addToDock">Add to dock</div>
           <div id="bbFabPickerOptions" style="display:flex;flex-direction:column;gap:10px;"></div>
-          <button onclick="closeFabPicker()" style="display:block;width:100%;margin-top:14px;padding:12px;background:#f8f9fa;color:#6c757d;border:none;border-radius:12px;font-weight:600;font-size:0.95em;cursor:pointer;">Cancel</button>
+          <button onclick="closeFabPicker()" style="display:block;width:100%;margin-top:14px;padding:12px;background:#f8f9fa;color:#6c757d;border:none;border-radius:12px;font-weight:600;font-size:0.95em;cursor:pointer;" data-i18n="common.cancel">Cancel</button>
         </div>
       </div>
 
@@ -465,14 +465,14 @@
       <div id="bbQuickNoteModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeQuickNoteModal();">
         <div style="background:white;border-radius:20px;padding:24px;max-width:300px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);">
           <div style="font-size:2em;text-align:center;margin-bottom:6px;">📝</div>
-          <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:4px;text-align:center;">Quick Note</div>
-          <p style="font-size:0.82em;color:#adb5bd;margin-bottom:12px;text-align:center;">Shows on your next journal entry</p>
-          <textarea id="bbQuickNoteInput" placeholder="Something to remember..." style="width:100%;min-height:90px;border:1.5px solid #e9ecef;border-radius:10px;padding:10px 12px;font-size:0.9em;color:#495057;resize:vertical;box-sizing:border-box;font-family:inherit;line-height:1.5;outline:none;"></textarea>
+          <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:4px;text-align:center;" data-i18n="quickNote.title">Quick Note</div>
+          <p style="font-size:0.82em;color:#adb5bd;margin-bottom:12px;text-align:center;" data-i18n="quickNote.subtitle">Shows on your next journal entry</p>
+          <textarea id="bbQuickNoteInput" placeholder="Something to remember..." data-i18n-placeholder="quickNote.placeholder" style="width:100%;min-height:90px;border:1.5px solid #e9ecef;border-radius:10px;padding:10px 12px;font-size:0.9em;color:#495057;resize:vertical;box-sizing:border-box;font-family:inherit;line-height:1.5;outline:none;"></textarea>
           <div style="display:flex;gap:10px;margin-top:12px;">
-            <button onclick="closeQuickNoteModal()" style="flex:1;padding:11px;background:white;color:#adb5bd;border:1.5px solid #e9ecef;border-radius:12px;font-weight:600;font-size:0.9em;cursor:pointer;">Cancel</button>
-            <button onclick="saveQuickNote()" style="flex:1;padding:11px;background:var(--brand-primary);color:white;border:none;border-radius:12px;font-weight:700;font-size:0.9em;cursor:pointer;">Save ✓</button>
+            <button onclick="closeQuickNoteModal()" style="flex:1;padding:11px;background:white;color:#adb5bd;border:1.5px solid #e9ecef;border-radius:12px;font-weight:600;font-size:0.9em;cursor:pointer;" data-i18n="common.cancel">Cancel</button>
+            <button onclick="saveQuickNote()" style="flex:1;padding:11px;background:var(--brand-primary);color:white;border:none;border-radius:12px;font-weight:700;font-size:0.9em;cursor:pointer;"><span data-i18n="common.save">Save</span> ✓</button>
           </div>
-          <button onclick="closeQuickNoteModal();window._hideExtraFab('quicknote')" style="display:block;margin:10px auto 0;padding:6px 10px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;">🙈 Hide this button</button>
+          <button onclick="closeQuickNoteModal();window._hideExtraFab('quicknote')" style="display:block;margin:10px auto 0;padding:6px 10px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="common.hideButton">🙈 Hide this button</button>
         </div>
       </div>
 
@@ -542,25 +542,25 @@
           <button onclick="window._bbAccountLogout()" style="width:100%;padding:12px;background:white;color:#dc3545;border:2px solid #dc3545;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;margin-bottom:10px;-webkit-tap-highlight-color:transparent;" data-i18n="account.signOut">Sign out</button>
           <div id="bbAccountPassSection" style="margin-bottom:10px;">
             <div id="bbAccountPassFields" style="display:none;margin-bottom:8px;">
-              <input type="password" id="bbAccountCurrentPass" placeholder="Current password" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;box-sizing:border-box;margin-bottom:6px;outline:none;font-family:inherit;">
-              <input type="password" id="bbAccountNewPass" placeholder="New password" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;box-sizing:border-box;margin-bottom:8px;outline:none;font-family:inherit;">
+              <input type="password" id="bbAccountCurrentPass" placeholder="Current password" data-i18n-placeholder="account.currentPassword" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;box-sizing:border-box;margin-bottom:6px;outline:none;font-family:inherit;">
+              <input type="password" id="bbAccountNewPass" placeholder="New password" data-i18n-placeholder="account.newPassword" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;box-sizing:border-box;margin-bottom:8px;outline:none;font-family:inherit;">
               <div style="display:flex;gap:8px;">
-                <button onclick="window._bbSubmitPasswordChange()" style="flex:1;padding:10px;background:var(--brand-primary);color:white;border:none;border-radius:8px;font-size:0.9em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Save</button>
-                <button onclick="document.getElementById('bbAccountPassFields').style.display='none';document.getElementById('bbAccountPassToggleBtn').style.display='';" style="padding:10px 14px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Cancel</button>
+                <button onclick="window._bbSubmitPasswordChange()" style="flex:1;padding:10px;background:var(--brand-primary);color:white;border:none;border-radius:8px;font-size:0.9em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="common.save">Save</button>
+                <button onclick="document.getElementById('bbAccountPassFields').style.display='none';document.getElementById('bbAccountPassToggleBtn').style.display='';" style="padding:10px 14px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="common.cancel">Cancel</button>
               </div>
             </div>
-            <button id="bbAccountPassToggleBtn" onclick="document.getElementById('bbAccountPassFields').style.display='';document.getElementById('bbAccountPassToggleBtn').style.display='none';document.getElementById('bbAccountCurrentPass').focus();" style="width:100%;padding:12px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Change password</button>
+            <button id="bbAccountPassToggleBtn" onclick="document.getElementById('bbAccountPassFields').style.display='';document.getElementById('bbAccountPassToggleBtn').style.display='none';document.getElementById('bbAccountCurrentPass').focus();" style="width:100%;padding:12px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="account.changePassword">Change password</button>
           </div>
           <div id="bbAccountEmailSection" style="margin-bottom:10px;">
             <div id="bbAccountEmailFields" style="display:none;margin-bottom:8px;">
-              <input type="email" id="bbAccountNewEmail" placeholder="New email address" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;box-sizing:border-box;margin-bottom:6px;outline:none;font-family:inherit;">
-              <input type="password" id="bbAccountEmailPass" placeholder="Current password" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;box-sizing:border-box;margin-bottom:8px;outline:none;font-family:inherit;">
+              <input type="email" id="bbAccountNewEmail" placeholder="New email address" data-i18n-placeholder="account.newEmail" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;box-sizing:border-box;margin-bottom:6px;outline:none;font-family:inherit;">
+              <input type="password" id="bbAccountEmailPass" placeholder="Current password" data-i18n-placeholder="account.currentPassword" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;box-sizing:border-box;margin-bottom:8px;outline:none;font-family:inherit;">
               <div style="display:flex;gap:8px;">
-                <button onclick="window._bbSubmitEmailChange()" style="flex:1;padding:10px;background:var(--brand-primary);color:white;border:none;border-radius:8px;font-size:0.9em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Save</button>
-                <button onclick="document.getElementById('bbAccountEmailFields').style.display='none';document.getElementById('bbAccountEmailToggleBtn').style.display='';" style="padding:10px 14px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Cancel</button>
+                <button onclick="window._bbSubmitEmailChange()" style="flex:1;padding:10px;background:var(--brand-primary);color:white;border:none;border-radius:8px;font-size:0.9em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="common.save">Save</button>
+                <button onclick="document.getElementById('bbAccountEmailFields').style.display='none';document.getElementById('bbAccountEmailToggleBtn').style.display='';" style="padding:10px 14px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="common.cancel">Cancel</button>
               </div>
             </div>
-            <button id="bbAccountEmailToggleBtn" onclick="document.getElementById('bbAccountEmailFields').style.display='';document.getElementById('bbAccountEmailToggleBtn').style.display='none';document.getElementById('bbAccountNewEmail').focus();" style="width:100%;padding:12px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Change email</button>
+            <button id="bbAccountEmailToggleBtn" onclick="document.getElementById('bbAccountEmailFields').style.display='';document.getElementById('bbAccountEmailToggleBtn').style.display='none';document.getElementById('bbAccountNewEmail').focus();" style="width:100%;padding:12px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="account.changeEmail">Change email</button>
           </div>
           <div style="margin-bottom:10px;">
             <div style="font-size:0.78em;font-weight:600;color:#6c757d;margin-bottom:6px;" data-i18n="account.language">Language</div>
@@ -1272,13 +1272,13 @@
     if (!user) return;
     const currentPass = (document.getElementById('bbAccountCurrentPass').value || '').trim();
     const newPass     = (document.getElementById('bbAccountNewPass').value     || '').trim();
-    if (!currentPass || !newPass) { _bbAccountShowMsg('⚠️ Please fill in both fields.', false); return; }
-    if (newPass.length < 6)       { _bbAccountShowMsg('⚠️ New password must be at least 6 characters.', false); return; }
+    if (!currentPass || !newPass) { _bbAccountShowMsg(_bbT('account.msg.fillBothFields', '⚠️ Please fill in both fields.'), false); return; }
+    if (newPass.length < 6)       { _bbAccountShowMsg(_bbT('account.msg.passwordTooShort', '⚠️ New password must be at least 6 characters.'), false); return; }
     const credential = _fb.auth.EmailAuthProvider.credential(user.email, currentPass);
     user.reauthenticateWithCredential(credential)
       .then(() => user.updatePassword(newPass))
       .then(() => {
-        _bbAccountShowMsg('✅ Password updated successfully.', true);
+        _bbAccountShowMsg(_bbT('account.msg.passwordUpdated', '✅ Password updated successfully.'), true);
         document.getElementById('bbAccountPassFields').style.display  = 'none';
         document.getElementById('bbAccountPassToggleBtn').style.display = '';
         document.getElementById('bbAccountCurrentPass').value = '';
@@ -1286,7 +1286,7 @@
       })
       .catch(err => {
         const wrongPass = err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential';
-        _bbAccountShowMsg('⚠️ ' + (wrongPass ? 'Current password is incorrect.' : (err.message || 'Could not update password.')), false);
+        _bbAccountShowMsg(wrongPass ? _bbT('account.msg.wrongPassword', '⚠️ Current password is incorrect.') : (err.message ? '⚠️ ' + err.message : _bbT('account.msg.passwordUpdateFailed', '⚠️ Could not update password.')), false);
       });
   };
 
@@ -1301,13 +1301,13 @@
     if (!user) return;
     const newEmail  = (document.getElementById('bbAccountNewEmail').value  || '').trim();
     const pass      = (document.getElementById('bbAccountEmailPass').value || '').trim();
-    if (!newEmail || !pass) { _bbAccountShowMsg('⚠️ Please fill in both fields.', false); return; }
-    if (!newEmail.includes('@') || !newEmail.includes('.')) { _bbAccountShowMsg('⚠️ Please enter a valid email address.', false); return; }
+    if (!newEmail || !pass) { _bbAccountShowMsg(_bbT('account.msg.fillBothFields', '⚠️ Please fill in both fields.'), false); return; }
+    if (!newEmail.includes('@') || !newEmail.includes('.')) { _bbAccountShowMsg(_bbT('account.msg.invalidEmail', '⚠️ Please enter a valid email address.'), false); return; }
     const credential = _fb.auth.EmailAuthProvider.credential(user.email, pass);
     user.reauthenticateWithCredential(credential)
       .then(() => user.updateEmail(newEmail))
       .then(() => {
-        _bbAccountShowMsg('✅ Email updated to ' + newEmail, true);
+        _bbAccountShowMsg(_bbT('account.msg.emailUpdated', '✅ Email updated to {email}').replace('{email}', newEmail), true);
         document.getElementById('bbAccountEmail').textContent = newEmail;
         document.getElementById('bbAccountEmailFields').style.display   = 'none';
         document.getElementById('bbAccountEmailToggleBtn').style.display = '';
@@ -1317,7 +1317,7 @@
       .catch(err => {
         const wrongPass = err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential';
         const inUse     = err.code === 'auth/email-already-in-use';
-        _bbAccountShowMsg('⚠️ ' + (wrongPass ? 'Current password is incorrect.' : inUse ? 'That email is already in use.' : (err.message || 'Could not update email.')), false);
+        _bbAccountShowMsg(wrongPass ? _bbT('account.msg.wrongPassword', '⚠️ Current password is incorrect.') : inUse ? _bbT('account.msg.emailInUse', '⚠️ That email is already in use.') : (err.message ? '⚠️ ' + err.message : _bbT('account.msg.emailUpdateFailed', '⚠️ Could not update email.')), false);
       });
   };
 

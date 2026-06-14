@@ -244,7 +244,16 @@
 //      and the online reconcile no longer trusts a stale done:true. Touches
 //      js/shared/i18n.js, js/journal.js, journal.html, fab.js, js/index.js,
 //      index.html.
-const CACHE_NAME = 'bipolarbear-v85';
+// v86: i18n pass round 2 (EN + FR) — wired the remaining hardcoded strings:
+//      classic (non-focused) journal form (sleep quality, medication, more-
+//      data question rows + yes/no/normal answers, notes), edit-entry mood +
+//      medication dropdowns, focused-mode placeholders/buttons (notes,
+//      intention, "More details", budget/goals "Set"/"Change", Over budget/
+//      On track), the empty-entries state, and the fab.js feedback modal,
+//      quick-note modal, FAB picker, account change-password/email modal +
+//      its success/error messages. Touches js/shared/i18n.js, js/journal.js,
+//      journal.html, fab.js.
+const CACHE_NAME = 'bipolarbear-v86';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

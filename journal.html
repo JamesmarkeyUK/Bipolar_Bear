@@ -253,11 +253,11 @@
         </div>
         <div class="sleep-selector" id="sleepSelector"></div>
         <div id="sleepQualitySubSection" style="display:none;">
-          <label style="display:block;margin-top:10px;margin-bottom:6px;font-size:0.85em;color:#6c757d;">Sleep Quality</label>
+          <label style="display:block;margin-top:10px;margin-bottom:6px;font-size:0.85em;color:#6c757d;" data-i18n="journal.label.sleepQuality">Sleep Quality</label>
           <div style="display:flex;gap:8px;">
-            <button type="button" id="sqBad"    onclick="_setSleepQuality('bad')"    style="flex:1;padding:8px 4px;border:1.5px solid #dee2e6;border-radius:10px;background:white;color:#6c757d;font-size:0.82em;cursor:pointer;-webkit-tap-highlight-color:transparent;">😴 Bad</button>
-            <button type="button" id="sqUnsure" onclick="_setSleepQuality('unsure')" style="flex:1;padding:8px 4px;border:1.5px solid #dee2e6;border-radius:10px;background:white;color:#6c757d;font-size:0.82em;cursor:pointer;-webkit-tap-highlight-color:transparent;">😐 OK</button>
-            <button type="button" id="sqGood"   onclick="_setSleepQuality('good')"   style="flex:1;padding:8px 4px;border:1.5px solid #dee2e6;border-radius:10px;background:white;color:#6c757d;font-size:0.82em;cursor:pointer;-webkit-tap-highlight-color:transparent;">😊 Good</button>
+            <button type="button" id="sqBad"    onclick="_setSleepQuality('bad')"    style="flex:1;padding:8px 4px;border:1.5px solid #dee2e6;border-radius:10px;background:white;color:#6c757d;font-size:0.82em;cursor:pointer;-webkit-tap-highlight-color:transparent;">😴 <span data-i18n="journal.value.bad">Bad</span></button>
+            <button type="button" id="sqUnsure" onclick="_setSleepQuality('unsure')" style="flex:1;padding:8px 4px;border:1.5px solid #dee2e6;border-radius:10px;background:white;color:#6c757d;font-size:0.82em;cursor:pointer;-webkit-tap-highlight-color:transparent;">😐 <span data-i18n="journal.value.ok">OK</span></button>
+            <button type="button" id="sqGood"   onclick="_setSleepQuality('good')"   style="flex:1;padding:8px 4px;border:1.5px solid #dee2e6;border-radius:10px;background:white;color:#6c757d;font-size:0.82em;cursor:pointer;-webkit-tap-highlight-color:transparent;">😊 <span data-i18n="journal.value.good">Good</span></button>
           </div>
         </div>
       </div>
@@ -265,90 +265,90 @@
       <div class="form-group hidden-until-mood" id="medicationSection">
         <span id="medLabelBtn" class="label-btn" onclick="showMedicationList()">💊 My Meds</span>
         <div class="medication-selector">
-          <button type="button" class="medication-btn" data-medication="not-taken">No / Forgot</button>
-          <button type="button" class="medication-btn medication-taken" data-medication="taken">Taken</button>
+          <button type="button" class="medication-btn" data-medication="not-taken" data-i18n="journal.editMood.notTaken">No / Forgot</button>
+          <button type="button" class="medication-btn medication-taken" data-medication="taken" data-i18n="journal.med.taken">Taken</button>
         </div>
       </div>
 
       <div class="form-group hidden-until-mood" id="notesSection">
-        <label>Notes (optional)</label>
-        <textarea id="notes" placeholder="What's on your mind? Any triggers, events, or patterns you noticed? Any micro wins today?" style="min-height:148px;"></textarea>
+        <label data-i18n="journal.notesOptional">Notes (optional)</label>
+        <textarea id="notes" placeholder="What's on your mind? Any triggers, events, or patterns you noticed? Any micro wins today?" data-i18n-placeholder="journal.placeholder.notes" style="min-height:148px;"></textarea>
       </div>
 
       <div class="form-group hidden-until-mood" id="moreDataArea" style="margin-top:4px;">
-        <button type="button" id="moreDataToggle" onclick="toggleMoreData()" style="background:none;border:none;color:var(--brand-primary);font-size:0.88em;font-weight:600;cursor:pointer;padding:4px 0;text-decoration:underline;text-underline-offset:3px;">📊 More data</button>
+        <button type="button" id="moreDataToggle" onclick="toggleMoreData()" style="background:none;border:none;color:var(--brand-primary);font-size:0.88em;font-weight:600;cursor:pointer;padding:4px 0;text-decoration:underline;text-underline-offset:3px;" data-i18n="journal.moreData">📊 More data</button>
         <div id="moreDataSection" style="display:none;margin-top:12px;border-radius:10px;">
           <!-- All tracking rows in ONE unified 4-column grid so buttons align across rows -->
           <div style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;align-items:center;gap:8px;width:100%;">
             <div id="goalsTrackRow" style="display:none">
-              <span style="font-size:0.9em;font-weight:600;color:#495057;cursor:pointer;text-decoration:underline;text-underline-offset:3px;" onclick="_toggleGoalsDetail()">🏅 Goal progress?</span>
+              <span style="font-size:0.9em;font-weight:600;color:#495057;cursor:pointer;text-decoration:underline;text-underline-offset:3px;" onclick="_toggleGoalsDetail()" data-i18n="journal.q.goalProgress">🏅 Goal progress?</span>
               <div style="grid-column:span 3;display:flex;gap:8px;">
-                <button type="button" class="medication-btn" data-goals="none" style="padding:10px 4px;flex:1;min-width:0;">No</button>
-                <button type="button" class="medication-btn" data-goals="some" style="padding:10px 4px;flex:1;min-width:0;">On track</button>
+                <button type="button" class="medication-btn" data-goals="none" style="padding:10px 4px;flex:1;min-width:0;" data-i18n="journal.value.no">No</button>
+                <button type="button" class="medication-btn" data-goals="some" style="padding:10px 4px;flex:1;min-width:0;" data-i18n="journal.value.onTrack">On track</button>
               </div>
               <div id="goalsDetail" style="display:none;grid-column:1/-1;padding-bottom:4px;"></div>
             </div>
             <div id="budgetTrackRow" style="display:none">
-              <span id="budgetLabel" style="font-size:0.9em;font-weight:600;color:#495057;cursor:pointer;text-decoration:underline;text-underline-offset:3px;" onclick="_toggleBudgetDetail()">💰 Kept budget?</span>
+              <span id="budgetLabel" style="font-size:0.9em;font-weight:600;color:#495057;cursor:pointer;text-decoration:underline;text-underline-offset:3px;" onclick="_toggleBudgetDetail()" data-i18n="journal.q.keptBudget">💰 Kept budget?</span>
               <div style="grid-column:span 3;display:flex;gap:8px;">
-                <button type="button" class="medication-btn" data-budget="no" style="padding:10px 4px;flex:1;min-width:0;">No</button>
-                <button type="button" class="medication-btn" data-budget="yes" style="padding:10px 4px;flex:1;min-width:0;">Yes</button>
+                <button type="button" class="medication-btn" data-budget="no" style="padding:10px 4px;flex:1;min-width:0;" data-i18n="journal.value.no">No</button>
+                <button type="button" class="medication-btn" data-budget="yes" style="padding:10px 4px;flex:1;min-width:0;" data-i18n="journal.value.yes">Yes</button>
               </div>
               <div id="budgetDetail" style="display:none;grid-column:1/-1;padding-bottom:4px;"></div>
             </div>
             <div id="emotionAnxietyRow" style="display:none">
-              <span style="font-size:0.9em;font-weight:600;color:#495057;">😰 Anxiety?</span>
-              <button type="button" class="medication-btn" data-anxiety="high" style="padding:10px 4px;width:100%;">More than usual</button>
-              <button type="button" class="medication-btn" data-anxiety="medium" style="padding:10px 4px;width:100%;">Normal</button>
-              <button type="button" class="medication-btn" data-anxiety="low" style="padding:10px 4px;width:100%;">Less than usual</button>
+              <span style="font-size:0.9em;font-weight:600;color:#495057;" data-i18n="journal.q.anxiety">😰 Anxiety?</span>
+              <button type="button" class="medication-btn" data-anxiety="high" style="padding:10px 4px;width:100%;" data-i18n="journal.value.moreThanUsual">More than usual</button>
+              <button type="button" class="medication-btn" data-anxiety="medium" style="padding:10px 4px;width:100%;" data-i18n="journal.value.normal">Normal</button>
+              <button type="button" class="medication-btn" data-anxiety="low" style="padding:10px 4px;width:100%;" data-i18n="journal.value.lessThanUsual">Less than usual</button>
             </div>
             <div id="emotionStressRow" style="display:none">
-              <span style="font-size:0.9em;font-weight:600;color:#495057;">😓 Stress?</span>
-              <button type="button" class="medication-btn" data-stress="high" style="padding:10px 4px;width:100%;">More than usual</button>
-              <button type="button" class="medication-btn" data-stress="medium" style="padding:10px 4px;width:100%;">Normal</button>
-              <button type="button" class="medication-btn" data-stress="low" style="padding:10px 4px;width:100%;">Less than usual</button>
+              <span style="font-size:0.9em;font-weight:600;color:#495057;" data-i18n="journal.q.stress">😓 Stress?</span>
+              <button type="button" class="medication-btn" data-stress="high" style="padding:10px 4px;width:100%;" data-i18n="journal.value.moreThanUsual">More than usual</button>
+              <button type="button" class="medication-btn" data-stress="medium" style="padding:10px 4px;width:100%;" data-i18n="journal.value.normal">Normal</button>
+              <button type="button" class="medication-btn" data-stress="low" style="padding:10px 4px;width:100%;" data-i18n="journal.value.lessThanUsual">Less than usual</button>
             </div>
             <div id="emotionIrritabilityRow" style="display:none">
-              <span style="font-size:0.9em;font-weight:600;color:#495057;">😠 Irritability?</span>
+              <span style="font-size:0.9em;font-weight:600;color:#495057;" data-i18n="journal.q.irritability">😠 Irritability?</span>
               <div style="grid-column:span 3;display:flex;gap:8px;">
-                <button type="button" class="medication-btn" data-irritability="yes" style="padding:10px 4px;flex:1;min-width:0;">More than usual</button>
-                <button type="button" class="medication-btn" data-irritability="medium" style="padding:10px 4px;flex:1;min-width:0;">Normal</button>
-                <button type="button" class="medication-btn" data-irritability="no" style="padding:10px 4px;flex:1;min-width:0;">Less than usual</button>
+                <button type="button" class="medication-btn" data-irritability="yes" style="padding:10px 4px;flex:1;min-width:0;" data-i18n="journal.value.moreThanUsual">More than usual</button>
+                <button type="button" class="medication-btn" data-irritability="medium" style="padding:10px 4px;flex:1;min-width:0;" data-i18n="journal.value.normal">Normal</button>
+                <button type="button" class="medication-btn" data-irritability="no" style="padding:10px 4px;flex:1;min-width:0;" data-i18n="journal.value.lessThanUsual">Less than usual</button>
               </div>
             </div>
             <div id="exerciseTrackRow" style="display:none">
-              <span style="font-size:0.9em;font-weight:600;color:#495057;">🏋️ Exercise?</span>
+              <span style="font-size:0.9em;font-weight:600;color:#495057;" data-i18n="journal.q.exercise">🏋️ Exercise?</span>
               <div style="grid-column:span 3;display:flex;gap:8px;">
-                <button type="button" class="medication-btn" data-exercise="no" style="padding:10px 4px;flex:1;min-width:0;">No</button>
-                <button type="button" class="medication-btn" data-exercise="yes" style="padding:10px 4px;flex:1;min-width:0;">Yes</button>
+                <button type="button" class="medication-btn" data-exercise="no" style="padding:10px 4px;flex:1;min-width:0;" data-i18n="journal.value.no">No</button>
+                <button type="button" class="medication-btn" data-exercise="yes" style="padding:10px 4px;flex:1;min-width:0;" data-i18n="journal.value.yes">Yes</button>
               </div>
             </div>
             <div id="outsideTrackRow" style="display:none">
-              <span style="font-size:0.9em;font-weight:600;color:#495057;">🌤️ Gone outside?</span>
+              <span style="font-size:0.9em;font-weight:600;color:#495057;" data-i18n="journal.q.outside">🌤️ Gone outside?</span>
               <div style="grid-column:span 3;display:flex;gap:8px;">
-                <button type="button" class="medication-btn" data-outside="no" style="padding:10px 4px;flex:1;min-width:0;">No</button>
-                <button type="button" class="medication-btn" data-outside="yes" style="padding:10px 4px;flex:1;min-width:0;">Yes</button>
+                <button type="button" class="medication-btn" data-outside="no" style="padding:10px 4px;flex:1;min-width:0;" data-i18n="journal.value.no">No</button>
+                <button type="button" class="medication-btn" data-outside="yes" style="padding:10px 4px;flex:1;min-width:0;" data-i18n="journal.value.yes">Yes</button>
               </div>
             </div>
             <div id="alcoholTrackRow" style="display:none">
-              <span style="font-size:0.9em;font-weight:600;color:#495057;">🍺 Alcohol?</span>
+              <span style="font-size:0.9em;font-weight:600;color:#495057;" data-i18n="journal.q.alcohol">🍺 Alcohol?</span>
               <div style="grid-column:span 3;display:flex;gap:8px;">
-                <button type="button" class="medication-btn" data-alcohol="yes" style="padding:10px 4px;flex:1;min-width:0;">🍺 Yes</button>
-                <button type="button" class="medication-btn" data-alcohol="no" style="padding:10px 4px;flex:1;min-width:0;">No</button>
+                <button type="button" class="medication-btn" data-alcohol="yes" style="padding:10px 4px;flex:1;min-width:0;">🍺 <span data-i18n="journal.value.yes">Yes</span></button>
+                <button type="button" class="medication-btn" data-alcohol="no" style="padding:10px 4px;flex:1;min-width:0;" data-i18n="journal.value.no">No</button>
               </div>
             </div>
             <div id="smokingTrackRow" style="display:none">
-              <span style="font-size:0.9em;font-weight:600;color:#495057;">🚬 Smoked?</span>
+              <span style="font-size:0.9em;font-weight:600;color:#495057;" data-i18n="journal.q.smoked">🚬 Smoked?</span>
               <div style="grid-column:span 3;display:flex;gap:8px;">
-                <button type="button" class="medication-btn" data-smoking="no" style="padding:10px 4px;flex:1;min-width:0;">No</button>
-                <button type="button" class="medication-btn" data-smoking="yes" style="padding:10px 4px;flex:1;min-width:0;">Yes</button>
+                <button type="button" class="medication-btn" data-smoking="no" style="padding:10px 4px;flex:1;min-width:0;" data-i18n="journal.value.no">No</button>
+                <button type="button" class="medication-btn" data-smoking="yes" style="padding:10px 4px;flex:1;min-width:0;" data-i18n="journal.value.yes">Yes</button>
               </div>
             </div>
             <div id="drugsTrackRow" style="display:none">
-              <span style="font-size:0.9em;font-weight:600;color:#495057;">💊 Drugs?</span>
+              <span style="font-size:0.9em;font-weight:600;color:#495057;" data-i18n="journal.q.drugs">💊 Drugs?</span>
               <div style="grid-column:span 3;display:flex;gap:8px;">
-                <button type="button" class="medication-btn" data-drugs="no" style="padding:10px 4px;flex:1;min-width:0;">No</button>
-                <button type="button" class="medication-btn" data-drugs="yes" style="padding:10px 4px;flex:1;min-width:0;">Yes</button>
+                <button type="button" class="medication-btn" data-drugs="no" style="padding:10px 4px;flex:1;min-width:0;" data-i18n="journal.value.no">No</button>
+                <button type="button" class="medication-btn" data-drugs="yes" style="padding:10px 4px;flex:1;min-width:0;" data-i18n="journal.value.yes">Yes</button>
               </div>
             </div>
             <div id="customTrackingRows" style="display:contents;"></div>
@@ -357,7 +357,7 @@
             <span></span>
             <button onclick="showFieldPicker()" style="width:36px;height:36px;min-width:36px;min-height:36px;border-radius:50%;background:rgba(255,149,0,0.08);color:var(--brand-primary);font-size:1.3em;border:2px dashed var(--brand-primary);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1;-webkit-tap-highlight-color:transparent;box-sizing:border-box;">+</button>
             <label style="display:flex;align-items:center;gap:6px;cursor:pointer;justify-content:flex-end;" onclick="toggleMoreDataDefault()">
-              <span style="font-size:0.75em;color:#6c757d;">Open by default</span>
+              <span style="font-size:0.75em;color:#6c757d;" data-i18n="journal.openByDefault">Open by default</span>
               <span id="moreDataDefaultSwitch" style="display:inline-flex;width:32px;height:18px;border-radius:9px;background:#dee2e6;position:relative;transition:background 0.2s;flex-shrink:0;">
                 <span style="width:14px;height:14px;border-radius:50%;background:white;position:absolute;top:2px;left:2px;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);"></span>
               </span>
@@ -971,13 +971,13 @@
         <input type="date" id="editEntryDate" style="width:100%; padding:8px; border:2px solid #e9ecef; border-radius:8px; margin-top:6px; font-size:1em; box-sizing:border-box;">
       </div>
       <div style="margin-bottom: 12px;">
-        <label style="font-weight:600; color:#495057;">Mood</label>
+        <label style="font-weight:600; color:#495057;" data-i18n="journal.label.mood">Mood</label>
         <select id="editEntryMood" style="width:100%; padding:8px; border:2px solid #e9ecef; border-radius:8px; margin-top:6px; font-size:1em; box-sizing:border-box;">
-          <option value="manic">🚀 Manic</option>
-          <option value="elevated">✨ Elevated</option>
-          <option value="stable">😊 Stable</option>
-          <option value="low">😔 Low</option>
-          <option value="depressed">🌧️ Depressed</option>
+          <option value="manic" data-i18n="journal.editMood.manic">🚀 Manic</option>
+          <option value="elevated" data-i18n="journal.editMood.elevated">✨ Elevated</option>
+          <option value="stable" data-i18n="journal.editMood.stable">😊 Stable</option>
+          <option value="low" data-i18n="journal.editMood.low">😔 Low</option>
+          <option value="depressed" data-i18n="journal.editMood.depressed">🌧️ Depressed</option>
         </select>
       </div>
       <div style="margin-bottom: 12px;">
@@ -989,10 +989,10 @@
         <input type="number" id="editEntrySleep" min="0" max="24" step="0.5" style="width:100%; padding:8px; border:2px solid #e9ecef; border-radius:8px; margin-top:6px; font-size:1em; box-sizing:border-box;">
       </div>
       <div style="margin-bottom: 12px;">
-        <label style="font-weight:600; color:#495057;">Medication</label>
+        <label style="font-weight:600; color:#495057;" data-i18n="journal.label.medication">Medication</label>
         <select id="editEntryMedication" style="width:100%; padding:8px; border:2px solid #e9ecef; border-radius:8px; margin-top:6px; font-size:1em; box-sizing:border-box;">
-          <option value="taken">✅ Taken</option>
-          <option value="not-taken">❌ No / Forgot</option>
+          <option value="taken" data-i18n="journal.med.taken">✅ Taken</option>
+          <option value="not-taken" data-i18n="journal.editMood.notTaken">❌ No / Forgot</option>
         </select>
       </div>
       <div style="margin-bottom: 12px;">

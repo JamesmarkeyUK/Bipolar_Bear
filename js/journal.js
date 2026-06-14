@@ -800,11 +800,11 @@ window.addEventListener('pageshow', () => {
       if (!energySelector) return;
 
       const energyRanges = [
-        { label: '💀 Not enough', value: 0 },
-        { label: '🪫 Less than usual', value: 3 },
-        { label: '⚡️ Normal', value: 5 },
-        { label: '🔋 More than usual', value: 7 },
-        { label: '🚀 Too much', value: 10 }
+        { label: BB.t('journal.energy.notEnough'), value: 0 },
+        { label: BB.t('journal.energy.less'), value: 3 },
+        { label: BB.t('journal.energy.normal'), value: 5 },
+        { label: BB.t('journal.energy.more'), value: 7 },
+        { label: BB.t('journal.energy.tooMuch'), value: 10 }
       ];
       
       energyRanges.forEach(range => {
@@ -1380,7 +1380,7 @@ window.addEventListener('pageshow', () => {
       const btn = document.getElementById('moreDataToggle');
       const opening = section.style.display === 'none';
       section.style.display = opening ? 'block' : 'none';
-      btn.textContent = opening ? '➖ Less' : '📊 More data';
+      btn.textContent = opening ? BB.t('journal.lessData') : BB.t('journal.moreData');
       if (opening) {
         setTimeout(() => {
           const notes = document.getElementById('notes');
@@ -2097,7 +2097,7 @@ window.addEventListener('pageshow', () => {
         if (_ph && _ph.style.display !== 'none') {
           _ph.style.display = 'none';
           const _ents = document.getElementById('entries');
-          if (_ents && !_ents.innerHTML.trim()) _ents.innerHTML = '<div class="no-entries">No entries yet. Start tracking your mood today! 🌱</div>';
+          if (_ents && !_ents.innerHTML.trim()) _ents.innerHTML = '<div class="no-entries">' + BB.t('journal.noEntries') + '</div>';
         }
       }, 8000);
       // After a forced reload-after-failure, Firestore's IndexedDB persistence needs extra
@@ -2204,7 +2204,7 @@ window.addEventListener('pageshow', () => {
             location.replace('index.html');
             return;
           }
-          document.getElementById('entries').innerHTML = '<div class="no-entries">No entries yet. Start tracking your mood today! 🌱</div>';
+          document.getElementById('entries').innerHTML = '<div class="no-entries">' + BB.t('journal.noEntries') + '</div>';
           document.getElementById('stats').style.display = 'none';
           document.getElementById('chart').style.display = 'none';
           const entriesHeader = document.querySelector('.entries-header');
@@ -4225,7 +4225,7 @@ window.addEventListener('pageshow', () => {
       _notesEl.id = 'fmStepNotesEl';
       if (_noteOpen) _notesEl.open = true;
       _notesEl.style.cssText = 'margin-top:14px;';
-      _notesEl.innerHTML = `<summary style="font-size:0.85em;font-weight:600;color:#6c757d;cursor:pointer;list-style:none;display:flex;align-items:center;gap:5px;-webkit-tap-highlight-color:transparent;padding:4px 0;" onclick="this.querySelector('.bb-stpchev').style.transform=this.parentElement.open?'rotate(0deg)':'rotate(90deg)'"><span class="bb-stpchev" style="font-size:0.75em;color:#6c757d;transition:transform 0.2s;">${_noteOpen ? '▼' : '▶'}</span>📝 Add a note</summary><textarea id="fmStepNoteInput" placeholder="Why did you feel this way?" style="width:100%;height:60px;border:1.5px solid #e9ecef;border-radius:10px;padding:10px;margin-top:6px;font-size:0.88em;font-family:inherit;resize:none;box-sizing:border-box;outline:none;transition:border-color 0.15s;" oninput="selectedStepNotes['${step.id}']=this.value;saveDraft();" onfocus="this.style.borderColor='var(--brand-primary)'" onblur="this.style.borderColor='#e9ecef'">${_noteVal.replace(/</g,'&lt;')}</textarea>`;
+      _notesEl.innerHTML = `<summary style="font-size:0.85em;font-weight:600;color:#6c757d;cursor:pointer;list-style:none;display:flex;align-items:center;gap:5px;-webkit-tap-highlight-color:transparent;padding:4px 0;" onclick="this.querySelector('.bb-stpchev').style.transform=this.parentElement.open?'rotate(0deg)':'rotate(90deg)'"><span class="bb-stpchev" style="font-size:0.75em;color:#6c757d;transition:transform 0.2s;">${_noteOpen ? '▼' : '▶'}</span>${BB.t('journal.addNote')}</summary><textarea id="fmStepNoteInput" placeholder="${BB.t('journal.placeholder.stepNote')}" style="width:100%;height:60px;border:1.5px solid #e9ecef;border-radius:10px;padding:10px;margin-top:6px;font-size:0.88em;font-family:inherit;resize:none;box-sizing:border-box;outline:none;transition:border-color 0.15s;" oninput="selectedStepNotes['${step.id}']=this.value;saveDraft();" onfocus="this.style.borderColor='var(--brand-primary)'" onblur="this.style.borderColor='#e9ecef'">${_noteVal.replace(/</g,'&lt;')}</textarea>`;
       const _container = document.getElementById('fmContent');
       if (_container) _container.appendChild(_notesEl);
     }
@@ -4461,7 +4461,7 @@ window.addEventListener('pageshow', () => {
             style="border-left:4px solid ${o.color};${i>0?'margin-top:8px;':''}">
             <span>${o.label}</span></button>`).join('') +
           `<div style="text-align:center;margin-top:14px;">
-            <button onclick="showGoalsList()" style="background:none;border:none;color:var(--brand-primary);font-size:0.85em;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px;-webkit-tap-highlight-color:transparent;">View / Edit Goals</button>
+            <button onclick="showGoalsList()" style="background:none;border:none;color:var(--brand-primary);font-size:0.85em;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px;-webkit-tap-highlight-color:transparent;">${BB.t('journal.btn.viewEditGoals')}</button>
           </div>`;
 
         case 'anxiety':
@@ -4520,14 +4520,14 @@ window.addEventListener('pageshow', () => {
           const _budgetInfo = _budgetVal
             ? `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:10px 14px;background:var(--brand-tint);border-radius:12px;border:1.5px solid rgba(255,149,0,0.3);">
                 <span style="font-size:0.9em;color:#495057;">💰 Daily budget: <b>${_budgetVal}</b></span>
-                <button onclick="showBudgetModal()" style="padding:4px 12px;background:var(--brand-primary);color:white;border:none;border-radius:8px;font-size:0.8em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Change</button>
+                <button onclick="showBudgetModal()" style="padding:4px 12px;background:var(--brand-primary);color:white;border:none;border-radius:8px;font-size:0.8em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">${BB.t('common.change')}</button>
               </div>`
             : `<div style="text-align:center;margin-bottom:14px;">
-                <button onclick="showBudgetModal()" style="padding:8px 18px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:12px;color:var(--brand-primary);font-weight:600;font-size:0.88em;cursor:pointer;-webkit-tap-highlight-color:transparent;">💰 Set daily budget</button>
+                <button onclick="showBudgetModal()" style="padding:8px 18px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:12px;color:var(--brand-primary);font-weight:600;font-size:0.88em;cursor:pointer;-webkit-tap-highlight-color:transparent;">${BB.t('journal.btn.setDailyBudget')}</button>
               </div>`;
           return _budgetInfo + [
-            {val:'no',  label:'❌ Over budget', color:'var(--brand-primary)'},
-            {val:'yes', label:'✅ On track',    color:'var(--brand-primary)'},
+            {val:'no',  label:BB.t('journal.budgetOver'),   color:'var(--brand-primary)'},
+            {val:'yes', label:BB.t('journal.budgetOnTrack'), color:'var(--brand-primary)'},
           ].map((o,i) => `<button class="fm-opt ${selectedBudget===o.val?'sel':''}"
             onclick="selectedBudget='${o.val}'; _fmAdvance();"
             style="border-left:4px solid ${o.color};${i>0?'margin-top:8px;':''}">
@@ -4560,14 +4560,14 @@ window.addEventListener('pageshow', () => {
             if (ex.id === 'goals') {
               const _goalItems = JSON.parse(localStorage.getItem('dailyGoals') || '[]');
               const _goalsDetail = _goalItems.length > 0
-                ? (() => { const _dg = _goalItems.map(g => `<span style="display:inline-block;background:rgba(255,149,0,0.12);border-radius:6px;padding:2px 7px;margin:2px;font-size:0.8em;color:#495057;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${g}</span>`).join(''); return `<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:8px 12px;background:var(--brand-tint);border-radius:10px;border:1.5px solid rgba(255,149,0,0.3);gap:8px;"><div style="flex:1;min-width:0;flex-wrap:wrap;display:flex;align-items:center;">${_dg}</div><button onclick="showGoalsList()" style="padding:3px 10px;background:var(--brand-primary);color:white;border:none;border-radius:7px;font-size:0.78em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;">Change</button></div>`; })()
-                : `<button onclick="showGoalsList()" style="padding:7px 16px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">🏅 Set daily goals</button>`;
+                ? (() => { const _dg = _goalItems.map(g => `<span style="display:inline-block;background:rgba(255,149,0,0.12);border-radius:6px;padding:2px 7px;margin:2px;font-size:0.8em;color:#495057;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${g}</span>`).join(''); return `<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:8px 12px;background:var(--brand-tint);border-radius:10px;border:1.5px solid rgba(255,149,0,0.3);gap:8px;"><div style="flex:1;min-width:0;flex-wrap:wrap;display:flex;align-items:center;">${_dg}</div><button onclick="showGoalsList()" style="padding:3px 10px;background:var(--brand-primary);color:white;border:none;border-radius:7px;font-size:0.78em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;">${BB.t('common.change')}</button></div>`; })()
+                : `<button onclick="showGoalsList()" style="padding:7px 16px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">${BB.t('journal.btn.setDailyGoals')}</button>`;
               const _goalsTitleClick = _goalItems.length > 0
                 ? "var el=document.getElementById('fmGoalsDetail');el.style.display=el.style.display==='none'?'':'none';"
                 : "showGoalsList()";
               const _goalsNoteVal = selectedStepNotes['goals'] || '';
               const _goalsNoteHtml = localStorage.getItem('elaborateResponsesEnabled') === 'true' && selectedGoals === 'none'
-                ? `<div style="grid-column:1/-1;margin-bottom:4px;"><input type="text" id="fmGoalsNoteInput" placeholder="More details (optional)" value="${_goalsNoteVal.replace(/"/g,'&quot;')}" style="width:100%;border:1.5px solid #e9ecef;border-radius:10px;padding:6px 10px;font-size:0.85em;font-family:inherit;box-sizing:border-box;outline:none;" oninput="selectedStepNotes['goals']=this.value;saveDraft();"></div>`
+                ? `<div style="grid-column:1/-1;margin-bottom:4px;"><input type="text" id="fmGoalsNoteInput" placeholder="${BB.t('journal.placeholder.moreDetails')}" value="${_goalsNoteVal.replace(/"/g,'&quot;')}" style="width:100%;border:1.5px solid #e9ecef;border-radius:10px;padding:6px 10px;font-size:0.85em;font-family:inherit;box-sizing:border-box;outline:none;" oninput="selectedStepNotes['goals']=this.value;saveDraft();"></div>`
                 : '';
               _md += `<span onclick="${_goalsTitleClick}" style="font-size:0.88em;font-weight:600;color:#495057;white-space:nowrap;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">🏅 Goal progress?</span>
               <div style="display:flex;gap:6px;">${_btns([
@@ -4600,7 +4600,7 @@ window.addEventListener('pageshow', () => {
             } else if (ex.id === 'outside') {
               const _outsideNoteVal = selectedStepNotes['outside'] || '';
               const _outsideNoteHtml = localStorage.getItem('elaborateResponsesEnabled') === 'true' && selectedOutside === 'no'
-                ? `<div style="grid-column:1/-1;margin-bottom:4px;"><input type="text" id="fmOutsideNoteInput" placeholder="More details (optional)" value="${_outsideNoteVal.replace(/"/g,'&quot;')}" style="width:100%;border:1.5px solid #e9ecef;border-radius:10px;padding:6px 10px;font-size:0.85em;font-family:inherit;box-sizing:border-box;outline:none;" oninput="selectedStepNotes['outside']=this.value;saveDraft();"></div>`
+                ? `<div style="grid-column:1/-1;margin-bottom:4px;"><input type="text" id="fmOutsideNoteInput" placeholder="${BB.t('journal.placeholder.moreDetails')}" value="${_outsideNoteVal.replace(/"/g,'&quot;')}" style="width:100%;border:1.5px solid #e9ecef;border-radius:10px;padding:6px 10px;font-size:0.85em;font-family:inherit;box-sizing:border-box;outline:none;" oninput="selectedStepNotes['outside']=this.value;saveDraft();"></div>`
                 : '';
               _md += `<span style="font-size:0.88em;font-weight:600;color:#495057;white-space:nowrap;">🌤️ Outside</span>
               <div style="display:flex;gap:6px;">${_btns([
@@ -4611,7 +4611,7 @@ window.addEventListener('pageshow', () => {
             } else if (ex.id === 'alcohol') {
               const _alcoholNoteVal = selectedStepNotes['alcohol'] || '';
               const _alcoholNoteHtml = localStorage.getItem('elaborateResponsesEnabled') === 'true' && selectedAlcohol === 'yes'
-                ? `<div style="grid-column:1/-1;margin-bottom:4px;"><input type="text" id="fmAlcoholNoteInput" placeholder="How much? (optional)" value="${_alcoholNoteVal.replace(/"/g,'&quot;')}" style="width:100%;border:1.5px solid #e9ecef;border-radius:10px;padding:6px 10px;font-size:0.85em;font-family:inherit;box-sizing:border-box;outline:none;" oninput="selectedStepNotes['alcohol']=this.value;saveDraft();"></div>`
+                ? `<div style="grid-column:1/-1;margin-bottom:4px;"><input type="text" id="fmAlcoholNoteInput" placeholder="${BB.t('journal.placeholder.howMuch')}" value="${_alcoholNoteVal.replace(/"/g,'&quot;')}" style="width:100%;border:1.5px solid #e9ecef;border-radius:10px;padding:6px 10px;font-size:0.85em;font-family:inherit;box-sizing:border-box;outline:none;" oninput="selectedStepNotes['alcohol']=this.value;saveDraft();"></div>`
                 : '';
               _md += `<span style="font-size:0.88em;font-weight:600;color:#495057;white-space:nowrap;">${_getBuiltinFieldLabel('trackAlcohol','🍺 Alcohol')}</span>
               <div style="display:flex;gap:6px;">${_btns([
@@ -4622,14 +4622,14 @@ window.addEventListener('pageshow', () => {
             } else if (ex.id === 'budget') {
               const _bv = localStorage.getItem('dailyBudget') || '';
               const _budgetDetail = _bv
-                ? `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--brand-tint);border-radius:10px;border:1.5px solid rgba(255,149,0,0.3);"><span style="font-size:0.85em;color:#495057;">💰 Daily budget: <b>${_bv}</b></span><button onclick="showBudgetModal()" style="padding:3px 10px;background:var(--brand-primary);color:white;border:none;border-radius:7px;font-size:0.78em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Change</button></div>`
-                : `<button onclick="showBudgetModal()" style="padding:7px 16px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">💰 Set daily budget</button>`;
+                ? `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--brand-tint);border-radius:10px;border:1.5px solid rgba(255,149,0,0.3);"><span style="font-size:0.85em;color:#495057;">💰 Daily budget: <b>${_bv}</b></span><button onclick="showBudgetModal()" style="padding:3px 10px;background:var(--brand-primary);color:white;border:none;border-radius:7px;font-size:0.78em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">${BB.t('common.change')}</button></div>`
+                : `<button onclick="showBudgetModal()" style="padding:7px 16px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">${BB.t('journal.btn.setDailyBudget')}</button>`;
               const _budgetTitleClick = _bv
                 ? "var el=document.getElementById('fmBudgetDetail');el.style.display=el.style.display==='none'?'':'none';"
                 : "showBudgetModal()";
               const _budgetNoteVal = selectedStepNotes['budget'] || '';
               const _budgetNoteHtml = localStorage.getItem('elaborateResponsesEnabled') === 'true' && selectedBudget === 'no'
-                ? `<div style="grid-column:1/-1;margin-bottom:4px;"><input type="text" id="fmBudgetNoteInput" placeholder="Where did the budget go? (optional)" value="${_budgetNoteVal.replace(/"/g,'&quot;')}" style="width:100%;border:1.5px solid #e9ecef;border-radius:10px;padding:6px 10px;font-size:0.85em;font-family:inherit;box-sizing:border-box;outline:none;" oninput="selectedStepNotes['budget']=this.value;saveDraft();"></div>`
+                ? `<div style="grid-column:1/-1;margin-bottom:4px;"><input type="text" id="fmBudgetNoteInput" placeholder="${BB.t('journal.placeholder.budgetNote')}" value="${_budgetNoteVal.replace(/"/g,'&quot;')}" style="width:100%;border:1.5px solid #e9ecef;border-radius:10px;padding:6px 10px;font-size:0.85em;font-family:inherit;box-sizing:border-box;outline:none;" oninput="selectedStepNotes['budget']=this.value;saveDraft();"></div>`
                 : '';
               _md += `<span onclick="${_budgetTitleClick}" style="font-size:0.88em;font-weight:600;color:#495057;white-space:nowrap;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">💰 Budget on track?</span>
               <div style="display:flex;gap:6px;">${_btns([
@@ -4648,7 +4648,7 @@ window.addEventListener('pageshow', () => {
             const _cfNegSel = _fPosNo ? selectedCustom[f.id]==='yes' : selectedCustom[f.id]==='no';
             const _cfNoteVal = selectedStepNotes[f.id] || '';
             const _cfNoteHtml = localStorage.getItem('elaborateResponsesEnabled') === 'true' && _cfNegSel
-              ? `<div style="grid-column:1/-1;margin-bottom:4px;"><input type="text" placeholder="More details (optional)" value="${_cfNoteVal.replace(/"/g,'&quot;')}" style="width:100%;border:1.5px solid #e9ecef;border-radius:10px;padding:6px 10px;font-size:0.85em;font-family:inherit;box-sizing:border-box;outline:none;" oninput="selectedStepNotes['${f.id}']=this.value;saveDraft();"></div>`
+              ? `<div style="grid-column:1/-1;margin-bottom:4px;"><input type="text" placeholder="${BB.t('journal.placeholder.moreDetails')}" value="${_cfNoteVal.replace(/"/g,'&quot;')}" style="width:100%;border:1.5px solid #e9ecef;border-radius:10px;padding:6px 10px;font-size:0.85em;font-family:inherit;box-sizing:border-box;outline:none;" oninput="selectedStepNotes['${f.id}']=this.value;saveDraft();"></div>`
               : '';
             _md += `<span style="font-size:0.88em;font-weight:600;color:#495057;white-space:nowrap;">${f.emoji||'📝'} ${f.label}</span>
             <div style="display:flex;gap:6px;">${_btns(_fPosNo ? [_yesOpt, _noOpt] : [_noOpt, _yesOpt])}</div>
@@ -4679,7 +4679,7 @@ window.addEventListener('pageshow', () => {
         case 'notes': {
           const _notesInitVal = (document.getElementById('notes')||{}).value||'';
           const _initWords = _notesInitVal.trim() ? _notesInitVal.trim().split(/\s+/).length : 0;
-          return `<textarea id="fmNotesInput" placeholder="What's on your mind? Any triggers, events, or patterns you noticed?"
+          return `<textarea id="fmNotesInput" placeholder="${BB.t('journal.placeholder.notes')}"
             style="width:100%;min-height:130px;border:2px solid #e9ecef;border-radius:12px;padding:12px;
             font-size:0.95em;font-family:inherit;resize:none;box-sizing:border-box;outline:none;transition:border-color 0.15s;"
             oninput="_fmNotesInput(this)">${_notesInitVal}</textarea>
@@ -4687,9 +4687,9 @@ window.addEventListener('pageshow', () => {
             ${localStorage.getItem('intentionEnabled') === 'true' ? `<details style="margin-top:14px;" ${selectedIntention ? 'open' : ''}>
               <summary style="font-size:0.85em;font-weight:600;color:#495057;cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;-webkit-tap-highlight-color:transparent;padding:2px 0;">
                 <span style="font-size:0.75em;color:#adb5bd;transition:transform 0.2s;" class="bb-int-chev">▶</span>
-                🌅 Intention for tomorrow
+                ${BB.t('journal.intentionLabel')}
               </summary>
-              <textarea id="fmIntentionInput" placeholder="What do you intend for tomorrow?"
+              <textarea id="fmIntentionInput" placeholder="${BB.t('journal.placeholder.intention')}"
                 style="width:100%;height:68px;border:2px solid #e9ecef;border-radius:12px;padding:12px;margin-top:8px;
                 font-size:0.95em;font-family:inherit;resize:none;box-sizing:border-box;outline:none;transition:border-color 0.15s;"
                 oninput="this.style.borderColor='var(--brand-primary)'">${selectedIntention||''}</textarea>
@@ -4697,9 +4697,9 @@ window.addEventListener('pageshow', () => {
         }
 
         case 'done': {
-          if (!selectedMood) return `<p style="text-align:center;color:#dc3545;font-size:0.9em;">⚠️ Go back and select a mood first.</p>`;
+          if (!selectedMood) return `<p style="text-align:center;color:#dc3545;font-size:0.9em;">${BB.t('journal.selectMoodFirst')}</p>`;
           const mc = _FM_MOOD_COLORS[selectedMood]||'var(--brand-primary)';
-          const eLabel = {0:'💀 Not enough',3:'🪫 Less than usual',5:'⚡️ Normal',7:'🔋 More than usual',10:'🚀 Too much'}[selectedEnergy]||selectedEnergy;
+          const eLabel = {0:BB.t('journal.energy.notEnough'),3:BB.t('journal.energy.less'),5:BB.t('journal.energy.normal'),7:BB.t('journal.energy.more'),10:BB.t('journal.energy.tooMuch')}[selectedEnergy]||selectedEnergy;
           const sLabel = {5:'≤5h',6.5:'6–7h',8:'7–9h',9.5:'9–10h',11:'10+h'}[selectedSleep]||selectedSleep+'h';
           const notesVal = (document.getElementById('fmNotesInput')||document.getElementById('notes')||{}).value||'';
           const intentionVal = (document.getElementById('fmIntentionInput')||{}).value ?? selectedIntention;
@@ -6124,7 +6124,7 @@ window.addEventListener('pageshow', () => {
       const _mds = document.getElementById('moreDataSection');
       const _mdt = document.getElementById('moreDataToggle');
       if (_mds) _mds.style.display = _mdd ? 'block' : 'none';
-      if (_mdt) _mdt.textContent = _mdd ? '➖ Less' : '📊 More data';
+      if (_mdt) _mdt.textContent = _mdd ? BB.t('journal.lessData') : BB.t('journal.moreData');
       _applyMoreDataDefaultToggle(_mdd);
 
       setDefaultDate();
@@ -6820,7 +6820,7 @@ window.addEventListener('pageshow', () => {
       const mdt = document.getElementById('moreDataToggle');
       const _moreDataDefault = localStorage.getItem('moreDataOpenByDefault') === 'true';
       if (mds) mds.style.display = _moreDataDefault ? 'block' : 'none';
-      if (mdt) mdt.textContent = _moreDataDefault ? '➖ Less' : '📊 More data';
+      if (mdt) mdt.textContent = _moreDataDefault ? BB.t('journal.lessData') : BB.t('journal.moreData');
       _applyMoreDataDefaultToggle(_moreDataDefault);
 
       document.querySelectorAll('.show-after-mood').forEach(el => {
@@ -9489,7 +9489,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       const _editMds = document.getElementById('moreDataSection');
       const _editMdt = document.getElementById('moreDataToggle');
       if (_editMds) _editMds.style.display = _editShowMore ? 'block' : 'none';
-      if (_editMdt) _editMdt.textContent = _editShowMore ? '➖ Less' : '📊 More data';
+      if (_editMdt) _editMdt.textContent = _editShowMore ? BB.t('journal.lessData') : BB.t('journal.moreData');
 
       // Update submit button label and show delete/back buttons
       // Start as 'Close' (grey) — no changes yet; updates to 'Update entry' as user edits
@@ -9600,7 +9600,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       if (!el) return;
       const goals = JSON.parse(localStorage.getItem('dailyGoals') || '[]');
       if (goals.length === 0) {
-        el.innerHTML = `<button onclick="showGoalsList()" style="padding:7px 16px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">🏅 Set daily goals</button>`;
+        el.innerHTML = `<button onclick="showGoalsList()" style="padding:7px 16px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">${BB.t('journal.btn.setDailyGoals')}</button>`;
       } else {
         const chips = goals.map(g => `<span style="display:inline-block;background:rgba(255,149,0,0.12);border-radius:6px;padding:2px 7px;margin:2px;font-size:0.8em;color:#495057;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${g}</span>`).join('');
         el.innerHTML = `<div style="display:flex;align-items:flex-start;justify-content:space-between;padding:8px 12px;background:var(--brand-tint);border-radius:10px;border:1.5px solid rgba(255,149,0,0.3);gap:8px;"><div style="flex:1;min-width:0;flex-wrap:wrap;display:flex;align-items:center;">${chips}</div><button onclick="showGoalsList()" style="padding:3px 10px;background:var(--brand-primary);color:white;border:none;border-radius:7px;font-size:0.78em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;">Edit</button></div>`;
@@ -9622,9 +9622,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       if (!el) return;
       const val = localStorage.getItem('dailyBudget') || '';
       if (!val) {
-        el.innerHTML = `<button onclick="showBudgetModal()" style="padding:7px 16px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">💰 Set daily budget</button>`;
+        el.innerHTML = `<button onclick="showBudgetModal()" style="padding:7px 16px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.85em;cursor:pointer;-webkit-tap-highlight-color:transparent;">${BB.t('journal.btn.setDailyBudget')}</button>`;
       } else {
-        el.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--brand-tint);border-radius:10px;border:1.5px solid rgba(255,149,0,0.3);"><span style="font-size:0.9em;color:#495057;">💰 Daily budget: <b>${val}</b></span><button onclick="showBudgetModal()" style="padding:3px 10px;background:var(--brand-primary);color:white;border:none;border-radius:7px;font-size:0.78em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Change</button></div>`;
+        el.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--brand-tint);border-radius:10px;border:1.5px solid rgba(255,149,0,0.3);"><span style="font-size:0.9em;color:#495057;">💰 Daily budget: <b>${val}</b></span><button onclick="showBudgetModal()" style="padding:3px 10px;background:var(--brand-primary);color:white;border:none;border-radius:7px;font-size:0.78em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">${BB.t('common.change')}</button></div>`;
       }
     }
 
