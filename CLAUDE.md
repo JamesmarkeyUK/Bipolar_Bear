@@ -297,6 +297,7 @@ translateZ(0)`), and to the viewport otherwise. See `_applyFabDock()` in
 
 ## Testing checklist after a major change
 
+- [ ] Bump version in BOTH repos at once: `scripts/bump-version.sh <buildNumber>` (build N → v1.N across web `_APP_VERSION`, `service-worker.js` `CACHE_NAME`, and `bipolarbear-native` iOS pbxproj + Android gradle). Then add the `CACHE_NAME` changelog note and commit both repos.
 - [ ] Web local: `python3 -m http.server 8765` from repo root, then hard-refresh in browser
 - [ ] iPhone: rsync → `npx cap sync` → Xcode build
 - [ ] Android: rsync → `npx cap sync` → Android Studio build
