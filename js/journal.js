@@ -2686,7 +2686,7 @@ window.addEventListener('pageshow', () => {
         title.textContent = BB.t('journal.stats.moodChart');
         body.innerHTML = sorted.map(e => {
           const d = new Date(e.date).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
-          const _mLbl = { manic:'Manic', elevated:'Elevated', stable:'Stable', good:'Stable', low:'Low', depressed:'Depressed' };
+          const _mLbl = { manic:BB.t('mood.manic'), elevated:BB.t('mood.elevated'), stable:BB.t('mood.stable'), good:BB.t('mood.stable'), low:BB.t('mood.low'), depressed:BB.t('mood.depressed') };
           return row(d, `${moodImg(e.mood)} ${_mLbl[e.mood] || (e.mood ? e.mood.charAt(0).toUpperCase() + e.mood.slice(1) : '')}`);
         }).join('');
       } else if (type === 'medication') {
@@ -2698,7 +2698,7 @@ window.addEventListener('pageshow', () => {
         }).join('');
       } else if (type === 'moodSummary') {
         const _moodColors = { manic:'#FF4136', elevated:'#FF851B', stable:'#2ECC40', good:'#2ECC40', low:'#0074D9', depressed:'#7B68EE' };
-        const _moodLabels = { manic:'Manic', elevated:'Elevated', stable:'Stable', good:'Stable', low:'Low', depressed:'Depressed' };
+        const _moodLabels = { manic:BB.t('mood.manic'), elevated:BB.t('mood.elevated'), stable:BB.t('mood.stable'), good:BB.t('mood.stable'), low:BB.t('mood.low'), depressed:BB.t('mood.depressed') };
         const allMoods = ['manic','elevated','stable','low','depressed'];
         const total = entries.length;
         const counts = {};
@@ -2730,7 +2730,7 @@ window.addEventListener('pageshow', () => {
         }).join('');
       } else if (type === 'total') {
         const _moodColors = { manic:'#FF4136', elevated:'#FF851B', stable:'#2ECC40', good:'#2ECC40', low:'#0074D9', depressed:'#7B68EE' };
-        const _moodLabels = { manic:'Manic', elevated:'Elevated', stable:'Stable', good:'Stable', low:'Low', depressed:'Depressed' };
+        const _moodLabels = { manic:BB.t('mood.manic'), elevated:BB.t('mood.elevated'), stable:BB.t('mood.stable'), good:BB.t('mood.stable'), low:BB.t('mood.low'), depressed:BB.t('mood.depressed') };
         title.textContent = BB.t('journal.stats.trackedDays');
         body.innerHTML = sorted.map(e => {
           const d = new Date(e.date).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
@@ -3558,14 +3558,14 @@ window.addEventListener('pageshow', () => {
     let _sleepHealthSynced  = false; // true only when sleep came from a health data sync
 
     const _FM_MOOD_COLORS  = { manic:'#ff4444', elevated:'var(--brand-primary)', stable:'#51cf66', good:'#51cf66', low:'#845ef7', depressed:'#5c7cfa' };
-    const _FM_MOOD_LABELS  = { manic:'Manic', elevated:'Elevated', stable:'Stable', good:'Stable', low:'Low', depressed:'Depressed' };
+    const _FM_MOOD_LABELS  = { manic:BB.t('mood.manic'), elevated:BB.t('mood.elevated'), stable:BB.t('mood.stable'), good:BB.t('mood.stable'), low:BB.t('mood.low'), depressed:BB.t('mood.depressed') };
 
     const _FM_ENERGY_LEVELS = [
-      { val:0,  label:'💀 Not enough',       color:'#6c757d' },
-      { val:3,  label:'🪫 Less than usual',  color:'#FF851B' },
-      { val:5,  label:'⚡️ Normal',           color:'#2ECC40' },
-      { val:7,  label:'🔋 More than usual',  color:'#FF851B' },
-      { val:10, label:'🚀 Too much',         color:'#FF4136' },
+      { val:0,  label:BB.t('journal.energy.notEnough'), color:'#6c757d' },
+      { val:3,  label:BB.t('journal.energy.less'),      color:'#FF851B' },
+      { val:5,  label:BB.t('journal.energy.normal'),    color:'#2ECC40' },
+      { val:7,  label:BB.t('journal.energy.more'),      color:'#FF851B' },
+      { val:10, label:BB.t('journal.energy.tooMuch'),   color:'#FF4136' },
     ];
     const _FM_SLEEP_RANGES = [
       { val:5,   label:'😫 ≤5h',   color:'#FF4136' },
@@ -4304,11 +4304,11 @@ window.addEventListener('pageshow', () => {
                 onmouseup="_fmLongPressCancel()"
                 onmouseleave="_fmLongPressCancel()">
                 <img class="emoji" src="images/moods/${m}.png" alt="${m}">
-                <span class="label">${m.charAt(0).toUpperCase()+m.slice(1)}</span>
+                <span class="label">${BB.t('mood.' + m)}</span>
               </button>`).join('')}
           </div>
           ${_linkedChip}
-          ${selectedLinkedMood ? `<button onclick="_fmAdvance()" style="width:100%;margin-top:14px;padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:14px;font-size:0.95em;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">Continue →</button>` : ''}
+          ${selectedLinkedMood ? `<button onclick="_fmAdvance()" style="width:100%;margin-top:14px;padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:14px;font-size:0.95em;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">${BB.t('common.continue')} →</button>` : ''}
           ${_showChooseMoodHint ? `<div id="_fmChooseMoodHintEl" style="display:flex;flex-direction:column;align-items:center;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-top:8px;">
             <svg width="24" height="22" viewBox="0 0 24 22" fill="none">
               <path d="M 12,20 Q 8,10 12,2" stroke="rgba(255,149,0,0.7)" stroke-width="2" stroke-linecap="round" fill="none"/>
@@ -4402,7 +4402,7 @@ window.addEventListener('pageshow', () => {
               <span class="fm-card-label">${text}${isSugg && !isSel ? '<br><span style="font-size:0.72em;opacity:0.65;">✓ sugg.</span>' : ''}</span>
             </button>`;
           }).join('')}</div>`;
-          const _sqHint = `<p style="text-align:center;font-size:0.78em;color:#adb5bd;margin-top:8px;margin-bottom:0;">Hold a response to log sleep quality</p>`;
+          const _sqHint = `<p style="text-align:center;font-size:0.78em;color:#adb5bd;margin-top:8px;margin-bottom:0;">${BB.t('journal.sleepQualityHint')}</p>`;
           return syncBtn + _syncedBanner + _sleepCards + _sqHint;
         }
 
@@ -4414,17 +4414,17 @@ window.addEventListener('pageshow', () => {
             <button class="fm-card-btn sq-bad ${_sqBad?'sel':''}" onclick="selectedSleepQuality='bad'; _fmAdvance();"
               style="${_sqBad ? 'border-color:#dc3545;background:#dc354522;color:#dc3545;' : ''}">
               <span class="fm-card-emoji">😴</span>
-              <span class="fm-card-label">Bad</span>
+              <span class="fm-card-label">${BB.t('journal.value.bad')}</span>
             </button>
             <button class="fm-card-btn sq-ok ${_sqUnsure?'sel':''}" onclick="selectedSleepQuality='unsure'; _fmAdvance();"
               style="${_sqUnsure ? 'border-color:#adb5bd;background:#adb5bd22;color:#adb5bd;' : ''}">
               <span class="fm-card-emoji">😐</span>
-              <span class="fm-card-label">OK</span>
+              <span class="fm-card-label">${BB.t('journal.value.ok')}</span>
             </button>
             <button class="fm-card-btn sq-good ${_sqGood?'sel':''}" onclick="selectedSleepQuality='good'; _fmAdvance();"
               style="${_sqGood ? 'border-color:#51cf66;background:#51cf6622;color:#51cf66;' : ''}">
               <span class="fm-card-emoji">😊</span>
-              <span class="fm-card-label">Good</span>
+              <span class="fm-card-label">${BB.t('journal.value.good')}</span>
             </button>
           </div>`;
         }
@@ -4446,16 +4446,16 @@ window.addEventListener('pageshow', () => {
             </div>
             <button class="fm-opt fm-hover-orange ${selectedMedication==='not-taken'?'sel':''}"
               onclick="selectedMedication='not-taken'; _fmAdvance();" style="border-left:4px solid var(--brand-primary);">
-              <span>❌ Not taken</span></button>
+              <span>${BB.t('journal.med.notTaken')}</span></button>
             <button class="fm-opt fm-hover-green ${selectedMedication==='taken'?'sel':''}"
               onclick="selectedMedication='taken'; _fmAdvance();" style="border-left:4px solid #51cf66;margin-top:8px;">
-              <span>✅ Taken</span></button>`;
+              <span>${BB.t('journal.med.taken')}</span></button>`;
         }
 
         case 'goals':
           return [
-            {val:'none', label:'❌ No',  color:'var(--brand-primary)'},
-            {val:'some', label:'✅ Yes', color:'var(--brand-primary)'},
+            {val:'none', label:'❌ ' + BB.t('journal.value.no'),  color:'var(--brand-primary)'},
+            {val:'some', label:'✅ ' + BB.t('journal.value.yes'), color:'var(--brand-primary)'},
           ].map((o,i) => `<button class="fm-opt ${selectedGoals===o.val?'sel':''}"
             onclick="selectedGoals='${o.val}'; _fmAdvance();"
             style="border-left:4px solid ${o.color};${i>0?'margin-top:8px;':''}">
@@ -4469,9 +4469,9 @@ window.addEventListener('pageshow', () => {
           const curSel = step.id==='anxiety' ? selectedAnxiety : selectedStress;
           const setter = step.id==='anxiety' ? 'selectedAnxiety' : 'selectedStress';
           return [
-            {val:'high',   label:'😰 More than usual', color:'#FF4136'},
-            {val:'medium', label:'😐 Normal',           color:'#FF851B'},
-            {val:'low',    label:'😌 Less than usual',  color:'#2ECC40'},
+            {val:'high',   label:'😰 ' + BB.t('journal.value.moreThanUsual'), color:'#FF4136'},
+            {val:'medium', label:'😐 ' + BB.t('journal.value.normal'),        color:'#FF851B'},
+            {val:'low',    label:'😌 ' + BB.t('journal.value.lessThanUsual'), color:'#2ECC40'},
           ].map((o,i) => `<button class="fm-opt ${curSel===o.val?'sel':''}"
             onclick="${setter}='${o.val}'; _fmAdvance();"
             style="border-left:4px solid ${o.color};${i>0?'margin-top:8px;':''}">
@@ -4480,9 +4480,9 @@ window.addEventListener('pageshow', () => {
 
         case 'irritability':
           return [
-            {val:'yes',    label:'😤 More than usual', color:'#FF4136'},
-            {val:'medium', label:'😐 Normal',           color:'#FF851B'},
-            {val:'no',     label:'😌 Less than usual',  color:'#2ECC40'},
+            {val:'yes',    label:'😤 ' + BB.t('journal.value.moreThanUsual'), color:'#FF4136'},
+            {val:'medium', label:'😐 ' + BB.t('journal.value.normal'),        color:'#FF851B'},
+            {val:'no',     label:'😌 ' + BB.t('journal.value.lessThanUsual'), color:'#2ECC40'},
           ].map((o,i) => `<button class="fm-opt ${selectedIrritability===o.val?'sel':''}"
             onclick="selectedIrritability='${o.val}'; _fmAdvance();"
             style="border-left:4px solid ${o.color};${i>0?'margin-top:8px;':''}">
@@ -4490,8 +4490,8 @@ window.addEventListener('pageshow', () => {
 
         case 'exercise':
           return [
-            {val:'no',  label:'🛋️ No',  color:'var(--brand-primary)'},
-            {val:'yes', label:'🏋️ Yes', color:'var(--brand-primary)'},
+            {val:'no',  label:'🛋️ ' + BB.t('journal.value.no'),  color:'var(--brand-primary)'},
+            {val:'yes', label:'🏋️ ' + BB.t('journal.value.yes'), color:'var(--brand-primary)'},
           ].map((o,i) => `<button class="fm-opt ${selectedExercise===o.val?'sel':''}"
             onclick="selectedExercise='${o.val}'; _fmAdvance();"
             style="border-left:4px solid ${o.color};${i>0?'margin-top:8px;':''}">
@@ -4499,8 +4499,8 @@ window.addEventListener('pageshow', () => {
 
         case 'outside':
           return [
-            {val:'no',  label:'🏠 No',  color:'var(--brand-primary)'},
-            {val:'yes', label:'🌤️ Yes', color:'var(--brand-primary)'},
+            {val:'no',  label:'🏠 ' + BB.t('journal.value.no'),  color:'var(--brand-primary)'},
+            {val:'yes', label:'🌤️ ' + BB.t('journal.value.yes'), color:'var(--brand-primary)'},
           ].map((o,i) => `<button class="fm-opt ${selectedOutside===o.val?'sel':''}"
             onclick="selectedOutside='${o.val}'; _fmAdvance();"
             style="border-left:4px solid ${o.color};${i>0?'margin-top:8px;':''}">
@@ -4508,8 +4508,8 @@ window.addEventListener('pageshow', () => {
 
         case 'alcohol':
           return [
-            {val:'yes', label:'🍺 Yes', color:'var(--brand-primary)'},
-            {val:'no',  label:'✅ No',  color:'var(--brand-primary)'},
+            {val:'yes', label:'🍺 ' + BB.t('journal.value.yes'), color:'var(--brand-primary)'},
+            {val:'no',  label:'✅ ' + BB.t('journal.value.no'),  color:'var(--brand-primary)'},
           ].map((o,i) => `<button class="fm-opt ${selectedAlcohol===o.val?'sel':''}"
             onclick="selectedAlcohol='${o.val}'; _fmAdvance();"
             style="border-left:4px solid ${o.color};${i>0?'margin-top:8px;':''}">
@@ -8163,7 +8163,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
               const cf = getCustomFields().find(f => f.id === id);
               return cf ? `  ·  ${cf.label}: ${val === 'yes' ? 'Yes' : 'No'}` : '';
             }).filter(Boolean).join('');
-          const _moodLabel = { manic:'Manic', elevated:'Elevated', stable:'Stable', good:'Stable', low:'Low', depressed:'Depressed' };
+          const _moodLabel = { manic:BB.t('mood.manic'), elevated:BB.t('mood.elevated'), stable:BB.t('mood.stable'), good:BB.t('mood.stable'), low:BB.t('mood.low'), depressed:BB.t('mood.depressed') };
           const detail = `${_moodLabel[entry.mood] || (entry.mood ? entry.mood.charAt(0).toUpperCase() + entry.mood.slice(1) : '')}  ·  Energy ${entry.energy}/10  ·  Sleep ${entry.sleep}h${sleepQualityStr}${stepsStr}  ·  Meds: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medication || 'taken')}${anxietyStr}${irritabilityStr}${stressStr2}${alcoholStr}${smokingStr}${drugsStr}${exerciseStr}${outsideStr}${customStr}${recordedPart}`;
           const detailLines = doc.splitTextToSize(detail, pageW - margin - (dotX + 35));
           doc.text(detailLines, dotX + 35, y);

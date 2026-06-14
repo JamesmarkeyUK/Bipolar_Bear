@@ -521,14 +521,14 @@
       <!-- Shared auth modal (sign in / sign up) -->
       <div class="bb-auth-overlay" id="bbAuthModal" onclick="if(event.target===this)window.closeAuthModal()">
         <div class="bb-auth-box">
-          <h3 id="bbAuthTitle" style="margin:0 0 14px;font-size:1.1em;color:#212529;text-align:center;">Welcome to Bipolar Bear 🐻</h3>
+          <h3 id="bbAuthTitle" style="margin:0 0 14px;font-size:1.1em;color:#212529;text-align:center;" data-i18n="auth.welcome">Welcome to Bipolar Bear 🐻</h3>
           <div id="bbAuthError" style="display:none;color:#dc3545;font-size:0.85em;padding:8px 12px;background:rgba(220,53,69,0.08);border-radius:8px;margin-bottom:10px;"></div>
-          <input type="email" id="bbAuthEmail" class="bb-auth-input" placeholder="Email" autocomplete="email">
-          <input type="password" id="bbAuthPassword" class="bb-auth-input" placeholder="Password" autocomplete="current-password">
-          <button id="bbAuthSubmit" style="width:100%;padding:13px;background:var(--brand-primary);color:white;border:none;border-radius:10px;font-weight:700;font-size:0.95em;cursor:pointer;margin-bottom:8px;">Sign In</button>
-          <button onclick="window.closeAuthModal()" style="width:100%;padding:11px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:10px;font-size:0.9em;font-weight:600;cursor:pointer;margin-bottom:10px;-webkit-tap-highlight-color:transparent;">Continue as Guest</button>
+          <input type="email" id="bbAuthEmail" class="bb-auth-input" placeholder="Email" data-i18n-placeholder="auth.emailPlaceholder" autocomplete="email">
+          <input type="password" id="bbAuthPassword" class="bb-auth-input" placeholder="Password" data-i18n-placeholder="auth.passwordPlaceholder" autocomplete="current-password">
+          <button id="bbAuthSubmit" style="width:100%;padding:13px;background:var(--brand-primary);color:white;border:none;border-radius:10px;font-weight:700;font-size:0.95em;cursor:pointer;margin-bottom:8px;" data-i18n="common.signIn">Sign In</button>
+          <button onclick="window.closeAuthModal()" style="width:100%;padding:11px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:10px;font-size:0.9em;font-weight:600;cursor:pointer;margin-bottom:10px;-webkit-tap-highlight-color:transparent;" data-i18n="auth.continueGuest">Continue as Guest</button>
           <div id="bbAuthToggle" style="text-align:center;font-size:0.85em;color:#6c757d;cursor:pointer;padding:4px;">Don't have an account? <span style="color:var(--brand-primary);font-weight:600;">Sign up</span></div>
-          <button onclick="(window._confirmDeleteGuestData||function(){})()" style="display:block;width:100%;margin-top:10px;background:none;border:none;color:#adb5bd;font-size:0.78em;cursor:pointer;padding:4px 8px;-webkit-tap-highlight-color:transparent;text-align:center;">🗑 Delete all guest data</button>
+          <button onclick="(window._confirmDeleteGuestData||function(){})()" style="display:block;width:100%;margin-top:10px;background:none;border:none;color:#adb5bd;font-size:0.78em;cursor:pointer;padding:4px 8px;-webkit-tap-highlight-color:transparent;text-align:center;" data-i18n="auth.deleteGuestData">🗑 Delete all guest data</button>
           <div id="bbAuthVersion" style="margin-top:8px;text-align:center;font-size:0.7em;color:#adb5bd;letter-spacing:0.02em;"></div>
         </div>
       </div>
@@ -1136,6 +1136,20 @@
   /** Whether the auth modal is currently in sign-up mode (toggled by the link). */
   let _bbIsSignUp = false;
 
+  /** Translate a key, falling back to the English literal if i18n isn't ready. */
+  function _bbT(key, fallback) {
+    return (window.BB && window.BB.t) ? window.BB.t(key) : fallback;
+  }
+
+  /** Build the sign-in/up toggle prompt with its highlighted link word. */
+  function _bbToggleHtml(isSignUp) {
+    const prompt = isSignUp ? _bbT('auth.hasAccount', 'Already have an account?')
+                            : _bbT('auth.noAccount', "Don't have an account?");
+    const link   = isSignUp ? _bbT('auth.signInLink', 'Sign in')
+                            : _bbT('auth.signUpLink', 'Sign up');
+    return prompt + ' <span style="color:var(--brand-primary);font-weight:600;">' + link + '</span>';
+  }
+
   /**
    * Show the sign-in / sign-up dialog. Resets all fields and switches to
    * sign-in mode (reset by the toggle link). Fires `_fabOnShowAuth` if the
@@ -1149,9 +1163,9 @@
     const err    = document.getElementById('bbAuthError');
     const email  = document.getElementById('bbAuthEmail');
     const pw     = document.getElementById('bbAuthPassword');
-    if (title)  title.textContent = 'Welcome to Bipolar Bear 🐻';
-    if (submit) submit.textContent = 'Sign In';
-    if (toggle) toggle.innerHTML = 'Don\'t have an account? <span style="color:var(--brand-primary);font-weight:600;">Sign up</span>';
+    if (title)  title.textContent = _bbT('auth.welcome', 'Welcome to Bipolar Bear 🐻');
+    if (submit) submit.textContent = _bbT('common.signIn', 'Sign In');
+    if (toggle) toggle.innerHTML = _bbToggleHtml(false);
     if (err)    { err.style.display = 'none'; err.textContent = ''; }
     if (email)  email.value = '';
     if (pw)     pw.value = '';
@@ -1325,11 +1339,9 @@
         const titleEl  = document.getElementById('bbAuthTitle');
         const submitEl = document.getElementById('bbAuthSubmit');
         const errEl    = document.getElementById('bbAuthError');
-        if (titleEl)  titleEl.textContent  = _bbIsSignUp ? 'Create Account' : 'Welcome to Bipolar Bear 🐻';
-        if (submitEl) submitEl.textContent = _bbIsSignUp ? 'Sign Up' : 'Sign In';
-        toggle.innerHTML = _bbIsSignUp
-          ? 'Already have an account? <span style="color:var(--brand-primary);font-weight:600;">Sign in</span>'
-          : 'Don\'t have an account? <span style="color:var(--brand-primary);font-weight:600;">Sign up</span>';
+        if (titleEl)  titleEl.textContent  = _bbIsSignUp ? _bbT('auth.createAccount', 'Create Account') : _bbT('auth.welcome', 'Welcome to Bipolar Bear 🐻');
+        if (submitEl) submitEl.textContent = _bbIsSignUp ? _bbT('common.signUp', 'Sign Up') : _bbT('common.signIn', 'Sign In');
+        toggle.innerHTML = _bbToggleHtml(_bbIsSignUp);
         if (errEl) errEl.style.display = 'none';
       });
     }

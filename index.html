@@ -202,6 +202,26 @@
               }
             }
             if (!hasUser && !S.get('GuestPinSalt')) return;
+
+            // Journal entry tick (✓ on the Mood Journal button). Paint it
+            // synchronously from the cached status journal.html writes, so it
+            // is correct on first paint instead of popping in ~1s later when
+            // js/index.js BLOCK 3 runs (after the blocking Firebase SDKs).
+            // Validate the cached key against today/yesterday so a previous
+            // day's "done" never sticks. Mirrors BLOCK 3 in js/index.js.
+            // Not gated by the stats preference — the tick always shows.
+            try {
+              var _useToday = localStorage.getItem('journalDefaultToday') === 'true';
+              var _td = new Date(); _td.setHours(0, 0, 0, 0);
+              if (!_useToday) _td.setDate(_td.getDate() - 1);
+              var _tk = _td.getFullYear() + '-' + String(_td.getMonth() + 1).padStart(2, '0') + '-' + String(_td.getDate()).padStart(2, '0');
+              var _es = JSON.parse(S.get('_entryStatus') || 'null');
+              if (_es && _es.key === _tk) {
+                var _jt = document.getElementById('journalEntryTick');
+                if (_jt) _jt.setAttribute('data-done', _es.done ? 'true' : 'false');
+              }
+            } catch (_) {}
+
             // Respect the "Show stats" preference — mirror the bb-hide-stats
             // gate in js/index.js (stats are shown only when explicitly on).
             // Stats off → apply the gate class synchronously too, so the

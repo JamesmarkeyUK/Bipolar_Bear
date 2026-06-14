@@ -339,11 +339,12 @@ setTimeout(function () {
             if (!useToday) target.setDate(target.getDate() - 1);
             const toKey = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
             const targetKey = toKey(target);
-            // If cache confidently says done, trust it immediately — no need to hit server
-            try {
-              const _cached = JSON.parse(BB.storage.get('_entryStatus') || 'null');
-              if (_cached && _cached.key === targetKey && _cached.done === true) return;
-            } catch(e) {}
+            // Always reconcile against Firestore when online — a cached
+            // `done:true` can be stale (e.g. an entry deleted on another
+            // device), and trusting it here left the home tick wrongly ticked
+            // until the user opened the journal and back. The synchronous
+            // BLOCK 3 above already painted the cached value for an instant
+            // tick; this just corrects it if the cache lies.
             // Single-field query only (compound queries need a Firestore index which may not exist)
             db.collection('entries')
               .where('userId', '==', user.uid)
@@ -515,8 +516,10 @@ setTimeout(function () {
 
       if (hintStored) hintStored.style.display = 'none';
       if (hintLabel) {
-        hintLabel.removeAttribute('data-i18n');
-        hintLabel.textContent = '🐻 Create an account to customise your experience';
+        hintLabel.setAttribute('data-i18n', 'home.accountHint');
+        hintLabel.textContent = (window.BB && window.BB.t)
+          ? window.BB.t('home.accountHint')
+          : '🐻 Create an account to customise your experience';
         hintLabel.style.whiteSpace = 'normal';
         hintLabel.style.maxWidth = 'min(280px, calc(100vw - 48px))';
         hintLabel.style.textAlign = 'center';

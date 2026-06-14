@@ -48,6 +48,7 @@
         survivalHint: '🐻 Click here to learn and share more about your bipolar',
         signinHintLabel: '🐻 Save your progress here',
         signinHintStored: 'Stored securely in Firebase',
+        accountHint: '🐻 Create an account to customise your experience',
         madeBy: 'Being built by James Markey',
         features: {
           insightsTitle: 'Visual Insights',
@@ -91,10 +92,15 @@
       },
       auth: {
         welcome: 'Welcome to Bipolar Bear 🐻',
+        createAccount: 'Create Account',
         noAccount: "Don't have an account?",
         hasAccount: 'Already have an account?',
         signUpLink: 'Sign up',
+        signInLink: 'Sign in',
         continueGuest: 'Continue as Guest',
+        emailPlaceholder: 'Email',
+        passwordPlaceholder: 'Password',
+        deleteGuestData: '🗑 Delete all guest data',
       },
       account: {
         signOut: 'Sign out',
@@ -111,7 +117,7 @@
         continue: 'Continue',
       },
       mood: {
-        manic: 'Manic', elevated: 'Elevated', good: 'Good',
+        manic: 'Manic', elevated: 'Elevated', stable: 'Stable', good: 'Stable',
         low: 'Low', depressed: 'Depressed',
       },
       anon: {
@@ -401,6 +407,14 @@
           normal: 'Normal',
           lessThanUsual: 'Less than usual',
         },
+        energy: {
+          notEnough: '💀 Not enough',
+          less: '🪫 Less than usual',
+          normal: '⚡️ Normal',
+          more: '🔋 More than usual',
+          tooMuch: '🚀 Too much',
+        },
+        sleepQualityHint: 'Hold a response to log sleep quality',
         confirm: {
           removeFieldTitle: 'Remove {field}?',
           removeFieldBody: 'This will hide it from your form and tracking. You can re-add it later.',
@@ -718,6 +732,7 @@
         survivalHint: '🐻 Cliquez ici pour en savoir plus sur votre bipolarité',
         signinHintLabel: '🐻 Sauvegardez votre progression ici',
         signinHintStored: 'Stocké en toute sécurité sur Firebase',
+        accountHint: '🐻 Créez un compte pour personnaliser votre expérience',
         madeBy: 'Développé par James Markey',
         features: { insightsTitle: 'Aperçus Visuels', insightsDesc: 'Visualisez vos tendances d\'humeur avec des graphiques', privateTitle: 'Privé et Sécurisé', privateDesc: 'Vos données restent en sécurité', trackTitle: 'Restez sur la Bonne Voie', trackDesc: 'Créez de bonnes habitudes avec des séries' },
         wa: { title: 'Rejoindre Bipolar Anonymous', body: 'Souhaitez-vous rejoindre notre groupe WhatsApp Bipolar Anonymous ?', join: '✅ Rejoindre le Groupe', cancel: 'Annuler', hide: '🙈 Masquer ce bouton' },
@@ -725,10 +740,10 @@
       },
       pd: { title: '👤 Informations Personnelles', subtitle: 'Tous les champs sont facultatifs. Apparaît sur les rapports PDF exportés pour votre professionnel de santé.', name: 'Nom', dob: 'Date de naissance (p.ex. 15 Jan 1990)', medNum: 'Numéro médical', diagnosis: 'Diagnostiqué comme (p.ex. Bipolaire I, Bipolaire II)', diagDate: 'Date du diagnostic (p.ex. Mars 2020)', address: 'Adresse', mobile: 'Numéro de portable', email: 'E-mail', emergency: "Contact d'urgence (nom et numéro)", notes: 'Notes (facultatif)' },
       pin: { title: 'Entrez votre PIN pour continuer', moreInfo: '🔐 Plus d\'infos', whyTitle: '🔐 Pourquoi y a-t-il un PIN ?', forgot: 'PIN oublié ?', tapToWake: 'Appuyer pour réveiller', incorrect: 'PIN incorrect. Réessayez.', gotIt: 'Compris' },
-      auth: { welcome: 'Bienvenue sur Bipolar Bear 🐻', noAccount: 'Pas de compte ?', hasAccount: 'Déjà un compte ?', signUpLink: "S'inscrire", continueGuest: 'Continuer en tant qu\'invité' },
+      auth: { welcome: 'Bienvenue sur Bipolar Bear 🐻', createAccount: 'Créer un compte', noAccount: 'Pas de compte ?', hasAccount: 'Déjà un compte ?', signUpLink: "S'inscrire", signInLink: 'Se connecter', continueGuest: 'Continuer en tant qu\'invité', emailPlaceholder: 'E-mail', passwordPlaceholder: 'Mot de passe', deleteGuestData: '🗑 Supprimer les données invité' },
       account: { signOut: 'Se déconnecter', changePassword: 'Changer le mot de passe', changeEmail: "Changer l'e-mail", currentPassword: 'Mot de passe actuel', newPassword: 'Nouveau mot de passe', newEmail: 'Nouvelle adresse e-mail', cancel: 'Annuler', language: 'Langue' },
       i18n: { chooseLang: 'Choisissez votre langue', continue: 'Continuer' },
-      mood: { manic: 'Maniaque', elevated: 'Élevé', good: 'Bien', low: 'Bas', depressed: 'Déprimé' },
+      mood: { manic: 'Maniaque', elevated: 'Élevé', stable: 'Stable', good: 'Stable', low: 'Bas', depressed: 'Déprimé' },
       anon: {
         verify: { back: '← Accueil', welcome: 'Bienvenue 👋', sub: 'Vérifiez votre e-mail pour rejoindre la communauté. Votre identité reste privée.', sendCode: 'Envoyer le code de vérification', verify: 'Vérifier →', changeEmail: "← Changer l'e-mail", resend: 'Renvoyer le code' },
         monika: { verified: 'E-mail Vérifié !', chooseSub: 'Choisissez maintenant votre <strong>Monika</strong> — votre nom anonyme. Max. 10 caractères.', postPreview: 'Vos posts ressembleront à ceci', btn: "C'est moi →", placeholder: 'ex. SunnyDaze' },
@@ -892,6 +907,14 @@
           normal: 'Normal',
           lessThanUsual: "Moins que d'habitude",
         },
+        energy: {
+          notEnough: '💀 Pas assez',
+          less: "🪫 Moins que d'habitude",
+          normal: '⚡️ Normal',
+          more: "🔋 Plus que d'habitude",
+          tooMuch: '🚀 Trop',
+        },
+        sleepQualityHint: 'Maintenez une réponse pour noter la qualité du sommeil',
         confirm: {
           removeFieldTitle: 'Supprimer {field} ?',
           removeFieldBody: 'Cela le masquera de votre formulaire et du suivi. Vous pourrez le rajouter plus tard.',

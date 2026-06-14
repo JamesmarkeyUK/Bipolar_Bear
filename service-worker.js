@@ -235,7 +235,16 @@
 //      Health"). Touches journal.html, js/journal.js.
 // v84: v1.12 — build-12 version bump (_APP_VERSION 1.12). Touches
 //      js/shared/brand-config.js.
-const CACHE_NAME = 'bipolarbear-v84';
+// v85: i18n pass + home live-data fixes — mood labels (Manic/Elevated/Stable/
+//      Low/Depressed) and focused-mode step options (energy, sleep quality,
+//      medication, anxiety/stress/irritability, yes/no) now go through BB.t
+//      (EN + FR complete); auth/account modal "Create an account" cluster
+//      wired to i18n. Home: entry tick now paints synchronously from cache
+//      (validated against today/yesterday so a stale day no longer sticks)
+//      and the online reconcile no longer trusts a stale done:true. Touches
+//      js/shared/i18n.js, js/journal.js, journal.html, fab.js, js/index.js,
+//      index.html.
+const CACHE_NAME = 'bipolarbear-v85';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
