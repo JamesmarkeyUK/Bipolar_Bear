@@ -260,7 +260,13 @@
 //      Entries modal, and the common confirm dialogs (select mood, discard
 //      changes, delete-all-entries). Touches js/shared/i18n.js, js/journal.js,
 //      journal.html.
-const CACHE_NAME = 'bipolarbear-v87';
+// v88: v1.13 — build-13 version bump (_APP_VERSION 1.13). App Store Guideline
+//      5.1.1(iv) fix: removed the cancelable in-app confirm() that sat before
+//      the HealthKit / Health Connect permission request when enabling the
+//      health-sync toggle. Flipping the toggle on now goes straight to the OS
+//      permission sheet (the real consent gate) — no exit button between the
+//      user's action and the request. Touches js/journal.js, brand-config.js.
+const CACHE_NAME = 'bipolarbear-v88';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
