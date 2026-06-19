@@ -266,7 +266,11 @@
 //      health-sync toggle. Flipping the toggle on now goes straight to the OS
 //      permission sheet (the real consent gate) — no exit button between the
 //      user's action and the request. Touches js/journal.js, brand-config.js.
-const CACHE_NAME = 'bipolarbear-v88';
+// v89: Full EN/FR i18n pass (moods, focused-mode steps + titles, journal
+//      labels, FAB strings, edit-entry modal, confirm dialogs, Missing Entries
+//      modal). Home live-data fix. Touches js/shared/i18n.js, js/journal.js,
+//      js/index.js, journal.html, fab.js.
+const CACHE_NAME = 'bipolarbear-v89';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
