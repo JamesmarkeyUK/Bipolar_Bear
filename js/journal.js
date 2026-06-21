@@ -11556,12 +11556,18 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         const toCancel = pending.notifications.filter(n => n.id === 2);
         if (toCancel.length > 0) await LocalNotifications.cancel({ notifications: toCancel });
 
-        // Compute last 7 days stats
+        // Compute stats for the 7 full days that are complete before the
+        // notification fires. We end the window at the day before yesterday
+        // (today - 2): the notification day hasn't been logged yet, and
+        // yesterday is commonly logged retroactively the next day, so neither
+        // is reliably filled in. Counting only up to day-before-yesterday
+        // avoids a misleading "6/7" for an entry that couldn't exist yet.
         const today = new Date(); today.setHours(0,0,0,0);
-        const weekAgo = new Date(today); weekAgo.setDate(today.getDate() - 6);
+        const windowEnd = new Date(today); windowEnd.setDate(today.getDate() - 2);
+        const windowStart = new Date(windowEnd); windowStart.setDate(windowEnd.getDate() - 6);
         const last7 = entries.filter(e => {
           const d = new Date(e.date); d.setHours(0,0,0,0);
-          return d >= weekAgo && d <= today;
+          return d >= windowStart && d <= windowEnd;
         });
 
         const entryCount = last7.length;
