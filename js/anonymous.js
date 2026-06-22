@@ -62,6 +62,7 @@ let muteTargetName  = '';
 let adminDeleteId    = '';
 let selfDeleteId     = '';
 let commentTargetId  = '';
+let lastCommentAuthor = ''; // monika of the most recent comment in the open thread (for the per-thread post gate)
 let currentThreadUnsub = null;
 let _bbUser         = null; // Firebase-auth verified user (BB App path)
 let _boardSetupDone = false; // initBoard's one-time handler wiring (compose, FAB, tabs, overlays)
@@ -2350,6 +2351,7 @@ async function openThread(postId) {
   const post = localPosts.find(p => p.id === postId);
   if (!post || post.isSeed) return;
   commentTargetId = postId;
+  lastCommentAuthor = ''; // reset until the listener reports the thread's newest comment
 
   document.getElementById('thread-original-post').innerHTML = renderThreadHeader(post);
   document.getElementById('thread-comments-list').innerHTML =
@@ -2379,6 +2381,12 @@ async function openThread(postId) {
     .collection('comments')
     .orderBy('timestamp', 'asc')
     .onSnapshot(snap => {
+      // Track the most recent comment's author (ordered asc, so last doc is
+      // newest) for the per-thread gate — use the raw snapshot, not the
+      // mute-filtered list, so a muted user's reply still counts as "someone
+      // else commented" and lifts your own gate.
+      const lastDoc = snap.docs[snap.docs.length - 1];
+      lastCommentAuthor = lastDoc ? (lastDoc.data().name || '') : '';
       const comments = snap.docs.map(d => ({ id: d.id, ...d.data() }))
         .filter(c => !c.name || !mutedUsers.has(c.name));
       const el = document.getElementById('thread-comments-list');
@@ -2398,6 +2406,7 @@ function closeThread() {
   if (currentThreadUnsub) { currentThreadUnsub(); currentThreadUnsub = null; }
   closeOv('ov-thread');
   commentTargetId = '';
+  lastCommentAuthor = '';
 }
 
 function renderThreadHeader(p) {
@@ -2453,6 +2462,12 @@ function setupThread() {
     if (_sending) return;
     const text = ta.value.trim();
     if (!text || !commentTargetId) return;
+    // Per-thread gate (mirrors the compose gate): you can leave a comment, but
+    // not a second one in a row — wait until someone else replies first.
+    if (!profile.isAdmin && lastCommentAuthor && lastCommentAuthor === profile.monika) {
+      showHint('Please wait until someone else replies before commenting again.');
+      return;
+    }
     _sending = true;
     sendBtn.disabled = true;
 
