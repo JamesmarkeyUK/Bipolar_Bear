@@ -32,6 +32,14 @@ const YELLOW      = 'var(--brand-secondary)';
 const YELLOW_DARK = '#c49e00';
 const YELLOW_LT   = '#ffe566';
 const ADMIN_EMAIL = 'inbox@jamesmarkey.co.uk';
+// App Store / Play review access. This single address skips email-code
+// verification using the fixed demo code below, so reviewers can test posting
+// without access to a live inbox. The board is already open to any
+// authenticated user (we anonymous-sign-in for comment threads regardless), so
+// this grants no capability an attacker couldn't already reach — it only avoids
+// the email round-trip for one known address.
+const REVIEW_EMAIL = 'test@bipolarbear.app';
+const REVIEW_CODE  = '424242';
 // True for both the anon web domain and the dedicated Capacitor bundle.
 // See BB.isAnonymousApp() in js/shared/brand-config.js — native shells
 // can't be detected by hostname alone.
@@ -521,6 +529,19 @@ function setupVerify() {
     const origText = sendBtn.textContent;
     sendBtn.textContent = 'Sending…';
     try {
+      // Reviewer bypass: skip the email round-trip for the demo address and go
+      // straight to the code step (the fixed REVIEW_CODE is checked on verify).
+      if (email.toLowerCase() === REVIEW_EMAIL) {
+        _sessionId    = 'review-bypass';
+        _pendingEmail = email;
+        document.getElementById('step-email').style.display = 'none';
+        document.getElementById('step-code').style.display  = 'block';
+        document.getElementById('code-sent-label').textContent =
+          'Enter your demo access code to continue.';
+        resetBoxes();
+        boxes[0].focus();
+        return;
+      }
       if (!window._anonSendCode) {
         throw new Error('Verification service unavailable — please try again in a moment.');
       }
@@ -591,7 +612,14 @@ function setupVerify() {
     const origText = verifyBtn.textContent;
     verifyBtn.textContent = 'Verifying…';
     try {
-      await window._anonVerifyCode({ sessionId: _sessionId, code });
+      if (_pendingEmail.toLowerCase() === REVIEW_EMAIL) {
+        // Reviewer bypass: validate the fixed demo code locally, then make sure
+        // an anonymous auth session exists so the reviewer can post and comment.
+        if (code !== REVIEW_CODE) throw new Error('Incorrect demo code. Please try again.');
+        await _ensureAuthSession();
+      } else {
+        await window._anonVerifyCode({ sessionId: _sessionId, code });
+      }
       // ✅ Verified
       if (_pendingEmail.toLowerCase() === ADMIN_EMAIL) {
         BB.storage.set('Anon_isAdmin', 'true');

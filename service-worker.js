@@ -277,7 +277,13 @@
 //      early-paint + _updateStreakBadge() use it, and the home auth listener now
 //      restores AnonVisitDate from Firestore. Touches js/shared/brand-config.js,
 //      js/index.js, index.html.
-const CACHE_NAME = 'bipolarbear-v90';
+// v91: Anonymous privacy sheet rewritten to be accurate — posts are plaintext
+//      on Firestore, so the old "End-to-End Encrypted / Messages are encrypted"
+//      claims were false. Now states posts are public, identity is hashed, and
+//      data is encrypted in transit + at rest. Updated across all 10 languages
+//      in js/shared/i18n.js + anonymous.html defaults. Also added an App Store
+//      reviewer bypass (test@bipolarbear.app) to js/anonymous.js.
+const CACHE_NAME = 'bipolarbear-v91';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
