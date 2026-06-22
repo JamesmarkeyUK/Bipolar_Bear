@@ -597,28 +597,18 @@ window.addEventListener('pageshow', () => {
   
   function _updateJournalAuthFab(loggedIn) {
     // The dock auth button is injected by fab.js as #bbAuthFab and uses window._fabOpenAuth
-    // as its click handler — update both the icon and the handler.
+    // as its click handler. Guests and signed-in users both land in the Settings
+    // modal — customising the journal form never requires an account, and Settings
+    // carries its own "Sign in to back up" button so syncing stays optional.
     const fab = document.getElementById('bbAuthFab');
-    if (loggedIn) {
-      window._fabOpenAuth = () => { if (typeof _dismissSettingsHint === 'function') _dismissSettingsHint(); showSettingsModal(); };
-      if (fab) {
-        fab.textContent = '⚙️';
-        fab.title = 'Settings';
-        fab.style.background = 'var(--brand-primary)';
-        fab.style.color = 'white';
-        fab.style.border = 'none';
-        fab.style.boxShadow = '0 2px 10px rgba(255,149,0,0.35)';
-      }
-    } else {
-      window._fabOpenAuth = () => window.showAuthModal();
-      if (fab) {
-        fab.textContent = '👤';
-        fab.title = 'Profile / Sign in';
-        fab.style.background = 'white';
-        fab.style.color = 'var(--brand-primary)';
-        fab.style.border = '2px solid var(--brand-primary)';
-        fab.style.boxShadow = '0 2px 10px rgba(255,149,0,0.25)';
-      }
+    window._fabOpenAuth = () => { if (typeof _dismissSettingsHint === 'function') _dismissSettingsHint(); showSettingsModal(); };
+    if (fab) {
+      fab.textContent = '⚙️';
+      fab.title = 'Settings';
+      fab.style.background = 'var(--brand-primary)';
+      fab.style.color = 'white';
+      fab.style.border = 'none';
+      fab.style.boxShadow = '0 2px 10px rgba(255,149,0,0.35)';
     }
     if (typeof window._applyFabDock === 'function') window._applyFabDock();
   }
@@ -670,7 +660,9 @@ window.addEventListener('pageshow', () => {
 
     // Auth modals now handled by shared fab.js — set hooks
     window._fabOnSignOut = logout;
-    window._fabOpenAuth  = () => window.showAuthModal();
+    // Default the dock button to Settings (guest-friendly). _updateJournalAuthFab
+    // refines icon/title once auth state resolves; either way it opens Settings.
+    window._fabOpenAuth  = () => { if (typeof _dismissSettingsHint === 'function') _dismissSettingsHint(); showSettingsModal(); };
 
     // ── Auth hooks for shared fab.js modal ──
     // Capture password before sign-in so onAuthStateChanged can derive the encryption key
@@ -10103,14 +10095,20 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
 
       // Populate login status
       const _loginStatusEl = document.getElementById('settingsLoginStatus');
+      const _isGuest = !(currentUser && currentUser.email);
       if (_loginStatusEl) {
-        if (currentUser && currentUser.email) {
+        if (!_isGuest) {
           const _emailSnip = currentUser.email.length > 10 ? currentUser.email.substring(0, 10) + '…' : currentUser.email;
           _loginStatusEl.textContent = 'Logged in (' + _emailSnip + ')';
         } else {
           _loginStatusEl.textContent = 'Guest mode';
         }
       }
+      // Guest-only "Sign in to back up" prompt — customising never needs an account.
+      const _guestSignInBtn = document.getElementById('settingsGuestSignIn');
+      const _guestSignInNote = document.getElementById('settingsGuestSignInNote');
+      if (_guestSignInBtn) _guestSignInBtn.style.display = _isGuest ? '' : 'none';
+      if (_guestSignInNote) _guestSignInNote.style.display = _isGuest ? '' : 'none';
 
       // Always open showing main panel
       document.getElementById('settingsMainPanel').style.display = '';

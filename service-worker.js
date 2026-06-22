@@ -283,7 +283,14 @@
 //      data is encrypted in transit + at rest. Updated across all 10 languages
 //      in js/shared/i18n.js + anonymous.html defaults. Also added an App Store
 //      reviewer bypass (test@bipolarbear.app) to js/anonymous.js.
-const CACHE_NAME = 'bipolarbear-v91';
+// v92: Sign-in is now optional everywhere — all features (customise journal +
+//      home) work as a guest, and signing in only backs up/syncs data. The
+//      home profile FAB opens the Profile modal for guests (was the sign-in
+//      form), the journal dock FAB opens Settings for guests (was the sign-in
+//      form) and Settings gained a guest-only "Sign in to back up" button, and
+//      the tutorial-finale account hint is reframed around optional backup.
+//      Touches js/index.js, js/journal.js, journal.html, js/shared/i18n.js.
+const CACHE_NAME = 'bipolarbear-v92';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

@@ -370,7 +370,10 @@ setTimeout(function () {
           if (userInfo) userInfo.style.display = 'none';
           const _pdHint = document.getElementById('personalDetailsHint');
           if (_pdHint) _pdHint.style.display = 'none';
-          window._fabOpenAuth = window.showAuthModal;
+          // Guests open the Profile modal (not the sign-in form): customise is
+          // available without an account, and the Customise panel carries its
+          // own "Sign up / in" button so backing up stays one tap away.
+          window._fabOpenAuth = window.showProfileModal;
           _setHomeAuthFab(false);
           // Hide stats from a previous account when Firebase fires with no
           // user (token expiry, sign-out via another tab, or just a signed-
@@ -523,7 +526,7 @@ setTimeout(function () {
         hintLabel.setAttribute('data-i18n', 'home.accountHint');
         hintLabel.textContent = (window.BB && window.BB.t)
           ? window.BB.t('home.accountHint')
-          : '🐻 Create an account to customise your experience';
+          : '🐻 Sign in to back up your data (optional)';
         hintLabel.style.whiteSpace = 'normal';
         hintLabel.style.maxWidth = 'min(280px, calc(100vw - 48px))';
         hintLabel.style.textAlign = 'center';
@@ -560,15 +563,21 @@ setTimeout(function () {
         // (_fabOnSignUp) hold back until the toast has actually appeared.
         window._bbFinaleToastPending = true;
         const _showToast = () => { window._bbFinaleToastPending = false; _showTutorialCompleteModal(); };
+        // Guests now land in the Profile modal (which carries the sign-in
+        // button); signed-up flows still open the auth modal directly. Either
+        // counts as "the modal was dealt with", so watch both.
+        const _finaleModalOpen = () => {
+          const a = document.getElementById('bbAuthModal');
+          const p = document.getElementById('idxProfileModal');
+          return (a && a.classList.contains('active')) || (p && p.classList.contains('active'));
+        };
         let waited = 0;
         const _openPoll = setInterval(() => {
           waited += 200;
-          const m = document.getElementById('bbAuthModal');
-          if (m && m.classList.contains('active')) {
+          if (_finaleModalOpen()) {
             clearInterval(_openPoll);
             const _closePoll = setInterval(() => {
-              const m2 = document.getElementById('bbAuthModal');
-              if (!m2 || !m2.classList.contains('active')) {
+              if (!_finaleModalOpen()) {
                 clearInterval(_closePoll);
                 setTimeout(_showToast, 350);
               }
