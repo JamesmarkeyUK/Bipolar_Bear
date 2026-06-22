@@ -16,7 +16,8 @@ const CHROME = process.platform === 'darwin'
   : 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 
 const screens = [
-  ['screen-anon1-hero.html',   '01-hero'],
+  ['screen-anon1-hero.html',       '01-hero'],
+  ['screen-anon1-hero-light.html', '01b-hero-light'],
   ['screen-anon2-monika.html', '02-monika'],
   ['screen-anon3-ask.html',    '03-ask'],
   ['screen-anon4-wiki.html',   '04-wiki'],

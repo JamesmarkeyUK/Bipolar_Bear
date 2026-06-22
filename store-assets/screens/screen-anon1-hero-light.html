@@ -5,94 +5,97 @@
 <link rel="stylesheet" href="../fonts.css">
 <link rel="stylesheet" href="shared.css">
 <style>
-  /* Phone-less art hero for Bipolar Anonymous — DARK variant.
-     Black/charcoal cover that lets the white community bubbles and the
-     yellow app badge pop for the store thumbnail. The floating chat
-     bubbles sit in the middle band between the headline and the badge,
-     leaving deliberate breathing room above the icon. */
+  /* Phone-less art hero for Bipolar Anonymous — LIGHT variant.
+     Clean white cover, the counterpart to the dark hero, so the store
+     listing alternates between a black and a white card. Bubbles get a
+     soft border + warm tint so they read on white. Same middle-band
+     bubble layout with breathing room above the badge. */
 
-  .canvas.bg-ink{
+  .canvas.bg-paper{
     background:
-      radial-gradient(95% 55% at 50% 40%, #2a2330 0%, rgba(42,35,48,0) 62%),
-      linear-gradient(180deg, #0a0a0d 0%, #121016 55%, #16121c 100%);
+      radial-gradient(95% 55% at 50% 38%, #fff7da 0%, rgba(255,247,218,0) 60%),
+      linear-gradient(180deg, #ffffff 0%, #fffdf6 58%, #fff6dd 100%);
   }
 
   .wordmark{ position:absolute; left:0; right:0; bottom:208px;
     display:flex; flex-direction:column; align-items:center; gap:4px; }
   .wordmark img{ width:300px; height:300px; border-radius:64px; margin-bottom:18px;
-    filter:drop-shadow(0 26px 46px rgba(0,0,0,.7)); }
-  .wordmark .name{ font-weight:900; font-size:132px; line-height:1; color:#ffffff;
+    filter:drop-shadow(0 24px 40px rgba(150,120,0,.32)); }
+  .wordmark .name{ font-weight:900; font-size:132px; line-height:1; color:#1a1500;
     letter-spacing:-.02em; white-space:nowrap; }
-  .wordmark .tag{ font-weight:800; font-size:42px; color:#b9aecb; opacity:.95;
+  .wordmark .tag{ font-weight:800; font-size:42px; color:#7a6a3a; opacity:.95;
     letter-spacing:.02em; margin-top:22px; }
 
-  /* Floating anonymous post bubbles */
-  .bubble{ position:absolute; background:#fff; border-radius:46px;
-    padding:38px 44px; display:flex; gap:28px; align-items:flex-start;
-    box-shadow:0 36px 70px -24px rgba(0,0,0,.7); }
+  /* Floating anonymous post bubbles — bordered so they read on white */
+  .bubble{ position:absolute; background:#fff; border:2px solid #f1e6c2;
+    border-radius:46px; padding:38px 44px; display:flex; gap:28px;
+    align-items:flex-start; box-shadow:0 34px 64px -26px rgba(150,120,0,.5); }
   .bubble .av{ flex:0 0 auto; width:104px; height:104px; border-radius:50%;
     display:flex; align-items:center; justify-content:center; color:#fff;
     font-weight:800; font-size:42px; font-family:'Segoe UI',system-ui,sans-serif;
     background:linear-gradient(135deg,#ffb340,#e07800);
-    box-shadow:0 8px 18px -6px rgba(0,0,0,.45); }
+    box-shadow:0 8px 18px -6px rgba(150,110,0,.4); }
   .bubble .who{ font-weight:800; font-size:32px; color:#1a1500; margin-bottom:10px;
     font-family:'Segoe UI',system-ui,sans-serif; }
   .bubble .msg{ font-size:38px; color:#2a2200; line-height:1.42;
     font-family:'Segoe UI',system-ui,sans-serif; }
   /* little tail */
-  .bubble::after{ content:""; position:absolute; bottom:-22px; left:84px;
-    width:48px; height:48px; background:#fff; border-radius:0 0 0 16px;
-    transform:rotate(45deg); }
+  .bubble::after{ content:""; position:absolute; bottom:-23px; left:84px;
+    width:48px; height:48px; background:#fff;
+    border-right:2px solid #f1e6c2; border-bottom:2px solid #f1e6c2;
+    border-radius:0 0 6px 0; transform:rotate(45deg); }
 
   /* small standalone avatars floating in the gaps */
   .floatav{ position:absolute; width:120px; height:120px; border-radius:50%;
     display:flex; align-items:center; justify-content:center; color:#fff;
     font-weight:800; font-size:44px; font-family:'Segoe UI',system-ui,sans-serif;
-    border:8px solid rgba(255,255,255,.16);
-    box-shadow:0 16px 30px -10px rgba(0,0,0,.6); }
+    border:8px solid #ffffff;
+    box-shadow:0 16px 30px -10px rgba(150,120,0,.4); }
+
+  .headline{ color:#1a1500; }
 </style>
 </head>
 <body>
-<div class="canvas bg-ink on-dark">
+<div class="canvas bg-paper">
 <div class="stage">
 
-  <!-- depth: glow, rings, dotted community thread, bokeh dots -->
+  <!-- depth: warm glow, rings, dotted community thread, bokeh dots -->
   <svg width="100%" height="100%" viewBox="0 0 1290 2796" preserveAspectRatio="xMidYMid slice"
        style="position:absolute;inset:0;overflow:visible;">
     <defs>
       <radialGradient id="cGlow" cx="0.5" cy="0.5" r="0.5">
-        <stop offset="0"    stop-color="#ffd84d" stop-opacity="0.18"/>
-        <stop offset="0.55" stop-color="#ffd84d" stop-opacity="0.05"/>
-        <stop offset="1"    stop-color="#ffd84d" stop-opacity="0"/>
+        <stop offset="0"    stop-color="#ffcf2e" stop-opacity="0.20"/>
+        <stop offset="0.55" stop-color="#ffcf2e" stop-opacity="0.06"/>
+        <stop offset="1"    stop-color="#ffcf2e" stop-opacity="0"/>
       </radialGradient>
     </defs>
 
     <!-- soft central light -->
     <ellipse cx="645" cy="1400" rx="900" ry="760" fill="url(#cGlow)"/>
     <!-- faint ripple rings -->
-    <g fill="none" stroke="#ffffff" stroke-opacity="0.07" stroke-width="3">
+    <g fill="none" stroke="#e7b800" stroke-opacity="0.14" stroke-width="3">
       <circle cx="645" cy="1400" r="540"/>
       <circle cx="645" cy="1400" r="800"/>
       <circle cx="645" cy="1400" r="1060"/>
     </g>
     <!-- dotted thread weaving between the voices -->
     <path d="M250,1120 C470,1240 760,1240 940,1400 C1090,1540 540,1640 360,1760 C240,1840 700,1890 980,1890"
-          fill="none" stroke="#ffffff" stroke-opacity="0.32" stroke-width="6"
+          fill="none" stroke="#e7b800" stroke-opacity="0.4" stroke-width="6"
           stroke-linecap="round" stroke-dasharray="2 28"/>
     <!-- floating bokeh dots -->
-    <g fill="#ffffff">
-      <circle cx="150" cy="1000" r="14" opacity="0.22"/>
-      <circle cx="1130" cy="1160" r="20" opacity="0.18"/>
-      <circle cx="1180" cy="1640" r="12" opacity="0.24"/>
-      <circle cx="110" cy="1440" r="11" opacity="0.24"/>
-      <circle cx="1000" cy="1980" r="16" opacity="0.16"/>
-      <circle cx="300" cy="2040" r="12" opacity="0.18"/>
+    <g fill="#e7b800">
+      <circle cx="150" cy="1000" r="14" opacity="0.26"/>
+      <circle cx="1130" cy="1160" r="20" opacity="0.2"/>
+      <circle cx="1180" cy="1640" r="12" opacity="0.28"/>
+      <circle cx="110" cy="1440" r="11" opacity="0.28"/>
+      <circle cx="1000" cy="1980" r="16" opacity="0.18"/>
+      <circle cx="300" cy="2040" r="12" opacity="0.22"/>
     </g>
   </svg>
 
   <!-- copy -->
   <div class="copy" style="top:0;height:880px;display:flex;flex-direction:column;justify-content:center;">
-    <div class="headline" style="font-size:150px;">You're not<br><span style="color:#ffd84d;text-shadow:0 6px 26px rgba(255,216,77,.35);">alone.</span></div>
+    <div class="headline" style="font-size:150px;">You're not<br><span style="color:#f0a500;text-shadow:0 6px 22px rgba(240,165,0,.25);">alone.</span></div>
   </div>
 
   <!-- floating anonymous community voices (middle band) -->
@@ -114,7 +117,7 @@
   <!-- small floating voices -->
   <div class="floatav" style="left:980px; top:1015px; background:linear-gradient(135deg,#64b5f6,#1565c0)">BB</div>
   <div class="floatav" style="left:40px; top:1560px; background:linear-gradient(135deg,#f48fb1,#c2185b)">JR</div>
-  <div class="floatav" style="left:980px; top:1740px; width:148px; height:148px; font-size:38px; background:#ffd84d; color:#1a1500">+You</div>
+  <div class="floatav" style="left:980px; top:1740px; width:148px; height:148px; font-size:38px; background:#1a1500; border-color:#ffe9a8">+You</div>
 
   <!-- brand -->
   <div class="wordmark">
