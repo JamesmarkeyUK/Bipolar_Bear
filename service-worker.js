@@ -270,7 +270,14 @@
 //      labels, FAB strings, edit-entry modal, confirm dialogs, Missing Entries
 //      modal). Home live-data fix. Touches js/shared/i18n.js, js/journal.js,
 //      js/index.js, journal.html, fab.js.
-const CACHE_NAME = 'bipolarbear-v89';
+// v90: Home anonymous visit-streak badge is now lapse-aware. The cached
+//      Anon_streak didn't self-expire, so a broken streak kept painting on the
+//      home page until the board recomputed it (the "2-day streak that wasn't"
+//      bug). New BB.anonLiveStreak() validates against AnonVisitDate; index.html
+//      early-paint + _updateStreakBadge() use it, and the home auth listener now
+//      restores AnonVisitDate from Firestore. Touches js/shared/brand-config.js,
+//      js/index.js, index.html.
+const CACHE_NAME = 'bipolarbear-v90';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

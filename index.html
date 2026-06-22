@@ -256,8 +256,11 @@
               jBadge.style.cursor = 'pointer';
             }
 
-            // Anonymous monika (👋) + visit streak (💬)
-            var anon = parseInt(S.get('Anon_streak') || '0', 10);
+            // Anonymous monika (👋) + visit streak (💬). Use the lapse-aware
+            // live streak — the raw cached Anon_streak doesn't self-expire, so
+            // a streak that broke days ago would otherwise paint here until the
+            // board recomputes it. Mirrors _updateStreakBadge() in js/index.js.
+            var anon = (window.BB.anonLiveStreak ? window.BB.anonLiveStreak() : parseInt(S.get('Anon_streak') || '0', 10));
             var monika = S.get('Anon_monika') || '';
             var aBadge = document.getElementById('anonStreakBadge');
             if (aBadge && monika) {

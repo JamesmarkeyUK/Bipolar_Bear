@@ -114,6 +114,37 @@ window.BB.storage = {
 };
 
 /**
+ * The anonymous-board "visit streak" as it should be DISPLAYED right now,
+ * accounting for lapse.
+ *
+ * `Anon_streak` is only the streak as of the last visit (`AnonVisitDate`) —
+ * it does not self-expire. The board resets it to 1 on the next visit if a
+ * day was skipped (see `_updateAnonStreak` in js/anonymous.js), but until the
+ * user opens the board the home page would otherwise keep advertising the
+ * stale number (the "2-day streak that wasn't" bug). This returns the live
+ * count, or 0 when the streak has lapsed or can't be confirmed as live.
+ *
+ * Dates use UTC (toISOString) to match how js/anonymous.js records
+ * `AnonVisitDate`. Any caller can keep its own "no streak → just the monika"
+ * branch by treating a 0 return the same as an absent streak.
+ */
+window.BB.anonLiveStreak = function () {
+  try {
+    var streak = parseInt(window.BB.storage.get('Anon_streak') || '0', 10);
+    if (!(streak > 0)) return 0;
+    var visitDate = window.BB.storage.get('AnonVisitDate') || '';
+    // No confirmed visit date → the board would reset to 1 on next open, so
+    // we can't honestly claim a live multi-day streak. Show nothing.
+    if (!visitDate) return 0;
+    var today     = new Date().toISOString().slice(0, 10);
+    var yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    return (visitDate === today || visitDate === yesterday) ? streak : 0;
+  } catch (_) {
+    return 0;
+  }
+};
+
+/**
  * True when the current page is acting as the standalone "Bipolar
  * Anonymous" app — either served from the anonymous web domain or
  * running inside the dedicated Capacitor bundle (where the build script

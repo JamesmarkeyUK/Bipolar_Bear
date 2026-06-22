@@ -287,6 +287,10 @@ setTimeout(function () {
             if (typeof _ap.visitStreak === 'number') {
               BB.storage.set('Anon_streak', String(_ap.visitStreak));
             }
+            // Also restore the last-visit date so BB.anonLiveStreak() can tell
+            // whether that streak is still live on a fresh device (where the
+            // board hasn't run to set AnonVisitDate locally yet).
+            if (_ap.visitDate) BB.storage.set('AnonVisitDate', _ap.visitDate);
             if (_ap.monika) BB.storage.set('Anon_monika', _ap.monika);
             if (_ap.verified) BB.storage.set('Anon_verified', 'true');
             _updateStreakBadge(); // refresh badge from the values we just wrote
@@ -778,7 +782,10 @@ setTimeout(function () {
     function _updateStreakBadge() {
       const streak = parseInt(BB.storage.get('CurrentStreak') || '0', 10);
       const stable = parseInt(BB.storage.get('StableStreak')  || '0', 10);
-      const anon   = parseInt(BB.storage.get('Anon_streak')   || '0', 10);
+      // Lapse-aware: the raw Anon_streak doesn't self-expire, so validate it
+      // against the last visit date (see BB.anonLiveStreak). Returns 0 once
+      // the streak has broken, which falls through to the monika-only branch.
+      const anon   = BB.anonLiveStreak();
       const hasAnon = !!BB.storage.get('Anon_monika');
 
       // Journal badge: 🔥 + 🧘
