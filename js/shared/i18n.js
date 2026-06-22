@@ -49,7 +49,7 @@
         survivalHint: '🐻 Click here to learn and share more about your bipolar',
         signinHintLabel: '🐻 Save your progress here',
         signinHintStored: 'Stored securely in Firebase',
-        accountHint: '🐻 Create an account to customise your experience',
+        accountHint: '🐻 Sign in to back up your data (optional)',
         madeBy: 'Being built by James Markey',
         features: {
           insightsTitle: 'Visual Insights',
@@ -828,7 +828,7 @@
         survivalHint: '🐻 Cliquez ici pour en savoir plus sur votre bipolarité',
         signinHintLabel: '🐻 Sauvegardez votre progression ici',
         signinHintStored: 'Stocké en toute sécurité sur Firebase',
-        accountHint: '🐻 Créez un compte pour personnaliser votre expérience',
+        accountHint: '🐻 Connectez-vous pour sauvegarder vos données (facultatif)',
         madeBy: 'Développé par James Markey',
         features: { insightsTitle: 'Aperçus Visuels', insightsDesc: 'Visualisez vos tendances d\'humeur avec des graphiques', privateTitle: 'Privé et Sécurisé', privateDesc: 'Vos données restent en sécurité', trackTitle: 'Restez sur la Bonne Voie', trackDesc: 'Créez de bonnes habitudes avec des séries' },
         wa: { title: 'Rejoindre Bipolar Anonymous', body: 'Souhaitez-vous rejoindre notre groupe WhatsApp Bipolar Anonymous ?', join: '✅ Rejoindre le Groupe', cancel: 'Annuler', hide: '🙈 Masquer ce bouton' },
