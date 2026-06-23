@@ -591,6 +591,158 @@
         clearDraft: { title: 'Clear Draft?', body: "Clear everything you've entered? This can't be undone.", btn: 'Clear' },
         hideSuggestion: { title: 'Never show suggested mood again?', body: 'The suggested mood will no longer appear on the save screen. You can re-enable this in Settings.', confirm: 'Yes, hide it' },
       },
+      lp: {
+        "nav": {
+          "getApp": "Get the app"
+        },
+        "hero": {
+          "eyebrow": "🐻 Free · iOS · Android · Web",
+          "h1": "Every high.<br>Every low.<br><span class=\"swing\">One bear that gets it.</span>",
+          "sub": "Bipolar Bear is a free, private mood journal and survival kit built for the swing of bipolar disorder. Track mood, energy, sleep and meds — then spot the patterns before they spot you.",
+          "webLink": "Or open the web app straight in your browser →",
+          "trust1": "🔒 End-to-end encrypted",
+          "trust2": "💷 Free, no ads",
+          "trust3": "🐻 Built with the community"
+        },
+        "meter": {
+          "todaysMood": "Today’s mood",
+          "live": "live",
+          "scaleDepressed": "Depressed",
+          "scaleStable": "Stable",
+          "scaleManic": "Manic",
+          "hint": "<b>Drag</b> the bear along the wave — that’s a month of bipolar in five seconds.",
+          "depressed": {
+            "name": "Depressed",
+            "tag": "Under the rain cloud"
+          },
+          "low": {
+            "name": "Low",
+            "tag": "Running on empty"
+          },
+          "stable": {
+            "name": "Stable",
+            "tag": "Even keel — steady"
+          },
+          "good": {
+            "name": "Good",
+            "tag": "Bright and balanced"
+          },
+          "elevated": {
+            "name": "Elevated",
+            "tag": "Buzzing, thoughts racing"
+          },
+          "manic": {
+            "name": "Manic",
+            "tag": "Soaring — the big highs"
+          },
+          "posts": {
+            "p1": "Three days stable after a rough patch. Small wins still count, right?",
+            "p2": "Finally told my partner about my diagnosis. They just hugged me. 🧡",
+            "p3": "Anyone else find mornings the hardest? Looking for routines that help.",
+            "p4": "Hypomania creeping in — logging it early this time. Proud of that.",
+            "p5": "Took my meds every day this week. Quietly chuffed with myself.",
+            "p6": "Rough night. Just needed to say it somewhere people actually get it."
+          }
+        },
+        "carousel": {
+          "screenshotLabel": "Show screenshot {i} of {n}"
+        },
+        "features": {
+          "eyebrow": "Why Bipolar Bear",
+          "heading": "Made for the way bipolar actually feels",
+          "sub": "Not another generic habit tracker. Every part is shaped around mood that moves.",
+          "f1Title": "Daily mood journal",
+          "f1Desc": "Log mood, energy, sleep, medication and notes in seconds. Your day, captured before it slips.",
+          "f2Title": "Your survival kit",
+          "f2Desc": "Coping strategies, crisis contacts and reasons to stay — built calm, ready for when it isn’t.",
+          "f3Title": "Spot your patterns",
+          "f3Desc": "On-device insights link sleep, alcohol and more to how you feel the next day.",
+          "f4Title": "End-to-end encrypted",
+          "f4Desc": "Entries are scrambled on your device before they ever leave it. Not even we can read them.",
+          "f5Title": "Streaks that stick",
+          "f5Desc": "Gentle nudges and streaks help the habit hold on the days that are hardest to hold.",
+          "f6Title": "Never alone",
+          "f6Desc": "Step into Bipolar Anonymous — an anonymous peer community — right from the app."
+        },
+        "bear": {
+          "heading": "Your mind, in your pocket.",
+          "body": "The everyday companion for living well with bipolar — quietly tracking the things that matter so you can see yourself clearly.",
+          "li1": "Mood, energy, sleep, meds &amp; free-text notes",
+          "li2": "Personalised insights, computed privately on your device",
+          "li3": "Export a clean PDF to share with your care team",
+          "li4": "Works offline — your journal is always there",
+          "launchWeb": "Launch the web app →"
+        },
+        "anon": {
+          "heading": "Share your thoughts,<br>not your identity.",
+          "body": "A separate, standalone app: an anonymous peer community for people living with bipolar. Pick a moniker, post what’s real, and find people who actually get it.",
+          "li1": "No real name — just a moniker you choose",
+          "li2": "Posts to relate to, not perform for",
+          "li3": "Recognised across all your devices",
+          "li4": "Your email is only ever stored as a hash",
+          "openLink": "Open bipolaranonymous.app →"
+        },
+        "founder": {
+          "eyebrow": "The human behind the bear",
+          "heading": "Built by James Markey",
+          "body": "Bipolar Bear began as one person’s tool for living with bipolar — and grew into a free app for everyone who needs one. James builds in the open and shares the whole journey, highs and lows included.",
+          "signoff": "No investors. No data harvesting. Just a tool he wished existed.",
+          "visit": "Visit jamesmarkey.co.uk →"
+        },
+        "hosting": {
+          "label": "Proudly hosted for free by",
+          "body": "Both apps are hosted free of charge by UNI SIM — so every penny goes to the people who need them, not the servers."
+        },
+        "foot": {
+          "brandDesc": "A free, private mood journal and survival kit for living with bipolar disorder — and an anonymous community for the days you’d rather not be alone.",
+          "appsHeading": "The apps",
+          "bearWeb": "Bipolar Bear · open the web app",
+          "anonLink": "Bipolar Anonymous · bipolaranonymous.app",
+          "moreHeading": "More",
+          "privacy": "Privacy",
+          "founder": "Founder · James Markey",
+          "hosting": "Hosting · UNI SIM",
+          "crisis": "<b>Not a crisis service.</b> Bipolar Bear is a self-help tool, not a substitute for professional care. If you’re in crisis, contact your local emergency services or a crisis line right away.",
+          "copyright": "© 2026 Bipolar Bear · Built by James Markey · Hosted by UNI SIM"
+        },
+        "anonpage": {
+          "heroEyebrow": "🫂 Free · 100% anonymous",
+          "heroH1": "Share your thoughts,<br><span class=\"swing\">not your identity.</span>",
+          "heroSub": "Bipolar Anonymous is a free, anonymous peer community for people living with bipolar. Pick a moniker, post what’s real, and find people who actually get it — no real name, ever.",
+          "heroWebLink": "Or open the community straight in your browser →",
+          "trust1": "🕵️ No real name, ever",
+          "trust2": "💛 People who get it",
+          "trust3": "💷 Free, no ads",
+          "youllPostAs": "You’ll post as",
+          "anonymousLabel": "anonymous",
+          "monikaSub": "No real name · recognised across your devices",
+          "justNow": "· just now",
+          "shuffleBtn": "🎲 Shuffle my identity",
+          "monikaHint": "Pick a <b>moniker</b> — your real name never leaves your head.",
+          "scHeading": "Real talk. No real names.",
+          "scBody": "An anonymous peer community for the things you can’t always say out loud. Pick a moniker, post what’s real, and find people living the same swing.",
+          "scLi1": "No real name — just a moniker you choose",
+          "scLi2": "Posts to relate to, not perform for",
+          "scLi3": "A community wiki, written by people who get it",
+          "scLi4": "Your email is only ever stored as a hash",
+          "openCommunity": "Open the community →",
+          "bearHeading": "Track the rest with Bipolar Bear.",
+          "bearBody": "The companion app from the same team — a free, private mood journal and survival kit for the day-to-day of living with bipolar.",
+          "bearLi1": "Mood, energy, sleep, meds &amp; free-text notes",
+          "bearLi2": "Personalised insights, computed privately on your device",
+          "bearLi3": "End-to-end encrypted — not even we can read it",
+          "bearLi4": "Works offline — your journal is always there",
+          "openBear": "Open bipolarbear.app →",
+          "founderEyebrow": "The human behind the apps",
+          "founderBody": "Bipolar Anonymous and Bipolar Bear both grew out of one person’s experience of living with bipolar — and a belief that nobody should have to face it alone or pay to get help. James builds in the open and shares the whole journey.",
+          "founderSignoff": "No investors. No data harvesting. Just tools he wished existed.",
+          "footBrandDesc": "A free, anonymous peer community for people living with bipolar — plus Bipolar Bear, a private mood journal and survival kit for the rest of it.",
+          "footAnonLink": "Bipolar Anonymous · open the community",
+          "footBearLink": "Bipolar Bear · bipolarbear.app",
+          "footCrisis": "<b>Not a crisis service.</b> Bipolar Anonymous is a peer-support community, not a substitute for professional care. If you’re in crisis, contact your local emergency services or a crisis line right away.",
+          "footCopyright": "© 2026 Bipolar Anonymous · Built by James Markey · Hosted by UNI SIM"
+        }
+      },
     },
 
     es: {
@@ -1209,6 +1361,158 @@
         delete: { title: 'Supprimer l\'entrée ?', body: 'Êtes-vous sûr de vouloir supprimer cette entrée d\'humeur ? Cette action est irréversible.', btn: 'Supprimer' },
         clearDraft: { title: 'Effacer le brouillon ?', body: 'Effacer tout ce que vous avez saisi ? Cette action est irréversible.', btn: 'Effacer' },
         hideSuggestion: { title: 'Ne plus afficher l\'humeur suggérée ?', body: 'L\'humeur suggérée n\'apparaîtra plus sur l\'écran de sauvegarde. Vous pouvez la réactiver dans les Paramètres.', confirm: 'Oui, masquer' },
+      },
+      lp: {
+        "nav": {
+          "getApp": "Télécharger l’app"
+        },
+        "hero": {
+          "eyebrow": "🐻 Gratuit · iOS · Android · Web",
+          "h1": "Chaque sommet.<br>Chaque creux.<br><span class=\"swing\">Un ours qui comprend.</span>",
+          "sub": "Bipolar Bear est un journal d’humeur et un kit de survie gratuits et privés, pensés pour les montagnes russes du trouble bipolaire. Suivez votre humeur, votre énergie, votre sommeil et vos traitements — puis repérez les schémas avant qu’ils ne vous repèrent.",
+          "webLink": "Ou ouvrez l’app web directement dans votre navigateur →",
+          "trust1": "🔒 Chiffré de bout en bout",
+          "trust2": "💷 Gratuit, sans publicité",
+          "trust3": "🐻 Construit avec la communauté"
+        },
+        "meter": {
+          "todaysMood": "Humeur du jour",
+          "live": "en direct",
+          "scaleDepressed": "Déprimé",
+          "scaleStable": "Stable",
+          "scaleManic": "Maniaque",
+          "hint": "<b>Faites glisser</b> l’ours le long de la vague — voilà un mois de bipolarité en cinq secondes.",
+          "depressed": {
+            "name": "Déprimé",
+            "tag": "Sous le nuage de pluie"
+          },
+          "low": {
+            "name": "Bas",
+            "tag": "À court d’énergie"
+          },
+          "stable": {
+            "name": "Stable",
+            "tag": "Sur la bonne voie — posé"
+          },
+          "good": {
+            "name": "En forme",
+            "tag": "Lumineux et équilibré"
+          },
+          "elevated": {
+            "name": "Élevé",
+            "tag": "Pétillant, pensées qui s’emballent"
+          },
+          "manic": {
+            "name": "Maniaque",
+            "tag": "Aux sommets — les grands hauts"
+          },
+          "posts": {
+            "p1": "Trois jours stables après une mauvaise passe. Les petites victoires comptent quand même, non ?",
+            "p2": "J’ai enfin parlé de mon diagnostic à mon partenaire. Il m’a juste pris dans ses bras. 🧡",
+            "p3": "Quelqu’un d’autre trouve les matins les plus durs ? Je cherche des routines qui aident.",
+            "p4": "L’hypomanie qui pointe — je la note tôt cette fois. Fière de ça.",
+            "p5": "J’ai pris mes médicaments tous les jours cette semaine. Discrètement content de moi.",
+            "p6": "Nuit difficile. J’avais juste besoin de le dire là où les gens comprennent vraiment."
+          }
+        },
+        "carousel": {
+          "screenshotLabel": "Afficher la capture {i} sur {n}"
+        },
+        "features": {
+          "eyebrow": "Pourquoi Bipolar Bear",
+          "heading": "Conçu pour ce que la bipolarité fait vraiment ressentir",
+          "sub": "Pas un énième suivi d’habitudes générique. Chaque détail est pensé autour d’une humeur qui bouge.",
+          "f1Title": "Journal d’humeur quotidien",
+          "f1Desc": "Notez humeur, énergie, sommeil, médicaments et observations en quelques secondes. Votre journée, capturée avant qu’elle ne file.",
+          "f2Title": "Votre kit de survie",
+          "f2Desc": "Stratégies d’adaptation, contacts d’urgence et raisons de tenir bon — préparés au calme, prêts pour quand ça ne l’est plus.",
+          "f3Title": "Repérez vos schémas",
+          "f3Desc": "Des analyses sur votre appareil relient sommeil, alcool et bien plus à votre ressenti du lendemain.",
+          "f4Title": "Chiffré de bout en bout",
+          "f4Desc": "Vos entrées sont chiffrées sur votre appareil avant même d’en sortir. Même nous ne pouvons pas les lire.",
+          "f5Title": "Des séries qui tiennent",
+          "f5Desc": "De petits rappels et des séries aident l’habitude à tenir les jours les plus difficiles à tenir.",
+          "f6Title": "Jamais seul",
+          "f6Desc": "Rejoignez Bipolar Anonymous — une communauté de pairs anonyme — directement depuis l’app."
+        },
+        "bear": {
+          "heading": "Votre esprit, dans votre poche.",
+          "body": "Le compagnon du quotidien pour bien vivre avec la bipolarité — il suit discrètement ce qui compte pour que vous puissiez vous voir clairement.",
+          "li1": "Humeur, énergie, sommeil, médicaments &amp; notes libres",
+          "li2": "Analyses personnalisées, calculées en privé sur votre appareil",
+          "li3": "Exportez un PDF clair à partager avec votre équipe soignante",
+          "li4": "Fonctionne hors ligne — votre journal est toujours là",
+          "launchWeb": "Lancer l’app web →"
+        },
+        "anon": {
+          "heading": "Partagez vos pensées,<br>pas votre identité.",
+          "body": "Une app distincte et autonome : une communauté de pairs anonyme pour les personnes vivant avec la bipolarité. Choisissez un Moniker, postez ce qui est vrai, et rencontrez des gens qui comprennent vraiment.",
+          "li1": "Pas de vrai nom — juste un Moniker que vous choisissez",
+          "li2": "Des posts auxquels s’identifier, pas pour faire bonne figure",
+          "li3": "Reconnu sur tous vos appareils",
+          "li4": "Votre e-mail n’est jamais stocké que sous forme de hachage",
+          "openLink": "Ouvrir bipolaranonymous.app →"
+        },
+        "founder": {
+          "eyebrow": "L’humain derrière l’ours",
+          "heading": "Créé par James Markey",
+          "body": "Bipolar Bear a commencé comme l’outil d’une seule personne pour vivre avec la bipolarité — et est devenu une app gratuite pour tous ceux qui en ont besoin. James construit à découvert et partage tout le parcours, les hauts comme les bas.",
+          "signoff": "Pas d’investisseurs. Pas de collecte de données. Juste un outil qu’il aurait aimé avoir.",
+          "visit": "Voir jamesmarkey.co.uk →"
+        },
+        "hosting": {
+          "label": "Fièrement hébergé gratuitement par",
+          "body": "Les deux apps sont hébergées gratuitement par UNI SIM — pour que chaque centime aille aux personnes qui en ont besoin, et non aux serveurs."
+        },
+        "foot": {
+          "brandDesc": "Un journal d’humeur et un kit de survie gratuits et privés pour vivre avec le trouble bipolaire — et une communauté anonyme pour les jours où l’on préfère ne pas rester seul.",
+          "appsHeading": "Les apps",
+          "bearWeb": "Bipolar Bear · ouvrir l’app web",
+          "anonLink": "Bipolar Anonymous · bipolaranonymous.app",
+          "moreHeading": "Plus",
+          "privacy": "Confidentialité",
+          "founder": "Fondateur · James Markey",
+          "hosting": "Hébergement · UNI SIM",
+          "crisis": "<b>Pas un service d’urgence.</b> Bipolar Bear est un outil d’entraide, pas un substitut à un suivi professionnel. Si vous êtes en crise, contactez immédiatement les services d’urgence locaux ou une ligne d’écoute.",
+          "copyright": "© 2026 Bipolar Bear · Créé par James Markey · Hébergé par UNI SIM"
+        },
+        "anonpage": {
+          "heroEyebrow": "🫂 Gratuit · 100 % anonyme",
+          "heroH1": "Partagez vos pensées,<br><span class=\"swing\">pas votre identité.</span>",
+          "heroSub": "Bipolar Anonymous est une communauté de pairs gratuite et anonyme pour les personnes vivant avec la bipolarité. Choisissez un Moniker, postez ce qui est vrai, et rencontrez des gens qui comprennent vraiment — jamais de vrai nom.",
+          "heroWebLink": "Ou ouvrez la communauté directement dans votre navigateur →",
+          "trust1": "🕵️ Jamais de vrai nom",
+          "trust2": "💛 Des gens qui comprennent",
+          "trust3": "💷 Gratuit, sans publicité",
+          "youllPostAs": "Vous publierez sous",
+          "anonymousLabel": "anonyme",
+          "monikaSub": "Pas de vrai nom · reconnu sur tous vos appareils",
+          "justNow": "· à l’instant",
+          "shuffleBtn": "🎲 Changer mon identité",
+          "monikaHint": "Choisissez un <b>Moniker</b> — votre vrai nom ne quitte jamais votre tête.",
+          "scHeading": "On se parle vraiment. Sans vrais noms.",
+          "scBody": "Une communauté de pairs anonyme pour ce qu’on ne peut pas toujours dire à voix haute. Choisissez un Moniker, postez ce qui est vrai, et rencontrez des gens qui vivent les mêmes hauts et bas.",
+          "scLi1": "Pas de vrai nom — juste un Moniker que vous choisissez",
+          "scLi2": "Des posts auxquels s’identifier, pas pour faire bonne figure",
+          "scLi3": "Un wiki communautaire, écrit par des gens qui comprennent",
+          "scLi4": "Votre e-mail n’est jamais stocké que sous forme de hachage",
+          "openCommunity": "Ouvrir la communauté →",
+          "bearHeading": "Suivez le reste avec Bipolar Bear.",
+          "bearBody": "L’app compagnon de la même équipe — un journal d’humeur et un kit de survie gratuits et privés pour le quotidien avec la bipolarité.",
+          "bearLi1": "Humeur, énergie, sommeil, médicaments &amp; notes libres",
+          "bearLi2": "Analyses personnalisées, calculées en privé sur votre appareil",
+          "bearLi3": "Chiffré de bout en bout — même nous ne pouvons pas le lire",
+          "bearLi4": "Fonctionne hors ligne — votre journal est toujours là",
+          "openBear": "Ouvrir bipolarbear.app →",
+          "founderEyebrow": "L’humain derrière les apps",
+          "founderBody": "Bipolar Anonymous et Bipolar Bear sont tous deux nés de l’expérience d’une seule personne vivant avec la bipolarité — et de la conviction que personne ne devrait avoir à l’affronter seul ni à payer pour être aidé. James construit à découvert et partage tout le parcours.",
+          "founderSignoff": "Pas d’investisseurs. Pas de collecte de données. Juste des outils qu’il aurait aimé avoir.",
+          "footBrandDesc": "Une communauté de pairs gratuite et anonyme pour les personnes vivant avec la bipolarité — et Bipolar Bear, un journal d’humeur et un kit de survie privés pour le reste.",
+          "footAnonLink": "Bipolar Anonymous · ouvrir la communauté",
+          "footBearLink": "Bipolar Bear · bipolarbear.app",
+          "footCrisis": "<b>Pas un service d’urgence.</b> Bipolar Anonymous est une communauté d’entraide entre pairs, pas un substitut à un suivi professionnel. Si vous êtes en crise, contactez immédiatement les services d’urgence locaux ou une ligne d’écoute.",
+          "footCopyright": "© 2026 Bipolar Anonymous · Créé par James Markey · Hébergé par UNI SIM"
+        }
       },
     },
 
