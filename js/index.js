@@ -506,6 +506,17 @@ setTimeout(function () {
       BB.storage.set('AccountHintShown', '1');
       window._bbAccountHintActive = true;
 
+      // The finale points the user at the profile button (Customise panel).
+      // Pre-enable the Survival Kit home button so it shows up already selected
+      // in that panel and is visible on the home screen the moment they close
+      // it — they discover the feature instead of having to find the toggle.
+      // Only flip it the first time (when it's never been set), so a user who
+      // deliberately turned it off later isn't overridden on a repeat finale.
+      if (BB.storage.get('SurvivalBtnEnabled') == null) {
+        BB.storage.set('SurvivalBtnEnabled', '1');
+        if (typeof window._applyOnboardingGating === 'function') window._applyOnboardingGating();
+      }
+
       // If the What's New popup beat the hint onto the screen, put it away
       // and un-mark it so it re-shows on the next visit instead.
       const _wn = document.getElementById('whatsNewPopup');

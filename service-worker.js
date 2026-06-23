@@ -303,7 +303,11 @@
 // v95: Move the Apple Health (HealthKit) sync card off the top level of
 //      Settings into the Advanced "Mobile Settings" panel, below the Daily
 //      Mood Reminder. Touches journal.html.
-const CACHE_NAME = 'bipolarbear-v95';
+// v96: Tutorial finale auto-enables the Survival Kit home button (only if the
+//      flag was never set) when it points the user at the profile button, so
+//      the Survival Kit is pre-selected in the Customise panel and visible on
+//      the home screen once they close it. Touches js/index.js.
+const CACHE_NAME = 'bipolarbear-v96';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
