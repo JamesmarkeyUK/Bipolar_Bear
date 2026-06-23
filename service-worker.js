@@ -314,7 +314,11 @@
 //      button alongside the Survival Kit (each only if its flag was never
 //      set), so both are pre-selected in the Customise panel. Touches
 //      js/index.js.
-const CACHE_NAME = 'bipolarbear-v98';
+// v99: First journal visit after the tutorial shows a one-shot blocking hint
+//      (index-finale style: dimmer + elevated FAB + label) pointing at the dock
+//      Settings FAB. New i18n key journal.hint.settingsFab in all 10 locales.
+//      Touches js/journal.js, js/shared/i18n.js, journal.html (changelog).
+const CACHE_NAME = 'bipolarbear-v99';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
