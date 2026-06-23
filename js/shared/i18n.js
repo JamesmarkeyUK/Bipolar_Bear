@@ -1103,7 +1103,8 @@
           "survivalKit": "Fully Prepared"
         },
         "nav": {
-          "journal": "Journal"
+          "journal": "Journal",
+          "home": "🏠 Home"
         }
       },
     },
@@ -2237,7 +2238,8 @@
           "survivalKit": "Fin prêt"
         },
         "nav": {
-          "journal": "Journal"
+          "journal": "Journal",
+          "home": "🏠 Accueil"
         }
       },
     },
