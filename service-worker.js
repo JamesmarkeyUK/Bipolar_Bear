@@ -293,7 +293,14 @@
 // v93: v1.14 (build 14) release — version bump only, rolls up the v90–v92
 //      web changes (lapse-aware anon streak, accurate privacy sheet,
 //      optional sign-in) into a fresh App Store build.
-const CACHE_NAME = 'bipolarbear-v93';
+// v94: Settings/profile tidy-up — drop the duplicate "Health data:" status
+//      line from the top Apple Health sync card (it already shows in the
+//      settings footer), and move the guest "Sign up / in" button below the
+//      language picker in the home Profile modal to mirror the Settings menu.
+//      Also fixes the journal open/close button rendering its raw i18n key
+//      (duplicate journal.btn block in the en + fr locales). Touches
+//      journal.html, index.html, js/shared/i18n.js.
+const CACHE_NAME = 'bipolarbear-v94';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
