@@ -349,7 +349,6 @@
           favourite: 'Marked as a favourite — find it anytime in All-Time Stats',
           tutorialDone: "Advanced tutorial complete. You're all set now!",
         },
-        btn: { openJournal: '📔 Open Journal', closeJournal: '📕 Close Journal' },
         prompt: {
           howFallback: 'How did you feel?',
           howToday: 'How is today going?',
@@ -473,6 +472,8 @@
           stepNote: 'Why did you feel this way?',
         },
         btn: {
+          openJournal: '📔 Open Journal',
+          closeJournal: '📕 Close Journal',
           viewEditGoals: 'View / Edit Goals',
           setDailyBudget: '💰 Set daily budget',
           setDailyGoals: '🏅 Set daily goals',
@@ -945,7 +946,6 @@
           favourite: 'Marqué comme favori — retrouvez-le dans les Statistiques Globales',
           tutorialDone: 'Tutoriel avancé terminé. Vous êtes prêt !',
         },
-        btn: { openJournal: '📔 Ouvrir le Journal', closeJournal: '📕 Fermer le Journal' },
         prompt: {
           howFallback: 'Comment vous êtes-vous senti·e ?',
           howToday: 'Comment se passe la journée ?',
@@ -1069,6 +1069,8 @@
           stepNote: 'Pourquoi vous êtes-vous senti ainsi ?',
         },
         btn: {
+          openJournal: '📔 Ouvrir le Journal',
+          closeJournal: '📕 Fermer le Journal',
           viewEditGoals: 'Voir / Modifier les objectifs',
           setDailyBudget: '💰 Définir le budget quotidien',
           setDailyGoals: '🏅 Définir les objectifs quotidiens',
