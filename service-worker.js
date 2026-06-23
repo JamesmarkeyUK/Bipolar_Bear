@@ -290,7 +290,10 @@
 //      form) and Settings gained a guest-only "Sign in to back up" button, and
 //      the tutorial-finale account hint is reframed around optional backup.
 //      Touches js/index.js, js/journal.js, journal.html, js/shared/i18n.js.
-const CACHE_NAME = 'bipolarbear-v92';
+// v93: v1.14 (build 14) release — version bump only, rolls up the v90–v92
+//      web changes (lapse-aware anon streak, accurate privacy sheet,
+//      optional sign-in) into a fresh App Store build.
+const CACHE_NAME = 'bipolarbear-v93';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
