@@ -24,7 +24,7 @@
 | **Email** | Resend API (`resend` npm package) — transactional email for anonymous verification codes |
 | **Firebase plan** | **Blaze (pay-as-you-go)** required — Cloud Functions and Secret Manager need it |
 | **Native wrapper** | Capacitor 8 (iOS + Android WebView) |
-| **Health data** | iOS HealthKit via `@flomentumsolutions/capacitor-health-extended` |
+| **Health data** | iOS HealthKit + Android Health Connect via `@flomentumsolutions/capacitor-health-extended` |
 | **Offline storage** | Firestore offline persistence + `localStorage` cache |
 | **PDF export** | jsPDF (client-side, no server) |
 | **Notifications** | Capacitor Local Notifications |
@@ -351,18 +351,40 @@ Change email    →  re-auth required (current password), then firebase updateEm
 - `bbPinLinkedUID` stores the Firebase Auth UID of the account that created the PIN
 - On `onAuthStateChanged`, if the signed-in UID doesn't match `bbPinLinkedUID`, all PIN keys are cleared and the overlay is hidden — prevents a different account from being locked out by another user's PIN
 
-### 2.8 Health Data Sync (iOS)
+### 2.8 Health Data Sync (iOS + Android)
 
 ```
 Plugin:   @flomentumsolutions/capacitor-health-extended
-Data:     Sleep duration  →  selectedSleep bucket (5 / 6.5 / 7.5 / 8.5 / 10h)
+          iOS     → Apple HealthKit
+          Android → Google Health Connect (watch/Wear OS data flows in here)
+Data:     Sleep duration  →  selectedSleep bucket (5 / 6.5 / 8 / 9.5 / 11h)
           Step count      →  entry.steps (shown inline with energy)
 
-Timing:   Sleep sync reads from last night's HealthKit records
-          Valid if sleep ended within 36 hours (prevents stale data)
-          Steps sync runs on page load for recent dates
+Permissions: READ_SLEEP, READ_STEPS (requested only on a deliberate user
+          action — toggle on, or Import button — per Apple Guideline 5.1.1(iv);
+          Health Connect also caps repeat prompts, then routes to its settings)
+
+Steps:    importStepsFromHealth() → queryAggregated({dataType:'steps', bucket:'day'})
+Sleep:    importSleepFromHealth() → queryLatestSample({dataType:'sleep'})
+          value is minutes-asleep (asleep stages only; InBed/Awake filtered out)
+          queryLatestSample ignores the date window and returns the most recent
+          session (~36h); a timestamp guard rejects samples outside the target day
+Backfill: backfillStepsFromHealth() writes step counts onto the past 7 days'
+          entries (Firestore batch when signed in, localStorage when guest)
+
+Timing:   Sleep sync reads last night's record; valid if it ended within ~36h
+          Steps sync runs on page load / mood tap for recent dates
+
+Auth UI:  _refreshHealthAuthDisplay() — iOS can only report "asked at some point"
+          so it probes a real query to confirm "Connected"; Android Health Connect
+          reports the true granted set (Authorised / Partially / Not yet)
 
 Guard:    _healthSyncInProgress flag prevents form navigation during async sync
+
+Android native (lives in the separate bipolarbear-native project, NOT this repo):
+          AndroidManifest needs the Health Connect <queries> block, READ_* perms,
+          a PermissionsRationaleActivity, and the Android 14+ permission-usage
+          activity-alias — without these the OS sheet never appears.
 ```
 
 ### 2.9 Focused Mode
