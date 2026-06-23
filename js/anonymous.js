@@ -3174,7 +3174,7 @@ document.getElementById('ms-stable-btn').addEventListener('click', openStableSet
 
 document.getElementById('ms-save').addEventListener('click', async () => {
   const newMonika = document.getElementById('ms-monika').value.trim();
-  if (newMonika.length < 2) { showHint('Monika must be at least 2 characters'); return; }
+  if (newMonika.length < 2) { showHint('Moniker must be at least 2 characters'); return; }
 
   const oldMonika = profile.monika;
   try {
@@ -3193,7 +3193,7 @@ document.getElementById('ms-save').addEventListener('click', async () => {
 
   closeOv('ov-monika');
   renderUserPill();
-  showHint('Monika updated ✓');
+  showHint('Moniker updated ✓');
 
   // Update past Firestore posts authored by this user
   if (db && oldMonika) {

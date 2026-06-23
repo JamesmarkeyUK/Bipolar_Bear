@@ -318,7 +318,11 @@
 //      (index-finale style: dimmer + elevated FAB + label) pointing at the dock
 //      Settings FAB. New i18n key journal.hint.settingsFab in all 10 locales.
 //      Touches js/journal.js, js/shared/i18n.js, journal.html (changelog).
-const CACHE_NAME = 'bipolarbear-v99';
+// v100: Spelling fix — user-facing "Monika" → "Moniker" (the correct English
+//       word for a chosen handle) across all 10 locales + hardcoded HTML/JS
+//       copy. Internal identifiers untouched (Firestore bbAnonMonikas,
+//       localStorage Anon_monika, element ids, i18n key names, openMonikaSettings).
+const CACHE_NAME = 'bipolarbear-v100';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
