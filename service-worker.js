@@ -310,7 +310,11 @@
 // v97: In-app changelog updated for v1.14 — added a "What's New" headline
 //      (js/index.js) and a v1.14 block in the full Changelog modal
 //      (journal.html) covering this release's user-facing changes.
-const CACHE_NAME = 'bipolarbear-v97';
+// v98: Tutorial finale now also auto-enables the Bipolar Anonymous home
+//      button alongside the Survival Kit (each only if its flag was never
+//      set), so both are pre-selected in the Customise panel. Touches
+//      js/index.js.
+const CACHE_NAME = 'bipolarbear-v98';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

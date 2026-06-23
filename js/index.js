@@ -507,15 +507,22 @@ setTimeout(function () {
       window._bbAccountHintActive = true;
 
       // The finale points the user at the profile button (Customise panel).
-      // Pre-enable the Survival Kit home button so it shows up already selected
-      // in that panel and is visible on the home screen the moment they close
-      // it — they discover the feature instead of having to find the toggle.
-      // Only flip it the first time (when it's never been set), so a user who
-      // deliberately turned it off later isn't overridden on a repeat finale.
+      // Pre-enable the Survival Kit + Bipolar Anonymous home buttons so they
+      // show up already selected in that panel and are visible on the home
+      // screen the moment they close it — they discover the features instead
+      // of having to find the toggles. Only flip each the first time (when it
+      // has never been set), so a user who deliberately turned one off later
+      // isn't overridden on a repeat finale.
+      let _btnsPreEnabled = false;
       if (BB.storage.get('SurvivalBtnEnabled') == null) {
         BB.storage.set('SurvivalBtnEnabled', '1');
-        if (typeof window._applyOnboardingGating === 'function') window._applyOnboardingGating();
+        _btnsPreEnabled = true;
       }
+      if (BB.storage.get('AnonBtnEnabled') == null) {
+        BB.storage.set('AnonBtnEnabled', '1');
+        _btnsPreEnabled = true;
+      }
+      if (_btnsPreEnabled && typeof window._applyOnboardingGating === 'function') window._applyOnboardingGating();
 
       // If the What's New popup beat the hint onto the screen, put it away
       // and un-mark it so it re-shows on the next visit instead.
