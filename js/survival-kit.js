@@ -31,6 +31,40 @@ function _esc(s) {
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
+/**
+ * Guarded translation helper. Returns the translated string for `k`
+ * (with optional {var} interpolation via `v`), falling back to the key
+ * itself if the i18n module hasn't loaded yet.
+ *
+ * @param {string} k  dot-notation i18n key (e.g. 'sk.memories.recordTitle')
+ * @param {Object} [v] interpolation vars, e.g. { mood: '🚀 Manic' }
+ * @returns {string}
+ */
+function _skt(k, v) {
+  return (window.BB && window.BB.t) ? window.BB.t(k, v) : k;
+}
+
+/**
+ * Mood-label lookup that respects the active language. The storage keys
+ * stay stable ('manic', 'elevated', 'good', 'low', 'depressed', 'hypomanic',
+ * 'stable') — only the displayed text is translated.
+ *
+ * @param {string} moodKey
+ * @returns {string}
+ */
+function _sktMood(moodKey) {
+  var map = {
+    manic: 'sk.moodLabels.manic',
+    elevated: 'sk.moodLabels.elevated',
+    hypomanic: 'sk.moodLabels.elevated',
+    good: 'sk.moodLabels.good',
+    stable: 'sk.moodLabels.good',
+    low: 'sk.moodLabels.low',
+    depressed: 'sk.moodLabels.depressed',
+  };
+  return map[moodKey] ? _skt(map[moodKey]) : moodKey;
+}
+
 // ── BLOCK 1: section/accordion toggling, page-load init ──
 // ── SECTION COLLAPSE ──
     function toggleSection(headerEl) {
@@ -58,7 +92,7 @@ function _esc(s) {
       const btn = document.getElementById('rememberToggleBtn');
       const isHidden = overlay.style.display === 'block';
       overlay.style.display = isHidden ? 'none' : 'block';
-      btn.textContent = isHidden ? 'Hide' : 'Show';
+      btn.textContent = isHidden ? _skt('sk.mindGames.hide') : _skt('sk.mindGames.show');
       _skUpdateTicks();
     }
 
@@ -181,9 +215,9 @@ function _esc(s) {
           _modal.id = 'skWelcomeModal';
           _modal.innerHTML = `<div style="background:linear-gradient(135deg,var(--brand-primary-mid),var(--brand-primary-light));border-radius:20px;padding:28px 32px;text-align:center;max-width:300px;width:calc(100vw - 64px);box-shadow:0 12px 48px rgba(255,107,0,0.55);">
             <div style="font-size:2.6em;margin-bottom:10px;">🧰</div>
-            <div style="font-weight:800;font-size:1.1em;color:white;margin-bottom:10px;">Your Survival Kit</div>
-            <div style="font-size:0.88em;color:rgba(255,255,255,0.9);line-height:1.5;margin-bottom:16px;">The survival kit is used to personalise your experience and supplement the mood journal. Come check it out later.</div>
-            <div style="font-size:0.78em;color:rgba(255,255,255,0.65);">Tap to dismiss</div>
+            <div style="font-weight:800;font-size:1.1em;color:white;margin-bottom:10px;">${_skt('sk.welcome.title')}</div>
+            <div style="font-size:0.88em;color:rgba(255,255,255,0.9);line-height:1.5;margin-bottom:16px;">${_skt('sk.welcome.body')}</div>
+            <div style="font-size:0.78em;color:rgba(255,255,255,0.65);">${_skt('sk.welcome.dismiss')}</div>
           </div>`;
           Object.assign(_modal.style, {
             position:'fixed', inset:'0', display:'flex', alignItems:'center', justifyContent:'center',
@@ -233,9 +267,12 @@ function _esc(s) {
       const firstName = (fullName || '').trim().split(/\s+/)[0] || '';
       if (firstName) {
         const possessive = firstName.endsWith('s') ? `${firstName}'` : `${firstName}'s`;
-        el.innerHTML = `${possessive}<br>Bipolar Survival Kit`;
+        // English uses a possessive ("James's …") via {possessive}; languages
+        // like French use the plain name ("… de {name}"). Both vars are passed
+        // so each locale string can pick whichever placeholder it needs.
+        el.innerHTML = _skt('sk.guideTitle.possessive', { possessive: _esc(possessive), name: _esc(firstName) });
       } else {
-        el.textContent = 'Bipolar Survival Kit';
+        el.textContent = _skt('sk.guideTitle.plain');
       }
     }
     // Apply from localStorage immediately (before Firestore loads)
@@ -583,7 +620,7 @@ function _esc(s) {
             // Unknown med: show simple accordion with just the name/dosage
             primaryHTML += `<div class="accordion">
               <button class="accordion-header" onclick="toggleAccordion(this)">${med.name}${med.dosage ? ' (' + med.dosage + ')' : ''}<span class="chevron">▼</span></button>
-              <div class="accordion-body"><p>Listed in your current medications. Ask your prescriber about this medication.</p></div>
+              <div class="accordion-body"><p>${_skt('sk.meds.unknownBody')}</p></div>
             </div>`;
           }
         });
@@ -609,7 +646,7 @@ function _esc(s) {
       const btn = document.getElementById('moreMedicationsBtn');
       const visible = section.style.display !== 'none';
       section.style.display = visible ? 'none' : 'block';
-      btn.textContent = visible ? 'More ▼' : 'Less ▲';
+      btn.textContent = visible ? _skt('sk.meds.more') : _skt('sk.meds.less');
     }
     window.toggleMoreMedications = toggleMoreMedications;
 
@@ -641,7 +678,7 @@ function _esc(s) {
       const display = document.getElementById('currentMedDisplay');
       if (!display) return;
       if (list.length === 0) {
-        display.innerHTML = '<em>Tap Edit to add your current medication</em>';
+        display.innerHTML = '<em>' + _esc(_skt('sk.meds.currentEmpty')) + '</em>';
       } else {
         display.innerHTML = list.map(m =>
           `<div>• <strong>${escMed(m.name)}</strong>${m.dosage ? ' — ' + escMed(m.dosage) : ''}</div>`
@@ -654,7 +691,7 @@ function _esc(s) {
       const el = document.getElementById('medInfoList');
       if (!el) return;
       if (list.length === 0) {
-        el.innerHTML = '<p style="text-align:center; color:#adb5bd; font-style:italic; font-size:0.9em; margin:8px 0 0;">No medications added yet</p>';
+        el.innerHTML = '<p style="text-align:center; color:#adb5bd; font-style:italic; font-size:0.9em; margin:8px 0 0;">' + _esc(_skt('sk.meds.emptyList')) + '</p>';
       } else {
         el.innerHTML = list.map((m, i) => `
           <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 12px; background:#f8f9fa; border-radius:10px; margin-bottom:8px;">
@@ -679,7 +716,7 @@ function _esc(s) {
       if (!addBtn) return;
       const originalHTML = addBtn.innerHTML;
       const originalOnclick = addBtn.getAttribute('onclick');
-      addBtn.innerHTML = 'Save Changes';
+      addBtn.innerHTML = _skt('sk.meds.saveChanges');
       addBtn.onclick = () => {
         const name = document.getElementById('medNameInput').value.trim();
         const dosage = document.getElementById('medDosageInput').value.trim();
@@ -782,7 +819,7 @@ function _esc(s) {
       const el = document.getElementById('gratitudeList');
       if (!el) return;
       if (list.length === 0) {
-        el.innerHTML = '<p style="color:var(--text-light,#6c757d);font-style:italic;font-size:0.9em;">Nothing added yet.</p>';
+        el.innerHTML = '<p style="color:var(--text-light,#6c757d);font-style:italic;font-size:0.9em;">' + _esc(_skt('sk.gratitude.empty')) + '</p>';
         return;
       }
       // `g` is user-typed gratitude text — escape before splicing into innerHTML.
@@ -796,8 +833,8 @@ function _esc(s) {
 
     function openAddGratitudeModal() {
       _editingGratitudeIndex = null;
-      document.getElementById('gratitudeModalTitle').textContent = '🙏 Add Gratitude';
-      document.getElementById('gratitudeSaveBtn').textContent = 'Add';
+      document.getElementById('gratitudeModalTitle').textContent = _skt('sk.gratitude.addTitle');
+      document.getElementById('gratitudeSaveBtn').textContent = _skt('sk.gratitude.addSaveBtn');
       document.getElementById('gratitudeInput').value = '';
       document.getElementById('addGratitudeModal').style.display = 'flex';
       setTimeout(() => document.getElementById('gratitudeInput').focus(), 100);
@@ -825,15 +862,15 @@ function _esc(s) {
     function editGratitudeItem(i) {
       const list = loadGratitude();
       _editingGratitudeIndex = i;
-      document.getElementById('gratitudeModalTitle').textContent = '🙏 Edit Gratitude';
-      document.getElementById('gratitudeSaveBtn').textContent = 'Save';
+      document.getElementById('gratitudeModalTitle').textContent = _skt('sk.gratitude.editTitle');
+      document.getElementById('gratitudeSaveBtn').textContent = _skt('sk.gratitude.editSaveBtn');
       document.getElementById('gratitudeInput').value = list[i];
       document.getElementById('addGratitudeModal').style.display = 'flex';
       setTimeout(() => document.getElementById('gratitudeInput').focus(), 100);
     }
 
     function deleteGratitudeItem(i) {
-      if (!confirm('Remove this item?')) return;
+      if (!confirm(_skt('sk.gratitude.confirmRemove'))) return;
       const list = loadGratitude();
       list.splice(i, 1);
       saveGratitudeList(list);
@@ -853,7 +890,7 @@ function _esc(s) {
       const el = document.getElementById('survivalGoalsList');
       if (!el) return;
       if (goals.length === 0) {
-        el.innerHTML = '<p style="color:var(--text-light,#6c757d); font-style:italic; font-size:0.9em;">No goals yet.</p>';
+        el.innerHTML = '<p style="color:var(--text-light,#6c757d); font-style:italic; font-size:0.9em;">' + _esc(_skt('sk.goals.empty')) + '</p>';
         return;
       }
       // `g` is user-typed goal text — escape before splicing into innerHTML.
@@ -911,7 +948,7 @@ function _esc(s) {
       doc.setTextColor(255, 255, 255);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(18);
-      doc.text('🐻 Bipolar Bear — Wall Tracker', pageW / 2, 18, { align: 'center' });
+      doc.text(_skt('sk.goals.pdfHeader'), pageW / 2, 18, { align: 'center' });
 
       // Goals header row
       const tableTop = 34;
@@ -1001,16 +1038,16 @@ function _esc(s) {
             const pdfData = doc.output('datauristring').split(',')[1];
             const result = await Filesystem.writeFile({ path: filename, data: pdfData, directory: 'DOCUMENTS' });
             if (Share) {
-              await Share.share({ title: 'Wall Tracker', url: result.uri, dialogTitle: 'Save or Share Your Wall Tracker' });
+              await Share.share({ title: _skt('sk.goals.pdfShareTitle'), url: result.uri, dialogTitle: _skt('sk.goals.pdfShareDialog') });
             } else {
-              alert('PDF saved to Documents folder! 📄\n\n' + filename);
+              alert(_skt('sk.goals.pdfSaved', { filename: filename }));
             }
           } else {
-            alert('Filesystem plugin not available.');
+            alert(_skt('sk.goals.pdfNoFilesystem'));
           }
         } catch (e) {
           console.error('Native PDF error:', e);
-          alert('Could not save PDF: ' + e.message);
+          alert(_skt('sk.goals.pdfError', { error: e.message }));
         }
       } else {
         doc.save(filename);
@@ -1052,7 +1089,7 @@ function _esc(s) {
     }
 
     function deleteSurvivalGoal(index) {
-      if (!confirm('Remove this goal?')) return;
+      if (!confirm(_skt('sk.goals.confirmRemove'))) return;
       const goals = JSON.parse(localStorage.getItem('dailyGoals') || '[]');
       goals.splice(index, 1);
       localStorage.setItem('dailyGoals', JSON.stringify(goals));
@@ -1064,7 +1101,7 @@ function _esc(s) {
 
     function editSurvivalGoal(index) {
       const goals = JSON.parse(localStorage.getItem('dailyGoals') || '[]');
-      const newText = prompt('Edit goal:', goals[index]);
+      const newText = prompt(_skt('sk.goals.editPrompt'), goals[index]);
       if (newText === null || newText.trim() === '') return;
       goals[index] = newText.trim();
       localStorage.setItem('dailyGoals', JSON.stringify(goals));
@@ -1079,8 +1116,8 @@ function _esc(s) {
       const el = document.getElementById('survivalBudgetDisplay');
       const input = document.getElementById('survivalBudgetInput');
       if (el) el.innerHTML = val
-        ? `<strong>Current budget:</strong> ${val}`
-        : '<em style="color:#adb5bd;">No budget set.</em>';
+        ? _skt('sk.goals.budgetCurrent', { value: _esc(val) })
+        : `<em style="color:#adb5bd;">${_esc(_skt('sk.goals.budgetNone'))}</em>`;
       if (input) input.value = val;
     }
 
@@ -1141,7 +1178,7 @@ function _esc(s) {
               ${_esc(r.title)} <span class="chevron">▼</span>
             </button>
             <div style="display:flex;gap:2px;flex-shrink:0;padding-right:4px;">
-              <button onclick="editReminder(${i})" style="background:none;border:none;cursor:pointer;font-size:1.05em;color:var(--brand-primary);padding:6px 4px;line-height:1;-webkit-tap-highlight-color:transparent;" title="Edit">✏️</button>
+              <button onclick="editReminder(${i})" style="background:none;border:none;cursor:pointer;font-size:1.05em;color:var(--brand-primary);padding:6px 4px;line-height:1;-webkit-tap-highlight-color:transparent;" title="${_esc(_skt('sk.moodDef.edit'))}">✏️</button>
               <button onclick="deleteReminder(${i})" style="background:none;border:none;cursor:pointer;font-size:1.1em;color:#ff6b6b;padding:6px 4px;line-height:1;-webkit-tap-highlight-color:transparent;">✕</button>
             </div>
           </div>
@@ -1161,7 +1198,7 @@ function _esc(s) {
       // Switch save button to update mode
       const saveBtn = document.querySelector('#addReminderModal button[onclick="saveReminder()"]');
       if (saveBtn) {
-        saveBtn.textContent = 'Save Changes';
+        saveBtn.textContent = _skt('sk.faq.saveChanges');
         saveBtn.onclick = function() {
           const title = document.getElementById('reminderTitleInput').value.trim();
           const message = document.getElementById('reminderMessageInput').value.trim();
@@ -1171,7 +1208,7 @@ function _esc(s) {
           closeAddReminderModal();
           renderCustomReminders();
           // Reset button
-          saveBtn.textContent = 'Save';
+          saveBtn.textContent = _skt('sk.faq.save');
           saveBtn.onclick = saveReminder;
         };
       }
@@ -1207,7 +1244,7 @@ function _esc(s) {
     }
 
     function deleteReminder(index) {
-      if (!confirm('Remove this reminder?')) return;
+      if (!confirm(_skt('sk.faq.confirmRemove'))) return;
       const list = loadCustomReminders();
       list.splice(index, 1);
       saveCustomReminders(list);
@@ -1282,7 +1319,7 @@ function _esc(s) {
       if (btn) btn.classList.add('active-mood');
       if (!fromCycle) {
         document.getElementById('memoriesBox').style.display = '';
-        document.getElementById('memoriesMoodLabel').textContent = MEMORY_MOOD_LABELS[mood] || mood;
+        document.getElementById('memoriesMoodLabel').textContent = _sktMood(mood) || mood;
         renderMemoryList();
       }
     }
@@ -1296,7 +1333,7 @@ function _esc(s) {
       const el = document.getElementById('memoriesList');
       if (!el) return;
       if (list.length === 0) {
-        el.innerHTML = '<p style="color:#6c757d;font-style:italic;font-size:0.9em;">No memories yet — tap Record to add one.</p>';
+        el.innerHTML = '<p style="color:#6c757d;font-style:italic;font-size:0.9em;">' + _esc(_skt('sk.memories.empty')) + '</p>';
         return;
       }
       // `text` is user-typed memory content; `date` is also user-set.
@@ -1310,7 +1347,7 @@ function _esc(s) {
               ${date ? `<div style="font-size:0.75em;color:#adb5bd;margin-bottom:2px;">${_esc(date)}</div>` : ''}
               <span style="font-size:0.92em;line-height:1.45;">${_esc(text)}</span>
             </div>
-            <button onclick="editMemory(${i})" style="background:none;border:none;cursor:pointer;font-size:1em;color:#adb5bd;flex-shrink:0;padding:0 4px;line-height:1;-webkit-tap-highlight-color:transparent;" title="Edit">✏️</button>
+            <button onclick="editMemory(${i})" style="background:none;border:none;cursor:pointer;font-size:1em;color:#adb5bd;flex-shrink:0;padding:0 4px;line-height:1;-webkit-tap-highlight-color:transparent;" title="${_esc(_skt('sk.moodDef.edit'))}">✏️</button>
             <button onclick="deleteMemory(${i})" style="background:none;border:none;cursor:pointer;font-size:1.1em;color:#ff6b6b;flex-shrink:0;padding:0 2px;line-height:1;-webkit-tap-highlight-color:transparent;">✕</button>
           </div>`;
       }).join('');
@@ -1319,7 +1356,7 @@ function _esc(s) {
     function openAddMemoryModal() {
       if (!_memoryMood) return;
       _editingMemoryIndex = null;
-      document.getElementById('addMemoryModalTitle').textContent = `Record a Memory — ${MEMORY_MOOD_LABELS[_memoryMood]}`;
+      document.getElementById('addMemoryModalTitle').textContent = _skt('sk.memories.recordTitle', { mood: _sktMood(_memoryMood) });
       document.getElementById('memoryInput').value = '';
       document.getElementById('memoryDateInput').value = '';
       _lockBodyScroll();
@@ -1334,7 +1371,7 @@ function _esc(s) {
       const entry = list[index];
       if (!entry) return;
       _editingMemoryIndex = index;
-      document.getElementById('addMemoryModalTitle').textContent = `Edit Memory — ${MEMORY_MOOD_LABELS[_memoryMood]}`;
+      document.getElementById('addMemoryModalTitle').textContent = _skt('sk.memories.editTitle', { mood: _sktMood(_memoryMood) });
       document.getElementById('memoryInput').value = typeof entry === 'object' ? entry.text : entry;
       document.getElementById('memoryDateInput').value = typeof entry === 'object' && entry.date ? entry.date : '';
       _lockBodyScroll();
@@ -1368,7 +1405,7 @@ function _esc(s) {
 
     function deleteMemory(index) {
       if (!_memoryMood) return;
-      if (!confirm('Remove this memory?')) return;
+      if (!confirm(_skt('sk.memories.confirmRemove'))) return;
       const data = loadMemories();
       if (data[_memoryMood]) { data[_memoryMood].splice(index, 1); }
       saveMemories(data);
@@ -1411,7 +1448,7 @@ function _esc(s) {
       const btn = document.querySelector(`#coping-strategies .mood-icon-btn.${cssClass}`);
       if (btn) btn.classList.add('active-mood');
       document.getElementById('copingStrategiesBox').style.display = '';
-      document.getElementById('copingMoodLabel').textContent = COPING_MOOD_LABELS[mood] || mood;
+      document.getElementById('copingMoodLabel').textContent = _sktMood(mood) || mood;
       renderCopingList();
     }
 
