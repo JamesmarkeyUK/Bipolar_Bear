@@ -322,7 +322,19 @@
 //       word for a chosen handle) across all 10 locales + hardcoded HTML/JS
 //       copy. Internal identifiers untouched (Firestore bbAnonMonikas,
 //       localStorage Anon_monika, element ids, i18n key names, openMonikaSettings).
-const CACHE_NAME = 'bipolarbear-v100';
+// v101: EN/FR language coverage pass — wired the remaining hardcoded English
+//       strings on the Bipolar Anonymous board (anonymous.js: relative times,
+//       button states, empty/error states, medication subtitles, status rows,
+//       aria-labels) through BB.t, and fully internationalised the public
+//       marketing landing pages (welcome.html, welcome-anonymous.html,
+//       js/welcome.js — new lp.* namespace, data-no-lang-picker opt-out) and
+//       the Survival Kit (survival-kit.html, js/survival-kit.js — new sk.*
+//       namespace covering the mood scale, strategies, mind games, reading/
+//       media, and dynamic modal titles/buttons). English + French added in
+//       js/shared/i18n.js. Touches js/shared/i18n.js, js/anonymous.js,
+//       welcome.html, welcome-anonymous.html, js/welcome.js, survival-kit.html,
+//       js/survival-kit.js.
+const CACHE_NAME = 'bipolarbear-v101';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
@@ -354,6 +366,7 @@ const STATIC_ASSETS = [
   './js/shared/onboarding.js',
   './js/shared/medications.js',
   './js/shared/version-check.js',
+  './js/shared/i18n.js',
 
   // NOTE: /version.json is deliberately NOT precached. It must always be
   // fetched fresh so a new release reaches stale clients on next page load
