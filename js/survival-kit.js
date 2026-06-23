@@ -174,7 +174,7 @@ function _sktMood(moodKey) {
       const hint = document.createElement('div');
       hint.id = 'moodDefHintEl';
       hint.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-bottom:6px;';
-      hint.innerHTML = '<span style="font-size:0.78em;font-weight:700;font-style:italic;color:rgba(255,255,255,0.9);font-family:\'Georgia\',serif;letter-spacing:0.01em;white-space:nowrap;text-shadow:0 1px 4px rgba(0,0,0,0.5);">Write what this mood feels like for you</span><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="8" y1="1" x2="8" y2="12" stroke="rgba(255,255,255,0.85)" stroke-width="2" stroke-linecap="round"/><polyline points="3,7 8,13 13,7" stroke="rgba(255,255,255,0.85)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      hint.innerHTML = '<span style="font-size:0.78em;font-weight:700;font-style:italic;color:rgba(255,255,255,0.9);font-family:\'Georgia\',serif;letter-spacing:0.01em;white-space:nowrap;text-shadow:0 1px 4px rgba(0,0,0,0.5);">' + _esc(_skt('sk.moodDef.hint')) + '</span><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="8" y1="1" x2="8" y2="12" stroke="rgba(255,255,255,0.85)" stroke-width="2" stroke-linecap="round"/><polyline points="3,7 8,13 13,7" stroke="rgba(255,255,255,0.85)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
       area.insertBefore(hint, area.firstChild);
     }
 
@@ -1459,7 +1459,7 @@ function _sktMood(moodKey) {
       const el = document.getElementById('copingStrategiesList');
       if (!el) return;
       if (list.length === 0) {
-        el.innerHTML = '<p style="color:#6c757d;font-style:italic;font-size:0.9em;">No strategies yet — tap Add to get started.</p>';
+        el.innerHTML = '<p style="color:#6c757d;font-style:italic;font-size:0.9em;">' + _esc(_skt('sk.strategies.empty')) + '</p>';
         return;
       }
       // `s` is user-typed coping strategy — escape before splicing into innerHTML.
@@ -1477,7 +1477,7 @@ function _sktMood(moodKey) {
     function openAddCopingModal() {
       if (!_copingMood) return;
       _editingCopingIndex = null;
-      document.getElementById('addCopingModalTitle').textContent = `Add Strategy — ${COPING_MOOD_LABELS[_copingMood]}`;
+      document.getElementById('addCopingModalTitle').textContent = _skt('sk.strategies.addTitle', { mood: _sktMood(_copingMood) });
       document.getElementById('copingStrategyInput').value = '';
       _lockBodyScroll();
       document.getElementById('addCopingModal').style.display = 'flex';
@@ -1488,7 +1488,7 @@ function _sktMood(moodKey) {
       if (!_copingMood) return;
       _editingCopingIndex = index;
       const data = loadCopingStrategies();
-      document.getElementById('addCopingModalTitle').textContent = `Edit Strategy — ${COPING_MOOD_LABELS[_copingMood]}`;
+      document.getElementById('addCopingModalTitle').textContent = _skt('sk.strategies.editTitle', { mood: _sktMood(_copingMood) });
       document.getElementById('copingStrategyInput').value = (data[_copingMood] || [])[index] || '';
       _lockBodyScroll();
       document.getElementById('addCopingModal').style.display = 'flex';
@@ -1520,7 +1520,7 @@ function _sktMood(moodKey) {
 
     function deleteCopingStrategy(index) {
       if (!_copingMood) return;
-      if (!confirm('Remove this strategy?')) return;
+      if (!confirm(_skt('sk.strategies.confirmRemove'))) return;
       const data = loadCopingStrategies();
       if (data[_copingMood]) { data[_copingMood].splice(index, 1); }
       saveCopingStrategies(data);
@@ -1565,20 +1565,20 @@ function _sktMood(moodKey) {
         el.innerHTML = `
           <div style="background:rgba(255,149,0,0.08);border:1.5px solid rgba(255,149,0,0.3);border-radius:10px;padding:12px 14px;">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-              <span style="font-size:0.75em;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--brand-primary);">My Definition</span>
+              <span style="font-size:0.75em;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--brand-primary);">${_esc(_skt('sk.moodDef.myDefinition'))}</span>
               <div style="display:flex;gap:8px;">
-                <button onclick="openMoodDefModal('${mood}')" style="background:none;border:none;cursor:pointer;font-size:0.8em;color:var(--brand-primary);font-weight:600;padding:0;-webkit-tap-highlight-color:transparent;">Edit</button>
-                <button onclick="deleteMoodDefinition('${mood}')" style="background:none;border:none;cursor:pointer;font-size:0.8em;color:#ff6b6b;font-weight:600;padding:0;-webkit-tap-highlight-color:transparent;">Remove</button>
+                <button onclick="openMoodDefModal('${mood}')" style="background:none;border:none;cursor:pointer;font-size:0.8em;color:var(--brand-primary);font-weight:600;padding:0;-webkit-tap-highlight-color:transparent;">${_esc(_skt('sk.moodDef.edit'))}</button>
+                <button onclick="deleteMoodDefinition('${mood}')" style="background:none;border:none;cursor:pointer;font-size:0.8em;color:#ff6b6b;font-weight:600;padding:0;-webkit-tap-highlight-color:transparent;">${_esc(_skt('sk.moodDef.remove'))}</button>
               </div>
             </div>
             <div style="font-size:0.9em;color:#495057;line-height:1.5;font-style:italic;">"${text}"</div>
           </div>
-          <button onclick="_toggleBipolarDef('${mood}',this)" style="background:none;border:none;cursor:pointer;font-size:0.8em;color:#adb5bd;font-weight:600;padding:4px 0;margin-top:4px;-webkit-tap-highlight-color:transparent;" id="bipolarDefToggle-${mood}">▸ Bipolar UK definition</button>`;
+          <button onclick="_toggleBipolarDef('${mood}',this)" style="background:none;border:none;cursor:pointer;font-size:0.8em;color:#adb5bd;font-weight:600;padding:4px 0;margin-top:4px;-webkit-tap-highlight-color:transparent;" id="bipolarDefToggle-${mood}">${_esc(_skt('sk.moodDef.bipolarUkClosed'))}</button>`;
         // Collapse the bipolar def
         if (defWrap) { defWrap.style.display = 'none'; }
       } else {
         el.innerHTML = `
-          <button onclick="openMoodDefModal('${mood}')" style="width:100%;padding:10px;background:none;border:2px dashed var(--brand-primary);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.9em;cursor:pointer;margin-top:4px;-webkit-tap-highlight-color:transparent;">+ Add your definition</button>`;
+          <button onclick="openMoodDefModal('${mood}')" style="width:100%;padding:10px;background:none;border:2px dashed var(--brand-primary);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.9em;cursor:pointer;margin-top:4px;-webkit-tap-highlight-color:transparent;">${_esc(_skt('sk.moodDef.addBtn'))}</button>`;
         // Show bipolar def expanded when no custom def
         if (defWrap) { defWrap.style.display = ''; }
       }
@@ -1589,7 +1589,7 @@ function _sktMood(moodKey) {
       if (!defWrap) return;
       const isHidden = defWrap.style.display === 'none';
       defWrap.style.display = isHidden ? '' : 'none';
-      btn.textContent = isHidden ? '▾ Bipolar UK definition' : '▸ Bipolar UK definition';
+      btn.textContent = isHidden ? _skt('sk.moodDef.bipolarUkOpen') : _skt('sk.moodDef.bipolarUkClosed');
     }
     window._toggleBipolarDef = _toggleBipolarDef;
 
@@ -1600,7 +1600,7 @@ function _sktMood(moodKey) {
     function openMoodDefModal(mood) {
       _moodDefEditing = mood;
       const data = loadMoodDefinitions();
-      document.getElementById('moodDefModalTitle').textContent = 'My definition — ' + (MOOD_DEF_LABELS[mood] || mood);
+      document.getElementById('moodDefModalTitle').textContent = _skt('sk.moodDef.modalTitleMood', { mood: _sktMood(mood) });
       document.getElementById('moodDefInput').value = data[mood] || '';
       _lockBodyScroll();
       document.getElementById('moodDefModal').style.display = 'flex';
@@ -1625,7 +1625,7 @@ function _sktMood(moodKey) {
     }
 
     function deleteMoodDefinition(mood) {
-      if (!confirm('Remove your definition for this mood?')) return;
+      if (!confirm(_skt('sk.moodDef.confirmRemove'))) return;
       const data = loadMoodDefinitions();
       delete data[mood];
       saveMoodDefinitions(data);
@@ -1634,13 +1634,13 @@ function _sktMood(moodKey) {
 
     // ── Survival Kit achievement check ──
     const _KIT_ACHIEVEMENTS = [
-      { id: 'first_definition', emoji: '📖', title: 'Know Thyself',  check: () => { const d = JSON.parse(localStorage.getItem('moodDefinitions') || '{}'); return Object.values(d).some(v => v && String(v).trim()); } },
-      { id: 'first_coping',     emoji: '🛡️', title: 'First Defence', check: () => { const s = JSON.parse(localStorage.getItem('copingStrategies') || '{}'); return Object.values(s).some(a => Array.isArray(a) && a.length > 0); } },
-      { id: 'first_medication', emoji: '💊', title: 'Medicated',     check: () => { const m = JSON.parse(localStorage.getItem('currentMedList') || '[]'); return Array.isArray(m) && m.length > 0; } },
-      { id: 'first_goal',       emoji: '🎯', title: 'Goal Setter',   check: () => { const g = JSON.parse(localStorage.getItem('dailyGoals') || '[]'); return Array.isArray(g) && g.length > 0; } },
-      { id: 'first_memory',     emoji: '💭', title: 'Memory Keeper',  check: () => { const m = JSON.parse(localStorage.getItem('moodMemories') || '{}'); return Object.values(m).some(a => Array.isArray(a) && a.length > 0); } },
-      { id: 'first_commitment', emoji: '🤝', title: 'Committed',      check: () => { const c = JSON.parse(localStorage.getItem('myCommitments') || '[]'); return Array.isArray(c) && c.length > 0; } },
-      { id: 'survival_kit',     emoji: '🧰', title: 'Fully Prepared',check: () => {
+      { id: 'first_definition', emoji: '📖', titleKey: 'sk.ach.firstDefinition', check: () => { const d = JSON.parse(localStorage.getItem('moodDefinitions') || '{}'); return Object.values(d).some(v => v && String(v).trim()); } },
+      { id: 'first_coping',     emoji: '🛡️', titleKey: 'sk.ach.firstCoping', check: () => { const s = JSON.parse(localStorage.getItem('copingStrategies') || '{}'); return Object.values(s).some(a => Array.isArray(a) && a.length > 0); } },
+      { id: 'first_medication', emoji: '💊', titleKey: 'sk.ach.firstMedication', check: () => { const m = JSON.parse(localStorage.getItem('currentMedList') || '[]'); return Array.isArray(m) && m.length > 0; } },
+      { id: 'first_goal',       emoji: '🎯', titleKey: 'sk.ach.firstGoal', check: () => { const g = JSON.parse(localStorage.getItem('dailyGoals') || '[]'); return Array.isArray(g) && g.length > 0; } },
+      { id: 'first_memory',     emoji: '💭', titleKey: 'sk.ach.firstMemory', check: () => { const m = JSON.parse(localStorage.getItem('moodMemories') || '{}'); return Object.values(m).some(a => Array.isArray(a) && a.length > 0); } },
+      { id: 'first_commitment', emoji: '🤝', titleKey: 'sk.ach.firstCommitment', check: () => { const c = JSON.parse(localStorage.getItem('myCommitments') || '[]'); return Array.isArray(c) && c.length > 0; } },
+      { id: 'survival_kit',     emoji: '🧰', titleKey: 'sk.ach.survivalKit', check: () => {
         const d = JSON.parse(localStorage.getItem('moodDefinitions') || '{}');
         const s = JSON.parse(localStorage.getItem('copingStrategies') || '{}');
         const m = JSON.parse(localStorage.getItem('currentMedList') || '[]');
@@ -1658,7 +1658,7 @@ function _sktMood(moodKey) {
       if (existing) existing.remove();
       const toast = document.createElement('div');
       toast.id = 'achievementToast';
-      toast.innerHTML = `<div style="font-size:2em;margin-bottom:4px;">${emoji}</div><div style="font-weight:700;font-size:0.95em;margin-bottom:2px;">Achievement Unlocked!</div><div style="font-weight:600;font-size:0.88em;">${title}</div><div style="font-size:0.75em;color:rgba(255,255,255,0.8);margin-top:4px;">Tap to dismiss</div>`;
+      toast.innerHTML = `<div style="font-size:2em;margin-bottom:4px;">${emoji}</div><div style="font-weight:700;font-size:0.95em;margin-bottom:2px;">${_esc(_skt('sk.ach.unlocked'))}</div><div style="font-weight:600;font-size:0.88em;">${_esc(title)}</div><div style="font-size:0.75em;color:rgba(255,255,255,0.8);margin-top:4px;">${_esc(_skt('sk.ach.tapDismiss'))}</div>`;
       Object.assign(toast.style, {
         position:'fixed', bottom:'80px', left:'50%', transform:'translateX(-50%) translateY(20px)',
         background:'linear-gradient(135deg,var(--brand-primary-mid),var(--brand-primary-light))', color:'white',
@@ -1688,7 +1688,7 @@ function _sktMood(moodKey) {
         if (newlyUnlocked.length > 0) {
           // Prefer showing the achievement that matches what triggered this check
           const toastAch = newlyUnlocked.find(a => a.id === triggerId) || newlyUnlocked[0];
-          _showAchievementToast(toastAch.emoji, toastAch.title);
+          _showAchievementToast(toastAch.emoji, _skt(toastAch.titleKey));
         }
       } catch(e) {}
     }
@@ -1750,12 +1750,12 @@ function _sktMood(moodKey) {
     let _stepIndex = 0;
 
     function _renderStep() {
-      const s = ALL_STEPS[_stepIndex];
-      document.getElementById('stepCounter').textContent = `Step ${_stepIndex + 1} of ${ALL_STEPS.length}`;
-      document.getElementById('stepLabel').textContent = s.label;
-      document.getElementById('stepText').innerHTML = s.text;
+      const n = _stepIndex + 1;
+      document.getElementById('stepCounter').textContent = _skt('sk.steps.counterDynamic', { n: n, total: ALL_STEPS.length });
+      document.getElementById('stepLabel').textContent = _skt('sk.steps.labels.s' + n);
+      document.getElementById('stepText').innerHTML = _skt('sk.steps.text.s' + n);
       document.getElementById('stepPrevBtn').style.opacity = _stepIndex === 0 ? '0.35' : '1';
-      document.getElementById('stepNextBtn').textContent = _stepIndex === ALL_STEPS.length - 1 ? 'Start over' : 'Next →';
+      document.getElementById('stepNextBtn').textContent = _stepIndex === ALL_STEPS.length - 1 ? _skt('sk.steps.startOver') : _skt('sk.steps.next');
     }
 
     function nextStep() {
@@ -1803,10 +1803,10 @@ function _sktMood(moodKey) {
       if (_commitmentIndex >= list.length) _commitmentIndex = list.length - 1;
       if (empty) empty.style.display = 'none';
       if (viewer) viewer.style.display = '';
-      document.getElementById('commitmentCounter').textContent = `Commitment ${_commitmentIndex + 1} of ${list.length}`;
+      document.getElementById('commitmentCounter').textContent = _skt('sk.steps.commitmentCounter', { n: _commitmentIndex + 1, total: list.length });
       document.getElementById('commitmentText').textContent = list[_commitmentIndex];
       document.getElementById('commitPrevBtn').style.opacity = _commitmentIndex === 0 ? '0.35' : '1';
-      document.getElementById('commitNextBtn').textContent = _commitmentIndex === list.length - 1 ? 'Start over' : 'Next →';
+      document.getElementById('commitNextBtn').textContent = _commitmentIndex === list.length - 1 ? _skt('sk.steps.startOver') : _skt('sk.steps.next');
     }
 
     function nextCommitment() {
@@ -1823,7 +1823,7 @@ function _sktMood(moodKey) {
 
     function openAddCommitmentModal() {
       _editingCommitment = false;
-      document.getElementById('commitmentModalTitle').textContent = 'Add Commitment';
+      document.getElementById('commitmentModalTitle').textContent = _skt('sk.steps.addCommitmentTitle');
       document.getElementById('commitmentInput').value = '';
       _lockBodyScroll();
       document.getElementById('commitmentModal').style.display = 'flex';
@@ -1833,7 +1833,7 @@ function _sktMood(moodKey) {
     function openEditCommitmentModal() {
       const list = loadCommitments();
       _editingCommitment = true;
-      document.getElementById('commitmentModalTitle').textContent = 'Edit Commitment';
+      document.getElementById('commitmentModalTitle').textContent = _skt('sk.steps.editCommitmentTitle');
       document.getElementById('commitmentInput').value = list[_commitmentIndex] || '';
       _lockBodyScroll();
       document.getElementById('commitmentModal').style.display = 'flex';
@@ -1862,7 +1862,7 @@ function _sktMood(moodKey) {
     }
 
     function deleteCommitment() {
-      if (!confirm('Remove this commitment?')) return;
+      if (!confirm(_skt('sk.steps.confirmRemoveCommitment'))) return;
       const list = loadCommitments();
       list.splice(_commitmentIndex, 1);
       if (_commitmentIndex > 0) _commitmentIndex--;
@@ -1881,10 +1881,19 @@ function _sktMood(moodKey) {
     renderCommitments();
 
     function openStepsModal(key) {
-      const data = stepsData[key];
-      document.getElementById('stepsModalTitle').textContent = data.title;
-      document.getElementById('stepsModalBody').innerHTML =
-        '<ul>' + data.items.map(i => `<li>${i}</li>`).join('') + '</ul>';
+      // key is 'steps1' | 'steps2' | 'steps3'. Titles and step ranges come
+      // from the i18n catalogue so the modal follows the active language.
+      const groups = {
+        steps1: { titleKey: 'sk.steps.modal.group1Title', from: 1, to: 3 },
+        steps2: { titleKey: 'sk.steps.modal.group2Title', from: 4, to: 10 },
+        steps3: { titleKey: 'sk.steps.modal.group3Title', from: 11, to: 12 },
+      };
+      const g = groups[key];
+      if (!g) return;
+      document.getElementById('stepsModalTitle').textContent = _skt(g.titleKey);
+      let items = '';
+      for (let n = g.from; n <= g.to; n++) items += `<li>${_skt('sk.steps.text.s' + n)}</li>`;
+      document.getElementById('stepsModalBody').innerHTML = '<ul>' + items + '</ul>';
       document.getElementById('stepsModal').classList.add('active');
     }
 
@@ -2180,16 +2189,16 @@ function _sktMood(moodKey) {
         const phoneMatch = contact.match(/[\d\s\+\-\(\)]{7,}/);
         const phoneHref = phoneMatch ? `tel:${phoneMatch[0].replace(/\s/g,'')}` : null;
         area.innerHTML = `
-          <div style="font-size:0.88em;color:rgba(255,255,255,0.85);margin-bottom:8px;font-weight:600;">📞 Emergency Contact</div>
+          <div style="font-size:0.88em;color:rgba(255,255,255,0.85);margin-bottom:8px;font-weight:600;">${_esc(_skt('sk.crisis.ecLabel'))}</div>
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;">
             ${phoneHref
-              ? `<a href="${phoneHref}" class="crisis-btn" style="font-size:0.95em;padding:10px 20px;">${contact}</a>`
-              : `<span style="color:white;font-weight:600;">${contact}</span>`}
-            <button type="button" onclick="openEmergencyContactForm()" style="background:rgba(255,255,255,0.15);color:white;border:1.5px solid rgba(255,255,255,0.4);border-radius:8px;padding:8px 14px;font-size:0.82em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Edit</button>
+              ? `<a href="${phoneHref}" class="crisis-btn" style="font-size:0.95em;padding:10px 20px;">${_esc(contact)}</a>`
+              : `<span style="color:white;font-weight:600;">${_esc(contact)}</span>`}
+            <button type="button" onclick="openEmergencyContactForm()" style="background:rgba(255,255,255,0.15);color:white;border:1.5px solid rgba(255,255,255,0.4);border-radius:8px;padding:8px 14px;font-size:0.82em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">${_esc(_skt('sk.crisis.ecEdit'))}</button>
           </div>`;
       } else {
         area.innerHTML = `
-          <button type="button" onclick="openEmergencyContactForm()" style="background:rgba(255,255,255,0.15);color:white;border:1.5px solid rgba(255,255,255,0.4);border-radius:10px;padding:10px 20px;font-size:0.9em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">+ Add Emergency Contact</button>`;
+          <button type="button" onclick="openEmergencyContactForm()" style="background:rgba(255,255,255,0.15);color:white;border:1.5px solid rgba(255,255,255,0.4);border-radius:10px;padding:10px 20px;font-size:0.9em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">${_esc(_skt('sk.crisis.ecAdd'))}</button>`;
       }
     }
 
@@ -2260,7 +2269,7 @@ function _sktMood(moodKey) {
       if (window.db && window.currentUser) {
         try { await window.db.collection('personalDetails').doc(window.currentUser.uid).set(data, { merge: true }); } catch(e) {}
       }
-      alert('✅ Personal details saved!');
+      alert(_skt('sk.pd.saved'));
       closePersonalDetailsModal();
     }
     window.showPersonalDetailsModal = showPersonalDetailsModal;
