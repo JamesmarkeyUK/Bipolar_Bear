@@ -315,7 +315,7 @@ function _updateLogoCursor() {
   if (!btn) return;
   if (_bbUser) {
     btn.style.cursor = 'pointer';
-    btn.title = 'Back to Bipolar Bear';
+    btn.title = _wt('anon.ui.backToBB');
   } else {
     btn.style.cursor = 'default';
     btn.title = '';
@@ -358,10 +358,10 @@ function num(n, fallback) {
 }
 
 function timeAgo(ts) {
-  if (!ts) return 'now';
+  if (!ts) return _wt('anon.time.now');
   const ms = ts.toMillis ? ts.toMillis() : (ts instanceof Date ? ts.getTime() : ts);
   const s = Math.floor((Date.now() - ms) / 1000);
-  if (s < 60)   return 'now';
+  if (s < 60)   return _wt('anon.time.now');
   if (s < 3600)  return Math.floor(s / 60) + 'm';
   if (s < 86400) return Math.floor(s / 3600) + 'h';
   return Math.floor(s / 86400) + 'd';
@@ -527,7 +527,7 @@ function setupVerify() {
     clearError();
     sendBtn.disabled = true;
     const origText = sendBtn.textContent;
-    sendBtn.textContent = 'Sending…';
+    sendBtn.textContent = _wt('anon.ui.sending');
     try {
       // Reviewer bypass: skip the email round-trip for the demo address and go
       // straight to the code step (the fixed REVIEW_CODE is checked on verify).
@@ -610,7 +610,7 @@ function setupVerify() {
     clearError();
     verifyBtn.disabled  = true;
     const origText = verifyBtn.textContent;
-    verifyBtn.textContent = 'Verifying…';
+    verifyBtn.textContent = _wt('anon.ui.verifying');
     try {
       if (_pendingEmail.toLowerCase() === REVIEW_EMAIL) {
         // Reviewer bypass: validate the fixed demo code locally, then make sure
@@ -755,13 +755,13 @@ function setupMonika() {
     if (monika.length < 2) return;
     const errEl = document.getElementById('monika-error');
     btn.disabled = true;
-    btn.textContent = 'Checking…';
+    btn.textContent = _wt('anon.ui.checking');
     try {
       if (await isMonikaInUse(monika, null)) {
-        errEl.textContent  = 'That name is already taken — please choose another.';
+        errEl.textContent  = _wt('anon.ui.nameTaken');
         errEl.style.display = 'block';
         btn.disabled = false;
-        btn.textContent = 'That\'s me →';
+        btn.textContent = _wt('anon.monika.btn');
         return;
       }
     } catch (e) { /* network error — allow through */ }
@@ -1024,11 +1024,11 @@ function setupMedDefine(onDone) {
   const sub = document.getElementById('med-define-sub');
   if (sub) {
     if (_bbUser && medList.length > 0) {
-      sub.textContent = 'These are your current medications from BipolarBear. Edit or add more, then continue.';
+      sub.textContent = _wt('anon.ui.medSubBbList');
     } else if (_bbUser) {
-      sub.textContent = 'Add your current medications. Changes will also update your BipolarBear app.';
+      sub.textContent = _wt('anon.ui.medSubBbAdd');
     } else {
-      sub.textContent = 'Add your current medications. Only the name is visible on posts — dosage stays private.';
+      sub.textContent = _wt('anon.medDefine.sub');
     }
   }
 
@@ -1036,7 +1036,7 @@ function setupMedDefine(onDone) {
     const el = document.getElementById('anon-med-list-wrap');
     if (!el) return;
     if (!medList.length) {
-      el.innerHTML = '<p style="color:var(--muted);font-size:13px;text-align:center;margin:4px 0 10px;">No medications added yet</p>';
+      el.innerHTML = '<p style="color:var(--muted);font-size:13px;text-align:center;margin:4px 0 10px;">' + esc(_wt('anon.ui.noMedsYet')) + '</p>';
       return;
     }
     el.innerHTML = medList.map((m, i) => `
@@ -1087,7 +1087,7 @@ function openMedSettings() {
     const el = document.getElementById('med-ov-list');
     if (!el) return;
     if (!medList.length) {
-      el.innerHTML = '<p style="color:var(--muted);font-size:13px;margin:4px 0 8px;">No medications added yet</p>';
+      el.innerHTML = '<p style="color:var(--muted);font-size:13px;margin:4px 0 8px;">' + esc(_wt('anon.ui.noMedsYet')) + '</p>';
       return;
     }
     el.innerHTML = medList.map((m, i) => `
@@ -1191,7 +1191,7 @@ function renderUserPill() {
       <span>🔥</span>
       <span style="font-size:11px;color:rgba(0,0,0,0.6);">${s}d</span>
       ${profile.showStable && profile.stableStreak > 0 ? `<span>🧘</span><span style="font-size:11px;color:rgba(0,0,0,0.6);">${profile.stableStreak}d</span>` : ''}
-      ${bday ? `<span title="Bipolar Bear birthday">🎂</span><span style="font-size:11px;color:rgba(0,0,0,0.6);">${bday}</span>` : ''}
+      ${bday ? `<span title="${esc(_wt('anon.ui.bbBirthday'))}">🎂</span><span style="font-size:11px;color:rgba(0,0,0,0.6);">${bday}</span>` : ''}
     </div>`;
 }
 
@@ -1330,7 +1330,7 @@ function renderWiki() {
     wiki.innerHTML = `
       <div id="wiki-search-bar" class="wiki-search-bar" style="display:none;">
         <input id="wiki-search-input" type="search" placeholder="${esc(_wt('anon.wiki.searchPlaceholder'))}" autocomplete="off" />
-        <button id="wiki-search-close" class="wiki-search-close" aria-label="Close search">✕</button>
+        <button id="wiki-search-close" class="wiki-search-close" aria-label="${esc(_wt('anon.ui.closeSearch'))}">✕</button>
       </div>
       <div class="wiki-pills">
         <div class="wiki-pill-row" data-pill-row="0">
@@ -2419,14 +2419,14 @@ async function openThread(postId) {
         .filter(c => !c.name || !mutedUsers.has(c.name));
       const el = document.getElementById('thread-comments-list');
       if (!comments.length) {
-        el.innerHTML = '<div class="empty-state" style="padding:24px 0 16px;">No comments yet — be the first! 💛</div>';
+        el.innerHTML = '<div class="empty-state" style="padding:24px 0 16px;">' + esc(_wt('anon.ui.noComments')) + '</div>';
         return;
       }
       el.innerHTML = comments.map(renderComment).join('');
     }, err => {
       console.warn('[Thread] comments listener error', err);
       const el = document.getElementById('thread-comments-list');
-      if (el) el.innerHTML = '<div class="empty-state" style="padding:24px 0 16px;">Couldn\'t load comments — please try again later.</div>';
+      if (el) el.innerHTML = '<div class="empty-state" style="padding:24px 0 16px;">' + esc(_wt('anon.ui.commentsError')) + '</div>';
     });
 }
 
@@ -2455,7 +2455,7 @@ function renderThreadHeader(p) {
           ${showMed ? `<div class="post-med">💊 ${esc(p.med)}</div>` : ''}
         </div>
       </div>
-      <span class="post-time">${p.timestamp ? timeAgo(p.timestamp) : 'now'}</span>
+      <span class="post-time">${p.timestamp ? timeAgo(p.timestamp) : _wt('anon.time.now')}</span>
     </div>
     <div class="post-text">${esc(p.text)}</div>
   </div>`;
@@ -2471,7 +2471,7 @@ function renderComment(c) {
       <div class="post-av-circle" style="width:28px;height:28px;font-size:11px;flex-shrink:0;background:linear-gradient(135deg,${g1},${g2});">${esc(av)}</div>
       <div style="flex:1;min-width:0;">
         <span class="post-name" style="font-size:12px;">[${esc(c.name)}]${adminBadge}</span>
-        <span style="font-size:11px;color:var(--muted);margin-left:6px;">${c.timestamp ? timeAgo(c.timestamp) : 'now'}</span>
+        <span style="font-size:11px;color:var(--muted);margin-left:6px;">${c.timestamp ? timeAgo(c.timestamp) : _wt('anon.time.now')}</span>
       </div>
     </div>
     <div class="comment-text">${esc(c.text)}</div>
@@ -2600,7 +2600,7 @@ function renderPosts(posts) {
   // have no name and always pass).
   posts = posts.filter(p => !p.name || !mutedUsers.has(p.name));
   if (!posts.length) {
-    list.innerHTML = '<div class="empty-state">No posts yet — be the first! 🌱</div>';
+    list.innerHTML = '<div class="empty-state">' + esc(_wt('anon.ui.noPosts')) + '</div>';
     return;
   }
   // Collapse runs of deleted posts: keep only the most recent tombstone, drop the rest.
@@ -2739,7 +2739,7 @@ function renderPost(p) {
           ${showMed ? `<div class="post-med">💊 ${esc(p.med)}</div>` : ''}
         </div>
       </div>
-      <span class="post-time">${p.timestamp ? timeAgo(p.timestamp) : 'now'}</span>
+      <span class="post-time">${p.timestamp ? timeAgo(p.timestamp) : _wt('anon.time.now')}</span>
     </div>
     <div class="post-text">${esc(p.text)}</div>
     <div class="post-actions">
@@ -3065,10 +3065,10 @@ function openMonikaSettings() {
   if (msStatus) {
     const list = _anonGetMedList();
     if (!list.length) {
-      msStatus.textContent = 'No medications added';
+      msStatus.textContent = _wt('anon.ui.noMeds');
     } else {
       const names = list.map(m => m.name).join(', ');
-      msStatus.textContent = profile.showMeds ? `${names} · Visible on posts` : `${names} · Private`;
+      msStatus.textContent = profile.showMeds ? `${names} · ${_wt('anon.ui.visibleOnPosts')}` : `${names} · ${_wt('anon.ui.privateStatus')}`;
     }
   }
 
@@ -3081,11 +3081,11 @@ function openMonikaSettings() {
   if (msStableStatus && _bbUser) {
     const streak = profile.stableStreak;
     if (!streak && !profile.stableSince) {
-      msStableStatus.textContent = 'Not set up yet';
+      msStableStatus.textContent = _wt('anon.ui.notSetUp');
     } else {
       msStableStatus.textContent = streak > 0
-        ? (profile.showStable ? `${streak}d · Visible on posts` : `${streak}d · Private`)
-        : (profile.showStable ? 'Visible on posts' : 'Private');
+        ? (profile.showStable ? `${streak}d · ${_wt('anon.ui.visibleOnPosts')}` : `${streak}d · ${_wt('anon.ui.privateStatus')}`)
+        : (profile.showStable ? _wt('anon.ui.visibleOnPosts') : _wt('anon.ui.privateStatus'));
     }
   }
 
