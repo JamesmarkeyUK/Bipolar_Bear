@@ -2008,6 +2008,7 @@ function _handleIndexJournalNav() {
     // (and fab.js) reads the same value without depending on this script.
     const _APP_VERSION = window._APP_VERSION;
     const _WHATS_NEW_HEADLINES = {
+      '1.14': 'Your Survival Kit now unlocks automatically at the end of the tutorial, Apple Health sync has moved into Advanced settings, and the journal Open/Close button label is fixed',
       '1.11': 'Community: mute anyone on the Anonymous board with the new 🙈 button (unmute from the About screen), plus clearer Apple Health / Health Connect labels in journal settings',
       '1.09': 'Smoother permissions — notification and health-sync access is now only requested when you switch each one on, with a more reliable Apple Health reconnection after reinstalling',
       '1.4': 'New 📖 Wiki tab on the Anonymous board — Medications, Conditions, Therapies, Lifestyle, Warning Signs, Hospital, Workplace, Pregnancy, For Loved Ones, and more, with inline search',

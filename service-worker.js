@@ -307,7 +307,10 @@
 //      flag was never set) when it points the user at the profile button, so
 //      the Survival Kit is pre-selected in the Customise panel and visible on
 //      the home screen once they close it. Touches js/index.js.
-const CACHE_NAME = 'bipolarbear-v96';
+// v97: In-app changelog updated for v1.14 — added a "What's New" headline
+//      (js/index.js) and a v1.14 block in the full Changelog modal
+//      (journal.html) covering this release's user-facing changes.
+const CACHE_NAME = 'bipolarbear-v97';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
