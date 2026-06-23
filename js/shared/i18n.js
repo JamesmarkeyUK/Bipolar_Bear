@@ -2712,8 +2712,11 @@
 
     document.addEventListener('DOMContentLoaded', function () {
       applyAll();
-      // Show language picker for first-time users (no language saved yet)
-      if (!saved) {
+      // Show language picker for first-time users (no language saved yet).
+      // Pages that opt out (e.g. the public marketing landing pages, served at
+      // `/`) set data-no-lang-picker on <html> — they translate via browser
+      // detection + data-i18n without an intrusive first-run overlay.
+      if (!saved && !document.documentElement.hasAttribute('data-no-lang-picker')) {
         var path = location.pathname;
         var isHome = path === '/' || path.endsWith('/index.html') || path.endsWith('/');
         var isAnon = path.endsWith('/anonymous.html') || (path.endsWith('/') && document.getElementById('screen-verify'));
