@@ -300,7 +300,10 @@
 //      Also fixes the journal open/close button rendering its raw i18n key
 //      (duplicate journal.btn block in the en + fr locales). Touches
 //      journal.html, index.html, js/shared/i18n.js.
-const CACHE_NAME = 'bipolarbear-v94';
+// v95: Move the Apple Health (HealthKit) sync card off the top level of
+//      Settings into the Advanced "Mobile Settings" panel, below the Daily
+//      Mood Reminder. Touches journal.html.
+const CACHE_NAME = 'bipolarbear-v95';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
