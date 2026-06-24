@@ -7410,16 +7410,29 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
           return;
         }
 
-        // Load ALL entries
+        // Load ALL entries — and DECRYPT them. On Firestore only userId/timestamp are
+        // plaintext; everything else (mood, date, energy, sleep, notes…) lives in an
+        // encrypted blob. Guest entries may likewise be PIN-encrypted in localStorage.
+        // Pushing raw docs left every field undefined, which crashed the export (e.g.
+        // computeInsights → e.date.slice). Mirror the auth-listener loader instead.
         const entries = [];
         if (currentUser) {
           const snapshot = await db.collection('entries').where('userId', '==', currentUser.uid).get();
-          snapshot.forEach(doc => entries.push(doc.data()));
+          const decoded = await Promise.all(snapshot.docs.map(doc => _decodeFirestoreEntry(doc)));
+          decoded.forEach(e => { if (e) entries.push(e); });
         } else {
           for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
             if (key && key.startsWith('entry:')) {
-              try { entries.push(JSON.parse(localStorage.getItem(key))); } catch(e) {}
+              try {
+                const parsed = JSON.parse(localStorage.getItem(key));
+                if (parsed && parsed._enc) {
+                  // Encrypted guest entry — only usable if the PIN key is loaded
+                  if (_guestCryptoKey) entries.push({ id: key, ...(await _guestDecrypt(_guestCryptoKey, parsed)) });
+                } else if (parsed) {
+                  entries.push({ id: key, ...parsed });
+                }
+              } catch(e) {}
             }
           }
         }
