@@ -334,7 +334,7 @@
 //       js/shared/i18n.js. Touches js/shared/i18n.js, js/anonymous.js,
 //       welcome.html, welcome-anonymous.html, js/welcome.js, survival-kit.html,
 //       js/survival-kit.js.
-const CACHE_NAME = 'bipolarbear-v101';
+const CACHE_NAME = 'bipolarbear-v102';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
