@@ -33,12 +33,12 @@
 (function () {
   'use strict';
 
-  // Per-platform store URLs. iOS App Store ID isn't known yet — left null
-  // so the banner falls back to "please update via your app store" copy
-  // without a broken tap target. Update once the App Store listing is live.
+  // Per-platform store URLs. The Bipolar Anonymous iOS listing isn't live yet,
+  // so its iOS entry stays null and the banner falls back to "please update
+  // via your app store" copy without a broken tap target.
   var STORE_URLS = {
     ios: {
-      main:      null,
+      main:      'https://apps.apple.com/gb/app/bipolar-bear/id6766637453',
       anonymous: null,
     },
     android: {
