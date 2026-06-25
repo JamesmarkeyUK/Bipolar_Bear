@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- Bipolar Bear welcome / landing page © 2026 - All Rights Reserved -->
-<html lang="en">
+<html lang="en" data-no-lang-picker>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -29,6 +29,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://www.bipolarbear.app/images/og-card.png">
 
+  <script src="js/shared/i18n.js"></script>
   <link rel="stylesheet" href="css/welcome.css">
 </head>
 <body>
@@ -82,7 +83,7 @@
   <div class="nav-links">
     <a class="nav-hide-sm" href="#bear">Bipolar Bear</a>
     <a class="nav-hide-sm" href="#anon">Bipolar Anonymous</a>
-    <a class="nav-cta" href="#get">Get the app</a>
+    <a class="nav-cta" href="#get" data-i18n="lp.nav.getApp">Get the app</a>
   </div>
 </nav>
 
@@ -107,9 +108,9 @@
     </div>
     <div class="wrap hero-inner">
       <div class="hero-copy">
-        <span class="eyebrow">🐻 Free · iOS · Android · Web</span>
-        <h1>Every high.<br>Every low.<br><span class="swing">One bear that gets it.</span></h1>
-        <p class="hero-sub">
+        <span class="eyebrow" data-i18n="lp.hero.eyebrow">🐻 Free · iOS · Android · Web</span>
+        <h1 data-i18n-html="lp.hero.h1">Every high.<br>Every low.<br><span class="swing">One bear that gets it.</span></h1>
+        <p class="hero-sub" data-i18n="lp.hero.sub">
           Bipolar Bear is a free, private mood journal and survival kit built for the
           swing of bipolar disorder. Track mood, energy, sleep and meds — then spot the
           patterns before they spot you.
@@ -123,22 +124,22 @@
               <svg viewBox="0 0 180 56"><use href="#badge-googleplay"></use></svg>
             </a>
           </div>
-          <a class="web-link" href="index.html">
+          <a class="web-link" href="index.html" data-i18n="lp.hero.webLink">
             Or open the web app straight in your browser →
           </a>
         </div>
         <div class="trust-row">
-          <span>🔒 End-to-end encrypted</span>
-          <span>💷 Free, no ads</span>
-          <span>🐻 Built with the community</span>
+          <span data-i18n="lp.hero.trust1">🔒 End-to-end encrypted</span>
+          <span data-i18n="lp.hero.trust2">💷 Free, no ads</span>
+          <span data-i18n="lp.hero.trust3">🐻 Built with the community</span>
         </div>
       </div>
 
       <!-- Interactive mood meter — drag/hover to ride the swing -->
       <div class="mood-meter" id="moodMeter">
         <div class="mm-label">
-          <span class="mm-title">Today’s mood</span>
-          <span class="mm-live"><span class="dot"></span>live</span>
+          <span class="mm-title" data-i18n="lp.meter.todaysMood">Today’s mood</span>
+          <span class="mm-live"><span class="dot"></span><span data-i18n="lp.meter.live">live</span></span>
         </div>
         <div class="mood-stage">
           <img class="mood-face" data-i="0" src="images/moods/depressed.png" alt="Depressed bear">
@@ -170,8 +171,8 @@
           </svg>
           <div class="mood-handle" id="moodHandle"></div>
         </div>
-        <div class="mood-scale"><span>Depressed</span><span>Stable</span><span>Manic</span></div>
-        <div class="mood-hint"><b>Drag</b> the bear along the wave — that’s a month of bipolar in five seconds.</div>
+        <div class="mood-scale"><span data-i18n="lp.meter.scaleDepressed">Depressed</span><span data-i18n="lp.meter.scaleStable">Stable</span><span data-i18n="lp.meter.scaleManic">Manic</span></div>
+        <div class="mood-hint" data-i18n-html="lp.meter.hint"><b>Drag</b> the bear along the wave — that’s a month of bipolar in five seconds.</div>
       </div>
     </div>
 
@@ -186,40 +187,40 @@
   <section class="features" id="features">
     <div class="wrap">
       <div class="section-head reveal">
-        <span class="eyebrow">Why Bipolar Bear</span>
-        <h2>Made for the way bipolar actually feels</h2>
-        <p>Not another generic habit tracker. Every part is shaped around mood that moves.</p>
+        <span class="eyebrow" data-i18n="lp.features.eyebrow">Why Bipolar Bear</span>
+        <h2 data-i18n="lp.features.heading">Made for the way bipolar actually feels</h2>
+        <p data-i18n="lp.features.sub">Not another generic habit tracker. Every part is shaped around mood that moves.</p>
       </div>
       <div class="feature-grid">
         <div class="feature-card reveal">
           <div class="feature-ic">📔</div>
-          <h3>Daily mood journal</h3>
-          <p>Log mood, energy, sleep, medication and notes in seconds. Your day, captured before it slips.</p>
+          <h3 data-i18n="lp.features.f1Title">Daily mood journal</h3>
+          <p data-i18n="lp.features.f1Desc">Log mood, energy, sleep, medication and notes in seconds. Your day, captured before it slips.</p>
         </div>
         <div class="feature-card reveal d1">
           <div class="feature-ic">🆘</div>
-          <h3>Your survival kit</h3>
-          <p>Coping strategies, crisis contacts and reasons to stay — built calm, ready for when it isn’t.</p>
+          <h3 data-i18n="lp.features.f2Title">Your survival kit</h3>
+          <p data-i18n="lp.features.f2Desc">Coping strategies, crisis contacts and reasons to stay — built calm, ready for when it isn’t.</p>
         </div>
         <div class="feature-card reveal d2">
           <div class="feature-ic">📈</div>
-          <h3>Spot your patterns</h3>
-          <p>On-device insights link sleep, alcohol and more to how you feel the next day.</p>
+          <h3 data-i18n="lp.features.f3Title">Spot your patterns</h3>
+          <p data-i18n="lp.features.f3Desc">On-device insights link sleep, alcohol and more to how you feel the next day.</p>
         </div>
         <div class="feature-card reveal">
           <div class="feature-ic">🔒</div>
-          <h3>End-to-end encrypted</h3>
-          <p>Entries are scrambled on your device before they ever leave it. Not even we can read them.</p>
+          <h3 data-i18n="lp.features.f4Title">End-to-end encrypted</h3>
+          <p data-i18n="lp.features.f4Desc">Entries are scrambled on your device before they ever leave it. Not even we can read them.</p>
         </div>
         <div class="feature-card reveal d1">
           <div class="feature-ic">🔥</div>
-          <h3>Streaks that stick</h3>
-          <p>Gentle nudges and streaks help the habit hold on the days that are hardest to hold.</p>
+          <h3 data-i18n="lp.features.f5Title">Streaks that stick</h3>
+          <p data-i18n="lp.features.f5Desc">Gentle nudges and streaks help the habit hold on the days that are hardest to hold.</p>
         </div>
         <div class="feature-card reveal d2">
           <div class="feature-ic">💬</div>
-          <h3>Never alone</h3>
-          <p>Step into Bipolar Anonymous — an anonymous peer community — right from the app.</p>
+          <h3 data-i18n="lp.features.f6Title">Never alone</h3>
+          <p data-i18n="lp.features.f6Desc">Step into Bipolar Anonymous — an anonymous peer community — right from the app.</p>
         </div>
       </div>
     </div>
@@ -237,13 +238,13 @@
               <div class="sb-dom">bipolarbear.app</div>
             </div>
           </div>
-          <h2>Your mind, in your pocket.</h2>
-          <p>The everyday companion for living well with bipolar — quietly tracking the things that matter so you can see yourself clearly.</p>
+          <h2 data-i18n="lp.bear.heading">Your mind, in your pocket.</h2>
+          <p data-i18n="lp.bear.body">The everyday companion for living well with bipolar — quietly tracking the things that matter so you can see yourself clearly.</p>
           <ul class="showcase-list">
-            <li><span class="tick">✓</span> Mood, energy, sleep, meds &amp; free-text notes</li>
-            <li><span class="tick">✓</span> Personalised insights, computed privately on your device</li>
-            <li><span class="tick">✓</span> Export a clean PDF to share with your care team</li>
-            <li><span class="tick">✓</span> Works offline — your journal is always there</li>
+            <li><span class="tick">✓</span> <span data-i18n-html="lp.bear.li1">Mood, energy, sleep, meds &amp; free-text notes</span></li>
+            <li><span class="tick">✓</span> <span data-i18n="lp.bear.li2">Personalised insights, computed privately on your device</span></li>
+            <li><span class="tick">✓</span> <span data-i18n="lp.bear.li3">Export a clean PDF to share with your care team</span></li>
+            <li><span class="tick">✓</span> <span data-i18n="lp.bear.li4">Works offline — your journal is always there</span></li>
           </ul>
           <div class="store-badges" style="margin-bottom:18px">
             <a class="store-badge" data-store="appstore-bear" href="https://apps.apple.com/gb/app/bipolar-bear/id6766637453" target="_blank" rel="noopener" title="Download Bipolar Bear on the App Store" aria-label="Download Bipolar Bear on the App Store">
@@ -253,7 +254,7 @@
               <svg viewBox="0 0 180 56"><use href="#badge-googleplay"></use></svg>
             </a>
           </div>
-          <a class="web-link" href="index.html">Launch the web app →</a>
+          <a class="web-link" href="index.html" data-i18n="lp.bear.launchWeb">Launch the web app →</a>
         </div>
         <div class="carousel reveal d1" data-carousel>
           <div class="carousel-viewport">
@@ -285,13 +286,13 @@
               <div class="sb-dom">bipolaranonymous.app</div>
             </div>
           </div>
-          <h2>Share your thoughts,<br>not your identity.</h2>
-          <p>A separate, standalone app: an anonymous peer community for people living with bipolar. Pick a monika, post what’s real, and find people who actually get it.</p>
+          <h2 data-i18n-html="lp.anon.heading">Share your thoughts,<br>not your identity.</h2>
+          <p data-i18n="lp.anon.body">A separate, standalone app: an anonymous peer community for people living with bipolar. Pick a moniker, post what’s real, and find people who actually get it.</p>
           <ul class="showcase-list">
-            <li><span class="tick">✓</span> No real name — just a monika you choose</li>
-            <li><span class="tick">✓</span> Posts to relate to, not perform for</li>
-            <li><span class="tick">✓</span> Recognised across all your devices</li>
-            <li><span class="tick">✓</span> Your email is only ever stored as a hash</li>
+            <li><span class="tick">✓</span> <span data-i18n="lp.anon.li1">No real name — just a moniker you choose</span></li>
+            <li><span class="tick">✓</span> <span data-i18n="lp.anon.li2">Posts to relate to, not perform for</span></li>
+            <li><span class="tick">✓</span> <span data-i18n="lp.anon.li3">Recognised across all your devices</span></li>
+            <li><span class="tick">✓</span> <span data-i18n="lp.anon.li4">Your email is only ever stored as a hash</span></li>
           </ul>
           <div class="store-badges" style="margin-bottom:18px">
             <a class="store-badge" data-store="appstore-anon" href="#" title="App Store link coming soon" aria-label="Download Bipolar Anonymous on the App Store">
@@ -301,13 +302,13 @@
               <svg viewBox="0 0 180 56"><use href="#badge-googleplay"></use></svg>
             </a>
           </div>
-          <a class="web-link" href="https://www.bipolaranonymous.app" target="_blank" rel="noopener noreferrer">Open bipolaranonymous.app →</a>
+          <a class="web-link" href="https://www.bipolaranonymous.app" target="_blank" rel="noopener noreferrer" data-i18n="lp.anon.openLink">Open bipolaranonymous.app →</a>
         </div>
         <div class="carousel reveal d1" data-carousel>
           <div class="carousel-viewport">
             <div class="carousel-track">
               <img class="carousel-slide" src="store-assets/out/anonymous/iphone/01-hero.png" alt="Bipolar Anonymous community feed" draggable="false">
-              <img class="carousel-slide" src="store-assets/out/anonymous/iphone/02-monika.png" alt="Pick a monika" loading="lazy" draggable="false">
+              <img class="carousel-slide" src="store-assets/out/anonymous/iphone/02-monika.png" alt="Pick a moniker" loading="lazy" draggable="false">
               <img class="carousel-slide" src="store-assets/out/anonymous/iphone/03-ask.png" alt="Ask the community" loading="lazy" draggable="false">
               <img class="carousel-slide" src="store-assets/out/anonymous/iphone/04-wiki.png" alt="Community wiki" loading="lazy" draggable="false">
               <img class="carousel-slide" src="store-assets/out/anonymous/iphone/05-report.png" alt="Report and keep it safe" loading="lazy" draggable="false">
@@ -328,11 +329,11 @@
         <img src="images/marketing/james-markey.jpg" alt="James Markey, founder of Bipolar Bear">
       </div>
       <div class="founder-copy reveal d1">
-        <span class="eyebrow">The human behind the bear</span>
-        <h2>Built by James Markey</h2>
-        <p>Bipolar Bear began as one person’s tool for living with bipolar — and grew into a free app for everyone who needs one. James builds in the open and shares the whole journey, highs and lows included.</p>
-        <p class="signoff">No investors. No data harvesting. Just a tool he wished existed.</p>
-        <a class="btn-pill" href="https://www.jamesmarkey.co.uk" target="_blank" rel="noopener noreferrer">
+        <span class="eyebrow" data-i18n="lp.founder.eyebrow">The human behind the bear</span>
+        <h2 data-i18n="lp.founder.heading">Built by James Markey</h2>
+        <p data-i18n="lp.founder.body">Bipolar Bear began as one person’s tool for living with bipolar — and grew into a free app for everyone who needs one. James builds in the open and shares the whole journey, highs and lows included.</p>
+        <p class="signoff" data-i18n="lp.founder.signoff">No investors. No data harvesting. Just a tool he wished existed.</p>
+        <a class="btn-pill" href="https://www.jamesmarkey.co.uk" target="_blank" rel="noopener noreferrer" data-i18n="lp.founder.visit">
           Visit jamesmarkey.co.uk →
         </a>
       </div>
@@ -342,12 +343,12 @@
   <!-- ───────────────────────── Hosting credit ───────────────────────── -->
   <section class="hosting">
     <div class="wrap">
-      <div class="host-label">Proudly hosted for free by</div>
+      <div class="host-label" data-i18n="lp.hosting.label">Proudly hosted for free by</div>
       <a class="host-card reveal" href="https://www.unisim.co.uk" target="_blank" rel="noopener noreferrer">
         <img src="images/marketing/unisim-logo.png" alt="UNI SIM">
         <div class="host-text">
           <b>UNI SIM</b>
-          <span>Both apps are hosted free of charge by UNI SIM — so every penny goes to the people who need them, not the servers.</span>
+          <span data-i18n="lp.hosting.body">Both apps are hosted free of charge by UNI SIM — so every penny goes to the people who need them, not the servers.</span>
         </div>
       </a>
     </div>
@@ -362,27 +363,27 @@
             <img src="icons/AppIcon.png" alt="">
             <b>Bipolar Bear</b>
           </div>
-          <p>A free, private mood journal and survival kit for living with bipolar disorder — and an anonymous community for the days you’d rather not be alone.</p>
+          <p data-i18n="lp.foot.brandDesc">A free, private mood journal and survival kit for living with bipolar disorder — and an anonymous community for the days you’d rather not be alone.</p>
         </div>
         <div class="foot-col">
-          <h4>The apps</h4>
-          <a href="index.html">Bipolar Bear · open the web app</a>
-          <a href="https://www.bipolaranonymous.app" target="_blank" rel="noopener noreferrer">Bipolar Anonymous · bipolaranonymous.app</a>
+          <h4 data-i18n="lp.foot.appsHeading">The apps</h4>
+          <a href="index.html" data-i18n="lp.foot.bearWeb">Bipolar Bear · open the web app</a>
+          <a href="https://www.bipolaranonymous.app" target="_blank" rel="noopener noreferrer" data-i18n="lp.foot.anonLink">Bipolar Anonymous · bipolaranonymous.app</a>
           <a class="store-badge-text" data-store="appstore-bear" href="https://apps.apple.com/gb/app/bipolar-bear/id6766637453" target="_blank" rel="noopener">Download on the App Store</a>
           <a class="store-badge-text" data-store="googleplay-bear" href="https://play.google.com/store/apps/details?id=com.bipolarbear.app" target="_blank" rel="noopener">Get it on Google Play</a>
         </div>
         <div class="foot-col">
-          <h4>More</h4>
-          <a href="privacy.html">Privacy</a>
-          <a href="https://www.jamesmarkey.co.uk" target="_blank" rel="noopener noreferrer">Founder · James Markey</a>
-          <a href="https://www.unisim.co.uk" target="_blank" rel="noopener noreferrer">Hosting · UNI SIM</a>
+          <h4 data-i18n="lp.foot.moreHeading">More</h4>
+          <a href="privacy.html" data-i18n="lp.foot.privacy">Privacy</a>
+          <a href="https://www.jamesmarkey.co.uk" target="_blank" rel="noopener noreferrer" data-i18n="lp.foot.founder">Founder · James Markey</a>
+          <a href="https://www.unisim.co.uk" target="_blank" rel="noopener noreferrer" data-i18n="lp.foot.hosting">Hosting · UNI SIM</a>
         </div>
       </div>
       <div class="foot-note">
-        <div class="crisis">
+        <div class="crisis" data-i18n-html="lp.foot.crisis">
           <b>Not a crisis service.</b> Bipolar Bear is a self-help tool, not a substitute for professional care. If you’re in crisis, contact your local emergency services or a crisis line right away.
         </div>
-        <div>© 2026 Bipolar Bear · Built by James Markey · Hosted by UNI SIM</div>
+        <div data-i18n="lp.foot.copyright">© 2026 Bipolar Bear · Built by James Markey · Hosted by UNI SIM</div>
       </div>
     </div>
   </footer>

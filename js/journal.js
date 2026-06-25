@@ -597,31 +597,104 @@ window.addEventListener('pageshow', () => {
   
   function _updateJournalAuthFab(loggedIn) {
     // The dock auth button is injected by fab.js as #bbAuthFab and uses window._fabOpenAuth
-    // as its click handler — update both the icon and the handler.
+    // as its click handler. Guests and signed-in users both land in the Settings
+    // modal — customising the journal form never requires an account, and Settings
+    // carries its own "Sign in to back up" button so syncing stays optional.
     const fab = document.getElementById('bbAuthFab');
-    if (loggedIn) {
-      window._fabOpenAuth = () => { if (typeof _dismissSettingsHint === 'function') _dismissSettingsHint(); showSettingsModal(); };
-      if (fab) {
-        fab.textContent = '⚙️';
-        fab.title = 'Settings';
-        fab.style.background = 'var(--brand-primary)';
-        fab.style.color = 'white';
-        fab.style.border = 'none';
-        fab.style.boxShadow = '0 2px 10px rgba(255,149,0,0.35)';
-      }
-    } else {
-      window._fabOpenAuth = () => window.showAuthModal();
-      if (fab) {
-        fab.textContent = '👤';
-        fab.title = 'Profile / Sign in';
-        fab.style.background = 'white';
-        fab.style.color = 'var(--brand-primary)';
-        fab.style.border = '2px solid var(--brand-primary)';
-        fab.style.boxShadow = '0 2px 10px rgba(255,149,0,0.25)';
-      }
+    window._fabOpenAuth = () => { if (typeof _dismissSettingsHint === 'function') _dismissSettingsHint(); showSettingsModal(); };
+    if (fab) {
+      fab.textContent = '⚙️';
+      fab.title = 'Settings';
+      fab.style.background = 'var(--brand-primary)';
+      fab.style.color = 'white';
+      fab.style.border = 'none';
+      fab.style.boxShadow = '0 2px 10px rgba(255,149,0,0.35)';
     }
     if (typeof window._applyFabDock === 'function') window._applyFabDock();
+
+    // First journal visit after the tutorial: surface a one-shot blocking hint
+    // pointing at this Settings FAB (mirrors the index tutorial-finale hint).
+    // Runs here, after auth resolves and the FAB is configured as ⚙️ Settings.
+    setTimeout(function () { try { _showSettingsFabHint(); } catch (_) {} }, 600);
   }
+
+  /**
+   * One-shot blocking hint pointing at the dock Settings (⚙️) FAB, shown the
+   * first time the user opens the journal after completing the tutorial. Mirrors
+   * the index tutorial-finale hint: a full-screen dimmer makes everything inert
+   * except the FAB (lifted above the dimmer), tapping the dimmer just nudges the
+   * pulsing "tap Settings" label, and tapping the FAB opens Settings + clears the
+   * hint. Self-contained — builds its own label, reuses the page's #bbHintOverlay.
+   */
+  function _showSettingsFabHint(_attempt) {
+    // Only after the tutorial is fully complete, and only ever once.
+    var step = (window.BB && BB.onboarding) ? BB.onboarding.getStep() : 0;
+    if (step < 12 || BB.storage.get('TutorialToastShown') !== '1') return;
+    if (BB.storage.get('SettingsFabHintShown') === '1') return;
+
+    var fab = document.getElementById('bbAuthFab');
+    var overlay = document.getElementById('bbHintOverlay');
+    // fab.js injects the dock after this script + the Firebase SDKs, so on a
+    // cold load the FAB may not exist yet. Retry for ~4s before giving up.
+    var notReady = !fab || !overlay || getComputedStyle(fab).display === 'none';
+    if (notReady) {
+      if ((_attempt || 0) < 16) setTimeout(function () { _showSettingsFabHint((_attempt || 0) + 1); }, 250);
+      return;
+    }
+    // Don't fight a modal that's already open — wait for it to close.
+    if (document.querySelector('.confirm-modal.active, .overlay-modal.active, .bb-auth-overlay.active')) {
+      if ((_attempt || 0) < 40) setTimeout(function () { _showSettingsFabHint((_attempt || 0) + 1); }, 300);
+      return;
+    }
+
+    BB.storage.set('SettingsFabHintShown', '1');
+
+    // Label (above the centred FAB) + downward arrow, mirroring index's signinHint.
+    var _label = (window.BB && BB.t) ? BB.t('journal.hint.settingsFab') : 'journal.hint.settingsFab';
+    if (_label === 'journal.hint.settingsFab') _label = '🐻 Tap Settings to customise your journal';
+    var hint = document.getElementById('settingsFabHint');
+    if (!hint) {
+      hint = document.createElement('div');
+      hint.id = 'settingsFabHint';
+      hint.style.cssText = 'position:fixed;bottom:76px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:4px;pointer-events:none;z-index:601;';
+      var inner = document.createElement('div');
+      inner.id = 'settingsFabHintInner';
+      inner.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:4px;';
+      inner.innerHTML = '<span style="background:rgba(0,0,0,0.58);color:white;font-size:0.8em;font-weight:700;padding:6px 13px;border-radius:20px;max-width:min(280px,calc(100vw - 48px));text-align:center;box-shadow:0 2px 10px rgba(0,0,0,0.25);"></span><svg width="16" height="18" viewBox="0 0 16 18" fill="none"><line x1="8" y1="1" x2="8" y2="14" stroke="rgba(255,255,255,0.85)" stroke-width="2" stroke-linecap="round"/><polyline points="3,9 8,15 13,9" stroke="rgba(255,255,255,0.85)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
+      hint.appendChild(inner);
+      document.body.appendChild(hint);
+    }
+    var _labelSpan = hint.querySelector('span');
+    if (_labelSpan) _labelSpan.textContent = _label;
+    hint.style.display = 'flex';
+    var _inner = document.getElementById('settingsFabHintInner');
+    var _pulse = _inner ? _inner.animate([{ opacity: 0.75 }, { opacity: 1 }, { opacity: 0.75 }], { duration: 1600, iterations: Infinity }) : null;
+
+    // Dim the page; lift the FAB above the dimmer so it stays tappable.
+    var prevFabZ = fab.style.zIndex;
+    overlay.style.display = '';
+    overlay.style.pointerEvents = 'auto';
+    fab.style.zIndex = '601';
+
+    function _cleanup() {
+      if (_pulse) { try { _pulse.cancel(); } catch (_) {} }
+      overlay.style.display = 'none';
+      overlay.style.pointerEvents = 'none';
+      overlay.onclick = null;
+      if (hint) hint.style.display = 'none';
+      fab.style.zIndex = prevFabZ;
+      fab.removeEventListener('click', _onFabClick);
+    }
+    overlay.onclick = function () {
+      // Not a dismiss — the Settings FAB is the way forward. Nudge the label.
+      if (!_inner) return;
+      _inner.style.animation = 'bbHintNudge 0.5s ease';
+      setTimeout(function () { _inner.style.animation = ''; }, 520);
+    };
+    function _onFabClick() { _cleanup(); }
+    fab.addEventListener('click', _onFabClick);
+  }
+  window._showSettingsFabHint = _showSettingsFabHint;
 
   // Check if Firebase is loaded and initialize
   if (typeof firebase !== 'undefined') {
@@ -670,7 +743,9 @@ window.addEventListener('pageshow', () => {
 
     // Auth modals now handled by shared fab.js — set hooks
     window._fabOnSignOut = logout;
-    window._fabOpenAuth  = () => window.showAuthModal();
+    // Default the dock button to Settings (guest-friendly). _updateJournalAuthFab
+    // refines icon/title once auth state resolves; either way it opens Settings.
+    window._fabOpenAuth  = () => { if (typeof _dismissSettingsHint === 'function') _dismissSettingsHint(); showSettingsModal(); };
 
     // ── Auth hooks for shared fab.js modal ──
     // Capture password before sign-in so onAuthStateChanged can derive the encryption key
@@ -693,7 +768,7 @@ window.addEventListener('pageshow', () => {
         'bbPrivateHintSeen', 'bbFavouriteHintSeen', 'bb_moodTipShown', 'bb_fmMoodTipShown',
         'bb_fmChooseMoodHintDone', 'bb_fmMoodInfoCloseHintDone',
         // Settings / customise tutorial hints
-        'bbSettingsHintDone',
+        'bbSettingsHintDone', 'bbSettingsFabHintShown',
         'bbCustomiseFormHintDone', 'bbCustomiseAdditionalHintDone', 'bbCloseSettingsHintDone', 'bbCustomiseFormCollapsed',
         'bbAdvancedTutorialToastShown',
         // Advanced settings badge + tap-hold hint pending
@@ -7335,16 +7410,29 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
           return;
         }
 
-        // Load ALL entries
+        // Load ALL entries — and DECRYPT them. On Firestore only userId/timestamp are
+        // plaintext; everything else (mood, date, energy, sleep, notes…) lives in an
+        // encrypted blob. Guest entries may likewise be PIN-encrypted in localStorage.
+        // Pushing raw docs left every field undefined, which crashed the export (e.g.
+        // computeInsights → e.date.slice). Mirror the auth-listener loader instead.
         const entries = [];
         if (currentUser) {
           const snapshot = await db.collection('entries').where('userId', '==', currentUser.uid).get();
-          snapshot.forEach(doc => entries.push(doc.data()));
+          const decoded = await Promise.all(snapshot.docs.map(doc => _decodeFirestoreEntry(doc)));
+          decoded.forEach(e => { if (e) entries.push(e); });
         } else {
           for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
             if (key && key.startsWith('entry:')) {
-              try { entries.push(JSON.parse(localStorage.getItem(key))); } catch(e) {}
+              try {
+                const parsed = JSON.parse(localStorage.getItem(key));
+                if (parsed && parsed._enc) {
+                  // Encrypted guest entry — only usable if the PIN key is loaded
+                  if (_guestCryptoKey) entries.push({ id: key, ...(await _guestDecrypt(_guestCryptoKey, parsed)) });
+                } else if (parsed) {
+                  entries.push({ id: key, ...parsed });
+                }
+              } catch(e) {}
             }
           }
         }
@@ -8742,6 +8830,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
          'bb_fmChooseMoodHintDone','bb_fmMoodInfoCloseHintDone',
          'bbAdvancedBadgePending','bbAdvancedBadgeVisible',
          'bb_fmTapHoldHintPending','bb_fmTapHoldHintReady',
+         'bbSettingsFabHintShown',
          'bbHasEntries',
          'bbOnboardingStep',
          // Streaks — must clear so the home page doesn't render a stale badge
@@ -10103,14 +10192,20 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
 
       // Populate login status
       const _loginStatusEl = document.getElementById('settingsLoginStatus');
+      const _isGuest = !(currentUser && currentUser.email);
       if (_loginStatusEl) {
-        if (currentUser && currentUser.email) {
+        if (!_isGuest) {
           const _emailSnip = currentUser.email.length > 10 ? currentUser.email.substring(0, 10) + '…' : currentUser.email;
           _loginStatusEl.textContent = 'Logged in (' + _emailSnip + ')';
         } else {
           _loginStatusEl.textContent = 'Guest mode';
         }
       }
+      // Guest-only "Sign in to back up" prompt — customising never needs an account.
+      const _guestSignInBtn = document.getElementById('settingsGuestSignIn');
+      const _guestSignInNote = document.getElementById('settingsGuestSignInNote');
+      if (_guestSignInBtn) _guestSignInBtn.style.display = _isGuest ? '' : 'none';
+      if (_guestSignInNote) _guestSignInNote.style.display = _isGuest ? '' : 'none';
 
       // Always open showing main panel
       document.getElementById('settingsMainPanel').style.display = '';

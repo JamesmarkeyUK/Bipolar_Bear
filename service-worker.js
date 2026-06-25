@@ -283,7 +283,64 @@
 //      data is encrypted in transit + at rest. Updated across all 10 languages
 //      in js/shared/i18n.js + anonymous.html defaults. Also added an App Store
 //      reviewer bypass (test@bipolarbear.app) to js/anonymous.js.
-const CACHE_NAME = 'bipolarbear-v92';
+// v92: Sign-in is now optional everywhere — all features (customise journal +
+//      home) work as a guest, and signing in only backs up/syncs data. The
+//      home profile FAB opens the Profile modal for guests (was the sign-in
+//      form), the journal dock FAB opens Settings for guests (was the sign-in
+//      form) and Settings gained a guest-only "Sign in to back up" button, and
+//      the tutorial-finale account hint is reframed around optional backup.
+//      Touches js/index.js, js/journal.js, journal.html, js/shared/i18n.js.
+// v93: v1.14 (build 14) release — version bump only, rolls up the v90–v92
+//      web changes (lapse-aware anon streak, accurate privacy sheet,
+//      optional sign-in) into a fresh App Store build.
+// v94: Settings/profile tidy-up — drop the duplicate "Health data:" status
+//      line from the top Apple Health sync card (it already shows in the
+//      settings footer), and move the guest "Sign up / in" button below the
+//      language picker in the home Profile modal to mirror the Settings menu.
+//      Also fixes the journal open/close button rendering its raw i18n key
+//      (duplicate journal.btn block in the en + fr locales). Touches
+//      journal.html, index.html, js/shared/i18n.js.
+// v95: Move the Apple Health (HealthKit) sync card off the top level of
+//      Settings into the Advanced "Mobile Settings" panel, below the Daily
+//      Mood Reminder. Touches journal.html.
+// v96: Tutorial finale auto-enables the Survival Kit home button (only if the
+//      flag was never set) when it points the user at the profile button, so
+//      the Survival Kit is pre-selected in the Customise panel and visible on
+//      the home screen once they close it. Touches js/index.js.
+// v97: In-app changelog updated for v1.14 — added a "What's New" headline
+//      (js/index.js) and a v1.14 block in the full Changelog modal
+//      (journal.html) covering this release's user-facing changes.
+// v98: Tutorial finale now also auto-enables the Bipolar Anonymous home
+//      button alongside the Survival Kit (each only if its flag was never
+//      set), so both are pre-selected in the Customise panel. Touches
+//      js/index.js.
+// v99: First journal visit after the tutorial shows a one-shot blocking hint
+//      (index-finale style: dimmer + elevated FAB + label) pointing at the dock
+//      Settings FAB. New i18n key journal.hint.settingsFab in all 10 locales.
+//      Touches js/journal.js, js/shared/i18n.js, journal.html (changelog).
+// v100: Spelling fix — user-facing "Monika" → "Moniker" (the correct English
+//       word for a chosen handle) across all 10 locales + hardcoded HTML/JS
+//       copy. Internal identifiers untouched (Firestore bbAnonMonikas,
+//       localStorage Anon_monika, element ids, i18n key names, openMonikaSettings).
+// v101: EN/FR language coverage pass — wired the remaining hardcoded English
+//       strings on the Bipolar Anonymous board (anonymous.js: relative times,
+//       button states, empty/error states, medication subtitles, status rows,
+//       aria-labels) through BB.t, and fully internationalised the public
+//       marketing landing pages (welcome.html, welcome-anonymous.html,
+//       js/welcome.js — new lp.* namespace, data-no-lang-picker opt-out) and
+//       the Survival Kit (survival-kit.html, js/survival-kit.js — new sk.*
+//       namespace covering the mood scale, strategies, mind games, reading/
+//       media, and dynamic modal titles/buttons). English + French added in
+//       js/shared/i18n.js. Touches js/shared/i18n.js, js/anonymous.js,
+//       welcome.html, welcome-anonymous.html, js/welcome.js, survival-kit.html,
+//       js/survival-kit.js.
+// v103: Bipolar Anonymous App Store compliance — in-app account deletion
+//       (guideline 5.1.1) plus a signup terms-acceptance gate, a zero-tolerance
+//       Community Guidelines & Terms overlay, and an in-app contact (guideline
+//       1.2) in anonymous.html / js/anonymous.js; a mobile top-bar overflow fix
+//       (css/anonymous.css); and the contact email switched to
+//       bipolar@unisim.co.uk (privacy.html + anonymous board).
+const CACHE_NAME = 'bipolarbear-v103';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
@@ -315,6 +372,7 @@ const STATIC_ASSETS = [
   './js/shared/onboarding.js',
   './js/shared/medications.js',
   './js/shared/version-check.js',
+  './js/shared/i18n.js',
 
   // NOTE: /version.json is deliberately NOT precached. It must always be
   // fetched fresh so a new release reaches stale clients on next page load

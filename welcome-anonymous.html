@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <!-- Bipolar Anonymous welcome / landing page © 2026 - All Rights Reserved -->
-<html lang="en">
+<html lang="en" data-no-lang-picker>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Bipolar Anonymous — anonymous peer support for living with bipolar</title>
-  <meta name="description" content="Bipolar Anonymous is a free, anonymous peer community for people living with bipolar. Pick a monika, share what's real, and find people who actually get it. Plus Bipolar Bear — a private mood journal & survival kit. iOS, Android and web.">
+  <meta name="description" content="Bipolar Anonymous is a free, anonymous peer community for people living with bipolar. Pick a moniker, share what's real, and find people who actually get it. Plus Bipolar Bear — a private mood journal & survival kit. iOS, Android and web.">
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#f5c800">
   <meta name="color-scheme" content="light">
@@ -21,13 +21,14 @@
   <meta property="og:url" content="https://www.bipolaranonymous.app/">
   <meta property="og:site_name" content="Bipolar Anonymous">
   <meta property="og:title" content="Bipolar Anonymous — share your thoughts, not your identity">
-  <meta property="og:description" content="A free, anonymous peer community for people living with bipolar. Pick a monika and find people who actually get it.">
+  <meta property="og:description" content="A free, anonymous peer community for people living with bipolar. Pick a moniker and find people who actually get it.">
   <meta property="og:image" content="https://www.bipolaranonymous.app/images/og-card-anonymous.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://www.bipolaranonymous.app/images/og-card-anonymous.png">
 
+  <script src="js/shared/i18n.js"></script>
   <link rel="stylesheet" href="css/welcome.css">
 </head>
 <body>
@@ -81,7 +82,7 @@
   <div class="nav-links">
     <a class="nav-hide-sm" href="#bear">Bipolar Bear</a>
     <a class="nav-hide-sm" href="#anon">Bipolar Anonymous</a>
-    <a class="nav-cta" href="#get">Get the app</a>
+    <a class="nav-cta" href="#get" data-i18n="lp.nav.getApp">Get the app</a>
   </div>
 </nav>
 
@@ -91,11 +92,11 @@
   <section class="hero hero--anon" id="hero">
     <div class="wrap hero-inner">
       <div class="hero-copy">
-        <span class="eyebrow">🫂 Free · 100% anonymous</span>
-        <h1>Share your thoughts,<br><span class="swing">not your identity.</span></h1>
-        <p class="hero-sub">
+        <span class="eyebrow" data-i18n="lp.anonpage.heroEyebrow">🫂 Free · 100% anonymous</span>
+        <h1 data-i18n-html="lp.anonpage.heroH1">Share your thoughts,<br><span class="swing">not your identity.</span></h1>
+        <p class="hero-sub" data-i18n="lp.anonpage.heroSub">
           Bipolar Anonymous is a free, anonymous peer community for people living with bipolar.
-          Pick a monika, post what’s real, and find people who actually get it — no real name, ever.
+          Pick a moniker, post what’s real, and find people who actually get it — no real name, ever.
         </p>
         <div class="hero-cta" id="get">
           <div class="store-badges">
@@ -106,41 +107,41 @@
               <svg viewBox="0 0 180 56"><use href="#badge-googleplay"></use></svg>
             </a>
           </div>
-          <a class="web-link" href="anonymous.html">
+          <a class="web-link" href="anonymous.html" data-i18n="lp.anonpage.heroWebLink">
             Or open the community straight in your browser →
           </a>
         </div>
         <div class="trust-row">
-          <span>🕵️ No real name, ever</span>
-          <span>💛 People who get it</span>
-          <span>💷 Free, no ads</span>
+          <span data-i18n="lp.anonpage.trust1">🕵️ No real name, ever</span>
+          <span data-i18n="lp.anonpage.trust2">💛 People who get it</span>
+          <span data-i18n="lp.anonpage.trust3">💷 Free, no ads</span>
         </div>
       </div>
 
       <!-- Interactive monika shuffler — click to cycle anonymous identities -->
       <div class="monika-card" id="monikaCard">
         <div class="mm-label">
-          <span class="mm-title">You’ll post as</span>
-          <span class="mm-live"><span class="dot"></span>anonymous</span>
+          <span class="mm-title" data-i18n="lp.anonpage.youllPostAs">You’ll post as</span>
+          <span class="mm-live"><span class="dot"></span><span data-i18n="lp.anonpage.anonymousLabel">anonymous</span></span>
         </div>
         <div class="monika-identity">
           <div class="monika-avatar" id="monikaAvatar" style="background:#ff9f1c">SS</div>
           <div>
             <div class="monika-name" id="monikaName">SunflowerSeed</div>
-            <div class="monika-sub">No real name · recognised across your devices</div>
+            <div class="monika-sub" data-i18n="lp.anonpage.monikaSub">No real name · recognised across your devices</div>
           </div>
         </div>
         <div class="monika-post">
           <div class="monika-post-head">
             <span class="monika-avatar sm" id="monikaAvatar2" style="background:#ff9f1c">SS</span>
             <span class="monika-post-name" id="monikaName2">SunflowerSeed</span>
-            <span class="monika-post-time">· just now</span>
+            <span class="monika-post-time" data-i18n="lp.anonpage.justNow">· just now</span>
           </div>
           <p class="monika-post-body" id="monikaPost">Three days stable after a rough patch. Small wins still count, right?</p>
           <div class="monika-post-react">🤍 47 · 💬 12</div>
         </div>
-        <button class="monika-shuffle" id="monikaShuffle" type="button">🎲 Shuffle my identity</button>
-        <div class="monika-hint">Pick a <b>monika</b> — your real name never leaves your head.</div>
+        <button class="monika-shuffle" id="monikaShuffle" type="button" data-i18n="lp.anonpage.shuffleBtn">🎲 Shuffle my identity</button>
+        <div class="monika-hint" data-i18n-html="lp.anonpage.monikaHint">Pick a <b>moniker</b> — your real name never leaves your head.</div>
       </div>
     </div>
 
@@ -163,13 +164,13 @@
               <div class="sb-dom">bipolaranonymous.app</div>
             </div>
           </div>
-          <h2>Real talk. No real names.</h2>
-          <p>An anonymous peer community for the things you can’t always say out loud. Pick a monika, post what’s real, and find people living the same swing.</p>
+          <h2 data-i18n="lp.anonpage.scHeading">Real talk. No real names.</h2>
+          <p data-i18n="lp.anonpage.scBody">An anonymous peer community for the things you can’t always say out loud. Pick a moniker, post what’s real, and find people living the same swing.</p>
           <ul class="showcase-list">
-            <li><span class="tick">✓</span> No real name — just a monika you choose</li>
-            <li><span class="tick">✓</span> Posts to relate to, not perform for</li>
-            <li><span class="tick">✓</span> A community wiki, written by people who get it</li>
-            <li><span class="tick">✓</span> Your email is only ever stored as a hash</li>
+            <li><span class="tick">✓</span> <span data-i18n="lp.anonpage.scLi1">No real name — just a moniker you choose</span></li>
+            <li><span class="tick">✓</span> <span data-i18n="lp.anonpage.scLi2">Posts to relate to, not perform for</span></li>
+            <li><span class="tick">✓</span> <span data-i18n="lp.anonpage.scLi3">A community wiki, written by people who get it</span></li>
+            <li><span class="tick">✓</span> <span data-i18n="lp.anonpage.scLi4">Your email is only ever stored as a hash</span></li>
           </ul>
           <div class="store-badges" style="margin-bottom:18px">
             <a class="store-badge" data-store="appstore-anon" href="#" title="App Store link coming soon" aria-label="Download Bipolar Anonymous on the App Store">
@@ -179,13 +180,13 @@
               <svg viewBox="0 0 180 56"><use href="#badge-googleplay"></use></svg>
             </a>
           </div>
-          <a class="web-link" href="anonymous.html">Open the community →</a>
+          <a class="web-link" href="anonymous.html" data-i18n="lp.anonpage.openCommunity">Open the community →</a>
         </div>
         <div class="carousel reveal d1" data-carousel>
           <div class="carousel-viewport">
             <div class="carousel-track">
               <img class="carousel-slide" src="store-assets/out/anonymous/iphone/01-hero.png" alt="Bipolar Anonymous community feed" draggable="false">
-              <img class="carousel-slide" src="store-assets/out/anonymous/iphone/02-monika.png" alt="Pick a monika" loading="lazy" draggable="false">
+              <img class="carousel-slide" src="store-assets/out/anonymous/iphone/02-monika.png" alt="Pick a moniker" loading="lazy" draggable="false">
               <img class="carousel-slide" src="store-assets/out/anonymous/iphone/03-ask.png" alt="Ask the community" loading="lazy" draggable="false">
               <img class="carousel-slide" src="store-assets/out/anonymous/iphone/04-wiki.png" alt="Community wiki" loading="lazy" draggable="false">
               <img class="carousel-slide" src="store-assets/out/anonymous/iphone/05-report.png" alt="Report and keep it safe" loading="lazy" draggable="false">
@@ -211,13 +212,13 @@
               <div class="sb-dom">bipolarbear.app</div>
             </div>
           </div>
-          <h2>Track the rest with Bipolar Bear.</h2>
-          <p>The companion app from the same team — a free, private mood journal and survival kit for the day-to-day of living with bipolar.</p>
+          <h2 data-i18n="lp.anonpage.bearHeading">Track the rest with Bipolar Bear.</h2>
+          <p data-i18n="lp.anonpage.bearBody">The companion app from the same team — a free, private mood journal and survival kit for the day-to-day of living with bipolar.</p>
           <ul class="showcase-list">
-            <li><span class="tick">✓</span> Mood, energy, sleep, meds &amp; free-text notes</li>
-            <li><span class="tick">✓</span> Personalised insights, computed privately on your device</li>
-            <li><span class="tick">✓</span> End-to-end encrypted — not even we can read it</li>
-            <li><span class="tick">✓</span> Works offline — your journal is always there</li>
+            <li><span class="tick">✓</span> <span data-i18n-html="lp.anonpage.bearLi1">Mood, energy, sleep, meds &amp; free-text notes</span></li>
+            <li><span class="tick">✓</span> <span data-i18n="lp.anonpage.bearLi2">Personalised insights, computed privately on your device</span></li>
+            <li><span class="tick">✓</span> <span data-i18n="lp.anonpage.bearLi3">End-to-end encrypted — not even we can read it</span></li>
+            <li><span class="tick">✓</span> <span data-i18n="lp.anonpage.bearLi4">Works offline — your journal is always there</span></li>
           </ul>
           <div class="store-badges" style="margin-bottom:18px">
             <a class="store-badge" data-store="appstore-bear" href="https://apps.apple.com/gb/app/bipolar-bear/id6766637453" target="_blank" rel="noopener" title="Download Bipolar Bear on the App Store" aria-label="Download Bipolar Bear on the App Store">
@@ -227,7 +228,7 @@
               <svg viewBox="0 0 180 56"><use href="#badge-googleplay"></use></svg>
             </a>
           </div>
-          <a class="web-link" href="https://www.bipolarbear.app" target="_blank" rel="noopener noreferrer">Open bipolarbear.app →</a>
+          <a class="web-link" href="https://www.bipolarbear.app" target="_blank" rel="noopener noreferrer" data-i18n="lp.anonpage.openBear">Open bipolarbear.app →</a>
         </div>
         <div class="carousel reveal d1" data-carousel>
           <div class="carousel-viewport">
@@ -254,11 +255,11 @@
         <img src="images/marketing/james-markey.jpg" alt="James Markey, founder">
       </div>
       <div class="founder-copy reveal d1">
-        <span class="eyebrow">The human behind the apps</span>
-        <h2>Built by James Markey</h2>
-        <p>Bipolar Anonymous and Bipolar Bear both grew out of one person’s experience of living with bipolar — and a belief that nobody should have to face it alone or pay to get help. James builds in the open and shares the whole journey.</p>
-        <p class="signoff">No investors. No data harvesting. Just tools he wished existed.</p>
-        <a class="btn-pill" href="https://www.jamesmarkey.co.uk" target="_blank" rel="noopener noreferrer">
+        <span class="eyebrow" data-i18n="lp.anonpage.founderEyebrow">The human behind the apps</span>
+        <h2 data-i18n="lp.founder.heading">Built by James Markey</h2>
+        <p data-i18n="lp.anonpage.founderBody">Bipolar Anonymous and Bipolar Bear both grew out of one person’s experience of living with bipolar — and a belief that nobody should have to face it alone or pay to get help. James builds in the open and shares the whole journey.</p>
+        <p class="signoff" data-i18n="lp.anonpage.founderSignoff">No investors. No data harvesting. Just tools he wished existed.</p>
+        <a class="btn-pill" href="https://www.jamesmarkey.co.uk" target="_blank" rel="noopener noreferrer" data-i18n="lp.founder.visit">
           Visit jamesmarkey.co.uk →
         </a>
       </div>
@@ -268,12 +269,12 @@
   <!-- ───────────────────────── Hosting credit ───────────────────────── -->
   <section class="hosting">
     <div class="wrap">
-      <div class="host-label">Proudly hosted for free by</div>
+      <div class="host-label" data-i18n="lp.hosting.label">Proudly hosted for free by</div>
       <a class="host-card reveal" href="https://www.unisim.co.uk" target="_blank" rel="noopener noreferrer">
         <img src="images/marketing/unisim-logo.png" alt="UNI SIM">
         <div class="host-text">
           <b>UNI SIM</b>
-          <span>Both apps are hosted free of charge by UNI SIM — so every penny goes to the people who need them, not the servers.</span>
+          <span data-i18n="lp.hosting.body">Both apps are hosted free of charge by UNI SIM — so every penny goes to the people who need them, not the servers.</span>
         </div>
       </a>
     </div>
@@ -288,27 +289,27 @@
             <img src="icons/AppIcon_anonymous_1024_store.png" alt="">
             <b>Bipolar Anonymous</b>
           </div>
-          <p>A free, anonymous peer community for people living with bipolar — plus Bipolar Bear, a private mood journal and survival kit for the rest of it.</p>
+          <p data-i18n="lp.anonpage.footBrandDesc">A free, anonymous peer community for people living with bipolar — plus Bipolar Bear, a private mood journal and survival kit for the rest of it.</p>
         </div>
         <div class="foot-col">
-          <h4>The apps</h4>
-          <a href="anonymous.html">Bipolar Anonymous · open the community</a>
-          <a href="https://www.bipolarbear.app" target="_blank" rel="noopener noreferrer">Bipolar Bear · bipolarbear.app</a>
+          <h4 data-i18n="lp.foot.appsHeading">The apps</h4>
+          <a href="anonymous.html" data-i18n="lp.anonpage.footAnonLink">Bipolar Anonymous · open the community</a>
+          <a href="https://www.bipolarbear.app" target="_blank" rel="noopener noreferrer" data-i18n="lp.anonpage.footBearLink">Bipolar Bear · bipolarbear.app</a>
           <a class="store-badge-text" data-store="appstore-anon" href="#" title="Link coming soon">Download on the App Store</a>
           <a class="store-badge-text" data-store="googleplay-anon" href="#" title="Link coming soon">Get it on Google Play</a>
         </div>
         <div class="foot-col">
-          <h4>More</h4>
-          <a href="privacy.html">Privacy</a>
-          <a href="https://www.jamesmarkey.co.uk" target="_blank" rel="noopener noreferrer">Founder · James Markey</a>
-          <a href="https://www.unisim.co.uk" target="_blank" rel="noopener noreferrer">Hosting · UNI SIM</a>
+          <h4 data-i18n="lp.foot.moreHeading">More</h4>
+          <a href="privacy.html" data-i18n="lp.foot.privacy">Privacy</a>
+          <a href="https://www.jamesmarkey.co.uk" target="_blank" rel="noopener noreferrer" data-i18n="lp.foot.founder">Founder · James Markey</a>
+          <a href="https://www.unisim.co.uk" target="_blank" rel="noopener noreferrer" data-i18n="lp.foot.hosting">Hosting · UNI SIM</a>
         </div>
       </div>
       <div class="foot-note">
-        <div class="crisis">
+        <div class="crisis" data-i18n-html="lp.anonpage.footCrisis">
           <b>Not a crisis service.</b> Bipolar Anonymous is a peer-support community, not a substitute for professional care. If you’re in crisis, contact your local emergency services or a crisis line right away.
         </div>
-        <div>© 2026 Bipolar Anonymous · Built by James Markey · Hosted by UNI SIM</div>
+        <div data-i18n="lp.anonpage.footCopyright">© 2026 Bipolar Anonymous · Built by James Markey · Hosted by UNI SIM</div>
       </div>
     </div>
   </footer>

@@ -75,9 +75,9 @@
   <div class="header">
     <div class="header-inner">
     <div style="display:flex; justify-content:flex-start; align-items:center; margin-bottom:12px;">
-      <a href="index.html" onclick="event.preventDefault(); location.replace('index.html')" class="home-link-btn">← Home</a>
+      <a href="index.html" onclick="event.preventDefault(); location.replace('index.html')" class="home-link-btn" data-i18n="sk.home">← Home</a>
       <div style="margin-left:auto;position:relative;">
-        <button id="skJournalNavBtn" onclick="_skGoToJournal()" title="Journal" style="background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.4);border-radius:50%;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;font-size:1.2em;cursor:pointer;line-height:1;-webkit-tap-highlight-color:transparent;flex-shrink:0;">📖</button>
+        <button id="skJournalNavBtn" onclick="_skGoToJournal()" title="Journal" data-i18n-title="sk.nav.journal" style="background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.4);border-radius:50%;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;font-size:1.2em;cursor:pointer;line-height:1;-webkit-tap-highlight-color:transparent;flex-shrink:0;">📖</button>
       </div>
     </div>
     <!-- Auth elements kept hidden here so JS can still reference them -->
@@ -87,13 +87,13 @@
     </div>
     <img src="images/logos/good_logo.png" alt="Bipolar Bear Logo" id="survivalLogo">
     <h1 id="survivalGuideTitle">Bipolar survival kit</h1>
-    <div class="helped-counter">❤️‍🩹 People Helped: <span class="helped-count-wrap"><span id="helpedCountSpinner"></span><span id="helpedCount" style="display:none;"></span></span><button id="helpedPlusBtn" class="helped-plus-btn" onclick="toggleHelped()" style="display:none;">+1</button></div>
+    <div class="helped-counter"><span data-i18n="sk.peopleHelped">❤️‍🩹 People Helped:</span> <span class="helped-count-wrap"><span id="helpedCountSpinner"></span><span id="helpedCount" style="display:none;"></span></span><button id="helpedPlusBtn" class="helped-plus-btn" onclick="toggleHelped()" style="display:none;">+1</button></div>
     <div id="skHelperHint" style="display:none;flex-direction:column;align-items:center;gap:2px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-top:6px;">
       <svg width="24" height="22" viewBox="0 0 24 22" fill="none">
         <path d="M 12,2 Q 8,12 12,20" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" fill="none"/>
         <polyline points="7,16 12,21 17,16" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
       </svg>
-      <span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,255,255,0.9);font-family:'Georgia',serif;letter-spacing:0.01em;text-align:center;max-width:220px;line-height:1.4;">🐻 Click here if Bipolar Bear helped you</span>
+      <span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,255,255,0.9);font-family:'Georgia',serif;letter-spacing:0.01em;text-align:center;max-width:220px;line-height:1.4;" data-i18n="sk.headerHelpHint">🐻 Click here if Bipolar Bear helped you</span>
     </div>
     </div><!-- end header-inner -->
   </div>
@@ -102,7 +102,7 @@
   <nav class="sticky-nav">
     <div class="sticky-nav-inner">
       <div class="sticky-nav-home">
-        <a href="index.html" onclick="event.preventDefault(); location.replace('index.html')">🏠 Home</a>
+        <a href="index.html" onclick="event.preventDefault(); location.replace('index.html')" data-i18n="sk.nav.home">🏠 Home</a>
       </div>
       <div class="sticky-nav-row">
         <a href="#mood-scale">📊 </a>
@@ -116,28 +116,28 @@
         <a href="#steps">🙏</a>
       </div>
       <div class="sticky-nav-help">
-        <a href="#help">🆘 Help</a>
+        <a href="#help" data-i18n="sk.help">🆘 Help</a>
       </div>
     </div>
   </nav>
 
   <div class="container">
 
-    <h3 style="font-size: 1.05em; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light); margin-top: 0px; margin-bottom: 14px; padding-left: 2px;">📖 Definition</h3>
+    <h3 style="font-size: 1.05em; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light); margin-top: 0px; margin-bottom: 14px; padding-left: 2px;" data-i18n="sk.def.heading">📖 Definition</h3>
 
       <div class="accordion">
         <button class="accordion-header" onclick="toggleAccordion(this)">
-          Bipolar Disorder Definition from DSM-5
+          <span data-i18n="sk.def.accordionTitle">Bipolar Disorder Definition from DSM-5</span>
           <span class="chevron">▼</span>
         </button>
         <div class="accordion-body">
           <ul>
-            <li><strong>Bipolar Type I</strong> — Characterised by manic episodes including euphoria, increased energy, and impulsive behaviours. Manic episodes can be preceded or followed by hypomanic or major depressive episodes.</li>
-            <li><strong>Bipolar Type II</strong> — Characterised by patterns of depressive episodes and hypomania, but without the full psychosis experience of bipolar I.</li>
-            <li><strong>Rapid Cycling</strong> — A high frequency of mood episodes (at least four) over the past 12 months. <em>This is what I have.</em></li>
+            <li data-i18n-html="sk.def.type1"><strong>Bipolar Type I</strong> — Characterised by manic episodes including euphoria, increased energy, and impulsive behaviours. Manic episodes can be preceded or followed by hypomanic or major depressive episodes.</li>
+            <li data-i18n-html="sk.def.type2"><strong>Bipolar Type II</strong> — Characterised by patterns of depressive episodes and hypomania, but without the full psychosis experience of bipolar I.</li>
+            <li data-i18n-html="sk.def.rapidCycling"><strong>Rapid Cycling</strong> — A high frequency of mood episodes (at least four) over the past 12 months. <em>This is what I have.</em></li>
           </ul>
-          <p style="margin-top: 14px;">The two poles are <strong>elevated moods</strong> and <strong>depressive moods</strong>. Everyone is different but generally an elevated mood lasts for at least several days and a depressive mood is present for most of the day for at least two weeks.</p>
-          <p style="margin-top: 10px;">Sources: <a href="https://icd.who.int/browse/2024-01/mms/en#199053300" target="_blank" style="color: var(--orange);">ICD-11</a> (Free) · <a href="https://www.amazon.co.uk/Diagnostic-Statistical-Manual-Mental-Disorders/dp/0890425558" target="_blank" style="color: var(--orange);">DSM-5</a></p>
+          <p style="margin-top: 14px;" data-i18n-html="sk.def.poles">The two poles are <strong>elevated moods</strong> and <strong>depressive moods</strong>. Everyone is different but generally an elevated mood lasts for at least several days and a depressive mood is present for most of the day for at least two weeks.</p>
+          <p style="margin-top: 10px;" data-i18n-html="sk.def.sources">Sources: <a href="https://icd.who.int/browse/2024-01/mms/en#199053300" target="_blank" style="color: var(--orange);">ICD-11</a> (Free) · <a href="https://www.amazon.co.uk/Diagnostic-Statistical-Manual-Mental-Disorders/dp/0890425558" target="_blank" style="color: var(--orange);">DSM-5</a></p>
         </div>
       </div>
 
@@ -145,108 +145,108 @@
     <div class="section" id="mood-scale">
       <div class="section-header" onclick="toggleSection(this)">
         <span class="section-icon">📊</span>
-        <h2>Bipolar Moods</h2>
+        <h2 data-i18n="sk.moodScale.sectionTitle">Bipolar Moods</h2>
         <span id="tick_mood-scale" style="margin-left:auto;margin-right:8px;font-size:0.85em;"></span>
         <span class="section-chevron">▼</span>
       </div>
       <div class="section-body">
 
-      <h3 style="font-size: 1.05em; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light); margin-bottom: 14px; padding-left: 2px;">Mood Scale</h3>
+      <h3 style="font-size: 1.05em; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light); margin-bottom: 14px; padding-left: 2px;" data-i18n="sk.moodScale.scaleTitle">Mood Scale</h3>
 
       <div class="card">
         <div class="mood-icon-grid">
           <button class="mood-icon-btn manic" onclick="showMoodDetail('manic')">
             <span class="emoji"><img src="images/moods/manic.png" width="40" alt="Manic"></span>
-            <span class="label">Manic</span>
+            <span class="label" data-i18n="sk.moods.manic">Manic</span>
           </button>
           <button class="mood-icon-btn hypomanic" onclick="showMoodDetail('hypomanic')">
             <span class="emoji"><img src="images/moods/elevated.png" width="40" alt="Elevated"></span>
-            <span class="label">Elevated</span>
+            <span class="label" data-i18n="sk.moods.elevated">Elevated</span>
           </button>
           <button class="mood-icon-btn stable" onclick="showMoodDetail('stable')">
             <span class="emoji"><img src="images/moods/good.png" width="40" alt="Good"></span>
-            <span class="label">Good</span>
+            <span class="label" data-i18n="sk.moods.good">Good</span>
           </button>
           <button class="mood-icon-btn low" onclick="showMoodDetail('low')">
             <span class="emoji"><img src="images/moods/low.png" width="40" alt="Low"></span>
-            <span class="label">Low</span>
+            <span class="label" data-i18n="sk.moods.low">Low</span>
           </button>
           <button class="mood-icon-btn depressed" onclick="showMoodDetail('depressed')">
             <span class="emoji"><img src="images/moods/depressed.png" width="40" alt="Depressed"></span>
-            <span class="label">Depressed</span>
+            <span class="label" data-i18n="sk.moods.depressed">Depressed</span>
           </button>
         </div>
-        <p id="moodScaleTip" style="text-align: center; font-weight: 600; color: var(--orange); margin-bottom: 14px;">☝️ Tap an icon to learn more</p>
+        <p id="moodScaleTip" style="text-align: center; font-weight: 600; color: var(--orange); margin-bottom: 14px;" data-i18n="sk.moodScale.tip">☝️ Tap an icon to learn more</p>
 
         <div id="moodDetail-manic" class="mood-detail-panel manic">
-          <h3>🚀 Manic (9–10)</h3>
+          <h3 data-i18n="sk.moods.manicTitle">🚀 Manic (9–10)</h3>
           <div id="bipolarDef-manic">
-            <div style="background:rgba(255,68,68,0.08); border-radius:8px; padding:10px 12px; margin:8px 0; font-size:0.85em;">
+            <div style="background:rgba(255,68,68,0.08); border-radius:8px; padding:10px 12px; margin:8px 0; font-size:0.85em;" data-i18n-html="sk.moods.manicBipolarUk">
               <strong>Bipolar UK Scale 9–10:</strong> Severe mania — hospitalisation often needed. Gross overactivity, flight of ideas, marked disinhibition, little or no sleep. Grandiose delusions, possible hallucinations. Unaware of own condition.
             </div>
           </div>
           <div id="moodDefArea-manic" style="margin-bottom:8px;"></div>
-          <p style="font-size:0.78em;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#6c757d;margin:10px 0 4px;">Recommendations</p>
-          <span class="action-tag">🚨 Freeze all bank cards, stop everything, stay inside.</span>
+          <p style="font-size:0.78em;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#6c757d;margin:10px 0 4px;" data-i18n="sk.moodScale.recommendations">Recommendations</p>
+          <span class="action-tag" data-i18n="sk.moods.manicAction">🚨 Freeze all bank cards, stop everything, stay inside.</span>
         </div>
         <div id="moodDetail-hypomanic" class="mood-detail-panel hypomanic">
-          <h3>😄 Elevated / Hypomanic (7–8)</h3>
+          <h3 data-i18n="sk.moods.elevatedTitle">😄 Elevated / Hypomanic (7–8)</h3>
           <div id="bipolarDef-hypomanic">
-            <div style="background:rgba(255,149,0,0.08); border-radius:8px; padding:10px 12px; margin:8px 0; font-size:0.85em;">
+            <div style="background:rgba(255,149,0,0.08); border-radius:8px; padding:10px 12px; margin:8px 0; font-size:0.85em;" data-i18n-html="sk.moods.elevatedBipolarUk">
               <strong>Bipolar UK Scale 7–8:</strong> Elevated mood, marked overactivity, reduced need for sleep (but not absent), increased energy, libido and confidence. Impulsive decisions. Still partially functional but judgement impaired.
             </div>
           </div>
           <div id="moodDefArea-hypomanic" style="margin-bottom:8px;"></div>
-          <p style="font-size:0.78em;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#6c757d;margin:10px 0 4px;">Recommendations</p>
-          <span class="action-tag">🧠 Think before doing something. Wait a while before making any decisions.</span>
+          <p style="font-size:0.78em;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#6c757d;margin:10px 0 4px;" data-i18n="sk.moodScale.recommendations">Recommendations</p>
+          <span class="action-tag" data-i18n="sk.moods.elevatedAction">🧠 Think before doing something. Wait a while before making any decisions.</span>
         </div>
         <div id="moodDetail-stable" class="mood-detail-panel stable">
-          <h3>😊 Good / Stable (5–6)</h3>
+          <h3 data-i18n="sk.moods.goodTitle">😊 Good / Stable (5–6)</h3>
           <div id="bipolarDef-stable">
-            <div style="background:rgba(81,207,102,0.08); border-radius:8px; padding:10px 12px; margin:8px 0; font-size:0.85em;">
+            <div style="background:rgba(81,207,102,0.08); border-radius:8px; padding:10px 12px; margin:8px 0; font-size:0.85em;" data-i18n-html="sk.moods.goodBipolarUk">
               <strong>Bipolar UK Scale 5–6:</strong> Normal, stable mood. Good energy, motivation and concentration. Able to function well at work and socially. Sleep pattern normal. This is the target state.
             </div>
           </div>
           <div id="moodDefArea-stable" style="margin-bottom:8px;"></div>
-          <p style="font-size:0.78em;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#6c757d;margin:10px 0 4px;">Recommendations</p>
-          <span class="action-tag">✅ Enjoy the moment. Keep things in check.</span>
+          <p style="font-size:0.78em;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#6c757d;margin:10px 0 4px;" data-i18n="sk.moodScale.recommendations">Recommendations</p>
+          <span class="action-tag" data-i18n="sk.moods.goodAction">✅ Enjoy the moment. Keep things in check.</span>
         </div>
         <div id="moodDetail-neutral" class="mood-detail-panel neutral">
-          <h3>😐 Neutral (4)</h3>
-          <p>Completely stable. No signs of mania or depression. Slight withdrawal and less concentration but manageable day to day.</p>
-          <div style="background:rgba(116,192,252,0.08); border-radius:8px; padding:10px 12px; margin:8px 0; font-size:0.85em;">
+          <h3 data-i18n="sk.moods.neutralTitle">😐 Neutral (4)</h3>
+          <p data-i18n="sk.moods.neutralBody">Completely stable. No signs of mania or depression. Slight withdrawal and less concentration but manageable day to day.</p>
+          <div style="background:rgba(116,192,252,0.08); border-radius:8px; padding:10px 12px; margin:8px 0; font-size:0.85em;" data-i18n-html="sk.moods.neutralBipolarUk">
             <strong>Bipolar UK Scale 4:</strong> Slightly below normal — mild withdrawal, slightly low mood but still coping day to day. No major impairment.
           </div>
-          <p style="font-size:0.78em;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#6c757d;margin:10px 0 4px;">Recommendations</p>
-          <span class="action-tag">✅ This is the baseline. Enjoy it.</span>
+          <p style="font-size:0.78em;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#6c757d;margin:10px 0 4px;" data-i18n="sk.moodScale.recommendations">Recommendations</p>
+          <span class="action-tag" data-i18n="sk.moods.neutralAction">✅ This is the baseline. Enjoy it.</span>
         </div>
         <div id="moodDetail-low" class="mood-detail-panel low">
-          <h3>😔 Low (2–3)</h3>
+          <h3 data-i18n="sk.moods.lowTitle">😔 Low (2–3)</h3>
           <div id="bipolarDef-low">
-            <div style="background:rgba(132,94,247,0.08); border-radius:8px; padding:10px 12px; margin:8px 0; font-size:0.85em;">
+            <div style="background:rgba(132,94,247,0.08); border-radius:8px; padding:10px 12px; margin:8px 0; font-size:0.85em;" data-i18n-html="sk.moods.lowBipolarUk">
               <strong>Bipolar UK Scale 2–3:</strong> Mild to moderate depression — low mood, fatigue, poor concentration, loss of interest and motivation. Withdrawing socially. Getting through the day but struggling.
             </div>
           </div>
           <div id="moodDefArea-low" style="margin-bottom:8px;"></div>
-          <p style="font-size:0.78em;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#6c757d;margin:10px 0 4px;">Recommendations</p>
-          <span class="action-tag">💙 Cognitive strategies. Get outside. Play games. Love yourself. Try not to withdraw entirely.</span>
+          <p style="font-size:0.78em;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#6c757d;margin:10px 0 4px;" data-i18n="sk.moodScale.recommendations">Recommendations</p>
+          <span class="action-tag" data-i18n="sk.moods.lowAction">💙 Cognitive strategies. Get outside. Play games. Love yourself. Try not to withdraw entirely.</span>
         </div>
         <div id="moodDetail-depressed" class="mood-detail-panel depressed">
-          <h3>🌧️ Depressed (0–1)</h3>
+          <h3 data-i18n="sk.moods.depressedTitle">🌧️ Depressed (0–1)</h3>
           <div id="bipolarDef-depressed">
-            <div style="background:rgba(92,124,250,0.08); border-radius:8px; padding:10px 12px; margin:8px 0; font-size:0.85em;">
+            <div style="background:rgba(92,124,250,0.08); border-radius:8px; padding:10px 12px; margin:8px 0; font-size:0.85em;" data-i18n-html="sk.moods.depressedBipolarUk">
               <strong>Bipolar UK Scale 0–1:</strong> Severe depression — unable to function, possible suicidal thoughts or self-harm. Urgent support needed. Tell someone you trust or call 999 / Samaritans 116 123.
             </div>
           </div>
           <div id="moodDefArea-depressed" style="margin-bottom:8px;"></div>
-          <p style="font-size:0.78em;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#6c757d;margin:10px 0 4px;">Recommendations</p>
-          <span class="action-tag">🆘 Tell someone. It's OK not to be OK right now.</span>
+          <p style="font-size:0.78em;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#6c757d;margin:10px 0 4px;" data-i18n="sk.moodScale.recommendations">Recommendations</p>
+          <span class="action-tag" data-i18n="sk.moods.depressedAction">🆘 Tell someone. It's OK not to be OK right now.</span>
         </div>
       </div>
 
       <div style="text-align: center; margin-top: 16px;">
 
-        <a href="https://www.bipolaruk.org/faqs/track-your-mood-scale" target="_blank" class="link-btn secondary">Official Bipolar UK Mood Scale ↗</a>
+        <a href="https://www.bipolaruk.org/faqs/track-your-mood-scale" target="_blank" class="link-btn secondary" data-i18n="sk.moodScale.officialLink">Official Bipolar UK Mood Scale ↗</a>
       </div>
 
       </div><!-- /section-body -->
@@ -256,7 +256,7 @@
     <div class="section collapsed" id="coping-strategies">
       <div class="section-header" onclick="toggleSection(this)">
         <span class="section-icon">🧠</span>
-        <h2>My Strategies</h2>
+        <h2 data-i18n="sk.strategies.sectionTitle">My Strategies</h2>
         <span id="tick_coping-strategies" style="margin-left:auto;margin-right:8px;font-size:0.85em;"></span>
         <span class="section-chevron">▼</span>
       </div>
@@ -265,31 +265,31 @@
           <div class="mood-icon-grid">
             <button class="mood-icon-btn manic" onclick="selectCopingMood('manic')">
               <span class="emoji"><img src="images/moods/manic.png" width="40" alt="Manic"></span>
-              <span class="label">Manic</span>
+              <span class="label" data-i18n="sk.moods.manic">Manic</span>
             </button>
             <button class="mood-icon-btn hypomanic" onclick="selectCopingMood('elevated')">
               <span class="emoji"><img src="images/moods/elevated.png" width="40" alt="Elevated"></span>
-              <span class="label">Elevated</span>
+              <span class="label" data-i18n="sk.moods.elevated">Elevated</span>
             </button>
             <button class="mood-icon-btn stable" onclick="selectCopingMood('good')">
               <span class="emoji"><img src="images/moods/good.png" width="40" alt="Good"></span>
-              <span class="label">Good</span>
+              <span class="label" data-i18n="sk.moods.good">Good</span>
             </button>
             <button class="mood-icon-btn low" onclick="selectCopingMood('low')">
               <span class="emoji"><img src="images/moods/low.png" width="40" alt="Low"></span>
-              <span class="label">Low</span>
+              <span class="label" data-i18n="sk.moods.low">Low</span>
             </button>
             <button class="mood-icon-btn depressed" onclick="selectCopingMood('depressed')">
               <span class="emoji"><img src="images/moods/depressed.png" width="40" alt="Depressed"></span>
-              <span class="label">Depressed</span>
+              <span class="label" data-i18n="sk.moods.depressed">Depressed</span>
             </button>
           </div>
-          <p id="copingStrategiesTip" style="text-align:center;font-weight:600;color:var(--orange);margin-bottom:14px;">☝️ Select a mood to see your strategies</p>
+          <p id="copingStrategiesTip" style="text-align:center;font-weight:600;color:var(--orange);margin-bottom:14px;" data-i18n="sk.strategies.tip">☝️ Select a mood to see your strategies</p>
 
           <div id="copingStrategiesBox" style="display:none;border-top:1px solid #f0f0f0;padding-top:14px;margin-top:2px;">
             <h3 id="copingMoodLabel" style="margin:0 0 10px;font-size:1em;"></h3>
             <div id="copingStrategiesList" style="min-height:36px;margin-bottom:10px;"></div>
-            <button onclick="openAddCopingModal()" style="width:100%;padding:10px;background:none;border:2px dashed var(--brand-primary);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;">+ Add coping strategy</button>
+            <button onclick="openAddCopingModal()" style="width:100%;padding:10px;background:none;border:2px dashed var(--brand-primary);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="sk.strategies.addBtn">+ Add coping strategy</button>
           </div>
         </div>
       </div>
@@ -299,7 +299,7 @@
     <div class="section collapsed" id="medications">
       <div class="section-header" onclick="toggleSection(this)">
         <span class="section-icon">💊</span>
-        <h2>My Meds</h2>
+        <h2 data-i18n="sk.meds.sectionTitle">My Meds</h2>
         <span id="tick_medications" style="margin-left:auto;margin-right:8px;font-size:0.85em;"></span>
         <span class="section-chevron">▼</span>
       </div>
@@ -308,16 +308,16 @@
         <!-- My Current Medication box -->
         <div class="card" style="margin-bottom:20px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <h3 style="margin:0; font-size:1em;">My Current Medication</h3>
-            <button onclick="openMedInfoModal()" style="background:white; color:var(--brand-primary); border:2px solid var(--brand-primary); border-radius:8px; padding:6px 14px; cursor:pointer; font-weight:600; font-size:0.85em;">Edit</button>
+            <h3 style="margin:0; font-size:1em;" data-i18n="sk.meds.currentTitle">My Current Medication</h3>
+            <button onclick="openMedInfoModal()" style="background:white; color:var(--brand-primary); border:2px solid var(--brand-primary); border-radius:8px; padding:6px 14px; cursor:pointer; font-weight:600; font-size:0.85em;" data-i18n="sk.meds.edit">Edit</button>
           </div>
           <div id="currentMedDisplay" style="color:#6c757d; font-size:0.9em; line-height:1.6; white-space:pre-wrap; word-break:break-word;">
-            <em>Tap Edit to add your current medication</em>
+            <em data-i18n="sk.meds.currentEmpty">Tap Edit to add your current medication</em>
           </div>
         </div>
 
         <!-- Common medications info - dynamically updated based on user's med list -->
-        <p style="color:var(--text-light); font-size:0.85em; margin-bottom:16px;">Common medications used to treat bipolar disorder. Always follow your prescriber's guidance.</p>
+        <p style="color:var(--text-light); font-size:0.85em; margin-bottom:16px;" data-i18n="sk.meds.commonNote">Common medications used to treat bipolar disorder. Always follow your prescriber's guidance.</p>
 
         <div id="primaryMedsContainer"></div>
 
@@ -326,7 +326,7 @@
           <div id="moreMedsContainer"></div>
         </div><!-- /moreMedicationsSection -->
 
-        <button id="moreMedicationsBtn" onclick="toggleMoreMedications()" style="width:100%; margin-top:8px; padding:10px; background:none; border:2px solid #e9ecef; border-radius:10px; color:#6c757d; font-size:0.9em; cursor:pointer; font-weight:600;">More ▼</button>
+        <button id="moreMedicationsBtn" onclick="toggleMoreMedications()" style="width:100%; margin-top:8px; padding:10px; background:none; border:2px solid #e9ecef; border-radius:10px; color:#6c757d; font-size:0.9em; cursor:pointer; font-weight:600;" data-i18n="sk.meds.more">More ▼</button>
 
       </div><!-- /section-body -->
     </div>
@@ -335,14 +335,14 @@
     <div class="section collapsed" id="gratitude">
       <div class="section-header" onclick="toggleSection(this)">
         <span class="section-icon">🙏</span>
-        <h2>Gratitude</h2>
+        <h2 data-i18n="sk.gratitude.sectionTitle">Gratitude</h2>
         <span id="tick_gratitude" style="margin-left:auto;margin-right:8px;font-size:0.85em;"></span>
         <span class="section-chevron">▼</span>
       </div>
       <div class="section-body">
-        <p style="color:var(--text-light);font-size:0.9em;line-height:1.6;margin-bottom:16px;">Noting what you're grateful for — even small things — can help shift focus during hard days. Add things that matter to you.</p>
+        <p style="color:var(--text-light);font-size:0.9em;line-height:1.6;margin-bottom:16px;" data-i18n="sk.gratitude.intro">Noting what you're grateful for — even small things — can help shift focus during hard days. Add things that matter to you.</p>
         <div id="gratitudeList" style="margin-bottom:12px;"></div>
-        <button onclick="openAddGratitudeModal()" style="width:100%;padding:10px;background:none;border:2px dashed var(--brand-primary);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;">+ Add gratitude</button>
+        <button onclick="openAddGratitudeModal()" style="width:100%;padding:10px;background:none;border:2px dashed var(--brand-primary);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="sk.gratitude.addBtn">+ Add gratitude</button>
       </div>
     </div>
 
@@ -350,46 +350,46 @@
     <div class="section collapsed" id="goals">
       <div class="section-header" onclick="toggleSection(this)">
         <span class="section-icon">🎯</span>
-        <h2>My 1-5 Yr Goals</h2>
+        <h2 data-i18n="sk.goals.sectionTitle">My 1-5 Yr Goals</h2>
         <span id="tick_goals" style="margin-left:auto;margin-right:8px;font-size:0.85em;"></span>
         <span class="section-chevron">▼</span>
       </div>
       <div class="section-body">
 
       <div class="card">
-        <h3>Progress Not Perfection</h3>
-        <p>It's important to look at the overall trajectory — achieving more goals than if I didn't have them. Month to month may not be up to expectation but year to year always surpasses it if I keep going.</p>
-        <p><strong>Progress doesn't go in a straight line! 📈</strong></p>
+        <h3 data-i18n="sk.goals.progressTitle">Progress Not Perfection</h3>
+        <p data-i18n="sk.goals.progressBody">It's important to look at the overall trajectory — achieving more goals than if I didn't have them. Month to month may not be up to expectation but year to year always surpasses it if I keep going.</p>
+        <p data-i18n-html="sk.goals.progressEmphasis"><strong>Progress doesn't go in a straight line! 📈</strong></p>
       </div>
 
       <div class="goals-desktop-grid">
         <!-- Left: Wall Tracker -->
         <div class="card" style="text-align: center;">
           <div style="font-size: 2.5em; margin-bottom: 8px;">📌</div>
-          <h3>Wall Tracker</h3>
-          <p style="color: var(--text-light); font-size: 0.9em; margin: 8px 0 14px;">Keep goals pinned to a physical board as a visual reminder.</p>
+          <h3 data-i18n="sk.goals.wallTrackerTitle">Wall Tracker</h3>
+          <p style="color: var(--text-light); font-size: 0.9em; margin: 8px 0 14px;" data-i18n="sk.goals.wallTrackerDesc">Keep goals pinned to a physical board as a visual reminder.</p>
           <div id="wallTrackerActions">
-            <a href="https://docs.google.com/document/d/1R_UAATfvnGBiKICxslWfuzDghOsxVAd6WDZdNXYnJdI/edit?usp=sharing" target="_blank" class="link-btn" id="wallTrackerPdfLink">Download ↗</a>
-            <button id="wallTrackerPdfBtn" onclick="generateWallTrackerPDF()" style="display:none;padding:10px 20px;background:var(--brand-primary);color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;margin-top:10px;font-size:0.9em;-webkit-tap-highlight-color:transparent;">Generate Wall Tracker PDF</button>
+            <a href="https://docs.google.com/document/d/1R_UAATfvnGBiKICxslWfuzDghOsxVAd6WDZdNXYnJdI/edit?usp=sharing" target="_blank" class="link-btn" id="wallTrackerPdfLink" data-i18n="sk.goals.download">Download ↗</a>
+            <button id="wallTrackerPdfBtn" onclick="generateWallTrackerPDF()" style="display:none;padding:10px 20px;background:var(--brand-primary);color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;margin-top:10px;font-size:0.9em;-webkit-tap-highlight-color:transparent;" data-i18n="sk.goals.generatePdf">Generate Wall Tracker PDF</button>
           </div>
         </div>
 
         <!-- Right: Goals + Budget stacked -->
         <div class="goals-desktop-right">
           <div class="card">
-            <h3 style="margin:0 0 4px;">🎯 My 1-5 Yr Goals</h3>
-            <p style="font-size:0.85em;color:#6c757d;margin:0 0 12px;">Synced with your journal daily goals</p>
+            <h3 style="margin:0 0 4px;" data-i18n="sk.goals.goalsCardTitle">🎯 My 1-5 Yr Goals</h3>
+            <p style="font-size:0.85em;color:#6c757d;margin:0 0 12px;" data-i18n="sk.goals.goalsCardSub">Synced with your journal daily goals</p>
             <div id="survivalGoalsList" style="margin-bottom:12px;"></div>
-            <button onclick="openAddGoalModal()" style="width:100%;padding:10px;background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);border-radius:8px;cursor:pointer;font-weight:600;-webkit-tap-highlight-color:transparent;">+ Add Goal</button>
+            <button onclick="openAddGoalModal()" style="width:100%;padding:10px;background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);border-radius:8px;cursor:pointer;font-weight:600;-webkit-tap-highlight-color:transparent;" data-i18n="sk.goals.addGoalBtn">+ Add Goal</button>
           </div>
 
           <div class="card">
-            <h3 style="margin:0 0 4px;">💰 Daily Budget</h3>
-            <p style="font-size:0.85em;color:#6c757d;margin:0 0 12px;">Synced with your journal — you'll be asked if you kept to it when logging each entry.</p>
+            <h3 style="margin:0 0 4px;" data-i18n="sk.goals.budgetCardTitle">💰 Daily Budget</h3>
+            <p style="font-size:0.85em;color:#6c757d;margin:0 0 12px;" data-i18n="sk.goals.budgetCardSub">Synced with your journal — you'll be asked if you kept to it when logging each entry.</p>
             <div id="survivalBudgetDisplay" style="margin-bottom:12px;font-size:0.9em;color:#495057;"></div>
             <div style="display:flex;gap:8px;">
-              <input type="text" id="survivalBudgetInput" placeholder="e.g. £50 daily" onkeydown="if(event.key==='Enter')saveSurvivalBudget()" style="flex:1;padding:10px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;box-sizing:border-box;">
-              <button onclick="saveSurvivalBudget()" style="padding:10px 16px;background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);border-radius:8px;cursor:pointer;font-weight:600;white-space:nowrap;-webkit-tap-highlight-color:transparent;">Save</button>
+              <input type="text" id="survivalBudgetInput" placeholder="e.g. £50 daily" data-i18n-placeholder="sk.goals.budgetPlaceholder" onkeydown="if(event.key==='Enter')saveSurvivalBudget()" style="flex:1;padding:10px;border:2px solid #e9ecef;border-radius:8px;font-size:0.9em;box-sizing:border-box;">
+              <button onclick="saveSurvivalBudget()" style="padding:10px 16px;background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);border-radius:8px;cursor:pointer;font-weight:600;white-space:nowrap;-webkit-tap-highlight-color:transparent;" data-i18n="sk.goals.save">Save</button>
             </div>
           </div>
         </div>
@@ -401,29 +401,29 @@
     <div class="section collapsed" id="mind">
       <div class="section-header" onclick="toggleSection(this)">
         <span class="section-icon">🧠</span>
-        <h2>Mind Games</h2>
+        <h2 data-i18n="sk.mindGames.sectionTitle">Mind Games</h2>
         <span id="tick_mind" style="margin-left:auto;margin-right:8px;font-size:0.85em;"></span>
         <span class="section-chevron">▼</span>
       </div>
       <div class="section-body">
 
       <div class="card" style="margin-bottom: 16px;">
-        <p>From time to time I lose my ability to recall anything. It's debilitating and scary. But I can't allow it to keep dragging me down.</p>
+        <p data-i18n="sk.mindGames.intro">From time to time I lose my ability to recall anything. It's debilitating and scary. But I can't allow it to keep dragging me down.</p>
       </div>
 
       <div class="card" style="margin-top: 16px;">
-        <h3 style="margin-bottom: 10px;">📝 Test Yourself</h3>
-        <p style="color: var(--text-light); font-size: 0.85em; margin-bottom: 12px;">Type something important. Hide it to cover with a block — tap to reveal.<br><br>
+        <h3 style="margin-bottom: 10px;" data-i18n="sk.mindGames.testTitle">📝 Test Yourself</h3>
+        <p style="color: var(--text-light); font-size: 0.85em; margin-bottom: 12px;" data-i18n-html="sk.mindGames.testBody">Type something important. Hide it to cover with a block — tap to reveal.<br><br>
           🎨 <b>Go Creative</b><br>Just met Colin Butcher? Imagine Colin the Caterpillar as a butcher. The weirder the image, the better it sticks.<br><br><b>🔢 Play with numbers<br></b>
 Need to remember your AirBnB code 6936#?<br>
 Try 69 then 6 halved (3) and 9 upside down (6), hashtag.</p>
         <div id="rememberContainer" style="position: relative; margin-bottom: 12px;">
-          <textarea id="rememberText" placeholder="Something I need to remember..." style="width:100%; min-height:80px; padding:10px; border:2px solid #e9ecef; border-radius:10px; font-family:inherit; font-size:0.9em; resize:vertical; box-sizing:border-box; outline:none;"></textarea>
+          <textarea id="rememberText" placeholder="Something I need to remember..." data-i18n-placeholder="sk.mindGames.rememberPlaceholder" style="width:100%; min-height:80px; padding:10px; border:2px solid #e9ecef; border-radius:10px; font-family:inherit; font-size:0.9em; resize:vertical; box-sizing:border-box; outline:none;"></textarea>
           <div id="rememberOverlay" onclick="toggleRemember()" style="display:none; position:absolute; inset:0; background:linear-gradient(135deg,var(--brand-primary-light) 0%,var(--brand-primary-mid) 100%); border-radius:10px; cursor:pointer; transition:opacity 0.2s;"></div>
         </div>
-        <button id="rememberToggleBtn" onclick="toggleRemember()" style="background:linear-gradient(135deg,var(--brand-primary-light),var(--brand-primary-mid)); color:white; border:none; padding:8px 20px; border-radius:8px; cursor:pointer; font-weight:600; font-size:0.85em;">Hide</button>
-      
-        <a href="https://www.bipolarbear.app/wp-content/uploads/2025/06/2015-Cognitive-Rehabilitation.pdf" target="_blank" class="link-btn secondary" style="margin-left: 25px; font-size: 0.8em;">Learn about CRT ↗</a>
+        <button id="rememberToggleBtn" onclick="toggleRemember()" style="background:linear-gradient(135deg,var(--brand-primary-light),var(--brand-primary-mid)); color:white; border:none; padding:8px 20px; border-radius:8px; cursor:pointer; font-weight:600; font-size:0.85em;" data-i18n="sk.mindGames.hide">Hide</button>
+
+        <a href="https://www.bipolarbear.app/wp-content/uploads/2025/06/2015-Cognitive-Rehabilitation.pdf" target="_blank" class="link-btn secondary" style="margin-left: 25px; font-size: 0.8em;" data-i18n="sk.mindGames.learnCrt">Learn about CRT ↗</a>
         </div>
 
       </div><!-- /section-body -->
@@ -433,7 +433,7 @@ Try 69 then 6 halved (3) and 9 upside down (6), hashtag.</p>
     <div class="section collapsed" id="books">
       <div class="section-header" onclick="toggleSection(this)">
         <span class="section-icon">📚</span>
-        <h2>Reading</h2>
+        <h2 data-i18n="sk.reading.sectionTitle">Reading</h2>
         <span id="tick_books" style="margin-left:auto;margin-right:8px;font-size:0.85em;"></span>
         <span class="section-chevron">▼</span>
       </div>
@@ -443,8 +443,8 @@ Try 69 then 6 halved (3) and 9 upside down (6), hashtag.</p>
         <div class="card" style="text-align: center;">
           <div style="font-size: 3em; margin-bottom: 10px;"><img style="max-width: 75px" src="images/book.png"></div>
           <h3>An Unquiet Mind</h3>
-          <p style="font-size: 0.85em;">A Memoir of Moods and Madness by Kay Redfield Jamison</p>
-          <a href="https://www.google.co.uk/books/edition/An_Unquiet_Mind/gWV-BAAAQBAJ" target="_blank" class="link-btn">Read Here ↗</a>
+          <p style="font-size: 0.85em;" data-i18n="sk.reading.book1Blurb">A Memoir of Moods and Madness by Kay Redfield Jamison</p>
+          <a href="https://www.google.co.uk/books/edition/An_Unquiet_Mind/gWV-BAAAQBAJ" target="_blank" class="link-btn" data-i18n="sk.reading.readHere">Read Here ↗</a>
         </div>
         
       </div>
@@ -455,15 +455,15 @@ Try 69 then 6 halved (3) and 9 upside down (6), hashtag.</p>
     <div class="section collapsed" id="media">
       <div class="section-header" onclick="toggleSection(this)">
         <span class="section-icon">🎵</span>
-        <h2>Media</h2>
+        <h2 data-i18n="sk.media.sectionTitle">Media</h2>
         <span id="tick_media" style="margin-left:auto;margin-right:8px;font-size:0.85em;"></span>
         <span class="section-chevron">▼</span>
       </div>
       <div class="section-body">
 
-      <p style="color: var(--text-light); margin-bottom: 16px;">I'm not alone. There are creatives, celebrities and ordinary people all over the place.</p>
+      <p style="color: var(--text-light); margin-bottom: 16px;" data-i18n="sk.media.intro">I'm not alone. There are creatives, celebrities and ordinary people all over the place.</p>
       <div style="background:white;border:1px solid #e9ecef;border-radius:14px;padding:18px 20px;margin-top:16px;text-align:center; margin-bottom: 25px;">
-        <div style="font-size:0.72em;font-weight:700;color:var(--brand-primary);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:14px;">✨ You're in good company</div>
+        <div style="font-size:0.72em;font-weight:700;color:var(--brand-primary);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:14px;" data-i18n="sk.media.goodCompany">✨ You're in good company</div>
         <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
           <div style="width:72px;height:72px;border-radius:50%;overflow:hidden;background:#f0e6d3;display:flex;align-items:center;justify-content:center;font-size:2em;" id="celebPhotoWrap">
             <img id="celebPhoto" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:none;">
@@ -472,7 +472,7 @@ Try 69 then 6 halved (3) and 9 upside down (6), hashtag.</p>
           <div>
             <div id="celebName" style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:2px;"></div>
             <div id="celebField" style="font-size:0.82em;color:#adb5bd;margin-bottom:8px;"></div>
-            <a id="celebWikiLink" href="#" target="_blank" style="font-size:0.78em;color:var(--brand-primary);font-weight:600;text-decoration:none;">Wikipedia ↗</a>
+            <a id="celebWikiLink" href="#" target="_blank" style="font-size:0.78em;color:var(--brand-primary);font-weight:600;text-decoration:none;" data-i18n="sk.media.wikipedia">Wikipedia ↗</a>
           </div>
         </div>
         <div style="display:flex;gap:10px;margin-top:14px;justify-content:center;">
@@ -484,18 +484,18 @@ Try 69 then 6 halved (3) and 9 upside down (6), hashtag.</p>
       <div class="three-col">
         <div class="card" style="text-align: center;">
           <div style="font-size: 3em; margin-bottom: 10px;">🎧</div>
-                    <h3>Music</h3>
+                    <h3 data-i18n="sk.media.musicTitle">Music</h3>
 
-          <a href="https://open.spotify.com/playlist/5mEUYreFXXc0MvRMxOXp95" target="_blank" class="link-btn">Spotify Playlist ↗</a>
+          <a href="https://open.spotify.com/playlist/5mEUYreFXXc0MvRMxOXp95" target="_blank" class="link-btn" data-i18n="sk.media.spotify">Spotify Playlist ↗</a>
           <br/><br/>
 
           
         </div>
         <div class="card" style="text-align: center;">
           <div style="font-size: 3em; margin-bottom: 10px;">📱</div>
-                    <h3>Phone</h3>
+                    <h3 data-i18n="sk.media.phoneTitle">Phone</h3>
 
-          <a href="https://www.bipolarbear.app/wp-content/uploads/2025/06/ChatGPT-Image-Jun-22-2025-10_41_15-AM.png" target="_blank" class="link-btn">Phone Wallpaper ↗</a><br/><br/>
+          <a href="https://www.bipolarbear.app/wp-content/uploads/2025/06/ChatGPT-Image-Jun-22-2025-10_41_15-AM.png" target="_blank" class="link-btn" data-i18n="sk.media.wallpaper">Phone Wallpaper ↗</a><br/><br/>
 
           
         </div>
@@ -511,7 +511,7 @@ Try 69 then 6 halved (3) and 9 upside down (6), hashtag.</p>
     <div class="section collapsed" id="memories">
       <div class="section-header" onclick="toggleSection(this)">
         <span class="section-icon">📸</span>
-        <h2>Memories</h2>
+        <h2 data-i18n="sk.memories.sectionTitle">Memories</h2>
         <span id="tick_memories" style="margin-left:auto;margin-right:8px;font-size:0.85em;"></span>
         <span class="section-chevron">▼</span>
       </div>
@@ -521,40 +521,40 @@ Try 69 then 6 halved (3) and 9 upside down (6), hashtag.</p>
         <div class="mood-icon-grid">
           <button class="mood-icon-btn manic" onclick="selectMemoryMood('manic')">
             <span class="emoji"><img src="images/moods/manic.png" width="40" alt="Manic"></span>
-            <span class="label">Manic</span>
+            <span class="label" data-i18n="sk.moods.manic">Manic</span>
           </button>
           <button class="mood-icon-btn hypomanic" onclick="selectMemoryMood('elevated')">
             <span class="emoji"><img src="images/moods/elevated.png" width="40" alt="Elevated"></span>
-            <span class="label">Elevated</span>
+            <span class="label" data-i18n="sk.moods.elevated">Elevated</span>
           </button>
           <button class="mood-icon-btn stable" onclick="selectMemoryMood('good')">
             <span class="emoji"><img src="images/moods/good.png" width="40" alt="Good"></span>
-            <span class="label">Good</span>
+            <span class="label" data-i18n="sk.moods.good">Good</span>
           </button>
           <button class="mood-icon-btn low" onclick="selectMemoryMood('low')">
             <span class="emoji"><img src="images/moods/low.png" width="40" alt="Low"></span>
-            <span class="label">Low</span>
+            <span class="label" data-i18n="sk.moods.low">Low</span>
           </button>
           <button class="mood-icon-btn depressed" onclick="selectMemoryMood('depressed')">
             <span class="emoji"><img src="images/moods/depressed.png" width="40" alt="Depressed"></span>
-            <span class="label">Depressed</span>
+            <span class="label" data-i18n="sk.moods.depressed">Depressed</span>
           </button>
         </div>
-        <p id="memoriesTip" style="text-align:center;font-weight:600;color:var(--orange);margin-bottom:14px;">☝️ Tap a mood to see your memories</p>
+        <p id="memoriesTip" style="text-align:center;font-weight:600;color:var(--orange);margin-bottom:14px;" data-i18n="sk.memories.tip">☝️ Tap a mood to see your memories</p>
 
         <div id="memoriesBox" style="display:none;border-top:1px solid #f0f0f0;padding-top:14px;margin-top:2px;">
           <h3 id="memoriesMoodLabel" style="margin:0 0 10px;font-size:1em;"></h3>
           <div id="memoriesList" style="min-height:36px;margin-bottom:10px;"></div>
-          <button onclick="openAddMemoryModal()" style="width:100%;padding:10px;background:none;border:2px dashed var(--brand-primary);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;">+ Record a memory</button>
+          <button onclick="openAddMemoryModal()" style="width:100%;padding:10px;background:none;border:2px dashed var(--brand-primary);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="sk.memories.addBtn">+ Record a memory</button>
         </div>
       </div>
 
-      <p style="color: var(--text-light); margin-bottom: 16px;"><em>In the future you can upload your memories (once I pay the hosting fees) but, for now, here's mine:</em></p>
+      <p style="color: var(--text-light); margin-bottom: 16px;"><em data-i18n="sk.memories.intro">In the future you can upload your memories (once I pay the hosting fees) but, for now, here's mine:</em></p>
 
       <div class="two-col" style="align-items: stretch;">
         <div class="card" style="text-align: center; display: flex; flex-direction: column;">
-          <h3 style="margin-bottom: 8px;">🏍️ Mood on Moon</h3>
-          <p style="font-size: 0.85em; color: var(--text-light); margin-bottom: 12px;">We've all driven our motorbike into a library.</p>
+          <h3 style="margin-bottom: 8px;" data-i18n="sk.memories.memory1Title">🏍️ Mood on Moon</h3>
+          <p style="font-size: 0.85em; color: var(--text-light); margin-bottom: 12px;" data-i18n="sk.memories.memory1Body">We've all driven our motorbike into a library.</p>
           <div style="flex: 1; position: relative; overflow: hidden; border-radius: 10px; min-height: 180px;">
             <video controls preload="metadata" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">
               <source src="https://www.bipolarbear.app/wp-content/uploads/2025/06/Motorbike-in-Library-OU.mp4#t=0.5" type="video/mp4">
@@ -563,8 +563,8 @@ Try 69 then 6 halved (3) and 9 upside down (6), hashtag.</p>
           </div>
         </div>
         <div class="card" style="text-align: center; display: flex; flex-direction: column;">
-          <h3 style="margin-bottom: 8px;">🎤 What is Going On?</h3>
-          <p style="font-size: 0.85em; color: var(--text-light); margin-bottom: 12px;">We've all spent thousands on an entire barn to give a PowerPoint presentation to family.</p>
+          <h3 style="margin-bottom: 8px;" data-i18n="sk.memories.memory2Title">🎤 What is Going On?</h3>
+          <p style="font-size: 0.85em; color: var(--text-light); margin-bottom: 12px;" data-i18n="sk.memories.memory2Body">We've all spent thousands on an entire barn to give a PowerPoint presentation to family.</p>
           <div style="flex: 1; position: relative; overflow: hidden; border-radius: 10px; min-height: 180px;">
             <video controls preload="metadata" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">
               <source src="https://www.bipolarbear.app/wp-content/uploads/2025/06/UNI-SIM-Xmas.mp4#t=0.5" type="video/mp4">
@@ -574,7 +574,7 @@ Try 69 then 6 halved (3) and 9 upside down (6), hashtag.</p>
         </div>
       </div>
 
-      <div class="quote-block" style="margin-top: 16px;">
+      <div class="quote-block" style="margin-top: 16px;" data-i18n-html="sk.memories.quote">
         Everything will pass.<br>
         <strong>You're braver than you believe,</strong><br>
         stronger than you seem, smarter than you think,<br>
@@ -587,7 +587,7 @@ Try 69 then 6 halved (3) and 9 upside down (6), hashtag.</p>
     <div class="section collapsed" id="faq">
       <div class="section-header" onclick="toggleSection(this)">
         <span class="section-icon">❓</span>
-        <h2>Struggling?</h2>
+        <h2 data-i18n="sk.faq.sectionTitle">Struggling?</h2>
         <span id="tick_faq" style="margin-left:auto;margin-right:8px;font-size:0.85em;"></span>
         <span class="section-chevron">▼</span>
       </div>
@@ -595,64 +595,64 @@ Try 69 then 6 halved (3) and 9 upside down (6), hashtag.</p>
 
       <div class="accordion">
         <button class="accordion-header" onclick="toggleAccordion(this)">
-          Can I manage bipolar with lifestyle changes? <span class="chevron">▼</span>
+          <span data-i18n="sk.faq.q1">Can I manage bipolar with lifestyle changes?</span> <span class="chevron">▼</span>
         </button>
         <div class="accordion-body">
-          <p>Lifestyle changes have made a big difference. But remember — for me, if I come off the meds, lifestyle alone isn't enough.</p>
+          <p data-i18n="sk.faq.q1Body">Lifestyle changes have made a big difference. But remember — for me, if I come off the meds, lifestyle alone isn't enough.</p>
           <ul>
-            <li>Get to the gym</li>
-            <li>Eliminate / reduce alcohol</li>
-            <li>Get 7–9 hours sleep</li>
-            <li>Eliminate / reduce refined sugar</li>
-            <li>Eat whole foods</li>
+            <li data-i18n="sk.faq.q1Item1">Get to the gym</li>
+            <li data-i18n="sk.faq.q1Item2">Eliminate / reduce alcohol</li>
+            <li data-i18n="sk.faq.q1Item3">Get 7–9 hours sleep</li>
+            <li data-i18n="sk.faq.q1Item4">Eliminate / reduce refined sugar</li>
+            <li data-i18n="sk.faq.q1Item5">Eat whole foods</li>
           </ul>
         </div>
       </div>
 
       <div class="accordion">
         <button class="accordion-header" onclick="toggleAccordion(this)">
-          Am I alone in all this? <span class="chevron">▼</span>
+          <span data-i18n="sk.faq.q2">Am I alone in all this?</span> <span class="chevron">▼</span>
         </button>
         <div class="accordion-body">
-          <p>No! In the UK there's 2% of the population (1 in 50) with bipolar. Around the world estimates range from 0.5 to 5%. That's a lot of people.</p>
+          <p data-i18n="sk.faq.q2Body">No! In the UK there's 2% of the population (1 in 50) with bipolar. Around the world estimates range from 0.5 to 5%. That's a lot of people.</p>
         </div>
       </div>
 
       <div class="accordion">
         <button class="accordion-header" onclick="toggleAccordion(this)">
-          Is everything conspiring against me? <span class="chevron">▼</span>
+          <span data-i18n="sk.faq.q3">Is everything conspiring against me?</span> <span class="chevron">▼</span>
         </button>
         <div class="accordion-body">
-          <p>No! Ok, maybe, but unlikely. It takes on average 9.5 years to get a proper diagnosis. Mine was pretty quick, so I can be happy about that.</p>
-          <p style="margin-top: 8px;">Suicide risk is 20x that of the general population. Hanging in reading this? Doing a good job. Just take it day by day, hour by hour and minute by minute.</p>
+          <p data-i18n="sk.faq.q3Body1">No! Ok, maybe, but unlikely. It takes on average 9.5 years to get a proper diagnosis. Mine was pretty quick, so I can be happy about that.</p>
+          <p style="margin-top: 8px;" data-i18n="sk.faq.q3Body2">Suicide risk is 20x that of the general population. Hanging in reading this? Doing a good job. Just take it day by day, hour by hour and minute by minute.</p>
         </div>
       </div>
 
       <div class="accordion">
         <button class="accordion-header" onclick="toggleAccordion(this)">
-          Why can't I remember anything? <span class="chevron">▼</span>
+          <span data-i18n="sk.faq.q4">Why can't I remember anything?</span> <span class="chevron">▼</span>
         </button>
         <div class="accordion-body">
-          <p>There's definitely something not right, and it happens to a lot of us, especially during low mood episodes. Use cognitive remedial therapy to improve this. Practice remembering names, numbers, shapes using strategies.</p>
-          <p style="margin-top: 8px;">And don't worry — as mood improves, so will memory. This isn't the first time.</p>
-          Why not check out: <a href="#mind" class="link-btn">🧠 My Mind</a>
+          <p data-i18n="sk.faq.q4Body1">There's definitely something not right, and it happens to a lot of us, especially during low mood episodes. Use cognitive remedial therapy to improve this. Practice remembering names, numbers, shapes using strategies.</p>
+          <p style="margin-top: 8px;" data-i18n="sk.faq.q4Body2">And don't worry — as mood improves, so will memory. This isn't the first time.</p>
+          <span data-i18n="sk.faq.q4Link">Why not check out:</span> <a href="#mind" class="link-btn" data-i18n="sk.faq.q4LinkBtn">🧠 My Mind</a>
 
         </div>
       </div>
 
       <div class="accordion">
         <button class="accordion-header" onclick="toggleAccordion(this)">
-          Are meds safe? <span class="chevron">▼</span>
+          <span data-i18n="sk.faq.q5">Are meds safe?</span> <span class="chevron">▼</span>
         </button>
         <div class="accordion-body">
-Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need to be slowly increased / decreased by a psychiatrist.
+<span data-i18n="sk.faq.q5Intro">Changes to</span> <a href="#medications" class="link-btn" data-i18n="sk.faq.q5IntroLink">💊 My Medication</a> <span data-i18n="sk.faq.q5IntroAfter">need to be slowly increased / decreased by a psychiatrist.</span>
 
           <div style="margin-top: 12px; padding: 10px 14px; background: #fff3cd; border-left: 4px solid var(--brand-primary); border-radius: 8px; font-size: 0.9em;">
-            <strong>⚠️ Important things to consider:</strong>
+            <strong data-i18n="sk.faq.q5Warning">⚠️ Important things to consider:</strong>
             <ul style="margin: 6px 0 0 0; padding-left: 18px;">
-              <li><strong>Water</strong> — Lithium levels can become too high if you don't drink enough water but can also be diluted if you drink too much. On the whole, normally better to drink too much than not enough.</li>
-              <li><strong>Ibuprofen (Nurofen, Advil)</strong> — Can raise Lithium levels to toxic levels. Use paracetamol instead.</li>
-              <li><strong>Grapefruit &amp; grapefruit juice</strong> — Interferes with how Quetiapine is processed. Avoid entirely.</li>
+              <li data-i18n-html="sk.faq.q5Water"><strong>Water</strong> — Lithium levels can become too high if you don't drink enough water but can also be diluted if you drink too much. On the whole, normally better to drink too much than not enough.</li>
+              <li data-i18n-html="sk.faq.q5Ibuprofen"><strong>Ibuprofen (Nurofen, Advil)</strong> — Can raise Lithium levels to toxic levels. Use paracetamol instead.</li>
+              <li data-i18n-html="sk.faq.q5Grapefruit"><strong>Grapefruit &amp; grapefruit juice</strong> — Interferes with how Quetiapine is processed. Avoid entirely.</li>
             </ul>
           </div>
         </div>
@@ -660,15 +660,15 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
 
       <div class="accordion">
         <button class="accordion-header" onclick="toggleAccordion(this)">
-          Out of meds and freaking out? <span class="chevron">▼</span>
+          <span data-i18n="sk.faq.q6">Out of meds and freaking out?</span> <span class="chevron">▼</span>
         </button>
         <div class="accordion-body">
-          <p>Calm down. Drop whatever you 'need' to do and call <strong>111</strong> for emergency medications. Write down the list of medications needed and just call. It's going to be OK.</p>
+          <p data-i18n-html="sk.faq.q6Body">Calm down. Drop whatever you 'need' to do and call <strong>111</strong> for emergency medications. Write down the list of medications needed and just call. It's going to be OK.</p>
         </div>
       </div>
       <div id="customRemindersContainer"></div>
 
-      <button onclick="openAddReminderModal()" style="width:100%;padding:10px;background:none;border:2px dashed var(--brand-primary);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.9em;cursor:pointer;margin-top:8px;-webkit-tap-highlight-color:transparent;">+ Add your own reminder</button>
+      <button onclick="openAddReminderModal()" style="width:100%;padding:10px;background:none;border:2px dashed var(--brand-primary);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.9em;cursor:pointer;margin-top:8px;-webkit-tap-highlight-color:transparent;" data-i18n="sk.faq.addReminderBtn">+ Add your own reminder</button>
 
       </div><!-- /section-body -->
     </div>
@@ -677,14 +677,14 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
     <div class="section collapsed" id="steps">
       <div class="section-header" onclick="toggleSection(this)">
         <span class="section-icon">🙏</span>
-        <h2>12 Steps</h2>
+        <h2 data-i18n="sk.steps.sectionTitle">12 Steps</h2>
         <span id="tick_steps" style="margin-left:auto;margin-right:8px;font-size:0.85em;"></span>
         <span class="section-chevron">▼</span>
       </div>
       <div class="section-body">
 
       <div class="card" style="margin-bottom: 16px;">
-        <p>I found hope in my version of <strong>Bipolar Anonymous</strong> when things were looking pretty bleak.</p>
+        <p data-i18n-html="sk.steps.intro">I found hope in my version of <strong>Bipolar Anonymous</strong> when things were looking pretty bleak.</p>
       </div>
 
       <div class="card" style="margin-bottom:16px;text-align:center;">
@@ -692,34 +692,34 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
         <div style="font-size:1.05em;font-weight:600;color:var(--brand-primary);margin-bottom:10px;" id="stepLabel"></div>
         <p id="stepText" style="font-size:0.95em;color:#495057;line-height:1.7;margin:0 0 18px;"></p>
         <div style="display:flex;gap:10px;justify-content:center;">
-          <button onclick="prevStep()" id="stepPrevBtn" style="padding:9px 20px;background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);border-radius:8px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">← Prev</button>
+          <button onclick="prevStep()" id="stepPrevBtn" style="padding:9px 20px;background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);border-radius:8px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="sk.steps.prev">← Prev</button>
           <button onclick="nextStep()" id="stepNextBtn" style="padding:9px 20px;background:var(--brand-primary);color:white;border:2px solid var(--brand-primary);border-radius:8px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Next →</button>
         </div>
       </div>
 
       <div class="card" style="margin-bottom:16px;text-align:center;">
-        <div style="font-size:0.88em;font-weight:700;color:#495057;margin-bottom:14px;">🤝 Your Commitments</div>
-        <div id="commitmentEmpty" style="color:#6c757d;font-style:italic;font-size:0.9em;margin-bottom:14px;">No commitments yet. Add your first below.</div>
+        <div style="font-size:0.88em;font-weight:700;color:#495057;margin-bottom:14px;" data-i18n="sk.steps.commitmentsTitle">🤝 Your Commitments</div>
+        <div id="commitmentEmpty" style="color:#6c757d;font-style:italic;font-size:0.9em;margin-bottom:14px;" data-i18n="sk.steps.commitmentsEmpty">No commitments yet. Add your first below.</div>
         <div id="commitmentViewer" style="display:none;">
           <div style="display:flex;align-items:center;margin-bottom:10px;">
             <div style="flex:1;font-size:0.78em;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#adb5bd;text-align:left;" id="commitmentCounter"></div>
             <div style="display:flex;gap:2px;">
-              <button onclick="openEditCommitmentModal()" title="Edit" style="background:none;border:none;cursor:pointer;font-size:1.05em;padding:4px;line-height:1;color:#adb5bd;-webkit-tap-highlight-color:transparent;">✏️</button>
-              <button onclick="deleteCommitment()" title="Delete" style="background:none;border:none;cursor:pointer;font-size:1.05em;padding:4px;line-height:1;color:#adb5bd;-webkit-tap-highlight-color:transparent;">🗑️</button>
+              <button onclick="openEditCommitmentModal()" title="Edit" data-i18n-title="sk.moodDef.edit" style="background:none;border:none;cursor:pointer;font-size:1.05em;padding:4px;line-height:1;color:#adb5bd;-webkit-tap-highlight-color:transparent;">✏️</button>
+              <button onclick="deleteCommitment()" title="Delete" data-i18n-title="sk.moodDef.remove" style="background:none;border:none;cursor:pointer;font-size:1.05em;padding:4px;line-height:1;color:#adb5bd;-webkit-tap-highlight-color:transparent;">🗑️</button>
             </div>
           </div>
           <p id="commitmentText" style="font-size:0.95em;color:#495057;line-height:1.7;margin:0 0 16px;white-space:pre-wrap;text-align:left;"></p>
           <div style="display:flex;gap:10px;justify-content:center;">
-            <button onclick="prevCommitment()" id="commitPrevBtn" style="padding:9px 20px;background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);border-radius:8px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">← Prev</button>
+            <button onclick="prevCommitment()" id="commitPrevBtn" style="padding:9px 20px;background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);border-radius:8px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="sk.steps.prev">← Prev</button>
             <button onclick="nextCommitment()" id="commitNextBtn" style="padding:9px 20px;background:var(--brand-primary);color:white;border:2px solid var(--brand-primary);border-radius:8px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Next →</button>
           </div>
         </div>
-        <button onclick="openAddCommitmentModal()" style="width:100%;padding:10px;background:none;border:2px dashed var(--brand-primary);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.9em;cursor:pointer;margin-top:14px;-webkit-tap-highlight-color:transparent;">+ Add Commitment</button>
+        <button onclick="openAddCommitmentModal()" style="width:100%;padding:10px;background:none;border:2px dashed var(--brand-primary);border-radius:10px;color:var(--brand-primary);font-weight:600;font-size:0.9em;cursor:pointer;margin-top:14px;-webkit-tap-highlight-color:transparent;" data-i18n="sk.steps.addCommitment">+ Add Commitment</button>
       </div>
 
       <div class="quote-block">
-        "Our prime purpose in this life is to help others and if you can't help them, at least don't hurt them."
-        <br><strong>– Dalai Lama</strong>
+        <span data-i18n="sk.steps.quote">"Our prime purpose in this life is to help others and if you can't help them, at least don't hurt them."</span>
+        <br><strong data-i18n="sk.steps.quoteSource">– Dalai Lama</strong>
       </div>
       </div><!-- /section-body -->
     </div>
@@ -728,7 +728,7 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
     <div class="section collapsed" id="spiritual">
       <div class="section-header" onclick="toggleSection(this)">
         <span class="section-icon">🙌</span>
-        <h2>Karma &amp; Spirit</h2>
+        <h2 data-i18n="sk.spiritual.sectionTitle">Karma &amp; Spirit</h2>
         <span id="tick_spiritual" style="margin-left:auto;margin-right:8px;font-size:0.85em;"></span>
         <span class="section-chevron">▼</span>
       </div>
@@ -748,27 +748,27 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
       <div class="four-col">
         <div class="card" style="text-align: center;">
           <div style="font-size: 2.5em; margin-bottom: 8px;">🪬</div>
-          <h3>Karma</h3>
-          <p style="font-size: 0.85em; color: var(--text-light); margin-bottom: 12px;">Work hard, be nice, do good things. Benjamin Franklin.</p>
-          <a href="https://gutenberg.org/files/20203/20203-h/20203-h.htm" target="_blank" class="link-btn">Free ↗</a>
+          <h3 data-i18n="sk.spiritual.karmaTitle">Karma</h3>
+          <p style="font-size: 0.85em; color: var(--text-light); margin-bottom: 12px;" data-i18n="sk.spiritual.karmaDesc">Work hard, be nice, do good things. Benjamin Franklin.</p>
+          <a href="https://gutenberg.org/files/20203/20203-h/20203-h.htm" target="_blank" class="link-btn" data-i18n="sk.spiritual.free">Free ↗</a>
         </div>
         <div class="card" style="text-align: center;">
           <div style="font-size: 2.5em; margin-bottom: 8px;">🕊️</div>
-          <h3>Bible</h3>
-          <p style="font-size: 0.85em; color: var(--text-light); margin-bottom: 12px;">KJV, NIV and many more translations available.</p>
-          <a href="https://www.bible.com/" target="_blank" class="link-btn">Read ↗</a>
+          <h3 data-i18n="sk.spiritual.bibleTitle">Bible</h3>
+          <p style="font-size: 0.85em; color: var(--text-light); margin-bottom: 12px;" data-i18n="sk.spiritual.bibleDesc">KJV, NIV and many more translations available.</p>
+          <a href="https://www.bible.com/" target="_blank" class="link-btn" data-i18n="sk.spiritual.read">Read ↗</a>
         </div>
         <div class="card" style="text-align: center;">
           <div style="font-size: 2.5em; margin-bottom: 8px;">🕋</div>
-          <h3>Quran</h3>
-          <p style="font-size: 0.85em; color: var(--text-light); margin-bottom: 12px;">Published in many places including Medina and Mecca.</p>
-          <a href="https://quran.com/en" target="_blank" class="link-btn">Read ↗</a>
+          <h3 data-i18n="sk.spiritual.quranTitle">Quran</h3>
+          <p style="font-size: 0.85em; color: var(--text-light); margin-bottom: 12px;" data-i18n="sk.spiritual.quranDesc">Published in many places including Medina and Mecca.</p>
+          <a href="https://quran.com/en" target="_blank" class="link-btn" data-i18n="sk.spiritual.read">Read ↗</a>
         </div>
         <div class="card" style="text-align: center;">
           <div style="font-size: 2.5em; margin-bottom: 8px;">✨</div>
-          <h3>Yours</h3>
-          <p style="font-size: 0.85em; color: var(--text-light); margin-bottom: 12px;">Jewish, Jedi, Buddhist, Humanist — whatever gives you meaning.</p>
-          <a href="https://en.wikipedia.org/wiki/List_of_religions_and_spiritual_traditions" target="_blank" class="link-btn secondary">Explore ↗</a>
+          <h3 data-i18n="sk.spiritual.yoursTitle">Yours</h3>
+          <p style="font-size: 0.85em; color: var(--text-light); margin-bottom: 12px;" data-i18n="sk.spiritual.yoursDesc">Jewish, Jedi, Buddhist, Humanist — whatever gives you meaning.</p>
+          <a href="https://en.wikipedia.org/wiki/List_of_religions_and_spiritual_traditions" target="_blank" class="link-btn secondary" data-i18n="sk.spiritual.explore">Explore ↗</a>
         </div>
       </div>
       </div><!-- /section-body -->
@@ -778,17 +778,17 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
     <div class="section collapsed" id="bipolar-anon">
       <div class="section-header" onclick="toggleSection(this)">
         <span class="section-icon">💬</span>
-        <h2>Bipolar Anonymous</h2>
+        <h2 data-i18n="sk.anon.sectionTitle">Bipolar Anonymous</h2>
         <span id="tick_bipolar-anon" style="margin-left:auto;margin-right:8px;font-size:0.85em;"></span>
         <span class="section-chevron">▼</span>
       </div>
       <div class="section-body">
       <div class="card">
-        <h3>💬 Bipolar Anonymous Chat</h3>
-        <p>Connect anonymously with others living with bipolar — no real name required, no data sold, just peer support from people who get it.</p>
-        <p style="margin-top: 8px; font-size: 0.9em; color: var(--text-light);"><strong>End-to-end encrypted</strong> · Anonymous alias only · Email verified then discarded · Zero data selling</p>
-        <a href="anonymous.html" class="link-btn">Bipolar Anonymous ↗</a>
-        <a href="https://www.bipolaruk.org/listing/category/online-support-groups-parent-category" target="_blank" class="link-btn secondary">Bipolar UK Groups ↗</a>
+        <h3 data-i18n="sk.anon.cardTitle">💬 Bipolar Anonymous Chat</h3>
+        <p data-i18n="sk.anon.body">Connect anonymously with others living with bipolar — no real name required, no data sold, just peer support from people who get it.</p>
+        <p style="margin-top: 8px; font-size: 0.9em; color: var(--text-light);" data-i18n-html="sk.anon.meta"><strong>End-to-end encrypted</strong> · Anonymous alias only · Email verified then discarded · Zero data selling</p>
+        <a href="anonymous.html" class="link-btn" data-i18n="sk.anon.link">Bipolar Anonymous ↗</a>
+        <a href="https://www.bipolaruk.org/listing/category/online-support-groups-parent-category" target="_blank" class="link-btn secondary" data-i18n="sk.anon.ukGroups">Bipolar UK Groups ↗</a>
       </div>
       </div><!-- /section-body -->
     </div>
@@ -796,11 +796,11 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
     <!-- HELP / CRISIS -->
     <div class="section" id="help">
       <div class="crisis-box">
-        <h3>🆘 Need Help Right Now?</h3>
-        <p>It's OK to ask for help. Regardless of how you feel, <strong>today is a beautiful day to be alive.</strong></p>
-        <a href="https://www.bipolaruk.org/" target="_blank" class="crisis-btn">🌐 Bipolar UK</a>
-        <a href="tel:111" class="crisis-btn">📞 Call 111</a>
-        <a href="tel:999" class="crisis-btn">🚨 999 Emergency</a>
+        <h3 data-i18n="sk.crisis.title">🆘 Need Help Right Now?</h3>
+        <p data-i18n-html="sk.crisis.body">It's OK to ask for help. Regardless of how you feel, <strong>today is a beautiful day to be alive.</strong></p>
+        <a href="https://www.bipolaruk.org/" target="_blank" class="crisis-btn" data-i18n="sk.crisis.bipolarUk">🌐 Bipolar UK</a>
+        <a href="tel:111" class="crisis-btn" data-i18n="sk.crisis.call111">📞 Call 111</a>
+        <a href="tel:999" class="crisis-btn" data-i18n="sk.crisis.emergency999">🚨 999 Emergency</a>
         <div id="emergencyContactArea" style="margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.25);"></div>
       </div>
     </div>
@@ -810,12 +810,12 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
   <!-- Emergency Contact Modal -->
   <div class="overlay-modal" id="ecModal" onclick="if(event.target===this)closeEcModal()">
     <div class="modal-box" style="max-width:400px;">
-      <h3 style="text-align:center;margin-bottom:6px;">📞 Emergency Contact</h3>
-      <p style="text-align:center;color:#6c757d;font-size:0.88em;margin-bottom:16px;">Saved to your profile — appears in the crisis box</p>
-      <input type="text" id="ecInput" class="modal-input" placeholder="Name &amp; number (e.g. Jane 07700 900123)">
+      <h3 style="text-align:center;margin-bottom:6px;" data-i18n="sk.ec.title">📞 Emergency Contact</h3>
+      <p style="text-align:center;color:#6c757d;font-size:0.88em;margin-bottom:16px;" data-i18n="sk.ec.subtitle">Saved to your profile — appears in the crisis box</p>
+      <input type="text" id="ecInput" class="modal-input" placeholder="Name &amp; number (e.g. Jane 07700 900123)" data-i18n-placeholder="sk.ec.placeholder">
       <div style="display:flex;gap:10px;margin-top:4px;">
-        <button onclick="saveEmergencyContact()" style="flex:1;padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:10px;font-weight:700;font-size:0.95em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Save</button>
-        <button onclick="closeEcModal()" style="flex:1;padding:12px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-weight:600;font-size:0.95em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Cancel</button>
+        <button onclick="saveEmergencyContact()" style="flex:1;padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:10px;font-weight:700;font-size:0.95em;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="sk.ec.save">Save</button>
+        <button onclick="closeEcModal()" style="flex:1;padding:12px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-weight:600;font-size:0.95em;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="sk.ec.cancel">Cancel</button>
       </div>
     </div>
   </div>
@@ -823,8 +823,8 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
   <!-- My Medications Modal -->
   <div class="overlay-modal" id="medInfoModal" onclick="if(event.target===this)closeMedInfoModal()">
     <div class="modal-box">
-      <h3 style="text-align:center; margin-bottom:6px;">My Medications</h3>
-      <p style="text-align:center; color:#6c757d; font-size:0.9em; margin-bottom:16px;">Track your current medications and dosages</p>
+      <h3 style="text-align:center; margin-bottom:6px;" data-i18n="sk.meds.modalTitle">My Medications</h3>
+      <p style="text-align:center; color:#6c757d; font-size:0.9em; margin-bottom:16px;" data-i18n="sk.meds.modalSubtitle">Track your current medications and dosages</p>
       <div id="medInfoList" style="margin-bottom:16px;"></div>
       <!-- Quick-add chips for the most commonly prescribed bipolar meds.
            Tapping fills the name input and focuses the dosage field. -->
@@ -836,21 +836,21 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
         <button type="button" class="med-chip" onclick="_fillMedName('Olanzapine')">Olanzapine</button>
         <button type="button" class="med-chip" onclick="_fillMedName('Aripiprazole')">Aripiprazole</button>
       </div>
-      <input type="text" id="medNameInput" class="modal-input" placeholder="Medication name">
-      <input type="text" id="medDosageInput" class="modal-input" placeholder="Dosage (e.g., 10mg, twice daily)">
-      <button onclick="addMedication()" class="modal-btn modal-btn-primary">Add Medication</button>
-      <button onclick="closeMedInfoModal()" class="modal-btn modal-btn-secondary">Close</button>
+      <input type="text" id="medNameInput" class="modal-input" placeholder="Medication name" data-i18n-placeholder="sk.meds.namePlaceholder">
+      <input type="text" id="medDosageInput" class="modal-input" placeholder="Dosage (e.g., 10mg, twice daily)" data-i18n-placeholder="sk.meds.dosagePlaceholder">
+      <button onclick="addMedication()" class="modal-btn modal-btn-primary" data-i18n="sk.meds.addBtn">Add Medication</button>
+      <button onclick="closeMedInfoModal()" class="modal-btn modal-btn-secondary" data-i18n="sk.meds.close">Close</button>
     </div>
   </div>
 
   <!-- Add Gratitude Modal -->
   <div id="addGratitudeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;justify-content:center;align-items:center;overflow:hidden;padding:20px;box-sizing:border-box;" onclick="if(event.target===this)closeAddGratitudeModal()">
     <div style="background:white;padding:28px;border-radius:20px;max-width:440px;width:100%;max-height:85dvh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,0.3);box-sizing:border-box;">
-      <h3 id="gratitudeModalTitle" style="margin-bottom:16px;">🙏 Add Gratitude</h3>
-      <input type="text" id="gratitudeInput" placeholder="e.g. My morning coffee, a good friend..." onkeydown="if(event.key==='Enter')saveGratitudeItem()" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;font-size:1em;box-sizing:border-box;font-family:inherit;">
+      <h3 id="gratitudeModalTitle" style="margin-bottom:16px;" data-i18n="sk.gratitude.addTitle">🙏 Add Gratitude</h3>
+      <input type="text" id="gratitudeInput" placeholder="e.g. My morning coffee, a good friend..." data-i18n-placeholder="sk.gratitude.placeholder" onkeydown="if(event.key==='Enter')saveGratitudeItem()" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;font-size:1em;box-sizing:border-box;font-family:inherit;">
       <div style="display:flex;gap:10px;justify-content:center;margin-top:14px;">
-        <button id="gratitudeSaveBtn" onclick="saveGratitudeItem()" style="padding:10px 20px;background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);border-radius:8px;cursor:pointer;font-weight:600;">Add</button>
-        <button onclick="closeAddGratitudeModal()" style="padding:10px 20px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:8px;cursor:pointer;font-weight:600;">Cancel</button>
+        <button id="gratitudeSaveBtn" onclick="saveGratitudeItem()" style="padding:10px 20px;background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);border-radius:8px;cursor:pointer;font-weight:600;" data-i18n="sk.gratitude.addSaveBtn">Add</button>
+        <button onclick="closeAddGratitudeModal()" style="padding:10px 20px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:8px;cursor:pointer;font-weight:600;" data-i18n="sk.goals.cancel">Cancel</button>
       </div>
     </div>
   </div>
@@ -858,11 +858,11 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
   <!-- Add Goal Modal -->
   <div id="addGoalModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;justify-content:center;align-items:center;overflow:hidden;padding:20px;box-sizing:border-box;" onclick="if(event.target===this)closeAddGoalModal()">
     <div style="background:white;padding:28px;border-radius:20px;max-width:440px;width:100%;max-height:85dvh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,0.3);box-sizing:border-box;">
-      <h3 style="margin-bottom:16px;">🎯 Add a Goal</h3>
-      <input type="text" id="survivalNewGoal" placeholder="e.g. Run a 5k, write a book..." onkeydown="if(event.key==='Enter')addSurvivalGoal()" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;font-size:1em;box-sizing:border-box;font-family:inherit;">
+      <h3 style="margin-bottom:16px;" data-i18n="sk.goals.addModalTitle">🎯 Add a Goal</h3>
+      <input type="text" id="survivalNewGoal" placeholder="e.g. Run a 5k, write a book..." data-i18n-placeholder="sk.goals.goalPlaceholder" onkeydown="if(event.key==='Enter')addSurvivalGoal()" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;font-size:1em;box-sizing:border-box;font-family:inherit;">
       <div style="display:flex;gap:10px;justify-content:center;margin-top:14px;">
-        <button onclick="addSurvivalGoal()" style="padding:10px 20px;background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);border-radius:8px;cursor:pointer;font-weight:600;">Add</button>
-        <button onclick="closeAddGoalModal()" style="padding:10px 20px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:8px;cursor:pointer;font-weight:600;">Cancel</button>
+        <button onclick="addSurvivalGoal()" style="padding:10px 20px;background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);border-radius:8px;cursor:pointer;font-weight:600;" data-i18n="sk.goals.addBtn">Add</button>
+        <button onclick="closeAddGoalModal()" style="padding:10px 20px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:8px;cursor:pointer;font-weight:600;" data-i18n="sk.goals.cancel">Cancel</button>
       </div>
     </div>
   </div>
@@ -870,11 +870,11 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
   <!-- Add Coping Strategy Modal -->
   <div id="addCopingModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;justify-content:center;align-items:center;overflow:hidden;padding:20px;box-sizing:border-box;" onclick="if(event.target===this)closeAddCopingModal()">
     <div style="background:white;padding:28px;border-radius:20px;max-width:440px;width:100%;max-height:85dvh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,0.3);box-sizing:border-box;">
-      <h3 id="addCopingModalTitle" style="margin-bottom:16px;">Add Coping Strategy</h3>
-      <textarea id="copingStrategyInput" placeholder="Describe a coping strategy for this mood..." rows="3" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;font-size:1em;box-sizing:border-box;resize:none;font-family:inherit;"></textarea>
+      <h3 id="addCopingModalTitle" style="margin-bottom:16px;" data-i18n="sk.strategies.copingModalTitle">Add Coping Strategy</h3>
+      <textarea id="copingStrategyInput" placeholder="Describe a coping strategy for this mood..." data-i18n-placeholder="sk.strategies.copingPlaceholder" rows="3" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;font-size:1em;box-sizing:border-box;resize:none;font-family:inherit;"></textarea>
       <div style="display:flex;gap:10px;justify-content:center;margin-top:14px;">
-        <button onclick="addCopingStrategy()" style="padding:10px 20px;background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);border-radius:8px;cursor:pointer;font-weight:600;">Add</button>
-        <button onclick="closeAddCopingModal()" style="padding:10px 20px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:8px;cursor:pointer;font-weight:600;">Cancel</button>
+        <button onclick="addCopingStrategy()" style="padding:10px 20px;background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);border-radius:8px;cursor:pointer;font-weight:600;" data-i18n="sk.goals.addBtn">Add</button>
+        <button onclick="closeAddCopingModal()" style="padding:10px 20px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:8px;cursor:pointer;font-weight:600;" data-i18n="sk.goals.cancel">Cancel</button>
       </div>
     </div>
   </div>
@@ -882,11 +882,11 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
   <!-- Add/Edit Commitment Modal -->
   <div id="commitmentModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;justify-content:center;align-items:center;overflow:hidden;padding:20px;box-sizing:border-box;" onclick="if(event.target===this)closeCommitmentModal()">
     <div style="background:white;padding:28px;border-radius:20px;max-width:440px;width:100%;max-height:85dvh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,0.3);box-sizing:border-box;">
-      <h3 id="commitmentModalTitle" style="margin-bottom:16px;">Add Commitment</h3>
-      <textarea id="commitmentInput" placeholder="Write your commitment..." rows="4" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;font-size:1em;box-sizing:border-box;resize:none;font-family:inherit;"></textarea>
+      <h3 id="commitmentModalTitle" style="margin-bottom:16px;" data-i18n="sk.steps.addCommitmentTitle">Add Commitment</h3>
+      <textarea id="commitmentInput" placeholder="Write your commitment..." data-i18n-placeholder="sk.steps.commitmentPlaceholder" rows="4" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;font-size:1em;box-sizing:border-box;resize:none;font-family:inherit;"></textarea>
       <div style="display:flex;gap:10px;justify-content:center;margin-top:14px;">
-        <button onclick="saveCommitment()" style="padding:10px 20px;background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);border-radius:8px;cursor:pointer;font-weight:600;">Save</button>
-        <button onclick="closeCommitmentModal()" style="padding:10px 20px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:8px;cursor:pointer;font-weight:600;">Cancel</button>
+        <button onclick="saveCommitment()" style="padding:10px 20px;background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);border-radius:8px;cursor:pointer;font-weight:600;" data-i18n="sk.steps.save">Save</button>
+        <button onclick="closeCommitmentModal()" style="padding:10px 20px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:8px;cursor:pointer;font-weight:600;" data-i18n="sk.steps.cancel">Cancel</button>
       </div>
     </div>
   </div>
@@ -894,12 +894,12 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
   <!-- Add Reminder Modal -->
   <div id="addReminderModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;justify-content:center;align-items:center;overflow:hidden;padding:20px;box-sizing:border-box;" onclick="if(event.target===this)closeAddReminderModal()">
     <div style="background:white;padding:28px;border-radius:20px;max-width:440px;width:100%;max-height:85dvh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,0.3);box-sizing:border-box;">
-      <h3 style="margin-bottom:16px;">Add Your Own Reminder</h3>
-      <input type="text" id="reminderTitleInput" placeholder="Title (e.g. 'Call someone')" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;font-size:1em;box-sizing:border-box;margin-bottom:12px;font-family:inherit;">
-      <textarea id="reminderMessageInput" placeholder="Your reminder message..." rows="4" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;font-size:1em;box-sizing:border-box;resize:none;font-family:inherit;"></textarea>
+      <h3 style="margin-bottom:16px;" data-i18n="sk.faq.addReminderTitle">Add Your Own Reminder</h3>
+      <input type="text" id="reminderTitleInput" placeholder="Title (e.g. 'Call someone')" data-i18n-placeholder="sk.faq.reminderTitlePlaceholder" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;font-size:1em;box-sizing:border-box;margin-bottom:12px;font-family:inherit;">
+      <textarea id="reminderMessageInput" placeholder="Your reminder message..." data-i18n-placeholder="sk.faq.reminderMessagePlaceholder" rows="4" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;font-size:1em;box-sizing:border-box;resize:none;font-family:inherit;"></textarea>
       <div style="display:flex;gap:10px;justify-content:center;margin-top:14px;">
-        <button onclick="saveReminder()" style="padding:10px 20px;background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);border-radius:8px;cursor:pointer;font-weight:600;">Save</button>
-        <button onclick="closeAddReminderModal()" style="padding:10px 20px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:8px;cursor:pointer;font-weight:600;">Cancel</button>
+        <button onclick="saveReminder()" style="padding:10px 20px;background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);border-radius:8px;cursor:pointer;font-weight:600;" data-i18n="sk.faq.save">Save</button>
+        <button onclick="closeAddReminderModal()" style="padding:10px 20px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:8px;cursor:pointer;font-weight:600;" data-i18n="sk.faq.cancel">Cancel</button>
       </div>
     </div>
   </div>
@@ -907,12 +907,12 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
   <!-- Add Memory Modal -->
   <div id="addMemoryModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;justify-content:center;align-items:center;overflow:hidden;padding:20px;box-sizing:border-box;" onclick="if(event.target===this)closeAddMemoryModal()">
     <div style="background:white;padding:28px;border-radius:20px;max-width:440px;width:100%;max-height:85dvh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,0.3);box-sizing:border-box;">
-      <h3 id="addMemoryModalTitle" style="margin-bottom:16px;">Record a Memory</h3>
-      <textarea id="memoryInput" placeholder="Describe this memory..." rows="3" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;font-size:1em;box-sizing:border-box;resize:none;font-family:inherit;margin-bottom:10px;"></textarea>
-      <input type="text" id="memoryDateInput" placeholder="When? e.g. Feb 2024, last summer, unknown" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;box-sizing:border-box;">
+      <h3 id="addMemoryModalTitle" style="margin-bottom:16px;" data-i18n="sk.memories.modalAddTitle">Record a Memory</h3>
+      <textarea id="memoryInput" placeholder="Describe this memory..." data-i18n-placeholder="sk.memories.memoryPlaceholder" rows="3" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;font-size:1em;box-sizing:border-box;resize:none;font-family:inherit;margin-bottom:10px;"></textarea>
+      <input type="text" id="memoryDateInput" placeholder="When? e.g. Feb 2024, last summer, unknown" data-i18n-placeholder="sk.memories.datePlaceholder" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;box-sizing:border-box;">
       <div style="display:flex;gap:10px;justify-content:center;margin-top:14px;">
-        <button onclick="addMemory()" style="padding:10px 20px;background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);border-radius:8px;cursor:pointer;font-weight:600;">Save</button>
-        <button onclick="closeAddMemoryModal()" style="padding:10px 20px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:8px;cursor:pointer;font-weight:600;">Cancel</button>
+        <button onclick="addMemory()" style="padding:10px 20px;background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);border-radius:8px;cursor:pointer;font-weight:600;" data-i18n="sk.memories.save">Save</button>
+        <button onclick="closeAddMemoryModal()" style="padding:10px 20px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:8px;cursor:pointer;font-weight:600;" data-i18n="sk.memories.cancel">Cancel</button>
       </div>
     </div>
   </div>
@@ -920,12 +920,12 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
   <!-- Mood Definition Modal -->
   <div id="moodDefModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;justify-content:center;align-items:center;overflow:hidden;padding:20px;box-sizing:border-box;" onclick="if(event.target===this)closeMoodDefModal()">
     <div style="background:white;padding:28px;border-radius:20px;max-width:440px;width:100%;max-height:85dvh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,0.3);box-sizing:border-box;">
-      <h3 id="moodDefModalTitle" style="margin-bottom:16px;">My definition</h3>
-      <p style="font-size:0.85em;color:#6c757d;margin-bottom:12px;">Describe what this mood feels like for you personally.</p>
-      <textarea id="moodDefInput" placeholder="In my own words, this mood feels like..." rows="4" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;font-size:1em;box-sizing:border-box;resize:none;font-family:inherit;"></textarea>
+      <h3 id="moodDefModalTitle" style="margin-bottom:16px;" data-i18n="sk.moodDef.modalTitle">My definition</h3>
+      <p style="font-size:0.85em;color:#6c757d;margin-bottom:12px;" data-i18n="sk.moodDef.modalSubtitle">Describe what this mood feels like for you personally.</p>
+      <textarea id="moodDefInput" placeholder="In my own words, this mood feels like..." data-i18n-placeholder="sk.moodDef.placeholder" rows="4" style="width:100%;padding:10px;border:2px solid #e9ecef;border-radius:8px;font-size:1em;box-sizing:border-box;resize:none;font-family:inherit;"></textarea>
       <div style="display:flex;gap:10px;justify-content:center;margin-top:14px;">
-        <button onclick="saveMoodDefinition()" style="padding:10px 20px;background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);border-radius:8px;cursor:pointer;font-weight:600;">Save</button>
-        <button onclick="closeMoodDefModal()" style="padding:10px 20px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:8px;cursor:pointer;font-weight:600;">Cancel</button>
+        <button onclick="saveMoodDefinition()" style="padding:10px 20px;background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);border-radius:8px;cursor:pointer;font-weight:600;" data-i18n="sk.moodDef.save">Save</button>
+        <button onclick="closeMoodDefModal()" style="padding:10px 20px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:8px;cursor:pointer;font-weight:600;" data-i18n="sk.moodDef.cancel">Cancel</button>
       </div>
     </div>
   </div>
@@ -944,21 +944,21 @@ Changes to <a href="#medications" class="link-btn">💊 My Medication</a> need t
   <!-- Personal Details Modal -->
   <div class="overlay-modal" id="skPersonalDetailsModal" onclick="if(event.target===this)closePersonalDetailsModal()">
     <div class="modal-box" style="max-width:420px;">
-      <h3>👤 Personal Details</h3>
-      <p style="color:#6c757d;font-size:0.85em;margin-bottom:16px;font-style:italic;">All fields are optional. This information will appear on exported PDF reports for your healthcare provider.</p>
-      <input type="text" id="pdName" class="modal-input" placeholder="Name">
-      <input type="text" id="pdDOB" class="modal-input" placeholder="Date of Birth (e.g., 15 Jan 1990)">
-      <input type="text" id="pdMedicalNum" class="modal-input" placeholder="Medical # / NHS Number">
-      <input type="text" id="pdDiagnosis" class="modal-input" placeholder="Diagnosed as (e.g., Bipolar I, Bipolar II)">
-      <input type="text" id="pdDiagnosisDate" class="modal-input" placeholder="Diagnosis Date (e.g., March 2020)">
-      <input type="text" id="pdAddress" class="modal-input" placeholder="Address">
-      <input type="tel" id="pdMobile" class="modal-input" placeholder="Mobile Number">
-      <input type="email" id="pdEmail" class="modal-input" placeholder="Email">
-      <input type="text" id="pdEmergencyContact" class="modal-input" placeholder="Emergency Contact (name & number)">
-      <textarea id="pdNotes" class="modal-input" placeholder="Notes (optional)" rows="3" style="resize:vertical;font-family:inherit;"></textarea>
+      <h3 data-i18n="sk.pd.title">👤 Personal Details</h3>
+      <p style="color:#6c757d;font-size:0.85em;margin-bottom:16px;font-style:italic;" data-i18n="sk.pd.subtitle">All fields are optional. This information will appear on exported PDF reports for your healthcare provider.</p>
+      <input type="text" id="pdName" class="modal-input" placeholder="Name" data-i18n-placeholder="sk.pd.name">
+      <input type="text" id="pdDOB" class="modal-input" placeholder="Date of Birth (e.g., 15 Jan 1990)" data-i18n-placeholder="sk.pd.dob">
+      <input type="text" id="pdMedicalNum" class="modal-input" placeholder="Medical # / NHS Number" data-i18n-placeholder="sk.pd.medNum">
+      <input type="text" id="pdDiagnosis" class="modal-input" placeholder="Diagnosed as (e.g., Bipolar I, Bipolar II)" data-i18n-placeholder="sk.pd.diagnosis">
+      <input type="text" id="pdDiagnosisDate" class="modal-input" placeholder="Diagnosis Date (e.g., March 2020)" data-i18n-placeholder="sk.pd.diagDate">
+      <input type="text" id="pdAddress" class="modal-input" placeholder="Address" data-i18n-placeholder="sk.pd.address">
+      <input type="tel" id="pdMobile" class="modal-input" placeholder="Mobile Number" data-i18n-placeholder="sk.pd.mobile">
+      <input type="email" id="pdEmail" class="modal-input" placeholder="Email" data-i18n-placeholder="sk.pd.email">
+      <input type="text" id="pdEmergencyContact" class="modal-input" placeholder="Emergency Contact (name & number)" data-i18n-placeholder="sk.pd.emergency">
+      <textarea id="pdNotes" class="modal-input" placeholder="Notes (optional)" data-i18n-placeholder="sk.pd.notes" rows="3" style="resize:vertical;font-family:inherit;"></textarea>
       <div style="display:flex;gap:10px;margin-top:4px;">
-        <button class="modal-btn" onclick="savePersonalDetails()" style="background:var(--brand-primary);color:white;">Save</button>
-        <button class="modal-btn" onclick="closePersonalDetailsModal()" style="background:white;color:#6c757d;border:2px solid #dee2e6;">Close</button>
+        <button class="modal-btn" onclick="savePersonalDetails()" style="background:var(--brand-primary);color:white;" data-i18n="sk.pd.save">Save</button>
+        <button class="modal-btn" onclick="closePersonalDetailsModal()" style="background:white;color:#6c757d;border:2px solid #dee2e6;" data-i18n="sk.pd.close">Close</button>
       </div>
     </div>
   </div>

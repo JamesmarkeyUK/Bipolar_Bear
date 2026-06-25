@@ -15,18 +15,23 @@
 (function () {
   'use strict';
 
+  // Tiny translation helper — resolves through the shared i18n module when
+  // available, falls back to the key (or supplied default) if BB isn't loaded.
+  function _t(k, v) { return (window.BB && window.BB.t) ? window.BB.t(k, v) : k; }
+
   var reduceMotion = window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ──────────────── 1. Interactive mood meter ──────────────── */
-  // Low → high. `t` (0..1) maps linearly onto this scale.
+  // Low → high. `t` (0..1) maps linearly onto this scale. Name + tag are
+  // resolved through i18n at render time (see render()) via their keys.
   var MOODS = [
-    { name: 'Depressed', tag: 'Under the rain cloud',   glow: '#9fb4c4', accent: '#5f7388' },
-    { name: 'Low',       tag: 'Running on empty',       glow: '#bcae9a', accent: '#7d8a55' },
-    { name: 'Stable',    tag: 'Even keel — steady',     glow: '#ffd089', accent: '#e8870e' },
-    { name: 'Good',      tag: 'Bright and balanced',    glow: '#ffc46b', accent: '#ff8a00' },
-    { name: 'Elevated',  tag: 'Buzzing, thoughts racing',glow: '#ffb24d', accent: '#ff7a00' },
-    { name: 'Manic',     tag: 'Soaring — the big highs', glow: '#ff9a3d', accent: '#ff5a00' }
+    { nameKey: 'lp.meter.depressed.name', tagKey: 'lp.meter.depressed.tag', glow: '#9fb4c4', accent: '#5f7388' },
+    { nameKey: 'lp.meter.low.name',       tagKey: 'lp.meter.low.tag',       glow: '#bcae9a', accent: '#7d8a55' },
+    { nameKey: 'lp.meter.stable.name',    tagKey: 'lp.meter.stable.tag',    glow: '#ffd089', accent: '#e8870e' },
+    { nameKey: 'lp.meter.good.name',      tagKey: 'lp.meter.good.tag',      glow: '#ffc46b', accent: '#ff8a00' },
+    { nameKey: 'lp.meter.elevated.name',  tagKey: 'lp.meter.elevated.tag',  glow: '#ffb24d', accent: '#ff7a00' },
+    { nameKey: 'lp.meter.manic.name',     tagKey: 'lp.meter.manic.tag',     glow: '#ff9a3d', accent: '#ff5a00' }
   ];
 
   var meter   = document.getElementById('moodMeter');
@@ -70,8 +75,8 @@
       current = idx;
       faces.forEach(function (f, i) { f.classList.toggle('active', i === idx); });
       var m = MOODS[idx];
-      if (nameEl) nameEl.textContent = m.name;
-      if (tagEl)  tagEl.textContent  = m.tag;
+      if (nameEl) nameEl.textContent = _t(m.nameKey);
+      if (tagEl)  tagEl.textContent  = _t(m.tagKey);
       if (nameEl) nameEl.style.color = m.accent;
       if (handle) handle.style.borderColor = m.accent;
       meter.style.setProperty('--mood-glow', m.glow);
@@ -154,13 +159,14 @@
       'RiverStone', 'KindEmber', 'GentleTide'];
     var COLORS = ['#ff9f1c', '#2ec4b6', '#9b5de5', '#3a86ff', '#ff5d8f',
       '#06d6a0', '#ef476f', '#f6a700'];
-    var POSTS = [
-      'Three days stable after a rough patch. Small wins still count, right?',
-      'Finally told my partner about my diagnosis. They just hugged me. 🧡',
-      'Anyone else find mornings the hardest? Looking for routines that help.',
-      'Hypomania creeping in — logging it early this time. Proud of that.',
-      'Took my meds every day this week. Quietly chuffed with myself.',
-      'Rough night. Just needed to say it somewhere people actually get it.'
+    // Example community posts — resolved through i18n at render time.
+    var POST_KEYS = [
+      'lp.meter.posts.p1',
+      'lp.meter.posts.p2',
+      'lp.meter.posts.p3',
+      'lp.meter.posts.p4',
+      'lp.meter.posts.p5',
+      'lp.meter.posts.p6'
     ];
     function initials(name) { return (name.match(/[A-Z]/g) || ['B', 'A']).slice(0, 2).join(''); }
 
@@ -173,7 +179,7 @@
       if (nameEl2) nameEl2.textContent = name;
       if (av1) { av1.textContent = ini; av1.style.background = color; }
       if (av2) { av2.textContent = ini; av2.style.background = color; }
-      if (postEl) postEl.textContent = POSTS[i % POSTS.length];
+      if (postEl) postEl.textContent = _t(POST_KEYS[i % POST_KEYS.length]);
     }
     function shuffle() { i = (i + 1) % MONIKAS.length; render(); }
 
@@ -249,7 +255,7 @@
       var b = document.createElement('button');
       b.type = 'button';
       b.className = 'carousel-dot' + (i === 0 ? ' active' : '');
-      b.setAttribute('aria-label', 'Show screenshot ' + (i + 1) + ' of ' + n);
+      b.setAttribute('aria-label', _t('lp.carousel.screenshotLabel', { i: i + 1, n: n }));
       b.addEventListener('click', function () { go(i); kick(); });
       if (dotsWrap) dotsWrap.appendChild(b);
       return b;

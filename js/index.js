@@ -370,7 +370,10 @@ setTimeout(function () {
           if (userInfo) userInfo.style.display = 'none';
           const _pdHint = document.getElementById('personalDetailsHint');
           if (_pdHint) _pdHint.style.display = 'none';
-          window._fabOpenAuth = window.showAuthModal;
+          // Guests open the Profile modal (not the sign-in form): customise is
+          // available without an account, and the Customise panel carries its
+          // own "Sign up / in" button so backing up stays one tap away.
+          window._fabOpenAuth = window.showProfileModal;
           _setHomeAuthFab(false);
           // Hide stats from a previous account when Firebase fires with no
           // user (token expiry, sign-out via another tab, or just a signed-
@@ -503,6 +506,24 @@ setTimeout(function () {
       BB.storage.set('AccountHintShown', '1');
       window._bbAccountHintActive = true;
 
+      // The finale points the user at the profile button (Customise panel).
+      // Pre-enable the Survival Kit + Bipolar Anonymous home buttons so they
+      // show up already selected in that panel and are visible on the home
+      // screen the moment they close it — they discover the features instead
+      // of having to find the toggles. Only flip each the first time (when it
+      // has never been set), so a user who deliberately turned one off later
+      // isn't overridden on a repeat finale.
+      let _btnsPreEnabled = false;
+      if (BB.storage.get('SurvivalBtnEnabled') == null) {
+        BB.storage.set('SurvivalBtnEnabled', '1');
+        _btnsPreEnabled = true;
+      }
+      if (BB.storage.get('AnonBtnEnabled') == null) {
+        BB.storage.set('AnonBtnEnabled', '1');
+        _btnsPreEnabled = true;
+      }
+      if (_btnsPreEnabled && typeof window._applyOnboardingGating === 'function') window._applyOnboardingGating();
+
       // If the What's New popup beat the hint onto the screen, put it away
       // and un-mark it so it re-shows on the next visit instead.
       const _wn = document.getElementById('whatsNewPopup');
@@ -523,7 +544,7 @@ setTimeout(function () {
         hintLabel.setAttribute('data-i18n', 'home.accountHint');
         hintLabel.textContent = (window.BB && window.BB.t)
           ? window.BB.t('home.accountHint')
-          : '🐻 Create an account to customise your experience';
+          : '🐻 Sign in to back up your data (optional)';
         hintLabel.style.whiteSpace = 'normal';
         hintLabel.style.maxWidth = 'min(280px, calc(100vw - 48px))';
         hintLabel.style.textAlign = 'center';
@@ -560,15 +581,21 @@ setTimeout(function () {
         // (_fabOnSignUp) hold back until the toast has actually appeared.
         window._bbFinaleToastPending = true;
         const _showToast = () => { window._bbFinaleToastPending = false; _showTutorialCompleteModal(); };
+        // Guests now land in the Profile modal (which carries the sign-in
+        // button); signed-up flows still open the auth modal directly. Either
+        // counts as "the modal was dealt with", so watch both.
+        const _finaleModalOpen = () => {
+          const a = document.getElementById('bbAuthModal');
+          const p = document.getElementById('idxProfileModal');
+          return (a && a.classList.contains('active')) || (p && p.classList.contains('active'));
+        };
         let waited = 0;
         const _openPoll = setInterval(() => {
           waited += 200;
-          const m = document.getElementById('bbAuthModal');
-          if (m && m.classList.contains('active')) {
+          if (_finaleModalOpen()) {
             clearInterval(_openPoll);
             const _closePoll = setInterval(() => {
-              const m2 = document.getElementById('bbAuthModal');
-              if (!m2 || !m2.classList.contains('active')) {
+              if (!_finaleModalOpen()) {
                 clearInterval(_closePoll);
                 setTimeout(_showToast, 350);
               }
@@ -1988,6 +2015,7 @@ function _handleIndexJournalNav() {
     // (and fab.js) reads the same value without depending on this script.
     const _APP_VERSION = window._APP_VERSION;
     const _WHATS_NEW_HEADLINES = {
+      '1.14': 'Your Survival Kit now unlocks automatically at the end of the tutorial, Apple Health sync has moved into Advanced settings, and the journal Open/Close button label is fixed',
       '1.11': 'Community: mute anyone on the Anonymous board with the new 🙈 button (unmute from the About screen), plus clearer Apple Health / Health Connect labels in journal settings',
       '1.09': 'Smoother permissions — notification and health-sync access is now only requested when you switch each one on, with a more reliable Apple Health reconnection after reinstalling',
       '1.4': 'New 📖 Wiki tab on the Anonymous board — Medications, Conditions, Therapies, Lifestyle, Warning Signs, Hospital, Workplace, Pregnancy, For Loved Ones, and more, with inline search',

@@ -655,11 +655,20 @@
       <h3 style="margin-bottom:16px;">📋 Changelog</h3>
       <div style="text-align:left; font-size:0.9em; color:#495057; line-height:1.7;">
         <div style="margin-bottom:14px;">
-          <strong style="color:var(--brand-primary);">v0.98</strong><br>
+          <strong style="color:var(--brand-primary);">v1.14</strong><br>
+          • ✨ Your Survival Kit and Bipolar Anonymous now unlock automatically at the end of the tutorial — pre-selected in Profile and waiting on your home screen<br>
+          • ✨ The first time you open the journal after the tutorial, a guided hint points you to the Settings button so you can customise your form<br>
+          • 🎨 Apple Health sync moved into Advanced settings, below the Daily Mood Reminder<br>
+          • 🎨 Profile: the guest "Sign up / in" button now sits below the language picker, matching the Settings menu<br>
+          • 🐛 Fix: the journal Open/Close button now shows its label instead of a raw text key<br>
+          • 🐛 Fix: removed a duplicate "Health data" status line from the top of Settings<br>
+        </div>
+        <div style="margin-bottom:14px;">
+          <strong style="color:#6c757d;">v0.98</strong><br>
           • 🐛 Fix: Journal streak &amp; stability counters now load on home page immediately after sign-in (no need to visit Journal first)<br>
           • 🐛 Fix: Achievement toasts no longer re-fire on a new device — unlocked achievements now sync across devices<br>
           • 🐛 Fix: Sign-out now clears streak, stability, and Bipolar Anonymous stats so the next account starts fresh<br>
-          • 🐛 Fix: Bipolar Anonymous monika, verified state &amp; "new messages" badge restore instantly on sign-in<br>
+          • 🐛 Fix: Bipolar Anonymous moniker, verified state &amp; "new messages" badge restore instantly on sign-in<br>
           • ✨ FAB dock customisation (slot order &amp; hidden buttons) now syncs across your devices via your account<br>
         </div>
         <div style="margin-bottom:14px;">
@@ -667,7 +676,7 @@
           • 🐛 Fix: Reminder &amp; weekly summary toggles now save instantly when changed (no need to tap Save)<br>
           • ✨ Reminder/weekly toggles now request iOS notification permission inline — clear "Blocked in iOS Settings" alert if denied<br>
           • ✨ Reminder time, reminders on/off, and weekly summary now sync across devices via your account<br>
-          • ✨ Bipolar Anonymous: signed-in users with a saved monika now go straight to the chat — no flash of the verify screen<br>
+          • ✨ Bipolar Anonymous: signed-in users with a saved moniker now go straight to the chat — no flash of the verify screen<br>
           • 🎨 Bipolar Anonymous: a run of deleted posts now collapses to a single "this post was deleted" tombstone instead of a stack<br>
           • ✨ Bipolar Anonymous button and sign-in button hidden during tutorial — revealed once tutorial is complete<br>
         </div>
@@ -1163,21 +1172,6 @@
           </div>
         </div>
 
-        <!-- Apple Health / HealthKit — surfaced at the top level of Settings so the
-             HealthKit functionality is clearly identified in the UI (Apple Guideline
-             2.5.1). Native only; hidden on web by showSettingsModal(). Branded to
-             "Apple Health (HealthKit)" / "Health Connect" by _brandHealthSyncUI(). -->
-        <div id="healthSyncSection" style="display:none; margin-bottom:16px; padding:14px 16px; border:1.5px solid #e9ecef; border-radius:14px;">
-          <div style="display: flex; align-items: center; justify-content: space-between; gap:12px;">
-            <div>
-              <div style="font-weight: 600; color: #495057; font-size: 0.95em;" id="healthSyncLabel">📱 Sync health data</div>
-              <div style="color: #6c757d; font-size: 0.82em; margin-top: 2px; max-width: 240px; line-height: 1.4;" id="healthSyncDesc">Import steps &amp; sleep hours from your phone's health app</div>
-            </div>
-            <label class="bb-switch"><input type="checkbox" id="healthSyncToggle" onchange="_toggleHealthSync()"><span class="bb-slider"></span></label>
-          </div>
-          <div class="settings-health-info" style="color:#6c757d;font-size:0.78em;margin-top:8px;"></div>
-        </div>
-
           <div id="customiseFormWrap" style="margin-bottom:16px;position:relative;">
           <div id="customiseFormHintEl" style="display:none;flex-direction:column;align-items:flex-end;gap:2px;margin-bottom:4px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;">
             <span style="font-size:0.72em;font-weight:700;font-style:italic;color:var(--brand-primary);font-family:'Georgia',serif;letter-spacing:0.01em;" data-i18n="journal.hint.clickHere">🐻 Click here</span>
@@ -1205,6 +1199,10 @@
             <button id="advancedSettingsBtn" onclick="openAdvancedSettings()" style="background: none; border: none; color: #6c757d; font-size: 0.82em; cursor: pointer; padding: 4px 8px; letter-spacing: 0.02em;">🛠️ Advanced ▸</button>
           </div>
         </div>
+
+        <!-- Guest-only: signing in is optional and only backs up data (hidden once signed in) -->
+        <button id="settingsGuestSignIn" onclick="closeSettingsModal();window.showAuthModal&&window.showAuthModal()" style="display:none;width:100%;padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:10px;font-size:0.92em;font-weight:700;cursor:pointer;margin-bottom:6px;-webkit-tap-highlight-color:transparent;">☁️ Sign in to back up your data</button>
+        <div id="settingsGuestSignInNote" style="display:none;color:#6c757d;font-size:0.78em;text-align:center;margin-bottom:14px;">Optional — everything works without an account. Sign in to sync across devices.</div>
 
         <div style="margin-top:4px;text-align:center;">
           <div style="color: #6c757d; font-size: 0.78em; line-height: 1.8;">
@@ -1241,6 +1239,19 @@
           <div style="display: flex; align-items: center; gap: 12px;">
             <label for="weeklySummaryEnabled" style="flex: 1; color: #6c757d; font-size: 0.95em; cursor: pointer;">Weekly summary (Sundays):</label>
             <label class="bb-switch"><input type="checkbox" id="weeklySummaryEnabled" onchange="_onWeeklyToggleChange()" checked><span class="bb-slider"></span></label>
+          </div>
+        </div>
+
+        <!-- Apple Health / HealthKit — native only; hidden on web by showSettingsModal().
+             Branded to "Apple Health (HealthKit)" / "Health Connect" by _brandHealthSyncUI().
+             Lives on the Advanced page, below the Daily Mood Reminder. -->
+        <div id="healthSyncSection" style="display:none; margin-bottom:24px; padding:14px 16px; border:1.5px solid #e9ecef; border-radius:14px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap:12px;">
+            <div>
+              <div style="font-weight: 600; color: #495057; font-size: 0.95em;" id="healthSyncLabel">📱 Sync health data</div>
+              <div style="color: #6c757d; font-size: 0.82em; margin-top: 2px; max-width: 240px; line-height: 1.4;" id="healthSyncDesc">Import steps &amp; sleep hours from your phone's health app</div>
+            </div>
+            <label class="bb-switch"><input type="checkbox" id="healthSyncToggle" onchange="_toggleHealthSync()"><span class="bb-slider"></span></label>
           </div>
         </div>
 
