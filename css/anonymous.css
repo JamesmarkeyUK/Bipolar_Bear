@@ -313,17 +313,28 @@
       padding: calc(16px + env(safe-area-inset-top, 0px)) 16px 0;
       flex-shrink: 0;
     }
-    .board-header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .board-header-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 14px; }
     .board-back-btn {
       color: var(--dark); text-decoration: none; background: rgba(0,0,0,0.1);
       padding: 8px 14px; border-radius: 20px; font-size: 0.9em; font-weight: 600;
       transition: background 0.2s; border: none; cursor: pointer; font-family: inherit;
     }
     @media (hover: hover) and (pointer: fine) { .board-back-btn:hover { background: rgba(0,0,0,0.18); } }
-    .board-logo { display: flex; align-items: center; gap: 10px; }
-    .board-logo img { width: 36px; height: 36px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-    .board-logo-name { font-size: 18px; font-weight: 800; color: var(--dark); letter-spacing: -0.3px; }
-    .board-logo-sub  { font-size: 10px; color: var(--dark); letter-spacing: 0.6px; text-transform: uppercase; }
+    /* min-width:0 lets the logo shrink below its content width so its
+       wordmark can ellipsis instead of pushing the user pill off-screen. */
+    .board-logo { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .board-logo img { width: 36px; height: 36px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); flex-shrink: 0; }
+    .board-logo > div { min-width: 0; }
+    .board-logo-name { font-size: 18px; font-weight: 800; color: var(--dark); letter-spacing: -0.3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+    .board-logo-sub  { font-size: 10px; color: var(--dark); letter-spacing: 0.6px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+    /* The identity pill must be allowed to shrink (and its monika name to
+       ellipsis) so the streak/stable/birthday badges never spill past the
+       16px gutter on a 375px screen. Avatar + badges stay fixed-size. */
+    #board-user-pill { min-width: 0; flex-shrink: 1; }
+    #board-user-pill .pill-row { min-width: 0; }
+    #board-user-pill .pill-namecol { min-width: 0; flex-shrink: 1; }
+    #board-user-pill .pill-name { display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #board-user-pill .pill-badge { flex-shrink: 0; white-space: nowrap; }
 
     .board-tabs { display: flex; gap: 4px; }
     .board-tab {

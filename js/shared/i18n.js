@@ -287,6 +287,13 @@
           save: 'Save Changes ✓',
           back: '← Back to Bipolar Bear',
           signOut: 'Sign Out',
+          deleteAccount: 'Delete my account',
+        },
+        deleteAccount: {
+          title: 'Delete your account?',
+          body: "This permanently deletes your account — your name, profile and every post you've made. This cannot be undone. You can sign up again any time with the same email.",
+          cancel: 'Cancel',
+          confirm: 'Delete forever',
         },
         medOv: {
           title: 'Your Medication',

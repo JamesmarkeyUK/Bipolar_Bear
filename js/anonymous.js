@@ -323,7 +323,7 @@ function _updateLogoCursor() {
 }
 
 // Close on backdrop tap
-['ov-compose','ov-firstpost','ov-sos','ov-report','ov-mute','ov-e2ee','ov-monika','ov-self-delete','ov-admin-delete','ov-med','ov-stable','ov-about'].forEach(id => {
+['ov-compose','ov-firstpost','ov-sos','ov-report','ov-mute','ov-e2ee','ov-monika','ov-self-delete','ov-admin-delete','ov-anon-delete','ov-terms','ov-med','ov-stable','ov-about'].forEach(id => {
   document.getElementById(id).addEventListener('click', e => {
     if (e.target === document.getElementById(id)) closeOv(id);
   });
@@ -332,6 +332,15 @@ function _updateLogoCursor() {
 document.getElementById('ov-thread').addEventListener('click', e => {
   if (e.target === document.getElementById('ov-thread')) closeThread();
 });
+
+// Community Guidelines & Terms overlay (UGC agreement, guideline 1.2).
+// Openable from the signup checkbox and the About sheet; closeable from its
+// own button (backdrop-tap is handled by the array above).
+['open-terms-link','about-terms-link'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('click', () => openOv('ov-terms'));
+});
+document.getElementById('terms-close').addEventListener('click', () => closeOv('ov-terms'));
 
 // ─────────────────────────────────────────────────────────────────
 // Utilities
@@ -467,6 +476,7 @@ function setupVerify() {
   const verifyBtn = document.getElementById('verify-btn');
   const boxes     = document.querySelectorAll('.code-box');
   const errDiv    = document.getElementById('verify-error');
+  const agreeChk  = document.getElementById('agree-terms');
   let   _pendingEmail = '';
   let   _sessionId    = null;
 
@@ -480,9 +490,11 @@ function setupVerify() {
   }
 
   function _validateEmail() {
-    const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailIn.value.trim());
-    sendBtn.disabled = !ok;
-    emailIn.classList.toggle('valid', ok);
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailIn.value.trim());
+    // Guideline 1.2: can't request a code until the terms checkbox is ticked.
+    const agreed  = !agreeChk || agreeChk.checked;
+    sendBtn.disabled = !(emailOk && agreed);
+    emailIn.classList.toggle('valid', emailOk);
   }
 
   // Ensure email field is editable and wired for validation
@@ -502,6 +514,11 @@ function setupVerify() {
 
   emailIn.addEventListener('input',   _validateEmail);
   emailIn.addEventListener('keydown', e => { if (e.key === 'Enter' && !sendBtn.disabled) sendBtn.click(); });
+  if (agreeChk) {
+    // Re-check the box if the user already agreed earlier this session.
+    agreeChk.checked = BB.storage.get('Anon_agreedTerms') === 'true';
+    agreeChk.onchange = _validateEmail;
+  }
 
   // Run once so button state matches whatever is already in the field
   _validateEmail();
@@ -626,6 +643,9 @@ function setupVerify() {
       }
       BB.storage.set('Anon_verified', 'true');
       BB.storage.set('Anon_email', _pendingEmail);
+      // Record acceptance of the terms / zero-tolerance policy (guideline 1.2).
+      BB.storage.set('Anon_agreedTerms', 'true');
+      BB.storage.set('Anon_agreedTermsAt', new Date().toISOString());
 
       // If the user is signed in via the BipolarBear app, link the verified
       // anon email to their user account so it can be used for future
@@ -1182,16 +1202,16 @@ function renderUserPill() {
   const av = profile.avatarInitials();
   const bday = _birthdayCompact(profile.joinedAt);
   document.getElementById('board-user-pill').innerHTML = `
-    <div style="display:flex;align-items:center;gap:5px;">
+    <div class="pill-row" style="display:flex;align-items:center;gap:5px;">
       <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,${g1},${g2});display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:11px;flex-shrink:0;">${esc(av)}</div>
-      <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0;">
-        <span style="font-size:12px;color:rgba(0,0,0,0.75);font-weight:600;">[${esc(m)}]</span>
+      <div class="pill-namecol" style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0;">
+        <span class="pill-name" style="font-size:12px;color:rgba(0,0,0,0.75);font-weight:600;">[${esc(m)}]</span>
         ${profile.isAdmin ? '<span style="background:rgba(0,0,0,0.55);color:#fff;font-size:9px;font-weight:800;border-radius:4px;padding:1px 5px;line-height:1.2;">ADMIN</span>' : ''}
       </div>
-      <span>🔥</span>
-      <span style="font-size:11px;color:rgba(0,0,0,0.6);">${s}d</span>
-      ${profile.showStable && profile.stableStreak > 0 ? `<span>🧘</span><span style="font-size:11px;color:rgba(0,0,0,0.6);">${profile.stableStreak}d</span>` : ''}
-      ${bday ? `<span title="Bipolar Bear birthday">🎂</span><span style="font-size:11px;color:rgba(0,0,0,0.6);">${bday}</span>` : ''}
+      <span class="pill-badge">🔥</span>
+      <span class="pill-badge" style="font-size:11px;color:rgba(0,0,0,0.6);">${s}d</span>
+      ${profile.showStable && profile.stableStreak > 0 ? `<span class="pill-badge">🧘</span><span class="pill-badge" style="font-size:11px;color:rgba(0,0,0,0.6);">${profile.stableStreak}d</span>` : ''}
+      ${bday ? `<span class="pill-badge" title="Bipolar Bear birthday">🎂</span><span class="pill-badge" style="font-size:11px;color:rgba(0,0,0,0.6);">${bday}</span>` : ''}
     </div>`;
 }
 
@@ -3145,6 +3165,11 @@ function openMonikaSettings() {
   const msSignOut = document.getElementById('ms-signout');
   if (msSignOut) msSignOut.style.display = _bbUser ? 'none' : 'block';
 
+  // Delete account is standalone-only too — BB-app users delete from the
+  // main app (which removes their anon footprint as part of that flow).
+  const msDelete = document.getElementById('ms-delete');
+  if (msDelete) msDelete.style.display = _bbUser ? 'none' : 'block';
+
   openOv('ov-monika');
 }
 
@@ -3161,6 +3186,87 @@ document.getElementById('ms-signout').addEventListener('click', () => {
   closeOv('ov-monika');
   boot(null);
 });
+
+// ── Delete account (standalone email-code path) ───────────────────────
+// Opens the confirmation sheet; the actual destruction runs on confirm.
+document.getElementById('ms-delete').addEventListener('click', () => {
+  closeOv('ov-monika');
+  openOv('ov-anon-delete');
+});
+document.getElementById('adel-acc-cancel').addEventListener('click', () => closeOv('ov-anon-delete'));
+document.getElementById('adel-acc-confirm').addEventListener('click', deleteAnonAccount);
+
+/**
+ * Permanently delete the standalone anonymous account. Removes every trace
+ * the signup created: the monika reservation, the cross-device anonProfile,
+ * all posts authored under the monika, the (anonymous) Firebase Auth user,
+ * and all local identity/session state. Best-effort per step — a network
+ * blip on one delete must not strand the user half-deleted, so each Firestore
+ * call swallows its own error and we always end on the verify screen.
+ *
+ * Required by App Store guideline 5.1.1(v): account creation must be matched
+ * by an in-app account-deletion path.
+ */
+async function deleteAnonAccount() {
+  const btn = document.getElementById('adel-acc-confirm');
+  if (btn) { btn.disabled = true; btn.textContent = 'Deleting…'; }
+
+  const monika = profile.monika;
+  const email  = BB.storage.get('Anon_email');
+
+  try {
+    // Comment-thread deletes need an auth session (Firestore rules require
+    // request.auth); the standalone path may not have signed in yet.
+    await _ensureAuthSession();
+
+    if (db) {
+      // 1. Delete every post authored under this monika.
+      if (monika) {
+        try {
+          const snap  = await db.collection(BB_BRAND.collections.posts).where('name', '==', monika).get();
+          // Chunk into batches of 450 (Firestore batch limit is 500).
+          let batch = db.batch(), n = 0;
+          for (const doc of snap.docs) {
+            batch.delete(doc.ref); n++;
+            if (n % 450 === 0) { await batch.commit(); batch = db.batch(); }
+          }
+          if (n % 450 !== 0) await batch.commit();
+        } catch (e) { console.warn('[AnonDelete] posts', e); }
+
+        // 2. Release the monika reservation so the name frees up.
+        await db.collection(BB_BRAND.collections.monikas).doc(monika.toLowerCase()).delete().catch(() => {});
+      }
+
+      // 3. Delete the cross-device profile (keyed by hashed email).
+      if (email) {
+        try {
+          const hash = await _anonEmailHash(email);
+          await db.collection('anonProfiles').doc(hash).delete();
+        } catch (e) { console.warn('[AnonDelete] anonProfile', e); }
+      }
+    }
+
+    // 4. Delete the (anonymous) Firebase Auth user. Anonymous users can
+    //    always delete without re-auth; ignore if there's no session.
+    try {
+      const u = firebase.auth && firebase.auth().currentUser;
+      if (u) await u.delete();
+    } catch (e) { console.warn('[AnonDelete] auth user', e); }
+  } catch (e) {
+    console.warn('[AnonDelete] failed', e);
+  } finally {
+    // 5. Wipe all local identity/session state (same scope as sign-out).
+    Object.keys(localStorage)
+      .filter(k => k === 'bbAnonLastVisit' || k === 'bbAnonVisitDate' || k.startsWith('bbAnon_'))
+      .forEach(k => localStorage.removeItem(k));
+    stopAllListeners();
+    if (btn) { btn.disabled = false; btn.textContent = 'Delete forever'; }
+    closeOv('ov-anon-delete');
+    boot(null);
+    showHint('Your account has been deleted');
+  }
+}
+
 const _msHomeBtn = document.getElementById('ms-home');
 if (_isAnonymousApp) {
   // "Discover BipolarBear" is already in the info popup — don't duplicate it here.
