@@ -1236,7 +1236,7 @@ function saveLastSeen(tab) {
 function tabHasUnseen(tab) {
   const seen = lastSeenMs[tab];
   return postsByTab[tab].some(p => {
-    if (p.isSystem || p.isSeed || p.isAnnouncement || p.deleted) return false;
+    if (p.isSystem || p.isSeed || p.isAnnouncement || p.deleted || p.isTopic) return false;
     const la = p.lastActivity?.toMillis?.() ?? 0;
     const ts = p.timestamp?.toMillis?.()    ?? 0;
     return Math.max(la, ts) > seen;
@@ -2310,6 +2310,120 @@ function assembleGeneralPosts(realPosts) {
   return [todaySystemPost(), ...sortPosts(realPosts), ...seedPosts()];
 }
 
+// ─────────────────────────────────────────────────────────────────
+// Daily discussion topic
+//
+// A rotating conversation-starter that drops into the General feed as a
+// real post (so it scrolls inline with messages and can take replies).
+// It is shared across all devices because it lives in Firestore as an
+// ordinary post — flagged isTopic, with a deterministic per-day doc id
+// (topic-YYYY-MM-DD) so racing clients converge on one doc rather than
+// creating duplicates. No separate collection and no rules change: any
+// authenticated user can already write posts.
+//
+// Rotation rule: a NEW topic only appears when it is a new (UTC) day AND
+// at least one real message has happened since the current topic went up
+// (a fresh top-level post, or a reply on the topic itself). If the topic
+// sparked no conversation, it stays put rather than being buried.
+// ─────────────────────────────────────────────────────────────────
+let _dailyTopics        = null; // string[] once loaded
+let _dailyTopicsPromise = null;
+let _topicCheckInFlight = false;
+
+function loadDailyTopics() {
+  if (_dailyTopics) return Promise.resolve(_dailyTopics);
+  if (_dailyTopicsPromise) return _dailyTopicsPromise;
+  _dailyTopicsPromise = fetch('data/daily-topics.json')
+    .then(r => r.json())
+    .then(j => { _dailyTopics = Array.isArray(j.topics) ? j.topics : []; return _dailyTopics; })
+    .catch(e => {
+      console.warn('[Anonymous] daily-topics load failed', e);
+      _dailyTopics = [];
+      return _dailyTopics;
+    });
+  return _dailyTopicsPromise;
+}
+
+function _postMs(p) {
+  return p.timestamp?.toMillis?.() ?? (p.timestamp instanceof Date ? p.timestamp.getTime() : 0);
+}
+
+// Pure: decide what (if anything) to do about the daily topic given the
+// current general-tab posts. Returns { action:'noop' } or
+// { action:'post', dayStr, index, replacePostId }.
+function decideDailyTopic(posts, poolLen, nowMs) {
+  if (!poolLen) return { action: 'noop' };
+  const todayStr = new Date(nowMs).toISOString().slice(0, 10); // UTC day — same for every client
+
+  // Current topic = newest post flagged isTopic.
+  let current = null, currentMs = -1;
+  for (const p of posts) {
+    if (!p.isTopic) continue;
+    const ms = _postMs(p);
+    if (ms >= currentMs) { currentMs = ms; current = p; }
+  }
+
+  // Bootstrap: no topic has ever been posted.
+  if (!current) return { action: 'post', dayStr: todayStr, index: 0, replacePostId: null };
+
+  // Never post twice on the same UTC day.
+  if (current.dayStr === todayStr) return { action: 'noop' };
+
+  // New day: only rotate if a real message arrived since the topic went up —
+  // either a reply on the topic, or a fresh top-level post.
+  const gotReply = (Number(current.commentCount) || 0) > 0;
+  const newPost  = posts.some(p => {
+    if (p.isTopic || p.isSystem || p.isSeed || p.isAnnouncement || p.deleted) return false;
+    return _postMs(p) > currentMs;
+  });
+  if (!gotReply && !newPost) return { action: 'noop' };
+
+  const nextIndex = ((Number(current.topicIndex) || 0) + 1) % poolLen;
+  return { action: 'post', dayStr: todayStr, index: nextIndex, replacePostId: current.id };
+}
+
+// Evaluate the rotation rule against the live feed and, if due, write the
+// next topic post. Safe to call on every snapshot: the same-day short-circuit
+// and the deterministic doc id make repeat calls idempotent.
+async function maybePostDailyTopic() {
+  if (!db || _topicCheckInFlight) return;
+  const pool = await loadDailyTopics();
+  if (!pool.length) return;
+
+  const decision = decideDailyTopic(postsByTab.general, pool.length, Date.now());
+  if (decision.action !== 'post') return;
+
+  _topicCheckInFlight = true;
+  try {
+    await _ensureAuthSession(); // writes require request.auth
+    const ref = db.collection(BB_BRAND.collections.posts).doc('topic-' + decision.dayStr);
+    const existing = await ref.get();
+    if (existing.exists) return; // another device already posted today's topic
+
+    await ref.set({
+      isTopic:    true,
+      topicIndex: decision.index,
+      dayStr:     decision.dayStr,
+      text:       pool[decision.index],
+      tab:        'general',
+      likes:      0,
+      isSystem:   false,
+      pinned:     false,
+      timestamp:  firebase.firestore.FieldValue.serverTimestamp(),
+    });
+
+    // Keep only one topic live at a time.
+    if (decision.replacePostId) {
+      db.collection(BB_BRAND.collections.posts).doc(decision.replacePostId)
+        .delete().catch(() => {});
+    }
+  } catch (e) {
+    console.warn('[Anonymous] daily topic post failed', e);
+  } finally {
+    _topicCheckInFlight = false;
+  }
+}
+
 function listenPosts() {
   stopAllListeners();
   postsByTab = { announcements: [], general: [] };
@@ -2331,6 +2445,7 @@ function listenPosts() {
       .limit(60)
       .onSnapshot(snap => {
         postsByTab[tab] = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        if (tab === 'general') maybePostDailyTopic(); // rotate the daily topic if due
         if (tab === currentTab) {
           localPosts = postsByTab[tab];
           renderPosts(tab === 'general'
@@ -2376,7 +2491,7 @@ async function cleanOldPosts() {
     const batch = db.batch();
     snap.docs.forEach(doc => {
       const data = doc.data();
-      if (data.reported || data.pinned) return;
+      if (data.reported || data.pinned || data.isTopic) return; // topics are managed by the rotation, never auto-swept
       // Preserve if a comment was added within the 7-day window
       if (data.lastActivity) {
         const laMs = data.lastActivity.toMillis
@@ -2458,6 +2573,18 @@ function closeThread() {
 }
 
 function renderThreadHeader(p) {
+  if (p.isTopic) {
+    return `<div class="thread-orig-post">
+      <div class="post-header">
+        <div class="post-avatar">
+          <div class="post-av-circle" style="background:linear-gradient(135deg,${YELLOW_LT},${YELLOW_DARK});">💬</div>
+          <div><div class="post-name">Today's topic</div></div>
+        </div>
+        <span class="post-time">${p.timestamp ? timeAgo(p.timestamp) : _wt('anon.time.now')}</span>
+      </div>
+      <div class="post-text">${esc(p.text)}</div>
+    </div>`;
+  }
   const g1 = safeColor(p.grad1, YELLOW_LT);
   const g2 = safeColor(p.grad2, YELLOW_DARK);
   const av = p.initials || initials(p.name);
@@ -2648,6 +2775,7 @@ function renderPosts(posts) {
   // would linger past the hour. Schedule a re-render for when it expires.
   scheduleTombstoneSweep(_nextTombstoneExpiry, _now);
   list.innerHTML = posts.map(p => {
+    if (p.isTopic)        return renderTopic(p);
     if (p.isSystem)       return renderSystem(p);
     if (p.isAnnouncement) return renderAnnouncement(p);
     return renderPost(p);
@@ -2711,6 +2839,18 @@ function renderSystem(p) {
     <div class="sys-emoji">${esc(p.icon) || '☀️'}</div>
     <div class="sys-text">${esc(p.text)}</div>
     <div class="sys-meta">BipolarBear${p.time ? ' · ' + esc(p.time) : (p.timestamp ? ' · ' + timeAgo(p.timestamp) : '')}</div>
+  </div>`;
+}
+
+function renderTopic(p) {
+  const replies = num(p.commentCount, 0);
+  const cta = replies
+    ? `${replies} ${replies === 1 ? 'reply' : 'replies'} · tap to join 💛`
+    : 'Tap to share your thoughts 💛';
+  return `<div class="topic-card" data-comment="${esc(p.id)}">
+    <div class="topic-head"><span class="topic-emoji">💬</span><span class="topic-label">Today's topic</span></div>
+    <div class="topic-text">${esc(p.text)}</div>
+    <div class="topic-cta">${cta}</div>
   </div>`;
 }
 

@@ -340,7 +340,10 @@
 //       1.2) in anonymous.html / js/anonymous.js; a mobile top-bar overflow fix
 //       (css/anonymous.css); and the contact email switched to
 //       bipolar@unisim.co.uk (privacy.html + anonymous board).
-const CACHE_NAME = 'bipolarbear-v103';
+// v104: Daily discussion topic on the Anonymous board — a rotating inline
+//       prompt post (data/daily-topics.json, js/anonymous.js, css/anonymous.css)
+//       that advances only after the board sees activity.
+const CACHE_NAME = 'bipolarbear-v104';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
@@ -397,6 +400,8 @@ const STATIC_ASSETS = [
   // Wiki tab data (fetched by js/anonymous.js renderers).
   './data/wiki-support-groups.json',
   './data/wiki-posts.json',
+  // Daily discussion-topic pool (fetched by maybePostDailyTopic).
+  './data/daily-topics.json',
 ];
 
 /**

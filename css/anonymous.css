@@ -386,6 +386,16 @@
     .sys-card .sys-text  { font-size: 14px; font-weight: 700; color: var(--dark); margin-bottom: 2px; }
     .sys-card .sys-meta  { font-size: 11px; color: var(--dark); }
 
+    /* Daily discussion topic — an inline, tappable prompt card */
+    .topic-card { background: rgba(245,200,0,0.10); border: 1.5px dashed rgba(245,200,0,0.55); border-radius: 16px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; transition: background .15s ease, transform .1s ease; }
+    .topic-card:hover  { background: rgba(245,200,0,0.16); }
+    .topic-card:active { transform: scale(0.99); }
+    .topic-card .topic-head  { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+    .topic-card .topic-emoji { font-size: 15px; }
+    .topic-card .topic-label { font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--yellow-dark); }
+    .topic-card .topic-text  { font-size: 15px; font-weight: 700; color: var(--dark); line-height: 1.35; }
+    .topic-card .topic-cta   { font-size: 12px; color: var(--muted, #888); margin-top: 8px; }
+
     /* Announcement card */
     .ann-card { background: rgba(245,200,0,0.08); border: 1px solid rgba(245,200,0,0.2); border-radius: 16px; padding: 14px 16px; margin-bottom: 10px; }
 
