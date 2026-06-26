@@ -353,7 +353,14 @@
 //       idempotent + non-destructive. Wired into the auth listeners on
 //       index.html, journal.html, survival-kit.html (js/index.js, js/journal.js,
 //       js/survival-kit.js) + precached in STATIC_ASSETS.
-const CACHE_NAME = 'bipolarbear-v105';
+// v106: Duplicate "Today's topic" fix — the capped (60-doc, unordered) feed
+//       listener could drop the live topic from its snapshot, so the rotation
+//       saw no current topic and re-bootstrapped a second one under a new day's
+//       doc id without deleting the first (two identical topic threads). The
+//       rotation now reads topics via a direct isTopic== query (immune to the
+//       cap), sweeps every topic but one, and a render-side dedupeTopics guard
+//       only ever shows the newest. js/anonymous.js.
+const CACHE_NAME = 'bipolarbear-v106';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

@@ -2307,7 +2307,23 @@ function seedPosts() {
 }
 
 function assembleGeneralPosts(realPosts) {
-  return [todaySystemPost(), ...sortPosts(realPosts), ...seedPosts()];
+  return [todaySystemPost(), ...sortPosts(dedupeTopics(realPosts)), ...seedPosts()];
+}
+
+// Defensive: only ever surface ONE "Today's topic". Firestore can transiently
+// (or, on a failed cleanup, persistently) hold more than one isTopic post — for
+// example when a capped feed snapshot drops the live topic and the rotation
+// re-bootstraps a fresh one. Keep the newest topic and drop the rest so the user
+// never sees two topic threads regardless of the underlying data state.
+function dedupeTopics(posts) {
+  let newest = null, newestMs = -1;
+  for (const p of posts) {
+    if (!p.isTopic) continue;
+    const ms = _postMs(p);
+    if (ms >= newestMs) { newestMs = ms; newest = p; }
+  }
+  if (!newest) return posts;
+  return posts.filter(p => !p.isTopic || p === newest);
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -2382,6 +2398,34 @@ function decideDailyTopic(posts, poolLen, nowMs) {
   return { action: 'post', dayStr: todayStr, index: nextIndex, replacePostId: current.id };
 }
 
+// Authoritatively read every live topic doc. The per-tab feed listener is
+// capped at 60 docs with NO ordering, so Firestore returns them by document id
+// — and topic ids ("topic-YYYY-MM-DD") sort late, so an existing topic silently
+// falls out of the snapshot once the feed is busy. Relying on that snapshot made
+// the rotation believe no topic existed and re-bootstrap a duplicate. A direct
+// equality query is immune to the cap. Returns null if the read fails so the
+// caller can fall back to the snapshot rather than skipping the rotation.
+async function fetchTopicDocs() {
+  try {
+    const snap = await db.collection(BB_BRAND.collections.posts)
+      .where('isTopic', '==', true).get();
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (e) {
+    console.warn('[Anonymous] topic fetch failed', e);
+    return null;
+  }
+}
+
+// Delete every topic doc except keepId, so only one "Today's topic" is ever
+// live. Fire-and-forget: a failed delete just leaves a straggler that the next
+// pass (or the render-side dedupeTopics guard) handles.
+function sweepStaleTopics(topicDocs, keepId) {
+  for (const t of topicDocs) {
+    if (t.id === keepId) continue;
+    db.collection(BB_BRAND.collections.posts).doc(t.id).delete().catch(() => {});
+  }
+}
+
 // Evaluate the rotation rule against the live feed and, if due, write the
 // next topic post. Safe to call on every snapshot: the same-day short-circuit
 // and the deterministic doc id make repeat calls idempotent.
@@ -2390,30 +2434,58 @@ async function maybePostDailyTopic() {
   const pool = await loadDailyTopics();
   if (!pool.length) return;
 
-  const decision = decideDailyTopic(postsByTab.general, pool.length, Date.now());
+  // Read the true set of topics rather than trusting the capped feed snapshot.
+  const topicDocs = await fetchTopicDocs();
+
+  // Converge to a single live topic no matter how duplicates arose (a failed
+  // prior cleanup, a re-bootstrap from a dropped snapshot, …): keep the newest
+  // and sweep the rest. Runs independently of the rotation decision below so
+  // existing duplicates get healed even when no new topic is due.
+  if (topicDocs && topicDocs.length > 1) {
+    const newest = topicDocs.reduce((a, b) => (_postMs(b) >= _postMs(a) ? b : a));
+    sweepStaleTopics(topicDocs, newest.id);
+  }
+
+  // Merge the authoritative topic(s) over the snapshot so decideDailyTopic sees
+  // the real current topic even when the snapshot dropped it (prevents the
+  // duplicate-bootstrap). If the fetch failed, fall back to the raw snapshot.
+  let posts = postsByTab.general;
+  if (topicDocs) {
+    const byId = new Map(posts.map(p => [p.id, p]));
+    for (const t of topicDocs) byId.set(t.id, t);
+    posts = [...byId.values()];
+  }
+
+  const decision = decideDailyTopic(posts, pool.length, Date.now());
   if (decision.action !== 'post') return;
 
   _topicCheckInFlight = true;
   try {
     await _ensureAuthSession(); // writes require request.auth
-    const ref = db.collection(BB_BRAND.collections.posts).doc('topic-' + decision.dayStr);
+    const newId = 'topic-' + decision.dayStr;
+    const ref = db.collection(BB_BRAND.collections.posts).doc(newId);
     const existing = await ref.get();
-    if (existing.exists) return; // another device already posted today's topic
 
-    await ref.set({
-      isTopic:    true,
-      topicIndex: decision.index,
-      dayStr:     decision.dayStr,
-      text:       pool[decision.index],
-      tab:        'general',
-      likes:      0,
-      isSystem:   false,
-      pinned:     false,
-      timestamp:  firebase.firestore.FieldValue.serverTimestamp(),
-    });
+    if (!existing.exists) {
+      await ref.set({
+        isTopic:    true,
+        topicIndex: decision.index,
+        dayStr:     decision.dayStr,
+        text:       pool[decision.index],
+        tab:        'general',
+        likes:      0,
+        isSystem:   false,
+        pinned:     false,
+        timestamp:  firebase.firestore.FieldValue.serverTimestamp(),
+      });
+    }
 
-    // Keep only one topic live at a time.
-    if (decision.replacePostId) {
+    // Keep only the topic we just (re)posted live. Sweep against the full
+    // authoritative list when we have it (removes any straggler, not just the
+    // one decideDailyTopic flagged); otherwise fall back to the single replace.
+    if (topicDocs) {
+      sweepStaleTopics(topicDocs, newId);
+    } else if (decision.replacePostId && decision.replacePostId !== newId) {
       db.collection(BB_BRAND.collections.posts).doc(decision.replacePostId)
         .delete().catch(() => {});
     }
