@@ -343,7 +343,13 @@
 // v104: Daily discussion topic on the Anonymous board — a rotating inline
 //       prompt post (data/daily-topics.json, js/anonymous.js, css/anonymous.css)
 //       that advances only after the board sees activity.
-const CACHE_NAME = 'bipolarbear-v104';
+// v105: Medication data-loss fix — guest-entered medications (currentMedList)
+//       lived only in localStorage; creating an account never uploaded them, so
+//       they vanished when localStorage was cleared (reinstall, eviction, new
+//       device). The auth listeners now back guest meds up to userSettings on
+//       sign-in/sign-up when the account has none yet (js/index.js,
+//       js/journal.js, js/survival-kit.js).
+const CACHE_NAME = 'bipolarbear-v105';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
