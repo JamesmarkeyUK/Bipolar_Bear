@@ -361,20 +361,13 @@ window.addEventListener('pageshow', () => {
             db.collection('userSettings').doc(user.uid).get(),
             new Promise((_, rej) => setTimeout(() => rej(new Error('settings-timeout')), 5000))
           ]).then(async doc => {
-            // Back up guest-entered medications to the account. Guest data lives
-            // only in localStorage (currentMedList) — signup/login never uploaded
-            // it, so meds were lost whenever localStorage was cleared. Push local
-            // meds up when the account has none yet. Idempotent; runs even when
-            // the doc doesn't exist (brand-new account) so guest meds are claimed.
-            try {
-              const _localMeds = JSON.parse(localStorage.getItem('currentMedList') || '[]');
-              const _remoteMeds = doc.exists ? doc.data().currentMedList : undefined;
-              if (Array.isArray(_localMeds) && _localMeds.length > 0 &&
-                  (!Array.isArray(_remoteMeds) || _remoteMeds.length === 0)) {
-                db.collection('userSettings').doc(user.uid)
-                  .set({ currentMedList: _localMeds }, { merge: true }).catch(() => {});
-              }
-            } catch (e) {}
+            // Back guest-entered data (meds, goals, budget, …) up to the
+            // account. Guest data lives only in localStorage; signup/login only
+            // ever pulled settings down, so anything authored before creating an
+            // account was never backed up and was lost when localStorage cleared.
+            // Runs even when the doc doesn't exist (brand-new account) so guest
+            // data is claimed. Idempotent and non-destructive.
+            if (window.BB && BB.claimGuestData) BB.claimGuestData(db, user, doc);
             if (doc.exists) {
               const d = doc.data();
               if (d.logoVariant !== undefined) {

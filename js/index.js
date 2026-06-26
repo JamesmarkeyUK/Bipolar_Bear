@@ -213,21 +213,14 @@ setTimeout(function () {
           if (_vBanner) _vBanner.remove();
           // Load user settings from Firestore (logo variant + survival kit data for ticks)
           db.collection('userSettings').doc(user.uid).get().then(doc => {
-            // Back up guest-entered medications to the account. Guest data lives
-            // only in localStorage (currentMedList) — signup/login never uploaded
-            // it, so meds were lost whenever localStorage was cleared (reinstall,
-            // storage eviction, switching device). Push local meds up when the
-            // account has none yet. Idempotent; runs before the !doc.exists return
-            // so brand-new accounts (no doc) are covered too.
-            try {
-              const _localMeds = JSON.parse(localStorage.getItem('currentMedList') || '[]');
-              const _remoteMeds = doc.exists ? doc.data().currentMedList : undefined;
-              if (Array.isArray(_localMeds) && _localMeds.length > 0 &&
-                  (!Array.isArray(_remoteMeds) || _remoteMeds.length === 0)) {
-                db.collection('userSettings').doc(user.uid)
-                  .set({ currentMedList: _localMeds }, { merge: true }).catch(() => {});
-              }
-            } catch (e) {}
+            // Back guest-entered data (meds, goals, coping strategies, mood
+            // definitions, …) up to the account. Guest data lives only in
+            // localStorage; signup/login only ever pulled settings down, so
+            // anything authored before creating an account was never backed up
+            // and was lost when localStorage cleared. Runs before the
+            // !doc.exists return so brand-new accounts are covered. Idempotent
+            // and non-destructive — only uploads what the account is missing.
+            if (window.BB && BB.claimGuestData) BB.claimGuestData(db, user, doc);
             if (!doc.exists) return;
             const d = doc.data();
             if (d.logoVariant !== undefined) {

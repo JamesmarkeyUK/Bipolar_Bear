@@ -2080,22 +2080,14 @@ function _sktMood(moodKey) {
           const _skSavedAt = parseInt(localStorage.getItem('_sk_savedAt') || '0', 10);
           const _skSkipOverwrite = Date.now() - _skSavedAt < 60000;
           db.collection('userSettings').doc(user.uid).get().then(doc => {
-            // Back up guest-entered medications to the account. The medication
-            // step in the tutorial saves only to localStorage (currentMedList);
-            // creating an account never uploaded it, so meds vanished once
-            // localStorage was cleared. Push local meds up when the account has
-            // none yet. Idempotent; runs before the !doc.exists return so a
-            // brand-new account (no doc) is covered. Bypasses _skSkipOverwrite
-            // because this only ever *adds* missing data, never overwrites.
-            try {
-              const _localMeds = JSON.parse(localStorage.getItem('currentMedList') || '[]');
-              const _remoteMeds = doc.exists ? doc.data().currentMedList : undefined;
-              if (Array.isArray(_localMeds) && _localMeds.length > 0 &&
-                  (!Array.isArray(_remoteMeds) || _remoteMeds.length === 0)) {
-                db.collection('userSettings').doc(user.uid)
-                  .set({ currentMedList: _localMeds }, { merge: true }).catch(() => {});
-              }
-            } catch (e) {}
+            // Back guest-entered data (meds, goals, coping strategies, mood
+            // definitions, memories, reminders, commitments, …) up to the
+            // account. The tutorial saves these only to localStorage; creating
+            // an account never uploaded them, so they vanished once localStorage
+            // was cleared. Runs before the !doc.exists return so a brand-new
+            // account is covered, and independently of _skSkipOverwrite because
+            // it only ever *adds* missing data, never overwrites.
+            if (window.BB && BB.claimGuestData) BB.claimGuestData(db, user, doc);
             if (!doc.exists) return;
             const d = doc.data();
             if (d.logoVariant !== undefined) {
