@@ -2080,6 +2080,14 @@ function _sktMood(moodKey) {
           const _skSavedAt = parseInt(localStorage.getItem('_sk_savedAt') || '0', 10);
           const _skSkipOverwrite = Date.now() - _skSavedAt < 60000;
           db.collection('userSettings').doc(user.uid).get().then(doc => {
+            // Back guest-entered data (meds, goals, coping strategies, mood
+            // definitions, memories, reminders, commitments, …) up to the
+            // account. The tutorial saves these only to localStorage; creating
+            // an account never uploaded them, so they vanished once localStorage
+            // was cleared. Runs before the !doc.exists return so a brand-new
+            // account is covered, and independently of _skSkipOverwrite because
+            // it only ever *adds* missing data, never overwrites.
+            if (window.BB && BB.claimGuestData) BB.claimGuestData(db, user, doc);
             if (!doc.exists) return;
             const d = doc.data();
             if (d.logoVariant !== undefined) {

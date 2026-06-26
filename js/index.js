@@ -213,6 +213,14 @@ setTimeout(function () {
           if (_vBanner) _vBanner.remove();
           // Load user settings from Firestore (logo variant + survival kit data for ticks)
           db.collection('userSettings').doc(user.uid).get().then(doc => {
+            // Back guest-entered data (meds, goals, coping strategies, mood
+            // definitions, …) up to the account. Guest data lives only in
+            // localStorage; signup/login only ever pulled settings down, so
+            // anything authored before creating an account was never backed up
+            // and was lost when localStorage cleared. Runs before the
+            // !doc.exists return so brand-new accounts are covered. Idempotent
+            // and non-destructive — only uploads what the account is missing.
+            if (window.BB && BB.claimGuestData) BB.claimGuestData(db, user, doc);
             if (!doc.exists) return;
             const d = doc.data();
             if (d.logoVariant !== undefined) {

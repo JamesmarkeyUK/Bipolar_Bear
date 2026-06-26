@@ -343,7 +343,17 @@
 // v104: Daily discussion topic on the Anonymous board — a rotating inline
 //       prompt post (data/daily-topics.json, js/anonymous.js, css/anonymous.css)
 //       that advances only after the board sees activity.
-const CACHE_NAME = 'bipolarbear-v104';
+// v105: Guest data-loss fix — guest-entered data (medications, daily goals,
+//       budget, coping strategies, mood definitions, memories, reminders,
+//       commitments, gratitude) lived only in localStorage; creating an account
+//       never uploaded it, so it vanished when localStorage was cleared
+//       (reinstall, eviction, new device). New shared helper
+//       js/shared/guest-data.js (BB.claimGuestData) backs guest data up to
+//       userSettings on sign-in/sign-up when the account has none yet —
+//       idempotent + non-destructive. Wired into the auth listeners on
+//       index.html, journal.html, survival-kit.html (js/index.js, js/journal.js,
+//       js/survival-kit.js) + precached in STATIC_ASSETS.
+const CACHE_NAME = 'bipolarbear-v105';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
@@ -376,6 +386,7 @@ const STATIC_ASSETS = [
   './js/shared/medications.js',
   './js/shared/version-check.js',
   './js/shared/i18n.js',
+  './js/shared/guest-data.js',
 
   // NOTE: /version.json is deliberately NOT precached. It must always be
   // fetched fresh so a new release reaches stale clients on next page load
