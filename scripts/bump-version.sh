@@ -9,7 +9,8 @@
 # Usage:   scripts/bump-version.sh <buildNumber>
 #   e.g.   scripts/bump-version.sh 13      # -> version 1.13, build 13
 #
-# Native repo path defaults to ~/bipolarbear-native (per CLAUDE.md). Override:
+# Native repo path defaults to ~/Github/James/Bipolar_Bear_Mobile/bipolarbear-native
+# (per CLAUDE.md). Override:
 #          NATIVE_REPO=/path/to/native scripts/bump-version.sh 13
 #
 # It edits files only — it does NOT commit, push, rsync, or cap-sync. Review the
@@ -23,7 +24,7 @@ BUILD="${1:?Usage: bump-version.sh <buildNumber>   (e.g. 13 -> v1.13 build 13)}"
 VER="1.$BUILD"
 
 WEB="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-NATIVE="${NATIVE_REPO:-$HOME/bipolarbear-native}"
+NATIVE="${NATIVE_REPO:-$HOME/Github/James/Bipolar_Bear_Mobile/bipolarbear-native}"
 [[ -d "$NATIVE" ]] || { echo "error: native repo not found at '$NATIVE' (set NATIVE_REPO=...)"; exit 1; }
 
 PBX="$NATIVE/ios/App/BipolarBear.xcodeproj/project.pbxproj"   # main app + widget, Debug+Release

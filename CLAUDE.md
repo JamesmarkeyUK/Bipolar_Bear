@@ -69,6 +69,13 @@ on the catch.
 
 ## Native build flow
 
+> **Native project locations.** Both Capacitor projects live side-by-side
+> under `~/Github/James/Bipolar_Bear_Mobile/` — `bipolarbear-native/` and
+> `bipolaranonymous-native/`. (They used to sit directly in the home dir
+> at `~/bipolarbear-native` and `~/bipolaranonymous-native`; those paths
+> are dead — the old home-dir `~/bipolaranonymous-native` is now just an
+> empty `www/` shell, safe to ignore or delete.)
+
 ### BipolarBear app (`com.bipolarbear.app`)
 
 ```bash
@@ -79,10 +86,10 @@ git pull
 rsync -av --delete \
   --exclude='.git' --exclude='.claude' --exclude='.DS_Store' \
   --exclude='www-anonymous' --exclude='scripts' --exclude='functions/node_modules' \
-  ./ ~/bipolarbear-native/www/
+  ./ ~/Github/James/Bipolar_Bear_Mobile/bipolarbear-native/www/
 
 # Then open native IDE:
-cd ~/bipolarbear-native && npx cap sync
+cd ~/Github/James/Bipolar_Bear_Mobile/bipolarbear-native && npx cap sync
 npx cap open ios       # or: npx cap open android
 ```
 
@@ -100,8 +107,8 @@ git pull
 node scripts/build-anonymous.js
 
 # Sync into the separate native project:
-rsync -av --delete ./www-anonymous/ ~/bipolaranonymous-native/www/
-cd ~/bipolaranonymous-native && npx cap sync
+rsync -av --delete ./www-anonymous/ ~/Github/James/Bipolar_Bear_Mobile/bipolaranonymous-native/www/
+cd ~/Github/James/Bipolar_Bear_Mobile/bipolaranonymous-native && npx cap sync
 npx cap open ios       # or: npx cap open android
 ```
 
@@ -112,7 +119,7 @@ check can't fire there — `location.hostname` is `localhost`).
 
 The script is platform-agnostic — it only produces the `www-anonymous/`
 bundle. The same bundle feeds both the iOS and Android targets inside
-`~/bipolaranonymous-native/`.
+`~/Github/James/Bipolar_Bear_Mobile/bipolaranonymous-native/`.
 
 ### Android first-time setup (Bipolar Anonymous)
 
@@ -120,7 +127,7 @@ Only needed once per machine. After this, the normal build flow above
 covers both platforms.
 
 ```bash
-cd ~/bipolaranonymous-native
+cd ~/Github/James/Bipolar_Bear_Mobile/bipolaranonymous-native
 npx cap add android
 ```
 
@@ -151,7 +158,7 @@ project so auth/Firestore accept its package ID:
 3. SHA-1: from Android Studio's Gradle panel → `:app → Tasks → android
    → signingReport` (use the **release** SHA-1, not debug)
 4. Download `google-services.json` → drop into
-   `~/bipolaranonymous-native/android/app/google-services.json`
+   `~/Github/James/Bipolar_Bear_Mobile/bipolaranonymous-native/android/app/google-services.json`
    (overwrites the placeholder Capacitor scaffolded)
 
 The existing Firestore security rules already allow writes from any
