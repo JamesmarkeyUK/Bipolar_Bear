@@ -1417,6 +1417,9 @@ window.addEventListener('pageshow', () => {
         b.classList.toggle('selected', b.dataset.budget === selectedBudget);
       });
 
+      // Lock sleep if the restored draft targets today/future (clears any drafted value)
+      _applySleepLock();
+
       // If focused mode is on, open at the done (review) step instead of leaving the regular form
       if (typeof _fmEnabled !== 'undefined' && _fmEnabled) {
         _fmSteps        = _buildFocusedSteps();
@@ -2564,7 +2567,8 @@ window.addEventListener('pageshow', () => {
         ? entries.slice(0, statsTimeframe)
         : (statsStartDate ? entries.filter(e => e.date >= statsStartDate) : entries);
       const avgEnergy = (statsEntries.reduce((sum, e) => sum + e.energy, 0) / statsEntries.length).toFixed(1);
-      const avgSleep = (statsEntries.reduce((sum, e) => sum + e.sleep, 0) / statsEntries.length).toFixed(1);
+      const _sleepStatEntries = statsEntries.filter(e => e.sleep != null);
+      const avgSleep = _sleepStatEntries.length ? (_sleepStatEntries.reduce((sum, e) => sum + e.sleep, 0) / _sleepStatEntries.length).toFixed(1) : '–';
       
       const moodCounts = {};
       statsEntries.forEach(e => {
@@ -2760,7 +2764,7 @@ window.addEventListener('pageshow', () => {
         }).join('');
       } else if (type === 'sleep') {
         title.textContent = BB.t('journal.stats.sleepChart');
-        body.innerHTML = sorted.map(e => {
+        body.innerHTML = sorted.filter(e => e.sleep != null).map(e => {
           const d = new Date(e.date).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
           return row(d, `${e.sleep}h`, e.sleep/12, '#667eea');
         }).join('');
@@ -3716,6 +3720,19 @@ window.addEventListener('pageshow', () => {
       return { isYest: false, dayPhrase: _t('journal.phrase.onDate', { date: longDate }), nightPhrase: _t('journal.phrase.nightOfDate', { date: longDate }) };
     }
 
+    // The sleep recorded against an entry dated D is "the night of D" — the night
+    // that begins on day D. For today (or any future date) that night hasn't
+    // happened yet, so there's nothing to record. Used to lock the sleep field
+    // and show a "haven't slept yet" message instead of selectable ranges.
+    function _sleepNotYet() {
+      const val = document.getElementById('entryDate')?.value;
+      if (!val) return false; // no explicit date → default is yesterday; sleep already happened
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const d = new Date(val + 'T00:00:00');
+      return !isNaN(d.getTime()) && d.getTime() >= today.getTime();
+    }
+    window._sleepNotYet = _sleepNotYet;
+
     function _buildFocusedSteps() {
       const _delBuiltinSteps = JSON.parse(localStorage.getItem('deletedBuiltinFields') || '[]');
       const _disSteps = _getDisabledSteps();
@@ -3730,7 +3747,15 @@ window.addEventListener('pageshow', () => {
       if (!_disSteps.includes('energy'))
         steps.push({ id:'energy', title:_t('journal.fm.energyTitle'), subtitle:_t('journal.fm.energySub', { phrase: _dh.dayPhrase }), auto:true });
       if (!_disSteps.includes('sleep')) {
-        steps.push({ id:'sleep', title: _dh.isYest ? _t('journal.fm.sleepTitleYest') : _t('journal.fm.sleepTitleOther', { phrase: _dh.nightPhrase }), subtitle:_t('journal.fm.sleepSub'), auto:true });
+        const _slNotYet = _sleepNotYet();
+        steps.push({
+          id:'sleep',
+          title: _slNotYet ? _t('journal.fm.sleepNotYetTitle')
+            : _dh.isYest ? _t('journal.fm.sleepTitleYest')
+            : _t('journal.fm.sleepTitleOther', { phrase: _dh.nightPhrase }),
+          subtitle: _slNotYet ? '' : _t('journal.fm.sleepSub'),
+          auto:true
+        });
       }
       // sleepQuality step is always included — only shown when user long-presses a sleep range
       steps.push({ id:'sleepQuality', title:_t('journal.fm.sleepQualityTitle'), subtitle:'', auto:true });
@@ -4256,7 +4281,7 @@ window.addEventListener('pageshow', () => {
       if (BB.storage.get('HealthSyncEnabled') === '1') {
         if (step.id === 'energy' && _fmStepsResult === null && !window._healthSyncInProgress) {
           setTimeout(() => importStepsFromHealth(true), 0);
-        } else if (step.id === 'sleep' && _fmSleepImported === null && !window._healthSyncInProgress && !_fmSleepAutoSyncDone) {
+        } else if (step.id === 'sleep' && _fmSleepImported === null && !window._healthSyncInProgress && !_fmSleepAutoSyncDone && !_sleepNotYet()) {
           setTimeout(() => importSleepFromHealth(true), 0);
         }
       }
@@ -4420,6 +4445,20 @@ window.addEventListener('pageshow', () => {
         }
 
         case 'sleep': {
+          // Entry dated today/future → "the night of D" hasn't happened yet.
+          // Lock the field: clear any value, show a message, offer Continue.
+          if (_sleepNotYet()) {
+            selectedSleep = null;
+            _fmSleepClear = true;
+            selectedSleepQuality = null;
+            _fmWantsSleepQuality = false;
+            return `<div style="text-align:center;padding:18px 8px;">
+                <div style="font-size:2.6em;margin-bottom:10px;line-height:1;">🌙</div>
+                <p style="font-size:0.98em;color:#495057;font-weight:600;margin:0 0 6px;">${BB.t('journal.fm.sleepNotYet')}</p>
+                <p style="font-size:0.83em;color:#adb5bd;margin:0 0 18px;">${BB.t('journal.fm.sleepNotYetSub')}</p>
+                <button onclick="_fmAdvance()" style="width:100%;padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:14px;font-size:0.95em;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">${BB.t('common.continue')} →</button>
+              </div>`;
+          }
           const _autoSyncSleep = BB.storage.get('HealthSyncEnabled') === '1';
           const _syncText = _fmSleepError === 'fail' ? '❌ Sync failed — try again'
             : _fmSleepError === 'nodata' ? '🤷 No sleep data found — try again'
@@ -5456,7 +5495,7 @@ window.addEventListener('pageshow', () => {
         const next = new Date(e.date);
         next.setDate(next.getDate() + 1);
         const k = next.toISOString().slice(0, 10);
-        if (dateMap[k]) lagMood.push({ sleep: e.sleep, nextMood: ms(dateMap[k].mood) });
+        if (dateMap[k] && e.sleep != null) lagMood.push({ sleep: e.sleep, nextMood: ms(dateMap[k].mood) });
       });
       if (lagMood.length >= 8) {
         const r = pearson(lagMood.map(p => p.sleep), lagMood.map(p => p.nextMood));
@@ -5482,7 +5521,7 @@ window.addEventListener('pageshow', () => {
         const next = new Date(e.date);
         next.setDate(next.getDate() + 1);
         const k = next.toISOString().slice(0, 10);
-        if (dateMap[k]) lagEnergy.push({ sleep: e.sleep, nextEnergy: dateMap[k].energy });
+        if (dateMap[k] && e.sleep != null) lagEnergy.push({ sleep: e.sleep, nextEnergy: dateMap[k].energy });
       });
       if (lagEnergy.length >= 8) {
         const r = pearson(lagEnergy.map(p => p.sleep), lagEnergy.map(p => p.nextEnergy));
@@ -5527,7 +5566,7 @@ window.addEventListener('pageshow', () => {
       // ── 5. Consecutive low-sleep runs ──
       let runCount = 0, afterRunTotal = 0, afterRunN = 0, runLen = 0;
       for (let i = 0; i < sorted.length; i++) {
-        if (sorted[i].sleep < 6) {
+        if (sorted[i].sleep != null && sorted[i].sleep < 6) {
           runLen++;
         } else {
           if (runLen >= 3) { afterRunTotal += ms(sorted[i].mood); afterRunN++; runCount++; }
@@ -6199,6 +6238,7 @@ window.addEventListener('pageshow', () => {
       _applyMoreDataDefaultToggle(_mdd);
 
       setDefaultDate();
+      _applySleepLock();
       // Restore any saved draft for today/yesterday (runs async-safe after DOM is ready)
       setTimeout(restoreDraft, 0);
       // Restart mood cycle in case it was stopped by a previous mood selection or edit
@@ -6429,6 +6469,7 @@ window.addEventListener('pageshow', () => {
  // sets default date + schedules restoreDraft via setTimeout
       // Override date to the "other" date — restoreDraft (scheduled above) will see this
       document.getElementById('entryDate').value = dateStr;
+      _applySleepLock();
       updateFormHeading();
       // Fix submit button label to reflect the actual date, not the default setting
       const now = new Date(); now.setHours(0,0,0,0);
@@ -6707,7 +6748,7 @@ window.addEventListener('pageshow', () => {
           const _stepsStr = entry.steps != null ? ` | 🏃 ${entry.steps >= 1000 ? Math.round(entry.steps/1000)+'k' : entry.steps}` : '';
           html += _calRow('⚡', _t('journal.label.energy'), `${entry.energy}/10${_stepsStr}`);
         }
-        if (entry.sleep  !== undefined) html += _calRow('😴', _t('journal.label.sleep'),  `${entry.sleep}h`);
+        if (entry.sleep  != null) html += _calRow('😴', _t('journal.label.sleep'),  `${entry.sleep}h`);
         if (entry.sleepQuality) html += _calRow(entry.sleepQuality === 'good' ? '😊' : entry.sleepQuality === 'bad' ? '😴' : '😐', _t('journal.label.sleepQuality'), _tVal(entry.sleepQuality));
         if (entry.medication) html += _calRow('💊', _t('journal.label.medication'), medLabels[entry.medication] || cap(entry.medication));
         if (entry.anxiety)     html += _calRow('😰', _t('journal.label.anxiety'),     _tVal(entry.anxiety));
@@ -7531,9 +7572,11 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         const mostCommonAll = Object.entries(allMoodCounts).sort((a,b)=>b[1]-a[1])[0];
         const mostCommonRecent = recent.length ? Object.entries(recentMoodCounts).sort((a,b)=>b[1]-a[1])[0] : null;
         const avgEnergyAll = allEntries.length ? (allEntries.reduce((s,e)=>s+e.energy,0)/allEntries.length).toFixed(1) : '-';
-        const avgSleepAll = allEntries.length ? (allEntries.reduce((s,e)=>s+e.sleep,0)/allEntries.length).toFixed(1) : '-';
+        const _allSleep = allEntries.filter(e=>e.sleep!=null);
+        const avgSleepAll = _allSleep.length ? (_allSleep.reduce((s,e)=>s+e.sleep,0)/_allSleep.length).toFixed(1) : '-';
         const avgEnergyRecent = recent.length ? (recent.reduce((s,e)=>s+e.energy,0)/recent.length).toFixed(1) : '-';
-        const avgSleepRecent = recent.length ? (recent.reduce((s,e)=>s+e.sleep,0)/recent.length).toFixed(1) : '-';
+        const _recentSleep = recent.filter(e=>e.sleep!=null);
+        const avgSleepRecent = _recentSleep.length ? (_recentSleep.reduce((s,e)=>s+e.sleep,0)/_recentSleep.length).toFixed(1) : '-';
         const medsTakenAll = allEntries.filter(e=>e.medication==='taken').length;
         const medsTakenRecent = recent.filter(e=>e.medication==='taken').length;
         const missedAll = allEntries.filter(e=>e.medication!=='taken').length;
@@ -9307,7 +9350,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
       document.getElementById('editEntryDate').value = `${yyyy}-${mm}-${dd}`;
       document.getElementById('editEntryMood').value = entry.mood;
       document.getElementById('editEntryEnergy').value = entry.energy;
-      document.getElementById('editEntrySleep').value = entry.sleep;
+      document.getElementById('editEntrySleep').value = entry.sleep != null ? entry.sleep : '';
       document.getElementById('editEntryMedication').value = entry.medication || 'taken';
       document.getElementById('editEntryNotes').value = entry.notes || '';
       document.getElementById('editEntryAnxiety').value = entry.anxiety || '';
@@ -9607,7 +9650,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
         timestamp: newDate.getTime(),
         mood: document.getElementById('editEntryMood').value,
         energy: parseFloat(document.getElementById('editEntryEnergy').value),
-        sleep: parseFloat(document.getElementById('editEntrySleep').value),
+        sleep: (() => { const _v = parseFloat(document.getElementById('editEntrySleep').value); return isNaN(_v) ? null : _v; })(),
         medication: document.getElementById('editEntryMedication').value,
         notes: document.getElementById('editEntryNotes').value,
         anxiety: document.getElementById('editEntryAnxiety').value || null,
@@ -9981,6 +10024,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     function onEntryDateChange(input) {
       updateFormHeading();
       checkMissingEntry(input);
+      _applySleepLock();
       // Update submit button label to reflect the chosen date (new entries only)
       if (!editingEntry) {
         const now = new Date(); now.setHours(0,0,0,0);
@@ -10000,6 +10044,38 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     }
 
     // Function to set date picker to today
+    // Normal (non-focused) entry form: lock/unlock the sleep selector based on
+    // whether the entry's night has happened yet. Mirrors the focused-mode lock.
+    function _applySleepLock() {
+      const sec = document.getElementById('sleepSection');
+      if (!sec) return;
+      const selector = document.getElementById('sleepSelector');
+      const btnRow   = document.getElementById('sleepBtnRow');
+      const sq       = document.getElementById('sleepQualitySubSection');
+      let msg = document.getElementById('sleepNotYetMsg');
+      if (_sleepNotYet()) {
+        selectedSleep = null;
+        selectedSleepQuality = null;
+        if (selector) selector.style.display = 'none';
+        if (btnRow)   btnRow.style.display = 'none';
+        if (sq)       sq.style.display = 'none';
+        if (!msg) {
+          msg = document.createElement('div');
+          msg.id = 'sleepNotYetMsg';
+          msg.style.cssText = 'text-align:center;padding:12px 8px;color:#6c757d;font-size:0.92em;font-weight:600;';
+          sec.appendChild(msg);
+        }
+        msg.textContent = '🌙 ' + ((window.BB && BB.t) ? BB.t('journal.fm.sleepNotYet') : "You haven't slept yet");
+        msg.style.display = '';
+      } else {
+        if (selector) selector.style.display = '';
+        if (btnRow)   btnRow.style.display = '';
+        if (msg)      msg.style.display = 'none';
+        if (selectedSleep == null) selectedSleep = 7.5;
+      }
+    }
+    window._applySleepLock = _applySleepLock;
+
     function setDefaultDate() {
       const dateInput = document.getElementById('entryDate');
       // Top-level boot call runs before body content is parsed, so the input
@@ -11980,6 +12056,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     window.importStepsFromHealth = importStepsFromHealth;
 
     async function importSleepFromHealth(isAuto) {
+      // Don't pull sleep for an entry whose night hasn't happened yet (today/future).
+      if (typeof _sleepNotYet === 'function' && _sleepNotYet()) return;
       const btn = document.getElementById('healthSleepBtn');
       const originalText = btn.textContent;
 
