@@ -60,6 +60,9 @@ window.BB_BRAND = {
     posts: 'bbAnonPosts',
     monikas: 'bbAnonMonikas',
     reports: 'bbAnonReports',
+    // Admin-maintained ban list (Apple UGC guideline 1.2 — "eject the user").
+    // Doc id = lowercased monika; presence = banned everywhere.
+    banned: 'bbAnonBanned',
   },
 
   // Marketing/manifest copy.

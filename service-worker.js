@@ -360,7 +360,14 @@
 //       rotation now reads topics via a direct isTopic== query (immune to the
 //       cap), sweeps every topic but one, and a render-side dedupeTopics guard
 //       only ever shows the newest. js/anonymous.js.
-const CACHE_NAME = 'bipolarbear-v106';
+// v107: Anonymous board UGC hardening (Apple guideline 1.2) — adds a
+//       client-side content filter (slur/explicit-language blocklist that
+//       rejects posts + comments before they reach Firestore; crisis language
+//       and UK slang deliberately not blocked) and an admin "ban user"
+//       mechanism (new bbAnonBanned collection + 🚫 button) that hides the
+//       user's content everywhere and blocks them from posting. Touches
+//       js/anonymous.js, js/shared/brand-config.js, anonymous.html.
+const CACHE_NAME = 'bipolarbear-v107';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

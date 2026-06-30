@@ -68,6 +68,7 @@ let sosTargetName   = '';
 let reportTargetId  = '';
 let muteTargetName  = '';
 let adminDeleteId    = '';
+let adminBanName     = '';
 let selfDeleteId     = '';
 let commentTargetId  = '';
 let lastCommentAuthor = ''; // monika of the most recent comment in the open thread (for the per-thread post gate)
@@ -123,6 +124,71 @@ const mutedUsers = new Set(
 );
 function saveMuted() {
   BB.storage.set('Anon_muted', JSON.stringify([...mutedUsers]));
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Content filter (Apple UGC guideline 1.2)
+// ─────────────────────────────────────────────────────────────────
+// Blocks posts and comments containing slurs, hate speech, or explicit
+// sexual content BEFORE they reach Firestore. Deliberately tight: crisis
+// language ("kill myself", "want to die", "self-harm") is NOT filtered — that
+// is a peer-support disclosure handled by the SOS flow, not something to
+// censor. We only block terms that are objectionable in any context on a
+// kind, anonymous mental-health board.
+const _BLOCKED_WORDS = [
+  // Identity-based slurs (hate speech)
+  'nigger', 'nigga', 'faggot', 'tranny', 'chink', 'spic', 'kike',
+  'wetback', 'coon', 'gook', 'paki', 'retard', 'retarded',
+  // Explicit sexual / harassment
+  'cunt', 'whore', 'slut', 'rape', 'rapist', 'cum', 'blowjob', 'dildo',
+  'porn', 'porno', 'pedo', 'pedophile', 'paedophile', 'molest',
+];
+const _BLOCKED_SET = new Set(_BLOCKED_WORDS);
+// The most-evaded, unambiguous slurs — caught even when padded with
+// separators ("n i g g e r", "f-a-g-g-o-t"). Kept to terms that are NOT
+// substrings of ordinary words, to avoid the Scunthorpe problem.
+const _BLOCKED_TIGHT = ['nigger', 'faggot'];
+
+// Fold common leetspeak so "f@gg0t" / "n1gger" still match.
+function _normalizeForFilter(s) {
+  return (s || '')
+    .toLowerCase()
+    .replace(/[@4]/g, 'a')
+    .replace(/0/g, 'o')
+    .replace(/[1!|]/g, 'i')
+    .replace(/3/g, 'e')
+    .replace(/[5$]/g, 's')
+    .replace(/7/g, 't');
+}
+
+// Returns the offending term if the text contains blocked content, else null.
+function findBlockedTerm(text) {
+  const norm = _normalizeForFilter(text);
+  // 1) Whole-word match — no false positives on substrings like "therapist"
+  //    or "scunthorpe".
+  const words = norm.split(/[^a-z]+/);
+  for (const w of words) {
+    if (w && _BLOCKED_SET.has(w)) return w;
+  }
+  // 2) Separator-stripped match for the worst slurs only.
+  const collapsed = norm.replace(/[^a-z]/g, '');
+  for (const w of _BLOCKED_TIGHT) {
+    if (collapsed.includes(w)) return w;
+  }
+  return null;
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Banned users (Apple UGC guideline 1.2 — "eject the user")
+// ─────────────────────────────────────────────────────────────────
+// Populated from the bbAnonBanned collection via a live listener so an admin
+// ban takes effect on every device: banned monikas' posts and comments are
+// hidden everywhere, and the banned user is blocked from composing. Monikas
+// are stored lowercased (doc id) for case-insensitive matching.
+const bannedUsers = new Set();
+let unsubBanned = null;
+function isBanned(name) {
+  return !!name && bannedUsers.has(String(name).toLowerCase());
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -323,7 +389,7 @@ function _updateLogoCursor() {
 }
 
 // Close on backdrop tap
-['ov-compose','ov-firstpost','ov-sos','ov-report','ov-mute','ov-e2ee','ov-monika','ov-self-delete','ov-admin-delete','ov-anon-delete','ov-terms','ov-med','ov-stable','ov-about'].forEach(id => {
+['ov-compose','ov-firstpost','ov-sos','ov-report','ov-mute','ov-e2ee','ov-monika','ov-self-delete','ov-admin-delete','ov-admin-ban','ov-anon-delete','ov-terms','ov-med','ov-stable','ov-about'].forEach(id => {
   document.getElementById(id).addEventListener('click', e => {
     if (e.target === document.getElementById(id)) closeOv(id);
   });
@@ -1190,6 +1256,7 @@ function initBoard() {
   _ensureAuthSession(); // fire-and-forget; openThread/send await the promise
   setTab('general');
   listenPosts(); // starts both tab listeners; setTab no longer does this
+  listenBanned(); // live ban list — hides banned users + gates compose
   cleanOldPosts();
   _anonSaveProfile(); _bbSaveProfile(); // persist profile to Firestore
 }
@@ -1226,6 +1293,45 @@ function stopAllListeners() {
   ['announcements', 'general'].forEach(tab => {
     if (unsubTabListeners[tab]) { unsubTabListeners[tab](); unsubTabListeners[tab] = null; }
   });
+  if (unsubBanned) { unsubBanned(); unsubBanned = null; }
+}
+
+// Re-render the current tab from cached posts (used after the ban list or mute
+// list changes, where no posts snapshot fires). No-op if the board isn't shown.
+function _rerenderCurrentTab() {
+  if (!document.getElementById('post-list')) return;
+  renderPosts(currentTab === 'general'
+    ? assembleGeneralPosts(localPosts)
+    : sortPosts(localPosts));
+}
+
+// Subscribe to the admin ban list. A ban hides the user's content for everyone
+// and re-gates the compose button if the current user was just banned.
+function listenBanned() {
+  if (!db) return;
+  if (unsubBanned) { unsubBanned(); unsubBanned = null; }
+  unsubBanned = db.collection(BB_BRAND.collections.banned)
+    .onSnapshot(snap => {
+      bannedUsers.clear();
+      snap.docs.forEach(d => {
+        const m = (d.data().monika || d.id || '').toLowerCase();
+        if (m) bannedUsers.add(m);
+      });
+      _rerenderCurrentTab();
+      _applyComposeBanGate();
+    }, err => console.warn('[Anonymous] banned listener error', err));
+}
+
+// Visually disable compose for a banned user. The hard gate lives in the
+// compose/comment handlers; this is the affordance. Inline styles avoid a
+// CSS-file dependency (and the service-worker cache bump that comes with it).
+function _applyComposeBanGate() {
+  const fab = document.getElementById('fab-compose');
+  if (!fab) return;
+  const banned = isBanned(profile.monika);
+  fab.style.filter  = banned ? 'grayscale(1)' : '';
+  fab.style.opacity = banned ? '0.45' : '';
+  fab.title = banned ? 'Posting disabled — your access has been revoked' : 'Write a post';
 }
 
 function saveLastSeen(tab) {
@@ -2623,7 +2729,7 @@ async function openThread(postId) {
       const lastDoc = snap.docs[snap.docs.length - 1];
       lastCommentAuthor = lastDoc ? (lastDoc.data().name || '') : '';
       const comments = snap.docs.map(d => ({ id: d.id, ...d.data() }))
-        .filter(c => !c.name || !mutedUsers.has(c.name));
+        .filter(c => !c.name || (!mutedUsers.has(c.name) && !isBanned(c.name)));
       const el = document.getElementById('thread-comments-list');
       if (!comments.length) {
         el.innerHTML = '<div class="empty-state" style="padding:24px 0 16px;">' + esc(_wt('anon.ui.noComments')) + '</div>';
@@ -2709,6 +2815,17 @@ function setupThread() {
     if (_sending) return;
     const text = ta.value.trim();
     if (!text || !commentTargetId) return;
+    // Banned users can't comment (Apple UGC 1.2).
+    if (isBanned(profile.monika)) {
+      showHint('Your access to the community has been revoked.');
+      return;
+    }
+    // Content filter (Apple UGC 1.2).
+    if (findBlockedTerm(text)) {
+      showHint('That comment may contain objectionable language. Please edit it. 💛');
+      sendBtn.disabled = false;
+      return;
+    }
     // Per-thread gate (mirrors the compose gate): you can leave a comment, but
     // not a second one in a row — wait until someone else replies first.
     if (!profile.isAdmin && lastCommentAuthor && lastCommentAuthor === profile.monika) {
@@ -2815,9 +2932,10 @@ function scheduleTombstoneSweep(nextExpiry, now) {
 
 function renderPosts(posts) {
   const list = document.getElementById('post-list');
-  // Drop posts from users muted on this device (system/announcement cards
-  // have no name and always pass).
-  posts = posts.filter(p => !p.name || !mutedUsers.has(p.name));
+  // Drop posts from users muted on this device, and from users an admin has
+  // banned (hidden for everyone). System/announcement cards have no name and
+  // always pass.
+  posts = posts.filter(p => !p.name || (!mutedUsers.has(p.name) && !isBanned(p.name)));
   if (!posts.length) {
     list.innerHTML = '<div class="empty-state">' + esc(_wt('anon.ui.noPosts')) + '</div>';
     return;
@@ -2896,6 +3014,15 @@ function renderPosts(posts) {
       openOv('ov-admin-delete');
     });
   });
+  // Admin ban buttons
+  list.querySelectorAll('[data-ban]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      adminBanName = btn.dataset.ban;
+      document.getElementById('aban-body').innerHTML =
+        `Ban <strong>[${esc(adminBanName)}]</strong>? Their existing posts will be removed and they won't be able to post or comment again.`;
+      openOv('ov-admin-ban');
+    });
+  });
   // Comment thread buttons
   list.querySelectorAll('[data-comment]').forEach(btn => {
     btn.addEventListener('click', () => openThread(btn.dataset.comment));
@@ -2953,6 +3080,8 @@ function renderPost(p) {
   const adminBadge   = p.isAdmin ? '<span class="admin-badge">ADMIN</span>' : '';
   const deleteBtn    = profile.isAdmin && !p.isSeed
     ? `<button class="icon-btn" data-delete="${esc(p.id)}" title="Delete post (admin)">🗑️</button>` : '';
+  const banBtn       = profile.isAdmin && !p.isSeed && p.name !== profile.monika
+    ? `<button class="icon-btn" data-ban="${esc(p.name)}" title="Ban this user (admin)">🚫</button>` : '';
   const pinBtn       = profile.isAdmin && !p.isSeed
     ? `<button class="icon-btn${p.pinned ? ' pin-active' : ''}" data-pin="${esc(p.id)}" data-tab="${esc(p.tab || currentTab)}" title="${p.pinned ? 'Unpin post' : 'Pin to top'}">📌</button>` : '';
   const selfDeleteBtn = !p.isSeed && !profile.isAdmin && p.name === profile.monika && isSelfDeleteEligible(p)
@@ -2983,6 +3112,7 @@ function renderPost(p) {
       ${selfDeleteBtn}
       ${pinBtn}
       ${deleteBtn}
+      ${banBtn}
       ${p.name !== profile.monika ? `<button class="icon-btn" data-sos="${esc(p.name)}" title="Send SOS flag">🆘</button>` : ''}
       ${p.name !== profile.monika ? `<button class="icon-btn" data-report="${esc(p.id)}" title="Report post">🚨</button>` : ''}
       ${p.name !== profile.monika ? `<button class="icon-btn" data-mute="${esc(p.name)}" title="Mute this user">🙈</button>` : ''}
@@ -3048,6 +3178,10 @@ function setupFAB() {
     setTab('general');
   });
   document.getElementById('fab-compose').addEventListener('click', () => {
+    if (isBanned(profile.monika)) {
+      showHint('Your access to the community has been revoked.');
+      return;
+    }
     const latest = getLatestRealPost(currentTab);
     if (!profile.isAdmin && latest && latest.name === profile.monika && (latest.likes || 0) === 0) {
       showHint('Please wait until someone else reacts to your message or posts another one.');
@@ -3082,6 +3216,17 @@ function setupCompose() {
     if (_posting) return; // guard against double-tap / re-entrant clicks
     const text = ta.value.trim();
     if (!text) return;
+    // Banned users can't post (Apple UGC 1.2 — ejected users stay out).
+    if (isBanned(profile.monika)) {
+      showHint('Your access to the community has been revoked.');
+      return;
+    }
+    // Content filter (Apple UGC 1.2). Keep the overlay open so the user can edit.
+    if (findBlockedTerm(text)) {
+      showHint('That post may contain objectionable language. Please edit it to keep the community safe. 💛');
+      post.disabled = false;
+      return;
+    }
     _posting = true;
     post.disabled = true;
     closeOv('ov-compose');
@@ -3262,6 +3407,13 @@ function setupOverlayActions() {
     closeOv('ov-admin-delete');
     adminDeletePost(adminDeleteId);
   });
+
+  // Admin ban
+  document.getElementById('aban-cancel').addEventListener('click', () => closeOv('ov-admin-ban'));
+  document.getElementById('aban-confirm').addEventListener('click', () => {
+    closeOv('ov-admin-ban');
+    adminBanUser(adminBanName);
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -3275,6 +3427,32 @@ function adminDeletePost(id) {
     deletedAt: firebase.firestore.FieldValue.serverTimestamp(),
   }).catch(err => console.error('[Admin] delete failed', err));
   showHint('Post deleted 🛡️');
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Admin: ban (eject) a user — Apple UGC guideline 1.2
+// ─────────────────────────────────────────────────────────────────
+// Adds the monika to the bbAnonBanned list (hides them everywhere via the
+// live ban listener, and blocks them from posting/commenting) AND tombstones
+// their existing posts so the content is removed server-side, independent of
+// any client having the ban list loaded.
+function adminBanUser(name) {
+  if (!db || !name) return;
+  const key = String(name).toLowerCase();
+  db.collection(BB_BRAND.collections.banned).doc(key).set({
+    monika: name,
+    bannedBy: profile.monika,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+  }).catch(err => console.error('[Admin] ban failed', err));
+  // Remove their existing posts so offending content disappears immediately.
+  db.collection(BB_BRAND.collections.posts).where('name', '==', name).get()
+    .then(snap => snap.forEach(doc => doc.ref.update({
+      deleted: true,
+      deletedByAdmin: true,
+      deletedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    }).catch(() => {})))
+    .catch(() => {});
+  showHint(`[${name}] banned and removed 🚫`);
 }
 
 // ─────────────────────────────────────────────────────────────────
