@@ -360,7 +360,16 @@
 //       rotation now reads topics via a direct isTopic== query (immune to the
 //       cap), sweeps every topic but one, and a render-side dedupeTopics guard
 //       only ever shows the newest. js/anonymous.js.
-const CACHE_NAME = 'bipolarbear-v106';
+// v107: iPad full-screen fix — on a real device (esp. iPad, ≈1024px wide) the
+//       ≥920px desktop device-frame mockup was rendering inside the native
+//       app, so the live iPad app — and its App Store screenshots — looked
+//       like a marketing mockup on a grey backdrop rather than the app in use
+//       (App Store screenshot rejection). js/shared/platform.js now tags <html>
+//       with .is-native, and css/{index,journal,survival-kit}.css suppress the
+//       frame for native builds (full-bleed brand background, centred column).
+//       fab.js docks the FAB to the viewport on native. Web desktop keeps the
+//       framed mockup. Touches platform.js, fab.js, index/journal/survival-kit CSS.
+const CACHE_NAME = 'bipolarbear-v107';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
