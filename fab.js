@@ -642,10 +642,15 @@
     if (_footer) _footer.style.display = '';
 
     // Slot positions relative to the fixed-positioning containing block.
-    // At ≥920px, #app-shell has transform:translateZ(0) so position:fixed is relative to it → use offsetWidth.
+    // At ≥920px on the web, #app-shell has transform:translateZ(0) so
+    // position:fixed is relative to it → use offsetWidth.
     // At <920px, position:fixed is viewport-relative regardless of app-shell width → use innerWidth.
+    // On native (Capacitor) the device-frame is suppressed and #app-shell has
+    // transform:none (see the html.is-native CSS override), so the dock is
+    // viewport-relative there too even on a wide iPad → use innerWidth.
+    const _native = document.documentElement.classList.contains('is-native');
     const _appShell = document.getElementById('app-shell');
-    const _shellW = window.innerWidth >= 920
+    const _shellW = (window.innerWidth >= 920 && !_native)
       ? ((_appShell && _appShell.offsetWidth) || window.innerWidth)
       : window.innerWidth;
     const _slotPos = {

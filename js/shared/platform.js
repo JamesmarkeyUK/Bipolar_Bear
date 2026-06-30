@@ -48,6 +48,16 @@
     return isNative() && _cap().getPlatform() === 'android';
   }
 
+  // Tag the document for native builds so CSS can suppress the desktop
+  // iPhone/iPad device-frame mockup (the ≥520/≥920px media queries) and
+  // render the app full-screen on real devices — critical on iPad, which is
+  // wide enough to otherwise trigger the frame. Set on <html> (always present
+  // at head-parse time, before <body> exists) so every page picks it up; the
+  // home page also mirrors it onto <body> in js/index.js, which is harmless.
+  if (isNative()) {
+    document.documentElement.classList.add('is-native');
+  }
+
   // Canonical namespace.
   window.BB = window.BB || {};
   window.BB.platform = { isNative: isNative, isIOS: isIOS, isAndroid: isAndroid };
