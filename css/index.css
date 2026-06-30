@@ -673,8 +673,16 @@
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
-        justify-content: flex-start !important;
+        justify-content: center !important;
         overflow: auto;
+      }
+      /* The home screen is short, so centre the logo + buttons in the viewport
+         rather than letting them sit top-anchored with a large empty area
+         below. Collapse the tall mobile container min-height so the flex
+         centring above can actually take effect. */
+      html.is-native .container {
+        min-height: auto !important;
+        flex: none !important;
       }
       html.is-native #iphone-frame,
       html.is-native #app-shell {

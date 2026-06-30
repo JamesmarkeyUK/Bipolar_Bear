@@ -994,11 +994,15 @@
         box-shadow: none !important;
         transform: none !important;
       }
-      /* Centre the app in a comfortable column rather than stretching edge to
-         edge across the full iPad width. */
+      /* Centre the app in a comfortable column on a white panel rather than
+         stretching edge to edge across the full iPad width. The white
+         background reads as a clean content sheet sitting on the brand colour,
+         instead of the section rows floating directly on orange. */
       html.is-native #iphone-frame {
         max-width: 760px !important;
         margin: 0 auto !important;
+        background: #fff !important;
+        box-shadow: 0 12px 48px rgba(0, 0, 0, 0.14) !important;
       }
       html.is-native #scroll-view {
         display: block !important;
