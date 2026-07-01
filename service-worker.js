@@ -376,7 +376,18 @@
 //       frame for native builds (full-bleed brand background, centred column).
 //       fab.js docks the FAB to the viewport on native. Web desktop keeps the
 //       framed mockup. Touches platform.js, fab.js, index/journal/survival-kit CSS.
-const CACHE_NAME = 'bipolarbear-v108';
+// v109: Anonymous board — guarantee a single "Today's topic" card. The render-side
+//       dedupe now lives inside renderPosts (the one choke point every render funnels
+//       through) instead of only assembleGeneralPosts, so the optimistic-compose path
+//       can no longer bypass it and surface duplicate topic cards. That path also now
+//       routes through assembleGeneralPosts so it keeps the greeting/seed cards.
+// v110: Anonymous board — daily topics are now archived, not deleted, when they
+//       rotate: an outgoing topic that got a reply is demoted in place to an
+//       ordinary BipolarBear post (same doc id, so its reply thread carries over)
+//       instead of being swept away; empty topics are still removed. Rotation
+//       also now requires a reply on the current topic — a topic with no
+//       responses stays up until it gets one, then rotates on the next UTC day.
+const CACHE_NAME = 'bipolarbear-v110';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
