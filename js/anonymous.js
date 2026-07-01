@@ -2443,10 +2443,12 @@ function dedupeTopics(posts) {
 // creating duplicates. No separate collection and no rules change: any
 // authenticated user can already write posts.
 //
-// Rotation rule: a NEW topic only appears when it is a new (UTC) day AND
-// at least one real message has happened since the current topic went up
-// (a fresh top-level post, or a reply on the topic itself). If the topic
-// sparked no conversation, it stays put rather than being buried.
+// Rotation rule: a NEW topic only appears when it is a new (UTC) day AND the
+// current topic has received at least one reply. A topic that sparked no
+// responses stays up until it does, so it always gets its chance to land.
+// When it does rotate, the outgoing topic is NOT deleted — it is demoted to an
+// ordinary BipolarBear post so its reply thread lives on in the feed (an empty
+// topic with no replies is simply removed instead, as there's nothing to keep).
 // ─────────────────────────────────────────────────────────────────
 let _dailyTopics        = null; // string[] once loaded
 let _dailyTopicsPromise = null;
@@ -2491,14 +2493,11 @@ function decideDailyTopic(posts, poolLen, nowMs) {
   // Never post twice on the same UTC day.
   if (current.dayStr === todayStr) return { action: 'noop' };
 
-  // New day: only rotate if a real message arrived since the topic went up —
-  // either a reply on the topic, or a fresh top-level post.
+  // New day: only rotate once the current topic has actually sparked a reply.
+  // No responses yet → it stays put and gets another day. Once someone has
+  // replied, it rotates to the next question on the next UTC day.
   const gotReply = (Number(current.commentCount) || 0) > 0;
-  const newPost  = posts.some(p => {
-    if (p.isTopic || p.isSystem || p.isSeed || p.isAnnouncement || p.deleted) return false;
-    return _postMs(p) > currentMs;
-  });
-  if (!gotReply && !newPost) return { action: 'noop' };
+  if (!gotReply) return { action: 'noop' };
 
   const nextIndex = ((Number(current.topicIndex) || 0) + 1) % poolLen;
   return { action: 'post', dayStr: todayStr, index: nextIndex, replacePostId: current.id };
@@ -2522,13 +2521,30 @@ async function fetchTopicDocs() {
   }
 }
 
-// Delete every topic doc except keepId, so only one "Today's topic" is ever
-// live. Fire-and-forget: a failed delete just leaves a straggler that the next
-// pass (or the render-side dedupeTopics guard) handles.
-function sweepStaleTopics(topicDocs, keepId) {
-  for (const t of topicDocs) {
-    if (t.id === keepId) continue;
-    db.collection(BB_BRAND.collections.posts).doc(t.id).delete().catch(() => {});
+// Retire a topic doc that is no longer the live one. If it sparked a
+// conversation (has at least one reply) it is demoted in place to an ordinary
+// BipolarBear post — same doc id, so the `comments` subcollection and its reply
+// thread carry over untouched — so the discussion lives on in the feed. If it
+// never got a reply there is nothing to preserve, so it is deleted. `topicDoc`
+// carries the doc data (needs commentCount); pass a synthesized doc when only
+// the id is known. Fire-and-forget: a failure just leaves a straggler that the
+// next pass (or the render-side dedupeTopics guard) handles.
+function retireTopic(topicDoc) {
+  if (!topicDoc || !topicDoc.id) return;
+  const ref = db.collection(BB_BRAND.collections.posts).doc(topicDoc.id);
+  const hasReplies = (Number(topicDoc.commentCount) || 0) > 0;
+  if (hasReplies) {
+    ref.update({
+      isTopic:  false,   // stop it counting as the live topic / being deduped away
+      wasTopic: true,    // render as a BipolarBear "past daily topic" post
+      name:     'BipolarBear',
+      isAdmin:  true,
+      initials: '🐻',
+      grad1:    YELLOW_LT,
+      grad2:    YELLOW_DARK,
+    }).catch(() => {});
+  } else {
+    ref.delete().catch(() => {});
   }
 }
 
@@ -2545,11 +2561,14 @@ async function maybePostDailyTopic() {
 
   // Converge to a single live topic no matter how duplicates arose (a failed
   // prior cleanup, a re-bootstrap from a dropped snapshot, …): keep the newest
-  // and sweep the rest. Runs independently of the rotation decision below so
-  // existing duplicates get healed even when no new topic is due.
+  // and retire the rest — archiving any that hold a conversation, deleting the
+  // empties. Runs independently of the rotation decision below so existing
+  // duplicates get healed even when no new topic is due.
   if (topicDocs && topicDocs.length > 1) {
     const newest = topicDocs.reduce((a, b) => (_postMs(b) >= _postMs(a) ? b : a));
-    sweepStaleTopics(topicDocs, newest.id);
+    for (const t of topicDocs) {
+      if (t.id !== newest.id) retireTopic(t);
+    }
   }
 
   // Merge the authoritative topic(s) over the snapshot so decideDailyTopic sees
@@ -2586,14 +2605,24 @@ async function maybePostDailyTopic() {
       });
     }
 
-    // Keep only the topic we just (re)posted live. Sweep against the full
-    // authoritative list when we have it (removes any straggler, not just the
-    // one decideDailyTopic flagged); otherwise fall back to the single replace.
+    // Retire the outgoing topic instead of deleting it: demote it to a
+    // BipolarBear post so its reply thread survives (rotation only fires once a
+    // topic got a reply, so this always archives rather than deletes). Prefer
+    // the authoritative doc (carries commentCount); synthesize one when the
+    // topic fetch failed — rotation implies a reply, so archive it.
+    if (decision.replacePostId && decision.replacePostId !== newId) {
+      const prev = (topicDocs || []).find(t => t.id === decision.replacePostId)
+        || { id: decision.replacePostId, commentCount: 1 };
+      retireTopic(prev);
+    }
+
+    // Clear out any *other* leftover topic docs (duplicate artifacts) — never
+    // the new topic and never the one we just retired.
     if (topicDocs) {
-      sweepStaleTopics(topicDocs, newId);
-    } else if (decision.replacePostId && decision.replacePostId !== newId) {
-      db.collection(BB_BRAND.collections.posts).doc(decision.replacePostId)
-        .delete().catch(() => {});
+      for (const t of topicDocs) {
+        if (t.id === newId || t.id === decision.replacePostId) continue;
+        retireTopic(t);
+      }
     }
   } catch (e) {
     console.warn('[Anonymous] daily topic post failed', e);
@@ -2757,6 +2786,21 @@ function renderThreadHeader(p) {
         <div class="post-avatar">
           <div class="post-av-circle" style="background:linear-gradient(135deg,${YELLOW_LT},${YELLOW_DARK});">💬</div>
           <div><div class="post-name">Today's topic</div></div>
+        </div>
+        <span class="post-time">${p.timestamp ? timeAgo(p.timestamp) : _wt('anon.time.now')}</span>
+      </div>
+      <div class="post-text">${esc(p.text)}</div>
+    </div>`;
+  }
+  if (p.wasTopic) {
+    return `<div class="thread-orig-post">
+      <div class="post-header">
+        <div class="post-avatar">
+          <div class="post-av-circle" style="background:linear-gradient(135deg,${YELLOW_LT},${YELLOW_DARK});">🐻</div>
+          <div>
+            <div class="post-name">[BipolarBear]<span class="admin-badge">ADMIN</span></div>
+            <div class="post-med" style="color:var(--muted);">💬 Past daily topic</div>
+          </div>
         </div>
         <span class="post-time">${p.timestamp ? timeAgo(p.timestamp) : _wt('anon.time.now')}</span>
       </div>
@@ -2972,6 +3016,7 @@ function renderPosts(posts) {
   scheduleTombstoneSweep(_nextTombstoneExpiry, _now);
   list.innerHTML = posts.map(p => {
     if (p.isTopic)        return renderTopic(p);
+    if (p.wasTopic)       return renderArchivedTopic(p);
     if (p.isSystem)       return renderSystem(p);
     if (p.isAnnouncement) return renderAnnouncement(p);
     return renderPost(p);
@@ -3056,6 +3101,38 @@ function renderTopic(p) {
     <div class="topic-head"><span class="topic-emoji">💬</span><span class="topic-label">Today's topic</span></div>
     <div class="topic-text">${esc(p.text)}</div>
     <div class="topic-cta">${cta}</div>
+  </div>`;
+}
+
+// A retired daily topic, rendered as an ordinary BipolarBear post so its reply
+// thread stays open and scrolls with the feed. Styled with the brand avatar and
+// no report/mute/ban affordances — you can't report or mute BipolarBear.
+function renderArchivedTopic(p) {
+  const liked        = likedPosts.has(p.id);
+  const likes        = num(p.likes, 0);
+  const commentCount = num(p.commentCount, 0);
+  const deleteBtn    = profile.isAdmin
+    ? `<button class="icon-btn" data-delete="${esc(p.id)}" title="Delete post (admin)">🗑️</button>` : '';
+  return `<div class="post-card">
+    <div class="post-header">
+      <div class="post-avatar">
+        <div class="post-av-circle" style="background:linear-gradient(135deg,${YELLOW_LT},${YELLOW_DARK});">🐻</div>
+        <div>
+          <div class="post-name">[BipolarBear]<span class="admin-badge">ADMIN</span></div>
+          <div class="post-med" style="color:var(--muted);">💬 Past daily topic</div>
+        </div>
+      </div>
+      <span class="post-time">${p.timestamp ? timeAgo(p.timestamp) : _wt('anon.time.now')}</span>
+    </div>
+    <div class="post-text">${esc(p.text)}</div>
+    <div class="post-actions">
+      <button class="like-btn ${liked ? 'liked' : ''}" data-id="${esc(p.id)}" data-likes="${likes}" data-author="BipolarBear">
+        💛 <span>${likes}</span>
+      </button>
+      <button class="comment-btn" data-comment="${esc(p.id)}" title="View comments">💬${commentCount > 0 ? ` <span>${commentCount}</span>` : ''}</button>
+      <div style="flex:1"></div>
+      ${deleteBtn}
+    </div>
   </div>`;
 }
 
