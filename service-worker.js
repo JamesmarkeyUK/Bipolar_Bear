@@ -376,7 +376,12 @@
 //       frame for native builds (full-bleed brand background, centred column).
 //       fab.js docks the FAB to the viewport on native. Web desktop keeps the
 //       framed mockup. Touches platform.js, fab.js, index/journal/survival-kit CSS.
-const CACHE_NAME = 'bipolarbear-v108';
+// v109: Anonymous board — guarantee a single "Today's topic" card. The render-side
+//       dedupe now lives inside renderPosts (the one choke point every render funnels
+//       through) instead of only assembleGeneralPosts, so the optimistic-compose path
+//       can no longer bypass it and surface duplicate topic cards. That path also now
+//       routes through assembleGeneralPosts so it keeps the greeting/seed cards.
+const CACHE_NAME = 'bipolarbear-v109';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

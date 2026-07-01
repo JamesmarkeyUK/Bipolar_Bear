@@ -2936,6 +2936,12 @@ function renderPosts(posts) {
   // banned (hidden for everyone). System/announcement cards have no name and
   // always pass.
   posts = posts.filter(p => !p.name || (!mutedUsers.has(p.name) && !isBanned(p.name)));
+  // Final safety net: never surface more than one "Today's topic" card, no matter
+  // which caller assembled `posts`. assembleGeneralPosts already dedupes, but the
+  // optimistic-compose path (and any future render path) can hand us the raw
+  // snapshot, which may hold several topic docs. Deduping here — the single choke
+  // point every render funnels through — makes duplicate topic cards impossible.
+  posts = dedupeTopics(posts);
   if (!posts.length) {
     list.innerHTML = '<div class="empty-state">' + esc(_wt('anon.ui.noPosts')) + '</div>';
     return;
@@ -3250,9 +3256,14 @@ function setupCompose() {
       timestamp: now,
     };
 
-    // Show post immediately (optimistic update)
+    // Show post immediately (optimistic update). Route through assembleGeneralPosts
+    // on the general tab so the optimistic render keeps the system greeting, the
+    // deduped daily topic, and the seed posts instead of dropping them until the
+    // next snapshot fires.
     localPosts.unshift({ id: optimisticId, ...entry });
-    renderPosts(sortPosts(localPosts));
+    renderPosts(currentTab === 'general'
+      ? assembleGeneralPosts(localPosts)
+      : sortPosts(localPosts));
 
     let docId = null;
     if (db) {
