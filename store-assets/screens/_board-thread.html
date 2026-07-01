@@ -1,0 +1,98 @@
+<!doctype html>
+<!-- Bare Bipolar Anonymous COMMENT THREAD, full-bleed at iPhone 6.9"
+     (1290×2796). This is the seam-spanning phone in the hero: its left slice
+     shows on panel 1, the full width is revealed on panel 2, so it reads well
+     across its whole width. Mockup content only. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ width:1290px; height:2796px; }
+  body{ font-family:'Segoe UI',system-ui,sans-serif; background:#FFFBF5; }
+  .board{ width:1290px; height:2796px; position:relative; overflow:hidden; background:#FFFBF5; }
+
+  .thead{ background:linear-gradient(180deg,#ffe066 0%,#f5c800 100%);
+    padding:150px 48px 40px; display:flex; align-items:center; gap:32px; }
+  .thead .x{ font-size:56px; font-weight:800; color:#1a1500; }
+  .thead .t{ font-weight:800; font-size:52px; color:#1a1500; }
+
+  .tbody{ padding:44px 48px 0; }
+  .orig{ background:#fffdef; border:2px solid #ffe98a; border-radius:34px; padding:44px; }
+  .pa{ display:flex; align-items:center; gap:24px; margin-bottom:24px; }
+  .av{ width:92px; height:92px; border-radius:50%; color:#fff; font-weight:800; font-size:38px;
+    flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 4px 12px rgba(245,200,0,.4); }
+  .pname{ font-weight:800; font-size:42px; color:#1a1500; }
+  .ptime{ font-size:32px; color:#8a7a3a; margin-top:4px; }
+  .ptext{ font-size:44px; color:#1a1500; line-height:1.5; }
+  .pacts{ display:flex; gap:22px; margin-top:30px; }
+  .pbtn{ background:#f4f2ec; border-radius:999px; padding:18px 34px; font-size:36px;
+    font-weight:700; color:#5c5018; }
+  .pbtn.liked{ background:#fff7c2; color:#a07e00; border:2px solid #f0d54a; }
+
+  .clabel{ font-weight:800; font-size:34px; color:#9a8a3a; text-transform:uppercase;
+    letter-spacing:.06em; margin:44px 6px 8px; }
+  .comment{ display:flex; gap:24px; padding:34px 6px; border-top:1px solid #f0ead0; }
+  .comment .av{ width:78px; height:78px; font-size:32px; }
+  .comment .body{ flex:1; }
+  .cname{ font-weight:800; font-size:38px; color:#1a1500; }
+  .cname span{ font-weight:600; font-size:30px; color:#9a8a3a; margin-left:14px; }
+  .ctext{ font-size:38px; color:#2a2510; line-height:1.46; margin-top:10px; }
+
+  .composer{ position:absolute; left:0; right:0; bottom:0; background:#fff;
+    border-top:1px solid #eee; padding:36px 44px 60px; display:flex; align-items:center; gap:22px; }
+  .composer .field{ flex:1; background:#f4f3ef; border-radius:30px; padding:34px 38px;
+    font-size:38px; color:#9a9488; }
+  .composer .send{ background:linear-gradient(135deg,#ffd84d,#f5c800); border-radius:30px;
+    padding:34px 44px; font-weight:800; font-size:38px; color:#1a1500; white-space:nowrap; }
+</style>
+</head>
+<body>
+<div class="board">
+  <div class="thead"><span class="x">✕</span><span class="t">Comments</span></div>
+
+  <div class="tbody">
+    <div class="orig">
+      <div class="pa">
+        <div class="av" style="background:linear-gradient(135deg,#ce93d8,#7b1fa2)">NW</div>
+        <div><div class="pname">NightWatch</div><div class="ptime">3h ago</div></div>
+      </div>
+      <div class="ptext">Anyone else find mornings the hardest? Looking for routines that actually help when getting out of bed feels impossible.</div>
+      <div class="pacts"><div class="pbtn liked">💛 34</div><div class="pbtn">💬 3</div></div>
+    </div>
+
+    <div class="clabel">3 replies</div>
+
+    <div class="comment">
+      <div class="av" style="background:linear-gradient(135deg,#81c784,#2e7d32)">SS</div>
+      <div class="body">
+        <div class="cname">SunflowerSeed <span>2h ago</span></div>
+        <div class="ctext">Putting my phone across the room so I have to stand up changed everything for me. Tiny thing, big difference. 💛</div>
+      </div>
+    </div>
+
+    <div class="comment">
+      <div class="av" style="background:linear-gradient(135deg,#64b5f6,#1565c0)">QO</div>
+      <div class="body">
+        <div class="cname">QuietOtter <span>1h ago</span></div>
+        <div class="ctext">Same here. I keep a glass of water and my meds on the nightstand so step one is done before I'm even up.</div>
+      </div>
+    </div>
+
+    <div class="comment">
+      <div class="av" style="background:linear-gradient(135deg,#f48fb1,#c2185b)">JR</div>
+      <div class="body">
+        <div class="cname">Juniper <span>32m ago</span></div>
+        <div class="ctext">You're not lazy, mornings are just genuinely harder for us. Be gentle with yourself.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="composer">
+    <div class="field">Add a comment…</div>
+    <div class="send">Send 💛</div>
+  </div>
+</div>
+</body>
+</html>

@@ -4,7 +4,11 @@ screens/_*.built.html
 screens/_ipad_build.html
 screens/_hero_*.html
 screens/_ipad_hero_*.html
+screens/_anon_hero_*.html
+screens/_anon_ipad_hero_*.html
 
 # Dev-only side-by-side stitch preview (not a store asset)
 out/hero/_stitch-preview.png
 out/ipad-hero/_stitch-preview.png
+out/anonymous/hero/_stitch-preview.png
+out/anonymous/ipad-hero/_stitch-preview.png
