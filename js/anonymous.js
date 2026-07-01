@@ -31,6 +31,11 @@
 const YELLOW      = 'var(--brand-secondary)';
 const YELLOW_DARK = '#c49e00';
 const YELLOW_LT   = '#ffe566';
+// How long a post/reply lives before cleanOldPosts() removes it. Also the cadence
+// the example (seed) posts rotate on, and the number surfaced in the feed footer,
+// so all three stay in lockstep.
+const POST_RETENTION_DAYS = 7;
+const DAY_MS = 24 * 60 * 60 * 1000;
 const ADMIN_EMAIL = 'inbox@jamesmarkey.co.uk';
 // App Store / Play review access. This single address skips email-code
 // verification using the fixed demo code below, so reviewers can test posting
@@ -2405,15 +2410,39 @@ function todaySystemPost() {
   return { id: 'sys_daily', isSystem: true, icon, text };
 }
 
+// Example posts shown at the foot of the General feed so the board never looks
+// empty. Purely local demo content (isSeed: no likes/comments/reports persist).
+// Two are shown at a time and the pair rotates every POST_RETENTION_DAYS so the
+// examples stay fresh — the same cadence real posts age out on. Keep entries
+// warm, supportive and non-clinical.
+const SEED_POOL = [
+  { name: 'SunnyDaze',  streak: 42, likes: 5, med: 'Lithium',     grad1: YELLOW_LT, grad2: YELLOW_DARK, initials: 'SD', text: 'Today was really hard but I made it through. Small wins 💛' },
+  { name: 'NightOwl',   streak: 7,  likes: 3, med: '',            grad1: '#64b5f6', grad2: '#1565c0',   initials: 'NO', text: 'Anyone else struggle with mornings? Takes me until noon to feel human 😅' },
+  { name: 'QuietTide',  streak: 15, likes: 4, med: '',            grad1: '#81c784', grad2: '#2e7d32',   initials: 'QT', text: 'Started a five-minute walk each morning. Tiny, but it helps me feel human again.' },
+  { name: 'PaperMoon',  streak: 63, likes: 8, med: 'Lamotrigine', grad1: '#ba68c8', grad2: '#6a1b9a',   initials: 'PM', text: 'Reminder to myself: a flat day is not a failed day. Just resting. 💛' },
+  { name: 'RiverStone', streak: 21, likes: 6, med: '',            grad1: '#4dd0e1', grad2: '#00838f',   initials: 'RS', text: 'Told someone how I was actually doing today instead of "fine". Felt lighter after.' },
+  { name: 'EmberGlow',  streak: 3,  likes: 2, med: 'Quetiapine',  grad1: '#ff8a65', grad2: '#d84315',   initials: 'EG', text: 'Rough week, but I kept my meds routine and ate something green. Counting it as a win.' },
+  { name: 'MapleHush',  streak: 30, likes: 7, med: '',            grad1: '#f06292', grad2: '#ad1457',   initials: 'MH', text: 'Made a playlist for the low days. Music gets me through more than I like to admit.' },
+  { name: 'DriftWood',  streak: 9,  likes: 5, med: '',            grad1: '#9575cd', grad2: '#4527a0',   initials: 'DW', text: "Learning that asking for help isn't losing. Rang my sister today and just talked. 💛" },
+];
+
 function seedPosts() {
-  return [
-    { id: 'seed_1', isSeed: true, tab: 'general', name: 'SunnyDaze', streak: 42, text: 'Today was really hard but I made it through. Small wins 💛', timestamp: null, likes: 5, med: 'Lithium', grad1: YELLOW_LT, grad2: YELLOW_DARK, initials: 'SD' },
-    { id: 'seed_2', isSeed: true, tab: 'general', name: 'NightOwl',  streak: 7,  text: 'Anyone else struggle with mornings? Takes me until noon to feel human 😅', timestamp: null, likes: 3, med: '', grad1: '#64b5f6', grad2: '#1565c0', initials: 'NO' },
-  ];
+  // Deterministic per-device from the clock — every POST_RETENTION_DAYS the
+  // window advances and the next consecutive pair shows. SEED_POOL has an even
+  // length so pairs never straddle the wrap.
+  const period = Math.floor(Date.now() / (POST_RETENTION_DAYS * DAY_MS));
+  const pick = i => SEED_POOL[(period * 2 + i) % SEED_POOL.length];
+  return [0, 1].map(i => ({ id: 'seed_' + (i + 1), isSeed: true, tab: 'general', timestamp: null, ...pick(i) }));
+}
+
+// A quiet note at the very bottom of the General feed telling users their posts
+// aren't permanent. isFooter is rendered by renderFeedFooter (see renderPosts).
+function feedFooter() {
+  return { id: 'sys_footer', isFooter: true };
 }
 
 function assembleGeneralPosts(realPosts) {
-  return [todaySystemPost(), ...sortPosts(dedupeTopics(realPosts)), ...seedPosts()];
+  return [todaySystemPost(), ...sortPosts(dedupeTopics(realPosts)), ...seedPosts(), feedFooter()];
 }
 
 // Defensive: only ever surface ONE "Today's topic". Firestore can transiently
@@ -2687,7 +2716,7 @@ function demoData() {
 // ─────────────────────────────────────────────────────────────────
 async function cleanOldPosts() {
   if (!db) return;
-  const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const cutoff = new Date(Date.now() - POST_RETENTION_DAYS * DAY_MS);
   try {
     // Query posts whose original timestamp is past the cutoff; we then
     // check lastActivity client-side to preserve posts kept alive by comments.
@@ -3019,6 +3048,7 @@ function renderPosts(posts) {
     if (p.wasTopic)       return renderArchivedTopic(p);
     if (p.isSystem)       return renderSystem(p);
     if (p.isAnnouncement) return renderAnnouncement(p);
+    if (p.isFooter)       return renderFeedFooter();
     return renderPost(p);
   }).join('');
 
@@ -3133,6 +3163,15 @@ function renderArchivedTopic(p) {
       <div style="flex:1"></div>
       ${deleteBtn}
     </div>
+  </div>`;
+}
+
+// Bottom-of-feed note: posts are not permanent. Kept in sync with
+// POST_RETENTION_DAYS (the cleanOldPosts cutoff and the seed rotation cadence).
+function renderFeedFooter() {
+  const days = POST_RETENTION_DAYS;
+  return `<div class="feed-footer" style="text-align:center;padding:18px 16px 10px;font-size:12px;line-height:1.5;color:var(--muted);">
+    💛 Posts and replies here automatically disappear after ${days} days.
   </div>`;
 }
 

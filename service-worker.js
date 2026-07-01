@@ -392,7 +392,12 @@
 //       steps (sleep, energy) get the mockup treatment: big emoji, large
 //       value readout, "Synced from Apple/Android Health" badge, and a
 //       full-screen focused-mode layout with a slider-wheel option picker.
-const CACHE_NAME = 'bipolarbear-v111';
+// v112: Anonymous board — the two example (seed) posts at the foot of the General
+//       feed now rotate through a pool every 7 days (the same window real posts
+//       age out on), and a footer note tells users "Posts and replies here
+//       automatically disappear after 7 days". Retention/rotation/footer all read
+//       one shared POST_RETENTION_DAYS constant.
+const CACHE_NAME = 'bipolarbear-v112';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
