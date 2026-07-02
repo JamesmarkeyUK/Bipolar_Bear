@@ -4345,7 +4345,9 @@ window.addEventListener('pageshow', () => {
       // wheel sits low; wire up the slider-wheel after layout.
       const _isHeroStep = ['mood', 'energy', 'sleep'].includes(step.id) && !!document.getElementById('fmWheel');
       _fmContentEl.classList.toggle('fm-content-hero', _isHeroStep);
-      if (_isHeroStep) requestAnimationFrame(_fmInitWheel);
+      // setTimeout(0), not rAF: rAF can starve in a backgrounded/hidden WebView
+      // and the wheel would never get its initial centring + hero paint.
+      if (_isHeroStep) setTimeout(_fmInitWheel, 0);
       if (step.id === 'notes') setTimeout(() => { const ta = document.getElementById('fmNotesInput'); if (ta) ta.focus(); }, 120);
       // Auto-sync health data if setting is ON
       if (BB.storage.get('HealthSyncEnabled') === '1') {
@@ -4449,8 +4451,18 @@ window.addEventListener('pageshow', () => {
       const isCommitted = committed !== null && String(committed) === val;
       let valueHtml = btn.dataset.label;
       let badge = null;
-      if (step.id === 'energy' && isCommitted && _fmStepsRaw != null) {
-        valueHtml = BB.t('journal.sync.steps', { n: Number(_fmStepsRaw).toLocaleString() });
+      // Steps for the entry being edited / the current form date — never the
+      // stale count from a previous focused-mode session on another date.
+      let _heroSteps = null;
+      if (step.id === 'energy') {
+        if (editingEntry && editingEntry.steps != null) _heroSteps = editingEntry.steps;
+        else {
+          const _dv = document.getElementById('entryDate')?.value;
+          if (_dv && window._healthStepsByDate && window._healthStepsByDate[_dv] != null) _heroSteps = window._healthStepsByDate[_dv];
+        }
+      }
+      if (step.id === 'energy' && isCommitted && _heroSteps != null) {
+        valueHtml = BB.t('journal.sync.steps', { n: Number(_heroSteps).toLocaleString() });
         badge = { cls: '', text: '✓ ' + _syncSourceLabel() };
       } else if (step.id === 'sleep' && isCommitted && _sleepHealthSynced) {
         valueHtml = _fmFmtSleepHM(selectedSleep);
