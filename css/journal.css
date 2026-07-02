@@ -241,8 +241,9 @@
       -webkit-overflow-scrolling: touch;
     }
     .fm-wheel::-webkit-scrollbar { display: none; }
-    /* One-handed reach: keep the wheel block raised off the very bottom edge. */
-    body.bb-fm-full #fmContent.fm-content-hero { padding-bottom: min(9vh, 72px); }
+    /* One-handed reach: keep the wheel block raised off the very bottom edge.
+       (Not on notes — its Next row sits directly below and would leave a gap.) */
+    body.bb-fm-full #fmContent.fm-content-hero:not(.fm-notes) { padding-bottom: min(9vh, 72px); }
     .fm-wheel-btn {
       scroll-snap-align: center;
       flex: 0 0 auto; min-width: 62px;

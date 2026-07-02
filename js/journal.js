@@ -3670,9 +3670,11 @@ window.addEventListener('pageshow', () => {
       { val:11,  label:'💤 10+h',  color:'#7B68EE' },
     ];
     const _FM_EYEBROWS = {
-      mood:   () => BB.t('journal.fm.eyebrowMood'),
-      energy: () => BB.t('journal.fm.eyebrowEnergy'),
-      sleep:  () => BB.t('journal.fm.eyebrowSleep'),
+      mood:       () => BB.t('journal.fm.eyebrowMood'),
+      energy:     () => BB.t('journal.fm.eyebrowEnergy'),
+      sleep:      () => BB.t('journal.fm.eyebrowSleep'),
+      medication: () => BB.t('journal.fm.eyebrowMeds'),
+      notes:      () => BB.t('journal.fm.eyebrowNotes'),
     };
 
     /** Platform-branded "Synced from …" badge label. */
@@ -4370,13 +4372,17 @@ window.addEventListener('pageshow', () => {
       // Content
       const _fmContentEl = document.getElementById('fmContent');
       _fmContentEl.innerHTML = _fmRenderContent(step);
-      // Hero steps (mood/energy/sleep): flex column so the hero centres and the
-      // wheel sits low; wire up the slider-wheel after layout.
-      const _isHeroStep = ['mood', 'energy', 'sleep'].includes(step.id) && !!document.getElementById('fmWheel');
+      // Hero steps: flex column so the hero centres and the wheel/input sits
+      // low; wire up the slider-wheel after layout. Notes has no wheel but
+      // shares the hero layout (its own class opts out of the bottom raise —
+      // the Next row sits under it and would leave a gap).
+      const _hasWheel = !!document.getElementById('fmWheel');
+      const _isHeroStep = _hasWheel || step.id === 'notes';
       _fmContentEl.classList.toggle('fm-content-hero', _isHeroStep);
+      _fmContentEl.classList.toggle('fm-notes', step.id === 'notes');
       // setTimeout(0), not rAF: rAF can starve in a backgrounded/hidden WebView
       // and the wheel would never get its initial centring + hero paint.
-      if (_isHeroStep) setTimeout(_fmInitWheel, 0);
+      if (_hasWheel) setTimeout(_fmInitWheel, 0);
       if (step.id === 'notes') setTimeout(() => { const ta = document.getElementById('fmNotesInput'); if (ta) ta.focus(); }, 120);
       // Auto-sync health data if setting is ON
       if (BB.storage.get('HealthSyncEnabled') === '1') {
@@ -4463,9 +4469,10 @@ window.addEventListener('pageshow', () => {
 
     /** The wheel value the user has actually committed on this step (null = none). */
     function _fmWheelCommittedVal(stepId) {
-      if (stepId === 'energy') return _fmEnergyClear ? null : String(selectedEnergy);
-      if (stepId === 'sleep')  return (_fmSleepClear || selectedSleep == null) ? null : String(_fmSleepBucketOf(selectedSleep));
-      if (stepId === 'mood')   return selectedMood || null;
+      if (stepId === 'energy')     return _fmEnergyClear ? null : String(selectedEnergy);
+      if (stepId === 'sleep')      return (_fmSleepClear || selectedSleep == null) ? null : String(_fmSleepBucketOf(selectedSleep));
+      if (stepId === 'mood')       return selectedMood || null;
+      if (stepId === 'medication') return selectedMedication || null;
       return null;
     }
 
@@ -4782,17 +4789,24 @@ window.addEventListener('pageshow', () => {
             }
           } catch(e) {}
           const _medHintDone = BB.storage.get('MedHintDone') === '1';
-          return `${medListHtml}
-            <div style="text-align:center;margin-bottom:${_medHintDone ? '14' : '4'}px;">
+          const _manageRow = `<div style="text-align:center;margin-bottom:${_medHintDone ? '0' : '4'}px;">
               <button id="manageMedsBtn" onclick="_dismissMedHint();showMedicationList()" style="background:none;border:none;color:${_medHintDone ? 'var(--brand-primary)' : 'rgba(255,255,255,0.9)'};font-size:0.8em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;text-decoration:underline;text-underline-offset:2px;">✏️ Manage medications</button>
               ${_medHintDone ? '' : `<div id="medHintEl" style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:4px;margin-bottom:10px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="8" y1="13" x2="8" y2="2" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round"/><polyline points="3,7 8,2 13,7" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,255,255,0.9);font-family:'Georgia',serif;letter-spacing:0.01em;text-shadow:0 1px 4px rgba(0,0,0,0.5);">${BB.t('journal.hint.logMed')}</span></div>`}
-            </div>
-            <button class="fm-opt fm-hover-orange ${selectedMedication==='not-taken'?'sel':''}"
-              onclick="selectedMedication='not-taken'; _fmAdvance();" style="border-left:4px solid var(--brand-primary);">
-              <span>${BB.t('journal.med.notTaken')}</span></button>
-            <button class="fm-opt fm-hover-green ${selectedMedication==='taken'?'sel':''}"
-              onclick="selectedMedication='taken'; _fmAdvance();" style="border-left:4px solid #51cf66;margin-top:8px;">
-              <span>${BB.t('journal.med.taken')}</span></button>`;
+            </div>`;
+          const _MED_OPTS = [
+            { val:'not-taken', label:BB.t('journal.med.notTaken'), color:'var(--brand-primary)' },
+            { val:'taken',     label:BB.t('journal.med.taken'),    color:'#51cf66' },
+          ];
+          const _medWheel = _fmWheelHtml(_MED_OPTS.map(o => {
+            const [emoji, ...rest] = o.label.split(' ');
+            return {
+              val: o.val, emoji, label: rest.join(' ') || o.label, color: o.color,
+              cls: selectedMedication === o.val ? 'sel' : '',
+              init: (selectedMedication || 'taken') === o.val,
+              onclick: `selectedMedication='${o.val}'; _fmAdvance();`,
+            };
+          }));
+          return medListHtml + _manageRow + _fmHeroHtml() + _medWheel;
         }
 
         case 'goals':
@@ -5022,7 +5036,10 @@ window.addEventListener('pageshow', () => {
         case 'notes': {
           const _notesInitVal = (document.getElementById('notes')||{}).value||'';
           const _initWords = _notesInitVal.trim() ? _notesInitVal.trim().split(/\s+/).length : 0;
-          return `<textarea id="fmNotesInput" placeholder="${BB.t('journal.placeholder.notes')}"
+          return `<div class="fm-hero">
+              <div class="fm-hero-emoji${_notesInitVal.trim() ? '' : ' ghost'}" id="fmHeroEmoji">📝</div>
+            </div>
+            <textarea id="fmNotesInput" placeholder="${BB.t('journal.placeholder.notes')}"
             style="width:100%;min-height:130px;border:2px solid #e9ecef;border-radius:12px;padding:12px;
             font-size:0.95em;font-family:inherit;resize:none;box-sizing:border-box;outline:none;transition:border-color 0.15s;"
             oninput="_fmNotesInput(this)">${_notesInitVal}</textarea>
@@ -5447,6 +5464,8 @@ window.addEventListener('pageshow', () => {
       const w = ta.value.trim() ? ta.value.trim().split(/\s+/).length : 0;
       const el = document.getElementById('fmWordCount');
       if (el) el.textContent = '✍️ ' + w + ' word' + (w === 1 ? '' : 's');
+      const _hero = document.getElementById('fmHeroEmoji');
+      if (_hero) _hero.classList.toggle('ghost', !ta.value.trim());
     }
     window._fmNotesInput = _fmNotesInput;
 

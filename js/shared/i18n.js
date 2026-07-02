@@ -418,6 +418,8 @@
           eyebrowMood: 'Mood',
           eyebrowEnergy: 'Energy',
           eyebrowSleep: 'Sleep',
+          eyebrowMeds: 'Medication',
+          eyebrowNotes: 'Notes',
           wheelHint: 'Swipe to change responses. Tap to confirm.',
           exit: 'Exit',
           resumeEntry: '✏️ Continue your entry',
