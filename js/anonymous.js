@@ -199,6 +199,10 @@ function isBanned(name) {
 // ─────────────────────────────────────────────────────────────────
 // Firebase
 // ─────────────────────────────────────────────────────────────────
+// File-scope (not inside initFirebase) — the 2.5s fallback boot at the foot
+// of this file reads it, and it must also stay false when Firebase never
+// loads and initFirebase never runs.
+let _anonInitialBoot = false;
 function initFirebase() {
   try {
     if (!firebase.apps.length) {
@@ -215,7 +219,6 @@ function initFirebase() {
     window._anonGetBBStats = _fns.httpsCallable('getBBStats');
 
     // Auth state handler — routes on first load, handles sign-out while on board
-    let _anonInitialBoot = false;
     firebase.auth().onAuthStateChanged(async function(user) {
       const isReal = user && !user.isAnonymous;
 
