@@ -408,13 +408,20 @@
         <button id="fmSaveShortcutBtn" onclick="_fmGoToDone()" style="display:none;background:none;border:none;color:#6c757d;font-size:1.1em;cursor:pointer;padding:0 2px;-webkit-tap-highlight-color:transparent;line-height:1;flex-shrink:0;" title="Go to save">💾</button>
       </div>
 
+      <!-- Flexible space so the title/subheader sits roughly halfway between
+           the top navigation and the big hero emoji (collapses on content-
+           heavy steps where there's no room). -->
+      <div id="fmHeaderSpacer"></div>
+
       <!-- Question -->
-      <div id="fmEyebrow" class="fm-eyebrow" style="display:none;"></div>
-      <h2 id="fmTitle" style="margin:0 0 4px;font-size:1.25em;font-weight:700;text-align:center;"></h2>
-      <p id="fmSubtitle" style="margin:0 0 20px;font-size:0.82em;color:#6c757d;text-align:center;min-height:1em;"></p>
+      <div id="fmHeader">
+        <div id="fmEyebrow" class="fm-eyebrow" style="display:none;"></div>
+        <h2 id="fmTitle" style="margin:0 0 4px;font-size:1.25em;font-weight:700;text-align:center;"></h2>
+        <p id="fmSubtitle" style="margin:0 0 20px;font-size:0.82em;color:#6c757d;text-align:center;min-height:1em;"></p>
+      </div>
 
       <!-- Step content area -->
-      <div id="fmContent" style="flex:1;"></div>
+      <div id="fmContent"></div>
 
       <!-- Next/Save button row (shown only for non-auto steps) -->
       <div id="fmNextRow" style="display:none;margin-top:16px;gap:10px;align-items:center;position:sticky;bottom:0;background:var(--brand-tint);padding-bottom:4px;">

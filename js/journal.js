@@ -3675,6 +3675,7 @@ window.addEventListener('pageshow', () => {
       sleep:      () => BB.t('journal.fm.eyebrowSleep'),
       medication: () => BB.t('journal.fm.eyebrowMeds'),
       notes:      () => BB.t('journal.fm.eyebrowNotes'),
+      done:       () => BB.t('journal.fm.eyebrowDone'),
     };
 
     /** Platform-branded "Synced from …" badge label. */
@@ -4349,8 +4350,8 @@ window.addEventListener('pageshow', () => {
       const _confirmStep = localStorage.getItem('fmConfirmStep') === 'true';
       // Auto steps always auto-advance (no Next button needed, even in confirm-step mode).
       // Non-auto steps show Next always; confirm-step mode is handled in _fmAdvance().
-      // Notes renders its own in-content Next (positioned in the wheel slot).
-      if (step.auto || step.id === 'notes') {
+      // Notes + done render their own in-content actions (positioned in the wheel slot).
+      if (step.auto || step.id === 'notes' || step.id === 'done') {
         nextRow.style.display = 'none';
       } else {
         nextRow.style.display = 'flex';
@@ -4378,9 +4379,10 @@ window.addEventListener('pageshow', () => {
       // shares the hero layout (its own class opts out of the bottom raise —
       // the Next row sits under it and would leave a gap).
       const _hasWheel = !!document.getElementById('fmWheel');
-      const _isHeroStep = _hasWheel || step.id === 'notes';
+      const _isHeroStep = _hasWheel || step.id === 'notes' || step.id === 'done';
       _fmContentEl.classList.toggle('fm-content-hero', _isHeroStep);
       _fmContentEl.classList.toggle('fm-notes', step.id === 'notes');
+      _fmContentEl.classList.toggle('fm-done', step.id === 'done');
       // setTimeout(0), not rAF: rAF can starve in a backgrounded/hidden WebView
       // and the wheel would never get its initial centring + hero paint.
       if (_hasWheel) setTimeout(_fmInitWheel, 0);
@@ -5079,7 +5081,7 @@ window.addEventListener('pageshow', () => {
           })();
           const _doneStepsStr = _doneStepsVal != null ? ` · 🏃 ${_doneStepsVal >= 1000 ? Math.round(_doneStepsVal/1000)+'k' : _doneStepsVal}` : '';
           const rows = [
-            { text:`<img src="images/moods/${selectedMood}.png" width="20" style="vertical-align:middle;margin-right:6px;"> <b>${cap(selectedMood)}</b>${selectedLinkedMood ? ` <span style="color:#adb5bd;font-weight:400;margin:0 4px;">/</span> <img src="images/moods/${selectedLinkedMood}.png" width="20" style="vertical-align:middle;margin-right:4px;opacity:0.85;"><b>${cap(selectedLinkedMood)}</b>` : ''}`, step:'mood' },
+            // Mood is shown as the big bear hero above, not as a list row.
             _fmEnergyClear
               ? { text:`<span style="color:#adb5bd;">Energy: —</span>`, step:'energy' }
               : { text:`Energy: ${eLabel}${_doneStepsStr}`, step:'energy', note:_sn('energy') },
@@ -5152,9 +5154,28 @@ window.addEventListener('pageshow', () => {
               <label class="bb-switch" style="margin:0;"><input type="checkbox" ${selectedPdfHide?'checked':''} onchange="_fmTogglePdfHide()"><span class="bb-slider"></span></label>
             </div>` : '';
           const _doneDate = (() => { try { const _dv = document.getElementById('entryDate')?.value; if (!_dv) return ''; const _dd = new Date(_dv+'T00:00:00'); return _dd.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'}); } catch(_){return '';} })();
-          return `${_doneDate ? `<div style="text-align:center;font-size:0.92em;color:#6c757d;margin-bottom:10px;">📅 ${_doneDate}</div>` : ''}<div style="display:inline-block;background:#f8f9fa;border-radius:14px;padding:16px;border-left:4px solid ${mc};max-width:100%;text-align:left;">
+          // Bear hero: the chosen mood shown big, instead of as a summary row.
+          const _linkedHero = selectedLinkedMood ? ` <span style="color:#adb5bd;font-weight:600;">/</span> <img src="images/moods/${selectedLinkedMood}.png" style="width:34px;height:34px;object-fit:contain;vertical-align:middle;opacity:0.9;"> ${cap(selectedLinkedMood)}` : '';
+          const _heroHtml = `<div class="fm-hero">
+              <div class="fm-hero-emoji"><img src="images/moods/${selectedMood}.png" alt=""></div>
+              <div class="fm-hero-value" style="color:${mc};">${cap(selectedMood)}${_linkedHero}</div>
+            </div>`;
+          // Delete + Save styled as wheel pills, sitting in the wheel slot.
+          const _noChanges = editingEntry && !_hasEditChanges();
+          const _delLabel = editingEntry ? BB.t('journal.fm.doneDelete') : BB.t('journal.fm.doneClear');
+          const _saveLabel = _noChanges ? BB.t('journal.fm.doneClose') : (editingEntry ? BB.t('journal.fm.doneUpdate') : BB.t('journal.fm.doneSave'));
+          const _saveEmoji = _noChanges ? '✓' : '💾';
+          const _actions = `<div class="fm-done-actions">
+              <button type="button" class="fm-wheel-btn fm-done-del" onclick="_fmDoneDelete()">
+                <span class="fm-wheel-emoji">🗑️</span><span class="fm-wheel-label">${_delLabel}</span>
+              </button>
+              <button type="button" class="fm-wheel-btn fm-done-save" onclick="_fmNext()" ${_noChanges ? 'disabled' : ''}>
+                <span class="fm-wheel-emoji">${_saveEmoji}</span><span class="fm-wheel-label">${_saveLabel}</span>
+              </button>
+            </div>`;
+          return `${_heroHtml}${_doneDate ? `<div style="text-align:center;font-size:0.92em;color:#6c757d;margin-bottom:10px;">📅 ${_doneDate}</div>` : ''}<div style="display:block;background:#f8f9fa;border-radius:14px;padding:16px;border-left:4px solid ${mc};max-width:100%;text-align:left;">
             ${rows.map(r=>{const idx=_fmSteps.findIndex(s=>s.id===r.step);const editBtn=idx>=0?`<button onclick="_fmReturnToDone=true;_fmGoTo(${idx})" style="background:none;border:none;color:#6c757d;font-size:0.82em;cursor:pointer;padding:2px 4px;-webkit-tap-highlight-color:transparent;flex-shrink:0;" title="Edit">✏️</button>`:'';if(r.note){return `<details style="padding:3px 0;"><summary style="display:flex;align-items:center;flex-wrap:nowrap;gap:6px;font-size:0.9em;color:#495057;min-width:0;cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;">${r.wrap?`<span style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap;word-break:break-word;flex:1;">${r.text}</span>`:`<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;">${r.text}</span>`}${editBtn}<span style="font-size:0.65em;color:#adb5bd;flex-shrink:0;margin-left:2px;transition:transform 0.15s;" class="bb-note-chev">▶</span></summary><div style="font-size:0.82em;color:#495057;padding:5px 0 3px 12px;font-style:italic;word-break:break-word;line-height:1.4;">📝 ${r.note}</div></details>`;}return r.wrap?`<div style="padding:3px 0;"><div style="display:flex;align-items:center;gap:8px;font-size:0.9em;color:#495057;"><span style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap;word-break:break-word;flex:1;">${r.text}</span>${editBtn}</div></div>`:`<div style="padding:3px 0;"><div style="display:flex;align-items:center;flex-wrap:nowrap;gap:6px;font-size:0.9em;color:#495057;min-width:0;"><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;">${r.text}</span>${editBtn}</div></div>`;}).join('')}
-          </div>${_privRow}${_suggestion}`;
+          </div>${_privRow}${_suggestion}${_actions}`;
         }
 
         default:
