@@ -396,7 +396,7 @@
     <div class="card" id="focusedModeCard" style="background:var(--brand-tint);display:none;flex-direction:column;padding:20px 20px 16px;">
       <!-- Top bar: back + progress dots + skip -->
       <div id="fmTopBar" style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-        <button id="fmBackBtn" onclick="_fmBack()" style="background:none;border:none;color:#6c757d;font-size:0.85em;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;white-space:nowrap;">← Back</button>
+        <button id="fmBackBtn" onclick="_fmExit()" style="background:none;border:none;color:#6c757d;font-size:0.85em;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;white-space:nowrap;">✕ Exit</button>
         <div id="fmProgressDots" style="display:flex;gap:5px;flex:1;justify-content:center;align-items:center;"></div>
         <button id="fmSkipBtn" onclick="_fmSkip()" style="background:none;border:none;color:#6c757d;font-size:0.85em;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;white-space:nowrap;">Skip →</button>
       </div>
@@ -426,6 +426,11 @@
     </div>
 
     <div id="fmExitLink" style="display:none;"></div>
+
+    <!-- Shown after ✕ Exit from focused mode on a day that isn't logged yet — the draft is kept -->
+    <div id="fmResumeSection" style="display:none;text-align:center;margin-bottom:16px;">
+      <button onclick="_fmResumeEntry()" style="background:rgba(255,255,255,0.18);color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.25);border:1.5px solid rgba(255,255,255,0.55);border-radius:20px;padding:10px 22px;font-size:0.95em;font-weight:700;font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="journal.fm.resumeEntry">✏️ Continue your entry</button>
+    </div>
 
     <!-- Journal Toggle Button (hidden until initial load completes) -->
     <!-- Onboarding hint 2: step 1 — points down to the journal toggle button -->

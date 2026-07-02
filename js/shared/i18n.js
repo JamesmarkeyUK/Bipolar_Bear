@@ -419,6 +419,8 @@
           eyebrowEnergy: 'Energy',
           eyebrowSleep: 'Sleep',
           wheelHint: 'Swipe to change responses. Tap to confirm.',
+          exit: 'Exit',
+          resumeEntry: '✏️ Continue your entry',
         },
         sync: {
           apple: 'Synced from Apple Health',

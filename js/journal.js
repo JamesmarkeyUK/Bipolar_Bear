@@ -3650,6 +3650,7 @@ window.addEventListener('pageshow', () => {
     let _sleepHealthSynced  = false; // true only when sleep came from a health data sync
     let _fmMoodSuggestion   = null; // best-guess mood derived from synced steps + sleep
     let _fmStepsRaw         = null; // raw synced step count (number) for the hero readout
+    let _fmUserExited       = false; // ✕ Exit on an unlogged day — blocks auto-reopen until resume
 
     const _FM_MOOD_COLORS  = { manic:'#ff4444', elevated:'var(--brand-primary)', stable:'#51cf66', good:'#51cf66', low:'#845ef7', depressed:'#5c7cfa' };
     const _FM_MOOD_LABELS  = { manic:BB.t('mood.manic'), elevated:BB.t('mood.elevated'), stable:BB.t('mood.stable'), good:BB.t('mood.stable'), low:BB.t('mood.low'), depressed:BB.t('mood.depressed') };
@@ -3999,6 +4000,9 @@ window.addEventListener('pageshow', () => {
       _fmSleepAutoSyncDone = false;
       _fmMoodSuggestion    = null;
       _fmStepsRaw          = null;
+      _fmUserExited        = false;
+      const _rsO = document.getElementById('fmResumeSection');
+      if (_rsO) _rsO.style.display = 'none';
       _fmExtraSelected     = new Set();
       _fmPrevMood          = null;
       document.getElementById('entryFormCard').style.display = 'none';
@@ -4050,6 +4054,52 @@ window.addEventListener('pageshow', () => {
       }
       _updateFocusModeBtn();
     }
+
+    /**
+     * Top-left ✕ Exit — leave the focused form. Editing: same discard-confirm
+     * as the old done-step ✕. New entry when the date already has a saved
+     * entry: back to the overview (draft discarded, matching the old step-0
+     * Close). New entry on an unlogged date: KEEP the draft and show a
+     * "Continue your entry" pill instead — exit is never destructive there.
+     */
+    function _fmExit() {
+      if (editingEntry) {
+        if (!_hasEditChanges()) { cancelEdit(); return; }
+        if (confirm(BB.t('journal.toast.discardChanges'))) cancelEdit();
+        return;
+      }
+      if (_todayEntryRef) { cancelNewEntry(); return; }
+      _fmUserExited = true;
+      _fmActive = false;
+      document.getElementById('focusedModeCard').style.display = 'none';
+      const _elX = document.getElementById('fmExitLink');
+      if (_elX) _elX.style.display = 'none';
+      document.getElementById('entryFormCard').style.display = 'none';
+      const _fflX = document.getElementById('fullFormExitLink');
+      if (_fflX) _fflX.style.display = 'none';
+      const _rsX = document.getElementById('fmResumeSection');
+      if (_rsX) _rsX.style.display = '';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    window._fmExit = _fmExit;
+
+    /** Reopen the form exactly where the user left it (state was kept). */
+    function _fmResumeEntry() {
+      _fmUserExited = false;
+      const _rsR = document.getElementById('fmResumeSection');
+      if (_rsR) _rsR.style.display = 'none';
+      if (_fmEnabled) {
+        _fmActive = true;
+        document.getElementById('focusedModeCard').style.display = 'flex';
+        const _elR = document.getElementById('fmExitLink');
+        if (_elR) _elR.style.display = '';
+        _renderFocusedStep();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        document.getElementById('entryFormCard').style.display = '';
+      }
+    }
+    window._fmResumeEntry = _fmResumeEntry;
 
     // Temporarily switch to full form without turning off focus mode as a setting
     function _fmSwitchToFullForm() {
@@ -4181,6 +4231,12 @@ window.addEventListener('pageshow', () => {
     window._openEditInFocusedMode = _openEditInFocusedMode;
 
     function _maybeFocusedModeAfterFormShown() {
+      // User tapped ✕ Exit on an unlogged day — don't bounce back into the
+      // form on a background refresh; the "Continue your entry" pill resumes.
+      if (_fmUserExited) {
+        document.getElementById('entryFormCard').style.display = 'none';
+        return;
+      }
       if (!_fmEnabled || editingEntry) return;
       // Don't restart focus mode if it's already active — e.g. a background Firestore refresh
       // calling loadEntries() → updateDatePickerStatus() must not reset the user's current step.
@@ -4247,21 +4303,16 @@ window.addEventListener('pageshow', () => {
       const _dotsEl = document.getElementById('fmProgressDots');
       const _topBar = document.getElementById('fmTopBar');
       const _stepCounter = document.getElementById('fmStepCounter');
-      if (_fmStepIndex === 0) {
-        _dotsEl.innerHTML = '';
-        _dotsEl.style.display = 'none';
-        if (_topBar) _topBar.style.display = 'none';
-        if (_stepCounter) _stepCounter.style.display = 'none';
-      } else {
-        _dotsEl.style.display = 'flex';
-        _dotsEl.innerHTML = _fmSteps.map((_,i) => `<div class="fm-dot ${i<_fmStepIndex?'done':i===_fmStepIndex?'cur':''}"></div>`).join('');
-        if (_topBar) _topBar.style.display = 'flex';
-        if (_stepCounter) _stepCounter.style.display = '';
-      }
-      document.getElementById('fmStepCounter').textContent = _fmStepIndex === 0 ? '' : `Step ${_fmStepIndex+1} of ${_fmSteps.length}`;
-      // Summary bar of completed steps (hidden on the mood step to keep it clean)
+      // Top bar is uniform across every step, including mood (step 0)
+      _dotsEl.style.display = 'flex';
+      _dotsEl.innerHTML = _fmSteps.map((_,i) => `<div class="fm-dot ${i<_fmStepIndex?'done':i===_fmStepIndex?'cur':''}"></div>`).join('');
+      if (_topBar) _topBar.style.display = 'flex';
+      if (_stepCounter) _stepCounter.style.display = '';
+      document.getElementById('fmStepCounter').textContent = `Step ${_fmStepIndex+1} of ${_fmSteps.length}`;
+      // Summary bar of completed steps (a fresh session has no chips yet on step 0
+      // — a lone dashed placeholder would just be noise)
       _fmBuildSummaryBar();
-      if (_fmStepIndex === 0) {
+      if (_fmStepIndex === 0 && _fmHighWater === 0) {
         const _sumBar = document.getElementById('fmSummaryBar');
         if (_sumBar) _sumBar.style.display = 'none';
       }
@@ -4274,43 +4325,21 @@ window.addEventListener('pageshow', () => {
         _eyebrowEl.textContent = _eb;
         _eyebrowEl.style.display = _eb ? '' : 'none';
       }
-      // Back button — on step 0 show "✕ Close" only when there's an overview to return to
-      // (editing an existing entry, OR the current tracking date already has a saved entry)
+      // Top-left: ✕ Exit on every step — step navigation lives in the dots
+      // and the tappable summary chips, so a Back button is redundant.
       const _backBtn = document.getElementById('fmBackBtn');
-      if (_fmStepIndex === 0) {
-        if (editingEntry || _todayEntryRef) {
-          _backBtn.textContent = '✕ Close';
-          _backBtn.onclick = editingEntry ? cancelEdit : cancelNewEntry;
-          _backBtn.style.visibility = 'visible';
-        } else {
-          _backBtn.style.visibility = 'hidden';
-        }
-      } else {
-        _backBtn.textContent = '← Back';
-        _backBtn.onclick = _fmBack;
-        _backBtn.style.visibility = 'visible';
-      }
-      // Skip button + save shortcut
+      _backBtn.textContent = '✕ ' + ((window.BB && BB.t) ? BB.t('journal.fm.exit') : 'Exit');
+      _backBtn.onclick = _fmExit;
+      _backBtn.style.visibility = 'visible';
+      // Skip button + save shortcut (mood is the one required field — no skip)
       const skipBtn = document.getElementById('fmSkipBtn');
-      if (step.id === 'done' && editingEntry) {
-        // Show X discard button top-right when editing
-        skipBtn.textContent = '✕';
-        skipBtn.title = 'Close';
-        skipBtn.onclick = () => {
-          if (!_hasEditChanges()) { cancelEdit(); return; }
-          if (confirm(BB.t('journal.toast.discardChanges'))) cancelEdit();
-        };
-        skipBtn.style.visibility = 'visible';
-        skipBtn.style.color = '#adb5bd';
-      } else {
-        skipBtn.textContent = 'Skip →';
-        skipBtn.title = '';
-        skipBtn.onclick = _fmSkip;
-        skipBtn.style.visibility = (step.id === 'done' || step.id === 'mood') ? 'hidden' : 'visible';
-        skipBtn.style.color = '#adb5bd';
-      }
+      skipBtn.textContent = 'Skip →';
+      skipBtn.title = '';
+      skipBtn.onclick = _fmSkip;
+      skipBtn.style.visibility = (step.id === 'done' || step.id === 'mood') ? 'hidden' : 'visible';
+      skipBtn.style.color = '#adb5bd';
       const saveShortcutBtn = document.getElementById('fmSaveShortcutBtn');
-      if (saveShortcutBtn) saveShortcutBtn.style.display = (step.id === 'done' || _fmStepIndex === 0) ? 'none' : 'inline-block';
+      if (saveShortcutBtn) saveShortcutBtn.style.display = (step.id === 'done' || (_fmStepIndex === 0 && _fmHighWater === 0)) ? 'none' : 'inline-block';
       // Next/save button row
       const nextRow = document.getElementById('fmNextRow');
       const nextBtn = document.getElementById('fmNextBtn');
