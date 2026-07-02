@@ -234,13 +234,15 @@
       display: flex; gap: 8px;
       overflow-x: auto;
       scroll-snap-type: x mandatory;
-      padding: 10px calc(50% - 38px) 14px;
+      /* Extra bottom padding gives the arc's dipped edge pills room —
+         overflow-x:auto clips vertically too, so they must stay inside. */
+      padding: 10px calc(50% - 38px) 40px;
       scrollbar-width: none;
       -webkit-overflow-scrolling: touch;
     }
     .fm-wheel::-webkit-scrollbar { display: none; }
-    /* One-handed reach: keep the wheel raised off the very bottom edge. */
-    body.bb-fm-full #fmContent.fm-content-hero .fm-wheel { margin-bottom: min(9vh, 72px); }
+    /* One-handed reach: keep the wheel block raised off the very bottom edge. */
+    body.bb-fm-full #fmContent.fm-content-hero { padding-bottom: min(9vh, 72px); }
     .fm-wheel-btn {
       scroll-snap-align: center;
       flex: 0 0 auto; min-width: 62px;
@@ -250,10 +252,20 @@
       font-family: inherit; font-weight: 700; font-size: 0.95em;
       display: flex; flex-direction: column; align-items: center; gap: 2px;
       cursor: pointer; -webkit-tap-highlight-color: transparent;
-      transition: transform 0.15s, background 0.15s, color 0.15s, border-color 0.15s;
+      /* Arc offsets (--arc-y/--arc-rot) are set per scroll frame in
+         _fmInitWheel — no transform transition, or they'd smear behind
+         the finger while scrolling. */
+      transform: translateY(var(--arc-y, 0px)) rotate(var(--arc-rot, 0deg)) scale(var(--arc-scale, 1));
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
       box-sizing: border-box;
     }
-    .fm-wheel-btn.center { transform: scale(1.08); border-color: var(--wb-color, var(--brand-primary)); }
+    .fm-wheel-btn.center { --arc-scale: 1.08; border-color: var(--wb-color, var(--brand-primary)); }
+    .fm-wheel-hint {
+      text-align: center;
+      font-size: 0.78em; font-weight: 600;
+      color: #adb5bd;
+      margin: 0 0 2px;
+    }
     .fm-wheel-btn.sel { background: var(--wb-color, var(--brand-primary)); color: #fff; }
     .fm-wheel-btn.linked { outline: 2px dashed var(--brand-primary); outline-offset: 2px; }
     .fm-wheel-btn img { width: 36px; height: 36px; object-fit: contain; }

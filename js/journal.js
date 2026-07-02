@@ -4418,8 +4418,8 @@ window.addEventListener('pageshow', () => {
       </div>`;
     }
 
-    function _fmWheelHtml(items) {
-      return `<div class="fm-wheel" id="fmWheel">${items.map(it => `<button type="button"
+    function _fmWheelHtml(items, extraHintHtml) {
+      return `<div class="fm-wheel-block"><div class="fm-wheel" id="fmWheel">${items.map(it => `<button type="button"
           class="fm-wheel-btn${it.cls ? ' ' + it.cls : ''}${it.init ? ' init' : ''}"
           data-val="${it.val}" data-label="${it.label}" data-color="${it.color}"
           ${it.emoji ? `data-emoji="${it.emoji}"` : ''} ${it.img ? `data-img="${it.img}"` : ''}
@@ -4428,7 +4428,8 @@ window.addEventListener('pageshow', () => {
           ${it.img ? `<img src="${it.img}" alt="">` : ''}
           <span class="fm-wheel-label">${it.label}</span>
           ${it.sub ? `<span class="fm-wheel-sub">${it.sub}</span>` : ''}
-        </button>`).join('')}</div>`;
+        </button>`).join('')}</div>
+        <p class="fm-wheel-hint">${BB.t('journal.fm.wheelHint')}</p>${extraHintHtml || ''}</div>`;
     }
 
     /** The wheel value the user has actually committed on this step (null = none). */
@@ -4491,13 +4492,23 @@ window.addEventListener('pageshow', () => {
       const btns = Array.prototype.slice.call(wheel.querySelectorAll('.fm-wheel-btn'));
       if (!btns.length) return;
       const update = () => {
+        // A scroll rAF can fire after the step re-rendered and replaced this
+        // wheel — painting the new step's hero with stale buttons. Bail out.
+        if (!wheel.isConnected) return;
         const wr = wheel.getBoundingClientRect();
         const wc = wr.left + wr.width / 2;
+        const half = Math.max(1, wr.width / 2);
         let best = null, bd = Infinity;
         btns.forEach(b => {
           const r = b.getBoundingClientRect();
-          const d = Math.abs(r.left + r.width / 2 - wc);
-          if (d < bd) { bd = d; best = b; }
+          const d = (r.left + r.width / 2 - wc) / half; // signed −1…1 across the wheel
+          const ad = Math.abs(d);
+          if (ad < bd) { bd = ad; best = b; }
+          // Slight arc, as if the pills sit on the rim of a big wheel: dip and
+          // tilt grow with distance from the centre (apex).
+          const dc = Math.max(-1, Math.min(1, d));
+          b.style.setProperty('--arc-y', (Math.min(1, ad * ad) * 26).toFixed(1) + 'px');
+          b.style.setProperty('--arc-rot', (dc * 9).toFixed(2) + 'deg');
         });
         if (best && !best.classList.contains('center')) {
           btns.forEach(b => b.classList.toggle('center', b === best));
@@ -4685,6 +4696,7 @@ window.addEventListener('pageshow', () => {
           const _committedBucket = (_fmSleepClear || selectedSleep == null) ? null : _fmSleepBucketOf(selectedSleep);
           const _initBucket = _committedBucket !== null ? _committedBucket
             : (_fmSleepSuggestion !== null ? _fmSleepSuggestion : 8);
+          const _sqHint = `<p class="fm-wheel-hint">${BB.t('journal.sleepQualityHint')}</p>`;
           const _sleepWheel = _fmWheelHtml(_FM_SLEEP_RANGES.map(r => {
             const isSel = _committedBucket === r.val;
             const [emoji, ...rest] = r.label.split(' ');
@@ -4701,12 +4713,11 @@ window.addEventListener('pageshow', () => {
               onclick: _slOnclick,
               extra: `onpointerdown="_fmSleepPtrDown(${r.val})" onpointerup="_fmSleepPtrUp()" onpointercancel="_fmSleepPtrCancel()"`,
             };
-          }));
+          }), _sqHint);
           // Small retry link when the auto-import errored (sync on, nothing pulled in)
           const _retryLink = (BB.storage.get('HealthSyncEnabled') === '1' && _fmSleepError)
             ? `<p style="text-align:center;margin:0;"><button onclick="importSleepFromHealth()" style="background:none;border:none;color:var(--brand-primary);font-size:0.82em;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px;-webkit-tap-highlight-color:transparent;">${_fmSleepError === 'nodata' ? '🤷 No sleep data found — try again' : '❌ Sync failed — try again'}</button></p>` : '';
-          const _sqHint = `<p style="text-align:center;font-size:0.78em;color:#adb5bd;margin-top:0;margin-bottom:0;">${BB.t('journal.sleepQualityHint')}</p>`;
-          return _fmHeroHtml() + _retryLink + _sleepWheel + _sqHint;
+          return _fmHeroHtml() + _retryLink + _sleepWheel;
         }
 
         case 'sleepQuality': {

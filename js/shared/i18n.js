@@ -418,6 +418,7 @@
           eyebrowMood: 'Mood',
           eyebrowEnergy: 'Energy',
           eyebrowSleep: 'Sleep',
+          wheelHint: 'Swipe to change responses. Tap to confirm.',
         },
         sync: {
           apple: 'Synced from Apple Health',
