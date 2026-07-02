@@ -5169,7 +5169,7 @@ window.addEventListener('pageshow', () => {
               <button type="button" class="fm-wheel-btn fm-done-del" onclick="_fmDoneDelete()">
                 <span class="fm-wheel-emoji">🗑️</span><span class="fm-wheel-label">${_delLabel}</span>
               </button>
-              <button type="button" class="fm-wheel-btn fm-done-save" onclick="_fmNext()" ${_noChanges ? 'disabled' : ''}>
+              <button type="button" class="fm-wheel-btn fm-done-save${_noChanges ? ' grey' : ''}" onclick="_fmNext()">
                 <span class="fm-wheel-emoji">${_saveEmoji}</span><span class="fm-wheel-label">${_saveLabel}</span>
               </button>
             </div>`;

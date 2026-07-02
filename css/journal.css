@@ -282,7 +282,7 @@
     .fm-done-actions .fm-wheel-emoji { font-size: 1.5em; line-height: 1.1; }
     .fm-done-del  { border-color: #ffc9c9 !important; color: #e03131 !important; background: #fff5f5 !important; }
     .fm-done-save { --wb-color: var(--fm-accent, var(--brand-primary)); background: var(--fm-accent, var(--brand-primary)) !important; color: #fff !important; border-color: transparent !important; }
-    .fm-done-save[disabled] { background: #adb5bd !important; cursor: default; }
+    .fm-done-save.grey { background: #adb5bd !important; }
     .fm-wheel-btn {
       scroll-snap-align: center;
       flex: 0 0 auto; min-width: 62px;
