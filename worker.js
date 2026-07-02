@@ -32,14 +32,21 @@
  * Configured by wrangler.json. Two settings there are load-bearing — do not
  * remove them or this whole file becomes dead code:
  *   - assets.binding = "ASSETS"          — wires up env.ASSETS (used below).
- *   - assets.run_worker_first = ["/", "/welcome", "/version.json"]
+ *   - assets.run_worker_first = ["/", "/welcome", "/index.html", "/version.json"]
  *         By default Cloudflare serves a matching static asset BEFORE the
  *         Worker, so `/` would resolve straight to index.html (the app) and
  *         `/welcome` straight to welcome.html (always the Bear page), and this
  *         script would never run. run_worker_first forces the Worker to handle
- *         these paths first, so the `/` + `/welcome` → landing rewrite and the
- *         /version.json CORS headers below actually take effect. Every other
- *         path stays asset-first (no Worker invocation).
+ *         these paths first, so the `/` + `/welcome` → landing rewrite, the
+ *         /index.html → app rewrite, and the /version.json CORS headers below
+ *         actually take effect. Every other path stays asset-first (no Worker
+ *         invocation).
+ *
+ * `/index.html` needs the same treatment as the landing pages but in the
+ * opposite direction: html_handling redirects a direct request for
+ * /index.html to `/` (307), and `/` is the landing page — so without the
+ * rewrite below, "open the web app" links on the landing page just reloaded
+ * the landing page.
  *
  * Note: this worker runs at the edge — it is unrelated to service-worker.js,
  * which runs in the browser.
@@ -85,6 +92,19 @@ export default {
       const landing = HOST_LANDING_MAP[url.hostname] || DEFAULT_LANDING;
       const target = new URL(url);
       target.pathname = landing;
+      return env.ASSETS.fetch(new Request(target.toString(), request));
+    }
+
+    // /index.html is the web app itself. Left to the asset binding, the
+    // default html_handling ("auto-trailing-slash") answers it with a 307
+    // redirect to `/` — which the landing rewrite above turns back into the
+    // welcome page, so every "open the web app" link just reloaded the
+    // landing. Serve the asset at its extensionless path (`/`) instead:
+    // env.ASSETS.fetch talks straight to the asset layer, so the landing
+    // rewrite doesn't re-run. Requires "/index.html" in run_worker_first.
+    if (url.pathname === '/index.html') {
+      const target = new URL(url);
+      target.pathname = '/';
       return env.ASSETS.fetch(new Request(target.toString(), request));
     }
 
