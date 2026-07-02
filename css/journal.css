@@ -241,9 +241,23 @@
       -webkit-overflow-scrolling: touch;
     }
     .fm-wheel::-webkit-scrollbar { display: none; }
-    /* One-handed reach: keep the wheel block raised off the very bottom edge.
-       (Not on notes — its Next row sits directly below and would leave a gap.) */
-    body.bb-fm-full #fmContent.fm-content-hero:not(.fm-notes) { padding-bottom: min(9vh, 72px); }
+    /* One-handed reach: keep the wheel block raised off the very bottom edge. */
+    body.bb-fm-full #fmContent.fm-content-hero { padding-bottom: min(9vh, 72px); }
+    /* Notes: in-content Next button sits where the wheel pills sit on the
+       other steps (extra bottom margin stands in for the wheel's own padding
+       + swipe hint), with the textarea above it and a smaller hero. */
+    .fm-notes-next {
+      width: 100%;
+      padding: 14px;
+      margin: 14px 0 min(7vh, 60px);
+      background: var(--fm-accent, var(--brand-primary));
+      color: #fff;
+      border: none; border-radius: 14px;
+      font-family: inherit; font-size: 1em; font-weight: 700;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
+    }
+    #fmContent.fm-notes .fm-hero { min-height: 96px; }
+    #fmContent.fm-notes .fm-hero-emoji { width: 84px; height: 84px; font-size: 46px; }
     .fm-wheel-btn {
       scroll-snap-align: center;
       flex: 0 0 auto; min-width: 62px;

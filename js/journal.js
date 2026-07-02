@@ -4349,7 +4349,8 @@ window.addEventListener('pageshow', () => {
       const _confirmStep = localStorage.getItem('fmConfirmStep') === 'true';
       // Auto steps always auto-advance (no Next button needed, even in confirm-step mode).
       // Non-auto steps show Next always; confirm-step mode is handled in _fmAdvance().
-      if (step.auto) {
+      // Notes renders its own in-content Next (positioned in the wheel slot).
+      if (step.auto || step.id === 'notes') {
         nextRow.style.display = 'none';
       } else {
         nextRow.style.display = 'flex';
@@ -5053,7 +5054,8 @@ window.addEventListener('pageshow', () => {
                 style="width:100%;height:68px;border:2px solid #e9ecef;border-radius:12px;padding:12px;margin-top:8px;
                 font-size:0.95em;font-family:inherit;resize:none;box-sizing:border-box;outline:none;transition:border-color 0.15s;"
                 oninput="this.style.borderColor='var(--brand-primary)'">${selectedIntention||''}</textarea>
-            </details>` : ''}`;
+            </details>` : ''}
+            <button class="fm-notes-next" onclick="_fmNext()">${BB.t('common.next')} →</button>`;
         }
 
         case 'done': {
