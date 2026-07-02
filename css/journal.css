@@ -228,6 +228,29 @@
       0%, 100% { transform: translateY(0) rotate(0deg); }
       50%      { transform: translateY(-2px) rotate(-2.5deg); }
     }
+
+    /* Sparks flying off the hero (the active centre item only): each spark
+       travels outward along its own vector (--sx/--sy), growing then fading.
+       Staggered delays keep it a twinkle, not a burst. */
+    .fm-hero-emoji-wrap { position: relative; display: inline-block; }
+    .fm-spark {
+      position: absolute; top: 50%; left: 50%;
+      line-height: 1; color: #ffb400;
+      text-shadow: 0 0 6px rgba(255, 200, 60, 0.8);
+      pointer-events: none; opacity: 0; z-index: 1;
+      animation: fmSpark 2.4s ease-out infinite;
+    }
+    .fm-spark.s1 { --sx: 58px;  --sy: -60px; font-size: 15px; animation-delay: 0s;    }
+    .fm-spark.s2 { --sx: -62px; --sy: -44px; font-size: 11px; animation-delay: 0.5s;  }
+    .fm-spark.s3 { --sx: 68px;  --sy: 18px;  font-size: 12px; animation-delay: 0.95s; }
+    .fm-spark.s4 { --sx: -50px; --sy: 44px;  font-size: 10px; animation-delay: 1.4s;  }
+    .fm-spark.s5 { --sx: 8px;   --sy: -74px; font-size: 12px; animation-delay: 1.85s; }
+    @keyframes fmSpark {
+      0%   { transform: translate(-50%, -50%) translate(calc(var(--sx) * 0.45), calc(var(--sy) * 0.45)) scale(0.2) rotate(0deg); opacity: 0; }
+      20%  { opacity: 1; }
+      70%  { opacity: 0.85; }
+      100% { transform: translate(-50%, -50%) translate(var(--sx), var(--sy)) scale(1.2) rotate(120deg); opacity: 0; }
+    }
     .fm-hero-value {
       font-size: 2.3em; font-weight: 800; color: #343a40; line-height: 1.1;
       text-align: center;
@@ -278,6 +301,7 @@
     .fm-wheel-btn:nth-child(3n) img,  .fm-wheel-btn:nth-child(3n) .fm-wheel-emoji  { animation-delay: -1.7s; }
     @media (prefers-reduced-motion: reduce) {
       .fm-hero-emoji, .fm-wheel-btn img, .fm-wheel-emoji, .step-hero-emoji { animation: none !important; }
+      .fm-spark { animation: none !important; opacity: 0 !important; }
     }
     /* One-handed reach: keep the wheel block raised off the very bottom edge. */
     body.bb-fm-full #fmContent.fm-content-hero { padding-bottom: min(9vh, 72px); }

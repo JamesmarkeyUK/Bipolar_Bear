@@ -244,16 +244,6 @@
 
       <div id="moodSelectorTip" style="display:none;text-align:center;font-size:0.82em;color:#6c757d;margin-bottom:8px;"></div>
 
-      <div class="form-group hidden-until-mood" id="energySection">
-        <span id="healthEnergyBtn" style="display:block;margin-bottom:5px;font-weight:600;color:#495057;font-size:0.9em;"><span id="healthEnergyBtnText">⚡ Energy</span></span>
-        <div class="step-hero" id="energyStepHero" style="display:none;">
-          <div class="step-hero-emoji" id="energyHeroEmoji"></div>
-          <div class="step-hero-value" id="energyHeroValue"></div>
-          <div class="step-hero-badge" id="energyHeroBadge" style="display:none;"></div>
-        </div>
-        <div class="energy-selector" id="energySelector"></div>
-      </div>
-
       <div class="form-group hidden-until-mood" id="sleepSection">
         <label id="sleepLabel" style="display:none;">😴 Sleep Hours</label>
         <div id="sleepBtnRow" style="position:relative;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">
@@ -273,6 +263,16 @@
             <button type="button" id="sqGood"   onclick="_setSleepQuality('good')"   style="flex:1;padding:8px 4px;border:1.5px solid #dee2e6;border-radius:10px;background:white;color:#6c757d;font-size:0.82em;cursor:pointer;-webkit-tap-highlight-color:transparent;">😊 <span data-i18n="journal.value.good">Good</span></button>
           </div>
         </div>
+      </div>
+
+      <div class="form-group hidden-until-mood" id="energySection">
+        <span id="healthEnergyBtn" style="display:block;margin-bottom:5px;font-weight:600;color:#495057;font-size:0.9em;"><span id="healthEnergyBtnText">⚡ Energy</span></span>
+        <div class="step-hero" id="energyStepHero" style="display:none;">
+          <div class="step-hero-emoji" id="energyHeroEmoji"></div>
+          <div class="step-hero-value" id="energyHeroValue"></div>
+          <div class="step-hero-badge" id="energyHeroBadge" style="display:none;"></div>
+        </div>
+        <div class="energy-selector" id="energySelector"></div>
       </div>
 
       <div class="form-group hidden-until-mood" id="medicationSection">

@@ -3780,8 +3780,9 @@ window.addEventListener('pageshow', () => {
       const steps = [
         { id:'mood', title:_fmMoodTitle(), subtitle:'', auto:true },
       ];
-      if (!_disSteps.includes('energy'))
-        steps.push({ id:'energy', title:_t('journal.fm.energyTitle'), subtitle:_t('journal.fm.energySub', { phrase: _dh.dayPhrase }), auto:true });
+      // Sleep is asked before energy. sleepQuality must stay directly after
+      // sleep — the long-press jump and the auto-skip in _fmAdvance rely on
+      // that adjacency.
       if (!_disSteps.includes('sleep')) {
         const _slNotYet = _sleepNotYet();
         steps.push({
@@ -3795,6 +3796,8 @@ window.addEventListener('pageshow', () => {
       }
       // sleepQuality step is always included — only shown when user long-presses a sleep range
       steps.push({ id:'sleepQuality', title:_t('journal.fm.sleepQualityTitle'), subtitle:'', auto:true });
+      if (!_disSteps.includes('energy'))
+        steps.push({ id:'energy', title:_t('journal.fm.energyTitle'), subtitle:_t('journal.fm.energySub', { phrase: _dh.dayPhrase }), auto:true });
       if (!_disSteps.includes('medication'))
         steps.push({ id:'medication', title:_t('journal.fm.medsTitle', { phrase: _dh.nightPhrase }), subtitle:'', auto:true });
       // More data step — all activated tracking fields shown together (order mirrors field picker)
@@ -3984,6 +3987,28 @@ window.addEventListener('pageshow', () => {
       new MutationObserver(sync).observe(card, { attributes: true, attributeFilter: ['style'] });
       sync();
     })();
+
+    // Keyboard: ← / → cycle the spinner wheel on desktop. Scrolling the
+    // adjacent pill into the centre fires the wheel's scroll pipeline, so the
+    // preview, dial needle and haptic tick all follow as if swiped.
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      if (typeof _fmActive === 'undefined' || !_fmActive) return;
+      const wheel = document.getElementById('fmWheel');
+      if (!wheel) return;
+      const _ae = document.activeElement;
+      if (_ae && ['TEXTAREA', 'INPUT', 'SELECT'].includes(_ae.tagName)) return;
+      if (document.querySelector('.confirm-modal.active')) return;
+      const btns = Array.prototype.slice.call(wheel.querySelectorAll('.fm-wheel-btn'));
+      if (!btns.length) return;
+      const cur = btns.findIndex(b => b.classList.contains('center'));
+      const from = cur < 0 ? Math.floor(btns.length / 2) : cur;
+      const next = Math.max(0, Math.min(btns.length - 1, from + (e.key === 'ArrowRight' ? 1 : -1)));
+      if (next === from && cur >= 0) return; // already at the end stop
+      const b = btns[next];
+      wheel.scrollTo({ left: b.offsetLeft - (wheel.clientWidth - b.offsetWidth) / 2, behavior: 'smooth' });
+      e.preventDefault();
+    });
 
     function _openFocusedMode() {
       if (editingEntry) return;
@@ -4449,9 +4474,16 @@ window.addEventListener('pageshow', () => {
     // bottom. Sliding the wheel previews the centred option in the hero
     // (ghosted, dashed outline until committed); tapping commits + advances.
 
+    /** Spark particles that fly off the hero emoji (the active centre item). */
+    function _fmSparksHtml() {
+      return `<span class="fm-spark s1">✦</span><span class="fm-spark s2">✦</span><span class="fm-spark s3">✧</span><span class="fm-spark s4">✦</span><span class="fm-spark s5">✧</span>`;
+    }
+
     function _fmHeroHtml() {
       return `<div class="fm-hero">
-        <div class="fm-hero-emoji" id="fmHeroEmoji"></div>
+        <div class="fm-hero-emoji-wrap">${_fmSparksHtml()}
+          <div class="fm-hero-emoji" id="fmHeroEmoji"></div>
+        </div>
         <div class="fm-hero-value" id="fmHeroValue"></div>
         <div class="fm-hero-badge" id="fmHeroBadge" style="visibility:hidden;">&nbsp;</div>
       </div>`;
@@ -5055,7 +5087,9 @@ window.addEventListener('pageshow', () => {
           const _notesInitVal = (document.getElementById('notes')||{}).value||'';
           const _initWords = _notesInitVal.trim() ? _notesInitVal.trim().split(/\s+/).length : 0;
           return `<div class="fm-hero">
-              <div class="fm-hero-emoji${_notesInitVal.trim() ? '' : ' ghost'}" id="fmHeroEmoji">📝</div>
+              <div class="fm-hero-emoji-wrap">${_fmSparksHtml()}
+                <div class="fm-hero-emoji${_notesInitVal.trim() ? '' : ' ghost'}" id="fmHeroEmoji">📝</div>
+              </div>
             </div>
             <textarea id="fmNotesInput" placeholder="${BB.t('journal.placeholder.notes')}"
             style="width:100%;min-height:130px;border:2px solid #e9ecef;border-radius:12px;padding:12px;
@@ -5097,12 +5131,13 @@ window.addEventListener('pageshow', () => {
           const _doneStepsStr = _doneStepsVal != null ? ` · 🏃 ${_doneStepsVal >= 1000 ? Math.round(_doneStepsVal/1000)+'k' : _doneStepsVal}` : '';
           const rows = [
             // Mood is shown as the big bear hero above, not as a list row.
-            _fmEnergyClear
-              ? { text:`<span style="color:#adb5bd;">Energy: —</span>`, step:'energy' }
-              : { text:`Energy: ${eLabel}${_doneStepsStr}`, step:'energy', note:_sn('energy') },
+            // Sleep first — mirrors the ask order of the steps.
             selectedSleep != null
               ? { text:`🛌 Sleep: ${sLabel}${selectedSleepQuality ? ` · ${selectedSleepQuality === 'good' ? '😊 Good' : selectedSleepQuality === 'unsure' ? '😐 OK' : '😴 Bad'}` : ''}`, step:'sleep', note:_sn('sleep') }
               : { text:`<span style="color:#adb5bd;">🛌 Sleep: —</span>`, step:'sleep' },
+            _fmEnergyClear
+              ? { text:`<span style="color:#adb5bd;">Energy: —</span>`, step:'energy' }
+              : { text:`Energy: ${eLabel}${_doneStepsStr}`, step:'energy', note:_sn('energy') },
             selectedMedication
               ? { text:selectedMedication==='taken'?'✅ Medication taken':'❌ Medication not taken', step:'medication', note:_sn('medication') }
               : { text:`<span style="color:#adb5bd;">💊 Medication: —</span>`, step:'medication' },
@@ -5172,7 +5207,9 @@ window.addEventListener('pageshow', () => {
           // Bear hero: the chosen mood shown big, instead of as a summary row.
           const _linkedHero = selectedLinkedMood ? ` <span style="color:#adb5bd;font-weight:600;">/</span> <img src="images/moods/${selectedLinkedMood}.png" style="width:34px;height:34px;object-fit:contain;vertical-align:middle;opacity:0.9;"> ${cap(selectedLinkedMood)}` : '';
           const _heroHtml = `<div class="fm-hero">
-              <div class="fm-hero-emoji"><img src="images/moods/${selectedMood}.png" alt=""></div>
+              <div class="fm-hero-emoji-wrap">${_fmSparksHtml()}
+                <div class="fm-hero-emoji"><img src="images/moods/${selectedMood}.png" alt=""></div>
+              </div>
               <div class="fm-hero-value" style="color:${mc};">${cap(selectedMood)}${_linkedHero}</div>
             </div>`;
           // Delete + Save styled as wheel pills, sitting in the wheel slot.

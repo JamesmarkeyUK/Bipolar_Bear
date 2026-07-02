@@ -404,7 +404,10 @@
 //       emoji at full visibility inside the dashed ring, hero/pill icons get a
 //       gentle looping bob, and the medication step moves "Manage medications"
 //       below the wheel to the bottom of the page.
-const CACHE_NAME = 'bipolarbear-v113';
+// v114: Focused mode — sleep is asked before energy (step order + full-form
+//       section order + review-list order), ← / → cycle the spinner on
+//       desktop, and sparks fly off the hero emoji (the active centre item).
+const CACHE_NAME = 'bipolarbear-v114';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
