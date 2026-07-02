@@ -213,12 +213,20 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 64px; line-height: 1; box-sizing: border-box;
       transition: opacity 0.15s;
+      animation: fmHeroFloat 3.2s ease-in-out infinite;
     }
     .fm-hero-emoji img { width: 86px; height: 86px; object-fit: contain; }
-    .fm-hero-emoji.ghost {
-      border: 3px dashed #ced4da;
-      opacity: 0.55;
-      filter: grayscale(0.35);
+    /* Uncommitted preview: dashed ring only — the emoji itself stays fully
+       visible (no fade/grayscale). */
+    .fm-hero-emoji.ghost { border: 3px dashed #ced4da; }
+    /* Gentle idle animations — calm, small amplitudes. */
+    @keyframes fmHeroFloat {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-5px); }
+    }
+    @keyframes fmPillBob {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50%      { transform: translateY(-2px) rotate(-2.5deg); }
     }
     .fm-hero-value {
       font-size: 2.3em; font-weight: 800; color: #343a40; line-height: 1.1;
@@ -237,18 +245,40 @@
     }
 
     /* ── Focused mode: slider-wheel option picker ── */
+    .fm-wheel-block { position: relative; }
+    /* Dial needle: fixed pointer over the wheel's centre slot. */
+    .fm-dial-arrow {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 0; height: 0;
+      border-left: 7px solid transparent; border-right: 7px solid transparent;
+      border-top: 9px solid var(--fm-accent, var(--brand-primary));
+      pointer-events: none; z-index: 2;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.18));
+    }
     .fm-wheel {
       position: relative;
       display: flex; gap: 8px;
       overflow-x: auto;
       scroll-snap-type: x mandatory;
-      /* Extra bottom padding gives the arc's dipped edge pills room —
-         overflow-x:auto clips vertically too, so they must stay inside. */
-      padding: 10px calc(50% - 38px) 40px;
+      /* Top padding clears the dial arrow + the centred pill's outline ring;
+         extra bottom padding gives the arc's dipped edge pills room —
+         overflow-x:auto clips vertically too, so they must stay inside.
+         Left/right padding is recomputed per wheel in _fmInitWheel so the
+         first/last pill can always centre (spinner works even when every
+         pill fits on screen). */
+      padding: 20px calc(50% - 38px) 40px;
       scrollbar-width: none;
       -webkit-overflow-scrolling: touch;
     }
     .fm-wheel::-webkit-scrollbar { display: none; }
+    /* Idle bob on the pill icons (mood bears, done-step action emojis) —
+       staggered so neighbours don't move in unison. */
+    .fm-wheel-btn img, .fm-wheel-emoji { animation: fmPillBob 2.6s ease-in-out infinite; }
+    .fm-wheel-btn:nth-child(2n) img,  .fm-wheel-btn:nth-child(2n) .fm-wheel-emoji  { animation-delay: -0.9s; }
+    .fm-wheel-btn:nth-child(3n) img,  .fm-wheel-btn:nth-child(3n) .fm-wheel-emoji  { animation-delay: -1.7s; }
+    @media (prefers-reduced-motion: reduce) {
+      .fm-hero-emoji, .fm-wheel-btn img, .fm-wheel-emoji, .step-hero-emoji { animation: none !important; }
+    }
     /* One-handed reach: keep the wheel block raised off the very bottom edge. */
     body.bb-fm-full #fmContent.fm-content-hero { padding-bottom: min(9vh, 72px); }
     /* Notes: in-content Next button sits where the wheel pills sit on the
@@ -266,6 +296,12 @@
     }
     #fmContent.fm-notes .fm-hero { min-height: 96px; }
     #fmContent.fm-notes .fm-hero-emoji { width: 84px; height: 84px; font-size: 46px; }
+
+    /* Medication: the "Manage medications" link moves below the wheel to the
+       very bottom of the page — it takes over the raise zone, so the step's
+       own bottom padding shrinks and the wheel stays in its usual slot. */
+    body.bb-fm-full #fmContent.fm-content-hero.fm-meds { padding-bottom: 14px; }
+    .fm-meds-manage { text-align: center; margin-top: 12px; }
 
     /* ── Done / "ready to save": bear hero + review list + delete/save pills ── */
     #fmContent.fm-done .fm-hero { flex: 0 0 auto; min-height: 0; padding: 4px 0 10px; gap: 8px; }
@@ -299,7 +335,14 @@
       transition: background 0.15s, color 0.15s, border-color 0.15s;
       box-sizing: border-box;
     }
-    .fm-wheel-btn.center { --arc-scale: 1.08; border-color: var(--wb-color, var(--brand-primary)); }
+    /* Centred pill: framed like the slot of a spinner dial — its own border
+       plus an offset outer ring, under the fixed dial arrow. */
+    .fm-wheel-btn.center {
+      --arc-scale: 1.08;
+      border-color: var(--wb-color, var(--brand-primary));
+      outline: 2px solid var(--wb-color, var(--brand-primary));
+      outline-offset: 3px;
+    }
     .fm-wheel-hint {
       text-align: center;
       font-size: 0.78em; font-weight: 600;
@@ -318,7 +361,7 @@
       align-items: center; gap: 6px;
       padding: 8px 0 12px;
     }
-    .step-hero-emoji { font-size: 44px; line-height: 1.15; }
+    .step-hero-emoji { font-size: 44px; line-height: 1.15; animation: fmHeroFloat 3.2s ease-in-out infinite; }
     .step-hero-emoji img { width: 52px; height: 52px; object-fit: contain; }
     .step-hero-value { font-size: 1.5em; font-weight: 800; color: #343a40; line-height: 1.1; }
     .step-hero-value .u { font-size: 0.6em; font-weight: 700; color: #868e96; }

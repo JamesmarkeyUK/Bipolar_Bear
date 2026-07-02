@@ -4383,6 +4383,7 @@ window.addEventListener('pageshow', () => {
       _fmContentEl.classList.toggle('fm-content-hero', _isHeroStep);
       _fmContentEl.classList.toggle('fm-notes', step.id === 'notes');
       _fmContentEl.classList.toggle('fm-done', step.id === 'done');
+      _fmContentEl.classList.toggle('fm-meds', step.id === 'medication');
       // setTimeout(0), not rAF: rAF can starve in a backgrounded/hidden WebView
       // and the wheel would never get its initial centring + hero paint.
       if (_hasWheel) setTimeout(_fmInitWheel, 0);
@@ -4457,7 +4458,7 @@ window.addEventListener('pageshow', () => {
     }
 
     function _fmWheelHtml(items, extraHintHtml) {
-      return `<div class="fm-wheel-block"><div class="fm-wheel" id="fmWheel">${items.map(it => `<button type="button"
+      return `<div class="fm-wheel-block"><div class="fm-dial-arrow" aria-hidden="true"></div><div class="fm-wheel" id="fmWheel">${items.map(it => `<button type="button"
           class="fm-wheel-btn${it.cls ? ' ' + it.cls : ''}${it.init ? ' init' : ''}"
           data-val="${it.val}" data-label="${it.label}" data-color="${it.color}"
           ${it.emoji ? `data-emoji="${it.emoji}"` : ''} ${it.img ? `data-img="${it.img}"` : ''}
@@ -4530,6 +4531,12 @@ window.addEventListener('pageshow', () => {
       if (!wheel) return;
       const btns = Array.prototype.slice.call(wheel.querySelectorAll('.fm-wheel-btn'));
       if (!btns.length) return;
+      // Spinner works even when every pill fits on screen (e.g. the two
+      // medication pills): pad the edges so the first/last pill can centre,
+      // which always leaves scrollable overflow to swipe through.
+      wheel.style.paddingLeft  = Math.max(0, (wheel.clientWidth - btns[0].offsetWidth) / 2) + 'px';
+      wheel.style.paddingRight = Math.max(0, (wheel.clientWidth - btns[btns.length - 1].offsetWidth) / 2) + 'px';
+      let _settled = false; // suppress the haptic tick on the initial centring
       const update = () => {
         // A scroll rAF can fire after the step re-rendered and replaced this
         // wheel — painting the new step's hero with stale buttons. Bail out.
@@ -4552,7 +4559,14 @@ window.addEventListener('pageshow', () => {
         if (best && !best.classList.contains('center')) {
           btns.forEach(b => b.classList.toggle('center', b === best));
           _fmHeroPreview(best);
+          // Dial needle takes the colour of the slot it points at.
+          const _arrow = wheel.parentElement && wheel.parentElement.querySelector('.fm-dial-arrow');
+          if (_arrow) _arrow.style.borderTopColor = best.dataset.color || '';
+          // Dial tick as the spinner clicks onto a new slot (not on the
+          // programmatic initial centring).
+          if (_settled) nativeHaptic('light');
         }
+        _settled = true;
       };
       wheel.addEventListener('scroll', () => {
         if (_fmWheelRAF) return;
@@ -4792,9 +4806,10 @@ window.addEventListener('pageshow', () => {
             }
           } catch(e) {}
           const _medHintDone = BB.storage.get('MedHintDone') === '1';
-          const _manageRow = `<div style="text-align:center;margin-bottom:${_medHintDone ? '0' : '4'}px;">
+          // Sits below the wheel at the very bottom of the page.
+          const _manageRow = `<div class="fm-meds-manage">
               <button id="manageMedsBtn" onclick="_dismissMedHint();showMedicationList()" style="background:none;border:none;color:${_medHintDone ? 'var(--brand-primary)' : 'rgba(255,255,255,0.9)'};font-size:0.8em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;text-decoration:underline;text-underline-offset:2px;">✏️ Manage medications</button>
-              ${_medHintDone ? '' : `<div id="medHintEl" style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:4px;margin-bottom:10px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="8" y1="13" x2="8" y2="2" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round"/><polyline points="3,7 8,2 13,7" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,255,255,0.9);font-family:'Georgia',serif;letter-spacing:0.01em;text-shadow:0 1px 4px rgba(0,0,0,0.5);">${BB.t('journal.hint.logMed')}</span></div>`}
+              ${_medHintDone ? '' : `<div id="medHintEl" style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:4px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="8" y1="13" x2="8" y2="2" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round"/><polyline points="3,7 8,2 13,7" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,255,255,0.9);font-family:'Georgia',serif;letter-spacing:0.01em;text-shadow:0 1px 4px rgba(0,0,0,0.5);">${BB.t('journal.hint.logMed')}</span></div>`}
             </div>`;
           const _MED_OPTS = [
             { val:'not-taken', label:BB.t('journal.med.notTaken'), color:'var(--brand-primary)' },
@@ -4809,7 +4824,7 @@ window.addEventListener('pageshow', () => {
               onclick: `selectedMedication='${o.val}'; _fmAdvance();`,
             };
           }));
-          return medListHtml + _manageRow + _fmHeroHtml() + _medWheel;
+          return medListHtml + _fmHeroHtml() + _medWheel + _manageRow;
         }
 
         case 'goals':

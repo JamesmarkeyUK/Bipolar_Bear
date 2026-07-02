@@ -397,7 +397,14 @@
 //       age out on), and a footer note tells users "Posts and replies here
 //       automatically disappear after 7 days". Retention/rotation/footer all read
 //       one shared POST_RETENTION_DAYS constant.
-const CACHE_NAME = 'bipolarbear-v112';
+// v113: Focused mode spinner polish — wheels are always swipeable (edge padding
+//       computed per wheel so the first/last pill can centre, even when all
+//       pills fit on screen), a dial arrow + outline ring frame the centred
+//       pill with a light haptic tick per slot change, ghost previews show the
+//       emoji at full visibility inside the dashed ring, hero/pill icons get a
+//       gentle looping bob, and the medication step moves "Manage medications"
+//       below the wheel to the bottom of the page.
+const CACHE_NAME = 'bipolarbear-v113';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
