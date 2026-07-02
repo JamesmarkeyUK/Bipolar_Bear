@@ -12,7 +12,7 @@
     input, textarea { user-select: text; -webkit-user-select: text; }
 
     body {
-      font-family: -apple-system, 'Segoe UI', Tahoma, sans-serif;
+      font-family: 'Nunito', -apple-system, 'Segoe UI', Tahoma, sans-serif;
       background: #000;
       height: 100vh; height: 100dvh;
       overflow: hidden;

@@ -88,9 +88,11 @@ const manifest = JSON.parse(read('manifest-anonymous.json'));
 manifest.start_url = 'index.html';
 write('manifest.json', JSON.stringify(manifest, null, 2) + '\n');
 
-// ─── 4. CSS ─────────────────────────────────────────────────────────
+// ─── 4. CSS + fonts ─────────────────────────────────────────────────
 copy('css/theme.css');
 copy('css/anonymous.css');
+copy('css/fonts.css');
+copyDir('fonts');
 
 // ─── 5. JS — page script + shared modules used by anonymous.html ────
 // Note: js/shared/onboarding.js is intentionally excluded — it's only

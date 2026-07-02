@@ -387,7 +387,12 @@
 //       instead of being swept away; empty topics are still removed. Rotation
 //       also now requires a reply on the current topic — a topic with no
 //       responses stays up until it gets one, then rotates on the next UTC day.
-const CACHE_NAME = 'bipolarbear-v110';
+// v111: Nunito ships as the app-wide font (css/fonts.css + fonts/*.woff2,
+//       matching the App Store artwork), and the journal form's synced
+//       steps (sleep, energy) get the mockup treatment: big emoji, large
+//       value readout, "Synced from Apple/Android Health" badge, and a
+//       full-screen focused-mode layout with a slider-wheel option picker.
+const CACHE_NAME = 'bipolarbear-v111';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
@@ -428,6 +433,11 @@ const STATIC_ASSETS = [
 
   // Shared theme tokens (loaded before page-specific CSS).
   './css/theme.css',
+
+  // App-wide display font (Nunito variable, self-hosted).
+  './css/fonts.css',
+  './fonts/nunito-latin.woff2',
+  './fonts/nunito-latin-ext.woff2',
 
   // Page-specific stylesheets (extracted from inline <style> in Phase 4).
   './css/welcome.css',
