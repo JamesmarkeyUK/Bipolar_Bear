@@ -415,6 +415,16 @@
           outsideTitle: 'Did you go outside?',
           alcoholTitle: 'Any alcohol today?',
           budgetTitle: 'Budget on track?',
+          eyebrowMood: 'Mood',
+          eyebrowEnergy: 'Energy',
+          eyebrowSleep: 'Sleep',
+        },
+        sync: {
+          apple: 'Synced from Apple Health',
+          android: 'Synced from Health Connect',
+          generic: 'Synced from Health',
+          steps: '{n} steps',
+          bestGuess: 'Best guess from your health data',
         },
         field: {
           goals: '🏅 Goals',

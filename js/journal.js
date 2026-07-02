@@ -907,9 +907,10 @@ window.addEventListener('pageshow', () => {
           btn.style.background = btn.dataset.color;
           btn.style.color = 'white';
           selectedEnergy = parseFloat(btn.dataset.energy);
+          _updateEnergyHero();
           scheduleDraftSave();
         });
-        
+
         energySelector.appendChild(btn);
       });
 
@@ -954,6 +955,9 @@ window.addEventListener('pageshow', () => {
           b.style.background = b.dataset.color;
           b.style.color = 'white';
           selectedSleep = parseFloat(b.dataset.sleep);
+          // Manual pick overrides any synced value
+          _sleepHealthSynced = false;
+          _updateSleepHero();
         }
         btn.addEventListener('pointerdown', e => {
           _sqLpFired = false;
@@ -1551,6 +1555,8 @@ window.addEventListener('pageshow', () => {
           el.classList.remove('hidden-until-mood');
           el.classList.add('show-after-mood');
         });
+        _updateEnergyHero();
+        _updateSleepHero();
         // Auto-sync health data if setting is ON. Pass isAuto=true so these
         // never raise the OS permission sheet from an ordinary mood tap — they
         // only run when access was already granted (see importStepsFromHealth).
@@ -3642,6 +3648,8 @@ window.addEventListener('pageshow', () => {
     let _fmExtraSelected    = new Set();
     let _sleepSuggestedVal  = null;
     let _sleepHealthSynced  = false; // true only when sleep came from a health data sync
+    let _fmMoodSuggestion   = null; // best-guess mood derived from synced steps + sleep
+    let _fmStepsRaw         = null; // raw synced step count (number) for the hero readout
 
     const _FM_MOOD_COLORS  = { manic:'#ff4444', elevated:'var(--brand-primary)', stable:'#51cf66', good:'#51cf66', low:'#845ef7', depressed:'#5c7cfa' };
     const _FM_MOOD_LABELS  = { manic:BB.t('mood.manic'), elevated:BB.t('mood.elevated'), stable:BB.t('mood.stable'), good:BB.t('mood.stable'), low:BB.t('mood.low'), depressed:BB.t('mood.depressed') };
@@ -3660,6 +3668,30 @@ window.addEventListener('pageshow', () => {
       { val:9.5, label:'😴 9–10h', color:'#0074D9' },
       { val:11,  label:'💤 10+h',  color:'#7B68EE' },
     ];
+    const _FM_EYEBROWS = {
+      mood:   () => BB.t('journal.fm.eyebrowMood'),
+      energy: () => BB.t('journal.fm.eyebrowEnergy'),
+      sleep:  () => BB.t('journal.fm.eyebrowSleep'),
+    };
+
+    /** Platform-branded "Synced from …" badge label. */
+    function _syncSourceLabel() {
+      return isIOS() ? BB.t('journal.sync.apple')
+        : isAndroid() ? BB.t('journal.sync.android')
+        : BB.t('journal.sync.generic');
+    }
+
+    /** 7.53 → "7<span class=u>h</span> 32<span class=u>m</span>" for the hero readout. */
+    function _fmFmtSleepHM(hours) {
+      const totalMin = Math.round(hours * 60);
+      const h = Math.floor(totalMin / 60), m = totalMin % 60;
+      return `${h}<span class="u">h</span>${m ? ` ${m}<span class="u">m</span>` : ''}`;
+    }
+
+    /** Map exact sleep hours to the wheel bucket value (matches the label ranges). */
+    function _fmSleepBucketOf(h) {
+      return h <= 5.5 ? 5 : h < 7 ? 6.5 : h <= 9 ? 8 : h <= 10 ? 9.5 : 11;
+    }
 
     function _fmFormatPromptDate(d) {
       const lang = (window.BB && BB.i18n && BB.i18n.getLang && BB.i18n.getLang()) || 'en';
@@ -3938,6 +3970,17 @@ window.addEventListener('pageshow', () => {
       }
     }
 
+    // Full-screen focused mode: keep body.bb-fm-full in sync with the card's
+    // visibility so every open/close path (save, cancel, edit, switch-to-full-
+    // form) restores the rest of the page without each needing its own hook.
+    (function _fmFullscreenSync() {
+      const card = document.getElementById('focusedModeCard');
+      if (!card || typeof MutationObserver === 'undefined') return;
+      const sync = () => document.body.classList.toggle('bb-fm-full', card.style.display !== 'none');
+      new MutationObserver(sync).observe(card, { attributes: true, attributeFilter: ['style'] });
+      sync();
+    })();
+
     function _openFocusedMode() {
       if (editingEntry) return;
       _fmSteps = _buildFocusedSteps();
@@ -3954,6 +3997,8 @@ window.addEventListener('pageshow', () => {
       _fmSleepSuggestion   = null;
       _fmSleepError        = null;
       _fmSleepAutoSyncDone = false;
+      _fmMoodSuggestion    = null;
+      _fmStepsRaw          = null;
       _fmExtraSelected     = new Set();
       _fmPrevMood          = null;
       document.getElementById('entryFormCard').style.display = 'none';
@@ -3965,11 +4010,18 @@ window.addEventListener('pageshow', () => {
       if (exitLink) exitLink.style.display = '';
       _updateFocusModeBtn();
       _renderFocusedStep();
+      // Kick off health imports right away (not just on the energy/sleep steps)
+      // so the mood step can offer a best-guess default from steps + sleep.
+      if (BB.storage.get('HealthSyncEnabled') === '1') {
+        if (_fmStepsResult === null && !window._healthSyncInProgress) setTimeout(() => importStepsFromHealth(true), 0);
+        if (_fmSleepImported === null && !_fmSleepAutoSyncDone && !_sleepNotYet()) setTimeout(() => importSleepFromHealth(true), 350);
+      }
       setTimeout(() => {
         const _fc = document.getElementById('focusedModeCard');
         if (!_fc) return;
-        const _r = _fc.getBoundingClientRect();
-        window.scrollTo({ top: Math.max(0, _r.top + window.scrollY - Math.max(16, (window.innerHeight - _r.height) / 2)), behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        const _sv = document.getElementById('scroll-view');
+        if (_sv && _sv.scrollTop) _sv.scrollTo({ top: 0, behavior: 'smooth' });
       }, 80);
     }
 
@@ -4171,6 +4223,8 @@ window.addEventListener('pageshow', () => {
       document.querySelectorAll('[data-outside]').forEach(b => b.classList.toggle('selected', b.dataset.outside === selectedOutside));
       document.querySelectorAll('[data-alcohol]').forEach(b => b.classList.toggle('selected', b.dataset.alcohol === selectedAlcohol));
       document.querySelectorAll('[data-budget]').forEach(b => b.classList.toggle('selected', b.dataset.budget === selectedBudget));
+      _updateEnergyHero();
+      _updateSleepHero();
     }
 
     const _FM_MOOD_BG     = { manic:'#fff0f0', elevated:'var(--brand-secondary-tint)', stable:'#f0fff4', good:'#f0fff4', low:'#f5f0ff', depressed:'#f0f4ff' };
@@ -4205,11 +4259,21 @@ window.addEventListener('pageshow', () => {
         if (_stepCounter) _stepCounter.style.display = '';
       }
       document.getElementById('fmStepCounter').textContent = _fmStepIndex === 0 ? '' : `Step ${_fmStepIndex+1} of ${_fmSteps.length}`;
-      // Summary bar of completed steps
+      // Summary bar of completed steps (hidden on the mood step to keep it clean)
       _fmBuildSummaryBar();
-      // Title / subtitle
+      if (_fmStepIndex === 0) {
+        const _sumBar = document.getElementById('fmSummaryBar');
+        if (_sumBar) _sumBar.style.display = 'none';
+      }
+      // Title / subtitle / eyebrow
       document.getElementById('fmTitle').textContent    = step.title;
       document.getElementById('fmSubtitle').textContent = step.subtitle || '';
+      const _eyebrowEl = document.getElementById('fmEyebrow');
+      if (_eyebrowEl) {
+        const _eb = _FM_EYEBROWS[step.id] && !(step.id === 'sleep' && _sleepNotYet()) ? _FM_EYEBROWS[step.id]() : '';
+        _eyebrowEl.textContent = _eb;
+        _eyebrowEl.style.display = _eb ? '' : 'none';
+      }
       // Back button — on step 0 show "✕ Close" only when there's an overview to return to
       // (editing an existing entry, OR the current tracking date already has a saved entry)
       const _backBtn = document.getElementById('fmBackBtn');
@@ -4275,7 +4339,13 @@ window.addEventListener('pageshow', () => {
       const _prevFmNotes = document.getElementById('fmNotesInput');
       if (_prevFmNotes) { const _notesEl = document.getElementById('notes'); if (_notesEl) _notesEl.value = _prevFmNotes.value; }
       // Content
-      document.getElementById('fmContent').innerHTML = _fmRenderContent(step);
+      const _fmContentEl = document.getElementById('fmContent');
+      _fmContentEl.innerHTML = _fmRenderContent(step);
+      // Hero steps (mood/energy/sleep): flex column so the hero centres and the
+      // wheel sits low; wire up the slider-wheel after layout.
+      const _isHeroStep = ['mood', 'energy', 'sleep'].includes(step.id) && !!document.getElementById('fmWheel');
+      _fmContentEl.classList.toggle('fm-content-hero', _isHeroStep);
+      if (_isHeroStep) requestAnimationFrame(_fmInitWheel);
       if (step.id === 'notes') setTimeout(() => { const ta = document.getElementById('fmNotesInput'); if (ta) ta.focus(); }, 120);
       // Auto-sync health data if setting is ON
       if (BB.storage.get('HealthSyncEnabled') === '1') {
@@ -4332,12 +4402,162 @@ window.addEventListener('pageshow', () => {
         style="border-left:4px solid ${color};${marginTop?'margin-top:8px;':''}">${label}</button>`;
     }
 
+    // ── Hero + slider-wheel step layout (mood / energy / sleep) ──
+    // The hero (big emoji, value readout, synced badge) fills the middle of the
+    // full-screen card; the wheel is a scroll-snap row of option pills near the
+    // bottom. Sliding the wheel previews the centred option in the hero
+    // (ghosted, dashed outline until committed); tapping commits + advances.
+
+    function _fmHeroHtml() {
+      return `<div class="fm-hero">
+        <div class="fm-hero-emoji" id="fmHeroEmoji"></div>
+        <div class="fm-hero-value" id="fmHeroValue"></div>
+        <div class="fm-hero-badge" id="fmHeroBadge" style="visibility:hidden;">&nbsp;</div>
+      </div>`;
+    }
+
+    function _fmWheelHtml(items) {
+      return `<div class="fm-wheel" id="fmWheel">${items.map(it => `<button type="button"
+          class="fm-wheel-btn${it.cls ? ' ' + it.cls : ''}${it.init ? ' init' : ''}"
+          data-val="${it.val}" data-label="${it.label}" data-color="${it.color}"
+          ${it.emoji ? `data-emoji="${it.emoji}"` : ''} ${it.img ? `data-img="${it.img}"` : ''}
+          style="--wb-color:${it.color};"
+          onclick="${it.onclick}" ${it.extra || ''}>
+          ${it.img ? `<img src="${it.img}" alt="">` : ''}
+          <span class="fm-wheel-label">${it.label}</span>
+          ${it.sub ? `<span class="fm-wheel-sub">${it.sub}</span>` : ''}
+        </button>`).join('')}</div>`;
+    }
+
+    /** The wheel value the user has actually committed on this step (null = none). */
+    function _fmWheelCommittedVal(stepId) {
+      if (stepId === 'energy') return _fmEnergyClear ? null : String(selectedEnergy);
+      if (stepId === 'sleep')  return (_fmSleepClear || selectedSleep == null) ? null : String(_fmSleepBucketOf(selectedSleep));
+      if (stepId === 'mood')   return selectedMood || null;
+      return null;
+    }
+
+    /** Paint the hero from the wheel button currently in the centre. */
+    function _fmHeroPreview(btn) {
+      const step    = _fmSteps[_fmStepIndex];
+      const emojiEl = document.getElementById('fmHeroEmoji');
+      const valEl   = document.getElementById('fmHeroValue');
+      const badgeEl = document.getElementById('fmHeroBadge');
+      if (!step || !btn || !emojiEl || !valEl || !badgeEl) return;
+      const val = btn.dataset.val;
+      const committed = _fmWheelCommittedVal(step.id);
+      const isCommitted = committed !== null && String(committed) === val;
+      let valueHtml = btn.dataset.label;
+      let badge = null;
+      if (step.id === 'energy' && isCommitted && _fmStepsRaw != null) {
+        valueHtml = BB.t('journal.sync.steps', { n: Number(_fmStepsRaw).toLocaleString() });
+        badge = { cls: '', text: '✓ ' + _syncSourceLabel() };
+      } else if (step.id === 'sleep' && isCommitted && _sleepHealthSynced) {
+        valueHtml = _fmFmtSleepHM(selectedSleep);
+        badge = { cls: '', text: '✓ ' + _syncSourceLabel() };
+      } else if (step.id === 'mood' && !selectedMood && _fmMoodSuggestion && val === _fmMoodSuggestion) {
+        badge = { cls: 'guess', text: '✨ ' + BB.t('journal.sync.bestGuess') };
+      }
+      emojiEl.innerHTML = btn.dataset.img ? `<img src="${btn.dataset.img}" alt="">` : (btn.dataset.emoji || '');
+      emojiEl.classList.toggle('ghost', !isCommitted);
+      valEl.innerHTML = valueHtml;
+      valEl.classList.toggle('ghost', !isCommitted);
+      if (badge) {
+        badgeEl.className = 'fm-hero-badge' + (badge.cls ? ' ' + badge.cls : '');
+        badgeEl.textContent = badge.text;
+        badgeEl.style.visibility = '';
+      } else {
+        badgeEl.style.visibility = 'hidden';
+        badgeEl.innerHTML = '&nbsp;';
+      }
+    }
+
+    let _fmWheelRAF = null;
+    function _fmInitWheel() {
+      const wheel = document.getElementById('fmWheel');
+      if (!wheel) return;
+      const btns = Array.prototype.slice.call(wheel.querySelectorAll('.fm-wheel-btn'));
+      if (!btns.length) return;
+      const update = () => {
+        const wr = wheel.getBoundingClientRect();
+        const wc = wr.left + wr.width / 2;
+        let best = null, bd = Infinity;
+        btns.forEach(b => {
+          const r = b.getBoundingClientRect();
+          const d = Math.abs(r.left + r.width / 2 - wc);
+          if (d < bd) { bd = d; best = b; }
+        });
+        if (best && !best.classList.contains('center')) {
+          btns.forEach(b => b.classList.toggle('center', b === best));
+          _fmHeroPreview(best);
+        }
+      };
+      wheel.addEventListener('scroll', () => {
+        if (_fmWheelRAF) return;
+        _fmWheelRAF = requestAnimationFrame(() => { _fmWheelRAF = null; update(); });
+      }, { passive: true });
+      // Centre the committed value, else the suggestion/middle option (.init)
+      const init = wheel.querySelector('.fm-wheel-btn.sel') || wheel.querySelector('.fm-wheel-btn.init') || btns[Math.floor(btns.length / 2)];
+      wheel.scrollLeft = init.offsetLeft - (wheel.clientWidth - init.offsetWidth) / 2;
+      update();
+    }
+
+    /**
+     * Best-guess default mood from synced health data. Very few steps + lots
+     * of sleep → low; lots of steps + little sleep → elevated; middling both
+     * → stable. Preview only — it becomes the mood wheel's initial centre with
+     * a "best guess" badge; the user still taps to commit.
+     */
+    function _fmMaybeSuggestMood() {
+      if (selectedMood || editingEntry) return;
+      const steps  = _fmStepsRaw;
+      const sleepH = _fmSleepImported;
+      if (steps == null && sleepH == null) return;
+      let score = 0; // negative → low, positive → elevated
+      if (steps != null)  { if (steps < 3000)  score--; else if (steps > 15000) score++; }
+      if (sleepH != null) { if (sleepH >= 9.5) score--; else if (sleepH <= 5.5) score++; }
+      _fmMoodSuggestion = score < 0 ? 'low' : score > 0 ? 'elevated' : 'stable';
+    }
+
+    // ── Regular (full) form: hero readout on the energy + sleep steps ──
+    function _updateEnergyHero() {
+      const hero = document.getElementById('energyStepHero');
+      if (!hero) return;
+      const lvl = _FM_ENERGY_LEVELS.find(l => l.val === selectedEnergy);
+      if (!lvl) { hero.style.display = 'none'; return; }
+      const [emoji, ...rest] = lvl.label.split(' ');
+      let steps = null;
+      const _dv = document.getElementById('entryDate')?.value;
+      if (_dv && window._healthStepsByDate && window._healthStepsByDate[_dv] != null) steps = window._healthStepsByDate[_dv];
+      hero.style.display = '';
+      document.getElementById('energyHeroEmoji').textContent = emoji;
+      document.getElementById('energyHeroValue').innerHTML =
+        steps != null ? BB.t('journal.sync.steps', { n: Number(steps).toLocaleString() }) : rest.join(' ');
+      const badgeEl = document.getElementById('energyHeroBadge');
+      badgeEl.textContent = '✓ ' + _syncSourceLabel();
+      badgeEl.style.display = steps != null ? '' : 'none';
+    }
+
+    function _updateSleepHero() {
+      const hero = document.getElementById('sleepStepHero');
+      if (!hero) return;
+      if (selectedSleep == null) { hero.style.display = 'none'; return; }
+      const range = _FM_SLEEP_RANGES.find(r => r.val === _fmSleepBucketOf(selectedSleep));
+      if (!range) { hero.style.display = 'none'; return; }
+      const [emoji, ...rest] = range.label.split(' ');
+      hero.style.display = '';
+      document.getElementById('sleepHeroEmoji').textContent = emoji;
+      document.getElementById('sleepHeroValue').innerHTML =
+        _sleepHealthSynced ? _fmFmtSleepHM(selectedSleep) : rest.join(' ');
+      const badgeEl = document.getElementById('sleepHeroBadge');
+      badgeEl.textContent = '✓ ' + _syncSourceLabel();
+      badgeEl.style.display = _sleepHealthSynced ? '' : 'none';
+    }
+
     function _fmRenderContent(step) {
       const cap = s => s ? s.charAt(0).toUpperCase()+s.slice(1) : '';
       switch (step.id) {
         case 'mood': {
-          // Pre-select Stable as a suggestion for first-time users
-          if (!selectedMood && !BB.storage.get('HasEntries')) selectedMood = 'stable';
           const _chooseMoodHintDone = BB.storage.get('_fmChooseMoodHintDone') === '1';
           const _showChooseMoodHint = !_chooseMoodHintDone && !editingEntry;
           const _showFmTip = !BB.storage.get('_fmMoodTipShown') && _chooseMoodHintDone && BB.storage.get('_fmTapHoldHintReady') === '1';
@@ -4389,20 +4609,18 @@ window.addEventListener('pageshow', () => {
           } else if (selectedMood && localStorage.getItem('moodLinkingEnabled') === '1') {
             _linkedChip = `<p style="text-align:center;font-size:0.72em;color:#adb5bd;margin-top:8px;margin-bottom:0;">Hold to link a secondary mood</p>`;
           }
-          return `${_quickNotesHtml}${_prevIntentionHtml}<div class="mood-selector" style="margin-bottom:0;">
-            ${['manic','elevated','stable','low','depressed'].map(m =>
-              `<button class="mood-btn mood-${m} ${selectedMood===m?'selected':''} ${selectedLinkedMood===m?'linked':(_fmLinkMoodPickerOpen&&m!==selectedMood?'linked':'')}"
-                onclick="_fmMoodTap('${m}')"
-                ontouchstart="_fmLongPressStart('${m}',event)"
-                ontouchend="_fmLongPressCancel()"
-                ontouchmove="_fmLongPressCancel()"
-                onmousedown="_fmLongPressStart('${m}',event)"
-                onmouseup="_fmLongPressCancel()"
-                onmouseleave="_fmLongPressCancel()">
-                <img class="emoji" src="images/moods/${m}.png" alt="${m}">
-                <span class="label">${BB.t('mood.' + m)}</span>
-              </button>`).join('')}
-          </div>
+          const _initMood = selectedMood || _fmMoodSuggestion || 'stable';
+          const _moodWheel = _fmWheelHtml(['manic','elevated','stable','low','depressed'].map(m => ({
+            val: m,
+            img: `images/moods/${m}.png`,
+            label: BB.t('mood.' + m),
+            color: _FM_MOOD_COLORS[m],
+            cls: `${selectedMood===m?'sel':''}${(selectedLinkedMood===m || (_fmLinkMoodPickerOpen && m!==selectedMood)) ? ' linked' : ''}`,
+            init: m === _initMood,
+            onclick: `_fmMoodTap('${m}')`,
+            extra: `ontouchstart="_fmLongPressStart('${m}',event)" ontouchend="_fmLongPressCancel()" ontouchmove="_fmLongPressCancel()" onmousedown="_fmLongPressStart('${m}',event)" onmouseup="_fmLongPressCancel()" onmouseleave="_fmLongPressCancel()"`,
+          })));
+          return `${_quickNotesHtml}${_prevIntentionHtml}${_fmHeroHtml()}${_moodWheel}
           ${_linkedChip}
           ${selectedLinkedMood ? `<button onclick="_fmAdvance()" style="width:100%;margin-top:14px;padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:14px;font-size:0.95em;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">${BB.t('common.continue')} →</button>` : ''}
           ${_showChooseMoodHint ? `<div id="_fmChooseMoodHintEl" style="display:flex;flex-direction:column;align-items:center;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-top:8px;">
@@ -4422,26 +4640,19 @@ window.addEventListener('pageshow', () => {
         }
 
         case 'energy': {
-          const _autoSyncEnergy = BB.storage.get('HealthSyncEnabled') === '1';
-          // Show re-sync button only when health sync is ON and data has already been imported
-          const _stepsSyncBtn = (_autoSyncEnergy && _fmStepsResult) ? `<button onclick="importStepsFromHealth()" style="width:100%;padding:11px 16px;margin-bottom:14px;
-            background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:12px;
-            color:var(--brand-primary);font-weight:600;font-size:0.88em;cursor:pointer;-webkit-tap-highlight-color:transparent;">
-            📱 Steps: ${_fmStepsResult} — Re-sync</button>` : '';
-          const _energyCards = `<div class="fm-card-grid">${_FM_ENERGY_LEVELS.map(l => {
-            const isSel = !_fmEnergyClear && selectedEnergy === l.val;
-            const isSugg = _fmEnergySuggestion === l.val;
+          const _committedEnergy = _fmEnergyClear ? null : selectedEnergy;
+          const _initEnergy = _committedEnergy !== null ? _committedEnergy
+            : (_fmEnergySuggestion !== null ? _fmEnergySuggestion : 5);
+          const _energyWheel = _fmWheelHtml(_FM_ENERGY_LEVELS.map(l => {
             const [emoji, ...rest] = l.label.split(' ');
-            const text = rest.join(' ');
-            return `<button class="fm-card-btn ${isSel?'sel':''}" onclick="selectedEnergy=${l.val}; _fmEnergyClear=false; _fmAdvance();"
-              onmouseenter="if(window.matchMedia('(pointer:fine)').matches && !this.classList.contains('sel')){this.style.borderColor='${l.color}';this.style.background='${l.color}18';this.style.color='${l.color}';}"
-              onmouseleave="if(window.matchMedia('(pointer:fine)').matches && !this.classList.contains('sel')){this.style.borderColor='';this.style.background='';this.style.color='';}"
-              style="${isSel ? `border-color:${l.color};background:${l.color}22;color:${l.color};` : ''}">
-              <span class="fm-card-emoji">${emoji}</span>
-              <span class="fm-card-label">${text}${isSugg && !isSel ? '<br><span style="font-size:0.72em;opacity:0.65;">✓ sugg.</span>' : ''}</span>
-            </button>`;
-          }).join('')}</div>`;
-          return _stepsSyncBtn + _energyCards;
+            return {
+              val: l.val, emoji, label: rest.join(' '), color: l.color,
+              cls: _committedEnergy === l.val ? 'sel' : '',
+              init: l.val === _initEnergy,
+              onclick: `selectedEnergy=${l.val}; _fmEnergyClear=false; _fmAdvance();`,
+            };
+          }));
+          return _fmHeroHtml() + _energyWheel;
         }
 
         case 'sleep': {
@@ -4459,61 +4670,31 @@ window.addEventListener('pageshow', () => {
                 <button onclick="_fmAdvance()" style="width:100%;padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:14px;font-size:0.95em;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">${BB.t('common.continue')} →</button>
               </div>`;
           }
-          const _autoSyncSleep = BB.storage.get('HealthSyncEnabled') === '1';
-          const _syncText = _fmSleepError === 'fail' ? '❌ Sync failed — try again'
-            : _fmSleepError === 'nodata' ? '🤷 No sleep data found — try again'
-            : isIOS() ? '📱 Re-sync from Apple Health'
-            : isAndroid() ? '📱 Re-sync from Health Connect'
-            : '📱 Re-sync from Health App';
-          // Show retry/resync button only when health sync is ON and: there's an error, OR user undid a sync
-          const _showSleepSyncBtn = _autoSyncSleep && (_fmSleepError || (_fmSleepAutoSyncDone && !_fmSleepImported && !_sleepHealthSynced));
-          const syncBtn = _showSleepSyncBtn ? `<button onclick="importSleepFromHealth()" style="width:100%;padding:11px 16px;margin-bottom:14px;
-            background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:12px;
-            color:var(--brand-primary);font-weight:600;font-size:0.88em;cursor:pointer;-webkit-tap-highlight-color:transparent;">
-            ${_syncText}</button>` : '';
-          // For exact (synced) values, highlight the closest bucket visually
-          let _closestFmBucket = null;
-          if (!_fmSleepClear && _fmSleepImported && !_FM_SLEEP_RANGES.some(r => r.val === selectedSleep)) {
-            // Range-based: match the label range rather than nearest midpoint
-            const _h = selectedSleep;
-            _closestFmBucket = _h <= 5.5 ? 5 : _h < 7 ? 6.5 : _h <= 9 ? 8 : _h <= 10 ? 9.5 : 11;
-          }
-          // Match banner colour to the correct sleep-range bucket (by label range, not nearest midpoint)
-          const _syncedRange = (_sleepHealthSynced && !_fmSleepClear)
-            ? (() => { const h = selectedSleep; return h <= 5.5 ? _FM_SLEEP_RANGES[0] : h < 7 ? _FM_SLEEP_RANGES[1] : h <= 9 ? _FM_SLEEP_RANGES[2] : h <= 10 ? _FM_SLEEP_RANGES[3] : _FM_SLEEP_RANGES[4]; })()
-            : null;
-          const _bannerCol = _syncedRange ? _syncedRange.color : '#51cf66';
-          const _syncedBanner = _sleepHealthSynced && !_fmSleepClear
-            ? `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;margin-bottom:10px;background:${_bannerCol}18;border:1.5px solid ${_bannerCol}55;border-radius:10px;">
-                <span style="font-size:0.9em;font-weight:600;color:${_bannerCol};">😴 ${selectedSleep}h synced from Health</span>
-                <div style="display:flex;align-items:center;gap:4px;">
-                  ${_autoSyncSleep ? `<button onclick="importSleepFromHealth()" style="background:none;border:1px solid #adb5bd;color:#adb5bd;font-size:0.75em;cursor:pointer;padding:2px 8px;border-radius:6px;-webkit-tap-highlight-color:transparent;">Re-sync</button>` : ''}
-                  <button onclick="_fmUndoSleepSync()" style="background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:2px 6px;">✕</button>
-                </div>
-               </div>` : '';
-          const _sleepCards = `<div class="fm-card-grid">${_FM_SLEEP_RANGES.map(r => {
-            const isSel = !_fmSleepClear && (selectedSleep === r.val || _closestFmBucket === r.val);
-            const isSugg = _fmSleepSuggestion === r.val;
+          const _committedBucket = (_fmSleepClear || selectedSleep == null) ? null : _fmSleepBucketOf(selectedSleep);
+          const _initBucket = _committedBucket !== null ? _committedBucket
+            : (_fmSleepSuggestion !== null ? _fmSleepSuggestion : 8);
+          const _sleepWheel = _fmWheelHtml(_FM_SLEEP_RANGES.map(r => {
+            const isSel = _committedBucket === r.val;
             const [emoji, ...rest] = r.label.split(' ');
-            const _rawText = rest.join(' ');
-            // When this bucket is selected via sync, show actual hours instead of range label
-            const text = (isSel && _sleepHealthSynced && !_fmSleepClear) ? `${selectedSleep}h` : _rawText;
+            // Tapping the already-synced bucket keeps the exact synced hours;
+            // tapping any other pill overrides the sync with the bucket value.
             const _slOnclick = (_sleepHealthSynced && isSel)
               ? `if(!_fmSlLpFired){_fmSleepClear=false;_fmAdvance();}`
               : `if(!_fmSlLpFired){selectedSleep=${r.val};_sleepHealthSynced=false;_fmSleepClear=false;_fmAdvance();}`;
-            return `<button class="fm-card-btn ${isSel?'sel':''}" onclick="${_slOnclick}"
-              onpointerdown="_fmSleepPtrDown(${r.val})"
-              onpointerup="_fmSleepPtrUp()"
-              onpointercancel="_fmSleepPtrCancel()"
-              onmouseenter="if(window.matchMedia('(pointer:fine)').matches && !this.classList.contains('sel')){this.style.borderColor='${r.color}';this.style.background='${r.color}18';this.style.color='${r.color}';}"
-              onmouseleave="if(window.matchMedia('(pointer:fine)').matches && !this.classList.contains('sel')){this.style.borderColor='';this.style.background='';this.style.color='';}"
-              style="${isSel ? `border-color:${r.color};background:${r.color};color:white;font-weight:700;` : ''}">
-              <span class="fm-card-emoji">${emoji}</span>
-              <span class="fm-card-label">${text}${isSugg && !isSel ? '<br><span style="font-size:0.72em;opacity:0.65;">✓ sugg.</span>' : ''}</span>
-            </button>`;
-          }).join('')}</div>`;
-          const _sqHint = `<p style="text-align:center;font-size:0.78em;color:#adb5bd;margin-top:8px;margin-bottom:0;">${BB.t('journal.sleepQualityHint')}</p>`;
-          return syncBtn + _syncedBanner + _sleepCards + _sqHint;
+            return {
+              val: r.val, emoji, label: rest.join(' '), color: r.color,
+              sub: (isSel && _sleepHealthSynced) ? `${selectedSleep}h` : '',
+              cls: isSel ? 'sel' : '',
+              init: r.val === _initBucket,
+              onclick: _slOnclick,
+              extra: `onpointerdown="_fmSleepPtrDown(${r.val})" onpointerup="_fmSleepPtrUp()" onpointercancel="_fmSleepPtrCancel()"`,
+            };
+          }));
+          // Small retry link when the auto-import errored (sync on, nothing pulled in)
+          const _retryLink = (BB.storage.get('HealthSyncEnabled') === '1' && _fmSleepError)
+            ? `<p style="text-align:center;margin:0;"><button onclick="importSleepFromHealth()" style="background:none;border:none;color:var(--brand-primary);font-size:0.82em;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px;-webkit-tap-highlight-color:transparent;">${_fmSleepError === 'nodata' ? '🤷 No sleep data found — try again' : '❌ Sync failed — try again'}</button></p>` : '';
+          const _sqHint = `<p style="text-align:center;font-size:0.78em;color:#adb5bd;margin-top:0;margin-bottom:0;">${BB.t('journal.sleepQualityHint')}</p>`;
+          return _fmHeroHtml() + _retryLink + _sleepWheel + _sqHint;
         }
 
         case 'sleepQuality': {
@@ -6858,6 +7039,10 @@ window.addEventListener('pageshow', () => {
       if (_sleepBtn) _sleepBtn.textContent = '😴 Sleep Hours';
       const _energyBtnText = document.getElementById('healthEnergyBtnText');
       if (_energyBtnText) _energyBtnText.textContent = '⚡ Energy';
+      const _ehReset = document.getElementById('energyStepHero');
+      if (_ehReset) _ehReset.style.display = 'none';
+      const _shReset = document.getElementById('sleepStepHero');
+      if (_shReset) _shReset.style.display = 'none';
       // steps result is now shown inside the energy button text — reset it
       const _ebtReset = document.getElementById('healthEnergyBtnText');
       if (_ebtReset && _ebtReset.textContent !== '⚡ Energy') _ebtReset.textContent = '⚡ Energy';
@@ -12014,6 +12199,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
           const stepsLabel = s >= 1000 ? Math.round(s / 1000) + 'k' : s;
           btnText.textContent = `⚡ Energy | 🏃 ${stepsLabel}`;
         }
+        _fmStepsRaw = s;
         // Update focused mode if active
         if (_fmActive) {
           const stepsLabel = s >= 1000 ? Math.round(s / 1000) + 'k' : String(s);
@@ -12023,6 +12209,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
           // Pre-select the suggested energy without auto-advancing
           selectedEnergy = _fmEnergySuggestion;
           _fmEnergyClear = false;
+          _fmMaybeSuggestMood();
           _renderFocusedStep();
         } else {
           // Non-focused: highlight the suggested energy button
@@ -12043,6 +12230,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
               selectedEnergy = _sugEn;
             }
           });
+          _updateEnergyHero();
         }
       } catch(e) {
         console.warn('Steps import failed:', e);
@@ -12169,6 +12357,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
             _fmSleepClear = false;
             _fmSleepError = null;
             _fmSleepAutoSyncDone = true;
+            _fmMaybeSuggestMood();
             _renderFocusedStep();
           } else {
             // Regular form: highlight closest bucket button but store actual hours
@@ -12184,6 +12373,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
             closestBtn.style.color = 'white';
             selectedSleep = roundedH; // store actual hours, not bucket
             _sleepHealthSynced = true;
+            _updateSleepHero();
           }
         } else {
           showFail();

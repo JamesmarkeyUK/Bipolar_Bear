@@ -78,6 +78,8 @@
   <!-- jsPDF for PDF export (deferred — only used on user action) -->
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   
+  <link rel="preload" href="fonts/nunito-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/fonts.css">
   <link rel="stylesheet" href="css/theme.css">
   <link rel="stylesheet" href="css/journal.css">
 </head>
@@ -244,6 +246,11 @@
 
       <div class="form-group hidden-until-mood" id="energySection">
         <span id="healthEnergyBtn" style="display:block;margin-bottom:5px;font-weight:600;color:#495057;font-size:0.9em;"><span id="healthEnergyBtnText">⚡ Energy</span></span>
+        <div class="step-hero" id="energyStepHero" style="display:none;">
+          <div class="step-hero-emoji" id="energyHeroEmoji"></div>
+          <div class="step-hero-value" id="energyHeroValue"></div>
+          <div class="step-hero-badge" id="energyHeroBadge" style="display:none;"></div>
+        </div>
         <div class="energy-selector" id="energySelector"></div>
       </div>
 
@@ -251,6 +258,11 @@
         <label id="sleepLabel" style="display:none;">😴 Sleep Hours</label>
         <div id="sleepBtnRow" style="position:relative;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">
           <span id="healthSleepBtn" style="font-weight:600;color:#495057;font-size:0.9em;">😴 Sleep Hours</span>
+        </div>
+        <div class="step-hero" id="sleepStepHero" style="display:none;">
+          <div class="step-hero-emoji" id="sleepHeroEmoji"></div>
+          <div class="step-hero-value" id="sleepHeroValue"></div>
+          <div class="step-hero-badge" id="sleepHeroBadge" style="display:none;"></div>
         </div>
         <div class="sleep-selector" id="sleepSelector"></div>
         <div id="sleepQualitySubSection" style="display:none;">
@@ -397,6 +409,7 @@
       </div>
 
       <!-- Question -->
+      <div id="fmEyebrow" class="fm-eyebrow" style="display:none;"></div>
       <h2 id="fmTitle" style="margin:0 0 4px;font-size:1.25em;font-weight:700;text-align:center;"></h2>
       <p id="fmSubtitle" style="margin:0 0 20px;font-size:0.82em;color:#6c757d;text-align:center;min-height:1em;"></p>
 
