@@ -1,0 +1,103 @@
+<!doctype html>
+<!-- Bipolar Anonymous board FEED at iPad 3:4 (1536×2048), so it fits the iPad
+     frame's aspect (object-fit:cover, no crop). Mirrors the real iPad app:
+     full-width yellow header, content in a centred column. Mockup content. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ width:1536px; height:2048px; }
+  body{ font-family:'Segoe UI',system-ui,sans-serif; background:#FFFBF5; }
+  .board{ width:1536px; height:2048px; position:relative; overflow:hidden; }
+
+  .bhead{ background:linear-gradient(180deg,#ffe066 0%,#f5c800 100%); padding:74px 0 40px; }
+  .hwrap{ max-width:1180px; margin:0 auto; padding:0 40px; }
+  .brow{ display:flex; align-items:center; justify-content:space-between; }
+  .btitle{ font-weight:800; font-size:56px; color:#1a1500; letter-spacing:-.01em; }
+  .streak{ background:rgba(255,255,255,.55); border-radius:999px; padding:14px 28px;
+    font-weight:800; font-size:36px; color:#1a1500; }
+  .tabs{ display:flex; gap:16px; margin-top:30px; }
+  .tab{ background:rgba(255,255,255,.42); border-radius:999px; padding:16px 34px;
+    font-weight:700; font-size:36px; color:#5c4500; }
+  .tab.on{ background:#fff; color:#1a1500; font-weight:800;
+    box-shadow:0 8px 20px -8px rgba(120,90,0,.4); }
+
+  .feed{ max-width:1180px; margin:0 auto; padding:44px 40px; display:flex;
+    flex-direction:column; gap:38px; }
+  .card{ background:#fff; border-radius:38px; padding:44px 46px;
+    box-shadow:0 24px 50px -30px rgba(120,90,0,.45); border:1px solid #f3ecd6; }
+  .pa{ display:flex; align-items:center; gap:24px; margin-bottom:24px; }
+  .av{ width:92px; height:92px; border-radius:50%; color:#fff; font-weight:800; font-size:38px;
+    flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 6px 16px -4px rgba(0,0,0,.3); }
+  .pname{ font-weight:800; font-size:40px; color:#1a1500; }
+  .pmeta{ font-size:30px; color:#8a7a3a; margin-top:4px; }
+  .ptext{ font-size:42px; color:#241f0a; line-height:1.5; }
+  .pacts{ display:flex; align-items:center; gap:18px; margin-top:32px; }
+  .pbtn{ background:#f6f4ee; border-radius:999px; padding:16px 32px; font-size:34px;
+    font-weight:700; color:#5c5018; }
+  .pbtn.liked{ background:#fff7c2; color:#a07e00; border:2px solid #f0d54a; }
+  .spacer{ flex:1; }
+  .pico{ font-size:36px; opacity:.32; }
+</style>
+</head>
+<body>
+<div class="board">
+  <div class="bhead"><div class="hwrap">
+    <div class="brow">
+      <div class="btitle">Bipolar Anonymous</div>
+      <div class="streak">🔥 5</div>
+    </div>
+    <div class="tabs">
+      <span class="tab on">💬 General</span>
+      <span class="tab">📢 Announcements</span>
+    </div>
+  </div></div>
+
+  <div class="feed">
+    <div class="card">
+      <div class="pa">
+        <div class="av" style="background:linear-gradient(135deg,#ffb340,#e07800)">QO</div>
+        <div><div class="pname">QuietOtter <span style="font-weight:700;color:#c99a00">🔥 12d</span></div>
+          <div class="pmeta">2h ago</div></div>
+      </div>
+      <div class="ptext">Told my partner about my diagnosis today — they just hugged me. 💛</div>
+      <div class="pacts">
+        <div class="pbtn liked">💛 41</div><div class="pbtn">💬 6</div>
+        <div class="spacer"></div>
+        <span class="pico">🆘</span><span class="pico">🚩</span><span class="pico">🙈</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="pa">
+        <div class="av" style="background:linear-gradient(135deg,#81c784,#2e7d32)">SS</div>
+        <div><div class="pname">SunflowerSeed <span style="font-weight:700;color:#c99a00">🔥 8d</span> <span style="font-weight:700;color:#6a9a3a">🧘 3d</span></div>
+          <div class="pmeta">4h ago</div></div>
+      </div>
+      <div class="ptext">Three days stable after a rough patch. Small wins still count.</div>
+      <div class="pacts">
+        <div class="pbtn liked">💛 28</div><div class="pbtn">💬 4</div>
+        <div class="spacer"></div>
+        <span class="pico">🆘</span><span class="pico">🚩</span><span class="pico">🙈</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="pa">
+        <div class="av" style="background:linear-gradient(135deg,#ce93d8,#7b1fa2)">NW</div>
+        <div><div class="pname">NightWatch <span style="font-weight:700;color:#c99a00">🔥 21d</span></div>
+          <div class="pmeta">6h ago</div></div>
+      </div>
+      <div class="ptext">Anyone else find mornings the hardest? 🌅</div>
+      <div class="pacts">
+        <div class="pbtn liked">💛 34</div><div class="pbtn">💬 3</div>
+        <div class="spacer"></div>
+        <span class="pico">🆘</span><span class="pico">🚩</span><span class="pico">🙈</span>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
