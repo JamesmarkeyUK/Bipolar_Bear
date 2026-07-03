@@ -484,7 +484,23 @@
 //       touch-action:pan-y (wheel + pills), plus a touchend fallback catches
 //       sub-26px flicks. The med list also moved from the top of the step to
 //       directly above "Manage medications".
-const CACHE_NAME = 'bipolarbear-v125';
+// v126: Release 1.18 (build 18) — version bump across web _APP_VERSION,
+//       version.json web channel, iOS (app + widget) and Android, plus the
+//       1.18 What's-New headline and changelog entries. Focused mode fixes:
+//       (1) Medication (and sleep-quality) short-wheel swipe — FOURTH attempt,
+//       and this time it stops fighting WebKit. The prior three suppressed
+//       native scrolling (overflow:hidden) and drove a JS stepper via
+//       touch-action + a rAF animation; all passed in Chromium and failed
+//       on-device because WebKit arbitrates the gesture differently (and a
+//       backgrounded WebView starves rAF). Short wheels now scroll NATIVELY,
+//       identical to the long mood/energy wheels that already work on-device
+//       (overflow-x:auto, touch-action:pan-x) — only CSS mandatory snap (which
+//       snaps a short-track flick straight back) is swapped for a JS
+//       snap-to-nearest on scroll-settle. (2) First journal step no longer
+//       opens with a large empty gap between the top bar and the question —
+//       on the fresh first step (summary bar hidden) the flexible header
+//       spacer is collapsed so the header sits under the nav.
+const CACHE_NAME = 'bipolarbear-v126';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
