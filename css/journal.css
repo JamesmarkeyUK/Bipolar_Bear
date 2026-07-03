@@ -595,6 +595,18 @@
       color: #adb5bd;
       margin: 0 0 2px;
     }
+    /* Blank spacer slot (medication wheel): a real 5th snap point that gives
+       the short wheel the width + snap-point count of a working long wheel, but
+       shows nothing and can't be selected (empty onclick). Stays invisible even
+       when it's the centred slot under the dial. */
+    .fm-wheel-btn.fm-wheel-blank {
+      min-width: 104px;
+      background: transparent !important;
+      border-color: transparent !important;
+      outline: none !important;
+      box-shadow: none !important;
+      cursor: default;
+    }
     .fm-wheel-btn.sel { background: var(--wb-color, var(--brand-primary)); color: #fff; }
     .fm-wheel-btn.linked { outline: 2px dashed var(--brand-primary); outline-offset: 2px; }
     .fm-wheel-btn img { width: 36px; height: 36px; object-fit: contain; }

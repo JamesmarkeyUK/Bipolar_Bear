@@ -4985,17 +4985,27 @@ window.addEventListener('pageshow', () => {
         }
 
         case 'sleepQuality': {
-          const _SQ_OPTS = [
-            { val:'bad',    emoji:'😴', label:BB.t('journal.value.bad'),  color:'#dc3545' },
-            { val:'unsure', emoji:'😐', label:BB.t('journal.value.ok'),   color:'#adb5bd' },
-            { val:'good',   emoji:'😊', label:BB.t('journal.value.good'), color:'#51cf66' },
-          ];
-          const _sqWheel = _fmWheelHtml(_SQ_OPTS.map(o => ({
+          // Built as a real 5-pill wheel — Bad, Bad, OK, Good, Good — so it runs
+          // the EXACT same native-scroll + CSS-snap path as the working 5-pill
+          // mood/energy wheels (a genuine 5-slot row, not a 2–3 slot one faked
+          // wide with padding, which never worked on-device). Duplicated ends
+          // give it the width iOS needs to treat it as a real scroll surface;
+          // every slot commits, and the OK middle is the neutral default centre.
+          const _sqP = (o, extra) => Object.assign({
             val: o.val, emoji: o.emoji, label: o.label, color: o.color,
             cls: selectedSleepQuality === o.val ? 'sel' : '',
-            init: (selectedSleepQuality || 'unsure') === o.val,
             onclick: `selectedSleepQuality='${o.val}'; _fmAdvance();`,
-          })));
+          }, extra || {});
+          const _sqBad = { val:'bad',    emoji:'😴', label:BB.t('journal.value.bad'),  color:'#dc3545' };
+          const _sqOk  = { val:'unsure', emoji:'😐', label:BB.t('journal.value.ok'),   color:'#adb5bd' };
+          const _sqGd  = { val:'good',   emoji:'😊', label:BB.t('journal.value.good'), color:'#51cf66' };
+          const _sqWheel = _fmWheelHtml([
+            _sqP(_sqBad),
+            _sqP(_sqBad),
+            _sqP(_sqOk, { init: !selectedSleepQuality }),
+            _sqP(_sqGd),
+            _sqP(_sqGd),
+          ]);
           return _fmHeroHtml() + _sqWheel;
         }
 
@@ -5016,19 +5026,28 @@ window.addEventListener('pageshow', () => {
               <button id="manageMedsBtn" onclick="_dismissMedHint();showMedicationList()" style="background:none;border:none;color:${_medHintDone ? 'var(--brand-primary)' : 'rgba(255,255,255,0.9)'};font-size:0.8em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;text-decoration:underline;text-underline-offset:2px;">✏️ Manage medications</button>
               ${_medHintDone ? '' : `<div id="medHintEl" style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:4px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="8" y1="13" x2="8" y2="2" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round"/><polyline points="3,7 8,2 13,7" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,255,255,0.9);font-family:'Georgia',serif;letter-spacing:0.01em;text-shadow:0 1px 4px rgba(0,0,0,0.5);">${BB.t('journal.hint.logMed')}</span></div>`}
             </div>`;
-          const _MED_OPTS = [
-            { val:'not-taken', label:BB.t('journal.med.notTaken'), color:'var(--brand-primary)' },
-            { val:'taken',     label:BB.t('journal.med.taken'),    color:'#51cf66' },
-          ];
-          const _medWheel = _fmWheelHtml(_MED_OPTS.map(o => {
-            const [emoji, ...rest] = o.label.split(' ');
-            return {
-              val: o.val, emoji, label: rest.join(' ') || o.label, color: o.color,
-              cls: selectedMedication === o.val ? 'sel' : '',
-              init: (selectedMedication || 'taken') === o.val,
-              onclick: `selectedMedication='${o.val}'; _fmAdvance();`,
-            };
-          }));
+          // Built as a real 5-pill wheel — Not taken, Not taken, [blank],
+          // Taken, Taken — so it runs the EXACT same native-scroll + CSS-snap
+          // path as the working 5-pill mood/energy wheels (a genuine 5-slot row,
+          // not a 2-slot one faked wide with padding, which never worked
+          // on-device). The empty centre slot is a neutral, non-committable
+          // start; only the four real slots commit. The pill body shows the
+          // label text — the ✅/❌ emoji is the hero glyph (data-emoji).
+          const _mdSplit = (s) => { const p = String(s).split(' '); return { emoji: p[0] || '', label: p.slice(1).join(' ') || String(s) }; };
+          const _mdNot = _mdSplit(BB.t('journal.med.notTaken'));
+          const _mdTk  = _mdSplit(BB.t('journal.med.taken'));
+          const _mdP = (val, sp, color) => ({
+            val, emoji: sp.emoji, label: sp.label, color,
+            cls: selectedMedication === val ? 'sel' : '',
+            onclick: `selectedMedication='${val}'; _fmAdvance();`,
+          });
+          const _medWheel = _fmWheelHtml([
+            _mdP('not-taken', _mdNot, 'var(--brand-primary)'),
+            _mdP('not-taken', _mdNot, 'var(--brand-primary)'),
+            { val:'', emoji:'💊', label:'', color:'', cls:'fm-wheel-blank', onclick:'', init: !selectedMedication },
+            _mdP('taken', _mdTk, '#51cf66'),
+            _mdP('taken', _mdTk, '#51cf66'),
+          ]);
           return _fmHeroHtml() + _medWheel + _manageRow;
         }
 

@@ -514,7 +514,20 @@
 //       blocked at the two ends. Version bump across web _APP_VERSION,
 //       version.json web channel, iOS (app+widget) + Android, plus 1.19
 //       What's-New + changelog.
-const CACHE_NAME = 'bipolarbear-v127';
+// v128: Release 1.20 (build 20) — medication/sleep-quality wheel swipe, SIXTH
+//       attempt, per the user's own plan: don't approximate a working wheel,
+//       BUILD one. The 5-pill mood/energy wheels always worked on-device; the
+//       2–3 pill wheels never did, through five attempts (JS steppers, JS
+//       settle, native scroll, runway padding). So medication and sleep-quality
+//       are now literally 5-pill wheels, wired to real answers with duplicates:
+//       medication = [Not taken, Not taken, (blank), Taken, Taken] (blank centre
+//       is a neutral, non-committable start); sleep-quality = [Bad, Bad, OK,
+//       Good, Good]. Identical DOM + native-scroll + CSS-snap to the working
+//       wheels, so behaviour must match. New .fm-wheel-blank CSS = an invisible
+//       non-selectable spacer slot. Version bump across web _APP_VERSION,
+//       version.json web channel, iOS (app+widget) + Android, plus 1.20
+//       What's-New + changelog.
+const CACHE_NAME = 'bipolarbear-v128';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
