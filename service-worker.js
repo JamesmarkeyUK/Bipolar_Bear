@@ -544,7 +544,11 @@
 //       moderation controls the feed posts do (report / mute / SOS, admin
 //       delete + ban, self-remove your own comment). Previously replies had no
 //       controls at all. js/anonymous.js + css/anonymous.css touched.
-const CACHE_NAME = 'bipolarbear-v130';
+// v131: Focused mode — medication + sleep-quality wheels hide their duplicate
+//       outer answers. The 5-pill scroll surface stays (iOS needs it) but the
+//       two outer copies render as invisible runway, so only the three distinct
+//       answers show. js/journal.js + css/journal.css touched.
+const CACHE_NAME = 'bipolarbear-v131';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
