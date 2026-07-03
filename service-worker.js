@@ -441,7 +441,12 @@
 //       a horizontal swipe on a short wheel now steps to the adjacent pill
 //       programmatically (same path as the ← / → keys) — reliable on iOS and
 //       always lands centred.
-const CACHE_NAME = 'bipolarbear-v119';
+// v120: Focused mode — motion-sensitivity compromise. Under
+//       prefers-reduced-motion the big travelling particle effects (sparks,
+//       pill bob, drifting zzz/flame/rain/money/tear auras) stay suppressed,
+//       but the gentle in-place idle motion (hero float + stable-bear halo
+//       glow) is now allowed through so the form still feels alive.
+const CACHE_NAME = 'bipolarbear-v120';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

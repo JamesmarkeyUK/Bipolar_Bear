@@ -380,9 +380,18 @@
     .fm-wheel-btn:nth-child(2n) img,  .fm-wheel-btn:nth-child(2n) .fm-wheel-emoji  { animation-delay: -0.9s; }
     .fm-wheel-btn:nth-child(3n) img,  .fm-wheel-btn:nth-child(3n) .fm-wheel-emoji  { animation-delay: -1.7s; }
     @media (prefers-reduced-motion: reduce) {
-      .fm-hero-emoji, .fm-wheel-btn img, .fm-wheel-emoji, .step-hero-emoji { animation: none !important; }
+      /* Motion-sensitivity compromise: suppress the large / travelling particle
+         effects (sparks, pill bob, and the drifting auras — zzz, flame, rain,
+         money, tear), but KEEP the gentle in-place idle motion — the hero's
+         soft float and the stable-bear halo glow — so the form still feels
+         alive without anything sweeping across the screen. */
+      .fm-wheel-btn img, .fm-wheel-emoji { animation: none !important; }
       .fm-spark { animation: none !important; opacity: 0 !important; }
-      .fm-aura { display: none !important; }
+      .fm-aura[data-type="zzz"]   span,
+      .fm-aura[data-type="flame"] span,
+      .fm-aura[data-type="rain"]  span,
+      .fm-aura[data-type="money"] span,
+      .fm-aura[data-type="tear"]  span { animation: none !important; opacity: 0 !important; }
     }
 
     /* ── Exited view (✕ Exit on an unlogged day): only the nav header and the
