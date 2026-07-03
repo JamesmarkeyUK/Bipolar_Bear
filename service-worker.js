@@ -435,7 +435,13 @@
 //       slots, spilling a pill off the screen edge ("not contained"); short
 //       wheels keep MANDATORY snapping now (a pill always settles centred) and
 //       get generous ~300px momentum room so the swipe still works.
-const CACHE_NAME = 'bipolarbear-v118';
+// v119: Focused mode — the v118 momentum padding pushed the short-wheel pill
+//       off-centre (no longer under the dial arrow). Reverted to exact
+//       centring, and instead of fighting iOS scroll-snap on a 2–3 pill wheel,
+//       a horizontal swipe on a short wheel now steps to the adjacent pill
+//       programmatically (same path as the ← / → keys) — reliable on iOS and
+//       always lands centred.
+const CACHE_NAME = 'bipolarbear-v119';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

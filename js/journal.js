@@ -4688,23 +4688,35 @@ window.addEventListener('pageshow', () => {
       if (!btns.length) return;
       // Spinner works even when every pill fits on screen (e.g. the two
       // medication pills): pad the edges so the first/last pill can centre,
-      // which always leaves scrollable overflow to swipe through.
+      // which always leaves scrollable overflow to swipe through. Exact
+      // centring — a pill always settles directly under the dial arrow.
       wheel.style.paddingLeft  = Math.max(0, (wheel.clientWidth - btns[0].offsetWidth) / 2) + 'px';
       wheel.style.paddingRight = Math.max(0, (wheel.clientWidth - btns[btns.length - 1].offsetWidth) / 2) + 'px';
-      // iOS Safari lock: with only a couple of pills the natural scroll range is
-      // tiny (the 2-option medication wheel is ~90px), and
-      // scroll-snap-type:mandatory then yanks every swipe straight back to the
-      // start pill — the wheel feels frozen. Give short wheels the same generous
-      // momentum room the 5-pill wheels already have (~300px) so a flick can
-      // build speed and cross to the next slot. We keep MANDATORY snapping (not
-      // proximity) so a pill always settles centred under the dial — proximity
-      // let the wheel rest between slots, spilling a pill off the edge.
-      const _MIN_SWIPE_RANGE = 300;
-      const _range0 = wheel.scrollWidth - wheel.clientWidth;
-      if (_range0 < _MIN_SWIPE_RANGE) {
-        const _pad = Math.ceil((_MIN_SWIPE_RANGE - _range0) / 2);
-        wheel.style.paddingLeft  = (parseFloat(wheel.style.paddingLeft)  || 0) + _pad + 'px';
-        wheel.style.paddingRight = (parseFloat(wheel.style.paddingRight) || 0) + _pad + 'px';
+      // Swipe fallback for short wheels. A 2–3 pill wheel (e.g. medication:
+      // Not taken / Taken) has too little scroll range for iOS Safari's
+      // scroll-snap:mandatory to flick through — a swipe just snaps back and
+      // the wheel feels frozen. For these, translate a horizontal swipe into an
+      // explicit step to the adjacent pill (the same path the ← / → keys use),
+      // so the gesture always advances and the pill still lands centred. Longer
+      // wheels scroll natively and are left untouched.
+      const _shortWheel = btns.length <= 3;
+      if (_shortWheel) {
+        let _swX = 0, _swY = 0;
+        wheel.addEventListener('touchstart', (e) => {
+          const t = e.touches[0]; _swX = t.clientX; _swY = t.clientY;
+        }, { passive: true });
+        wheel.addEventListener('touchend', (e) => {
+          const t = e.changedTouches[0];
+          const dx = t.clientX - _swX, dy = t.clientY - _swY;
+          // Ignore taps and mostly-vertical drags — let the tap select.
+          if (Math.abs(dx) < 28 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
+          const cur  = btns.findIndex(b => b.classList.contains('center'));
+          const from = cur < 0 ? Math.floor(btns.length / 2) : cur;
+          const next = Math.max(0, Math.min(btns.length - 1, from + (dx < 0 ? 1 : -1)));
+          if (next === from) return;
+          const b = btns[next];
+          wheel.scrollTo({ left: b.offsetLeft - (wheel.clientWidth - b.offsetWidth) / 2, behavior: 'smooth' });
+        }, { passive: true });
       }
       let _settled = false; // suppress the haptic tick on the initial centring
       const update = () => {
