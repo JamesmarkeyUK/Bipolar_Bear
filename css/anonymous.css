@@ -370,7 +370,7 @@
     .post-med  { font-size: 10px; color: var(--muted); background: var(--yellow-bg); border-radius: 4px; padding: 1px 5px; display: inline-block; margin-top: 2px; }
     .post-time { font-size: 11px; color: var(--muted); white-space: nowrap; }
     .post-text { font-size: 14px; color: var(--dark); line-height: 1.6; margin-bottom: 12px; }
-    .post-actions { display: flex; align-items: center; gap: 8px; }
+    .post-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; row-gap: 6px; }
     .like-btn {
       display: flex; align-items: center; gap: 5px;
       background: #f5f5f5; border: 1px solid transparent; border-radius: 20px;
@@ -378,7 +378,7 @@
       font-family: inherit; transition: all 0.15s;
     }
     .like-btn.liked { background: var(--yellow-bg); border-color: var(--yellow); color: var(--dark); font-weight: 700; }
-    .icon-btn { background: none; border: none; cursor: pointer; font-size: 18px; opacity: 0.5; padding: 4px; line-height: 1; }
+    .icon-btn { background: none; border: none; cursor: pointer; font-size: 16px; opacity: 0.5; padding: 4px 2px; line-height: 1; flex-shrink: 0; }
 
     /* System message */
     .sys-card { background: linear-gradient(135deg, var(--yellow), var(--yellow-dark)); border-radius: 16px; padding: 16px; margin-bottom: 10px; text-align: center; }
