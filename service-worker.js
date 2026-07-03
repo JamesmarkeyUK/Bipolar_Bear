@@ -450,7 +450,13 @@
 //       appears only when the device has Reduce Motion enabled (revealed
 //       purely by the prefers-reduced-motion media query), so it's clear why
 //       the animations are held back.
-const CACHE_NAME = 'bipolarbear-v121';
+// v122: Anonymous board — fix the "stuck on Loading posts…" boot hang when the
+//       Firebase SDK is blocked or slow (ad blockers, offline first paint,
+//       restricted networks). The 2.5s fallback boot referenced
+//       _anonInitialBoot, which was scoped inside initFirebase(), so the
+//       fallback threw a ReferenceError instead of booting the board. The flag
+//       now lives at file scope in js/anonymous.js.
+const CACHE_NAME = 'bipolarbear-v122';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
