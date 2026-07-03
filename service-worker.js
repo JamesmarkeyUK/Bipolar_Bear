@@ -413,7 +413,15 @@
 //       journal.html's PIN gate bounced every Mood Journal tap straight back
 //       to the home screen. PIN lock + dimmer wiring now defer to
 //       DOMContentLoaded.
-const CACHE_NAME = 'bipolarbear-v115';
+// v116: Focused mode — sleep-quality step joins the spinner-wheel design,
+//       sleep long-press only fires on the centred pill, icon-specific hero
+//       effects (zzz / rocket exhaust / rain / money / tear / halo), iOS
+//       wheel swipe fixes (touch-action pan-x + snap released around
+//       programmatic centring), blocking tutorial hints scroll their target
+//       into view, and the exited view gains a delete-draft bin + a
+//       "Show more" collapsible over the rest of the landing screen (with
+//       the nav header forced visible).
+const CACHE_NAME = 'bipolarbear-v116';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

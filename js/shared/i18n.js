@@ -421,6 +421,9 @@
           eyebrowMeds: 'Medication',
           eyebrowNotes: 'Notes',
           eyebrowDone: 'Review',
+          eyebrowSleepQuality: 'Sleep quality',
+          exitMore: '▾ Show more',
+          exitLess: '▴ Show less',
           doneDelete: 'Delete',
           doneClear: 'Clear',
           doneSave: 'Save',
@@ -502,7 +505,7 @@
           more: '🔋 More than usual',
           tooMuch: '🚀 Too much',
         },
-        sleepQualityHint: 'Hold a response to log sleep quality',
+        sleepQualityHint: 'Hold the selected response to log sleep quality',
         q: {
           goalProgress: '🏅 Goal progress?',
           keptBudget: '💰 Kept budget?',

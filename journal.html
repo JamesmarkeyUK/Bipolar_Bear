@@ -436,7 +436,11 @@
 
     <!-- Shown after ✕ Exit from focused mode on a day that isn't logged yet — the draft is kept -->
     <div id="fmResumeSection" style="display:none;text-align:center;margin-bottom:16px;">
-      <button onclick="_fmResumeEntry()" style="background:rgba(255,255,255,0.18);color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.25);border:1.5px solid rgba(255,255,255,0.55);border-radius:20px;padding:10px 22px;font-size:0.95em;font-weight:700;font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="journal.fm.resumeEntry">✏️ Continue your entry</button>
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px;">
+        <button onclick="_fmResumeEntry()" style="background:rgba(255,255,255,0.18);color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.25);border:1.5px solid rgba(255,255,255,0.55);border-radius:20px;padding:10px 22px;font-size:0.95em;font-weight:700;font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="journal.fm.resumeEntry">✏️ Continue your entry</button>
+        <button onclick="clearDraftWithConfirm()" title="Delete draft" style="background:rgba(255,255,255,0.14);border:1.5px solid rgba(255,255,255,0.45);border-radius:50%;width:44px;height:44px;min-width:44px;font-size:1.1em;cursor:pointer;-webkit-tap-highlight-color:transparent;display:inline-flex;align-items:center;justify-content:center;">🗑️</button>
+      </div>
+      <button id="fmExitMoreBtn" onclick="_fmExitToggleMore(this)" style="background:none;border:none;color:rgba(255,255,255,0.85);text-shadow:0 1px 3px rgba(0,0,0,0.25);text-decoration:underline;text-underline-offset:2px;font-size:0.82em;font-weight:600;font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;margin-top:14px;" data-i18n="journal.fm.exitMore">▾ Show more</button>
     </div>
 
     <!-- Journal Toggle Button (hidden until initial load completes) -->

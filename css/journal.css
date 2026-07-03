@@ -251,6 +251,76 @@
       70%  { opacity: 0.85; }
       100% { transform: translate(-50%, -50%) translate(var(--sx), var(--sy)) scale(1.2) rotate(120deg); opacity: 0; }
     }
+
+    /* ── Icon-specific hero effects (fm-aura, set per item in
+          _fmApplyAura): zzz off the sleeper, exhaust under the rocket,
+          rain from the depressed bear's cloud, and so on. ── */
+    .fm-aura { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+    .fm-aura span { position: absolute; opacity: 0; line-height: 1; }
+    /* zzz — drift up-right from the sleeper's head */
+    .fm-aura[data-type="zzz"] span {
+      left: 64%; top: 26%;
+      font-weight: 800; color: #7b68ee; font-family: inherit;
+      animation: fmZzz 2.7s ease-out infinite;
+    }
+    .fm-aura[data-type="zzz"] .a1 { font-size: 12px; animation-delay: 0s; }
+    .fm-aura[data-type="zzz"] .a2 { font-size: 15px; animation-delay: 0.9s; }
+    .fm-aura[data-type="zzz"] .a3 { font-size: 18px; animation-delay: 1.8s; }
+    @keyframes fmZzz {
+      0%   { transform: translate(0, 0) rotate(10deg); opacity: 0; }
+      20%  { opacity: 0.95; }
+      100% { transform: translate(24px, -34px) rotate(-8deg); opacity: 0; }
+    }
+    /* flame — rocket exhaust streaming down-left */
+    .fm-aura[data-type="flame"] span { left: 30%; top: 60%; animation: fmFlame 1.2s ease-in infinite; }
+    .fm-aura[data-type="flame"] .a1 { font-size: 14px; animation-delay: 0s; }
+    .fm-aura[data-type="flame"] .a2 { font-size: 10px; animation-delay: 0.4s; }
+    .fm-aura[data-type="flame"] .a3 { font-size: 12px; animation-delay: 0.8s; }
+    @keyframes fmFlame {
+      0%   { transform: translate(0, 0) scale(0.5) rotate(160deg); opacity: 0.95; }
+      100% { transform: translate(-24px, 26px) scale(1.25) rotate(200deg); opacity: 0; }
+    }
+    /* rain — drops falling under the storm cloud */
+    .fm-aura[data-type="rain"] span { top: 6%; font-size: 10px; animation: fmRain 1.9s linear infinite; }
+    .fm-aura[data-type="rain"] .a1 { left: 18%; animation-delay: 0s; }
+    .fm-aura[data-type="rain"] .a2 { left: 42%; animation-delay: 0.7s; }
+    .fm-aura[data-type="rain"] .a3 { left: 66%; animation-delay: 1.2s; }
+    .fm-aura[data-type="rain"] .a4 { left: 84%; animation-delay: 0.35s; }
+    @keyframes fmRain {
+      0%   { transform: translateY(0); opacity: 0; }
+      15%  { opacity: 0.85; }
+      100% { transform: translateY(70px); opacity: 0; }
+    }
+    /* money — notes fluttering down past the manic bear */
+    .fm-aura[data-type="money"] span { top: 0; font-size: 12px; animation: fmMoney 2.8s ease-in-out infinite; }
+    .fm-aura[data-type="money"] .a1 { left: 12%; animation-delay: 0s; }
+    .fm-aura[data-type="money"] .a2 { left: 50%; animation-delay: 1s; }
+    .fm-aura[data-type="money"] .a3 { left: 78%; animation-delay: 1.9s; }
+    @keyframes fmMoney {
+      0%   { transform: translate(0, 0) rotate(-14deg); opacity: 0; }
+      15%  { opacity: 0.9; }
+      50%  { transform: translate(9px, 38px) rotate(12deg); }
+      100% { transform: translate(-5px, 78px) rotate(-10deg); opacity: 0; }
+    }
+    /* tear — a single slow drop for the low bear */
+    .fm-aura[data-type="tear"] span { left: 60%; top: 44%; font-size: 11px; animation: fmTear 3.4s ease-in infinite; }
+    @keyframes fmTear {
+      0%   { transform: translateY(0); opacity: 0; }
+      25%  { opacity: 0.9; }
+      100% { transform: translateY(32px); opacity: 0; }
+    }
+    /* halo — soft golden glow pulsing behind the stable bear */
+    .fm-aura[data-type="halo"] .a1 {
+      left: 50%; top: 50%; width: 112px; height: 112px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 210, 80, 0.55), transparent 65%);
+      animation: fmHalo 2.8s ease-in-out infinite;
+    }
+    @keyframes fmHalo {
+      0%, 100% { opacity: 0.25; transform: translate(-50%, -50%) scale(0.9); }
+      50%      { opacity: 0.75; transform: translate(-50%, -50%) scale(1.12); }
+    }
     .fm-hero-value {
       font-size: 2.3em; font-weight: 800; color: #343a40; line-height: 1.1;
       text-align: center;
@@ -282,6 +352,11 @@
       position: relative;
       display: flex; gap: 8px;
       overflow-x: auto;
+      /* iOS: allow horizontal panning to start from the pill buttons —
+         without this a swipe that begins on a button can be eaten as a
+         tap gesture and the wheel never scrolls. */
+      touch-action: pan-x;
+      overscroll-behavior-x: contain;
       scroll-snap-type: x mandatory;
       /* Top padding clears the dial arrow + the centred pill's outline ring;
          extra bottom padding gives the arc's dipped edge pills room —
@@ -302,7 +377,13 @@
     @media (prefers-reduced-motion: reduce) {
       .fm-hero-emoji, .fm-wheel-btn img, .fm-wheel-emoji, .step-hero-emoji { animation: none !important; }
       .fm-spark { animation: none !important; opacity: 0 !important; }
+      .fm-aura { display: none !important; }
     }
+
+    /* ── Exited view (✕ Exit on an unlogged day): only the nav header and the
+          resume controls show; everything else on the landing collapses
+          behind the "Show more" toggle in #fmResumeSection. ── */
+    body.bb-fm-exited:not(.bb-fm-exited-open) .bb-exit-hide { display: none !important; }
     /* One-handed reach: keep the wheel block raised off the very bottom edge. */
     body.bb-fm-full #fmContent.fm-content-hero { padding-bottom: min(9vh, 72px); }
     /* Notes: in-content Next button sits where the wheel pills sit on the
@@ -345,6 +426,7 @@
     .fm-done-save.grey { background: #adb5bd !important; }
     .fm-wheel-btn {
       scroll-snap-align: center;
+      touch-action: pan-x;
       flex: 0 0 auto; min-width: 62px;
       padding: 10px 12px;
       border: 2px solid transparent; border-radius: 14px;

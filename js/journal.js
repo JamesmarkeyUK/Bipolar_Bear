@@ -208,6 +208,16 @@ window.addEventListener('pageshow', () => {
           if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
           el.classList.add('bb-hint-elevated');
         });
+        // A blocking hint is useless if its target is below the fold (e.g.
+        // "Manage medications" now sits at the bottom of the full-screen
+        // medication step on small phones) — bring the target into view.
+        const _scrollTarget = _showMedHint ? document.getElementById('manageMedsBtn')
+          : _showSettings ? document.getElementById('settingsBtn') : null;
+        if (_scrollTarget) {
+          setTimeout(() => {
+            try { _scrollTarget.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (_) {}
+          }, 150);
+        }
       }
       // Scroll lock + center pointer arrow for blocking onboarding steps
       if (_blockingSteps.has(step)) {
@@ -3673,9 +3683,10 @@ window.addEventListener('pageshow', () => {
       mood:       () => BB.t('journal.fm.eyebrowMood'),
       energy:     () => BB.t('journal.fm.eyebrowEnergy'),
       sleep:      () => BB.t('journal.fm.eyebrowSleep'),
-      medication: () => BB.t('journal.fm.eyebrowMeds'),
-      notes:      () => BB.t('journal.fm.eyebrowNotes'),
-      done:       () => BB.t('journal.fm.eyebrowDone'),
+      medication:   () => BB.t('journal.fm.eyebrowMeds'),
+      notes:        () => BB.t('journal.fm.eyebrowNotes'),
+      done:         () => BB.t('journal.fm.eyebrowDone'),
+      sleepQuality: () => BB.t('journal.fm.eyebrowSleepQuality'),
     };
 
     /** Platform-branded "Synced from …" badge label. */
@@ -4029,6 +4040,7 @@ window.addEventListener('pageshow', () => {
       _fmMoodSuggestion    = null;
       _fmStepsRaw          = null;
       _fmUserExited        = false;
+      _fmClearExitedView();
       const _rsO = document.getElementById('fmResumeSection');
       if (_rsO) _rsO.style.display = 'none';
       _fmExtraSelected     = new Set();
@@ -4107,13 +4119,47 @@ window.addEventListener('pageshow', () => {
       if (_fflX) _fflX.style.display = 'none';
       const _rsX = document.getElementById('fmResumeSection');
       if (_rsX) _rsX.style.display = '';
+      // Minimal exited view: nav header + resume controls stay visible, the
+      // rest of the landing content (streaks, open journal, …) collapses
+      // behind the "Show more" toggle in the resume section.
+      const _cont = document.querySelector('.container');
+      if (_cont) {
+        Array.prototype.forEach.call(_cont.children, (child, i) => {
+          if (i === 0 || child.id === 'fmResumeSection') return; // keep the nav header row
+          child.classList.add('bb-exit-hide');
+        });
+      }
+      document.body.classList.add('bb-fm-exited');
+      document.body.classList.remove('bb-fm-exited-open');
+      // Onboarding gating hides these at low steps, but after an exit the
+      // user needs somewhere to go — force the nav targets visible.
+      const _hmX = document.getElementById('homeLink');
+      if (_hmX) _hmX.style.display = '';
+      const _skX = document.getElementById('survivalNavBtn');
+      if (_skX) _skX.style.display = '';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     window._fmExit = _fmExit;
 
+    /** Undo the exited-view collapse (resume, draft delete, fresh open). */
+    function _fmClearExitedView() {
+      document.body.classList.remove('bb-fm-exited', 'bb-fm-exited-open');
+      document.querySelectorAll('.bb-exit-hide').forEach(el => el.classList.remove('bb-exit-hide'));
+      const _mb = document.getElementById('fmExitMoreBtn');
+      if (_mb) _mb.textContent = BB.t('journal.fm.exitMore');
+    }
+
+    /** "Show more / Show less" on the exited view. */
+    function _fmExitToggleMore(btn) {
+      const open = document.body.classList.toggle('bb-fm-exited-open');
+      if (btn) btn.textContent = open ? BB.t('journal.fm.exitLess') : BB.t('journal.fm.exitMore');
+    }
+    window._fmExitToggleMore = _fmExitToggleMore;
+
     /** Reopen the form exactly where the user left it (state was kept). */
     function _fmResumeEntry() {
       _fmUserExited = false;
+      _fmClearExitedView();
       const _rsR = document.getElementById('fmResumeSection');
       if (_rsR) _rsR.style.display = 'none';
       if (_fmEnabled) {
@@ -4479,9 +4525,40 @@ window.addEventListener('pageshow', () => {
       return `<span class="fm-spark s1">✦</span><span class="fm-spark s2">✦</span><span class="fm-spark s3">✧</span><span class="fm-spark s4">✦</span><span class="fm-spark s5">✧</span>`;
     }
 
+    /**
+     * Icon-specific looping effects layered over the hero: zzz drifting off
+     * the sleeping emoji, exhaust flames under the rocket, rain under the
+     * depressed bear's cloud, and so on. Keyed by emoji glyph or (for the
+     * mood PNGs) by mood value.
+     */
+    const _FM_AURAS = {
+      '😴': 'zzz', '💤': 'zzz', '🚀': 'flame',
+      manic: 'money', stable: 'halo', low: 'tear', depressed: 'rain',
+    };
+    const _AURA_HTML = {
+      zzz:   '<span class="a1">z</span><span class="a2">z</span><span class="a3">z</span>',
+      flame: '<span class="a1">🔥</span><span class="a2">🔥</span><span class="a3">🔥</span>',
+      rain:  '<span class="a1">💧</span><span class="a2">💧</span><span class="a3">💧</span><span class="a4">💧</span>',
+      money: '<span class="a1">💵</span><span class="a2">💵</span><span class="a3">💵</span>',
+      tear:  '<span class="a1">💧</span>',
+      halo:  '<span class="a1"></span>',
+    };
+    function _fmAuraHtml(type) {
+      return `<div class="fm-aura" id="fmHeroAura" data-type="${type || ''}">${_AURA_HTML[type] || ''}</div>`;
+    }
+    /** Swap the hero's aura to match the previewed item. */
+    function _fmApplyAura(auraKey) {
+      const el = document.getElementById('fmHeroAura');
+      if (!el) return;
+      const type = _FM_AURAS[auraKey] || '';
+      if (el.dataset.type === type) return;
+      el.dataset.type = type;
+      el.innerHTML = _AURA_HTML[type] || '';
+    }
+
     function _fmHeroHtml() {
       return `<div class="fm-hero">
-        <div class="fm-hero-emoji-wrap">${_fmSparksHtml()}
+        <div class="fm-hero-emoji-wrap">${_fmSparksHtml()}${_fmAuraHtml('')}
           <div class="fm-hero-emoji" id="fmHeroEmoji"></div>
         </div>
         <div class="fm-hero-value" id="fmHeroValue"></div>
@@ -4507,8 +4584,9 @@ window.addEventListener('pageshow', () => {
     function _fmWheelCommittedVal(stepId) {
       if (stepId === 'energy')     return _fmEnergyClear ? null : String(selectedEnergy);
       if (stepId === 'sleep')      return (_fmSleepClear || selectedSleep == null) ? null : String(_fmSleepBucketOf(selectedSleep));
-      if (stepId === 'mood')       return selectedMood || null;
-      if (stepId === 'medication') return selectedMedication || null;
+      if (stepId === 'mood')         return selectedMood || null;
+      if (stepId === 'medication')   return selectedMedication || null;
+      if (stepId === 'sleepQuality') return selectedSleepQuality || null;
       return null;
     }
 
@@ -4545,6 +4623,8 @@ window.addEventListener('pageshow', () => {
       }
       emojiEl.innerHTML = btn.dataset.img ? `<img src="${btn.dataset.img}" alt="">` : (btn.dataset.emoji || '');
       emojiEl.classList.toggle('ghost', !isCommitted);
+      // Icon-specific effect: mood items key by value (PNG), others by glyph.
+      _fmApplyAura(btn.dataset.img ? val : (btn.dataset.emoji || ''));
       valEl.innerHTML = valueHtml;
       valEl.classList.toggle('ghost', !isCommitted);
       if (badge) {
@@ -4604,9 +4684,13 @@ window.addEventListener('pageshow', () => {
         if (_fmWheelRAF) return;
         _fmWheelRAF = requestAnimationFrame(() => { _fmWheelRAF = null; update(); });
       }, { passive: true });
-      // Centre the committed value, else the suggestion/middle option (.init)
+      // Centre the committed value, else the suggestion/middle option (.init).
+      // iOS Safari can leave a snap container "stuck" after a programmatic
+      // scrollLeft write — disable snapping for the write, restore after.
       const init = wheel.querySelector('.fm-wheel-btn.sel') || wheel.querySelector('.fm-wheel-btn.init') || btns[Math.floor(btns.length / 2)];
+      wheel.style.scrollSnapType = 'none';
       wheel.scrollLeft = init.offsetLeft - (wheel.clientWidth - init.offsetWidth) / 2;
+      setTimeout(() => { wheel.style.scrollSnapType = ''; }, 50);
       update();
     }
 
@@ -4796,7 +4880,7 @@ window.addEventListener('pageshow', () => {
               cls: isSel ? 'sel' : '',
               init: r.val === _initBucket,
               onclick: _slOnclick,
-              extra: `onpointerdown="_fmSleepPtrDown(${r.val})" onpointerup="_fmSleepPtrUp()" onpointercancel="_fmSleepPtrCancel()"`,
+              extra: `onpointerdown="_fmSleepPtrDown(${r.val}, this)" onpointerup="_fmSleepPtrUp()" onpointercancel="_fmSleepPtrCancel()"`,
             };
           }), _sqHint);
           // Small retry link when the auto-import errored (sync on, nothing pulled in)
@@ -4806,26 +4890,18 @@ window.addEventListener('pageshow', () => {
         }
 
         case 'sleepQuality': {
-          const _sqBad    = selectedSleepQuality === 'bad';
-          const _sqGood   = selectedSleepQuality === 'good';
-          const _sqUnsure = selectedSleepQuality === 'unsure';
-          return `<div class="fm-card-grid" style="grid-template-columns:repeat(3,1fr);">
-            <button class="fm-card-btn sq-bad ${_sqBad?'sel':''}" onclick="selectedSleepQuality='bad'; _fmAdvance();"
-              style="${_sqBad ? 'border-color:#dc3545;background:#dc354522;color:#dc3545;' : ''}">
-              <span class="fm-card-emoji">😴</span>
-              <span class="fm-card-label">${BB.t('journal.value.bad')}</span>
-            </button>
-            <button class="fm-card-btn sq-ok ${_sqUnsure?'sel':''}" onclick="selectedSleepQuality='unsure'; _fmAdvance();"
-              style="${_sqUnsure ? 'border-color:#adb5bd;background:#adb5bd22;color:#adb5bd;' : ''}">
-              <span class="fm-card-emoji">😐</span>
-              <span class="fm-card-label">${BB.t('journal.value.ok')}</span>
-            </button>
-            <button class="fm-card-btn sq-good ${_sqGood?'sel':''}" onclick="selectedSleepQuality='good'; _fmAdvance();"
-              style="${_sqGood ? 'border-color:#51cf66;background:#51cf6622;color:#51cf66;' : ''}">
-              <span class="fm-card-emoji">😊</span>
-              <span class="fm-card-label">${BB.t('journal.value.good')}</span>
-            </button>
-          </div>`;
+          const _SQ_OPTS = [
+            { val:'bad',    emoji:'😴', label:BB.t('journal.value.bad'),  color:'#dc3545' },
+            { val:'unsure', emoji:'😐', label:BB.t('journal.value.ok'),   color:'#adb5bd' },
+            { val:'good',   emoji:'😊', label:BB.t('journal.value.good'), color:'#51cf66' },
+          ];
+          const _sqWheel = _fmWheelHtml(_SQ_OPTS.map(o => ({
+            val: o.val, emoji: o.emoji, label: o.label, color: o.color,
+            cls: selectedSleepQuality === o.val ? 'sel' : '',
+            init: (selectedSleepQuality || 'unsure') === o.val,
+            onclick: `selectedSleepQuality='${o.val}'; _fmAdvance();`,
+          })));
+          return _fmHeroHtml() + _sqWheel;
         }
 
         case 'medication': {
@@ -5206,8 +5282,9 @@ window.addEventListener('pageshow', () => {
           const _doneDate = (() => { try { const _dv = document.getElementById('entryDate')?.value; if (!_dv) return ''; const _dd = new Date(_dv+'T00:00:00'); return _dd.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'}); } catch(_){return '';} })();
           // Bear hero: the chosen mood shown big, instead of as a summary row.
           const _linkedHero = selectedLinkedMood ? ` <span style="color:#adb5bd;font-weight:600;">/</span> <img src="images/moods/${selectedLinkedMood}.png" style="width:34px;height:34px;object-fit:contain;vertical-align:middle;opacity:0.9;"> ${cap(selectedLinkedMood)}` : '';
+          const _doneAura = _FM_AURAS[selectedMood] || '';
           const _heroHtml = `<div class="fm-hero">
-              <div class="fm-hero-emoji-wrap">${_fmSparksHtml()}
+              <div class="fm-hero-emoji-wrap">${_fmSparksHtml()}<div class="fm-aura" data-type="${_doneAura}">${_AURA_HTML[_doneAura] || ''}</div>
                 <div class="fm-hero-emoji"><img src="images/moods/${selectedMood}.png" alt=""></div>
               </div>
               <div class="fm-hero-value" style="color:${mc};">${cap(selectedMood)}${_linkedHero}</div>
@@ -6635,6 +6712,11 @@ window.addEventListener('pageshow', () => {
         const _elCancel = document.getElementById('fmExitLink');
         if (_elCancel) _elCancel.style.display = 'none';
       }
+      // Draft is gone — the "Continue your entry" exited view no longer applies.
+      _fmUserExited = false;
+      if (typeof _fmClearExitedView === 'function') _fmClearExitedView();
+      const _rsCnc = document.getElementById('fmResumeSection');
+      if (_rsCnc) _rsCnc.style.display = 'none';
       clearDraft();
       resetEntryForm();
       document.getElementById('entryFormCard').style.display = 'none';
@@ -12535,8 +12617,12 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
     // window._fmSlLpFired must be on window so inline onclick handlers can read it
     window._fmSlLpFired = false;
     let _fmSlLpTimer = null;
-    window._fmSleepPtrDown = function(val) {
+    window._fmSleepPtrDown = function(val, el) {
       window._fmSlLpFired = false;
+      // Only the pill currently in the spinner's centre slot accepts the
+      // long-press — holding an off-centre pill mid-swipe shouldn't jump
+      // to the sleep-quality step.
+      if (el && !el.classList.contains('center')) return;
       _fmSlLpTimer = setTimeout(() => {
         window._fmSlLpFired = true;
         _fmWantsSleepQuality = true;
