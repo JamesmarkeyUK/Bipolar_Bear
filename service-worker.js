@@ -540,7 +540,11 @@
 //       definite 'not-taken', not 'unsure'. Version bump across web
 //       _APP_VERSION, version.json web channel, iOS (app+widget) + Android,
 //       plus 1.21 What's-New + changelog.
-const CACHE_NAME = 'bipolarbear-v129';
+// v130: Anonymous board — comments inside a thread now carry the same
+//       moderation controls the feed posts do (report / mute / SOS, admin
+//       delete + ban, self-remove your own comment). Previously replies had no
+//       controls at all. js/anonymous.js + css/anonymous.css touched.
+const CACHE_NAME = 'bipolarbear-v130';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

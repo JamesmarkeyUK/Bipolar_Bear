@@ -491,6 +491,8 @@
     .comment-card:last-child { border-bottom: none; }
     .comment-header { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
     .comment-text { font-size: 13px; color: var(--dark); line-height: 1.55; padding-left: 36px; }
+    .comment-actions { display: flex; align-items: center; gap: 6px; margin-top: 4px; padding-left: 36px; }
+    .comment-actions .icon-btn { font-size: 14px; }
 
     /* ── Wiki tab ── */
     #wiki-section { padding: 12px 12px 110px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }

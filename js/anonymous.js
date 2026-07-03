@@ -76,6 +76,12 @@ let adminDeleteId    = '';
 let adminBanName     = '';
 let selfDeleteId     = '';
 let commentTargetId  = '';
+// Comment moderation targets (thread view). Parent post id is captured at
+// click time so a confirm still resolves the right thread even if state drifts.
+let commentActionParent = '';
+let commentSelfDeleteId  = '';
+let commentAdminDeleteId = '';
+let reportCommentMeta    = null; // {id, parentId, name, text} when reporting a comment, else null
 let lastCommentAuthor = ''; // monika of the most recent comment in the open thread (for the per-thread post gate)
 let currentThreadUnsub = null;
 let _bbUser         = null; // Firebase-auth verified user (BB App path)
@@ -2811,6 +2817,50 @@ function closeThread() {
   lastCommentAuthor = '';
 }
 
+// Hard-delete a comment from a thread (self-remove or admin-remove) and keep
+// the parent post's commentCount in step. The open thread's snapshot listener
+// drops the comment from the list on the next tick.
+function deleteComment(parentId, commentId, opts) {
+  const admin = !!(opts && opts.admin);
+  if (!db || !parentId || !commentId) return;
+  const postRef = db.collection(BB_BRAND.collections.posts).doc(parentId);
+  postRef.collection('comments').doc(commentId).delete()
+    .then(() => postRef.update({
+      commentCount: firebase.firestore.FieldValue.increment(-1),
+    }).catch(() => {}))
+    .catch(err => console.error('[Thread] comment delete failed', err));
+  showHint(admin ? 'Comment deleted 🛡️' : 'Comment removed ✓');
+}
+
+// The self-delete / admin-delete overlays are shared between feed posts and
+// thread comments. Cache their default (post) copy once, then swap in
+// comment-specific wording when acting on a comment, restoring it otherwise.
+let _delOverlayCopy = null;
+function setDeleteOverlayMode(which, isComment) {
+  if (!_delOverlayCopy) {
+    _delOverlayCopy = {
+      selfTitle: document.querySelector('#ov-self-delete .sheet-title').textContent,
+      selfSub:   document.querySelector('#ov-self-delete .sheet-sub').textContent,
+      selfBtn:   document.getElementById('sdel-confirm').textContent,
+      adminTitle:document.querySelector('#ov-admin-delete .sheet-title').textContent,
+      adminSub:  document.querySelector('#ov-admin-delete .sheet-sub').textContent,
+    };
+  }
+  if (which === 'self') {
+    document.querySelector('#ov-self-delete .sheet-title').textContent =
+      isComment ? 'Remove your comment?' : _delOverlayCopy.selfTitle;
+    document.querySelector('#ov-self-delete .sheet-sub').textContent =
+      isComment ? "This will permanently delete your comment. This can't be undone." : _delOverlayCopy.selfSub;
+    document.getElementById('sdel-confirm').textContent =
+      isComment ? 'Remove comment' : _delOverlayCopy.selfBtn;
+  } else {
+    document.querySelector('#ov-admin-delete .sheet-title').textContent =
+      isComment ? 'Delete comment?' : _delOverlayCopy.adminTitle;
+    document.querySelector('#ov-admin-delete .sheet-sub').textContent =
+      isComment ? "This comment will be permanently removed and can't be undone." : _delOverlayCopy.adminSub;
+  }
+}
+
 function renderThreadHeader(p) {
   if (p.isTopic) {
     return `<div class="thread-orig-post">
@@ -2867,7 +2917,22 @@ function renderComment(c) {
   const g2 = safeColor(c.grad2, YELLOW_DARK);
   const av = c.initials || initials(c.name);
   const adminBadge = c.isAdmin ? '<span class="admin-badge">ADMIN</span>' : '';
-  return `<div class="comment-card">
+  const isMine = c.name && c.name === profile.monika;
+  // Moderation controls (mirror the feed post controls). Actions read the
+  // comment id / author from the .comment-card dataset, so buttons stay light.
+  const selfDeleteBtn = isMine && !profile.isAdmin
+    ? `<button class="icon-btn" data-cselfdelete title="Remove your comment" style="opacity:0.4;">🗑️</button>` : '';
+  const adminDeleteBtn = profile.isAdmin
+    ? `<button class="icon-btn" data-cdelete title="Delete comment (admin)">🗑️</button>` : '';
+  const banBtn = profile.isAdmin && !isMine
+    ? `<button class="icon-btn" data-cban title="Ban this user (admin)">🚫</button>` : '';
+  const sosBtn = !isMine
+    ? `<button class="icon-btn" data-csos title="Send SOS flag">🆘</button>` : '';
+  const reportBtn = !isMine
+    ? `<button class="icon-btn" data-creport title="Report comment">🚨</button>` : '';
+  const muteBtn = !isMine
+    ? `<button class="icon-btn" data-cmute title="Mute this user">🙈</button>` : '';
+  return `<div class="comment-card" data-cid="${esc(c.id)}" data-author="${esc(c.name)}">
     <div class="comment-header">
       <div class="post-av-circle" style="width:28px;height:28px;font-size:11px;flex-shrink:0;background:linear-gradient(135deg,${g1},${g2});">${esc(av)}</div>
       <div style="flex:1;min-width:0;">
@@ -2876,6 +2941,15 @@ function renderComment(c) {
       </div>
     </div>
     <div class="comment-text">${esc(c.text)}</div>
+    <div class="comment-actions">
+      <div style="flex:1"></div>
+      ${selfDeleteBtn}
+      ${adminDeleteBtn}
+      ${banBtn}
+      ${sosBtn}
+      ${reportBtn}
+      ${muteBtn}
+    </div>
   </div>`;
 }
 
@@ -2885,6 +2959,50 @@ function setupThread() {
 
   ta.addEventListener('input', () => { sendBtn.disabled = !ta.value.trim(); });
   document.getElementById('thread-close').addEventListener('click', closeThread);
+
+  // Comment moderation controls (delegated — the comments list re-renders on
+  // every snapshot, so per-button binding would be re-wired constantly).
+  document.getElementById('thread-comments-list').addEventListener('click', e => {
+    const btn = e.target.closest('button.icon-btn');
+    if (!btn) return;
+    const card = btn.closest('.comment-card');
+    if (!card) return;
+    const cid    = card.dataset.cid || '';
+    const author = card.dataset.author || '';
+    const d = btn.dataset;
+    if ('cmute' in d) {
+      muteTargetName = author;
+      document.getElementById('mute-body').innerHTML =
+        `Hide all posts and comments from <strong>[${esc(author)}]</strong> on this device? You can unmute them any time from the About screen.`;
+      openOv('ov-mute');
+    } else if ('csos' in d) {
+      sosTargetName = author;
+      document.getElementById('sos-body').innerHTML =
+        `Are you worried about <strong>[${esc(author)}]</strong>? A moderator will be notified to check in. Only use this if genuinely concerned.`;
+      openOv('ov-sos');
+    } else if ('cban' in d) {
+      adminBanName = author;
+      document.getElementById('aban-body').innerHTML =
+        `Ban <strong>[${esc(author)}]</strong>? Their existing posts will be removed and they won't be able to post or comment again.`;
+      openOv('ov-admin-ban');
+    } else if ('creport' in d) {
+      reportCommentMeta = {
+        id: cid, parentId: commentTargetId, name: author,
+        text: card.querySelector('.comment-text')?.textContent || '',
+      };
+      openOv('ov-report');
+    } else if ('cselfdelete' in d) {
+      commentSelfDeleteId = cid;
+      commentActionParent = commentTargetId;
+      setDeleteOverlayMode('self', true);
+      openOv('ov-self-delete');
+    } else if ('cdelete' in d) {
+      commentAdminDeleteId = cid;
+      commentActionParent = commentTargetId;
+      setDeleteOverlayMode('admin', true);
+      openOv('ov-admin-delete');
+    }
+  });
 
   let _sending = false;
   sendBtn.addEventListener('click', async () => {
@@ -3072,6 +3190,7 @@ function renderPosts(posts) {
   list.querySelectorAll('[data-report]').forEach(btn => {
     btn.addEventListener('click', () => {
       reportTargetId = btn.dataset.report;
+      reportCommentMeta = null; // this is a post report, not a comment report
       openOv('ov-report');
     });
   });
@@ -3088,6 +3207,8 @@ function renderPosts(posts) {
   list.querySelectorAll('[data-selfdelete]').forEach(btn => {
     btn.addEventListener('click', () => {
       selfDeleteId = btn.dataset.selfdelete;
+      commentSelfDeleteId = ''; // this is a post self-delete, not a comment
+      setDeleteOverlayMode('self', false);
       openOv('ov-self-delete');
     });
   });
@@ -3095,6 +3216,8 @@ function renderPosts(posts) {
   list.querySelectorAll('[data-delete]').forEach(btn => {
     btn.addEventListener('click', () => {
       adminDeleteId = btn.dataset.delete;
+      commentAdminDeleteId = ''; // this is a post delete, not a comment
+      setDeleteOverlayMode('admin', false);
       openOv('ov-admin-delete');
     });
   });
@@ -3489,7 +3612,18 @@ function setupOverlayActions() {
   document.querySelectorAll('.report-opt').forEach(btn => {
     btn.addEventListener('click', () => {
       closeOv('ov-report');
-      if (db && reportTargetId) {
+      if (db && reportCommentMeta) {
+        // Comment report — target the comment in its parent thread.
+        const m = reportCommentMeta;
+        db.collection(BB_BRAND.collections.reports).add({
+          type: 'report', kind: 'comment',
+          postId: m.parentId, commentId: m.id, reason: btn.dataset.reason,
+          postText: m.text, postName: m.name,
+          reportedBy: profile.monika,
+          adminEmail: ADMIN_EMAIL,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        }).catch(() => {});
+      } else if (db && reportTargetId) {
         const post = localPosts.find(p => p.id === reportTargetId);
         db.collection(BB_BRAND.collections.reports).add({
           type: 'report', postId: reportTargetId, reason: btn.dataset.reason,
@@ -3503,6 +3637,8 @@ function setupOverlayActions() {
         db.collection(BB_BRAND.collections.posts).doc(reportTargetId)
           .update({ reported: true }).catch(() => {});
       }
+      reportCommentMeta = null;
+      reportTargetId = '';
       showHint('Report submitted — thank you 🙏');
     });
   });
@@ -3523,6 +3659,12 @@ function setupOverlayActions() {
   document.getElementById('sdel-cancel').addEventListener('click', () => closeOv('ov-self-delete'));
   document.getElementById('sdel-confirm').addEventListener('click', () => {
     closeOv('ov-self-delete');
+    if (commentSelfDeleteId) {
+      deleteComment(commentActionParent, commentSelfDeleteId, { admin: false });
+      commentSelfDeleteId = '';
+      commentActionParent = '';
+      return;
+    }
     if (db && selfDeleteId) {
       db.collection(BB_BRAND.collections.posts).doc(selfDeleteId).delete().catch(() => {});
       localPosts = localPosts.filter(p => p.id !== selfDeleteId);
@@ -3535,6 +3677,12 @@ function setupOverlayActions() {
   document.getElementById('adel-cancel').addEventListener('click', () => closeOv('ov-admin-delete'));
   document.getElementById('adel-confirm').addEventListener('click', () => {
     closeOv('ov-admin-delete');
+    if (commentAdminDeleteId) {
+      deleteComment(commentActionParent, commentAdminDeleteId, { admin: true });
+      commentAdminDeleteId = '';
+      commentActionParent = '';
+      return;
+    }
     adminDeletePost(adminDeleteId);
   });
 
