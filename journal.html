@@ -402,6 +402,14 @@
       </div>
       <div id="fmStepCounter" style="text-align:center;font-size:0.75em;color:#6c757d;margin-bottom:10px;"></div>
 
+      <!-- Reduced-motion indicator: hidden by default, revealed purely by the
+           prefers-reduced-motion media query in journal.css so it appears
+           exactly when the animations are being held back. -->
+      <div id="fmReducedMotionBadge" title="Animations are reduced because your device has Reduce Motion turned on.">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 9a7 7 0 0 1 0 6"/><path d="M9 6a12 12 0 0 1 0 12"/><line x1="3.5" y1="20.5" x2="20.5" y2="3.5"/></svg>
+        <span>Reduced motion</span>
+      </div>
+
       <!-- Completed-step summary chips + save shortcut -->
       <div style="display:flex;align-items:center;gap:6px;justify-content:center;margin-bottom:14px;">
         <div id="fmSummaryBar" style="display:none;flex-wrap:nowrap;overflow-x:auto;gap:6px;justify-content:center;scrollbar-width:none;"></div>

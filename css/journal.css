@@ -379,6 +379,9 @@
     .fm-wheel-btn img, .fm-wheel-emoji { animation: fmPillBob 2.6s ease-in-out infinite; }
     .fm-wheel-btn:nth-child(2n) img,  .fm-wheel-btn:nth-child(2n) .fm-wheel-emoji  { animation-delay: -0.9s; }
     .fm-wheel-btn:nth-child(3n) img,  .fm-wheel-btn:nth-child(3n) .fm-wheel-emoji  { animation-delay: -1.7s; }
+    /* Reduced-motion indicator badge — shown only when the OS setting is on
+       (revealed inside the media query below). */
+    #fmReducedMotionBadge { display: none; }
     @media (prefers-reduced-motion: reduce) {
       /* Motion-sensitivity compromise: suppress the large / travelling particle
          effects (sparks, pill bob, and the drifting auras — zzz, flame, rain,
@@ -392,6 +395,22 @@
       .fm-aura[data-type="rain"]  span,
       .fm-aura[data-type="money"] span,
       .fm-aura[data-type="tear"]  span { animation: none !important; opacity: 0 !important; }
+      #fmReducedMotionBadge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        align-self: center;
+        margin: -4px auto 12px;
+        padding: 3px 10px;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.05);
+        color: #868e96;
+        font-size: 0.68em;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        -webkit-tap-highlight-color: transparent;
+      }
+      #fmReducedMotionBadge svg { flex-shrink: 0; }
     }
 
     /* ── Exited view (✕ Exit on an unlogged day): only the nav header and the

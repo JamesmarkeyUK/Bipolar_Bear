@@ -446,7 +446,11 @@
 //       pill bob, drifting zzz/flame/rain/money/tear auras) stay suppressed,
 //       but the gentle in-place idle motion (hero float + stable-bear halo
 //       glow) is now allowed through so the form still feels alive.
-const CACHE_NAME = 'bipolarbear-v120';
+// v121: Focused mode — small "Reduced motion" badge in the card header that
+//       appears only when the device has Reduce Motion enabled (revealed
+//       purely by the prefers-reduced-motion media query), so it's clear why
+//       the animations are held back.
+const CACHE_NAME = 'bipolarbear-v121';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
