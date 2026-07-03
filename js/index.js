@@ -2023,6 +2023,7 @@ function _handleIndexJournalNav() {
     // (and fab.js) reads the same value without depending on this script.
     const _APP_VERSION = window._APP_VERSION;
     const _WHATS_NEW_HEADLINES = {
+      '1.21': 'The medication step now has an "🤷 Unsure" answer in the middle, for the nights you can’t quite remember',
       '1.20': 'Another go at the medication and sleep-quality steps — the wheels are rebuilt to spin exactly like the mood and energy ones',
       '1.19': 'Swiping the medication and sleep-quality steps now works properly — the shorter wheels spin just like the mood and energy ones',
       '1.18': 'Two journal fixes: swiping the medication step now works properly, and the first step no longer opens with an awkward gap above the question',

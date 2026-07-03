@@ -2383,7 +2383,7 @@ window.addEventListener('pageshow', () => {
               <div style="color: #6c757d; font-size: 0.9em; display:flex; flex-wrap:wrap; line-height:1.8;">${(() => {
                 const _G='#2ECC40',_R='#FF4136',_N='#adb5bd';
                 const _chips = [];
-                if (entry.medication) _chips.push([entry.medication!=='not-taken'?'💊 Taken':'💊 Not taken', entry.medication!=='not-taken'?_G:_R]);
+                if (entry.medication) _chips.push([entry.medication==='taken'?'💊 Taken':entry.medication==='unsure'?'💊 Unsure':'💊 Not taken', entry.medication==='taken'?_G:entry.medication==='unsure'?_N:_R]);
                 if (entry.goals)      _chips.push([`🏅 ${entry.goals==='some'?'Yes':'No'}`, entry.goals==='some'?_G:_R]);
                 if (entry.budget)     _chips.push([`💰 ${entry.budget==='yes'?'Yes':'No'}`, entry.budget==='yes'?_G:_R]);
                 if (entry.exercise)   _chips.push([`🏋️ ${entry.exercise==='yes'?'Yes':'No'}`, entry.exercise==='yes'?_G:_R]);
@@ -2911,7 +2911,7 @@ window.addEventListener('pageshow', () => {
         rows.push(`<div style="margin-bottom:6px;"><b>Energy:</b> ${entry.energy}/10${_stepsStr}</div>`);
       }
       if (entry.sleep  != null) rows.push(`<div style="margin-bottom:6px;"><b>Sleep:</b> ${entry.sleep}h</div>`);
-      rows.push(`<div style="margin-bottom:6px;"><b>Medication:</b> ${entry.medication === 'not-taken' ? '❌ Not taken' : '✅ Taken'}</div>`);
+      rows.push(`<div style="margin-bottom:6px;"><b>Medication:</b> ${entry.medication === 'not-taken' ? '❌ Not taken' : entry.medication === 'unsure' ? '🤷 Unsure' : '✅ Taken'}</div>`);
       if (entry.goals)  rows.push(`<div style="margin-bottom:6px;"><b>Goals:</b> ${cap(entry.goals)}</div>`);
       if (entry.budget) rows.push(`<div style="margin-bottom:6px;"><b>Budget:</b> ${entry.budget === 'yes' ? '✅ Kept budget' : '❌ Didn\'t keep budget'}</div>`);
       if (entry.anxiety && entry.anxiety !== 'none')           rows.push(`<div style="margin-bottom:6px;"><b>Anxiety:</b> ${cap(entry.anxiety)}</div>`);
@@ -5030,21 +5030,22 @@ window.addEventListener('pageshow', () => {
           // Taken, Taken — so it runs the EXACT same native-scroll + CSS-snap
           // path as the working 5-pill mood/energy wheels (a genuine 5-slot row,
           // not a 2-slot one faked wide with padding, which never worked
-          // on-device). The empty centre slot is a neutral, non-committable
-          // start; only the four real slots commit. The pill body shows the
-          // label text — the ✅/❌ emoji is the hero glyph (data-emoji).
+          // on-device). The centre slot is a real "Unsure" answer (grey), the
+          // neutral default under the dial; all five slots commit. The pill body
+          // shows the label text — the ✅/❌/🤷 emoji is the hero glyph (data-emoji).
           const _mdSplit = (s) => { const p = String(s).split(' '); return { emoji: p[0] || '', label: p.slice(1).join(' ') || String(s) }; };
           const _mdNot = _mdSplit(BB.t('journal.med.notTaken'));
           const _mdTk  = _mdSplit(BB.t('journal.med.taken'));
-          const _mdP = (val, sp, color) => ({
+          const _mdUn  = _mdSplit(BB.t('journal.med.unsure'));
+          const _mdP = (val, sp, color, extra) => Object.assign({
             val, emoji: sp.emoji, label: sp.label, color,
             cls: selectedMedication === val ? 'sel' : '',
             onclick: `selectedMedication='${val}'; _fmAdvance();`,
-          });
+          }, extra || {});
           const _medWheel = _fmWheelHtml([
             _mdP('not-taken', _mdNot, 'var(--brand-primary)'),
             _mdP('not-taken', _mdNot, 'var(--brand-primary)'),
-            { val:'', emoji:'💊', label:'', color:'', cls:'fm-wheel-blank', onclick:'', init: !selectedMedication },
+            _mdP('unsure', _mdUn, '#adb5bd', { init: !selectedMedication }),
             _mdP('taken', _mdTk, '#51cf66'),
             _mdP('taken', _mdTk, '#51cf66'),
           ]);
@@ -5331,7 +5332,7 @@ window.addEventListener('pageshow', () => {
               ? { text:`<span style="color:#adb5bd;">Energy: —</span>`, step:'energy' }
               : { text:`Energy: ${eLabel}${_doneStepsStr}`, step:'energy', note:_sn('energy') },
             selectedMedication
-              ? { text:selectedMedication==='taken'?'✅ Medication taken':'❌ Medication not taken', step:'medication', note:_sn('medication') }
+              ? { text:selectedMedication==='taken'?'✅ Medication taken':selectedMedication==='unsure'?'🤷 Medication unsure':'❌ Medication not taken', step:'medication', note:_sn('medication') }
               : { text:`<span style="color:#adb5bd;">💊 Medication: —</span>`, step:'medication' },
             (()=>{
               const _G='#2ECC40',_R='#FF4136',_N='#adb5bd';
@@ -5477,8 +5478,8 @@ window.addEventListener('pageshow', () => {
           // Absorbed into the sleep chip — skip showing a separate chip
           continue;
         } else if (s.id === 'medication' && selectedMedication) {
-          html = selectedMedication === 'taken' ? '💊 ✅' : '💊 ❌';
-          borderColor = selectedMedication === 'taken' ? '#2ECC40' : '#dc3545';
+          html = selectedMedication === 'taken' ? '💊 ✅' : selectedMedication === 'unsure' ? '💊 🤷' : '💊 ❌';
+          borderColor = selectedMedication === 'taken' ? '#2ECC40' : selectedMedication === 'unsure' ? '#adb5bd' : '#dc3545';
         } else if (s.id === 'more_data') {
           html = '➕'; borderColor = '#adb5bd';
         } else if (s.id === 'notes') {
@@ -7255,7 +7256,7 @@ window.addEventListener('pageshow', () => {
         if (_map[m] && window.BB && BB.t) return BB.t(_map[m]);
         return m.charAt(0).toUpperCase() + m.slice(1);
       };
-      const medLabels = { taken: _t('journal.med.taken'), missed: _t('journal.med.missed'), skipped: _t('journal.med.skipped') };
+      const medLabels = { taken: _t('journal.med.taken'), missed: _t('journal.med.missed'), skipped: _t('journal.med.skipped'), unsure: _t('journal.med.unsure'), 'not-taken': _t('journal.med.notTaken') };
       const cap = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
 
       let html = `<div style="font-weight:700;color:#495057;margin-bottom:14px;font-size:0.95em;">🗓️ ${dateStr}</div>`;
@@ -7545,7 +7546,7 @@ window.addEventListener('pageshow', () => {
                  title="Mood: ${{manic:'Manic',elevated:'Elevated',stable:'Stable',good:'Stable',low:'Low',depressed:'Depressed'}[entry.mood] || (entry.mood ? entry.mood.charAt(0).toUpperCase()+entry.mood.slice(1) : '')}
 Energy: ${entry.energy}/10
 Sleep: ${entry.sleep}h${entry.steps != null ? `\nSteps: ${entry.steps.toLocaleString()}` : ''}
-Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medication || 'taken')}"></div>
+Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medication === 'unsure' ? 'Unsure' : (entry.medication || 'taken')}"></div>
             <div class="chart-label">${date.getDate()}/${date.getMonth() + 1}</div>
           </div>
         `;
@@ -8820,7 +8821,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medicati
               return cf ? `  ·  ${cf.label}: ${val === 'yes' ? 'Yes' : 'No'}` : '';
             }).filter(Boolean).join('');
           const _moodLabel = { manic:BB.t('mood.manic'), elevated:BB.t('mood.elevated'), stable:BB.t('mood.stable'), good:BB.t('mood.stable'), low:BB.t('mood.low'), depressed:BB.t('mood.depressed') };
-          const detail = `${_moodLabel[entry.mood] || (entry.mood ? entry.mood.charAt(0).toUpperCase() + entry.mood.slice(1) : '')}  ·  Energy ${entry.energy}/10  ·  Sleep ${entry.sleep}h${sleepQualityStr}${stepsStr}  ·  Meds: ${entry.medication === 'not-taken' ? 'No / Forgot' : (entry.medication || 'taken')}${anxietyStr}${irritabilityStr}${stressStr2}${alcoholStr}${smokingStr}${drugsStr}${exerciseStr}${outsideStr}${customStr}${recordedPart}`;
+          const detail = `${_moodLabel[entry.mood] || (entry.mood ? entry.mood.charAt(0).toUpperCase() + entry.mood.slice(1) : '')}  ·  Energy ${entry.energy}/10  ·  Sleep ${entry.sleep}h${sleepQualityStr}${stepsStr}  ·  Meds: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medication === 'unsure' ? 'Unsure' : (entry.medication || 'taken')}${anxietyStr}${irritabilityStr}${stressStr2}${alcoholStr}${smokingStr}${drugsStr}${exerciseStr}${outsideStr}${customStr}${recordedPart}`;
           const detailLines = doc.splitTextToSize(detail, pageW - margin - (dotX + 35));
           doc.text(detailLines, dotX + 35, y);
           y += (detailLines.length - 1) * 4;

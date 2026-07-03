@@ -279,6 +279,7 @@
         <span id="medLabelBtn" class="label-btn" onclick="showMedicationList()">💊 My Meds</span>
         <div class="medication-selector">
           <button type="button" class="medication-btn" data-medication="not-taken" data-i18n="journal.editMood.notTaken">No / Forgot</button>
+          <button type="button" class="medication-btn" data-medication="unsure" data-i18n="journal.med.unsure">🤷 Unsure</button>
           <button type="button" class="medication-btn medication-taken" data-medication="taken" data-i18n="journal.med.taken">Taken</button>
         </div>
       </div>
@@ -693,7 +694,11 @@
       <h3 style="margin-bottom:16px;">📋 Changelog</h3>
       <div style="text-align:left; font-size:0.9em; color:#495057; line-height:1.7;">
         <div style="margin-bottom:14px;">
-          <strong style="color:var(--brand-primary);">v1.20</strong><br>
+          <strong style="color:var(--brand-primary);">v1.21</strong><br>
+          • ✨ New: the medication step now has an "🤷 Unsure" answer in the middle — for nights you can’t quite remember. It shows up as Unsure across your calendar, stats and export, and counts as not taken for your adherence streak<br>
+        </div>
+        <div style="margin-bottom:14px;">
+          <strong style="color:#6c757d;">v1.20</strong><br>
           • 🐛 Fix: the medication and sleep-quality wheels are rebuilt as full spinners so they swipe exactly like the mood and energy steps<br>
         </div>
         <div style="margin-bottom:14px;">
@@ -1065,6 +1070,7 @@
         <label style="font-weight:600; color:#495057;" data-i18n="journal.label.medication">Medication</label>
         <select id="editEntryMedication" style="width:100%; padding:8px; border:2px solid #e9ecef; border-radius:8px; margin-top:6px; font-size:1em; box-sizing:border-box;">
           <option value="taken" data-i18n="journal.med.taken">✅ Taken</option>
+          <option value="unsure" data-i18n="journal.med.unsure">🤷 Unsure</option>
           <option value="not-taken" data-i18n="journal.editMood.notTaken">❌ No / Forgot</option>
         </select>
       </div>

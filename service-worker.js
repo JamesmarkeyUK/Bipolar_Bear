@@ -527,7 +527,20 @@
 //       non-selectable spacer slot. Version bump across web _APP_VERSION,
 //       version.json web channel, iOS (app+widget) + Android, plus 1.20
 //       What's-New + changelog.
-const CACHE_NAME = 'bipolarbear-v128';
+// v129: Release 1.21 (build 21) — medication step gains a third answer,
+//       "🤷 Unsure", as the neutral centre slot of the 5-pill wheel (was an
+//       invisible blank). It's a real saved value: displayed honestly as
+//       Unsure everywhere it appears (focused review + summary chips, calendar
+//       chips, stat detail, calendar row label, PDF/CSV export, the regular
+//       form buttons + edit-entry <select>), and counts as NOT taken for the
+//       medication adherence % and the med streak (per user's choice — all the
+//       adherence checks already gate on === 'taken', so Unsure is excluded
+//       automatically). New i18n key journal.med.unsure (English; other locales
+//       fall back to it). Warning-sign mood scoring still fires only on a
+//       definite 'not-taken', not 'unsure'. Version bump across web
+//       _APP_VERSION, version.json web channel, iOS (app+widget) + Android,
+//       plus 1.21 What's-New + changelog.
+const CACHE_NAME = 'bipolarbear-v129';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

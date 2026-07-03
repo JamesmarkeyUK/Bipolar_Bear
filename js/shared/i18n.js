@@ -571,7 +571,7 @@
           deleteAllBody: 'This will permanently delete all your journal entries and remove your PIN.\n\nThere is no recovery. Continue?',
           deleteAllLast: 'Last chance — all entries will be deleted. Are you sure?',
         },
-        med: { taken: '✅ Taken', missed: '❌ Missed', skipped: '⏭️ Skipped', notTaken: '❌ Not taken' },
+        med: { taken: '✅ Taken', missed: '❌ Missed', skipped: '⏭️ Skipped', notTaken: '❌ Not taken', unsure: '🤷 Unsure' },
         moodInfo: {
           yourDefinition: 'Your Definition',
           yourStrategies: 'Your Coping Strategies',
