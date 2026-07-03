@@ -4717,21 +4717,46 @@ window.addEventListener('pageshow', () => {
       // centring — a pill always settles directly under the dial arrow.
       wheel.style.paddingLeft  = Math.max(0, (wheel.clientWidth - btns[0].offsetWidth) / 2) + 'px';
       wheel.style.paddingRight = Math.max(0, (wheel.clientWidth - btns[btns.length - 1].offsetWidth) / 2) + 'px';
-      // Swipe for short wheels. A 2–3 pill wheel (e.g. medication: Not taken /
-      // Taken) has too little scroll range for iOS Safari's
-      // scroll-snap:mandatory to flick through — the native swipe just snaps
-      // straight back, so the wheel feels frozen. Kill the native scroll
-      // entirely (overflow:hidden still allows programmatic scrollLeft) and
-      // drive it ourselves: a horizontal drag steps to the adjacent pill via a
-      // smooth scroll that can't be snapped back, and always lands centred.
+      // Swipe/drag for short wheels. A 2–3 pill wheel (e.g. medication:
+      // Not taken / Taken) has too little scroll range for native
+      // scroll-snap:mandatory flicks — the swipe just snaps straight back, so
+      // the wheel feels frozen. Kill the native scroll (overflow:hidden still
+      // allows programmatic scrollLeft) AND scroll-snap: on iOS an active
+      // mandatory snap re-targets a programmatic smooth scroll back to the
+      // pill it started on, which is the same frozen feel overflow:hidden was
+      // meant to fix. Movement is driven by a rAF scrollLeft animation (no
+      // native smooth scroll to be hijacked): a horizontal drag — finger or
+      // mouse — steps to the adjacent pill and always lands centred.
       // Longer wheels scroll natively and are left untouched.
       const _shortWheel = btns.length <= 3;
       if (_shortWheel) {
         wheel.style.overflowX = 'hidden';
+        wheel.style.scrollSnapType = 'none';
+        wheel.style.webkitOverflowScrolling = 'auto';
+        let _animRAF = null;
+        const _animateTo = (target) => {
+          if (_animRAF) { cancelAnimationFrame(_animRAF); _animRAF = null; }
+          const from = wheel.scrollLeft, dist = target - from;
+          if (!dist) return;
+          const t0 = performance.now(), dur = 240;
+          const frame = (now) => {
+            if (!wheel.isConnected) { _animRAF = null; return; }
+            const t = Math.min(1, (now - t0) / dur);
+            wheel.scrollLeft = from + dist * (1 - Math.pow(1 - t, 3)); // ease-out
+            update();
+            _animRAF = t < 1 ? requestAnimationFrame(frame) : null;
+          };
+          _animRAF = requestAnimationFrame(frame);
+        };
         const _goToPill = (i) => {
           const b = btns[Math.max(0, Math.min(btns.length - 1, i))];
-          wheel.scrollTo({ left: b.offsetLeft - (wheel.clientWidth - b.offsetWidth) / 2, behavior: 'smooth' });
+          _animateTo(Math.round(b.offsetLeft - (wheel.clientWidth - b.offsetWidth) / 2));
         };
+        const _stepPill = (dir) => {
+          const cur = btns.findIndex(b => b.classList.contains('center'));
+          _goToPill((cur < 0 ? Math.floor(btns.length / 2) : cur) + dir);
+        };
+        // Touch: one horizontal drag = one step.
         let _swX = 0, _swY = 0, _swiped = false;
         wheel.addEventListener('touchstart', (e) => {
           const t = e.touches[0]; _swX = t.clientX; _swY = t.clientY; _swiped = false;
@@ -4744,14 +4769,40 @@ window.addEventListener('pageshow', () => {
           // pending tap so the swipe doesn't also fire a pill's onclick.
           if (Math.abs(dx) > 26 && Math.abs(dx) > Math.abs(dy) * 1.2) {
             _swiped = true;
-            const cur  = btns.findIndex(b => b.classList.contains('center'));
-            const from = cur < 0 ? Math.floor(btns.length / 2) : cur;
-            _goToPill(from + (dx < 0 ? 1 : -1));
+            _stepPill(dx < 0 ? 1 : -1);
           }
         }, { passive: true });
-        // Swallow the click iOS synthesises at the end of a swipe gesture.
+        // Mouse: overflow:hidden also kills desktop drag-scroll and trackpad
+        // panning, so mirror the same one-step drag gesture for mouse
+        // pointers (touch is handled by the listeners above).
+        let _mX = null, _mDragged = false;
+        wheel.addEventListener('pointerdown', (e) => {
+          if (e.pointerType !== 'mouse') return;
+          _mX = e.clientX; _mDragged = false;
+        });
+        wheel.addEventListener('pointermove', (e) => {
+          if (e.pointerType !== 'mouse' || _mX === null || _mDragged) return;
+          const dx = e.clientX - _mX;
+          if (Math.abs(dx) > 26) { _mDragged = true; _stepPill(dx < 0 ? 1 : -1); }
+        });
+        ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev =>
+          wheel.addEventListener(ev, (e) => { if (e.pointerType === 'mouse') _mX = null; }));
+        // Trackpad / mouse-wheel: one step per distinct scroll burst.
+        let _whT = 0;
+        wheel.addEventListener('wheel', (e) => {
+          const d = Math.abs(e.deltaX) >= Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+          if (!d) return;
+          e.preventDefault();
+          const now = performance.now();
+          const _inBurst = now - _whT < 350;
+          _whT = now;
+          if (!_inBurst) _stepPill(d > 0 ? 1 : -1);
+        }, { passive: false });
+        // Swallow the click that trails a gesture — iOS synthesises one after
+        // a swipe, and a mouse drag released over a pill fires one too. It
+        // must not also commit the pill it happens to land on.
         wheel.addEventListener('click', (e) => {
-          if (_swiped) { e.preventDefault(); e.stopPropagation(); _swiped = false; }
+          if (_swiped || _mDragged) { e.preventDefault(); e.stopPropagation(); _swiped = _mDragged = false; }
         }, true);
       }
       let _settled = false; // suppress the haptic tick on the initial centring
@@ -4796,10 +4847,13 @@ window.addEventListener('pageshow', () => {
       // Centre the committed value, else the suggestion/middle option (.init).
       // iOS Safari can leave a snap container "stuck" after a programmatic
       // scrollLeft write — disable snapping for the write, restore after.
+      // Short wheels keep snapping off for good: they're driven entirely by
+      // the programmatic stepper above, and re-arming mandatory snap lets
+      // iOS re-target those scrolls back to the current pill (frozen wheel).
       const init = wheel.querySelector('.fm-wheel-btn.sel') || wheel.querySelector('.fm-wheel-btn.init') || btns[Math.floor(btns.length / 2)];
       wheel.style.scrollSnapType = 'none';
       wheel.scrollLeft = init.offsetLeft - (wheel.clientWidth - init.offsetWidth) / 2;
-      setTimeout(() => { wheel.style.scrollSnapType = ''; }, 50);
+      if (!_shortWheel) setTimeout(() => { wheel.style.scrollSnapType = ''; }, 50);
       update();
     }
 

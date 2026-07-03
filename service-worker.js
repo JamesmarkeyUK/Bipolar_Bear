@@ -464,7 +464,15 @@
 //       😫 sweat, 😕 sigh, 😊 bliss, 😐 meh — plus the existing zzz/flame/rain/
 //       money/tear/halo). (3) the exited-view "Show more" toggle is hidden
 //       during the tutorial, when there's nothing more to reveal.
-const CACHE_NAME = 'bipolarbear-v123';
+// v124: Focused mode — medication (short) wheel actually spins everywhere.
+//       The v123 stepper left scroll-snap:x mandatory armed, and on iOS the
+//       snap re-targets the programmatic smooth scroll back to the pill it
+//       started on — the wheel looked frozen; snapping is now off for good on
+//       short wheels and movement is a rAF scrollLeft animation. Desktop was
+//       worse off: overflow:hidden killed native scrolling but the drag
+//       handler was touch-only, so a mouse couldn't spin the wheel at all —
+//       mouse drag and trackpad/mouse-wheel scrolling now step between pills.
+const CACHE_NAME = 'bipolarbear-v124';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
