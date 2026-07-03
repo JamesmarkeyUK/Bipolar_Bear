@@ -472,7 +472,10 @@
 //       worse off: overflow:hidden killed native scrolling but the drag
 //       handler was touch-only, so a mouse couldn't spin the wheel at all —
 //       mouse drag and trackpad/mouse-wheel scrolling now step between pills.
-const CACHE_NAME = 'bipolarbear-v124';
+// v125: Release 1.17 (build 17) — version bump across web _APP_VERSION,
+//       version.json web channel, iOS (app + widget) and Android, plus the
+//       1.17 What's-New headline and changelog entries.
+const CACHE_NAME = 'bipolarbear-v125';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

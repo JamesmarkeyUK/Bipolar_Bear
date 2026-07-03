@@ -2023,6 +2023,7 @@ function _handleIndexJournalNav() {
     // (and fab.js) reads the same value without depending on this script.
     const _APP_VERSION = window._APP_VERSION;
     const _WHATS_NEW_HEADLINES = {
+      '1.17': 'The journal has a whole new feel — full-screen steps with a spinner wheel, big animated emoji, Apple Health readouts like "7h 32m · synced", a smart mood suggestion from your sleep + steps, and a fresh rounded look across the app',
       '1.14': 'Your Survival Kit now unlocks automatically at the end of the tutorial, Apple Health sync has moved into Advanced settings, and the journal Open/Close button label is fixed',
       '1.11': 'Community: mute anyone on the Anonymous board with the new 🙈 button (unmute from the About screen), plus clearer Apple Health / Health Connect labels in journal settings',
       '1.09': 'Smoother permissions — notification and health-sync access is now only requested when you switch each one on, with a more reliable Apple Health reconnection after reinstalling',
