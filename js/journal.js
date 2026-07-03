@@ -4372,13 +4372,28 @@ window.addEventListener('pageshow', () => {
     /**
      * Pale wash of a wheel option's colour. `color` may be a hex value
      * (energy/sleep/mood pills) or a CSS custom-property reference like
-     * var(--brand-primary) (the elevated mood), so mix in the browser rather
-     * than parsing — color-mix handles both. e.g. #ff922b (6-7h sleep) → pale
-     * orange.
+     * var(--brand-primary) (the elevated mood). We resolve it to concrete RGB
+     * through the DOM and mix 14% colour over white in JS, returning a plain
+     * rgb() string. (color-mix() would be cleaner but is silently dropped on
+     * iOS Safari < 16.2 — an unsupported background value leaves the card stuck
+     * on the mood default.) e.g. #ff922b (6-7h sleep) → pale orange.
      */
+    let _fmTintProbe = null;
     function _fmPaleTint(color) {
       if (!color) return null;
-      return `color-mix(in srgb, ${color} 14%, white)`;
+      // Resolve hex / var()/ named colours to "rgb(r, g, b)" via computed style.
+      if (!_fmTintProbe) {
+        _fmTintProbe = document.createElement('span');
+        _fmTintProbe.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:0;height:0;';
+        document.body.appendChild(_fmTintProbe);
+      }
+      _fmTintProbe.style.color = '';
+      _fmTintProbe.style.color = color;
+      const resolved = getComputedStyle(_fmTintProbe).color;
+      const m = resolved.match(/(\d+(?:\.\d+)?)[,\s]+(\d+(?:\.\d+)?)[,\s]+(\d+(?:\.\d+)?)/);
+      if (!m) return null;
+      const mix = (c) => Math.round(0.14 * parseFloat(c) + 0.86 * 255);
+      return `rgb(${mix(m[1])}, ${mix(m[2])}, ${mix(m[3])})`;
     }
 
     /**
@@ -4676,22 +4691,21 @@ window.addEventListener('pageshow', () => {
       // which always leaves scrollable overflow to swipe through.
       wheel.style.paddingLeft  = Math.max(0, (wheel.clientWidth - btns[0].offsetWidth) / 2) + 'px';
       wheel.style.paddingRight = Math.max(0, (wheel.clientWidth - btns[btns.length - 1].offsetWidth) / 2) + 'px';
-      // iOS Safari lock: with only a couple of pills the total scroll range is
+      // iOS Safari lock: with only a couple of pills the natural scroll range is
       // tiny (the 2-option medication wheel is ~90px), and
       // scroll-snap-type:mandatory then yanks every swipe straight back to the
-      // start pill — the wheel feels frozen. Pad the edges until there's real
-      // momentum room, and for the very shortest wheels loosen the snap to
-      // `proximity` so a drag can actually cross to the other slot before it
-      // settles. Measure the natural range BEFORE padding — that's what decides
-      // whether iOS would have locked it.
-      const _MIN_SWIPE_RANGE = 200;
+      // start pill — the wheel feels frozen. Give short wheels the same generous
+      // momentum room the 5-pill wheels already have (~300px) so a flick can
+      // build speed and cross to the next slot. We keep MANDATORY snapping (not
+      // proximity) so a pill always settles centred under the dial — proximity
+      // let the wheel rest between slots, spilling a pill off the edge.
+      const _MIN_SWIPE_RANGE = 300;
       const _range0 = wheel.scrollWidth - wheel.clientWidth;
       if (_range0 < _MIN_SWIPE_RANGE) {
         const _pad = Math.ceil((_MIN_SWIPE_RANGE - _range0) / 2);
         wheel.style.paddingLeft  = (parseFloat(wheel.style.paddingLeft)  || 0) + _pad + 'px';
         wheel.style.paddingRight = (parseFloat(wheel.style.paddingRight) || 0) + _pad + 'px';
       }
-      const _snapType = _range0 < 130 ? 'x proximity' : 'x mandatory';
       let _settled = false; // suppress the haptic tick on the initial centring
       const update = () => {
         // A scroll rAF can fire after the step re-rendered and replaced this
@@ -4737,7 +4751,7 @@ window.addEventListener('pageshow', () => {
       const init = wheel.querySelector('.fm-wheel-btn.sel') || wheel.querySelector('.fm-wheel-btn.init') || btns[Math.floor(btns.length / 2)];
       wheel.style.scrollSnapType = 'none';
       wheel.scrollLeft = init.offsetLeft - (wheel.clientWidth - init.offsetWidth) / 2;
-      setTimeout(() => { wheel.style.scrollSnapType = _snapType; }, 50);
+      setTimeout(() => { wheel.style.scrollSnapType = ''; }, 50);
       update();
     }
 

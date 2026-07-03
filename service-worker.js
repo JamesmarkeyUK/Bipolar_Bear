@@ -427,7 +427,15 @@
 //       Also fixes the 2-option medication wheel refusing to swipe on iOS
 //       Safari — its scroll range was too small for scroll-snap:mandatory, so
 //       short wheels now get momentum padding + proximity snapping.
-const CACHE_NAME = 'bipolarbear-v117';
+// v118: Focused mode fixes for v117 regressions on iOS —
+//       (1) the wheel background wash used CSS color-mix(), which older iOS
+//       Safari silently drops, so the tint never showed; it is now computed in
+//       JS as a plain rgb() value (resolves hex + var(--brand-*) alike).
+//       (2) the medication wheel's proximity snapping let it rest between
+//       slots, spilling a pill off the screen edge ("not contained"); short
+//       wheels keep MANDATORY snapping now (a pill always settles centred) and
+//       get generous ~300px momentum room so the swipe still works.
+const CACHE_NAME = 'bipolarbear-v118';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
