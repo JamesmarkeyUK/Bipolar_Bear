@@ -596,6 +596,17 @@
       margin: 0 0 2px;
     }
     .fm-wheel-btn.sel { background: var(--wb-color, var(--brand-primary)); color: #fff; }
+    /* Runway slots (medication / sleep-quality outer copies): real pills kept
+       in the wheel — same width, still snap-aligned + tappable — so short
+       answer sets still present iOS with a genuine 5-slot scroll surface, but
+       painted as empty space so the user never sees a duplicated answer. The
+       label keeps its box (visibility, not display) so the slot width, and thus
+       the scroll geometry, is byte-identical to the working 5-pill wheels. */
+    .fm-wheel-btn.fm-wheel-runway { background: transparent; border-color: transparent !important; }
+    .fm-wheel-btn.fm-wheel-runway.center { outline: none; border-color: transparent !important; }
+    .fm-wheel-btn.fm-wheel-runway.sel { background: transparent; color: #495057; }
+    .fm-wheel-btn.fm-wheel-runway .fm-wheel-label,
+    .fm-wheel-btn.fm-wheel-runway .fm-wheel-sub { visibility: hidden; }
     .fm-wheel-btn.linked { outline: 2px dashed var(--brand-primary); outline-offset: 2px; }
     .fm-wheel-btn img { width: 36px; height: 36px; object-fit: contain; }
     .fm-wheel-label { white-space: nowrap; }
