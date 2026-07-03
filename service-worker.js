@@ -424,6 +424,9 @@
 // v117: Focused mode — the form background now follows the wheel: spinning to
 //       a slot washes the card in a pale tint of that slot's colour (e.g. 6-7h
 //       sleep → pale orange), falling back to the mood-based default per step.
+//       Also fixes the 2-option medication wheel refusing to swipe on iOS
+//       Safari — its scroll range was too small for scroll-snap:mandatory, so
+//       short wheels now get momentum padding + proximity snapping.
 const CACHE_NAME = 'bipolarbear-v117';
 
 /**

@@ -4676,6 +4676,22 @@ window.addEventListener('pageshow', () => {
       // which always leaves scrollable overflow to swipe through.
       wheel.style.paddingLeft  = Math.max(0, (wheel.clientWidth - btns[0].offsetWidth) / 2) + 'px';
       wheel.style.paddingRight = Math.max(0, (wheel.clientWidth - btns[btns.length - 1].offsetWidth) / 2) + 'px';
+      // iOS Safari lock: with only a couple of pills the total scroll range is
+      // tiny (the 2-option medication wheel is ~90px), and
+      // scroll-snap-type:mandatory then yanks every swipe straight back to the
+      // start pill — the wheel feels frozen. Pad the edges until there's real
+      // momentum room, and for the very shortest wheels loosen the snap to
+      // `proximity` so a drag can actually cross to the other slot before it
+      // settles. Measure the natural range BEFORE padding — that's what decides
+      // whether iOS would have locked it.
+      const _MIN_SWIPE_RANGE = 200;
+      const _range0 = wheel.scrollWidth - wheel.clientWidth;
+      if (_range0 < _MIN_SWIPE_RANGE) {
+        const _pad = Math.ceil((_MIN_SWIPE_RANGE - _range0) / 2);
+        wheel.style.paddingLeft  = (parseFloat(wheel.style.paddingLeft)  || 0) + _pad + 'px';
+        wheel.style.paddingRight = (parseFloat(wheel.style.paddingRight) || 0) + _pad + 'px';
+      }
+      const _snapType = _range0 < 130 ? 'x proximity' : 'x mandatory';
       let _settled = false; // suppress the haptic tick on the initial centring
       const update = () => {
         // A scroll rAF can fire after the step re-rendered and replaced this
@@ -4721,7 +4737,7 @@ window.addEventListener('pageshow', () => {
       const init = wheel.querySelector('.fm-wheel-btn.sel') || wheel.querySelector('.fm-wheel-btn.init') || btns[Math.floor(btns.length / 2)];
       wheel.style.scrollSnapType = 'none';
       wheel.scrollLeft = init.offsetLeft - (wheel.clientWidth - init.offsetWidth) / 2;
-      setTimeout(() => { wheel.style.scrollSnapType = ''; }, 50);
+      setTimeout(() => { wheel.style.scrollSnapType = _snapType; }, 50);
       update();
     }
 
