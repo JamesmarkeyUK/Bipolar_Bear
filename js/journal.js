@@ -4717,75 +4717,28 @@ window.addEventListener('pageshow', () => {
       if (!wheel) return;
       const btns = Array.prototype.slice.call(wheel.querySelectorAll('.fm-wheel-btn'));
       if (!btns.length) return;
-      // Spinner works even when every pill fits on screen (e.g. the two
-      // medication pills): pad the edges so the first/last pill can centre,
-      // which always leaves scrollable overflow to swipe through. Exact
-      // centring — a pill always settles directly under the dial arrow.
-      wheel.style.paddingLeft  = Math.max(0, (wheel.clientWidth - btns[0].offsetWidth) / 2) + 'px';
-      wheel.style.paddingRight = Math.max(0, (wheel.clientWidth - btns[btns.length - 1].offsetWidth) / 2) + 'px';
-      // Short wheels (2–3 pills, e.g. medication: Not taken / Taken) scroll
-      // NATIVELY, exactly like the long wheels — native WebKit touch scrolling
-      // is the one thing that reliably moves on a real iPhone. Three earlier
-      // fixes that suppressed native scroll (overflow:hidden) and drove a JS
-      // stepper through touch-action + a rAF scrollLeft animation all passed in
-      // Chromium yet stayed frozen on-device: WebKit arbitrates the gesture
-      // differently than Chromium's touch emulation, and a hidden/backgrounded
-      // WebView starves rAF outright. The only real flaw of native scroll on so
-      // short a track is CSS scroll-snap:mandatory, which snaps a small flick
-      // straight back and feels frozen — so we drop mandatory snap and snap to
-      // the nearest pill ourselves once the finger-driven scroll goes quiet.
-      // (Longer wheels keep native mandatory snap and are left untouched.)
-      const _shortWheel = btns.length <= 3;
-      if (_shortWheel) {
-        wheel.style.scrollSnapType = 'none';
-        const _pillTarget  = (b) => Math.round(b.offsetLeft - (wheel.clientWidth - b.offsetWidth) / 2);
-        const _nearestPill = () => {
-          const wc = wheel.getBoundingClientRect().left + wheel.clientWidth / 2;
-          let best = null, bd = Infinity;
-          btns.forEach(b => { const r = b.getBoundingClientRect(); const d = Math.abs(r.left + r.width / 2 - wc); if (d < bd) { bd = d; best = b; } });
-          return best;
-        };
-        // Guard flag: our own smooth snap fires scroll events too; ignore them
-        // so the debounce doesn't fight the animation it just started.
-        let _snapping = false;
-        const _scrollToPill = (b) => {
-          if (!b) return;
-          const target = _pillTarget(b);
-          if (Math.abs(target - wheel.scrollLeft) < 1) return; // already centred
-          _snapping = true;
-          wheel.scrollTo({ left: target, behavior: 'smooth' });
-          setTimeout(() => { _snapping = false; }, 320);
-        };
-        // Native scroll settles wherever the finger lifts; snap to the nearest
-        // pill so it always lands centred under the dial. Debounced to fire once
-        // the scroll goes quiet.
-        let _settleT = null;
-        wheel.addEventListener('scroll', () => {
-          if (_snapping) return;
-          if (_settleT) clearTimeout(_settleT);
-          _settleT = setTimeout(() => _scrollToPill(_nearestPill()), 90);
-        }, { passive: true });
-        // A drag that scrolled the wheel must not also fire a pill's
-        // tap-to-commit (a finger lift, or a mouse drag released over a pill,
-        // both synthesise a trailing click). _dragged is set by either gesture.
-        let _tX = null, _dragged = false;
-        wheel.addEventListener('touchstart', (e) => { _tX = e.touches[0].clientX; _dragged = false; }, { passive: true });
-        wheel.addEventListener('touchmove',  (e) => { if (_tX !== null && Math.abs(e.touches[0].clientX - _tX) > 8) _dragged = true; }, { passive: true });
-        // Desktop: native overflow scroll pans by trackpad but a mouse button
-        // can't drag-scroll it, so step one pill per horizontal mouse drag.
-        const _step = (dir) => {
-          const cur = btns.indexOf(_nearestPill());
-          _scrollToPill(btns[Math.max(0, Math.min(btns.length - 1, (cur < 0 ? 0 : cur) + dir))]);
-        };
-        let _mX = null;
-        wheel.addEventListener('pointerdown', (e) => { if (e.pointerType === 'mouse') { _mX = e.clientX; _dragged = false; } });
-        wheel.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse' && _mX !== null && !_dragged) { const dx = e.clientX - _mX; if (Math.abs(dx) > 26) { _dragged = true; _step(dx < 0 ? 1 : -1); } } });
-        ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev =>
-          wheel.addEventListener(ev, (e) => { if (e.pointerType === 'mouse') _mX = null; }));
-        wheel.addEventListener('click', (e) => {
-          if (_dragged) { e.preventDefault(); e.stopPropagation(); _dragged = false; }
-        }, true);
-      }
+      // Every wheel — long (mood/energy: 5 pills) or short (medication: 2,
+      // sleep-quality: 3) — now runs the SAME path: native horizontal scroll +
+      // CSS scroll-snap, the browser doing all the work. That path has always
+      // worked on real iPhones for the long wheels; the short ones only ever
+      // misbehaved because earlier code special-cased them (suppressing native
+      // scroll for a JS touch/rAF stepper, or swapping CSS snap for a JS settle)
+      // — paths WebKit handles differently than Chromium's touch emulation,
+      // which is exactly why every "verified in a browser" fix still failed
+      // on-device. No special-casing now: identical to the working steps.
+      //
+      // Pad the edges so the first/last pill can sit dead-centre under the dial.
+      // Short wheels also get a big runway on each side: a 2–3 pill row is too
+      // narrow for iOS to treat as a real scroll surface (a flick just snaps
+      // straight back and feels frozen), whereas the long wheels get that
+      // scrollable width for free from all their pills. The runway is empty
+      // scroll space — with mandatory snap you can never rest on it, it always
+      // pulls to the nearest pill — so it behaves exactly like adding blank
+      // cards to swipe from that are blocked at the two ends.
+      const _centrePad = (b) => Math.max(0, (wheel.clientWidth - b.offsetWidth) / 2);
+      const _runway = btns.length <= 3 ? Math.round(wheel.clientWidth * 0.55) : 0;
+      wheel.style.paddingLeft  = (_centrePad(btns[0]) + _runway) + 'px';
+      wheel.style.paddingRight = (_centrePad(btns[btns.length - 1]) + _runway) + 'px';
       let _settled = false; // suppress the haptic tick on the initial centring
       const update = () => {
         // A scroll rAF can fire after the step re-rendered and replaced this
@@ -4827,14 +4780,12 @@ window.addEventListener('pageshow', () => {
       }, { passive: true });
       // Centre the committed value, else the suggestion/middle option (.init).
       // iOS Safari can leave a snap container "stuck" after a programmatic
-      // scrollLeft write — disable snapping for the write, restore after.
-      // Short wheels keep snapping off for good: they snap to the nearest pill
-      // in JS (see above), and re-arming CSS mandatory snap would re-target
-      // those programmatic scrolls back to the current pill (frozen wheel).
+      // scrollLeft write — disable snapping for the write, restore it just after
+      // so native mandatory snap takes over for finger scrolling (all wheels).
       const init = wheel.querySelector('.fm-wheel-btn.sel') || wheel.querySelector('.fm-wheel-btn.init') || btns[Math.floor(btns.length / 2)];
       wheel.style.scrollSnapType = 'none';
       wheel.scrollLeft = init.offsetLeft - (wheel.clientWidth - init.offsetWidth) / 2;
-      if (!_shortWheel) setTimeout(() => { wheel.style.scrollSnapType = ''; }, 50);
+      setTimeout(() => { wheel.style.scrollSnapType = ''; }, 50);
       update();
     }
 

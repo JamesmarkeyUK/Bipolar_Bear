@@ -500,7 +500,21 @@
 //       opens with a large empty gap between the top bar and the question —
 //       on the fresh first step (summary bar hidden) the flexible header
 //       spacer is collapsed so the header sits under the nav.
-const CACHE_NAME = 'bipolarbear-v126';
+// v127: Release 1.19 (build 19) — medication/sleep-quality wheel swipe, FIFTH
+//       attempt, and the simplest yet: stop treating short wheels as special at
+//       all. v126 still ran a bespoke path (JS snap-to-nearest); it kept failing
+//       on-device. The 5-pill mood/energy wheels have always worked because they
+//       use plain native scroll + CSS scroll-snap and nothing else. So the whole
+//       short-wheel branch is deleted — medication (2) and sleep-quality (3) now
+//       run that identical path. The only reason a 2–3 pill row misbehaved is
+//       it's too narrow for iOS to treat as a scroll surface (a flick snaps
+//       straight back), so short wheels get a big invisible runway of edge
+//       padding (~55% of the wheel width each side); with mandatory snap you
+//       can never rest on the runway, so it acts like blank cards to swipe from,
+//       blocked at the two ends. Version bump across web _APP_VERSION,
+//       version.json web channel, iOS (app+widget) + Android, plus 1.19
+//       What's-New + changelog.
+const CACHE_NAME = 'bipolarbear-v127';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
