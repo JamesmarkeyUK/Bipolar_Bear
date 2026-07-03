@@ -4733,6 +4733,17 @@ window.addEventListener('pageshow', () => {
         wheel.style.overflowX = 'hidden';
         wheel.style.scrollSnapType = 'none';
         wheel.style.webkitOverflowScrolling = 'auto';
+        // iOS: the stylesheet's touch-action:pan-x invites WebKit to claim a
+        // horizontal drag as a NATIVE pan — but this wheel has no native
+        // scroll (overflow:hidden), so WebKit swallows the gesture doing
+        // nothing and stops dispatching touchmove before the stepper's
+        // threshold trips (the listeners are passive, so touch-action is the
+        // only lever). pan-y keeps vertical page scrolling native while
+        // leaving horizontal drags entirely to the JS stepper. Must be set on
+        // the pills too — effective touch-action is the intersection along
+        // the target's ancestor chain, and the pills carry their own pan-x.
+        wheel.style.touchAction = 'pan-y';
+        btns.forEach(b => { b.style.touchAction = 'pan-y'; });
         let _animRAF = null;
         const _animateTo = (target) => {
           if (_animRAF) { cancelAnimationFrame(_animRAF); _animRAF = null; }
@@ -4768,6 +4779,21 @@ window.addEventListener('pageshow', () => {
           // Once it's clearly a horizontal drag, step once and disarm the
           // pending tap so the swipe doesn't also fire a pill's onclick.
           if (Math.abs(dx) > 26 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+            _swiped = true;
+            _stepPill(dx < 0 ? 1 : -1);
+          }
+        }, { passive: true });
+        // Short-flick fallback: a quick flick can lift off before the 26px
+        // move threshold trips. Catch it on touchend with a lower bar — still
+        // clearly horizontal and well above tap wobble, so plain taps (which
+        // commit via the pill's onclick) are unaffected. Setting _swiped also
+        // disarms the trailing synthesised click.
+        wheel.addEventListener('touchend', (e) => {
+          if (_swiped) return;
+          const t = e.changedTouches[0];
+          if (!t) return;
+          const dx = t.clientX - _swX, dy = t.clientY - _swY;
+          if (Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy) * 1.2) {
             _swiped = true;
             _stepPill(dx < 0 ? 1 : -1);
           }
@@ -5077,8 +5103,10 @@ window.addEventListener('pageshow', () => {
             }
           } catch(e) {}
           const _medHintDone = BB.storage.get('MedHintDone') === '1';
-          // Sits below the wheel at the very bottom of the page.
+          // Sits below the wheel at the very bottom of the page, with the
+          // user's med list directly above the "Manage medications" link.
           const _manageRow = `<div class="fm-meds-manage">
+              ${medListHtml}
               <button id="manageMedsBtn" onclick="_dismissMedHint();showMedicationList()" style="background:none;border:none;color:${_medHintDone ? 'var(--brand-primary)' : 'rgba(255,255,255,0.9)'};font-size:0.8em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;text-decoration:underline;text-underline-offset:2px;">✏️ Manage medications</button>
               ${_medHintDone ? '' : `<div id="medHintEl" style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:4px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="8" y1="13" x2="8" y2="2" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round"/><polyline points="3,7 8,2 13,7" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,255,255,0.9);font-family:'Georgia',serif;letter-spacing:0.01em;text-shadow:0 1px 4px rgba(0,0,0,0.5);">${BB.t('journal.hint.logMed')}</span></div>`}
             </div>`;
@@ -5095,7 +5123,7 @@ window.addEventListener('pageshow', () => {
               onclick: `selectedMedication='${o.val}'; _fmAdvance();`,
             };
           }));
-          return medListHtml + _fmHeroHtml() + _medWheel + _manageRow;
+          return _fmHeroHtml() + _medWheel + _manageRow;
         }
 
         case 'goals':

@@ -474,7 +474,16 @@
 //       mouse drag and trackpad/mouse-wheel scrolling now step between pills.
 // v125: Release 1.17 (build 17) — version bump across web _APP_VERSION,
 //       version.json web channel, iOS (app + widget) and Android, plus the
-//       1.17 What's-New headline and changelog entries.
+//       1.17 What's-New headline and changelog entries. Also: medication
+//       wheel — third (and root-cause) iOS swipe fix. The stylesheet's
+//       touch-action:pan-x let WebKit claim horizontal drags as native pans,
+//       but the short wheel has no native scroll (overflow:hidden), so iOS
+//       swallowed the gesture before the JS stepper's threshold tripped —
+//       invisible in Chromium touch emulation, which is why v123/v124 passed
+//       verification but failed on-device. Short wheels now force
+//       touch-action:pan-y (wheel + pills), plus a touchend fallback catches
+//       sub-26px flicks. The med list also moved from the top of the step to
+//       directly above "Manage medications".
 const CACHE_NAME = 'bipolarbear-v125';
 
 /**
