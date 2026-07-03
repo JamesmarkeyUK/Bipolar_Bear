@@ -4131,6 +4131,11 @@ window.addEventListener('pageshow', () => {
       }
       document.body.classList.add('bb-fm-exited');
       document.body.classList.remove('bb-fm-exited-open');
+      // During the tutorial (onboarding not yet complete) the landing content is
+      // still gated, so "Show more" would reveal nothing — hide the toggle until
+      // the tutorial is done (step 12).
+      const _exitMoreBtn = document.getElementById('fmExitMoreBtn');
+      if (_exitMoreBtn) _exitMoreBtn.style.display = (_getOnboardingStep() < 12) ? 'none' : '';
       // Onboarding gating hides these at low steps, but after an exit the
       // user needs somewhere to go — force the nav targets visible.
       const _hmX = document.getElementById('homeLink');
@@ -4574,17 +4579,36 @@ window.addEventListener('pageshow', () => {
      * depressed bear's cloud, and so on. Keyed by emoji glyph or (for the
      * mood PNGs) by mood value.
      */
+    // Every mood and every energy / sleep / sleep-quality emoji gets its own
+    // effect when it's the centred (active) choice. Moods are keyed by value
+    // (the pill is a PNG); the rest by emoji glyph (variation selectors are
+    // stripped before lookup — see _fmApplyAura).
     const _FM_AURAS = {
-      '😴': 'zzz', '💤': 'zzz', '🚀': 'flame',
-      manic: 'money', stable: 'halo', low: 'tear', depressed: 'rain',
+      // Moods
+      manic: 'money', elevated: 'rise', stable: 'halo', good: 'halo', low: 'tear', depressed: 'rain',
+      // Energy — 💀 not enough, 🪫 less, ⚡ normal, 🔋 more, 🚀 too much
+      '💀': 'ghost', '🪫': 'drain', '⚡': 'zap', '🔋': 'charge', '🚀': 'flame',
+      // Sleep — 😫 ≤5h, 😕 6–7h, 😊 7–9h, 😴 9–10h, 💤 10+h
+      '😫': 'sweat', '😕': 'sigh', '😊': 'bliss', '😴': 'zzz', '💤': 'zzz',
+      // Sleep quality — 😐 unsure (😴 bad → zzz, 😊 good → bliss share the above)
+      '😐': 'meh',
     };
     const _AURA_HTML = {
-      zzz:   '<span class="a1">z</span><span class="a2">z</span><span class="a3">z</span>',
-      flame: '<span class="a1">🔥</span><span class="a2">🔥</span><span class="a3">🔥</span>',
-      rain:  '<span class="a1">💧</span><span class="a2">💧</span><span class="a3">💧</span><span class="a4">💧</span>',
-      money: '<span class="a1">💵</span><span class="a2">💵</span><span class="a3">💵</span>',
-      tear:  '<span class="a1">💧</span>',
-      halo:  '<span class="a1"></span>',
+      zzz:    '<span class="a1">z</span><span class="a2">z</span><span class="a3">z</span>',
+      flame:  '<span class="a1">🔥</span><span class="a2">🔥</span><span class="a3">🔥</span>',
+      rain:   '<span class="a1">💧</span><span class="a2">💧</span><span class="a3">💧</span><span class="a4">💧</span>',
+      money:  '<span class="a1">💵</span><span class="a2">💵</span><span class="a3">💵</span>',
+      tear:   '<span class="a1">💧</span>',
+      halo:   '<span class="a1"></span>',
+      rise:   '<span class="a1">▴</span><span class="a2">▴</span><span class="a3">▴</span>',
+      ghost:  '<span class="a1">👻</span>',
+      drain:  '<span class="a1"></span>',
+      zap:    '<span class="a1">⚡</span><span class="a2">⚡</span>',
+      charge: '<span class="a1">⚡</span><span class="a2">⚡</span>',
+      sweat:  '<span class="a1">💦</span>',
+      sigh:   '<span class="a1">💨</span>',
+      bliss:  '<span class="a1">✨</span><span class="a2">✨</span><span class="a3">✨</span>',
+      meh:    '<span class="a1">·</span><span class="a2">·</span><span class="a3">·</span>',
     };
     function _fmAuraHtml(type) {
       return `<div class="fm-aura" id="fmHeroAura" data-type="${type || ''}">${_AURA_HTML[type] || ''}</div>`;
@@ -4593,7 +4617,8 @@ window.addEventListener('pageshow', () => {
     function _fmApplyAura(auraKey) {
       const el = document.getElementById('fmHeroAura');
       if (!el) return;
-      const type = _FM_AURAS[auraKey] || '';
+      // Strip emoji variation selectors (e.g. ⚡️ → ⚡) so glyph keys match.
+      const type = _FM_AURAS[(auraKey || '').replace(/\uFE0F/g, '')] || '';
       if (el.dataset.type === type) return;
       el.dataset.type = type;
       el.innerHTML = _AURA_HTML[type] || '';
@@ -4692,31 +4717,42 @@ window.addEventListener('pageshow', () => {
       // centring — a pill always settles directly under the dial arrow.
       wheel.style.paddingLeft  = Math.max(0, (wheel.clientWidth - btns[0].offsetWidth) / 2) + 'px';
       wheel.style.paddingRight = Math.max(0, (wheel.clientWidth - btns[btns.length - 1].offsetWidth) / 2) + 'px';
-      // Swipe fallback for short wheels. A 2–3 pill wheel (e.g. medication:
-      // Not taken / Taken) has too little scroll range for iOS Safari's
-      // scroll-snap:mandatory to flick through — a swipe just snaps back and
-      // the wheel feels frozen. For these, translate a horizontal swipe into an
-      // explicit step to the adjacent pill (the same path the ← / → keys use),
-      // so the gesture always advances and the pill still lands centred. Longer
-      // wheels scroll natively and are left untouched.
+      // Swipe for short wheels. A 2–3 pill wheel (e.g. medication: Not taken /
+      // Taken) has too little scroll range for iOS Safari's
+      // scroll-snap:mandatory to flick through — the native swipe just snaps
+      // straight back, so the wheel feels frozen. Kill the native scroll
+      // entirely (overflow:hidden still allows programmatic scrollLeft) and
+      // drive it ourselves: a horizontal drag steps to the adjacent pill via a
+      // smooth scroll that can't be snapped back, and always lands centred.
+      // Longer wheels scroll natively and are left untouched.
       const _shortWheel = btns.length <= 3;
       if (_shortWheel) {
-        let _swX = 0, _swY = 0;
-        wheel.addEventListener('touchstart', (e) => {
-          const t = e.touches[0]; _swX = t.clientX; _swY = t.clientY;
-        }, { passive: true });
-        wheel.addEventListener('touchend', (e) => {
-          const t = e.changedTouches[0];
-          const dx = t.clientX - _swX, dy = t.clientY - _swY;
-          // Ignore taps and mostly-vertical drags — let the tap select.
-          if (Math.abs(dx) < 28 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
-          const cur  = btns.findIndex(b => b.classList.contains('center'));
-          const from = cur < 0 ? Math.floor(btns.length / 2) : cur;
-          const next = Math.max(0, Math.min(btns.length - 1, from + (dx < 0 ? 1 : -1)));
-          if (next === from) return;
-          const b = btns[next];
+        wheel.style.overflowX = 'hidden';
+        const _goToPill = (i) => {
+          const b = btns[Math.max(0, Math.min(btns.length - 1, i))];
           wheel.scrollTo({ left: b.offsetLeft - (wheel.clientWidth - b.offsetWidth) / 2, behavior: 'smooth' });
+        };
+        let _swX = 0, _swY = 0, _swiped = false;
+        wheel.addEventListener('touchstart', (e) => {
+          const t = e.touches[0]; _swX = t.clientX; _swY = t.clientY; _swiped = false;
         }, { passive: true });
+        wheel.addEventListener('touchmove', (e) => {
+          if (_swiped) return;
+          const t = e.touches[0];
+          const dx = t.clientX - _swX, dy = t.clientY - _swY;
+          // Once it's clearly a horizontal drag, step once and disarm the
+          // pending tap so the swipe doesn't also fire a pill's onclick.
+          if (Math.abs(dx) > 26 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+            _swiped = true;
+            const cur  = btns.findIndex(b => b.classList.contains('center'));
+            const from = cur < 0 ? Math.floor(btns.length / 2) : cur;
+            _goToPill(from + (dx < 0 ? 1 : -1));
+          }
+        }, { passive: true });
+        // Swallow the click iOS synthesises at the end of a swipe gesture.
+        wheel.addEventListener('click', (e) => {
+          if (_swiped) { e.preventDefault(); e.stopPropagation(); _swiped = false; }
+        }, true);
       }
       let _settled = false; // suppress the haptic tick on the initial centring
       const update = () => {

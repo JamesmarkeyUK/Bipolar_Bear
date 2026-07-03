@@ -456,7 +456,15 @@
 //       _anonInitialBoot, which was scoped inside initFirebase(), so the
 //       fallback threw a ReferenceError instead of booting the board. The flag
 //       now lives at file scope in js/anonymous.js.
-const CACHE_NAME = 'bipolarbear-v122';
+// v123: Focused mode — (1) short wheels (medication) now swipe reliably: native
+//       scroll is disabled and a horizontal drag steps to the adjacent pill
+//       programmatically (iOS scroll-snap could never flick a 2-pill wheel).
+//       (2) a unique aura per mood + per energy/sleep/quality emoji when it's
+//       the active choice (elevated ▴rise, 💀 ghost, 🪫 drain, ⚡ zap, 🔋 charge,
+//       😫 sweat, 😕 sigh, 😊 bliss, 😐 meh — plus the existing zzz/flame/rain/
+//       money/tear/halo). (3) the exited-view "Show more" toggle is hidden
+//       during the tutorial, when there's nothing more to reveal.
+const CACHE_NAME = 'bipolarbear-v123';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

@@ -326,6 +326,108 @@
       0%, 100% { opacity: 0.25; transform: translate(-50%, -50%) scale(0.9); }
       50%      { opacity: 0.75; transform: translate(-50%, -50%) scale(1.12); }
     }
+    /* rise — upward flecks for the elevated mood (energised, lifting) */
+    .fm-aura[data-type="rise"] span {
+      left: 50%; bottom: 8%; color: var(--brand-primary);
+      font-size: 13px; font-weight: 900; animation: fmRise 1.9s ease-out infinite;
+    }
+    .fm-aura[data-type="rise"] .a1 { margin-left: -18px; animation-delay: 0s; }
+    .fm-aura[data-type="rise"] .a2 { margin-left: 0;     animation-delay: 0.5s; }
+    .fm-aura[data-type="rise"] .a3 { margin-left: 16px;  animation-delay: 1s; }
+    @keyframes fmRise {
+      0%   { transform: translateY(0) scale(0.6); opacity: 0; }
+      25%  { opacity: 0.95; }
+      100% { transform: translateY(-42px) scale(1); opacity: 0; }
+    }
+    /* ghost — a wisp drifting up for the "no energy" skull */
+    .fm-aura[data-type="ghost"] .a1 {
+      left: 54%; top: 34%; font-size: 18px; animation: fmGhost 3s ease-in-out infinite;
+    }
+    @keyframes fmGhost {
+      0%   { transform: translate(0, 0) rotate(0); opacity: 0; }
+      25%  { opacity: 0.85; }
+      60%  { transform: translate(10px, -22px) rotate(6deg); }
+      100% { transform: translate(-6px, -40px) rotate(-6deg); opacity: 0; }
+    }
+    /* drain — slow dim red glow for the low-battery "less" energy */
+    .fm-aura[data-type="drain"] .a1 {
+      left: 50%; top: 50%; width: 104px; height: 104px;
+      transform: translate(-50%, -50%); border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 65, 54, 0.4), transparent 60%);
+      animation: fmDrain 2.4s ease-in-out infinite;
+    }
+    @keyframes fmDrain {
+      0%, 100% { opacity: 0.15; transform: translate(-50%, -50%) scale(0.85); }
+      50%      { opacity: 0.5;  transform: translate(-50%, -50%) scale(1.05); }
+    }
+    /* zap — quick electric flashes for "normal" energy */
+    .fm-aura[data-type="zap"] span {
+      color: #ffd43b; font-size: 13px; text-shadow: 0 0 6px rgba(255, 212, 59, 0.9);
+      animation: fmZap 1.1s steps(1, end) infinite;
+    }
+    .fm-aura[data-type="zap"] .a1 { left: 24%; top: 30%; animation-delay: 0s; }
+    .fm-aura[data-type="zap"] .a2 { left: 66%; top: 52%; animation-delay: 0.55s; }
+    @keyframes fmZap {
+      0%   { opacity: 0; transform: scale(0.6); }
+      10%  { opacity: 1; transform: scale(1.15); }
+      25%  { opacity: 0; }
+      100% { opacity: 0; }
+    }
+    /* charge — green bolts rising for "more" energy */
+    .fm-aura[data-type="charge"] span {
+      left: 50%; bottom: 12%; color: #2ECC40; font-size: 13px;
+      text-shadow: 0 0 5px rgba(46, 204, 64, 0.7); animation: fmCharge 1.7s ease-out infinite;
+    }
+    .fm-aura[data-type="charge"] .a1 { margin-left: -14px; animation-delay: 0s; }
+    .fm-aura[data-type="charge"] .a2 { margin-left: 12px;  animation-delay: 0.7s; }
+    @keyframes fmCharge {
+      0%   { transform: translateY(0) scale(0.6); opacity: 0; }
+      25%  { opacity: 0.95; }
+      100% { transform: translateY(-40px) scale(1.1); opacity: 0; }
+    }
+    /* sweat — a bead flicking off the exhausted ≤5h sleep face */
+    .fm-aura[data-type="sweat"] .a1 {
+      left: 70%; top: 26%; font-size: 13px; animation: fmSweat 1.8s ease-in infinite;
+    }
+    @keyframes fmSweat {
+      0%   { transform: translate(0, 0) scale(0.7); opacity: 0; }
+      20%  { opacity: 0.9; }
+      100% { transform: translate(14px, -16px) scale(1); opacity: 0; }
+    }
+    /* sigh — a puff drifting sideways for the meh 6–7h sleep face */
+    .fm-aura[data-type="sigh"] .a1 {
+      left: 60%; top: 40%; font-size: 15px; animation: fmSigh 2.6s ease-out infinite;
+    }
+    @keyframes fmSigh {
+      0%   { transform: translate(0, 0) scale(0.6); opacity: 0; }
+      25%  { opacity: 0.7; }
+      100% { transform: translate(30px, -6px) scale(1.1); opacity: 0; }
+    }
+    /* bliss — sparkles twinkling up for the content 7–9h / good-quality face */
+    .fm-aura[data-type="bliss"] span {
+      color: #ffd43b; text-shadow: 0 0 6px rgba(255, 210, 80, 0.8);
+      animation: fmBliss 2.6s ease-in-out infinite;
+    }
+    .fm-aura[data-type="bliss"] .a1 { left: 22%; top: 30%; font-size: 12px; animation-delay: 0s; }
+    .fm-aura[data-type="bliss"] .a2 { left: 70%; top: 24%; font-size: 10px; animation-delay: 0.9s; }
+    .fm-aura[data-type="bliss"] .a3 { left: 52%; top: 60%; font-size: 11px; animation-delay: 1.7s; }
+    @keyframes fmBliss {
+      0%   { transform: translateY(4px) scale(0.5) rotate(0); opacity: 0; }
+      30%  { opacity: 1; }
+      100% { transform: translateY(-14px) scale(1.1) rotate(40deg); opacity: 0; }
+    }
+    /* meh — a neutral "…" pulsing in sequence for the "unsure" quality face */
+    .fm-aura[data-type="meh"] span {
+      left: 50%; top: 20%; font-size: 20px; font-weight: 900; color: #adb5bd;
+      animation: fmMeh 2.2s ease-in-out infinite;
+    }
+    .fm-aura[data-type="meh"] .a1 { margin-left: -16px; animation-delay: 0s; }
+    .fm-aura[data-type="meh"] .a2 { margin-left: 0;     animation-delay: 0.3s; }
+    .fm-aura[data-type="meh"] .a3 { margin-left: 14px;  animation-delay: 0.6s; }
+    @keyframes fmMeh {
+      0%, 100% { opacity: 0.15; transform: translateY(0); }
+      50%      { opacity: 0.7;  transform: translateY(-3px); }
+    }
     .fm-hero-value {
       font-size: 2.3em; font-weight: 800; color: #343a40; line-height: 1.1;
       text-align: center;
@@ -390,11 +492,11 @@
          alive without anything sweeping across the screen. */
       .fm-wheel-btn img, .fm-wheel-emoji { animation: none !important; }
       .fm-spark { animation: none !important; opacity: 0 !important; }
-      .fm-aura[data-type="zzz"]   span,
-      .fm-aura[data-type="flame"] span,
-      .fm-aura[data-type="rain"]  span,
-      .fm-aura[data-type="money"] span,
-      .fm-aura[data-type="tear"]  span { animation: none !important; opacity: 0 !important; }
+      /* Suppress every travelling / flashing aura; keep only the in-place glows
+         (halo, drain). Covers current and future aura types by default. */
+      .fm-aura:not([data-type="halo"]):not([data-type="drain"]) span {
+        animation: none !important; opacity: 0 !important;
+      }
       #fmReducedMotionBadge {
         display: inline-flex;
         align-items: center;
