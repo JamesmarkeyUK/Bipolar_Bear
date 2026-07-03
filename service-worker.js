@@ -407,7 +407,13 @@
 // v114: Focused mode — sleep is asked before energy (step order + full-form
 //       section order + review-list order), ← / → cycle the spinner on
 //       desktop, and sparks fly off the hero emoji (the active centre item).
-const CACHE_NAME = 'bipolarbear-v114';
+// v115: Fix — the home-page PIN lock init ran while the document was still
+//       parsing (js/index.js sits above the #guestPinOverlay markup), so for
+//       a locked guest it threw, the unlock overlay never appeared, and
+//       journal.html's PIN gate bounced every Mood Journal tap straight back
+//       to the home screen. PIN lock + dimmer wiring now defer to
+//       DOMContentLoaded.
+const CACHE_NAME = 'bipolarbear-v115';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

@@ -2077,7 +2077,13 @@ function _handleIndexJournalNav() {
 
 // ── BLOCK 8: PIN lock overlay (guest encryption PIN or native logged-in PIN) ──
 // ── App-wide PIN lock (guest encryption PIN or native logged-in PIN) ──
-    (function() {
+    // Deferred to DOMContentLoaded: this script tag sits ABOVE the
+    // #guestPinOverlay markup in index.html, so at parse time
+    // getElementById returns null. Running inline threw a TypeError for any
+    // locked guest, which both suppressed the PIN unlock (journal.html then
+    // bounced every visit straight back to an unlockable home screen) and
+    // killed every top-level statement after this block.
+    function _initPinLock() {
       const _isNat = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
       // Signed-in users use account-derived encryption, not the guest PIN —
       // a stale bbGuestPinSalt from a pre-sign-in guest session shouldn't
@@ -2090,7 +2096,8 @@ function _handleIndexJournalNav() {
 
       const unlocked = sessionStorage.getItem('bbPinUnlocked') === '1';
       if (!unlocked) {
-        document.getElementById('guestPinOverlay').style.display = 'flex';
+        const _pinOv = document.getElementById('guestPinOverlay');
+        if (_pinOv) _pinOv.style.display = 'flex';
       }
 
       // Inactivity relock after 5 minutes
@@ -2110,7 +2117,12 @@ function _handleIndexJournalNav() {
         document.addEventListener(ev, _resetIdleTimer, { passive: true })
       );
       if (unlocked) _resetIdleTimer(); // only start timer if currently unlocked
-    })();
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', _initPinLock);
+    } else {
+      _initPinLock();
+    }
 
     let _idxPinBuf = '';
 
@@ -2225,9 +2237,13 @@ function _handleIndexJournalNav() {
         _startDimTimer();
       };
 
-      // Watch the PIN overlay for show/hide to start/stop the timer
-      const _ov = document.getElementById('guestPinOverlay');
-      if (_ov) {
+      // Watch the PIN overlay for show/hide to start/stop the timer.
+      // Deferred to DOMContentLoaded — this script runs above the overlay
+      // markup, so a parse-time getElementById would come back null and the
+      // dimmer would silently never attach.
+      function _wireDimmer() {
+        const _ov = document.getElementById('guestPinOverlay');
+        if (!_ov) return;
         new MutationObserver(() => {
           if (_ov.style.display !== 'none') {
             _startDimTimer();
@@ -2238,15 +2254,20 @@ function _handleIndexJournalNav() {
         }).observe(_ov, { attributes: true, attributeFilter: ['style'] });
         // Start immediately if overlay is already visible on page load
         if (_ov.style.display === 'flex') _startDimTimer();
-      }
 
-      // Any tap/key while PIN overlay is active resets the sleep timer
-      ['touchstart', 'mousedown', 'keydown'].forEach(ev =>
-        document.addEventListener(ev, () => {
-          if (!_ov || _ov.style.display === 'none') return;
-          window._wakePinDimmer();
-        }, { passive: true })
-      );
+        // Any tap/key while PIN overlay is active resets the sleep timer
+        ['touchstart', 'mousedown', 'keydown'].forEach(ev =>
+          document.addEventListener(ev, () => {
+            if (_ov.style.display === 'none') return;
+            window._wakePinDimmer();
+          }, { passive: true })
+        );
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', _wireDimmer);
+      } else {
+        _wireDimmer();
+      }
     })();
 
     // _nukeGuestData / _confirmDeleteGuestData live in fab.js so the
