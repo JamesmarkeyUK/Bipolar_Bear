@@ -173,6 +173,11 @@
       min-height: calc(100vh - 20px);
       min-height: calc(100dvh - 20px);
     }
+    /* Ease the wheel-driven background wash (see _fmApplyWheelBg) so spinning
+       through slots fades between hues instead of snapping. */
+    #focusedModeCard, #fmNextRow, #entryFormCard {
+      transition: background 0.25s ease;
+    }
     @media (min-width: 920px) {
       /* Desktop device-frame mockup: #scroll-view is the scroll container, so
          size the card to the frame's inner height instead of the viewport. */

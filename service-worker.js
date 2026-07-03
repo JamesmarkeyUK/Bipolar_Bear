@@ -421,7 +421,10 @@
 //       into view, and the exited view gains a delete-draft bin + a
 //       "Show more" collapsible over the rest of the landing screen (with
 //       the nav header forced visible).
-const CACHE_NAME = 'bipolarbear-v116';
+// v117: Focused mode — the form background now follows the wheel: spinning to
+//       a slot washes the card in a pale tint of that slot's colour (e.g. 6-7h
+//       sleep → pale orange), falling back to the mood-based default per step.
+const CACHE_NAME = 'bipolarbear-v117';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

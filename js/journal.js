@@ -4369,6 +4369,34 @@ window.addEventListener('pageshow', () => {
       if (fullCard) fullCard.style.background = bg;
     }
 
+    /**
+     * Pale wash of a wheel option's colour. `color` may be a hex value
+     * (energy/sleep/mood pills) or a CSS custom-property reference like
+     * var(--brand-primary) (the elevated mood), so mix in the browser rather
+     * than parsing — color-mix handles both. e.g. #ff922b (6-7h sleep) → pale
+     * orange.
+     */
+    function _fmPaleTint(color) {
+      if (!color) return null;
+      return `color-mix(in srgb, ${color} 14%, white)`;
+    }
+
+    /**
+     * Live background wash driven by the wheel: while the user spins to a slot,
+     * tint the form to a pale version of that slot's colour. Falls back to the
+     * mood-based default (_fmApplyMoodTheme) when the slot has no colour.
+     */
+    function _fmApplyWheelBg(color) {
+      const bg = _fmPaleTint(color);
+      if (!bg) return;
+      const card   = document.getElementById('focusedModeCard');
+      const sticky = document.getElementById('fmNextRow');
+      if (card)   card.style.background = bg;
+      if (sticky) sticky.style.background = bg;
+      const fullCard = document.getElementById('entryFormCard');
+      if (fullCard) fullCard.style.background = bg;
+    }
+
     function _renderFocusedStep() {
       const step = _fmSteps[_fmStepIndex];
       if (!step) return;
@@ -4674,6 +4702,9 @@ window.addEventListener('pageshow', () => {
           // Dial needle takes the colour of the slot it points at.
           const _arrow = wheel.parentElement && wheel.parentElement.querySelector('.fm-dial-arrow');
           if (_arrow) _arrow.style.borderTopColor = best.dataset.color || '';
+          // Wash the form background with a pale tint of the centred slot's
+          // colour, so spinning the wheel previews the mood/energy/sleep hue.
+          _fmApplyWheelBg(best.dataset.color);
           // Dial tick as the spinner clicks onto a new slot (not on the
           // programmatic initial centring).
           if (_settled) nativeHaptic('light');
