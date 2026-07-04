@@ -557,7 +557,13 @@
 //       so a flick can only come to rest on the three real answers. Folded into
 //       the still-unreleased build 22 (asset-only fix; no version bump).
 //       css/journal.css touched.
-const CACHE_NAME = 'bipolarbear-v133';
+// v134: Release 1.23 (build 23) — version-only rebump of the main app to match
+//       the Bipolar Anonymous app (which went to 1.23/23 for an Android
+//       launcher-icon hotfix). No new main-app content vs the unreleased 1.22;
+//       the focused-mode wheel change now ships as 1.23. Bump across web
+//       _APP_VERSION, iOS (app+widget) + Android; What's-New + changelog relabel
+//       1.22 -> 1.23 (the store builds never shipped as 1.22).
+const CACHE_NAME = 'bipolarbear-v134';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
