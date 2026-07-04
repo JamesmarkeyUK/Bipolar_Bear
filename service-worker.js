@@ -548,7 +548,12 @@
 //       outer answers. The 5-pill scroll surface stays (iOS needs it) but the
 //       two outer copies render as invisible runway, so only the three distinct
 //       answers show. js/journal.js + css/journal.css touched.
-const CACHE_NAME = 'bipolarbear-v131';
+// v132: Focused mode — the medication + sleep-quality wheels can no longer
+//       come to rest on a blank runway slot. The centre pick (hero, needle,
+//       highlight) skips runway slots, and a scroll-settle nudge bounces the
+//       wheel onto the nearest visible pill if a flick snaps onto a blank
+//       edge duplicate. Keyboard ←/→ also skips runway slots. js/journal.js.
+const CACHE_NAME = 'bipolarbear-v132';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

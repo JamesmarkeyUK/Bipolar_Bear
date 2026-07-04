@@ -4010,7 +4010,8 @@ window.addEventListener('pageshow', () => {
       const _ae = document.activeElement;
       if (_ae && ['TEXTAREA', 'INPUT', 'SELECT'].includes(_ae.tagName)) return;
       if (document.querySelector('.confirm-modal.active')) return;
-      const btns = Array.prototype.slice.call(wheel.querySelectorAll('.fm-wheel-btn'));
+      const btns = Array.prototype.slice.call(wheel.querySelectorAll('.fm-wheel-btn'))
+        .filter(b => !b.classList.contains('fm-wheel-runway'));
       if (!btns.length) return;
       const cur = btns.findIndex(b => b.classList.contains('center'));
       const from = cur < 0 ? Math.floor(btns.length / 2) : cur;
@@ -4717,6 +4718,10 @@ window.addEventListener('pageshow', () => {
       if (!wheel) return;
       const btns = Array.prototype.slice.call(wheel.querySelectorAll('.fm-wheel-btn'));
       if (!btns.length) return;
+      // Runway slots are invisible duplicates — they must stay in the scroll
+      // surface (iOS needs the 5-slot width) but the dial must never present
+      // one as the current answer: the pill under the needle would be blank.
+      const realBtns = btns.filter(b => !b.classList.contains('fm-wheel-runway'));
       // Every wheel — long (mood/energy: 5 pills) or short (medication: 2,
       // sleep-quality: 3) — now runs the SAME path: native horizontal scroll +
       // CSS scroll-snap, the browser doing all the work. That path has always
@@ -4752,7 +4757,10 @@ window.addEventListener('pageshow', () => {
           const r = b.getBoundingClientRect();
           const d = (r.left + r.width / 2 - wc) / half; // signed −1…1 across the wheel
           const ad = Math.abs(d);
-          if (ad < bd) { bd = ad; best = b; }
+          // Centre pick skips runway slots (sleep quality / medication): the
+          // hero, needle and highlight always track the nearest REAL pill,
+          // so overshooting onto a blank edge slot never blanks the readout.
+          if (ad < bd && !b.classList.contains('fm-wheel-runway')) { bd = ad; best = b; }
           // Slight arc, as if the pills sit on the rim of a big wheel: dip and
           // tilt grow with distance from the centre (apex).
           const dc = Math.max(-1, Math.min(1, d));
@@ -4774,7 +4782,34 @@ window.addEventListener('pageshow', () => {
         }
         _settled = true;
       };
+      // If a flick snaps to rest on a runway slot (blank edge duplicate on the
+      // sleep-quality / medication wheels), nudge the wheel one slot inward so
+      // it always settles on a visible pill. Runs after scrolling goes quiet;
+      // the corrective smooth-scroll re-enters this path but then finds a real
+      // pill centred, so it's a one-shot nudge, not a loop.
+      let _settleTimer = null;
+      const settleOffRunway = () => {
+        if (!wheel.isConnected || !realBtns.length || realBtns.length === btns.length) return;
+        const wr = wheel.getBoundingClientRect();
+        const wc = wr.left + wr.width / 2;
+        const nearest = (list) => {
+          let n = null, nd = Infinity;
+          list.forEach(b => {
+            const r = b.getBoundingClientRect();
+            const d = Math.abs(r.left + r.width / 2 - wc);
+            if (d < nd) { nd = d; n = b; }
+          });
+          return n;
+        };
+        const resting = nearest(btns);
+        if (!resting || !resting.classList.contains('fm-wheel-runway')) return;
+        const target = nearest(realBtns);
+        if (!target) return;
+        wheel.scrollTo({ left: target.offsetLeft - (wheel.clientWidth - target.offsetWidth) / 2, behavior: 'smooth' });
+      };
       wheel.addEventListener('scroll', () => {
+        if (_settleTimer) clearTimeout(_settleTimer);
+        _settleTimer = setTimeout(settleOffRunway, 160);
         if (_fmWheelRAF) return;
         _fmWheelRAF = requestAnimationFrame(() => { _fmWheelRAF = null; update(); });
       }, { passive: true });
