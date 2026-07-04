@@ -569,13 +569,18 @@
 //       the spacer (like the fresh-first step) so the heading rides up under the
 //       summary chips. Folded into the still-unreleased build 23 (asset-only fix;
 //       no version bump). js/journal.js + css/journal.css touched.
-// v136: Release 1.24 (build 24) — Bipolar Anonymous gains iPad support. css/
-//       anonymous.css: gate the #iphone-frame device-mockup on <html>.is-native
-//       so native iPad renders full-screen (centred 620px column) instead of a
-//       fake iPhone on grey — the same mockup trap that got the main app's iPad
-//       screenshots rejected. Main app rebumped in lockstep (1.23 -> 1.24, no new
-//       main-app content); What's-New + changelog relabel 1.23 -> 1.24.
-const CACHE_NAME = 'bipolarbear-v136';
+// v136: Bipolar Anonymous gains iPad support. css/anonymous.css: gate the
+//       #iphone-frame device-mockup on <html>.is-native so native iPad renders
+//       full-screen (centred 620px column) instead of a fake iPhone on grey —
+//       the same mockup trap that got the main app's iPad screenshots rejected.
+//       (Originally bumped to 1.24 in lockstep, then re-pinned to 1.23 — see v137.)
+// v137: Ship the iPad support as part of 1.23 / build 23 (NOT 1.24) — the user
+//       had already uploaded the other 1.23 builds and the anon app had no
+//       upload since the rejected build 22, so the icon-fix + iPad ship together
+//       as one clean 1.23/23 anon build. Reverted _APP_VERSION 1.24 -> 1.23, iOS
+//       (app+widget) + Android build 24 -> 23 in both native repos, and the
+//       What's-New + changelog relabel back to 1.23.
+const CACHE_NAME = 'bipolarbear-v137';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
