@@ -552,7 +552,12 @@
 // v132: Release 1.22 (build 22) — ships the v131 focused-mode wheel change to
 //       the App Store / Play Store. Version bump across web _APP_VERSION, iOS
 //       (app+widget) + Android, plus 1.22 What's-New + changelog.
-const CACHE_NAME = 'bipolarbear-v132';
+// v133: Focused mode — block the medication/sleep-quality wheels from settling
+//       on the hidden runway slots (scroll-snap-align:none on .fm-wheel-runway),
+//       so a flick can only come to rest on the three real answers. Folded into
+//       the still-unreleased build 22 (asset-only fix; no version bump).
+//       css/journal.css touched.
+const CACHE_NAME = 'bipolarbear-v133';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

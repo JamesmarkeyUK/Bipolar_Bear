@@ -597,12 +597,16 @@
     }
     .fm-wheel-btn.sel { background: var(--wb-color, var(--brand-primary)); color: #fff; }
     /* Runway slots (medication / sleep-quality outer copies): real pills kept
-       in the wheel — same width, still snap-aligned + tappable — so short
-       answer sets still present iOS with a genuine 5-slot scroll surface, but
-       painted as empty space so the user never sees a duplicated answer. The
-       label keeps its box (visibility, not display) so the slot width, and thus
-       the scroll geometry, is byte-identical to the working 5-pill wheels. */
-    .fm-wheel-btn.fm-wheel-runway { background: transparent; border-color: transparent !important; }
+       in the wheel — same width — so short answer sets still present iOS with a
+       genuine 5-slot scroll surface, but painted as empty space so the user
+       never sees a duplicated answer. The label keeps its box (visibility, not
+       display) so the slot width, and thus the scroll surface, is unchanged.
+       scroll-snap-align:none removes them as snap targets: the wheel can only
+       come to rest on the three real answers, and the runway becomes pure
+       overscroll space that always pulls back to the nearest real pill — so a
+       flick can never settle on an empty/hidden slot. (They stay tappable, and
+       still carry the edge value's data-*, so nothing breaks if one is grazed.) */
+    .fm-wheel-btn.fm-wheel-runway { background: transparent; border-color: transparent !important; scroll-snap-align: none; }
     .fm-wheel-btn.fm-wheel-runway.center { outline: none; border-color: transparent !important; }
     .fm-wheel-btn.fm-wheel-runway.sel { background: transparent; color: #495057; }
     .fm-wheel-btn.fm-wheel-runway .fm-wheel-label,
