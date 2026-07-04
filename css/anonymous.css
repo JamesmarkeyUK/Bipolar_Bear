@@ -158,6 +158,48 @@
       #app-shell { border-radius: 30px; }
     }
 
+    /* ── Native iPad: render full-screen, NOT the desktop device-frame mockup ──
+       The ≥520px / ≥920px blocks above dress #iphone-frame up as an iPhone on a
+       grey backdrop — a deliberate WEB-desktop presentation. On a real device
+       that frame must NOT appear: an iPad is wide enough (≈768–1024px) to trigger
+       it, which would make the live app — and its App Store screenshots — look
+       like a mockup rather than the app in use (this is exactly what got the main
+       BipolarBear app's iPad screenshots rejected). Gated on <html>.is-native
+       (set by js/shared/platform.js). Native iPhone is portrait-locked ≤430px so
+       it never reaches ≥520px and is untouched. Unlike the main app (which drops
+       to document flow), the anon board keeps its fixed-height #app-shell with
+       internal scroll — we only strip the frame chrome and centre the shell in a
+       comfortable reading column. */
+    @media (min-width: 520px) {
+      html.is-native body { background: var(--yellow); }
+      html.is-native #iphone-frame {
+        width: 100% !important;
+        height: 100dvh !important;
+        background: var(--yellow) !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+      }
+      html.is-native #app-shell {
+        max-width: 620px !important;
+        width: 100% !important;
+        height: 100dvh !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+      }
+      html.is-native #iphone-frame::before,
+      html.is-native #iphone-frame::after,
+      html.is-native #iphone-frame .dynamic-island,
+      html.is-native #iphone-frame .home-indicator {
+        display: none !important;
+        content: none !important;
+      }
+      /* No dynamic island on a real device — undo the frame's island clearance
+         so the header/onboarding sit at their normal (safe-area) top padding. */
+      html.is-native .board-header { padding-top: calc(16px + env(safe-area-inset-top, 0px)) !important; }
+      html.is-native .onboard-bg   { padding-top: max(60px, env(safe-area-inset-top, 0px)) !important; }
+    }
+
     /* ── Admin badge ── */
     .admin-badge {
       display: inline-block;
