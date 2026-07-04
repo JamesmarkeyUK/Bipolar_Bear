@@ -547,8 +547,12 @@
 // v131: Focused mode — medication + sleep-quality wheels hide their duplicate
 //       outer answers. The 5-pill scroll surface stays (iOS needs it) but the
 //       two outer copies render as invisible runway, so only the three distinct
-//       answers show. js/journal.js + css/journal.css touched.
-const CACHE_NAME = 'bipolarbear-v131';
+//       answers show. js/journal.js + css/journal.css touched. (Web-only interim
+//       deploy; folded into the v1.22 store release below.)
+// v132: Release 1.22 (build 22) — ships the v131 focused-mode wheel change to
+//       the App Store / Play Store. Version bump across web _APP_VERSION, iOS
+//       (app+widget) + Android, plus 1.22 What's-New + changelog.
+const CACHE_NAME = 'bipolarbear-v132';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
