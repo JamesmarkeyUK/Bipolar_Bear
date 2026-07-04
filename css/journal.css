@@ -209,6 +209,10 @@
        the question. Collapse it so the header sits just under the top nav —
        matching how it reads once completed-step chips fill that band on return. */
     body.bb-fm-full #focusedModeCard.fm-fresh-first #fmHeaderSpacer { flex: 0 0 auto; min-height: 10px; }
+    /* Additional-tracking (more_data): a dense answer list with no hero below, so
+       the floating header would leave a dead gap above the question. Collapse the
+       spacer like the fresh-first step so the heading rides up under the chips. */
+    body.bb-fm-full #focusedModeCard.fm-flat-top #fmHeaderSpacer { flex: 0 0 auto; min-height: 10px; }
 
     /* ── Focused mode: hero readout (big emoji + value + synced badge) ── */
     #fmContent.fm-content-hero { display: flex; flex-direction: column; }

@@ -563,7 +563,13 @@
 //       the focused-mode wheel change now ships as 1.23. Bump across web
 //       _APP_VERSION, iOS (app+widget) + Android; What's-New + changelog relabel
 //       1.22 -> 1.23 (the store builds never shipped as 1.22).
-const CACHE_NAME = 'bipolarbear-v134';
+// v135: Focused mode — collapse the dead space above the "Additional tracking"
+//       (more_data) step. It has no hero, so the flexible header spacer floated
+//       the heading down over a ~165px gap; a new .fm-flat-top class collapses
+//       the spacer (like the fresh-first step) so the heading rides up under the
+//       summary chips. Folded into the still-unreleased build 23 (asset-only fix;
+//       no version bump). js/journal.js + css/journal.css touched.
+const CACHE_NAME = 'bipolarbear-v135';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

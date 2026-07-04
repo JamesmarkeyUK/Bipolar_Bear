@@ -4509,6 +4509,11 @@ window.addEventListener('pageshow', () => {
       _fmContentEl.classList.toggle('fm-notes', step.id === 'notes');
       _fmContentEl.classList.toggle('fm-done', step.id === 'done');
       _fmContentEl.classList.toggle('fm-meds', step.id === 'medication');
+      // Additional-tracking (more_data) is a dense answer list with no big hero
+      // below to balance the floating header — so the flexible header spacer just
+      // leaves a dead gap above the question. Collapse it (see .fm-flat-top CSS)
+      // so the heading rides up under the summary chips, like the fresh-first step.
+      document.getElementById('focusedModeCard').classList.toggle('fm-flat-top', step.id === 'more_data');
       // setTimeout(0), not rAF: rAF can starve in a backgrounded/hidden WebView
       // and the wheel would never get its initial centring + hero paint.
       if (_hasWheel) setTimeout(_fmInitWheel, 0);
