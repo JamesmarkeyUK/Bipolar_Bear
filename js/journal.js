@@ -5042,10 +5042,12 @@ window.addEventListener('pageshow', () => {
           // real, same-width, snap-aligned, tappable slots so iOS still sees a
           // genuine 5-slot scroll surface, but painted as invisible runway (see
           // .fm-wheel-runway) so the user only sees the three distinct answers.
-          // The centre slot is a real "Unsure" answer (grey), the neutral
-          // default under the dial; landing on a runway slot still commits its
-          // (edge) value. The pill body shows the label text — the ✅/❌/🤷
-          // emoji is the hero glyph (data-emoji).
+          // The centre slot is a real "Unsure" answer (grey); the wheel's
+          // neutral default under the dial is "Taken" (the common case — most
+          // nights meds ARE taken), so it lands there when nothing is committed
+          // yet. Landing on a runway slot still commits its (edge) value. The
+          // pill body shows the label text — the ✅/❌/🤷 emoji is the hero
+          // glyph (data-emoji).
           const _mdSplit = (s) => { const p = String(s).split(' '); return { emoji: p[0] || '', label: p.slice(1).join(' ') || String(s) }; };
           const _mdNot = _mdSplit(BB.t('journal.med.notTaken'));
           const _mdTk  = _mdSplit(BB.t('journal.med.taken'));
@@ -5058,8 +5060,8 @@ window.addEventListener('pageshow', () => {
           const _medWheel = _fmWheelHtml([
             _mdP('not-taken', _mdNot, 'var(--brand-primary)', { spacer: true }),
             _mdP('not-taken', _mdNot, 'var(--brand-primary)'),
-            _mdP('unsure', _mdUn, '#adb5bd', { init: !selectedMedication }),
-            _mdP('taken', _mdTk, '#51cf66'),
+            _mdP('unsure', _mdUn, '#adb5bd'),
+            _mdP('taken', _mdTk, '#51cf66', { init: !selectedMedication }),
             _mdP('taken', _mdTk, '#51cf66', { spacer: true }),
           ]);
           return _fmHeroHtml() + _medWheel + _manageRow;
