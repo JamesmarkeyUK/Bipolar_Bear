@@ -1317,6 +1317,15 @@ function _fitBoardLogo() {
   if (nameEl.scrollWidth > nameEl.clientWidth + 1) logo.classList.add('logo-iconly');
 }
 
+// Record that the user posted (or commented) today, so the BipolarBear home
+// page can show its "posted today" tick next to Bipolar Anonymous. Same local
+// date key format the home page's entry ticks use.
+function _anonMarkPostedToday() {
+  const d = new Date();
+  const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  try { BB.storage.set('Anon_lastPostDate', key); } catch (e) {}
+}
+
 function setupTabs() {
   document.querySelectorAll('.board-tab').forEach(btn => {
     btn.addEventListener('click', () => setTab(btn.dataset.tab));
@@ -3069,6 +3078,7 @@ function setupThread() {
         const postRef = db.collection(BB_BRAND.collections.posts).doc(commentTargetId);
         await postRef.collection('comments').add(comment);
         sent = true;
+        _anonMarkPostedToday();
         // Bump the parent post to the top of the board and update count.
         // Separate try — a failed bump shouldn't read as a failed comment.
         try {
@@ -3537,6 +3547,7 @@ function setupCompose() {
           timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         });
         docId = ref.id;
+        _anonMarkPostedToday();
         // Replace optimistic entry with the real one from the snapshot (happens automatically)
       } catch (e) { console.error('[Anonymous] post failed', e); }
     }

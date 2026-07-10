@@ -325,6 +325,31 @@ setTimeout(function () {
                 _revealBadge(_badge2, 'block');
               }
             }
+            // Refresh the "posted today" tick next to Bipolar Anonymous.
+            // Query only the user's own posts by monika (single-field, so no
+            // composite index needed) and check whether any landed today. The
+            // synchronous BLOCK 3b below already painted the cached value for
+            // an instant tick; this reconciles it (cross-device / cache lies).
+            if (currentUser && navigator.onLine) {
+              const _monika = BB.storage.get('Anon_monika') || '';
+              if (_monika) {
+                const _n = new Date();
+                const _todayKey = `${_n.getFullYear()}-${String(_n.getMonth()+1).padStart(2,'0')}-${String(_n.getDate()).padStart(2,'0')}`;
+                const _isToday = ts => {
+                  if (!ts) return false;
+                  try { const dt = ts.toDate ? ts.toDate() : new Date(ts); return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}` === _todayKey; } catch(_) { return false; }
+                };
+                db.collection(BB_BRAND.collections.posts)
+                  .where('name', '==', _monika)
+                  .get().then(snap => {
+                    const done = snap.docs.some(dd => { const x = dd.data(); return !x.deleted && _isToday(x.timestamp); });
+                    const _aTick = document.getElementById('anonEntryTick');
+                    if (_aTick) _aTick.setAttribute('data-done', done ? 'true' : 'false');
+                    if (done) BB.storage.set('Anon_lastPostDate', _todayKey);
+                    else if (BB.storage.get('Anon_lastPostDate') === _todayKey) BB.storage.remove('Anon_lastPostDate');
+                  }).catch(() => {});
+              }
+            }
             // Re-run the survival tick check now that localStorage is populated
             const sTick = document.getElementById('survivalTick');
             if (sTick) {
@@ -992,7 +1017,7 @@ setTimeout(function () {
         // Streaks & stats — must clear so they don't leak between accounts
         'CurrentStreak', 'StableStreak',
         // Anonymous board state
-        'Anon_streak', 'Anon_monika', 'Anon_verified', 'AnonLastVisit',
+        'Anon_streak', 'Anon_monika', 'Anon_verified', 'AnonLastVisit', 'Anon_lastPostDate',
         // Mood step tutorial hints
         '_moodTipShown', '_fmMoodTipShown',
         '_fmChooseMoodHintDone', '_fmMoodInfoCloseHintDone',
@@ -1029,6 +1054,8 @@ setTimeout(function () {
       if (jTick) jTick.setAttribute('data-done', 'false');
       const sTick = document.getElementById('survivalTick');
       if (sTick) sTick.setAttribute('data-done', 'false');
+      const aTick = document.getElementById('anonEntryTick');
+      if (aTick) aTick.setAttribute('data-done', 'false');
 
       // Hide streak / anon badges so old account's stats don't linger on the home page.
       // Sign-out is a user-driven action, not a page-load load state — call apply
@@ -1729,6 +1756,15 @@ setTimeout(function () {
           if (e.date && toKey(new Date(e.date)) === targetKey) { setTickDone(true); return; }
         } catch(e) {}
       }
+    })();
+
+// ── BLOCK 3b: Bipolar Anonymous "posted today" tick ──
+    (function() {
+      const tick = document.getElementById('anonEntryTick');
+      if (!tick) return;
+      const d = new Date();
+      const todayKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      tick.setAttribute('data-done', BB.storage.get('Anon_lastPostDate') === todayKey ? 'true' : 'false');
     })();
 
 // ── BLOCK 4: survival-kit completion tick ──

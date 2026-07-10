@@ -143,9 +143,12 @@
       </div>
 
       <div class="btn-container" id="anonymousContainer">
-        <a href="anonymous.html" class="btn btn-anonymous locked" id="anonymousBtn">
+        <a href="anonymous.html" class="btn btn-anonymous locked" id="anonymousBtn" style="position:relative;">
           <span class="icon">💬</span>
           <span data-i18n="nav.anonymous">Bipolar Anonymous</span>
+          <span id="anonEntryTick" class="entry-tick" data-done="false">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
         </a>
         <div id="anonymousSignInNote" class="btn-subnote-muted" data-i18n="home.signInNote">Sign in to join the community</div>
         <div id="anonMessagesBadge" class="btn-subnote bb-skeleton">💬 0 new messages</div>
