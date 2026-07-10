@@ -284,6 +284,8 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
   document.getElementById('app-shell').style.opacity = '1';
+  // The logo fit can only be measured once the board screen is laid out.
+  if (id === 'board') requestAnimationFrame(_fitBoardLogo);
 }
 
 async function boot(user) {
@@ -1294,6 +1296,25 @@ function renderUserPill() {
       ${profile.showStable && profile.stableStreak > 0 ? `<span class="pill-badge">🧘</span><span class="pill-badge" style="font-size:11px;color:rgba(0,0,0,0.6);">${profile.stableStreak}d</span>` : ''}
       ${bday ? `<span class="pill-badge" title="${esc(_wt('anon.ui.bbBirthday'))}">🎂</span><span class="pill-badge" style="font-size:11px;color:rgba(0,0,0,0.6);">${bday}</span>` : ''}
     </div>`;
+  _fitBoardLogo();
+}
+
+// On the narrow board header the identity pill (moniker, streaks, birthday)
+// takes priority over the "Anonymous / BipolarBear" wordmark. If the wordmark
+// can't show in full without truncating, drop it and keep just the logo icon,
+// freeing the row for the user's name and streak badges. Measures real element
+// widths (not the viewport), so it behaves the same inside the desktop iPhone
+// frame as on a real phone. Always resets to shown before measuring, so it
+// re-expands when the row grows and never flip-flops.
+function _fitBoardLogo() {
+  const logo   = document.getElementById('board-logo-btn');
+  const nameEl = logo && logo.querySelector('.board-logo-name');
+  if (!logo || !nameEl) return;
+  logo.classList.remove('logo-iconly');
+  // Board not laid out yet (screen hidden) — nothing to measure.
+  if (!nameEl.clientWidth && !nameEl.scrollWidth) return;
+  // Wordmark is being truncated → drop it entirely.
+  if (nameEl.scrollWidth > nameEl.clientWidth + 1) logo.classList.add('logo-iconly');
 }
 
 function setupTabs() {
@@ -1646,6 +1667,7 @@ let _wikiFadesResizeT = 0;
 window.addEventListener('resize', () => {
   clearTimeout(_wikiFadesResizeT);
   _wikiFadesResizeT = setTimeout(_updateWikiFades, 120);
+  _fitBoardLogo();
 });
 
 const _CONDITIONS = [
