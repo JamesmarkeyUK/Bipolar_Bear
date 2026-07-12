@@ -2861,6 +2861,18 @@ function setDeleteOverlayMode(which, isComment) {
   }
 }
 
+// Every admin is shown to everyone under one shared identity so no individual
+// admin's monika (e.g. a real name) is exposed on the board. Returns the
+// bracketed on-screen author label. The item's own `name` is still used
+// everywhere else (ban / mute / self-delete checks, data attributes) — only
+// the visible label is masked, so the ADMIN badge is folded into the name and
+// no longer rendered separately for these posts.
+const ADMIN_DISPLAY_NAME = 'Bipolar Bear Admin';
+function authorLabel(item) {
+  if (item && item.isAdmin) return `[${ADMIN_DISPLAY_NAME}]`;
+  return `[${esc(item ? item.name : '')}]`;
+}
+
 function renderThreadHeader(p) {
   if (p.isTopic) {
     return `<div class="thread-orig-post">
@@ -2892,7 +2904,6 @@ function renderThreadHeader(p) {
   const g1 = safeColor(p.grad1, YELLOW_LT);
   const g2 = safeColor(p.grad2, YELLOW_DARK);
   const av = p.initials || initials(p.name);
-  const adminBadge = p.isAdmin ? '<span class="admin-badge">ADMIN</span>' : '';
   const showMed    = profile.showMeds && p.med;
   const streakNum  = num(p.streak, 1);
   const stableNum  = num(p.stable, 0);
@@ -2902,7 +2913,7 @@ function renderThreadHeader(p) {
       <div class="post-avatar">
         <div class="post-av-circle" style="background:linear-gradient(135deg,${g1},${g2});">${esc(av)}</div>
         <div>
-          <div class="post-name">[${esc(p.name)}]${adminBadge} 🔥 ${streakNum}d${showStable ? ` 🧘 ${stableNum}d` : ''}</div>
+          <div class="post-name">${authorLabel(p)} 🔥 ${streakNum}d${showStable ? ` 🧘 ${stableNum}d` : ''}</div>
           ${showMed ? `<div class="post-med">💊 ${esc(p.med)}</div>` : ''}
         </div>
       </div>
@@ -2916,7 +2927,6 @@ function renderComment(c) {
   const g1 = safeColor(c.grad1, YELLOW_LT);
   const g2 = safeColor(c.grad2, YELLOW_DARK);
   const av = c.initials || initials(c.name);
-  const adminBadge = c.isAdmin ? '<span class="admin-badge">ADMIN</span>' : '';
   const isMine = c.name && c.name === profile.monika;
   // Moderation controls (mirror the feed post controls). Actions read the
   // comment id / author from the .comment-card dataset, so buttons stay light.
@@ -2936,7 +2946,7 @@ function renderComment(c) {
     <div class="comment-header">
       <div class="post-av-circle" style="width:28px;height:28px;font-size:11px;flex-shrink:0;background:linear-gradient(135deg,${g1},${g2});">${esc(av)}</div>
       <div style="flex:1;min-width:0;">
-        <span class="post-name" style="font-size:12px;">[${esc(c.name)}]${adminBadge}</span>
+        <span class="post-name" style="font-size:12px;">${authorLabel(c)}</span>
         <span style="font-size:11px;color:var(--muted);margin-left:6px;">${c.timestamp ? timeAgo(c.timestamp) : _wt('anon.time.now')}</span>
       </div>
     </div>
@@ -3325,7 +3335,6 @@ function renderPost(p) {
   const g1           = safeColor(p.grad1, YELLOW_LT);
   const g2           = safeColor(p.grad2, YELLOW_DARK);
   const av           = p.initials || initials(p.name);
-  const adminBadge   = p.isAdmin ? '<span class="admin-badge">ADMIN</span>' : '';
   const deleteBtn    = profile.isAdmin && !p.isSeed
     ? `<button class="icon-btn" data-delete="${esc(p.id)}" title="Delete post (admin)">🗑️</button>` : '';
   const banBtn       = profile.isAdmin && !p.isSeed && p.name !== profile.monika
@@ -3344,7 +3353,7 @@ function renderPost(p) {
       <div class="post-avatar">
         <div class="post-av-circle" style="background:linear-gradient(135deg,${g1},${g2});">${esc(av)}</div>
         <div>
-          <div class="post-name">[${esc(p.name)}]${adminBadge} 🔥 ${streakNum}d${showStable ? ` 🧘 ${stableNum}d` : ''}${postBday ? ` 🎂 ${postBday}` : ''}</div>
+          <div class="post-name">${authorLabel(p)} 🔥 ${streakNum}d${showStable ? ` 🧘 ${stableNum}d` : ''}${postBday ? ` 🎂 ${postBday}` : ''}</div>
           ${showMed ? `<div class="post-med">💊 ${esc(p.med)}</div>` : ''}
         </div>
       </div>
