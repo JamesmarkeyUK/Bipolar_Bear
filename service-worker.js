@@ -584,7 +584,15 @@
 //       explaining every post action button (💛 Like, 💬 Comment, 🆘 SOS,
 //       🚨 Report, 🙈 Mute, 🗑️ Remove), plus a "Moderators only" sub-section
 //       for the admin buttons (📌 Pin, 🗑️ Delete, 🚫 Ban).
-const CACHE_NAME = 'bipolarbear-v138';
+// v139: Three UI tweaks — (1) focused-mode medication wheel defaults to
+//       'Taken' instead of 'Unsure'; (2) the Bipolar Anonymous board header
+//       drops its 'Anonymous / BipolarBear' wordmark to just the logo icon
+//       when the identity pill (moniker, streaks, birthday) needs the room;
+//       (3) the home page shows a 'posted today' tick next to Bipolar
+//       Anonymous when you've posted or commented on the board today.
+//       index.html + js/index.js + js/anonymous.js + js/journal.js +
+//       css/anonymous.css touched. (Web-only interim deploy; no version bump.)
+const CACHE_NAME = 'bipolarbear-v139';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
