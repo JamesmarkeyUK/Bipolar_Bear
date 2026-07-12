@@ -580,7 +580,11 @@
 //       as one clean 1.23/23 anon build. Reverted _APP_VERSION 1.24 -> 1.23, iOS
 //       (app+widget) + Android build 24 -> 23 in both native repos, and the
 //       What's-New + changelog relabel back to 1.23.
-const CACHE_NAME = 'bipolarbear-v137';
+// v138: anonymous.html — add a "Post actions" box to the ℹ️ About screen
+//       explaining every post action button (💛 Like, 💬 Comment, 🆘 SOS,
+//       🚨 Report, 🙈 Mute, 🗑️ Remove), plus a "Moderators only" sub-section
+//       for the admin buttons (📌 Pin, 🗑️ Delete, 🚫 Ban).
+const CACHE_NAME = 'bipolarbear-v138';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
