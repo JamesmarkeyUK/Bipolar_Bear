@@ -367,6 +367,10 @@
     .board-logo { display: flex; align-items: center; gap: 10px; min-width: 0; }
     .board-logo img { width: 36px; height: 36px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); flex-shrink: 0; }
     .board-logo > div { min-width: 0; }
+    /* When the header is too narrow to show the wordmark in full without
+       truncating, _fitBoardLogo() drops it entirely — leaving just the logo
+       icon so the identity pill (name, streaks, birthday) gets the room. */
+    .board-logo.logo-iconly > div { display: none; }
     .board-logo-name { font-size: 18px; font-weight: 800; color: var(--dark); letter-spacing: -0.3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
     .board-logo-sub  { font-size: 10px; color: var(--dark); letter-spacing: 0.6px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
     /* The identity pill must be allowed to shrink (and its monika name to
