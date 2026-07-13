@@ -609,7 +609,13 @@
 //       the 'MBE' honorific to the James Markey founder credit everywhere it
 //       appears. Touches welcome.html, welcome-anonymous.html, index.html,
 //       js/shared/i18n.js (all precached — bump so returning users get fresh HTML).
-const CACHE_NAME = 'bipolarbear-v141';
+// v142: Landing-page carousels — add the second hero panel (02-hero) as slide 2
+//       of both showcases on both pages. The 01/02-hero shots are a matched
+//       diptych ("Every high. Every low." + "Track every mood in seconds";
+//       "You're not alone" + "Real people who get it") but the carousels
+//       jumped straight from hero to the feature screens, dropping 02-hero.
+//       Touches welcome.html + welcome-anonymous.html (precached — bump).
+const CACHE_NAME = 'bipolarbear-v142';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
