@@ -2059,6 +2059,7 @@ function _handleIndexJournalNav() {
     // (and fab.js) reads the same value without depending on this script.
     const _APP_VERSION = window._APP_VERSION;
     const _WHATS_NEW_HEADLINES = {
+      '1.24': 'A round of polish: the medication step now starts on "Taken", the home screen shows a tick when you’ve posted on Bipolar Anonymous today, and the community board is clearer — admins post as "Bipolar Bear Admin" and a new About-screen guide explains every post-action button',
       '1.23': 'The medication and sleep-quality steps look cleaner — the spinner now shows just the answers, without the repeated options that used to appear on either side',
       '1.21': 'The medication step now has an "🤷 Unsure" answer in the middle, for the nights you can’t quite remember',
       '1.20': 'Another go at the medication and sleep-quality steps — the wheels are rebuilt to spin exactly like the mood and energy ones',

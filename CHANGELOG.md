@@ -1,5 +1,41 @@
 # BipolarBear Changelog
 
+## v1.24
+- 🎭 Anonymous board: admin authors are now masked as **"Bipolar Bear Admin"** everywhere on the board (feed posts, thread headers, comments) instead of showing an individual admin monika — presents moderation as one consistent voice. Touches `js/anonymous.js`
+- ✨ Anonymous board: a **"Post actions"** guide box added to the ℹ️ About screen, explaining every post-action button (💛 Like, 💬 Comment, 🆘 SOS, 🚨 Report, 🙈 Mute, 🗑️ Remove) plus a "Moderators only" sub-section for the admin buttons (📌 Pin, 🗑️ Delete, 🚫 Ban). Touches `anonymous.html`
+- 🎨 Focused mode: the medication wheel now defaults to **"Taken"** (the most common answer) instead of "Unsure"
+- ✨ Home: a **"posted today" tick** appears next to Bipolar Anonymous once you've posted or commented on the board today. Touches `index.html`, `js/index.js`, `js/anonymous.js`, `js/journal.js`
+- 🎨 Anonymous board header drops its "Anonymous / BipolarBear" wordmark to just the logo icon when the identity pill (monika, streaks, birthday) needs the room. Touches `css/anonymous.css`
+- Version bump: `_APP_VERSION` 1.24, `version.json` web channel 1.24, iOS (app+widget) + Android build 24, `service-worker.js` `CACHE_NAME` v140
+
+## v1.23
+- 🍏 Bipolar Anonymous gains **iPad support** — `css/anonymous.css` gates the `#iphone-frame` device-mockup on `<html>.is-native` so native iPad renders full-screen (centred 620px column) instead of a fake iPhone on a grey field (the same mockup trap that got the main app's iPad screenshots rejected)
+- 🎨 Focused mode: collapse the dead space above the "Additional tracking" step (a new `.fm-flat-top` class collapses the flexible header spacer, since that step has no hero) and block the medication/sleep-quality wheels from settling on their hidden runway slots (`scroll-snap-align:none` on `.fm-wheel-runway`)
+- Version-only rebump of the main app to 1.23 / build 23 to keep it in lockstep with the Bipolar Anonymous app (which went to 1.23 for an Android launcher-icon hotfix). The store builds never shipped as 1.22, so the focused-mode wheel work from 1.22 ships here. Bump across web `_APP_VERSION`, iOS (app+widget) + Android
+
+## v1.22
+- 🎨 Focused mode: the medication + sleep-quality wheels now **hide their duplicate outer answers**. The 5-pill scroll surface stays (iOS needs it to swipe), but the two outer copies render as invisible runway so only the three distinct answers show. Touches `js/journal.js`, `css/journal.css`
+- 🛡️ Anonymous board: **moderation controls on thread comments** — replies inside a thread now carry the same controls the feed posts do (report / mute / SOS, admin delete + ban, self-remove your own comment); previously replies had none. Admin control icons (pin/delete/ban) are kept inside the card. Touches `js/anonymous.js`, `css/anonymous.css`
+
+## v1.21
+- ✨ Focused mode: the medication step gains an **"🤷 Unsure"** answer in the middle, for nights you can't quite remember. It shows as Unsure across the calendar, stats and export, and counts as *not taken* for the adherence streak (a definite not-taken, not a neutral)
+
+## v1.20
+- 🐛 Focused mode: the medication and sleep-quality steps are **rebuilt as real 5-pill spinner wheels** so they swipe exactly like the mood and energy steps (an earlier special-cased short-wheel implementation never span reliably on iOS)
+
+## v1.19
+- 🐛 Focused mode: reworked the short-wheel swipe — deleted the special case and reused the working full-wheel template plus a runway of padding slots, so the shorter medication/sleep-quality wheels spin like the others
+
+## v1.18
+- 🐛 Focused mode fixes: swiping the medication step now works properly (native-scroll swipe), and the first step no longer opens with an awkward gap above the question (fresh-first-step spacing)
+
+## v1.17
+- 🎨 **Journal redesign** — focused mode reworked into a full-screen, one-question-at-a-time flow with a spinner-wheel option picker, big animated emoji, per-mood/emoji colour auras, Apple Health readouts (e.g. "7h 32m · synced"), a smart mood suggestion derived from your sleep + steps, and a fresh rounded look (Nunito shipped app-wide to match the App Store artwork). Sleep is now asked before energy; a "Reduced motion" badge appears when the OS setting is on. Extensive work across `js/journal.js`, `css/journal.css`
+- 🛡️ Anonymous board (Apple UGC 1.2 compliance): a **content filter** on new posts/comments plus **admin user-ban**, so objectionable content and abusive users can be moderated. Duplicate "Today's topic" threads are now impossible; rotated daily topics are archived as BipolarBear posts; example posts rotate weekly with a retention footer
+- 🍏 iPad rendering fix: native iPad builds render **full-screen** (no desktop device-frame mockup), with centred home content and a white content panel for the survival kit
+- 😴 Journal: sleep is **locked for today/future entries** ("haven't slept yet") to avoid logging a night that hasn't happened
+- ✉️ Feedback + beta-signup emails now route to `inbox@jamesmarkey.co.uk`
+
 ## v1.14
 - 🐛 Fix (guest data loss): data entered during the tutorial as a guest — medications, daily goals, daily budget, coping strategies, mood definitions, mood memories, custom reminders, commitments and gratitude — was saved only to `localStorage`. Creating an account never uploaded that local data to Firestore — the auth listeners only ever pulled settings *down* from the account — so a guest's data was never backed up and disappeared the moment `localStorage` was cleared (app reinstall, storage eviction, switching device/web↔native). A new shared helper `BB.claimGuestData` (`js/shared/guest-data.js`) now backs guest-entered data *up* to `userSettings/{uid}` on sign-in/sign-up whenever the account doesn't already have that value, so guest data is claimed into the new account and survives across devices. Idempotent and non-destructive (it only ever adds data the account is missing, never overwrites an existing account value). Wired into the home, journal, and survival-kit auth listeners. Touches `js/shared/guest-data.js` (new), `index.html`, `journal.html`, `survival-kit.html`, `js/index.js`, `js/journal.js`, `js/survival-kit.js`, `service-worker.js` (`CACHE_NAME` v105)
 

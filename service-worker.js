@@ -592,7 +592,16 @@
 //       Anonymous when you've posted or commented on the board today.
 //       index.html + js/index.js + js/anonymous.js + js/journal.js +
 //       css/anonymous.css touched. (Web-only interim deploy; no version bump.)
-const CACHE_NAME = 'bipolarbear-v139';
+// v140: Release 1.24 (build 24) — ships the interim web-only work since 1.23 as
+//       a store build. Bundles: (1) admin authors are masked as 'Bipolar Bear
+//       Admin' on the Anonymous board (js/anonymous.js — this was a prior
+//       web-only deploy that never got its own SW note); (2) the v138 "Post
+//       actions" About-screen guide box; (3) the v139 trio (med wheel defaults
+//       to 'Taken', anon header wordmark drop, home 'posted today' tick).
+//       Version bump across web _APP_VERSION 1.23 -> 1.24, version.json web
+//       channel 1.21 -> 1.24, iOS (app+widget) + Android build 23 -> 24, plus
+//       1.24 What's-New + in-app changelog + CHANGELOG.md (backfilled 1.17-1.23).
+const CACHE_NAME = 'bipolarbear-v140';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

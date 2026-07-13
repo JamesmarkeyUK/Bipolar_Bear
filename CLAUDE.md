@@ -82,11 +82,20 @@ on the catch.
 # In the repo (working copy):
 git pull
 
-# Sync to the Capacitor project:
+# Sync to the Capacitor project. Capacitor's `cap copy` bundles EVERYTHING in
+# www/ into the app (`.assetsignore` is NOT read by @capacitor/cli — it's only
+# used by @capacitor/assets for icon generation), so keep non-runtime files out
+# of www/ here or they bloat the APK/AAB/IPA. store-assets (~57MB screenshots),
+# functions (Cloud Functions source), www-anonymous (the other app's bundle),
+# .wrangler, scripts and the *.md docs are none of them needed at runtime.
 rsync -av --delete \
-  --exclude='.git' --exclude='.claude' --exclude='.DS_Store' \
-  --exclude='www-anonymous' --exclude='scripts' --exclude='functions/node_modules' \
+  --exclude='.git' --exclude='.claude' --exclude='.github' --exclude='.DS_Store' \
+  --exclude='www-anonymous' --exclude='scripts' --exclude='functions' \
+  --exclude='store-assets' --exclude='.wrangler' --exclude='*.md' \
   ./ ~/Github/James/Bipolar_Bear_Mobile/bipolarbear-native/www/
+
+# On Windows (no rsync) the equivalent is robocopy /MIR with the same excludes
+# via /XD (dirs) + /XF '*.md', then delete any of the above already in www/.
 
 # Then open native IDE:
 cd ~/Github/James/Bipolar_Bear_Mobile/bipolarbear-native && npx cap sync
