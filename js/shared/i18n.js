@@ -50,7 +50,7 @@
         signinHintLabel: '🐻 Save your progress here',
         signinHintStored: 'Stored securely in Firebase',
         accountHint: '🐻 Sign in to back up your data (optional)',
-        madeBy: 'Being built by James Markey',
+        madeBy: 'Being built by James Markey MBE',
         features: {
           insightsTitle: 'Visual Insights',
           insightsDesc: 'See your mood patterns over time with charts',
@@ -718,7 +718,7 @@
         },
         "founder": {
           "eyebrow": "The human behind the bear",
-          "heading": "Built by James Markey",
+          "heading": "Built by James Markey MBE",
           "body": "Bipolar Bear began as one person’s tool for living with bipolar — and grew into a free app for everyone who needs one. James builds in the open and shares the whole journey, highs and lows included.",
           "signoff": "No investors. No data harvesting. Just a tool he wished existed.",
           "visit": "Visit jamesmarkey.co.uk →"
@@ -734,10 +734,10 @@
           "anonLink": "Bipolar Anonymous · bipolaranonymous.app",
           "moreHeading": "More",
           "privacy": "Privacy",
-          "founder": "Founder · James Markey",
+          "founder": "Founder · James Markey MBE",
           "hosting": "Hosting · UNI SIM",
           "crisis": "<b>Not a crisis service.</b> Bipolar Bear is a self-help tool, not a substitute for professional care. If you’re in crisis, contact your local emergency services or a crisis line right away.",
-          "copyright": "© 2026 Bipolar Bear · Built by James Markey · Hosted by UNI SIM"
+          "copyright": "© 2026 Bipolar Bear · Built by James Markey MBE · Hosted by UNI SIM"
         },
         "anonpage": {
           "heroEyebrow": "🫂 Free · 100% anonymous",
@@ -774,7 +774,7 @@
           "footAnonLink": "Bipolar Anonymous · open the community",
           "footBearLink": "Bipolar Bear · bipolarbear.app",
           "footCrisis": "<b>Not a crisis service.</b> Bipolar Anonymous is a peer-support community, not a substitute for professional care. If you’re in crisis, contact your local emergency services or a crisis line right away.",
-          "footCopyright": "© 2026 Bipolar Anonymous · Built by James Markey · Hosted by UNI SIM"
+          "footCopyright": "© 2026 Bipolar Anonymous · Built by James Markey MBE · Hosted by UNI SIM"
         }
       },
       sk: {
@@ -1164,7 +1164,7 @@
         survivalHint: '🐻 Haz clic aquí para aprender y compartir más sobre tu bipolar',
         signinHintLabel: '🐻 Guarda tu progreso aquí',
         signinHintStored: 'Almacenado de forma segura en Firebase',
-        madeBy: 'Creado por James Markey',
+        madeBy: 'Creado por James Markey MBE',
         features: {
           insightsTitle: 'Información Visual',
           insightsDesc: 'Ve tus patrones de ánimo con gráficos',
@@ -1402,7 +1402,7 @@
         signinHintLabel: '🐻 Sauvegardez votre progression ici',
         signinHintStored: 'Stocké en toute sécurité sur Firebase',
         accountHint: '🐻 Connectez-vous pour sauvegarder vos données (facultatif)',
-        madeBy: 'Développé par James Markey',
+        madeBy: 'Développé par James Markey MBE',
         features: { insightsTitle: 'Aperçus Visuels', insightsDesc: 'Visualisez vos tendances d\'humeur avec des graphiques', privateTitle: 'Privé et Sécurisé', privateDesc: 'Vos données restent en sécurité', trackTitle: 'Restez sur la Bonne Voie', trackDesc: 'Créez de bonnes habitudes avec des séries' },
         wa: { title: 'Rejoindre Bipolar Anonymous', body: 'Souhaitez-vous rejoindre notre groupe WhatsApp Bipolar Anonymous ?', join: '✅ Rejoindre le Groupe', cancel: 'Annuler', hide: '🙈 Masquer ce bouton' },
         whatsNew: { gotIt: 'Compris', changelog: 'Journal complet ↗' },
@@ -1853,7 +1853,7 @@
         },
         "founder": {
           "eyebrow": "L’humain derrière l’ours",
-          "heading": "Créé par James Markey",
+          "heading": "Créé par James Markey MBE",
           "body": "Bipolar Bear a commencé comme l’outil d’une seule personne pour vivre avec la bipolarité — et est devenu une app gratuite pour tous ceux qui en ont besoin. James construit à découvert et partage tout le parcours, les hauts comme les bas.",
           "signoff": "Pas d’investisseurs. Pas de collecte de données. Juste un outil qu’il aurait aimé avoir.",
           "visit": "Voir jamesmarkey.co.uk →"
@@ -1869,10 +1869,10 @@
           "anonLink": "Bipolar Anonymous · bipolaranonymous.app",
           "moreHeading": "Plus",
           "privacy": "Confidentialité",
-          "founder": "Fondateur · James Markey",
+          "founder": "Fondateur · James Markey MBE",
           "hosting": "Hébergement · UNI SIM",
           "crisis": "<b>Pas un service d’urgence.</b> Bipolar Bear est un outil d’entraide, pas un substitut à un suivi professionnel. Si vous êtes en crise, contactez immédiatement les services d’urgence locaux ou une ligne d’écoute.",
-          "copyright": "© 2026 Bipolar Bear · Créé par James Markey · Hébergé par UNI SIM"
+          "copyright": "© 2026 Bipolar Bear · Créé par James Markey MBE · Hébergé par UNI SIM"
         },
         "anonpage": {
           "heroEyebrow": "🫂 Gratuit · 100 % anonyme",
@@ -1909,7 +1909,7 @@
           "footAnonLink": "Bipolar Anonymous · ouvrir la communauté",
           "footBearLink": "Bipolar Bear · bipolarbear.app",
           "footCrisis": "<b>Pas un service d’urgence.</b> Bipolar Anonymous est une communauté d’entraide entre pairs, pas un substitut à un suivi professionnel. Si vous êtes en crise, contactez immédiatement les services d’urgence locaux ou une ligne d’écoute.",
-          "footCopyright": "© 2026 Bipolar Anonymous · Créé par James Markey · Hébergé par UNI SIM"
+          "footCopyright": "© 2026 Bipolar Anonymous · Créé par James Markey MBE · Hébergé par UNI SIM"
         }
       },
       sk: {
@@ -2295,7 +2295,7 @@
         survivalHint: '🐻 Klicken Sie hier, um mehr über Ihre Bipolarität zu erfahren',
         signinHintLabel: '🐻 Speichern Sie Ihren Fortschritt hier',
         signinHintStored: 'Sicher in Firebase gespeichert',
-        madeBy: 'Entwickelt von James Markey',
+        madeBy: 'Entwickelt von James Markey MBE',
         features: { insightsTitle: 'Visuelle Einblicke', insightsDesc: 'Sehen Sie Ihre Stimmungsmuster mit Diagrammen', privateTitle: 'Privat & Sicher', privateDesc: 'Ihre Daten bleiben sicher bei Ihnen', trackTitle: 'Bleiben Sie auf Kurs', trackDesc: 'Bauen Sie gesunde Gewohnheiten auf' },
         wa: { title: 'Bipolar Anonymous beitreten', body: 'Möchten Sie unserer WhatsApp-Gruppe Bipolar Anonymous beitreten?', join: '✅ Gruppe beitreten', cancel: 'Abbrechen', hide: '🙈 Schaltfläche ausblenden' },
         whatsNew: { gotIt: 'Verstanden', changelog: 'Vollständiges Protokoll ↗' },
@@ -2485,7 +2485,7 @@
         survivalHint: '🐻 Clicca qui per saperne di più sulla tua bipolarità',
         signinHintLabel: '🐻 Salva i tuoi progressi qui',
         signinHintStored: 'Archiviato in modo sicuro su Firebase',
-        madeBy: 'Sviluppato da James Markey',
+        madeBy: 'Sviluppato da James Markey MBE',
         features: { insightsTitle: 'Approfondimenti Visivi', insightsDesc: 'Vedi i tuoi schemi d\'umore nel tempo con grafici', privateTitle: 'Privato e Sicuro', privateDesc: 'I tuoi dati rimangono al sicuro con te', trackTitle: 'Rimani in Carreggiata', trackDesc: 'Costruisci abitudini sane con le serie' },
         wa: { title: 'Unisciti a Bipolar Anonymous', body: 'Vorresti unirti al nostro gruppo WhatsApp Bipolar Anonymous?', join: '✅ Unisciti al Gruppo', cancel: 'Annulla', hide: '🙈 Nascondi questo pulsante' },
         whatsNew: { gotIt: 'Capito', changelog: 'Registro completo ↗' },
@@ -2675,7 +2675,7 @@
         survivalHint: '🐻 Clique aqui para aprender mais sobre seu bipolar',
         signinHintLabel: '🐻 Salve seu progresso aqui',
         signinHintStored: 'Armazenado com segurança no Firebase',
-        madeBy: 'Desenvolvido por James Markey',
+        madeBy: 'Desenvolvido por James Markey MBE',
         features: { insightsTitle: 'Insights Visuais', insightsDesc: 'Veja seus padrões de humor com gráficos', privateTitle: 'Privado e Seguro', privateDesc: 'Seus dados ficam seguros com você', trackTitle: 'Fique no Caminho Certo', trackDesc: 'Construa hábitos saudáveis com sequências' },
         wa: { title: 'Entrar no Bipolar Anonymous', body: 'Gostaria de entrar no nosso grupo do WhatsApp Bipolar Anonymous?', join: '✅ Entrar no Grupo', cancel: 'Cancelar', hide: '🙈 Ocultar este botão' },
         whatsNew: { gotIt: 'Entendi', changelog: 'Registro completo ↗' },
@@ -2865,7 +2865,7 @@
         survivalHint: '🐻 Klik hier om meer te leren over uw bipolariteit',
         signinHintLabel: '🐻 Sla uw voortgang hier op',
         signinHintStored: 'Veilig opgeslagen in Firebase',
-        madeBy: 'Ontwikkeld door James Markey',
+        madeBy: 'Ontwikkeld door James Markey MBE',
         features: { insightsTitle: 'Visuele Inzichten', insightsDesc: 'Bekijk uw stemmingspatronen met grafieken', privateTitle: 'Privé en Veilig', privateDesc: 'Uw gegevens blijven veilig bij u', trackTitle: 'Blijf op de Goede Weg', trackDesc: 'Bouw gezonde gewoonten op met reeksen' },
         wa: { title: 'Word lid van Bipolar Anonymous', body: 'Wilt u deelnemen aan onze WhatsApp-groep Bipolar Anonymous?', join: '✅ Groep Aansluiten', cancel: 'Annuleren', hide: '🙈 Verberg deze knop' },
         whatsNew: { gotIt: 'Begrepen', changelog: 'Volledig logboek ↗' },
@@ -3055,7 +3055,7 @@
         survivalHint: '🐻 Kliknij tutaj, aby dowiedzieć się więcej o swoim bipolarze',
         signinHintLabel: '🐻 Zapisz swój postęp tutaj',
         signinHintStored: 'Bezpiecznie przechowywane w Firebase',
-        madeBy: 'Tworzone przez James Markey',
+        madeBy: 'Tworzone przez James Markey MBE',
         features: { insightsTitle: 'Wizualne Spostrzeżenia', insightsDesc: 'Zobacz swoje wzorce nastroju na wykresach', privateTitle: 'Prywatny i Bezpieczny', privateDesc: 'Twoje dane są bezpieczne', trackTitle: 'Utrzymaj Kurs', trackDesc: 'Buduj zdrowe nawyki z seriami' },
         wa: { title: 'Dołącz do Bipolar Anonymous', body: 'Chcesz dołączyć do naszej grupy WhatsApp Bipolar Anonymous?', join: '✅ Dołącz do Grupy', cancel: 'Anuluj', hide: '🙈 Ukryj ten przycisk' },
         whatsNew: { gotIt: 'Rozumiem', changelog: 'Pełny rejestr ↗' },
@@ -3249,7 +3249,7 @@
         survivalHint: '🐻 Klicka här för att lära dig mer om din bipolaritet',
         signinHintLabel: '🐻 Spara dina framsteg här',
         signinHintStored: 'Lagrat säkert i Firebase',
-        madeBy: 'Skapas av James Markey',
+        madeBy: 'Skapas av James Markey MBE',
         features: { insightsTitle: 'Visuella Insikter', insightsDesc: 'Se dina stämningsmönster med diagram', privateTitle: 'Privat & Säkert', privateDesc: 'Dina data förblir säkra hos dig', trackTitle: 'Håll Dig på Rätt Spår', trackDesc: 'Bygg hälsosamma vanor med serier' },
         wa: { title: 'Gå med i Bipolar Anonymous', body: 'Vill du gå med i vår WhatsApp-grupp Bipolar Anonymous?', join: '✅ Gå med i Gruppen', cancel: 'Avbryt', hide: '🙈 Dölj den här knappen' },
         whatsNew: { gotIt: 'Förstått', changelog: 'Fullständig logg ↗' },
@@ -3439,7 +3439,7 @@
         survivalHint: '🐻 点击这里了解更多关于你的双相情感障碍',
         signinHintLabel: '🐻 在这里保存你的进度',
         signinHintStored: '安全存储在Firebase中',
-        madeBy: '由James Markey开发',
+        madeBy: '由James Markey MBE开发',
         features: { insightsTitle: '可视化洞察', insightsDesc: '通过图表查看情绪变化规律', privateTitle: '私密且安全', privateDesc: '您的数据安全保存', trackTitle: '保持进度', trackDesc: '通过连续记录养成健康习惯' },
         wa: { title: '加入Bipolar Anonymous', body: '您想加入我们的WhatsApp群组Bipolar Anonymous吗？', join: '✅ 加入群组', cancel: '取消', hide: '🙈 隐藏此按钮' },
         whatsNew: { gotIt: '明白了', changelog: '完整更新日志 ↗' },

@@ -601,7 +601,15 @@
 //       Version bump across web _APP_VERSION 1.23 -> 1.24, version.json web
 //       channel 1.21 -> 1.24, iOS (app+widget) + Android build 23 -> 24, plus
 //       1.24 What's-New + in-app changelog + CHANGELOG.md (backfilled 1.17-1.23).
-const CACHE_NAME = 'bipolarbear-v140';
+// v141: Marketing landing pages — repoint the iPhone screenshot carousels at the
+//       renamed store-asset files after the reorg (iphone/02-sleep -> 04-sleep,
+//       04-patterns -> 06-patterns, 05-survivalkit -> 07-survivalkit, 06-pin ->
+//       08-pin, anonymous/iphone/01b-hero-light -> 01-hero); the old paths 404'd
+//       so every carousel slide but the hero was blank in production. Also append
+//       the 'MBE' honorific to the James Markey founder credit everywhere it
+//       appears. Touches welcome.html, welcome-anonymous.html, index.html,
+//       js/shared/i18n.js (all precached — bump so returning users get fresh HTML).
+const CACHE_NAME = 'bipolarbear-v141';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
