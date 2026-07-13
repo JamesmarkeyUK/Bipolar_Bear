@@ -260,8 +260,22 @@ section{position:relative;}
 .nav--anon:not(.scrolled) .nav-cta{background:#1f1a05;color:#fff!important;}
 
 /* ───────── Monika shuffler (anon hero interactive) ───────── */
+/* The card and the bear that peeks out behind its top edge share this stage
+   so the bear can be positioned relative to the card (the card itself is
+   overflow:hidden, so the bear has to be a sibling, not a child). */
+.monika-stage{position:relative;}
+.monika-bear{
+  position:absolute;left:50%;bottom:100%;
+  transform:translateX(-50%);
+  width:180px;height:auto;
+  /* Pull the bear down so only its top half (blindfold up) clears the card;
+     the rest hides behind the near-opaque card body. */
+  margin-bottom:-96px;
+  z-index:0;pointer-events:none;user-select:none;
+  filter:drop-shadow(0 12px 22px rgba(160,120,0,0.28));
+}
 .monika-card{
-  position:relative;
+  position:relative;z-index:2;
   background:linear-gradient(180deg,rgba(255,255,255,0.97),rgba(255,255,255,0.92));
   border:1px solid rgba(255,255,255,0.7);border-radius:28px;
   padding:28px 28px 24px;color:var(--ink);

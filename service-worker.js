@@ -615,7 +615,11 @@
 //       "You're not alone" + "Real people who get it") but the carousels
 //       jumped straight from hero to the feature screens, dropping 02-hero.
 //       Touches welcome.html + welcome-anonymous.html (precached — bump).
-const CACHE_NAME = 'bipolarbear-v142';
+// v143: Anon hero — the blindfolded Bipolar Anonymous bear logo now peeks out
+//       behind the top of the "You'll post as…" monika card (top half only,
+//       from the blindfold up; the card body hides the rest). New .monika-stage
+//       wrapper + .monika-bear in welcome-anonymous.html / css/welcome.css.
+const CACHE_NAME = 'bipolarbear-v143';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
