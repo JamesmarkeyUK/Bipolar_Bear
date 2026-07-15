@@ -452,6 +452,7 @@
         mute: { title: 'Mute this user?', body: 'All their posts and comments will be hidden on this device. You can unmute them any time from the About screen.', bodyNamed: 'Hide all posts and comments from {name} on this device? You can unmute them any time from the About screen.', confirm: 'Mute 🙈' },
         ban: { title: 'Ban this user?', body: "Their existing posts will be removed and they won't be able to post or comment again.", bodyNamed: "Ban {name}? Their existing posts will be removed and they won't be able to post or comment again.", confirm: 'Ban 🚫' },
         thread: { title: 'Comments', placeholder: 'Add a comment…', send: 'Send 💛' },
+        tips: { moniker: 'Your moniker settings', about: 'About Bipolar Anonymous', announcements: 'Announcements', compose: 'Write a post', search: 'Search the wiki', general: 'General Chat', privacy: 'Privacy info' },
       },
       journal: {
         hint: {
@@ -1515,6 +1516,7 @@
         mute: { title: '¿Silenciar a este usuario?', body: 'Todas sus publicaciones y comentarios se ocultarán en este dispositivo. Puedes dejar de silenciarlo en cualquier momento desde la pantalla Acerca de.', bodyNamed: '¿Ocultar todas las publicaciones y comentarios de {name} en este dispositivo? Puedes dejar de silenciarlo en cualquier momento desde la pantalla Acerca de.', confirm: 'Silenciar 🙈' },
         ban: { title: '¿Vetar a este usuario?', body: 'Sus publicaciones existentes se eliminarán y no podrá volver a publicar ni comentar.', bodyNamed: '¿Vetar a {name}? Sus publicaciones existentes se eliminarán y no podrá volver a publicar ni comentar.', confirm: 'Vetar 🚫' },
         thread: { title: 'Comentarios', placeholder: 'Añade un comentario…', send: 'Enviar 💛' },
+        tips: { moniker: 'Ajustes de tu moniker', about: 'Acerca de Bipolar Anonymous', announcements: 'Anuncios', compose: 'Escribir una publicación', search: 'Buscar en la wiki', general: 'Chat general', privacy: 'Información de privacidad' },
       },
       journal: {
         hint: {
@@ -1979,6 +1981,7 @@
         mute: { title: 'Masquer cet utilisateur ?', body: 'Tous ses posts et commentaires seront masqués sur cet appareil. Vous pouvez le réafficher à tout moment depuis l\'écran À propos.', bodyNamed: 'Masquer tous les posts et commentaires de {name} sur cet appareil ? Vous pouvez le réafficher à tout moment depuis l\'écran À propos.', confirm: 'Masquer 🙈' },
         ban: { title: 'Bannir cet utilisateur ?', body: 'Ses posts existants seront supprimés et il ne pourra plus publier ni commenter.', bodyNamed: 'Bannir {name} ? Ses posts existants seront supprimés et il ne pourra plus publier ni commenter.', confirm: 'Bannir 🚫' },
         thread: { title: 'Commentaires', placeholder: 'Ajouter un commentaire…', send: 'Envoyer 💛' },
+        tips: { moniker: 'Réglages de votre moniker', about: 'À propos de Bipolar Anonymous', announcements: 'Annonces', compose: 'Écrire un post', search: 'Rechercher dans le wiki', general: 'Chat général', privacy: 'Infos de confidentialité' },
       },
       journal: {
         hint: {
@@ -2957,6 +2960,7 @@
         mute: { title: 'Diesen Benutzer stummschalten?', body: 'Alle seine Beiträge und Kommentare werden auf diesem Gerät ausgeblendet. Sie können die Stummschaltung jederzeit über den Info-Bildschirm aufheben.', bodyNamed: 'Alle Beiträge und Kommentare von {name} auf diesem Gerät ausblenden? Sie können die Stummschaltung jederzeit über den Info-Bildschirm aufheben.', confirm: 'Stummschalten 🙈' },
         ban: { title: 'Diesen Benutzer sperren?', body: 'Seine vorhandenen Beiträge werden entfernt und er kann nicht mehr posten oder kommentieren.', bodyNamed: '{name} sperren? Seine vorhandenen Beiträge werden entfernt und er kann nicht mehr posten oder kommentieren.', confirm: 'Sperren 🚫' },
         thread: { title: 'Kommentare', placeholder: 'Kommentar hinzufügen…', send: 'Senden 💛' },
+        tips: { moniker: 'Ihre Moniker-Einstellungen', about: 'Über Bipolar Anonymous', announcements: 'Ankündigungen', compose: 'Beitrag schreiben', search: 'Wiki durchsuchen', general: 'Allgemeiner Chat', privacy: 'Datenschutzinfos' },
       },
       journal: {
         hint: {
@@ -3325,6 +3329,7 @@
         mute: { title: 'Silenziare questo utente?', body: 'Tutti i suoi post e commenti saranno nascosti su questo dispositivo. Puoi riattivarlo in qualsiasi momento dalla schermata Informazioni.', bodyNamed: 'Nascondere tutti i post e i commenti di {name} su questo dispositivo? Puoi riattivarlo in qualsiasi momento dalla schermata Informazioni.', confirm: 'Silenzia 🙈' },
         ban: { title: 'Bandire questo utente?', body: 'I suoi post esistenti saranno rimossi e non potrà più pubblicare né commentare.', bodyNamed: 'Bandire {name}? I suoi post esistenti saranno rimossi e non potrà più pubblicare né commentare.', confirm: 'Bandisci 🚫' },
         thread: { title: 'Commenti', placeholder: 'Aggiungi un commento…', send: 'Invia 💛' },
+        tips: { moniker: 'Impostazioni del tuo moniker', about: 'Informazioni su Bipolar Anonymous', announcements: 'Annunci', compose: 'Scrivi un post', search: 'Cerca nella wiki', general: 'Chat generale', privacy: 'Info sulla privacy' },
       },
       journal: {
         hint: {
@@ -3693,6 +3698,7 @@
         mute: { title: 'Silenciar este usuário?', body: 'Todas as suas publicações e comentários serão ocultados neste dispositivo. Você pode reativá-lo a qualquer momento na tela Sobre.', bodyNamed: 'Ocultar todas as publicações e comentários de {name} neste dispositivo? Você pode reativá-lo a qualquer momento na tela Sobre.', confirm: 'Silenciar 🙈' },
         ban: { title: 'Banir este usuário?', body: 'As suas publicações existentes serão removidas e ele não poderá mais publicar ou comentar.', bodyNamed: 'Banir {name}? As suas publicações existentes serão removidas e ele não poderá mais publicar ou comentar.', confirm: 'Banir 🚫' },
         thread: { title: 'Comentários', placeholder: 'Adicionar um comentário…', send: 'Enviar 💛' },
+        tips: { moniker: 'Definições do seu moniker', about: 'Sobre o Bipolar Anonymous', announcements: 'Anúncios', compose: 'Escrever uma publicação', search: 'Pesquisar na wiki', general: 'Chat geral', privacy: 'Informações de privacidade' },
       },
       journal: {
         hint: {
@@ -4061,6 +4067,7 @@
         mute: { title: 'Deze gebruiker dempen?', body: 'Al hun berichten en reacties worden op dit apparaat verborgen. U kunt ze op elk moment weer tonen via het scherm Over.', bodyNamed: 'Alle berichten en reacties van {name} op dit apparaat verbergen? U kunt ze op elk moment weer tonen via het scherm Over.', confirm: 'Dempen 🙈' },
         ban: { title: 'Deze gebruiker verbannen?', body: 'Hun bestaande berichten worden verwijderd en ze kunnen niet meer plaatsen of reageren.', bodyNamed: '{name} verbannen? Hun bestaande berichten worden verwijderd en ze kunnen niet meer plaatsen of reageren.', confirm: 'Verbannen 🚫' },
         thread: { title: 'Reacties', placeholder: 'Een reactie toevoegen…', send: 'Verzenden 💛' },
+        tips: { moniker: 'Uw moniker-instellingen', about: 'Over Bipolar Anonymous', announcements: 'Aankondigingen', compose: 'Een bericht schrijven', search: 'Wiki doorzoeken', general: 'Algemene chat', privacy: 'Privacy-info' },
       },
       journal: {
         hint: {
@@ -4429,6 +4436,7 @@
         mute: { title: 'Wyciszyć tego użytkownika?', body: 'Wszystkie jego wpisy i komentarze zostaną ukryte na tym urządzeniu. W każdej chwili możesz cofnąć wyciszenie na ekranie O aplikacji.', bodyNamed: 'Ukryć wszystkie wpisy i komentarze użytkownika {name} na tym urządzeniu? W każdej chwili możesz cofnąć wyciszenie na ekranie O aplikacji.', confirm: 'Wycisz 🙈' },
         ban: { title: 'Zbanować tego użytkownika?', body: 'Jego istniejące wpisy zostaną usunięte i nie będzie mógł już publikować ani komentować.', bodyNamed: 'Zbanować użytkownika {name}? Jego istniejące wpisy zostaną usunięte i nie będzie mógł już publikować ani komentować.', confirm: 'Zbanuj 🚫' },
         thread: { title: 'Komentarze', placeholder: 'Dodaj komentarz…', send: 'Wyślij 💛' },
+        tips: { moniker: 'Ustawienia Twojej moniker', about: 'O Bipolar Anonymous', announcements: 'Ogłoszenia', compose: 'Napisz wpis', search: 'Przeszukaj wiki', general: 'Czat ogólny', privacy: 'Informacje o prywatności' },
       },
       journal: {
         hint: {
@@ -4801,6 +4809,7 @@
         mute: { title: 'Tysta den här användaren?', body: 'Alla deras inlägg och kommentarer döljs på den här enheten. Du kan sluta tysta dem när som helst från Om-skärmen.', bodyNamed: 'Dölja alla inlägg och kommentarer från {name} på den här enheten? Du kan sluta tysta dem när som helst från Om-skärmen.', confirm: 'Tysta 🙈' },
         ban: { title: 'Stänga av den här användaren?', body: 'Deras befintliga inlägg tas bort och de kommer inte att kunna posta eller kommentera igen.', bodyNamed: 'Stänga av {name}? Deras befintliga inlägg tas bort och de kommer inte att kunna posta eller kommentera igen.', confirm: 'Stäng av 🚫' },
         thread: { title: 'Kommentarer', placeholder: 'Lägg till en kommentar…', send: 'Skicka 💛' },
+        tips: { moniker: 'Dina moniker-inställningar', about: 'Om Bipolar Anonymous', announcements: 'Meddelanden', compose: 'Skriv ett inlägg', search: 'Sök i wikin', general: 'Allmän chatt', privacy: 'Integritetsinfo' },
       },
       journal: {
         hint: {
@@ -5169,6 +5178,7 @@
         mute: { title: '屏蔽此用户？', body: '他们的所有帖子和评论将在此设备上被隐藏。您可以随时在“关于”页面取消屏蔽。', bodyNamed: '在此设备上隐藏 {name} 的所有帖子和评论？您可以随时在“关于”页面取消屏蔽。', confirm: '屏蔽 🙈' },
         ban: { title: '封禁此用户？', body: '他们现有的帖子将被移除，并且将无法再发帖或评论。', bodyNamed: '封禁 {name}？他们现有的帖子将被移除，并且将无法再发帖或评论。', confirm: '封禁 🚫' },
         thread: { title: '评论', placeholder: '添加评论…', send: '发送 💛' },
+        tips: { moniker: '您的Moniker设置', about: '关于Bipolar Anonymous', announcements: '公告', compose: '写帖子', search: '搜索维基', general: '综合聊天', privacy: '隐私信息' },
       },
       journal: {
         hint: {

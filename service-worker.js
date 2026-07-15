@@ -711,7 +711,14 @@
 //       into the 9 non-English locales, preserving all <br>/<strong>/&nbsp;
 //       markup and the 18+/zero-tolerance meaning. Completes v158's About
 //       wiring. Touches js/shared/i18n.js.
-const CACHE_NAME = 'bipolarbear-v159';
+// v160: i18n audit — anonymous board FAB tooltips (moniker settings, About,
+//       Announcements, Write a post, Search wiki, General Chat, Privacy info)
+//       wired to a new anon.tips namespace across all 10 locales, plus the
+//       "Loading posts…" empty-state to the existing anon.board.loading. This
+//       completes anonymous.html's static-text i18n pass (data-i18n up to 139);
+//       remaining anonymous work is js/anonymous.js runtime toasts/errors.
+//       Touches anonymous.html + js/shared/i18n.js.
+const CACHE_NAME = 'bipolarbear-v160';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

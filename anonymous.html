@@ -228,7 +228,7 @@
           <div class="board-logo-sub">BipolarBear</div>
         </div>
       </button>
-      <button id="board-user-pill" onclick="openMonikaSettings()" title="Your moniker settings" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:20px;transition:background 0.15s;" onmouseenter="this.style.background='rgba(255,255,255,0.15)'" onmouseleave="this.style.background='none'"></button>
+      <button id="board-user-pill" onclick="openMonikaSettings()" title="Your moniker settings" data-i18n-title="anon.tips.moniker" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:20px;transition:background 0.15s;" onmouseenter="this.style.background='rgba(255,255,255,0.15)'" onmouseleave="this.style.background='none'"></button>
     </div>
     <div class="board-tabs">
       <button class="board-tab" id="tab-ann" data-tab="announcements" data-i18n="anon.board.announcements">📢 Announcements</button>
@@ -238,7 +238,7 @@
   </div>
 
   <div id="post-list">
-    <div class="empty-state">Loading posts…</div>
+    <div class="empty-state" data-i18n="anon.board.loading">Loading posts…</div>
   </div>
 
   <!-- Wiki tab content. Populated in Phase 3. -->
@@ -248,12 +248,12 @@
   <div class="fab-footer">
     <div class="fab-hint" id="fab-hint"></div>
     <div class="fab-bar">
-      <button class="fab-btn" id="fab-home"    title="About Bipolar Anonymous">ℹ️</button>
-      <button class="fab-btn" id="fab-ann"     title="Announcements">📢</button>
-      <button class="fab-btn-compose" id="fab-compose" title="Write a post">✏️</button>
-      <button class="fab-btn-compose" id="fab-search" title="Search the wiki" style="display:none;">🔍</button>
-      <button class="fab-btn active" id="fab-gen" title="General Chat">💬</button>
-      <button class="fab-btn" id="fab-e2ee"    title="Privacy info">🔒</button>
+      <button class="fab-btn" id="fab-home"    title="About Bipolar Anonymous" data-i18n-title="anon.tips.about">ℹ️</button>
+      <button class="fab-btn" id="fab-ann"     title="Announcements" data-i18n-title="anon.tips.announcements">📢</button>
+      <button class="fab-btn-compose" id="fab-compose" title="Write a post" data-i18n-title="anon.tips.compose">✏️</button>
+      <button class="fab-btn-compose" id="fab-search" title="Search the wiki" data-i18n-title="anon.tips.search" style="display:none;">🔍</button>
+      <button class="fab-btn active" id="fab-gen" title="General Chat" data-i18n-title="anon.tips.general">💬</button>
+      <button class="fab-btn" id="fab-e2ee"    title="Privacy info" data-i18n-title="anon.tips.privacy">🔒</button>
     </div>
   </div>
 
