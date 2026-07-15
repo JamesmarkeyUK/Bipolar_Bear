@@ -679,7 +679,13 @@
 // v153: i18n audit — translate v152's 15 journal.mods keys (calendar,
 //       depressed-support, favourites, PIN setup, anniversary) into the 9
 //       non-English locales. Completes v152. Touches js/shared/i18n.js.
-const CACHE_NAME = 'bipolarbear-v153';
+// v154: i18n audit — journal header tooltips (Survival Kit, Change date,
+//       Favourite), the offline banner, and the focused-mode card (Switch to
+//       focused, Exit/Skip/Next, Reduced motion + tooltip, Go-to-save, Delete
+//       draft) wired to 12 new journal.mods keys across all 10 locales. Also
+//       routes journal.js's runtime fmSkipBtn label through journal.mods.fmSkip.
+//       Touches journal.html, js/journal.js, js/shared/i18n.js (all precached).
+const CACHE_NAME = 'bipolarbear-v154';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

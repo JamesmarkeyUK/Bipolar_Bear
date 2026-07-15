@@ -120,7 +120,7 @@
 
   <!-- Offline banner -->
   <div id="offlineBanner" style="display:none; position:fixed; bottom:0; left:0; right:0; z-index:200; background:rgba(0,0,0,0.75); color:rgba(255,255,255,0.9); text-align:center; padding:7px 16px; padding-bottom:calc(7px + env(safe-area-inset-bottom)); font-size:0.8em; letter-spacing:0.02em; backdrop-filter:blur(4px);">
-    📶 Offline — new entries will sync when reconnected
+    <span data-i18n="journal.mods.offlineBanner">📶 Offline — new entries will sync when reconnected</span>
   </div>
 
   <!-- Main App Content -->
@@ -140,7 +140,7 @@
           </div>
         </div>
         <div style="margin-left:auto;position:relative;">
-          <button id="survivalNavBtn" onclick="_survivalNavClick()" title="Survival Kit" style="background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.4);border-radius:50%;width:38px;height:38px;min-width:38px;min-height:38px;padding:0;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;font-size:1.2em;cursor:pointer;line-height:1;-webkit-tap-highlight-color:transparent;flex-shrink:0;">🧰</button>
+          <button id="survivalNavBtn" onclick="_survivalNavClick()" title="Survival Kit" data-i18n-title="journal.mods.survivalKitTip" style="background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.4);border-radius:50%;width:38px;height:38px;min-width:38px;min-height:38px;padding:0;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;font-size:1.2em;cursor:pointer;line-height:1;-webkit-tap-highlight-color:transparent;flex-shrink:0;">🧰</button>
         </div>
       </div>
         <div class="empty-space"></div>
@@ -212,10 +212,10 @@
 
     <div class="card" id="entryFormCard" style="background: var(--brand-tint); display:none;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-        <button id="editCancelBtn" onclick="cancelEdit()" style="display:none;background:none;border:none;color:#6c757d;font-size:0.82em;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;">← Back</button>
-        <button id="formCalendarBtn" onclick="toggleDatePicker()" style="background:none;border:none;font-size:1.5em;cursor:pointer;padding:4px;line-height:1;-webkit-tap-highlight-color:transparent;flex-shrink:0;" title="Change date">🗓️</button>
+        <button id="editCancelBtn" onclick="cancelEdit()" style="display:none;background:none;border:none;color:#6c757d;font-size:0.82em;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;" data-i18n="common.back">← Back</button>
+        <button id="formCalendarBtn" onclick="toggleDatePicker()" style="background:none;border:none;font-size:1.5em;cursor:pointer;padding:4px;line-height:1;-webkit-tap-highlight-color:transparent;flex-shrink:0;" title="Change date" data-i18n-title="journal.mods.changeDateTip">🗓️</button>
         <h2 id="entryFormHeading" data-i18n="journal.prompt.howYesterday" style="margin:0;flex:1;text-align:center;">How was yesterday?</h2>
-        <button id="favouriteBtn" onclick="toggleFavourite()" style="background:none;border:none;font-size:1.5em;cursor:pointer;padding:4px;line-height:1;color:#6c757d;-webkit-tap-highlight-color:transparent;flex-shrink:0;" title="Favourite">☆</button>
+        <button id="favouriteBtn" onclick="toggleFavourite()" style="background:none;border:none;font-size:1.5em;cursor:pointer;padding:4px;line-height:1;color:#6c757d;-webkit-tap-highlight-color:transparent;flex-shrink:0;" title="Favourite" data-i18n-title="journal.mods.favouriteTip">☆</button>
       </div>
       
       
@@ -390,31 +390,31 @@
 
     <!-- Switch to focused mode (shown below full form card when user has switched away from focused mode) -->
     <div id="fullFormExitLink" style="display:none;text-align:center;margin-top:10px;">
-      <button onclick="_fmSwitchToFocusedMode()" style="background:none;border:none;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);text-decoration:underline;font-size:0.78em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Switch to focused mode</button>
+      <button onclick="_fmSwitchToFocusedMode()" style="background:none;border:none;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);text-decoration:underline;font-size:0.78em;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="journal.mods.switchToFocused">Switch to focused mode</button>
     </div>
 
     <!-- Focused Mode Card -->
     <div class="card" id="focusedModeCard" style="background:var(--brand-tint);display:none;flex-direction:column;padding:20px 20px 16px;">
       <!-- Top bar: back + progress dots + skip -->
       <div id="fmTopBar" style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-        <button id="fmBackBtn" onclick="_fmExit()" style="background:none;border:none;color:#6c757d;font-size:0.85em;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;white-space:nowrap;">✕ Exit</button>
+        <button id="fmBackBtn" onclick="_fmExit()" style="background:none;border:none;color:#6c757d;font-size:0.85em;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;white-space:nowrap;" data-i18n="journal.mods.fmExit">✕ Exit</button>
         <div id="fmProgressDots" style="display:flex;gap:5px;flex:1;justify-content:center;align-items:center;"></div>
-        <button id="fmSkipBtn" onclick="_fmSkip()" style="background:none;border:none;color:#6c757d;font-size:0.85em;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;white-space:nowrap;">Skip →</button>
+        <button id="fmSkipBtn" onclick="_fmSkip()" style="background:none;border:none;color:#6c757d;font-size:0.85em;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;white-space:nowrap;" data-i18n="journal.mods.fmSkip">Skip →</button>
       </div>
       <div id="fmStepCounter" style="text-align:center;font-size:0.75em;color:#6c757d;margin-bottom:10px;"></div>
 
       <!-- Reduced-motion indicator: hidden by default, revealed purely by the
            prefers-reduced-motion media query in journal.css so it appears
            exactly when the animations are being held back. -->
-      <div id="fmReducedMotionBadge" title="Animations are reduced because your device has Reduce Motion turned on.">
+      <div id="fmReducedMotionBadge" title="Animations are reduced because your device has Reduce Motion turned on." data-i18n-title="journal.mods.reducedMotionTip">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 9a7 7 0 0 1 0 6"/><path d="M9 6a12 12 0 0 1 0 12"/><line x1="3.5" y1="20.5" x2="20.5" y2="3.5"/></svg>
-        <span>Reduced motion</span>
+        <span data-i18n="journal.mods.reducedMotion">Reduced motion</span>
       </div>
 
       <!-- Completed-step summary chips + save shortcut -->
       <div style="display:flex;align-items:center;gap:6px;justify-content:center;margin-bottom:14px;">
         <div id="fmSummaryBar" style="display:none;flex-wrap:nowrap;overflow-x:auto;gap:6px;justify-content:center;scrollbar-width:none;"></div>
-        <button id="fmSaveShortcutBtn" onclick="_fmGoToDone()" style="display:none;background:none;border:none;color:#6c757d;font-size:1.1em;cursor:pointer;padding:0 2px;-webkit-tap-highlight-color:transparent;line-height:1;flex-shrink:0;" title="Go to save">💾</button>
+        <button id="fmSaveShortcutBtn" onclick="_fmGoToDone()" style="display:none;background:none;border:none;color:#6c757d;font-size:1.1em;cursor:pointer;padding:0 2px;-webkit-tap-highlight-color:transparent;line-height:1;flex-shrink:0;" title="Go to save" data-i18n-title="journal.mods.goToSaveTip">💾</button>
       </div>
 
       <!-- Flexible space so the title/subheader sits roughly halfway between
@@ -435,7 +435,7 @@
       <!-- Next/Save button row (shown only for non-auto steps) -->
       <div id="fmNextRow" style="display:none;margin-top:16px;gap:10px;align-items:center;position:sticky;bottom:0;background:var(--brand-tint);padding-bottom:4px;">
         <button id="fmDeleteBtn" onclick="_fmDoneDelete()" style="display:none;min-width:52px;height:52px;background:white;color:#ff6b6b;border:2px solid #ff6b6b;border-radius:14px;font-size:1.3em;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;">🗑️</button>
-        <button id="fmNextBtn" onclick="_fmNext()" style="flex:1;padding:14px;background:var(--brand-primary);color:white;border:none;border-radius:14px;font-size:1em;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">Next →</button>
+        <button id="fmNextBtn" onclick="_fmNext()" style="flex:1;padding:14px;background:var(--brand-primary);color:white;border:none;border-radius:14px;font-size:1em;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="journal.mods.fmNext">Next →</button>
       </div>
       <div id="fmDraftStatus" style="text-align:right;font-size:0.75em;color:#6c757d;margin-top:4px;min-height:1em;transition:opacity 0.5s ease;opacity:0;"></div>
 
@@ -447,7 +447,7 @@
     <div id="fmResumeSection" style="display:none;text-align:center;margin-bottom:16px;">
       <div style="display:flex;align-items:center;justify-content:center;gap:10px;">
         <button onclick="_fmResumeEntry()" style="background:rgba(255,255,255,0.18);color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.25);border:1.5px solid rgba(255,255,255,0.55);border-radius:20px;padding:10px 22px;font-size:0.95em;font-weight:700;font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="journal.fm.resumeEntry">✏️ Continue your entry</button>
-        <button onclick="clearDraftWithConfirm()" title="Delete draft" style="background:rgba(255,255,255,0.14);border:1.5px solid rgba(255,255,255,0.45);border-radius:50%;width:44px;height:44px;min-width:44px;font-size:1.1em;cursor:pointer;-webkit-tap-highlight-color:transparent;display:inline-flex;align-items:center;justify-content:center;">🗑️</button>
+        <button onclick="clearDraftWithConfirm()" title="Delete draft" data-i18n-title="journal.mods.deleteDraftTip" style="background:rgba(255,255,255,0.14);border:1.5px solid rgba(255,255,255,0.45);border-radius:50%;width:44px;height:44px;min-width:44px;font-size:1.1em;cursor:pointer;-webkit-tap-highlight-color:transparent;display:inline-flex;align-items:center;justify-content:center;">🗑️</button>
       </div>
       <button id="fmExitMoreBtn" onclick="_fmExitToggleMore(this)" style="background:none;border:none;color:rgba(255,255,255,0.85);text-shadow:0 1px 3px rgba(0,0,0,0.25);text-decoration:underline;text-underline-offset:2px;font-size:0.82em;font-weight:600;font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;margin-top:14px;" data-i18n="journal.fm.exitMore">▾ Show more</button>
     </div>
