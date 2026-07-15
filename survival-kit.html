@@ -777,24 +777,11 @@ Try 69 then 6 halved (3) and 9 upside down (6), hashtag.</p>
       </div><!-- /section-body -->
     </div>
 
-    <!-- BIPOLAR ANONYMOUS CHAT -->
-    <div class="section collapsed" id="bipolar-anon">
-      <div class="section-header" onclick="toggleSection(this)">
-        <span class="section-icon">💬</span>
-        <h2 data-i18n="sk.anon.sectionTitle">Bipolar Anonymous</h2>
-        <span id="tick_bipolar-anon" style="margin-left:auto;margin-right:8px;font-size:0.85em;"></span>
-        <span class="section-chevron">▼</span>
-      </div>
-      <div class="section-body">
-      <div class="card">
-        <h3 data-i18n="sk.anon.cardTitle">💬 Bipolar Anonymous Chat</h3>
-        <p data-i18n="sk.anon.body">Connect anonymously with others living with bipolar — no real name required, no data sold, just peer support from people who get it.</p>
-        <p style="margin-top: 8px; font-size: 0.9em; color: var(--text-light);" data-i18n-html="sk.anon.meta"><strong>End-to-end encrypted</strong> · Anonymous alias only · Email verified then discarded · Zero data selling</p>
-        <a href="anonymous.html" class="link-btn" data-i18n="sk.anon.link">Bipolar Anonymous ↗</a>
-        <a href="https://www.bipolaruk.org/listing/category/online-support-groups-parent-category" target="_blank" class="link-btn secondary" data-i18n="sk.anon.ukGroups">Bipolar UK Groups ↗</a>
-      </div>
-      </div><!-- /section-body -->
-    </div>
+    <!-- The Bipolar Anonymous section used to sit here. Removed: the board is
+         reachable from the home screen (and its own standalone app), and the
+         survival kit is for the user's own private material. The Bipolar UK
+         support-group finder that shared this card moved into the crisis box
+         below, next to the other Bipolar UK links. -->
 
     <!-- HELP / CRISIS -->
     <div class="section" id="help">
@@ -802,6 +789,10 @@ Try 69 then 6 halved (3) and 9 upside down (6), hashtag.</p>
         <h3 data-i18n="sk.crisis.title">🆘 Need Help Right Now?</h3>
         <p data-i18n-html="sk.crisis.body">It's OK to ask for help. Regardless of how you feel, <strong>today is a beautiful day to be alive.</strong></p>
         <a href="https://www.bipolaruk.org/" target="_blank" class="crisis-btn" data-i18n="sk.crisis.bipolarUk">🌐 Bipolar UK</a>
+        <!-- Rehomed from the removed Bipolar Anonymous card. Keeps the
+             sk.anon.ukGroups key so the existing 10 locale translations of
+             this label still resolve. -->
+        <a href="https://www.bipolaruk.org/listing/category/online-support-groups-parent-category" target="_blank" class="crisis-btn" data-i18n="sk.anon.ukGroups">Bipolar UK Groups ↗</a>
         <a href="tel:111" class="crisis-btn" data-i18n="sk.crisis.call111">📞 Call 111</a>
         <a href="tel:999" class="crisis-btn" data-i18n="sk.crisis.emergency999">🚨 999 Emergency</a>
         <div id="emergencyContactArea" style="margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.25);"></div>

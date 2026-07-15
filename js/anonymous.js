@@ -91,6 +91,11 @@ let _boardSetupDone = false; // initBoard's one-time handler wiring (compose, FA
 const profile = {
   get monika()      { return BB.storage.get('Anon_monika')    || ''; },
   get verified()    { return BB.storage.get('Anon_verified')  === 'true'; },
+  // Guideline 1.2 agreement. Set by the verify-screen checkbox on the
+  // standalone path and by screen-agree on the BB-app path (which skips
+  // verify). Mirrored to userSettings.anonProfile.termsAccepted so it
+  // survives a reinstall.
+  get termsOk()     { return BB.storage.get('Anon_agreedTerms') === 'true'; },
   get showMeds()    { return BB.storage.get('Anon_showMeds')    === 'true'; },
   get showStable()  { return BB.storage.get('Anon_showStable') === 'true'; },
   get stableStreak(){ return parseInt(BB.storage.get('Anon_stableStreak') || '0', 10); },
@@ -315,6 +320,13 @@ async function boot(user) {
     BB.storage.set('Anon_verified', 'true');
     // Restore full anon profile (monika, meds, stable, etc.) from userSettings
     await _bbRestoreProfile(user.uid);
+    // Guideline 1.2: this path skips the verify screen, so the terms checkbox
+    // there never ran. Gate on the agreement before any UGC is reachable.
+    if (!profile.termsOk) {
+      showScreen('agree');
+      setupAgree();
+      return;
+    }
     if (profile.monika) {
       showScreen('board');
       initBoard();
@@ -323,10 +335,25 @@ async function boot(user) {
       setupMonika();
     }
   } else if (profile.verified && profile.monika) {
-    // Standalone verified (email code path, not signed in to main app)
+    // Standalone verified (email code path, not signed in to main app).
     // Refresh stats from Firestore on every visit so stableStreak / joinedAt
     // stay current without requiring a fresh email verification.
     const savedEmail = BB.storage.get('Anon_email');
+    // Backfill the guideline-1.2 flag for standalone installs that predate it:
+    // they ticked the verify-screen checkbox, so re-prompting is wrong, and
+    // without this the pre-activation picker would flash screen-agree at them.
+    // Gated on Anon_email — only the standalone path stores it, so a BB-app
+    // user landing here (e.g. the 2.5s auth-timeout fallback boot(null)) is
+    // NOT silently granted an agreement they never gave.
+    if (savedEmail && !profile.termsOk) BB.storage.set('Anon_agreedTerms', 'true');
+    // Anything still lacking an agreement at this point reached here without
+    // the verify-screen checkbox (a BB-app user whose auth didn't resolve in
+    // time). No UGC before the gate — initBoard() must not run.
+    if (!profile.termsOk) {
+      showScreen('agree');
+      setupAgree();
+      return;
+    }
     if (savedEmail) await _anonRestoreProfile(savedEmail);
     showScreen('board');
     initBoard();
@@ -418,7 +445,7 @@ document.getElementById('ov-thread').addEventListener('click', e => {
 // Community Guidelines & Terms overlay (UGC agreement, guideline 1.2).
 // Openable from the signup checkbox and the About sheet; closeable from its
 // own button (backdrop-tap is handled by the array above).
-['open-terms-link','about-terms-link'].forEach(id => {
+['open-terms-link','open-terms-link-bb','about-terms-link'].forEach(id => {
   const el = document.getElementById(id);
   if (el) el.addEventListener('click', () => openOv('ov-terms'));
 });
@@ -547,6 +574,50 @@ function showHint(msg) {
   h.classList.add('show');
   clearTimeout(h._t);
   h._t = setTimeout(() => h.classList.remove('show'), 2200);
+}
+
+// ─────────────────────────────────────────────────────────────────
+// SCREEN: Agree to terms (BipolarBear-app path only)
+// ─────────────────────────────────────────────────────────────────
+/**
+ * Guideline 1.2 gate for users who arrive already signed in to BipolarBear
+ * and therefore never see the verify screen's terms checkbox. Records the
+ * agreement locally and (best-effort) in userSettings/{uid}.anonProfile so
+ * it survives a reinstall, then continues to the board or monika picker.
+ */
+let _agreeWired = false;
+function setupAgree() {
+  const chk  = document.getElementById('agree-terms-bb');
+  const btn  = document.getElementById('agree-continue-btn');
+  if (!chk || !btn) return;
+  chk.checked  = false;
+  btn.disabled = true;
+  if (_agreeWired) return;
+  _agreeWired = true;
+
+  chk.addEventListener('change', () => { btn.disabled = !chk.checked; });
+
+  btn.addEventListener('click', async () => {
+    if (!chk.checked) return;
+    btn.disabled = true;
+    BB.storage.set('Anon_agreedTerms', 'true');
+    BB.storage.set('Anon_agreedTermsAt', new Date().toISOString());
+    // Best-effort cross-device mirror — never block entry on a failed write.
+    if (db && _bbUser) {
+      try {
+        await db.collection('userSettings').doc(_bbUser.uid).set(
+          { anonProfile: { termsAccepted: true } }, { merge: true }
+        );
+      } catch (_) { /* local flag is enough for this session */ }
+    }
+    if (profile.monika) {
+      showScreen('board');
+      initBoard();
+    } else {
+      showScreen('monika');
+      setupMonika();
+    }
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -1034,6 +1105,11 @@ async function _bbRestoreProfile(uid) {
       } catch (_) { /* best-effort */ }
     }
     if (ap.monika)                   BB.storage.set('Anon_monika',      ap.monika);
+    // Guideline 1.2 agreement — restore so a returning or reinstalled user
+    // isn't asked twice. Deliberately NOT inferred from an existing monika:
+    // BB-app users who joined before this gate shipped never saw the terms,
+    // so they must accept once, exactly as a new user does.
+    if (ap.termsAccepted) BB.storage.set('Anon_agreedTerms', 'true');
     if (ap.colorKey)                 BB.storage.set('Anon_colorKey',    ap.colorKey);
     if (ap.customInit !== undefined) BB.storage.set('Anon_initials',    ap.customInit || '');
     if (ap.showMeds   !== undefined) BB.storage.set('Anon_showMeds',    ap.showMeds   ? 'true' : 'false');
@@ -1101,6 +1177,7 @@ function _bbSaveProfile() {
     visitDate:   BB.storage.get('AnonVisitDate') || null,
     joinedAt:    profile.joinedAt   || null,
     verified:    BB.storage.get('Anon_verified') === 'true',
+    termsAccepted: profile.termsOk, // guideline 1.2 agreement (see screen-agree)
   };
   db.collection('userSettings').doc(_bbUser.uid).set(
     { anonProfile: data }, { merge: true }

@@ -578,6 +578,16 @@
             </select>
           </div>
           <button onclick="(window._fabOpenPersonalInfo||function(){})()" style="width:100%;padding:12px;background:white;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;margin-bottom:10px;-webkit-tap-highlight-color:transparent;">👤 Personal information</button>
+          <!-- App Store guideline 5.1.1(v): account deletion must be reachable
+               from wherever account management lives. This modal is the only
+               account UI on survival-kit, and the one reviewers find first on
+               index/journal, so the entry point belongs here. -->
+          <div id="bbAccountDeleteSection" style="margin-bottom:10px;padding-top:10px;border-top:1px solid #e9ecef;">
+            <button onclick="window._bbAccountDelete()" style="width:100%;padding:12px;background:rgba(201,42,42,0.08);color:#c92a2a;border:2px solid #c92a2a;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="account.deleteAccount">🗑️ Delete account</button>
+          </div>
+          <div id="bbAccountDeleteLocked" style="display:none;margin-bottom:10px;padding-top:10px;border-top:1px solid #e9ecef;">
+            <div style="color:#6c757d;font-size:0.82em;padding:10px;border:1.5px solid #dee2e6;border-radius:10px;text-align:center;" data-i18n="account.deleteLocked">🔒 Account cannot be deleted</div>
+          </div>
           <button onclick="window.closeAccountModal()" style="width:100%;padding:10px;background:#f8f9fa;color:#6c757d;border:2px solid #e9ecef;border-radius:10px;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="common.cancel">Cancel</button>
           <div id="bbAccountVersion" style="margin-top:10px;text-align:center;font-size:0.7em;color:#adb5bd;letter-spacing:0.02em;"></div>
         </div>
@@ -1220,6 +1230,13 @@
     if (emailPassEl) emailPassEl.value = '';
     const langSel = document.getElementById('bbLangSelect');
     if (langSel && window.BB && window.BB.i18n) langSel.value = window.BB.i18n.getLang();
+    // Protected demo/owner account can't be deleted — mirrors the same guard
+    // on the journal Danger Zone (see _protected in js/journal.js).
+    const _protected = !!(user && user.email === 'inbox@jamesmarkey.co.uk');
+    const delSection = document.getElementById('bbAccountDeleteSection');
+    const delLocked  = document.getElementById('bbAccountDeleteLocked');
+    if (delSection) delSection.style.display = _protected ? 'none' : '';
+    if (delLocked)  delLocked.style.display  = _protected ? '' : 'none';
     const verEl = document.getElementById('bbAccountVersion');
     if (verEl) verEl.textContent = (window.BB && window.BB.versionLabel) ? window.BB.versionLabel() : '';
     const modal = document.getElementById('bbAccountModal');
@@ -1249,6 +1266,22 @@
     } else {
       const _fb = window.firebase;
       if (_fb && _fb.auth) _fb.auth().signOut();
+    }
+  };
+
+  /**
+   * Account-deletion handler for the account modal (App Store 5.1.1(v)).
+   * index.html and journal.html both define confirmDeleteAll() — the full
+   * re-auth → Firestore wipe → user.delete() flow. survival-kit.html has no
+   * such code, so it hands off to the home page via ?deleteAccount=1 rather
+   * than duplicating the destructive path a third time.
+   */
+  window._bbAccountDelete = function () {
+    window.closeAccountModal();
+    if (typeof window.confirmDeleteAll === 'function') {
+      window.confirmDeleteAll();
+    } else {
+      location.href = 'index.html?deleteAccount=1';
     }
   };
 

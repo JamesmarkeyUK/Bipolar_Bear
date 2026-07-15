@@ -382,7 +382,6 @@ function _sktMood(moodKey) {
         { id: 'memories',          done: () => { try { const mm = JSON.parse(localStorage.getItem('moodMemories')||'{}'); return Object.values(mm).some(a => Array.isArray(a) && a.length > 0); } catch(e){return false;} } },
         { id: 'steps',             done: () => { try { const sc = JSON.parse(localStorage.getItem('myCommitments')||'[]'); return Array.isArray(sc) && sc.length > 0; } catch(e){return false;} } },
         { id: 'faq',               done: () => { try { const cr = JSON.parse(localStorage.getItem('customReminders')||'[]'); return Array.isArray(cr) && cr.length > 0; } catch(e){return false;} } },
-        { id: 'bipolar-anon', done: () => true },
         // Info-only sections — always complete
         { id: 'mood-scale', done: () => true },
         { id: 'books',      done: () => true },

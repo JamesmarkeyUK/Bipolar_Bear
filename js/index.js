@@ -139,6 +139,12 @@ setTimeout(function () {
         currentUser = user && !user.isAnonymous ? user : null;
         window.currentUser = currentUser;
 
+        // survival-kit.html has no delete flow of its own, so fab.js sends the
+        // user here with ?deleteAccount=1 (App Store 5.1.1(v)). Fire it from
+        // the auth callback so confirmDeleteAll() sees the resolved user
+        // rather than a null currentUser on first paint.
+        _maybeAutoDeleteAccount();
+
         // Clear stale guest PIN if it was set by a different account.
         // Guest PINs (bbGuestPinSalt) are only valid for the account that created them.
         if (user && !user.isAnonymous) {
@@ -1066,9 +1072,9 @@ setTimeout(function () {
       if (_aBadge) { _aBadge.classList.remove('bb-skeleton'); _aBadge.style.display = 'none'; }
       const _amBadge = document.getElementById('anonMessagesBadge');
       if (_amBadge) { _amBadge.classList.remove('bb-skeleton'); _amBadge.style.display = 'none'; }
-      // Reset survival kit progress count to default (4 always-complete sections + 1 anon = 5/13)
+      // Reset survival kit progress count to default (4 always-complete sections = 4/12)
       const _sp = document.getElementById('survivalProgress');
-      if (_sp) { _sp.classList.remove('bb-skeleton'); _sp.textContent = '5 / 13 sections complete'; }
+      if (_sp) { _sp.classList.remove('bb-skeleton'); _sp.textContent = '4 / 12 sections complete'; }
 
       if (auth) auth.signOut();
     }
@@ -1426,6 +1432,22 @@ setTimeout(function () {
       deleteAllEntries({ deleteAccount: isSignedIn });
     }
     window.confirmDeleteAll = confirmDeleteAll;
+
+    /**
+     * Honour ?deleteAccount=1 (set by fab.js on survival-kit, which has no
+     * delete flow of its own). One-shot: the query param is stripped before
+     * prompting so a refresh or back-navigation can't re-arm the dialog.
+     */
+    let _autoDeleteFired = false;
+    function _maybeAutoDeleteAccount() {
+      if (_autoDeleteFired) return;
+      let wanted = false;
+      try { wanted = new URLSearchParams(location.search).get('deleteAccount') === '1'; } catch (e) { return; }
+      if (!wanted) return;
+      _autoDeleteFired = true;
+      try { history.replaceState(null, '', location.pathname); } catch (e) {}
+      setTimeout(confirmDeleteAll, 0);
+    }
 
     async function deleteAllEntries(opts) {
       opts = opts || {};
@@ -1809,10 +1831,9 @@ setTimeout(function () {
         if (_obj('moodMemories')) _c++;
         if (_arr('myCommitments')) _c++;
         if (_arr('customReminders')) _c++;
-        _c++; // bipolar-anon section is always complete (info section)
-        _prog.textContent = _c >= 13
+        _prog.textContent = _c >= 12
           ? '✓ All sections completed'
-          : _c + ' / 13 sections complete';
+          : _c + ' / 12 sections complete';
         _revealBadge(_prog, 'block');
       }
     })();

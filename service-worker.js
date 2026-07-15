@@ -619,7 +619,23 @@
 //       behind the top of the "You'll post as…" monika card (top half only,
 //       from the blindfold up; the card body hides the rest). New .monika-stage
 //       wrapper + .monika-bear in welcome-anonymous.html / css/welcome.css.
-const CACHE_NAME = 'bipolarbear-v143';
+// v144: App Store review fixes for Bipolar Bear 1.2 (build 23).
+//       5.1.1(v) — account deletion was only reachable from the home profile
+//       modal and the journal Danger Zone; the reviewer found neither. The
+//       shared account modal (fab.js, shown on index/journal/survival-kit) now
+//       carries a "🗑️ Delete account" button. index/journal delegate to their
+//       existing confirmDeleteAll(); survival-kit has no delete flow of its own
+//       so it hands off via index.html?deleteAccount=1 (js/index.js).
+//       1.2 — signed-in BipolarBear users skipped anonymous.html's verify
+//       screen, and with it the 18+/zero-tolerance checkbox, so they reached
+//       the board having agreed to nothing. New screen-agree gates that path;
+//       agreement persists as bbAnon_agreedTerms + anonProfile.termsAccepted.
+//       Also removed the Bipolar Anonymous section from survival-kit.html
+//       (board stays on the home screen); its Bipolar UK Groups link moved to
+//       the crisis box, and the kit's section count drops 13 → 12.
+//       Touches fab.js, js/index.js, index.html, survival-kit.html,
+//       js/survival-kit.js, anonymous.html, js/anonymous.js, js/shared/i18n.js.
+const CACHE_NAME = 'bipolarbear-v144';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

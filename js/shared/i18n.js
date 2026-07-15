@@ -112,6 +112,8 @@
         newEmail: 'New email address',
         cancel: 'Cancel',
         language: 'Language',
+        deleteAccount: '🗑️ Delete account',
+        deleteLocked: '🔒 Account cannot be deleted',
         msg: {
           fillBothFields: '⚠️ Please fill in both fields.',
           passwordTooShort: '⚠️ New password must be at least 6 characters.',
@@ -150,6 +152,11 @@
         low: 'Low', depressed: 'Depressed',
       },
       anon: {
+        agree: {
+          title: 'Before you join 👋',
+          sub: 'This is a peer community. To keep it safe for everyone, please confirm you agree to the rules.',
+          continue: 'Continue →',
+        },
         verify: {
           back: '← Home',
           welcome: 'Welcome 👋',
