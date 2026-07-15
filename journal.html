@@ -1087,6 +1087,13 @@
           <option value="low" data-i18n="journal.editMood.low">😔 Low</option>
           <option value="depressed" data-i18n="journal.editMood.depressed">🌧️ Depressed</option>
         </select>
+        <!-- Full mood spectrum: 0–10 numeric editor, shown instead of the select
+             when the entry uses the spectrum (see openEditModal / saveEditedEntry). -->
+        <div id="editEntryMoodSpectrumWrap" style="display:none; margin-top:6px;">
+          <input type="range" id="editEntryMoodNum" min="0" max="10" step="1" value="5"
+                 oninput="_onEditSpectrumInput(this.value)" style="width:100%;">
+          <div id="editEntryMoodNumLabel" style="text-align:center; font-weight:600; color:#495057; font-size:0.9em; margin-top:4px;">5 · Stable</div>
+        </div>
       </div>
       <div style="margin-bottom: 12px;">
         <label style="font-weight:600; color:#495057;" data-i18n="journal.energyRange">Energy (0–10)</label>

@@ -1314,7 +1314,7 @@ window.addEventListener('pageshow', () => {
       // showed — otherwise it stays visible forever (looks like a stuck save).
       if (_getOnboardingStep() === 0) { showDraftStatus('clear'); return; } // no drafts until first real entry is saved
       if (editingEntry) { showDraftStatus('clear'); return; }
-      if (!selectedMood) { showDraftStatus('clear'); return; }
+      if (!_hasMood()) { showDraftStatus('clear'); return; }
       const targetKey = document.getElementById('entryDate')?.value;
       if (!targetKey) { showDraftStatus('clear'); return; }
       const draft = {
@@ -1622,6 +1622,11 @@ window.addEventListener('pageshow', () => {
     }
     // Category → mood image path (works for numbers via _moodCat).
     function _moodImg(m) { return `images/moods/${_moodCat(m)}.png`; }
+    // Category emoji for any mood value (independent of any locally-shadowed map).
+    function _moodEmoji(m) {
+      const e = { manic:'🚀', elevated:'✨', stable:'😊', good:'😊', low:'😔', depressed:'🌧️' };
+      return e[_moodCat(m)] || '';
+    }
     // Numeric score on the legacy 1–5 axis (charts/regression/averages).
     // Spectrum 0→1 … 10→5 so numeric entries sit on the same axis as legacy ones
     // while preserving full 0–10 granularity.
@@ -1649,6 +1654,8 @@ window.addEventListener('pageshow', () => {
     function _moodLabelNum(m) {
       return _isNumericMood(m) ? `${_moodLabelOf(m)} (${_fmtMoodNum(m)})` : _moodLabelOf(m);
     }
+    // A mood is "chosen" when it's set — including the spectrum value 0 (which is falsy).
+    function _hasMood() { return selectedMood != null && selectedMood !== ''; }
 
     // Mood selection
     document.querySelectorAll('.mood-btn').forEach(btn => {
@@ -1706,7 +1713,7 @@ window.addEventListener('pageshow', () => {
       const _moodKey = _moodKeyMap[mood];
       const label = (_moodKey && window.BB && BB.t) ? BB.t(_moodKey) : (mood.charAt(0).toUpperCase() + mood.slice(1));
       document.getElementById('moodInfoHeader').style.background = def.color;
-      document.getElementById('moodInfoIcon').src = `images/moods/${mood}.png`;
+      document.getElementById('moodInfoIcon').src = _moodImg(mood);
       document.getElementById('moodInfoIcon').alt = label;
       document.getElementById('moodInfoLabel').textContent = label;
 
@@ -1926,7 +1933,7 @@ window.addEventListener('pageshow', () => {
       }
 
       function startCycle() {
-        if (cycleInterval || selectedMood) return;
+        if (cycleInterval || selectedMood || _spectrumEnabled()) return;
         cycleInterval = setInterval(() => {
           if (selectedMood || hovered) {
             stopCycle(); // self-terminate — no point running after mood is chosen
@@ -1996,7 +2003,7 @@ window.addEventListener('pageshow', () => {
     })();
 
     async function saveEntry() {
-      if (!selectedMood) {
+      if (!_hasMood()) {
         alert(BB.t('journal.toast.selectMood'));
         return;
       }
@@ -2481,12 +2488,12 @@ window.addEventListener('pageshow', () => {
               })()
             : '';
           return `
-            <div class="entry" style="border-left-color: ${moodColors[entry.mood]}">
+            <div class="entry" style="border-left-color: ${moodColors[_moodCat(entry.mood)]}">
               <div class="entry-header" style="margin-bottom:4px;">
                 <div class="entry-date" style="flex:1; min-width:0;">${date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}${recordedStr}</div>
                 <div style="display:flex; align-items:center; gap:8px; flex-shrink:0; margin-left:8px;">
-                  <img src="images/moods/${entry.mood}.png" alt="${entry.mood}" class="entry-mood" style="width:32px;height:32px;object-fit:contain;">
-                  ${entry.linkedMood ? `<img src="images/moods/${entry.linkedMood}.png" alt="${entry.linkedMood}" style="width:22px;height:22px;object-fit:contain;opacity:0.75;margin-left:-4px;" title="Also: ${entry.linkedMood}">` : ''}
+                  <img src="${_moodImg(entry.mood)}" alt="${_moodLabelOf(entry.mood)}" class="entry-mood" style="width:32px;height:32px;object-fit:contain;">
+                  ${entry.linkedMood ? `<img src="${_moodImg(entry.linkedMood)}" alt="${_moodLabelOf(entry.linkedMood)}" style="width:22px;height:22px;object-fit:contain;opacity:0.75;margin-left:-4px;" title="Also: ${_moodLabelOf(entry.linkedMood)}">` : ''}
                   ${entry.pdfHide ? `<span style="font-size:1em;line-height:1;opacity:0.7;" title="Private">🕵️</span>` : ''}
                   ${entry.favourite ? `<span style="font-size:1em;color:var(--brand-primary);line-height:1;" title="Favourite">★</span>` : ''}
                   <button class="edit-btn" id="edit-${actualIndex}" title="Edit entry" style="background:none; border:none; cursor:pointer; font-size:1.1em; padding:4px;">✏️</button>
@@ -2701,8 +2708,9 @@ window.addEventListener('pageshow', () => {
       
       const moodCounts = {};
       statsEntries.forEach(e => {
-        moodCounts[e.mood] = (moodCounts[e.mood] || 0) + 1;
-        if (e.linkedMood) moodCounts[e.linkedMood] = (moodCounts[e.linkedMood] || 0) + 1;
+        const _c = _moodCat(e.mood);
+        moodCounts[_c] = (moodCounts[_c] || 0) + 1;
+        if (e.linkedMood) { const _lc = _moodCat(e.linkedMood); moodCounts[_lc] = (moodCounts[_lc] || 0) + 1; }
       });
       const _sortedMoods = Object.entries(moodCounts).sort((a, b) => b[1] - a[1]);
       const mostCommon = _sortedMoods[0];
@@ -2828,11 +2836,11 @@ window.addEventListener('pageshow', () => {
           <div class="stat-number">
             <div style="display:flex;align-items:flex-end;justify-content:center;gap:6px;">
               <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:6px;">
-                <img src="images/moods/${mostCommon[0]}.png" alt="${mostCommon[0]}" style="width:38px;height:38px;object-fit:contain;">
+                <img src="${_moodImg(mostCommon[0])}" alt="${_moodLabelOf(mostCommon[0])}" style="width:38px;height:38px;object-fit:contain;">
                 <div style="font-size:0.7em;line-height:1;margin-top:2px;">🥇</div>
               </div>
               ${secondCommon ? `<div style="display:flex;flex-direction:column;align-items:center;">
-                <img src="images/moods/${secondCommon[0]}.png" alt="${secondCommon[0]}" style="width:28px;height:28px;object-fit:contain;">
+                <img src="${_moodImg(secondCommon[0])}" alt="${_moodLabelOf(secondCommon[0])}" style="width:28px;height:28px;object-fit:contain;">
                 <div style="font-size:0.7em;line-height:1;margin-top:2px;">🥈${secondIsTied ? '<span style="font-size:0.8em;vertical-align:middle;">=</span>' : ''}</div>
               </div>` : ''}
             </div>
@@ -2874,7 +2882,7 @@ window.addEventListener('pageshow', () => {
       const modal = document.getElementById('statDetailModal');
       const title = document.getElementById('statDetailTitle');
       const body = document.getElementById('statDetailBody');
-      const moodImg = (mood) => `<img src="images/moods/${mood}.png" alt="${mood}" style="width:20px;height:20px;object-fit:contain;vertical-align:middle;">`;
+      const moodImg = (mood) => `<img src="${_moodImg(mood)}" alt="${_moodLabelOf(mood)}" style="width:20px;height:20px;object-fit:contain;vertical-align:middle;">`;
       const sorted = [...entries].sort((a, b) => b.timestamp - a.timestamp);
 
       const row = (label, value, bar, barColor) => {
@@ -2901,8 +2909,7 @@ window.addEventListener('pageshow', () => {
         title.textContent = BB.t('journal.stats.moodChart');
         body.innerHTML = sorted.map(e => {
           const d = new Date(e.date).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
-          const _mLbl = { manic:BB.t('mood.manic'), elevated:BB.t('mood.elevated'), stable:BB.t('mood.stable'), good:BB.t('mood.stable'), low:BB.t('mood.low'), depressed:BB.t('mood.depressed') };
-          return row(d, `${moodImg(e.mood)} ${_mLbl[e.mood] || (e.mood ? e.mood.charAt(0).toUpperCase() + e.mood.slice(1) : '')}`);
+          return row(d, `${moodImg(e.mood)} ${_moodLabelNum(e.mood)}`);
         }).join('');
       } else if (type === 'medication') {
         title.textContent = BB.t('journal.stats.medChart');
@@ -2919,8 +2926,9 @@ window.addEventListener('pageshow', () => {
         const counts = {};
         allMoods.forEach(m => { counts[m] = 0; });
         entries.forEach(e => {
-          if (counts[e.mood] !== undefined) counts[e.mood]++;
-          if (e.linkedMood && counts[e.linkedMood] !== undefined) counts[e.linkedMood]++;
+          const _c = _moodCat(e.mood);
+          if (counts[_c] !== undefined) counts[_c]++;
+          if (e.linkedMood) { const _lc = _moodCat(e.linkedMood); if (counts[_lc] !== undefined) counts[_lc]++; }
         });
         const sortedMoods = [...allMoods].sort((a, b) => counts[b] - counts[a]);
         title.textContent = `🧠 Mood Breakdown`;
@@ -2933,7 +2941,7 @@ window.addEventListener('pageshow', () => {
           return `<div style="padding:8px 0;border-bottom:1px solid #f0f0f0;">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
               <div style="display:flex;align-items:center;gap:8px;">
-                <img src="images/moods/${mood}.png" style="width:22px;height:22px;object-fit:contain;">
+                <img src="${_moodImg(mood)}" style="width:22px;height:22px;object-fit:contain;">
                 <span style="color:#495057;font-weight:600;">${_moodLabels[mood]}</span>
               </div>
               <span style="font-weight:700;color:${color};">${value}</span>
@@ -2949,12 +2957,12 @@ window.addEventListener('pageshow', () => {
         title.textContent = BB.t('journal.stats.trackedDays');
         body.innerHTML = sorted.map(e => {
           const d = new Date(e.date).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
-          const c = _moodColors[e.mood] || 'var(--brand-primary)';
-          const lbl = _moodLabels[e.mood] || e.mood;
+          const c = _moodColors[_moodCat(e.mood)] || 'var(--brand-primary)';
+          const lbl = _moodLabelNum(e.mood);
           return `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;margin-bottom:4px;border-radius:8px;background:${c}18;border-left:3px solid ${c};">
             <span style="color:#495057;font-size:0.9em;">${d}</span>
             <span style="display:flex;align-items:center;gap:5px;">
-              <img src="images/moods/${e.mood}.png" alt="${e.mood}" style="width:22px;height:22px;object-fit:contain;">
+              <img src="${_moodImg(e.mood)}" alt="${_moodLabelOf(e.mood)}" style="width:22px;height:22px;object-fit:contain;">
               <span style="font-size:0.82em;font-weight:600;color:${c};">${lbl}</span>
             </span>
           </div>`;
@@ -2981,13 +2989,13 @@ window.addEventListener('pageshow', () => {
         el.innerHTML = favs.map(entry => {
           const d = new Date(entry.date);
           const label = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
-          const color = moodColors[entry.mood] || 'var(--brand-primary)';
+          const color = moodColors[_moodCat(entry.mood)] || 'var(--brand-primary)';
           const notesPreview = entry.notes
             ? `<div style="font-size:0.82em;color:#6c757d;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${entry.notes}</div>`
             : '';
           return `
             <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:6px;background:#f8f9fa;border-radius:10px;border-left:4px solid ${color};">
-              <img src="images/moods/${entry.mood}.png" width="28" height="28" style="flex-shrink:0;">
+              <img src="${_moodImg(entry.mood)}" width="28" height="28" style="flex-shrink:0;">
               <div style="flex:1;min-width:0;">
                 <div style="font-weight:600;font-size:0.88em;">${label}</div>
                 ${notesPreview}
@@ -3010,7 +3018,7 @@ window.addEventListener('pageshow', () => {
       const d = new Date(entry.date);
       const dateLabel = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
       document.getElementById('statDetailTitle').innerHTML =
-        `<img src="images/moods/${entry.mood}.png" width="26" style="vertical-align:middle;margin-right:8px;">${dateLabel}`;
+        `<img src="${_moodImg(entry.mood)}" width="26" style="vertical-align:middle;margin-right:8px;">${dateLabel}`;
       document.getElementById('statDetailBody').innerHTML = _buildFavouriteDetailHTML(entry);
       document.getElementById('statDetailModal').classList.add('active');
     }
@@ -3018,7 +3026,7 @@ window.addEventListener('pageshow', () => {
     function _buildFavouriteDetailHTML(entry) {
       const rows = [];
       const cap = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : '—';
-      rows.push(`<div style="margin-bottom:6px;"><b>Mood:</b> ${cap(entry.mood)}</div>`);
+      rows.push(`<div style="margin-bottom:6px;"><b>Mood:</b> ${_moodLabelNum(entry.mood)}</div>`);
       if (entry.energy != null) {
         const _stepsStr = entry.steps != null ? ` | 🏃 ${entry.steps >= 1000 ? Math.round(entry.steps/1000)+'k' : entry.steps}` : '';
         rows.push(`<div style="margin-bottom:6px;"><b>Energy:</b> ${entry.energy}/10${_stepsStr}</div>`);
@@ -3087,13 +3095,13 @@ window.addEventListener('pageshow', () => {
         el.innerHTML = favs.map(entry => {
           const d = new Date(entry.date);
           const label = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
-          const color = moodColors[entry.mood] || 'var(--brand-primary)';
+          const color = moodColors[_moodCat(entry.mood)] || 'var(--brand-primary)';
           const notesPreview = entry.notes
             ? `<div style="font-size:0.82em;color:#6c757d;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${entry.notes}</div>`
             : '';
           return `
             <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:6px;background:#f8f9fa;border-radius:10px;border-left:4px solid ${color};">
-              <img src="images/moods/${entry.mood}.png" width="28" height="28" style="flex-shrink:0;">
+              <img src="${_moodImg(entry.mood)}" width="28" height="28" style="flex-shrink:0;">
               <div style="flex:1;min-width:0;">
                 <div style="font-weight:600;font-size:0.88em;">${label}</div>
                 ${notesPreview}
@@ -3116,7 +3124,7 @@ window.addEventListener('pageshow', () => {
       const d = new Date(entry.date);
       const dateLabel = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
       document.getElementById('statDetailTitle').innerHTML =
-        `<img src="images/moods/${entry.mood}.png" width="26" style="vertical-align:middle;margin-right:8px;">${dateLabel}`;
+        `<img src="${_moodImg(entry.mood)}" width="26" style="vertical-align:middle;margin-right:8px;">${dateLabel}`;
       document.getElementById('statDetailBody').innerHTML = _buildFavouriteDetailHTML(entry);
       document.getElementById('statDetailModal').classList.add('active');
     }
@@ -4025,6 +4033,13 @@ window.addEventListener('pageshow', () => {
     }
     window._onSpectrumChange = _onSpectrumChange;
 
+    // Live label update for the legacy edit-modal's 0–10 spectrum slider.
+    function _onEditSpectrumInput(v) {
+      const el = document.getElementById('editEntryMoodNumLabel');
+      if (el) el.textContent = `${_fmtMoodNum(v)} · ${_moodLabelOf(Number(v))}`;
+    }
+    window._onEditSpectrumInput = _onEditSpectrumInput;
+
     // Preselect the slider to a given numeric mood (used by draft restore / edit load).
     function _setSpectrumValue(n) {
       const slider = document.getElementById('mscSlider');
@@ -4698,12 +4713,12 @@ window.addEventListener('pageshow', () => {
       } else {
         nextRow.style.display = 'flex';
       }
-      const _accent = (selectedMood && _FM_MOOD_COLORS[selectedMood]) || 'var(--brand-primary)';
+      const _accent = ((selectedMood != null && selectedMood !== '') && _FM_MOOD_COLORS[_moodCat(selectedMood)]) || 'var(--brand-primary)';
       const _t = (k) => (window.BB && BB.t) ? BB.t(k) : k;
       if (step.id === 'done') {
         const _noChanges = editingEntry && !_hasEditChanges();
-        nextBtn.textContent = !selectedMood ? _t('journal.save.fmSelectMood') : (_noChanges ? _t('journal.save.fmClose') : (editingEntry ? _t('journal.save.fmEdit') : _t('journal.save.fmSave')));
-        nextBtn.style.background = (_noChanges || !selectedMood) ? '#adb5bd' : _accent;
+        nextBtn.textContent = !_hasMood() ? _t('journal.save.fmSelectMood') : (_noChanges ? _t('journal.save.fmClose') : (editingEntry ? _t('journal.save.fmEdit') : _t('journal.save.fmSave')));
+        nextBtn.style.background = (_noChanges || !_hasMood()) ? '#adb5bd' : _accent;
       } else {
         nextBtn.textContent = _t('common.next') + ' →';
         nextBtn.style.background = _accent;
@@ -5557,8 +5572,8 @@ window.addEventListener('pageshow', () => {
         }
 
         case 'done': {
-          if (!selectedMood) return `<p style="text-align:center;color:#dc3545;font-size:0.9em;">${BB.t('journal.selectMoodFirst')}</p>`;
-          const mc = _FM_MOOD_COLORS[selectedMood]||'var(--brand-primary)';
+          if (!_hasMood()) return `<p style="text-align:center;color:#dc3545;font-size:0.9em;">${BB.t('journal.selectMoodFirst')}</p>`;
+          const mc = _FM_MOOD_COLORS[_moodCat(selectedMood)]||'var(--brand-primary)';
           const eLabel = {0:BB.t('journal.energy.notEnough'),3:BB.t('journal.energy.less'),5:BB.t('journal.energy.normal'),7:BB.t('journal.energy.more'),10:BB.t('journal.energy.tooMuch')}[selectedEnergy]||selectedEnergy;
           const sLabel = {5:'≤5h',6.5:'6–7h',8:'7–9h',9.5:'9–10h',11:'10+h'}[selectedSleep]||selectedSleep+'h';
           const notesVal = (document.getElementById('fmNotesInput')||document.getElementById('notes')||{}).value||'';
@@ -5622,7 +5637,7 @@ window.addEventListener('pageshow', () => {
             if (selectedMood !== m) return `<button onclick="_fmApplySuggestedMood('${m}')" style="padding:4px 10px;background:${col};color:white;border:none;border-radius:8px;font-size:0.78em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Use ${lbl}</button>`;
             return '';
           };
-          const _suggestion = localStorage.getItem('showMoodSuggestion') !== '1' ? '' : `
+          const _suggestion = (localStorage.getItem('showMoodSuggestion') !== '1' || _spectrumEnabled()) ? '' : `
             <div style="margin-top:12px;border-radius:12px;border:1px solid rgba(255,149,0,0.2);overflow:hidden;">
               <div style="display:flex;align-items:center;background:rgba(255,149,0,0.06);">
                 <button onclick="var p=this.parentElement.nextElementSibling;p.style.display=p.style.display==='none'?'block':'none';this.querySelector('.bb-chev').style.transform=p.style.display==='none'?'rotate(0deg)':'rotate(180deg)';"
@@ -5653,12 +5668,12 @@ window.addEventListener('pageshow', () => {
           const _doneDate = (() => { try { const _dv = document.getElementById('entryDate')?.value; if (!_dv) return ''; const _dd = new Date(_dv+'T00:00:00'); return _dd.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'}); } catch(_){return '';} })();
           // Bear hero: the chosen mood shown big, instead of as a summary row.
           const _linkedHero = selectedLinkedMood ? ` <span style="color:#adb5bd;font-weight:600;">/</span> <img src="images/moods/${selectedLinkedMood}.png" style="width:34px;height:34px;object-fit:contain;vertical-align:middle;opacity:0.9;"> ${cap(selectedLinkedMood)}` : '';
-          const _doneAura = _FM_AURAS[selectedMood] || '';
+          const _doneAura = _FM_AURAS[_moodCat(selectedMood)] || '';
           const _heroHtml = `<div class="fm-hero">
               <div class="fm-hero-emoji-wrap">${_fmSparksHtml()}<div class="fm-aura" data-type="${_doneAura}">${_AURA_HTML[_doneAura] || ''}</div>
-                <div class="fm-hero-emoji"><img src="images/moods/${selectedMood}.png" alt=""></div>
+                <div class="fm-hero-emoji"><img src="${_moodImg(selectedMood)}" alt=""></div>
               </div>
-              <div class="fm-hero-value" style="color:${mc};">${cap(selectedMood)}${_linkedHero}</div>
+              <div class="fm-hero-value" style="color:${mc};">${_moodLabelNum(selectedMood)}${_linkedHero}</div>
             </div>`;
           // Delete + Save styled as wheel pills, sitting in the wheel slot.
           const _noChanges = editingEntry && !_hasEditChanges();
@@ -5712,10 +5727,10 @@ window.addEventListener('pageshow', () => {
         if (!s) continue;
         const isCurrent = i === _fmStepIndex;
         let html = null, borderColor = '#dee2e6';
-        if (s.id === 'mood' && selectedMood) {
-          const col = _FM_MOOD_COLORS[selectedMood] || '#adb5bd';
-          const lbl = _FM_MOOD_LABELS[selectedMood] || selectedMood;
-          html = `<img src="images/moods/${selectedMood}.png" style="width:16px;height:16px;vertical-align:middle;margin-right:3px;">${lbl}`;
+        if (s.id === 'mood' && selectedMood != null && selectedMood !== '') {
+          const col = _FM_MOOD_COLORS[_moodCat(selectedMood)] || '#adb5bd';
+          const lbl = _moodLabelNum(selectedMood);
+          html = `<img src="${_moodImg(selectedMood)}" style="width:16px;height:16px;vertical-align:middle;margin-right:3px;">${lbl}`;
           borderColor = col;
         } else if (s.id === 'energy' && !_fmEnergyClear) {
           const lvl = _FM_ENERGY_LEVELS.find(l => l.val === selectedEnergy);
@@ -5762,7 +5777,7 @@ window.addEventListener('pageshow', () => {
 
     function _fmStepIsAnswered(step) {
       switch (step.id) {
-        case 'mood':         return !!selectedMood;
+        case 'mood':         return _hasMood();
         case 'energy':       return !_fmEnergyClear;
         case 'sleep':        return !_fmSleepClear;
         case 'sleepQuality': return selectedSleepQuality !== null;
@@ -6028,7 +6043,7 @@ window.addEventListener('pageshow', () => {
       const step = _fmSteps[_fmStepIndex];
       if (!step) return;
       if (step.id === 'done') {
-        if (!selectedMood) {
+        if (!_hasMood()) {
           const _moodIdx = _fmSteps.findIndex(s => s.id === 'mood');
           if (_moodIdx >= 0) _fmGoTo(_moodIdx);
           return;
@@ -6229,7 +6244,7 @@ window.addEventListener('pageshow', () => {
         return dx2 && dy2 ? num / Math.sqrt(dx2 * dy2) : null;
       }
 
-      const ms = (mood) => moodValues[mood] || 3;
+      const ms = (mood) => _moodScore(mood);
       // Convert numeric mood score (1–6) to a readable label
       const moodLabel = n => {
         const v = parseFloat(n);
@@ -6616,7 +6631,7 @@ window.addEventListener('pageshow', () => {
 
     function _achStableStreak(entries) {
       const goodMoods = new Set(['manic','elevated','stable','good']);
-      const goodSet = new Set(entries.filter(e => goodMoods.has(e.mood)).map(e => { const d = new Date(e.date); d.setHours(0,0,0,0); return d.getTime(); }));
+      const goodSet = new Set(entries.filter(e => goodMoods.has(_moodCat(e.mood))).map(e => { const d = new Date(e.date); d.setHours(0,0,0,0); return d.getTime(); }));
       const today = new Date(); today.setHours(0,0,0,0);
       let streak = 0, chk = new Date(today);
       while (goodSet.has(chk.getTime())) { streak++; chk.setDate(chk.getDate()-1); }
@@ -6633,7 +6648,7 @@ window.addEventListener('pageshow', () => {
       const streak = _achCurrentStreak(entries);
       const medStreak = _achMedStreak(entries);
       const stableStreak = _achStableStreak(entries);
-      const moods = new Set(entries.map(e => e.mood));
+      const moods = new Set(entries.map(e => _moodCat(e.mood)));
       const notesCount = entries.filter(e => e.notes && e.notes.trim()).length;
 
       // Survival Kit checks (localStorage)
@@ -7364,7 +7379,7 @@ window.addEventListener('pageshow', () => {
         const d = prevMonthLastDay - i;
         const key = `${prevYear}-${String(prevMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
         const entry = moodByDate[key];
-        const bg = entry ? moodColors[entry.mood] : '#e9ecef';
+        const bg = entry ? moodColors[_moodCat(entry.mood)] : '#e9ecef';
         const clickable = !!entry;
         cells += `<div ${clickable ? `onclick="showCalDayDetail('${key}')" class="cal-cell"` : ''} style="aspect-ratio:1;background:${bg};border-radius:6px;border:2px solid transparent;display:flex;align-items:center;justify-content:center;font-size:0.7em;color:${entry?'white':'#c8ced4'};font-weight:600;opacity:0.4;${clickable?'cursor:pointer;':''}">${d}</div>`;
       }
@@ -7379,7 +7394,7 @@ window.addEventListener('pageshow', () => {
         const isFuture = date > today;
         const isCurrentMonth = _monthCalOffset === 0;
         const isBirthday = birthday && date.getMonth() === birthday.month && d === birthday.day;
-        const bg = entry ? moodColors[entry.mood] : (isFuture && !isCurrentMonth) ? 'transparent' : '#e9ecef';
+        const bg = entry ? moodColors[_moodCat(entry.mood)] : (isFuture && !isCurrentMonth) ? 'transparent' : '#e9ecef';
         const border = isToday ? '2px solid var(--brand-primary)' : isBirthday ? '2px dashed #e91e8c' : '2px solid transparent';
         const color = entry ? 'white' : (isFuture && !isCurrentMonth) ? 'transparent' : '#adb5bd';
         const opacity = (isFuture && !isCurrentMonth) ? 0.25 : 1;
@@ -7398,7 +7413,7 @@ window.addEventListener('pageshow', () => {
 
       const _mCounts = {};
       const _mYYYYMM = `${year}-${String(month + 1).padStart(2, '0')}`;
-      entries.filter(e => e.date && e.date.startsWith(_mYYYYMM)).forEach(e => { if (e.mood) { const m = e.mood === 'good' ? 'stable' : e.mood; _mCounts[m] = (_mCounts[m] || 0) + 1; } });
+      entries.filter(e => e.date && e.date.startsWith(_mYYYYMM)).forEach(e => { if (e.mood != null && e.mood !== '') { const m = _moodCat(e.mood); _mCounts[m] = (_mCounts[m] || 0) + 1; } });
       const legend = Object.entries(_mCounts)
         .sort((a, b) => b[1] - a[1])
         .map(([mood, cnt]) => {
@@ -7521,8 +7536,8 @@ window.addEventListener('pageshow', () => {
             <button onclick="openFormForNewEntry('${key}')" class="confirm-btn confirm-btn-no" style="font-size:0.85em;">${_t('journal.calendar.addEntry')}</button>
           </div>`;
       } else {
-        const color = moodColors[entry.mood] || '#adb5bd';
-        html += `<div style="background:${color};color:white;border-radius:10px;padding:10px 14px;font-weight:700;font-size:1em;margin-bottom:10px;">${moodEmojis[entry.mood] || ''} ${_tMood(entry.mood)}</div>`;
+        const color = moodColors[_moodCat(entry.mood)] || '#adb5bd';
+        html += `<div style="background:${color};color:white;border-radius:10px;padding:10px 14px;font-weight:700;font-size:1em;margin-bottom:10px;">${_moodEmoji(entry.mood)} ${_moodLabelNum(entry.mood)}</div>`;
         html += `<div>`;
         if (entry.energy !== undefined) {
           const _stepsStr = entry.steps != null ? ` | 🏃 ${entry.steps >= 1000 ? Math.round(entry.steps/1000)+'k' : entry.steps}` : '';
@@ -7764,7 +7779,7 @@ window.addEventListener('pageshow', () => {
       const maxHeight = 120; // max height in pixels
       
       // Calculate trend line using linear regression
-      const moodValuesArray = last14.map(e => moodValues[e.mood]);
+      const moodValuesArray = last14.map(e => _moodScore(e.mood));
       const n = moodValuesArray.length;
       let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
       
@@ -7791,13 +7806,13 @@ window.addEventListener('pageshow', () => {
       `;
       
       const html = last14.map(entry => {
-        const heightPx = (moodValues[entry.mood] / 6) * maxHeight;
+        const heightPx = (_moodScore(entry.mood) / 6) * maxHeight;
         const date = new Date(entry.date);
         
         return `
           <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;">
-            <div class="chart-bar" style="height: ${heightPx}px; background: ${moodColors[entry.mood]}" 
-                 title="Mood: ${{manic:'Manic',elevated:'Elevated',stable:'Stable',good:'Stable',low:'Low',depressed:'Depressed'}[entry.mood] || (entry.mood ? entry.mood.charAt(0).toUpperCase()+entry.mood.slice(1) : '')}
+            <div class="chart-bar" style="height: ${heightPx}px; background: ${moodColors[_moodCat(entry.mood)]}"
+                 title="Mood: ${_moodLabelNum(entry.mood)}
 Energy: ${entry.energy}/10
 Sleep: ${entry.sleep}h${entry.steps != null ? `\nSteps: ${entry.steps.toLocaleString()}` : ''}
 Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medication === 'unsure' ? 'Unsure' : (entry.medication || 'taken')}"></div>
@@ -7861,7 +7876,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
           dateKey: dateKey,
           mood: mood,
           entry: entry,
-          color: mood ? moodColors[mood] : '#e9ecef',
+          color: (mood != null && mood !== '') ? (moodColors[_moodCat(mood)] || '#e9ecef') : '#e9ecef',
           isInRange: isInRange
         });
 
@@ -7923,14 +7938,14 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
           <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; font-size: 0.85em; min-height: 22px;">
             ${(() => {
               const _yCounts = {};
-              entries.forEach(e => { if (e.mood) _yCounts[e.mood] = (_yCounts[e.mood] || 0) + 1; });
+              entries.forEach(e => { if (e.mood != null && e.mood !== '') { const _c = _moodCat(e.mood); _yCounts[_c] = (_yCounts[_c] || 0) + 1; } });
               return Object.entries(moodColors).filter(([mood]) => _yCounts[mood] > 0)
                 .sort((a, b) => (_yCounts[b[0]] || 0) - (_yCounts[a[0]] || 0))
                 .map(([mood, color]) => {
                   const cnt = _yCounts[mood] || 0;
                   return `<div onclick="showStatDetail('moodSummary')" style="display:flex;align-items:center;gap:5px;cursor:pointer;" title="${cnt} days">
                     <div style="width:12px;height:12px;background:${color};border-radius:2px;flex-shrink:0;"></div>
-                    <span style="color:#6c757d;">${mood}</span>
+                    <span style="color:#6c757d;">${_moodCatLabel(mood)}</span>
                   </div>`;
                 }).join('');
             })()}
@@ -7945,7 +7960,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
                     <div style="display: flex; flex-direction: column; gap: ${gapSize}px;">
                       ${week.map(day => {
                         const tooltipText = day.entry ?
-                          `${day.date.toLocaleDateString()}: ${day.mood}\\nEnergy: ${day.entry.energy}/10, Sleep: ${day.entry.sleep}h` :
+                          `${day.date.toLocaleDateString()}: ${_moodLabelNum(day.mood)}\\nEnergy: ${day.entry.energy}/10, Sleep: ${day.entry.sleep}h` :
                           day.date.toLocaleDateString();
                         return `
                         <div style="
@@ -7953,8 +7968,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
                           height: ${squareSize}px;
                           background: ${day.isInRange ? day.color : '#f8f9fa'};
                           border-radius: 2px;
-                          ${day.mood ? `border: 2px solid ${day.color}; box-shadow: 0 0 0 1px rgba(0,0,0,0.1);` : 'border: 1px solid #e9ecef;'}
-                          opacity: ${day.isInRange ? (day.mood ? '1' : '0.3') : '0.1'};
+                          ${day.entry ? `border: 2px solid ${day.color}; box-shadow: 0 0 0 1px rgba(0,0,0,0.1);` : 'border: 1px solid #e9ecef;'}
+                          opacity: ${day.isInRange ? (day.entry ? '1' : '0.3') : '0.1'};
                         " title="${tooltipText}"></div>
                       `}).join('')}
                     </div>
@@ -8351,8 +8366,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
         const allEntries = _filterByPeriod(entries, leftPeriod);
         const recent     = _filterByPeriod(entries, rightPeriod);
         const allMoodCounts = {}, recentMoodCounts = {};
-        allEntries.forEach(e => { const m = e.mood === 'good' ? 'stable' : e.mood; allMoodCounts[m] = (allMoodCounts[m]||0)+1; });
-        recent.forEach(e => { const m = e.mood === 'good' ? 'stable' : e.mood; recentMoodCounts[m] = (recentMoodCounts[m]||0)+1; });
+        allEntries.forEach(e => { const m = _moodCat(e.mood); allMoodCounts[m] = (allMoodCounts[m]||0)+1; });
+        recent.forEach(e => { const m = _moodCat(e.mood); recentMoodCounts[m] = (recentMoodCounts[m]||0)+1; });
         const mostCommonAll = Object.entries(allMoodCounts).sort((a,b)=>b[1]-a[1])[0];
         const mostCommonRecent = recent.length ? Object.entries(recentMoodCounts).sort((a,b)=>b[1]-a[1])[0] : null;
         const avgEnergyAll = allEntries.length ? (allEntries.reduce((s,e)=>s+e.energy,0)/allEntries.length).toFixed(1) : '-';
@@ -8773,8 +8788,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
           const d = new Date(e.date);
           const bucket = months.find(m => m.year === d.getFullYear() && m.month === d.getMonth());
           if (bucket) {
-            bucket.counts[e.mood] = (bucket.counts[e.mood]||0)+1;
-            if (e.linkedMood) bucket.counts[e.linkedMood] = (bucket.counts[e.linkedMood]||0)+1;
+            bucket.counts[_moodCat(e.mood)] = (bucket.counts[_moodCat(e.mood)]||0)+1;
+            if (e.linkedMood) bucket.counts[_moodCat(e.linkedMood)] = (bucket.counts[_moodCat(e.linkedMood)]||0)+1;
             if (e.sleep  != null) bucket.sleeps.push(e.sleep);
             if (e.energy != null) bucket.energies.push(e.energy);
             if (e.steps  != null && e.steps > 0) bucket.steps.push(e.steps);
@@ -9075,7 +9090,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
               return cf ? `  ·  ${cf.label}: ${val === 'yes' ? 'Yes' : 'No'}` : '';
             }).filter(Boolean).join('');
           const _moodLabel = { manic:BB.t('mood.manic'), elevated:BB.t('mood.elevated'), stable:BB.t('mood.stable'), good:BB.t('mood.stable'), low:BB.t('mood.low'), depressed:BB.t('mood.depressed') };
-          const detail = `${_moodLabel[entry.mood] || (entry.mood ? entry.mood.charAt(0).toUpperCase() + entry.mood.slice(1) : '')}  ·  Energy ${entry.energy}/10  ·  Sleep ${entry.sleep}h${sleepQualityStr}${stepsStr}  ·  Meds: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medication === 'unsure' ? 'Unsure' : (entry.medication || 'taken')}${anxietyStr}${irritabilityStr}${stressStr2}${alcoholStr}${smokingStr}${drugsStr}${exerciseStr}${outsideStr}${customStr}${recordedPart}`;
+          const detail = `${_moodLabelNum(entry.mood)}  ·  Energy ${entry.energy}/10  ·  Sleep ${entry.sleep}h${sleepQualityStr}${stepsStr}  ·  Meds: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medication === 'unsure' ? 'Unsure' : (entry.medication || 'taken')}${anxietyStr}${irritabilityStr}${stressStr2}${alcoholStr}${smokingStr}${drugsStr}${exerciseStr}${outsideStr}${customStr}${recordedPart}`;
           const detailLines = doc.splitTextToSize(detail, pageW - margin - (dotX + 35));
           doc.text(detailLines, dotX + 35, y);
           y += (detailLines.length - 1) * 4;
@@ -10063,7 +10078,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
       // Build date → mood map (normalise date to YYYY-MM-DD)
       const moodByDate = {};
       entries.forEach(e => {
-        if (!e.date || !e.mood) return;
+        if (!e.date || e.mood == null || e.mood === '') return;
         const key = String(e.date).slice(0, 10); // handles both "2026-05-04" and timestamp strings
         moodByDate[key] = e.mood;
       });
@@ -10082,8 +10097,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
       while (true) {
         const key = cur.toISOString().slice(0, 10);
         const mood = moodByDate[key];
-        // 'good' is the legacy value for Stable
-        if (!mood || (mood !== 'stable' && mood !== 'good')) break;
+        // Numeric spectrum moods in the stable band (4–6) count too, via _moodCat.
+        if (mood == null || mood === '' || _moodCat(mood) !== 'stable') break;
         streak++;
         startDate = key;
         cur.setDate(cur.getDate() - 1);
@@ -10132,7 +10147,21 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
       const mm = String(date.getMonth()+1).padStart(2,'0');
       const dd = String(date.getDate()).padStart(2,'0');
       document.getElementById('editEntryDate').value = `${yyyy}-${mm}-${dd}`;
-      document.getElementById('editEntryMood').value = entry.mood;
+      // Mood: use the 0–10 spectrum editor when this entry (or the current mode) is numeric.
+      const _editSel = document.getElementById('editEntryMood');
+      const _editSpecWrap = document.getElementById('editEntryMoodSpectrumWrap');
+      const _useSpectrumEdit = _isNumericMood(entry.mood) || _spectrumEnabled();
+      if (_useSpectrumEdit) {
+        if (_editSel) _editSel.style.display = 'none';
+        if (_editSpecWrap) _editSpecWrap.style.display = '';
+        const _num = _isNumericMood(entry.mood) ? Math.round(Number(entry.mood)) : 5;
+        const _numEl = document.getElementById('editEntryMoodNum');
+        if (_numEl) _numEl.value = String(_num);
+        _onEditSpectrumInput(_num);
+      } else {
+        if (_editSel) { _editSel.style.display = ''; _editSel.value = entry.mood; }
+        if (_editSpecWrap) _editSpecWrap.style.display = 'none';
+      }
       document.getElementById('editEntryEnergy').value = entry.energy;
       document.getElementById('editEntrySleep').value = entry.sleep != null ? entry.sleep : '';
       document.getElementById('editEntryMedication').value = entry.medication || 'taken';
@@ -10445,7 +10474,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
         ...editingEntry,
         date: newDate.toISOString(),
         timestamp: newDate.getTime(),
-        mood: document.getElementById('editEntryMood').value,
+        mood: (document.getElementById('editEntryMoodSpectrumWrap') && document.getElementById('editEntryMoodSpectrumWrap').style.display !== 'none')
+          ? Number(document.getElementById('editEntryMoodNum').value)
+          : document.getElementById('editEntryMood').value,
         energy: parseFloat(document.getElementById('editEntryEnergy').value),
         sleep: (() => { const _v = parseFloat(document.getElementById('editEntrySleep').value); return isNaN(_v) ? null : _v; })(),
         medication: document.getElementById('editEntryMedication').value,
@@ -12550,7 +12581,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
         const entryCount = last7.length;
         const medsTaken = last7.filter(e => !e.medication || e.medication === 'taken').length;
         const moodScore = entryCount > 0
-          ? last7.reduce((s, e) => s + (moodValues[e.mood] || 3), 0) / entryCount : 0;
+          ? last7.reduce((s, e) => s + _moodScore(e.mood), 0) / entryCount : 0;
         const moodEmoji = moodScore >= 5 ? '😄' : moodScore >= 4 ? '🙂' : moodScore >= 3 ? '😐' : moodScore >= 2 ? '😔' : '😞';
 
         const body = entryCount === 0
