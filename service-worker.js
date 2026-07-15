@@ -676,7 +676,10 @@
 //       anniversary modals wired to journal.mods.* (15 new keys) + reused
 //       pin.title/pin.forgot. English source + HTML wired here; the 9
 //       non-English locales land in v153. Touches journal.html + i18n.js.
-const CACHE_NAME = 'bipolarbear-v152';
+// v153: i18n audit — translate v152's 15 journal.mods keys (calendar,
+//       depressed-support, favourites, PIN setup, anniversary) into the 9
+//       non-English locales. Completes v152. Touches js/shared/i18n.js.
+const CACHE_NAME = 'bipolarbear-v153';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
