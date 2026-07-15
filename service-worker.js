@@ -733,7 +733,13 @@
 //       CTA) and anon.seed (8 sample posts) namespaces, plus anon.ui.loading /
 //       loadingComments and anon.sos.bodyNamed — translated into all 10
 //       locales. Touches js/anonymous.js + js/shared/i18n.js.
-const CACHE_NAME = 'bipolarbear-v164';
+// v165: i18n audit — journal.js runtime dialogs (64 alerts/confirms/prompts/
+//       toasts under a new journal.dlg namespace: save/storage errors, PDF/CSV/
+//       backup export + import, the delete-account / full-reset confirmation
+//       flow with {email}/{count} interpolation, med/goal dialogs, health-
+//       permission recovery, notification + new-version prompts) translated
+//       into all 10 locales. Touches js/journal.js + js/shared/i18n.js.
+const CACHE_NAME = 'bipolarbear-v165';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
