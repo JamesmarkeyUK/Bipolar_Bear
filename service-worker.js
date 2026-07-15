@@ -619,7 +619,7 @@
 //       behind the top of the "You'll post as…" monika card (top half only,
 //       from the blindfold up; the card body hides the rest). New .monika-stage
 //       wrapper + .monika-bear in welcome-anonymous.html / css/welcome.css.
-const CACHE_NAME = 'bipolarbear-v143';
+const CACHE_NAME = 'bipolarbear-v144';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
