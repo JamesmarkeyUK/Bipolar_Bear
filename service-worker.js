@@ -656,7 +656,13 @@
 //       across all 10 locales. Deferred: the delete-account confirm/alert flow
 //       and the What's-New changelog headlines. Touches index.html, js/index.js,
 //       js/shared/i18n.js (all precached).
-const CACHE_NAME = 'bipolarbear-v147';
+// v148: i18n audit — journal Settings stack. The entire settings modal
+//       (main panel, mobile/reminder panel, Focus Mode, Journal Options,
+//       Stats, Danger Zone, Achievements) was hardcoded English. Wire
+//       journal.html to a new journal.settings.* namespace (42 keys) across
+//       all 10 locales, reusing common.back/save and account.deleteLocked.
+//       Touches journal.html + js/shared/i18n.js (both precached).
+const CACHE_NAME = 'bipolarbear-v148';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
