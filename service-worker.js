@@ -635,7 +635,13 @@
 //       the crisis box, and the kit's section count drops 13 → 12.
 //       Touches fab.js, js/index.js, index.html, survival-kit.html,
 //       js/survival-kit.js, anonymous.html, js/anonymous.js, js/shared/i18n.js.
-const CACHE_NAME = 'bipolarbear-v144';
+// v145: Translate v144's five new i18n keys into the other 9 locales. They
+//       were added in English only, so t()'s English fallback rendered them
+//       in English beside correctly-translated neighbours (e.g. a Dutch user
+//       saw "← Startpagina" above an English "Before you join 👋"). Adds
+//       anon.agree.{title,sub,continue} and account.{deleteAccount,deleteLocked}
+//       to es/fr/de/it/pt/nl/pl/sv/zh. Touches js/shared/i18n.js (precached).
+const CACHE_NAME = 'bipolarbear-v145';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
