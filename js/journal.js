@@ -457,6 +457,10 @@ window.addEventListener('pageshow', () => {
               if (d.moodLinkingEnabled !== undefined) {
                 localStorage.setItem('moodLinkingEnabled', d.moodLinkingEnabled ? '1' : '0');
               }
+              if (d.moodSpectrumEnabled !== undefined) {
+                localStorage.setItem('moodSpectrumEnabled', d.moodSpectrumEnabled ? '1' : '0');
+                if (typeof _applyMoodSpectrumMode === 'function') _applyMoodSpectrumMode();
+              }
               if (d.healthSyncEnabled !== undefined) {
                 BB.storage.set('HealthSyncEnabled', d.healthSyncEnabled ? '1' : '0');
               }
@@ -554,7 +558,7 @@ window.addEventListener('pageshow', () => {
               ['PinEnabled','PinCode','FavAnniShown',
                'PrivateHintSeen','FavouriteHintSeen','_moodTipShown','_fmMoodTipShown','_draft']
                 .forEach(k => BB.storage.remove(k));
-              ['moreDataOpenByDefault','showMoodSuggestion','moodLinkingEnabled']
+              ['moreDataOpenByDefault','showMoodSuggestion','moodLinkingEnabled','moodSpectrumEnabled']
                 .forEach(k => localStorage.removeItem(k));
               BB.storage.remove('OnboardingStep'); // new user starts at step 0
               localStorage.setItem('focusedModeEnabled', '1');
@@ -1230,6 +1234,32 @@ window.addEventListener('pageshow', () => {
       document.getElementById('depressedSupportModal').classList.remove('active');
       _fmAdvance();
     }
+    // Focused-mode tap for the 0–10 spectrum wheel — commits the numeric mood.
+    function _fmSpectrumTap(n) {
+      n = Number(n);
+      _fmLinkMoodPickerOpen = false;
+      _fmPrevMood = null;
+      selectedLinkedMood = null;
+      selectedMood = n;
+      if (n <= 1) {
+        // Severe low — surface the same support modal as the 'depressed' category.
+        _renderFocusedStep();
+        const _ec = localStorage.getItem('personalEmergencyContact') || '';
+        const _ecEl = document.getElementById('depressedEmergencyContact');
+        if (_ec && _ecEl) {
+          document.getElementById('depressedEmergencyText').textContent = _ec;
+          const _ecNum = _ec.match(/[\d\s\+\-\(\)]{6,}/)?.[0]?.trim();
+          document.getElementById('depressedEmergencyLink').href = _ecNum ? 'tel:' + _ecNum.replace(/\s/g,'') : '#';
+          _ecEl.style.display = '';
+        } else if (_ecEl) {
+          _ecEl.style.display = 'none';
+        }
+        document.getElementById('depressedSupportModal').classList.add('active');
+      } else {
+        _fmAdvance();
+      }
+    }
+    window._fmSpectrumTap = _fmSpectrumTap;
     window._fmLongPressStart = _fmLongPressStart;
     window._fmLongPressCancel = _fmLongPressCancel;
     window._fmMoodTap = _fmMoodTap;
@@ -1328,16 +1358,23 @@ window.addEventListener('pageshow', () => {
       if (!targetKey) return;
       let draft;
       try { draft = JSON.parse(BB.storage.get('_draft') || 'null'); } catch(e) { return; }
-      if (!draft || draft.targetKey !== targetKey || !draft.mood) return;
+      if (!draft || draft.targetKey !== targetKey || draft.mood == null || draft.mood === '') return;
 
       // Select mood (reveals rest of form)
       document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected', 'cycle-hover'));
-      const moodBtn = document.querySelector(`[data-mood="${draft.mood}"]`);
-      if (!moodBtn) return;
-      moodBtn.classList.add('selected');
-      selectedMood = draft.mood;
+      if (_isNumericMood(draft.mood)) {
+        // Spectrum draft — restore via the slider control.
+        selectedMood = Number(draft.mood);
+        _applyMoodSpectrumMode();
+        _setSpectrumValue(selectedMood);
+      } else {
+        const moodBtn = document.querySelector(`[data-mood="${draft.mood}"]`);
+        if (!moodBtn) return;
+        moodBtn.classList.add('selected');
+        selectedMood = draft.mood;
+      }
       selectedLinkedMood = draft.linkedMood || null;
-      if (typeof _fmApplyMoodTheme === 'function') _fmApplyMoodTheme(draft.mood);
+      if (typeof _fmApplyMoodTheme === 'function') _fmApplyMoodTheme(_moodCat(draft.mood));
       document.querySelectorAll('.hidden-until-mood').forEach(el => {
         el.classList.remove('hidden-until-mood');
         el.classList.add('show-after-mood');
@@ -1500,6 +1537,13 @@ window.addEventListener('pageshow', () => {
       setTimeout(initializeButtons, 0);
     }
 
+    // Apply the mood-input mode (five buttons vs 0–10 spectrum slider) once the DOM is ready.
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => { try { _applyMoodSpectrumMode(); } catch(e) {} });
+    } else {
+      setTimeout(() => { try { _applyMoodSpectrumMode(); } catch(e) {} }, 0);
+    }
+
     const moodValues = {
       'manic': 5,
       'elevated': 4,
@@ -1536,6 +1580,75 @@ window.addEventListener('pageshow', () => {
       low:      { color: '#845ef7', text: 'Feelings of panic and anxiety, concentration difficult and memory poor, some comfort in routine. Slow thinking, no appetite, need to be alone, sleep excessive or difficult, everything a struggle.' },
       depressed:{ color: '#5c7cfa', text: 'Feelings of hopelessness and guilt, thoughts of suicide, little movement, impossible to do anything. Everything is bleak — please reach out to someone you trust or call Samaritans 116 123.' },
     };
+
+    // ── Full mood spectrum (0–10) ────────────────────────────────────────
+    // When the "Full mood spectrum" setting is on, an entry's `mood` is stored
+    // as a RAW NUMBER 0–10 instead of a category string. Everything downstream
+    // (colour / emoji / image / label / chart value) is derived from the number
+    // via the helpers below, so legacy category-string entries and numeric
+    // spectrum entries coexist without migration. Bands follow the Bipolar UK
+    // mood scale: 0–1 severely depressed, 2–3 depressed, 4–6 stable/balanced,
+    // 7–8 hypomanic, 9–10 manic — each band maps to one of the five legacy
+    // categories so the existing colour / emoji / image assets are reused.
+    const SPECTRUM_LABELS = {
+      0: 'Severely depressed',
+      1: 'Severely depressed',
+      2: 'Depressed',
+      3: 'Depressed',
+      4: 'Slightly low but stable',
+      5: 'Stable',
+      6: 'Slightly high but stable',
+      7: 'Hypomanic',
+      8: 'Hypomanic',
+      9: 'Manic',
+      10: 'Manic',
+    };
+    function _spectrumEnabled() { return localStorage.getItem('moodSpectrumEnabled') === '1'; }
+    // True only for a raw spectrum number (0–10); legacy category strings return false.
+    function _isNumericMood(m) {
+      return typeof m === 'number'
+        ? isFinite(m)
+        : (typeof m === 'string' && m.trim() !== '' && isFinite(Number(m)));
+    }
+    // Map any mood value to one of the five legacy categories.
+    function _moodCat(m) {
+      if (!_isNumericMood(m)) return m === 'good' ? 'stable' : m;
+      const n = Number(m);
+      if (n <= 1) return 'depressed';
+      if (n <= 3) return 'low';
+      if (n <= 6) return 'stable';
+      if (n <= 8) return 'elevated';
+      return 'manic';
+    }
+    // Category → mood image path (works for numbers via _moodCat).
+    function _moodImg(m) { return `images/moods/${_moodCat(m)}.png`; }
+    // Numeric score on the legacy 1–5 axis (charts/regression/averages).
+    // Spectrum 0→1 … 10→5 so numeric entries sit on the same axis as legacy ones
+    // while preserving full 0–10 granularity.
+    function _moodScore(m) {
+      return _isNumericMood(m) ? 1 + (Number(m) / 10) * 4 : (moodValues[m] != null ? moodValues[m] : 3);
+    }
+    // Format a spectrum number for display (integers plain, else one decimal).
+    function _fmtMoodNum(m) { const n = Number(m); return Number.isInteger(n) ? String(n) : n.toFixed(1); }
+    // Translated label for a legacy category.
+    function _moodCatLabel(cat) {
+      const map = { manic:'mood.manic', elevated:'mood.elevated', stable:'mood.stable', good:'mood.stable', low:'mood.low', depressed:'mood.depressed' };
+      const k = map[cat];
+      if (k && window.BB && BB.t) return BB.t(k);
+      return cat ? cat.charAt(0).toUpperCase() + cat.slice(1) : '';
+    }
+    // Descriptive label for any mood value (spectrum → band description, else category name).
+    function _moodLabelOf(m) {
+      if (_isNumericMood(m)) {
+        const r = Math.max(0, Math.min(10, Math.round(Number(m))));
+        return SPECTRUM_LABELS[r] || _moodCatLabel(_moodCat(m));
+      }
+      return _moodCatLabel(m);
+    }
+    // Label with the number appended for spectrum moods, e.g. "Slightly low but stable (4)".
+    function _moodLabelNum(m) {
+      return _isNumericMood(m) ? `${_moodLabelOf(m)} (${_fmtMoodNum(m)})` : _moodLabelOf(m);
+    }
 
     // Mood selection
     document.querySelectorAll('.mood-btn').forEach(btn => {
@@ -3833,6 +3946,96 @@ window.addEventListener('pageshow', () => {
       return steps;
     }
 
+    function _toggleMoodSpectrum() {
+      const chk = document.getElementById('moodSpectrumToggle');
+      const on = !!(chk && chk.checked);
+      localStorage.setItem('moodSpectrumEnabled', on ? '1' : '0');
+      // Switching modes changes what `selectedMood` should hold (number vs string),
+      // so clear any in-progress selection to avoid a mismatched value being saved.
+      selectedMood = null;
+      selectedLinkedMood = null;
+      _applyMoodSpectrumMode();
+      if (typeof _fmActive !== 'undefined' && _fmActive) _renderFocusedStep();
+      if (window.db && window.currentUser) {
+        window.db.collection('userSettings').doc(window.currentUser.uid).set({ moodSpectrumEnabled: on }, { merge: true }).catch(() => {});
+      }
+    }
+    window._toggleMoodSpectrum = _toggleMoodSpectrum;
+
+    // Show/hide the spectrum slider vs the five-button selector in the standard form.
+    function _applyMoodSpectrumMode() {
+      const on = _spectrumEnabled();
+      const btns = document.querySelector('.mood-selector');
+      const wheel = document.getElementById('moodSpectrumControl');
+      if (btns) btns.style.display = on ? 'none' : '';
+      if (wheel) wheel.style.display = on ? '' : 'none';
+      // Reset the standard-form selection UI so no stale highlight/value lingers.
+      document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected', 'cycle-hover', 'linked'));
+      if (on) _resetSpectrumControl();
+    }
+    window._applyMoodSpectrumMode = _applyMoodSpectrumMode;
+
+    // Reset the standard-form spectrum slider to its neutral, not-yet-chosen state.
+    function _resetSpectrumControl() {
+      const slider = document.getElementById('mscSlider');
+      if (slider) slider.value = 5;
+      const ctrl = document.getElementById('moodSpectrumControl');
+      if (ctrl) ctrl.classList.remove('committed');
+      _renderSpectrumReadout(5);
+    }
+
+    // Paint the slider readout (image / number / label / accent) for value n.
+    function _renderSpectrumReadout(n) {
+      const cat = _moodCat(Number(n));
+      const color = moodColors[cat] || 'var(--brand-primary)';
+      const img = document.getElementById('mscImg');
+      const valEl = document.getElementById('mscValue');
+      const labelEl = document.getElementById('mscLabel');
+      const slider = document.getElementById('mscSlider');
+      const ctrl = document.getElementById('moodSpectrumControl');
+      if (img) img.src = _moodImg(Number(n));
+      if (valEl) { valEl.textContent = _fmtMoodNum(n); valEl.style.color = color; }
+      if (labelEl) labelEl.textContent = _moodLabelOf(Number(n));
+      if (slider) slider.style.setProperty('--msc-accent', color);
+      if (ctrl) ctrl.style.setProperty('--msc-accent', color);
+    }
+
+    // Slider interaction → commit the numeric mood and reveal the rest of the form
+    // (mirrors what a .mood-btn click does in the five-mood UI).
+    function _onSpectrumChange(v) {
+      const n = Number(v);
+      selectedMood = n;
+      const ctrl = document.getElementById('moodSpectrumControl');
+      if (ctrl) ctrl.classList.add('committed');
+      const hint = document.getElementById('mscHint');
+      if (hint) hint.style.display = 'none';
+      _renderSpectrumReadout(n);
+      if (typeof _fmApplyMoodTheme === 'function') _fmApplyMoodTheme(_moodCat(n));
+      document.querySelectorAll('.hidden-until-mood').forEach(el => {
+        el.classList.remove('hidden-until-mood');
+        el.classList.add('show-after-mood');
+      });
+      if (typeof _updateEnergyHero === 'function') _updateEnergyHero();
+      if (typeof _updateSleepHero === 'function') _updateSleepHero();
+      if (BB.storage.get('HealthSyncEnabled') === '1') {
+        if (typeof importStepsFromHealth === 'function') importStepsFromHealth(true);
+        if (typeof importSleepFromHealth === 'function') importSleepFromHealth(true);
+      }
+      scheduleDraftSave();
+    }
+    window._onSpectrumChange = _onSpectrumChange;
+
+    // Preselect the slider to a given numeric mood (used by draft restore / edit load).
+    function _setSpectrumValue(n) {
+      const slider = document.getElementById('mscSlider');
+      if (slider) slider.value = String(Math.max(0, Math.min(10, Math.round(Number(n)))));
+      const ctrl = document.getElementById('moodSpectrumControl');
+      if (ctrl) ctrl.classList.add('committed');
+      const hint = document.getElementById('mscHint');
+      if (hint) hint.style.display = 'none';
+      _renderSpectrumReadout(n);
+    }
+
     function _toggleMoodLinking() {
       const chk = document.getElementById('moodLinkingToggle');
       const val = chk && chk.checked ? '1' : '0';
@@ -4331,8 +4534,20 @@ window.addEventListener('pageshow', () => {
     }
 
     function _fmSyncFormVisuals() {
-      if (selectedMood) {
-        document.querySelectorAll('.mood-btn').forEach(b => b.classList.toggle('selected', b.dataset.mood === selectedMood));
+      if (selectedMood != null && selectedMood !== '') {
+        const _btns = document.querySelector('.mood-selector');
+        const _wheel = document.getElementById('moodSpectrumControl');
+        if (_isNumericMood(selectedMood)) {
+          // Numeric (spectrum) mood — show the slider regardless of the current
+          // toggle so an entry saved on the spectrum always displays correctly.
+          if (_btns) _btns.style.display = 'none';
+          if (_wheel) _wheel.style.display = '';
+          _setSpectrumValue(Number(selectedMood));
+        } else {
+          if (_btns) _btns.style.display = '';
+          if (_wheel) _wheel.style.display = 'none';
+          document.querySelectorAll('.mood-btn').forEach(b => b.classList.toggle('selected', b.dataset.mood === selectedMood));
+        }
         document.querySelectorAll('.hidden-until-mood').forEach(el => {
           el.classList.add('show-after-mood'); el.classList.remove('hidden-until-mood');
         });
@@ -4364,8 +4579,10 @@ window.addEventListener('pageshow', () => {
 
     const _FM_MOOD_BG     = { manic:'#fff0f0', elevated:'var(--brand-secondary-tint)', stable:'#f0fff4', good:'#f0fff4', low:'#f5f0ff', depressed:'#f0f4ff' };
     function _fmApplyMoodTheme(mood) {
-      const accent = (mood && _FM_MOOD_COLORS[mood]) || 'var(--brand-primary)';
-      const bg     = (mood && _FM_MOOD_BG[mood])     || 'var(--brand-tint)';
+      // Accept a legacy category string OR a spectrum number — normalise to a category.
+      const cat    = (mood != null && mood !== '') ? _moodCat(mood) : null;
+      const accent = (cat && _FM_MOOD_COLORS[cat]) || 'var(--brand-primary)';
+      const bg     = (cat && _FM_MOOD_BG[cat])     || 'var(--brand-tint)';
       const card   = document.getElementById('focusedModeCard');
       const sticky = document.getElementById('fmNextRow');
       if (card)   { card.style.background = bg;   card.style.setProperty('--fm-accent', accent); }
@@ -4663,7 +4880,7 @@ window.addEventListener('pageshow', () => {
     function _fmWheelCommittedVal(stepId) {
       if (stepId === 'energy')     return _fmEnergyClear ? null : String(selectedEnergy);
       if (stepId === 'sleep')      return (_fmSleepClear || selectedSleep == null) ? null : String(_fmSleepBucketOf(selectedSleep));
-      if (stepId === 'mood')         return selectedMood || null;
+      if (stepId === 'mood')         return (selectedMood != null && selectedMood !== '') ? String(selectedMood) : null;
       if (stepId === 'medication')   return selectedMedication || null;
       if (stepId === 'sleepQuality') return selectedSleepQuality || null;
       return null;
@@ -4697,7 +4914,7 @@ window.addEventListener('pageshow', () => {
       } else if (step.id === 'sleep' && isCommitted && _sleepHealthSynced) {
         valueHtml = _fmFmtSleepHM(selectedSleep);
         badge = { cls: '', text: '✓ ' + _syncSourceLabel() };
-      } else if (step.id === 'mood' && !selectedMood && _fmMoodSuggestion && val === _fmMoodSuggestion) {
+      } else if (step.id === 'mood' && (selectedMood == null || selectedMood === '') && _fmMoodSuggestion && val === _fmMoodSuggestion) {
         badge = { cls: 'guess', text: '✨ ' + BB.t('journal.sync.bestGuess') };
       }
       emojiEl.innerHTML = btn.dataset.img ? `<img src="${btn.dataset.img}" alt="">` : (btn.dataset.emoji || '');
@@ -4900,6 +5117,28 @@ window.addEventListener('pageshow', () => {
               <p style="text-align:center;font-size:0.72em;color:#adb5bd;margin-top:4px;margin-bottom:0;">Tap <strong>${cap(selectedMood)}</strong> again to skip &nbsp;<button onclick="_fmLinkMoodPickerOpen=false;_renderFocusedStep();" style="background:none;border:none;color:#adb5bd;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:0;text-decoration:underline;">Cancel</button></p>`;
           } else if (selectedMood && localStorage.getItem('moodLinkingEnabled') === '1') {
             _linkedChip = `<p style="text-align:center;font-size:0.72em;color:#adb5bd;margin-top:8px;margin-bottom:0;">Hold to link a secondary mood</p>`;
+          }
+          // Full mood spectrum — render an 11-point (0–10) wheel instead of the
+          // five fixed moods. Each stop maps to a legacy category for its image/colour.
+          if (_spectrumEnabled()) {
+            const _initN = (selectedMood != null && selectedMood !== '') ? Math.round(Number(selectedMood)) : 5;
+            const _spectrumWheel = _fmWheelHtml([0,1,2,3,4,5,6,7,8,9,10].map(n => ({
+              val: n,
+              img: _moodImg(n),
+              label: SPECTRUM_LABELS[n],
+              color: _FM_MOOD_COLORS[_moodCat(n)],
+              cls: (selectedMood != null && selectedMood !== '' && Number(selectedMood) === n) ? 'sel' : '',
+              init: n === _initN,
+              onclick: `_fmSpectrumTap(${n})`,
+            })));
+            return `${_quickNotesHtml}${_prevIntentionHtml}${_fmHeroHtml()}${_spectrumWheel}
+            ${_showChooseMoodHint ? `<div id="_fmChooseMoodHintEl" style="display:flex;flex-direction:column;align-items:center;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-top:8px;">
+              <svg width="24" height="22" viewBox="0 0 24 22" fill="none">
+                <path d="M 12,20 Q 8,10 12,2" stroke="rgba(255,149,0,0.7)" stroke-width="2" stroke-linecap="round" fill="none"/>
+                <polyline points="7,6 12,1 17,6" stroke="rgba(255,149,0,0.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              </svg>
+              <span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,149,0,0.9);white-space:nowrap;font-family:'Georgia',serif;letter-spacing:0.01em;">${BB.t('journal.hint.chooseMood')}</span>
+            </div>` : ''}`;
           }
           const _initMood = selectedMood || _fmMoodSuggestion || 'stable';
           const _moodWheel = _fmWheelHtml(['manic','elevated','stable','low','depressed'].map(m => ({
@@ -9016,7 +9255,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
               ['focusedModeEnabled','fmConfirmStep','fmAutoAdvance','fmAutoAdvanceMoreData',
                'elaborateResponsesEnabled','intentionEnabled','incognitoMode','pdfHideByDefault',
                'showMoodSuggestion','moreDataOpenByDefault','achievementToastsEnabled',
-               'weeklySummaryEnabled','customiseFormEnabled','moodLinkingEnabled'].forEach(k => {
+               'weeklySummaryEnabled','customiseFormEnabled','moodLinkingEnabled','moodSpectrumEnabled'].forEach(k => {
                 if (settings[k] !== undefined) fsSettings[k] = _boolKey(settings[k]);
               });
               if (settings.statsStartDate) fsSettings.statsStartDate = settings.statsStartDate;
@@ -9286,7 +9525,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
         'incognitoMode', 'pdfHideByDefault',
         'showMoodSuggestion', 'moreDataOpenByDefault',
         'achievementToastsEnabled', 'statsStartDate', 'weeklySummaryEnabled',
-        'customiseFormEnabled', 'disabledSteps', 'moodLinkingEnabled',
+        'customiseFormEnabled', 'disabledSteps', 'moodLinkingEnabled', 'moodSpectrumEnabled',
         'customTrackingFields', 'deletedDefaultCustomFields', 'deletedBuiltinFields',
       ];
       _keys.forEach(k => localStorage.removeItem(k));
@@ -9468,7 +9707,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
           'incognitoMode', 'pdfHideByDefault',
           'showMoodSuggestion', 'moreDataOpenByDefault',
           'achievementToastsEnabled', 'statsStartDate', 'weeklySummaryEnabled',
-          'customiseFormEnabled', 'disabledSteps', 'moodLinkingEnabled',
+          'customiseFormEnabled', 'disabledSteps', 'moodLinkingEnabled', 'moodSpectrumEnabled',
           'customTrackingFields', 'deletedDefaultCustomFields', 'deletedBuiltinFields',
           'bbPinEnabled', 'bbPinCode', 'bbNativePinEnabled',
           'bbHealthSyncEnabled', 'reminderEnabled', 'reminderTime',
@@ -10030,10 +10269,23 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
       // Select mood and reveal form sections
       selectedMood = entry.mood;
       selectedLinkedMood = entry.linkedMood || null;
-      if (typeof _fmApplyMoodTheme === 'function') _fmApplyMoodTheme(entry.mood);
-      document.querySelectorAll('.mood-btn').forEach(b => {
-        b.classList.toggle('selected', b.dataset.mood === entry.mood);
-      });
+      if (typeof _fmApplyMoodTheme === 'function') _fmApplyMoodTheme(_moodCat(entry.mood));
+      if (_isNumericMood(entry.mood)) {
+        // Numeric (spectrum) mood — show the slider set to the entry's value.
+        const _btns = document.querySelector('.mood-selector');
+        const _wheel = document.getElementById('moodSpectrumControl');
+        if (_btns) _btns.style.display = 'none';
+        if (_wheel) _wheel.style.display = '';
+        _setSpectrumValue(Number(entry.mood));
+      } else {
+        const _btns = document.querySelector('.mood-selector');
+        const _wheel = document.getElementById('moodSpectrumControl');
+        if (_btns) _btns.style.display = '';
+        if (_wheel) _wheel.style.display = 'none';
+        document.querySelectorAll('.mood-btn').forEach(b => {
+          b.classList.toggle('selected', b.dataset.mood === entry.mood);
+        });
+      }
       document.querySelectorAll('.hidden-until-mood').forEach(el => {
         el.classList.remove('hidden-until-mood');
         el.classList.add('show-after-mood');
@@ -10846,6 +11098,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
       // Incognito mode
       document.getElementById('incognitoModeToggle').checked = localStorage.getItem('incognitoMode') === 'true';
       document.getElementById('moodLinkingToggle').checked = localStorage.getItem('moodLinkingEnabled') === '1';
+      const _msToggle = document.getElementById('moodSpectrumToggle');
+      if (_msToggle) _msToggle.checked = _spectrumEnabled();
       document.getElementById('moodSuggestionToggle').checked = localStorage.getItem('showMoodSuggestion') === '1';
       document.getElementById('focusModeToggle').checked = _fmEnabled;
       document.getElementById('focusModeSubOptions').style.display = _fmEnabled ? '' : 'none';

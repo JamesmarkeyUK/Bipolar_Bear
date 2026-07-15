@@ -779,6 +779,60 @@
       .mood-depressed:hover{ border-color: #5c7cfa; background: #f0f4ff; }
     }
 
+    /* ── Full mood spectrum (0–10) slider control ── */
+    .mood-spectrum-control {
+      --msc-accent: #51cf66;
+      margin: 4px 0 14px;
+      padding: 16px 14px 14px;
+      border: 2px solid #eef0f2;
+      border-radius: 18px;
+      background: #fff;
+      transition: border-color 0.25s ease;
+    }
+    .mood-spectrum-control.committed { border-color: var(--msc-accent); }
+    .msc-readout {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      opacity: 0.55;
+      transition: opacity 0.2s ease;
+    }
+    .mood-spectrum-control.committed .msc-readout { opacity: 1; }
+    .msc-img { width: 46px; height: 46px; object-fit: contain; }
+    .msc-text { text-align: left; }
+    .msc-value { font-size: 1.9em; font-weight: 800; line-height: 1; color: #51cf66; }
+    .msc-label { font-size: 0.9em; font-weight: 600; color: #495057; margin-top: 2px; }
+    .msc-slider {
+      -webkit-appearance: none; appearance: none;
+      width: 100%; height: 8px; border-radius: 6px;
+      background: linear-gradient(90deg, #5c7cfa 0%, #845ef7 20%, #51cf66 50%, var(--brand-primary) 78%, #ff4444 100%);
+      outline: none; margin: 4px 0 6px;
+    }
+    .msc-slider::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 26px; height: 26px; border-radius: 50%;
+      background: #fff; border: 3px solid var(--msc-accent);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2); cursor: pointer;
+      transition: border-color 0.2s ease;
+    }
+    .msc-slider::-moz-range-thumb {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: #fff; border: 3px solid var(--msc-accent);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2); cursor: pointer;
+    }
+    .msc-scale {
+      display: flex; justify-content: space-between;
+      font-size: 0.68em; color: #adb5bd; font-weight: 600; margin-top: 2px;
+    }
+    .msc-scale span:nth-child(2) { text-align: center; }
+    .msc-scale span:last-child { text-align: right; }
+    .msc-hint {
+      text-align: center; font-size: 0.78em; color: var(--brand-primary);
+      font-weight: 600; margin-top: 10px;
+    }
+
     .form-group {
       margin-bottom: 12px;
     }
