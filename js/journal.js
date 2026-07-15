@@ -4693,7 +4693,7 @@ window.addEventListener('pageshow', () => {
       _backBtn.style.visibility = 'visible';
       // Skip button + save shortcut (mood is the one required field — no skip)
       const skipBtn = document.getElementById('fmSkipBtn');
-      skipBtn.textContent = 'Skip →';
+      skipBtn.textContent = BB.t('journal.mods.fmSkip');
       skipBtn.title = '';
       skipBtn.onclick = _fmSkip;
       skipBtn.style.visibility = (step.id === 'done' || step.id === 'mood') ? 'hidden' : 'visible';

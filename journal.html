@@ -120,7 +120,7 @@
 
   <!-- Offline banner -->
   <div id="offlineBanner" style="display:none; position:fixed; bottom:0; left:0; right:0; z-index:200; background:rgba(0,0,0,0.75); color:rgba(255,255,255,0.9); text-align:center; padding:7px 16px; padding-bottom:calc(7px + env(safe-area-inset-bottom)); font-size:0.8em; letter-spacing:0.02em; backdrop-filter:blur(4px);">
-    📶 Offline — new entries will sync when reconnected
+    <span data-i18n="journal.mods.offlineBanner">📶 Offline — new entries will sync when reconnected</span>
   </div>
 
   <!-- Main App Content -->
@@ -140,7 +140,7 @@
           </div>
         </div>
         <div style="margin-left:auto;position:relative;">
-          <button id="survivalNavBtn" onclick="_survivalNavClick()" title="Survival Kit" style="background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.4);border-radius:50%;width:38px;height:38px;min-width:38px;min-height:38px;padding:0;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;font-size:1.2em;cursor:pointer;line-height:1;-webkit-tap-highlight-color:transparent;flex-shrink:0;">🧰</button>
+          <button id="survivalNavBtn" onclick="_survivalNavClick()" title="Survival Kit" data-i18n-title="journal.mods.survivalKitTip" style="background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.4);border-radius:50%;width:38px;height:38px;min-width:38px;min-height:38px;padding:0;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;font-size:1.2em;cursor:pointer;line-height:1;-webkit-tap-highlight-color:transparent;flex-shrink:0;">🧰</button>
         </div>
       </div>
         <div class="empty-space"></div>
@@ -212,10 +212,10 @@
 
     <div class="card" id="entryFormCard" style="background: var(--brand-tint); display:none;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-        <button id="editCancelBtn" onclick="cancelEdit()" style="display:none;background:none;border:none;color:#6c757d;font-size:0.82em;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;">← Back</button>
-        <button id="formCalendarBtn" onclick="toggleDatePicker()" style="background:none;border:none;font-size:1.5em;cursor:pointer;padding:4px;line-height:1;-webkit-tap-highlight-color:transparent;flex-shrink:0;" title="Change date">🗓️</button>
+        <button id="editCancelBtn" onclick="cancelEdit()" style="display:none;background:none;border:none;color:#6c757d;font-size:0.82em;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;" data-i18n="common.back">← Back</button>
+        <button id="formCalendarBtn" onclick="toggleDatePicker()" style="background:none;border:none;font-size:1.5em;cursor:pointer;padding:4px;line-height:1;-webkit-tap-highlight-color:transparent;flex-shrink:0;" title="Change date" data-i18n-title="journal.mods.changeDateTip">🗓️</button>
         <h2 id="entryFormHeading" data-i18n="journal.prompt.howYesterday" style="margin:0;flex:1;text-align:center;">How was yesterday?</h2>
-        <button id="favouriteBtn" onclick="toggleFavourite()" style="background:none;border:none;font-size:1.5em;cursor:pointer;padding:4px;line-height:1;color:#6c757d;-webkit-tap-highlight-color:transparent;flex-shrink:0;" title="Favourite">☆</button>
+        <button id="favouriteBtn" onclick="toggleFavourite()" style="background:none;border:none;font-size:1.5em;cursor:pointer;padding:4px;line-height:1;color:#6c757d;-webkit-tap-highlight-color:transparent;flex-shrink:0;" title="Favourite" data-i18n-title="journal.mods.favouriteTip">☆</button>
       </div>
       
       
@@ -410,31 +410,31 @@
 
     <!-- Switch to focused mode (shown below full form card when user has switched away from focused mode) -->
     <div id="fullFormExitLink" style="display:none;text-align:center;margin-top:10px;">
-      <button onclick="_fmSwitchToFocusedMode()" style="background:none;border:none;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);text-decoration:underline;font-size:0.78em;cursor:pointer;-webkit-tap-highlight-color:transparent;">Switch to focused mode</button>
+      <button onclick="_fmSwitchToFocusedMode()" style="background:none;border:none;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);text-decoration:underline;font-size:0.78em;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="journal.mods.switchToFocused">Switch to focused mode</button>
     </div>
 
     <!-- Focused Mode Card -->
     <div class="card" id="focusedModeCard" style="background:var(--brand-tint);display:none;flex-direction:column;padding:20px 20px 16px;">
       <!-- Top bar: back + progress dots + skip -->
       <div id="fmTopBar" style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-        <button id="fmBackBtn" onclick="_fmExit()" style="background:none;border:none;color:#6c757d;font-size:0.85em;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;white-space:nowrap;">✕ Exit</button>
+        <button id="fmBackBtn" onclick="_fmExit()" style="background:none;border:none;color:#6c757d;font-size:0.85em;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;white-space:nowrap;" data-i18n="journal.mods.fmExit">✕ Exit</button>
         <div id="fmProgressDots" style="display:flex;gap:5px;flex:1;justify-content:center;align-items:center;"></div>
-        <button id="fmSkipBtn" onclick="_fmSkip()" style="background:none;border:none;color:#6c757d;font-size:0.85em;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;white-space:nowrap;">Skip →</button>
+        <button id="fmSkipBtn" onclick="_fmSkip()" style="background:none;border:none;color:#6c757d;font-size:0.85em;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;white-space:nowrap;" data-i18n="journal.mods.fmSkip">Skip →</button>
       </div>
       <div id="fmStepCounter" style="text-align:center;font-size:0.75em;color:#6c757d;margin-bottom:10px;"></div>
 
       <!-- Reduced-motion indicator: hidden by default, revealed purely by the
            prefers-reduced-motion media query in journal.css so it appears
            exactly when the animations are being held back. -->
-      <div id="fmReducedMotionBadge" title="Animations are reduced because your device has Reduce Motion turned on.">
+      <div id="fmReducedMotionBadge" title="Animations are reduced because your device has Reduce Motion turned on." data-i18n-title="journal.mods.reducedMotionTip">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 9a7 7 0 0 1 0 6"/><path d="M9 6a12 12 0 0 1 0 12"/><line x1="3.5" y1="20.5" x2="20.5" y2="3.5"/></svg>
-        <span>Reduced motion</span>
+        <span data-i18n="journal.mods.reducedMotion">Reduced motion</span>
       </div>
 
       <!-- Completed-step summary chips + save shortcut -->
       <div style="display:flex;align-items:center;gap:6px;justify-content:center;margin-bottom:14px;">
         <div id="fmSummaryBar" style="display:none;flex-wrap:nowrap;overflow-x:auto;gap:6px;justify-content:center;scrollbar-width:none;"></div>
-        <button id="fmSaveShortcutBtn" onclick="_fmGoToDone()" style="display:none;background:none;border:none;color:#6c757d;font-size:1.1em;cursor:pointer;padding:0 2px;-webkit-tap-highlight-color:transparent;line-height:1;flex-shrink:0;" title="Go to save">💾</button>
+        <button id="fmSaveShortcutBtn" onclick="_fmGoToDone()" style="display:none;background:none;border:none;color:#6c757d;font-size:1.1em;cursor:pointer;padding:0 2px;-webkit-tap-highlight-color:transparent;line-height:1;flex-shrink:0;" title="Go to save" data-i18n-title="journal.mods.goToSaveTip">💾</button>
       </div>
 
       <!-- Flexible space so the title/subheader sits roughly halfway between
@@ -455,7 +455,7 @@
       <!-- Next/Save button row (shown only for non-auto steps) -->
       <div id="fmNextRow" style="display:none;margin-top:16px;gap:10px;align-items:center;position:sticky;bottom:0;background:var(--brand-tint);padding-bottom:4px;">
         <button id="fmDeleteBtn" onclick="_fmDoneDelete()" style="display:none;min-width:52px;height:52px;background:white;color:#ff6b6b;border:2px solid #ff6b6b;border-radius:14px;font-size:1.3em;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;">🗑️</button>
-        <button id="fmNextBtn" onclick="_fmNext()" style="flex:1;padding:14px;background:var(--brand-primary);color:white;border:none;border-radius:14px;font-size:1em;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">Next →</button>
+        <button id="fmNextBtn" onclick="_fmNext()" style="flex:1;padding:14px;background:var(--brand-primary);color:white;border:none;border-radius:14px;font-size:1em;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="journal.mods.fmNext">Next →</button>
       </div>
       <div id="fmDraftStatus" style="text-align:right;font-size:0.75em;color:#6c757d;margin-top:4px;min-height:1em;transition:opacity 0.5s ease;opacity:0;"></div>
 
@@ -467,7 +467,7 @@
     <div id="fmResumeSection" style="display:none;text-align:center;margin-bottom:16px;">
       <div style="display:flex;align-items:center;justify-content:center;gap:10px;">
         <button onclick="_fmResumeEntry()" style="background:rgba(255,255,255,0.18);color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.25);border:1.5px solid rgba(255,255,255,0.55);border-radius:20px;padding:10px 22px;font-size:0.95em;font-weight:700;font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="journal.fm.resumeEntry">✏️ Continue your entry</button>
-        <button onclick="clearDraftWithConfirm()" title="Delete draft" style="background:rgba(255,255,255,0.14);border:1.5px solid rgba(255,255,255,0.45);border-radius:50%;width:44px;height:44px;min-width:44px;font-size:1.1em;cursor:pointer;-webkit-tap-highlight-color:transparent;display:inline-flex;align-items:center;justify-content:center;">🗑️</button>
+        <button onclick="clearDraftWithConfirm()" title="Delete draft" data-i18n-title="journal.mods.deleteDraftTip" style="background:rgba(255,255,255,0.14);border:1.5px solid rgba(255,255,255,0.45);border-radius:50%;width:44px;height:44px;min-width:44px;font-size:1.1em;cursor:pointer;-webkit-tap-highlight-color:transparent;display:inline-flex;align-items:center;justify-content:center;">🗑️</button>
       </div>
       <button id="fmExitMoreBtn" onclick="_fmExitToggleMore(this)" style="background:none;border:none;color:rgba(255,255,255,0.85);text-shadow:0 1px 3px rgba(0,0,0,0.25);text-decoration:underline;text-underline-offset:2px;font-size:0.82em;font-weight:600;font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;margin-top:14px;" data-i18n="journal.fm.exitMore">▾ Show more</button>
     </div>
@@ -529,11 +529,11 @@
 
   <div class="confirm-modal" id="confirmModal" style="z-index:1050;">
     <div class="confirm-content">
-      <h3 id="confirmModalTitle">Delete Entry?</h3>
-      <p id="confirmModalBody">Are you sure you want to delete this mood entry? This can't be undone.</p>
+      <h3 id="confirmModalTitle" data-i18n="journal.delete.title">Delete Entry?</h3>
+      <p id="confirmModalBody" data-i18n="journal.delete.body">Are you sure you want to delete this mood entry? This can't be undone.</p>
       <div class="confirm-buttons">
-        <button class="confirm-btn confirm-btn-no" onclick="closeConfirmModal()">Cancel</button>
-        <button class="confirm-btn confirm-btn-yes" id="confirmModalBtn" onclick="confirmDelete()">Delete</button>
+        <button class="confirm-btn confirm-btn-no" onclick="closeConfirmModal()" data-i18n="common.cancel">Cancel</button>
+        <button class="confirm-btn confirm-btn-yes" id="confirmModalBtn" onclick="confirmDelete()" data-i18n="journal.delete.btn">Delete</button>
       </div>
     </div>
   </div>
@@ -809,14 +809,14 @@
   <!-- Calendar Month/Year Picker -->
   <div class="confirm-modal" id="calMonthPickerModal" onclick="if(event.target===this)closeCalMonthPicker()">
     <div class="confirm-content" style="max-width:300px;text-align:center;">
-      <h3 style="margin-bottom:20px;">📅 Go to Month</h3>
+      <h3 style="margin-bottom:20px;" data-i18n="journal.mods.calMonthTitle">📅 Go to Month</h3>
       <div style="display:flex;gap:12px;justify-content:center;margin-bottom:20px;">
         <select id="calPickerMonth" style="flex:1;padding:10px;border:2px solid #e9ecef;border-radius:10px;font-size:1em;color:#495057;appearance:auto;-webkit-appearance:auto;"></select>
         <select id="calPickerYear" style="width:90px;padding:10px;border:2px solid #e9ecef;border-radius:10px;font-size:1em;color:#495057;appearance:auto;-webkit-appearance:auto;"></select>
       </div>
       <div class="confirm-buttons">
-        <button class="confirm-btn confirm-btn-no" onclick="closeCalMonthPicker()">Cancel</button>
-        <button class="confirm-btn" onclick="applyCalMonthPicker()" style="background:var(--brand-primary);color:white;border-color:var(--brand-primary);">Go</button>
+        <button class="confirm-btn confirm-btn-no" onclick="closeCalMonthPicker()" data-i18n="common.cancel">Cancel</button>
+        <button class="confirm-btn" onclick="applyCalMonthPicker()" style="background:var(--brand-primary);color:white;border-color:var(--brand-primary);" data-i18n="journal.mods.go">Go</button>
       </div>
     </div>
   </div>
@@ -828,7 +828,7 @@
       <h3 id="statDetailTitle" style="margin-bottom:12px;"></h3>
       <div id="statDetailBody" style="max-height:55vh;overflow-y:auto;font-size:0.9em;"></div>
       <div class="confirm-buttons" style="margin-top:16px;">
-        <button class="confirm-btn confirm-btn-no" onclick="closeStatDetail()">Close</button>
+        <button class="confirm-btn confirm-btn-no" onclick="closeStatDetail()" data-i18n="common.close">Close</button>
       </div>
     </div>
   </div>
@@ -838,8 +838,8 @@
   <div class="confirm-modal" id="depressedSupportModal" onclick="if(event.target===this)_fmDismissDepressedMsg()">
     <div class="confirm-content" style="max-width:420px;text-align:center;">
       <div style="font-size:2.5em;margin-bottom:10px;">♥️</div>
-      <h3 style="margin-bottom:12px;color:#5c7cfa;">You matter</h3>
-      <p style="font-size:0.95em;color:#495057;line-height:1.6;margin-bottom:16px;">
+      <h3 style="margin-bottom:12px;color:#5c7cfa;" data-i18n="journal.mods.youMatter">You matter</h3>
+      <p style="font-size:0.95em;color:#495057;line-height:1.6;margin-bottom:16px;" data-i18n="journal.mods.depressedBody">
         It sounds like things are tough right now. That takes real courage to acknowledge. You don't have to face this alone — logging how you feel is a meaningful step.
       </p>
       <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
@@ -847,31 +847,31 @@
           <span style="font-size:1.4em;">📞</span>
           <div style="text-align:left;">
             <div style="font-weight:700;font-size:0.95em;color:#5c7cfa;">Samaritans</div>
-            <div style="font-size:0.82em;color:#6c757d;">116 123 · Free, 24/7</div>
+            <div style="font-size:0.82em;color:#6c757d;" data-i18n="journal.mods.samaritansFree">116 123 · Free, 24/7</div>
           </div>
         </a>
         <div id="depressedEmergencyContact" style="display:none;">
           <a id="depressedEmergencyLink" href="#" style="display:flex;align-items:center;gap:12px;background:#f0f4ff;border:1.5px solid #5c7cfa;border-radius:12px;padding:12px 16px;text-decoration:none;color:#495057;">
             <span style="font-size:1.4em;">🧡</span>
             <div style="text-align:left;">
-              <div style="font-weight:700;font-size:0.95em;color:#5c7cfa;">Emergency Contact</div>
+              <div style="font-weight:700;font-size:0.95em;color:#5c7cfa;" data-i18n="journal.mods.emergencyContact">Emergency Contact</div>
               <div id="depressedEmergencyText" style="font-size:0.82em;color:#6c757d;"></div>
             </div>
           </a>
         </div>
       </div>
       <div class="confirm-buttons">
-        <button class="confirm-btn confirm-btn-yes" onclick="_fmDismissDepressedMsg()" style="background:#5c7cfa;border-color:#5c7cfa;color:white;">Continue logging</button>
+        <button class="confirm-btn confirm-btn-yes" onclick="_fmDismissDepressedMsg()" style="background:#5c7cfa;border-color:#5c7cfa;color:white;" data-i18n="journal.mods.continueLogging">Continue logging</button>
       </div>
     </div>
   </div>
 
   <div class="confirm-modal" id="favouritesModal" onclick="if(event.target===this)closeFavouritesModal()">
     <div class="confirm-content" style="max-width:500px;">
-      <h3 style="margin-bottom:16px;">⭐ Favourite Entries</h3>
+      <h3 style="margin-bottom:16px;" data-i18n="journal.mods.favTitle">⭐ Favourite Entries</h3>
       <div id="favouritesList" style="max-height:55vh;overflow-y:auto;margin-bottom:16px;"></div>
       <div class="confirm-buttons">
-        <button class="confirm-btn confirm-btn-no" onclick="closeFavouritesModal()">Close</button>
+        <button class="confirm-btn confirm-btn-no" onclick="closeFavouritesModal()" data-i18n="common.close">Close</button>
       </div>
     </div>
   </div>
@@ -895,7 +895,7 @@
   <div id="pinOverlay" style="position:fixed;inset:0;background:linear-gradient(135deg,var(--brand-primary-light) 0%,var(--brand-primary-mid) 100%);z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:24px;display:none;">
     <img src="icons/AppIcon.png" width="72" height="72" style="border-radius:18px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
     <h2 style="color:white;margin-bottom:6px;font-size:1.3em;">Bipolar Bear</h2>
-    <p style="color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-size:0.88em;margin-bottom:28px;">Enter your PIN to continue</p>
+    <p style="color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-size:0.88em;margin-bottom:28px;" data-i18n="pin.title">Enter your PIN to continue</p>
     <div id="pinDots" style="display:flex;gap:12px;margin-bottom:24px;">
       <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
     </div>
@@ -914,13 +914,13 @@
       <button class="pin-key" onclick="pinKey('0')">0</button>
       <button class="pin-key pin-key-del" onclick="pinDel()">⌫</button>
     </div>
-    <button onclick="pinForgot()" style="background:none;border:none;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-size:0.78em;cursor:pointer;margin-top:8px;padding:4px 12px;text-decoration:underline;">Forgot PIN?</button>
+    <button onclick="pinForgot()" style="background:none;border:none;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-size:0.78em;cursor:pointer;margin-top:8px;padding:4px 12px;text-decoration:underline;" data-i18n="pin.forgot">Forgot PIN?</button>
   </div>
 
   <!-- PIN Setup Modal -->
   <div class="confirm-modal" id="pinSetupModal" onclick="if(event.target===this)closePinSetup()">
     <div class="confirm-content" style="max-width:320px;text-align:center;">
-      <h3 id="pinSetupTitle" style="margin-bottom:8px;">🔒 Set PIN</h3>
+      <h3 id="pinSetupTitle" style="margin-bottom:8px;" data-i18n="journal.mods.setPinTitle">🔒 Set PIN</h3>
       <p id="pinSetupDesc" style="color:#6c757d;font-size:0.88em;margin-bottom:20px;"></p>
       <div id="pinSetupDots" style="display:flex;gap:12px;justify-content:center;margin-bottom:16px;">
         <div class="pin-dot pin-dot-dark"></div><div class="pin-dot pin-dot-dark"></div><div class="pin-dot pin-dot-dark"></div><div class="pin-dot pin-dot-dark"></div>
@@ -941,8 +941,8 @@
         <button class="pin-key pin-key-dark pin-key-del" onclick="pinSetupDel()">⌫</button>
       </div>
       <div class="confirm-buttons">
-        <button class="confirm-btn confirm-btn-no" onclick="closePinSetup()">Cancel</button>
-        <button id="pinDisableBtn" class="confirm-btn" onclick="disablePin()" style="display:none;background:white;color:#dc3545;border:2px solid #dc3545;">Disable PIN</button>
+        <button class="confirm-btn confirm-btn-no" onclick="closePinSetup()" data-i18n="common.cancel">Cancel</button>
+        <button id="pinDisableBtn" class="confirm-btn" onclick="disablePin()" style="display:none;background:white;color:#dc3545;border:2px solid #dc3545;" data-i18n="journal.mods.disablePin">Disable PIN</button>
       </div>
     </div>
   </div>
@@ -950,8 +950,8 @@
   <!-- Guest PIN Setup Overlay (mandatory on first entry save for guests) -->
   <div id="guestPinSetupOverlay" style="position:fixed;inset:0;background:linear-gradient(135deg,var(--brand-primary-light) 0%,var(--brand-primary-mid) 100%);z-index:9998;flex-direction:column;align-items:center;justify-content:center;padding:24px;display:none;">
     <img src="icons/AppIcon.png" width="72" height="72" style="border-radius:18px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
-    <h2 id="guestPinSetupTitle" style="color:white;margin-bottom:6px;font-size:1.3em;text-align:center;">Protect your data</h2>
-    <p id="guestPinSetupDesc" style="color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-size:0.88em;margin-bottom:28px;text-align:center;max-width:260px;">Choose a 4-digit PIN to lock your journal.</p>
+    <h2 id="guestPinSetupTitle" style="color:white;margin-bottom:6px;font-size:1.3em;text-align:center;" data-i18n="journal.mods.protectData">Protect your data</h2>
+    <p id="guestPinSetupDesc" style="color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-size:0.88em;margin-bottom:28px;text-align:center;max-width:260px;" data-i18n="journal.mods.choosePinDesc">Choose a 4-digit PIN to lock your journal.</p>
     <div id="guestPinSetupDots" style="display:flex;gap:12px;margin-bottom:24px;">
       <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
     </div>
@@ -970,38 +970,38 @@
       <button class="pin-key" onclick="guestPinSetupKey('0')">0</button>
       <button class="pin-key pin-key-del" onclick="guestPinSetupDel()">⌫</button>
     </div>
-    <p style="color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-size:0.75em;text-align:center;max-width:240px;line-height:1.5;">Your PIN encrypts your data on this device. If you forget your PIN, your entries cannot be recovered.</p>
+    <p style="color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.3);font-size:0.75em;text-align:center;max-width:240px;line-height:1.5;" data-i18n="journal.mods.pinEncryptNote">Your PIN encrypts your data on this device. If you forget your PIN, your entries cannot be recovered.</p>
   </div>
 
   <!-- Favourite Anniversary Modal -->
   <div class="confirm-modal" id="favAnniversaryModal" onclick="if(event.target===this)closeFavAnniversaryModal()">
     <div class="confirm-content" style="max-width:500px;">
-      <h3 id="favAnniversaryTitle" style="margin-bottom:16px;">⭐ On this day</h3>
+      <h3 id="favAnniversaryTitle" style="margin-bottom:16px;" data-i18n="journal.mods.onThisDay">⭐ On this day</h3>
       <div id="favAnniversaryList" style="max-height:55vh;overflow-y:auto;margin-bottom:16px;"></div>
       <div class="confirm-buttons">
-        <button class="confirm-btn confirm-btn-no" onclick="closeFavAnniversaryModal()">Close</button>
-        <button class="confirm-btn" onclick="rescheduleAnniversary()" style="background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);">Show again next year</button>
+        <button class="confirm-btn confirm-btn-no" onclick="closeFavAnniversaryModal()" data-i18n="common.close">Close</button>
+        <button class="confirm-btn" onclick="rescheduleAnniversary()" style="background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);" data-i18n="journal.mods.showAgainNextYear">Show again next year</button>
       </div>
     </div>
   </div>
 
   <div class="confirm-modal" id="medicationModal">
     <div class="confirm-content" style="max-width: 500px;">
-      <h3>My Medications</h3>
-      <p style="color: #6c757d; margin-bottom: 20px;">Track your current medications and dosages</p>
+      <h3 data-i18n="journal.mods.medTitle">My Medications</h3>
+      <p style="color: #6c757d; margin-bottom: 20px;" data-i18n="journal.mods.medDesc">Track your current medications and dosages</p>
       
       <div id="medicationList" style="margin-bottom: 20px; max-height: 300px; overflow-y: auto;">
         <!-- Medications will be listed here -->
       </div>
       
       <div style="margin-bottom: 15px;">
-        <input type="text" id="newMedName" placeholder="Medication name" style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 8px; margin-bottom: 10px; font-size: 1em;">
-        <input type="text" id="newMedDose" placeholder="Dosage (e.g., 10mg, twice daily)" style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1em;">
+        <input type="text" id="newMedName" placeholder="Medication name" data-i18n-placeholder="journal.mods.medNamePlaceholder" style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 8px; margin-bottom: 10px; font-size: 1em;">
+        <input type="text" id="newMedDose" placeholder="Dosage (e.g., 10mg, twice daily)" data-i18n-placeholder="journal.mods.medDosePlaceholder" style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1em;">
       </div>
       
       <div class="confirm-buttons">
-        <button class="confirm-btn" onclick="addMedication()" style="background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary);">Add Medication</button>
-        <button class="confirm-btn confirm-btn-no" onclick="closeMedicationModal()">Close</button>
+        <button class="confirm-btn" onclick="addMedication()" style="background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary);" data-i18n="journal.mods.addMed">Add Medication</button>
+        <button class="confirm-btn confirm-btn-no" onclick="closeMedicationModal()" data-i18n="common.close">Close</button>
       </div>
     </div>
   </div>
@@ -1009,15 +1009,15 @@
   <!-- Goals List Modal -->
   <div class="confirm-modal" id="goalsModal">
     <div class="confirm-content" style="max-width: 500px;">
-      <h3>🏅 Today's Goals</h3>
-      <p style="color: #6c757d; margin-bottom: 20px;">Your daily goals — track whether you hit them each day</p>
+      <h3 data-i18n="journal.mods.goalsTitle">🏅 Today's Goals</h3>
+      <p style="color: #6c757d; margin-bottom: 20px;" data-i18n="journal.mods.goalsDesc">Your daily goals — track whether you hit them each day</p>
       <div id="goalsList" style="margin-bottom: 20px; max-height: 300px; overflow-y: auto;"></div>
       <div style="margin-bottom: 15px;">
-        <input type="text" id="newGoalText" placeholder="New goal (e.g. Go to the gym)" style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1em; box-sizing: border-box;">
+        <input type="text" id="newGoalText" placeholder="New goal (e.g. Go to the gym)" data-i18n-placeholder="journal.mods.goalPlaceholder" style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1em; box-sizing: border-box;">
       </div>
       <div class="confirm-buttons">
-        <button class="confirm-btn" onclick="addGoal()" style="background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary);">Add Goal</button>
-        <button class="confirm-btn confirm-btn-no" onclick="closeGoalsModal()">Close</button>
+        <button class="confirm-btn" onclick="addGoal()" style="background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary);" data-i18n="journal.mods.addGoal">Add Goal</button>
+        <button class="confirm-btn confirm-btn-no" onclick="closeGoalsModal()" data-i18n="common.close">Close</button>
       </div>
     </div>
   </div>
@@ -1025,12 +1025,12 @@
   <!-- Budget Modal -->
   <div class="confirm-modal" id="budgetModal" onclick="if(event.target===this)closeBudgetModal()">
     <div class="confirm-content" style="max-width:400px;">
-      <h3 style="margin-bottom:8px;">💰 Daily Budget</h3>
-      <p style="color:#6c757d;font-size:0.88em;margin:0 0 16px;">Set a daily spending limit — you'll be asked if you kept to it when logging each entry.</p>
-      <input type="text" id="budgetInput" placeholder="e.g. £50 daily" onkeydown="if(event.key==='Enter')saveBudgetSetting()" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;box-sizing:border-box;outline:none;margin-bottom:16px;">
+      <h3 style="margin-bottom:8px;" data-i18n="journal.mods.budgetTitle">💰 Daily Budget</h3>
+      <p style="color:#6c757d;font-size:0.88em;margin:0 0 16px;" data-i18n="journal.mods.budgetDesc">Set a daily spending limit — you'll be asked if you kept to it when logging each entry.</p>
+      <input type="text" id="budgetInput" placeholder="e.g. £50 daily" data-i18n-placeholder="journal.mods.budgetPlaceholder" onkeydown="if(event.key==='Enter')saveBudgetSetting()" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;box-sizing:border-box;outline:none;margin-bottom:16px;">
       <div class="confirm-buttons">
-        <button class="confirm-btn confirm-btn-no" onclick="closeBudgetModal()">Cancel</button>
-        <button class="confirm-btn confirm-btn-yes" onclick="saveBudgetSetting()" style="background:var(--brand-primary);border-color:var(--brand-primary);color:white;">Save</button>
+        <button class="confirm-btn confirm-btn-no" onclick="closeBudgetModal()" data-i18n="common.cancel">Cancel</button>
+        <button class="confirm-btn confirm-btn-yes" onclick="saveBudgetSetting()" style="background:var(--brand-primary);border-color:var(--brand-primary);color:white;" data-i18n="common.save">Save</button>
       </div>
     </div>
   </div>
@@ -1038,16 +1038,16 @@
   <!-- Export Format Selection Modal -->
   <div class="confirm-modal" id="exportModal">
     <div class="confirm-content">
-      <h3>Choose Export Format</h3>
-      <p style="margin-bottom: 25px; color: #6c757d;">Select the format for your backup</p>
+      <h3 data-i18n="journal.mods.exportTitle">Choose Export Format</h3>
+      <p style="margin-bottom: 25px; color: #6c757d;" data-i18n="journal.mods.exportDesc">Select the format for your backup</p>
       <div class="confirm-buttons" style="flex-direction: column; gap: 15px;">
-        <button class="confirm-btn" onclick="document.getElementById('exportModal').classList.remove('active');exportData()" style="background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary); width: 100%;">
+        <button class="confirm-btn" onclick="document.getElementById('exportModal').classList.remove('active');exportData()" style="background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary); width: 100%;" data-i18n="journal.mods.exportJson">
           🐻 Bipolar Bear (.json)
         </button>
-        <button class="confirm-btn" onclick="document.getElementById('exportModal').classList.remove('active');exportDataCSV()" style="background: white; color: #51cf66; border: 2px solid #51cf66; width: 100%;">
+        <button class="confirm-btn" onclick="document.getElementById('exportModal').classList.remove('active');exportDataCSV()" style="background: white; color: #51cf66; border: 2px solid #51cf66; width: 100%;" data-i18n="journal.mods.exportCsv">
           📄 Open CSV (.csv)
         </button>
-        <button class="confirm-btn confirm-btn-no" onclick="document.getElementById('exportModal').classList.remove('active')" style="width: 100%;">Cancel</button>
+        <button class="confirm-btn confirm-btn-no" onclick="document.getElementById('exportModal').classList.remove('active')" style="width: 100%;" data-i18n="common.cancel">Cancel</button>
       </div>
     </div>
   </div>
@@ -1055,17 +1055,17 @@
   <!-- Import Format Selection Modal -->
   <div class="confirm-modal" id="importModal">
     <div class="confirm-content">
-      <h3>Choose Import Format</h3>
-      <p style="margin-bottom: 25px; color: #6c757d;">Select the format of your data file</p>
+      <h3 data-i18n="journal.mods.importTitle">Choose Import Format</h3>
+      <p style="margin-bottom: 25px; color: #6c757d;" data-i18n="journal.mods.importDesc">Select the format of your data file</p>
       <div class="confirm-buttons" style="flex-direction: column; gap: 15px;">
-        <button class="confirm-btn" onclick="selectImportFormat('bipolarbear')" style="background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary); width: 100%;">
+        <button class="confirm-btn" onclick="selectImportFormat('bipolarbear')" style="background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary); width: 100%;" data-i18n="journal.mods.importJson">
           🐻 BipolarBear Format (.json)
         </button>
-        <button class="confirm-btn" onclick="selectImportFormat('daylio')" style="background: white; color: #4dabf7; border: 2px solid #4dabf7; width: 100%;">
+        <button class="confirm-btn" onclick="selectImportFormat('daylio')" style="background: white; color: #4dabf7; border: 2px solid #4dabf7; width: 100%;" data-i18n="journal.mods.importDaylio">
           📊 Daylio Export (.csv)
         </button>
-        <button class="confirm-btn confirm-btn-no" onclick="closeImportModal()" style="width: 100%;">Cancel</button>
-        <button class="confirm-btn" onclick="closeImportModal();window.location.href='index.html#feedback'" style="background:white;color:#495057;border:2px solid #6c757d;width:100%;font-size:0.82em;">📣 Request a new import format</button>
+        <button class="confirm-btn confirm-btn-no" onclick="closeImportModal()" style="width: 100%;" data-i18n="common.cancel">Cancel</button>
+        <button class="confirm-btn" onclick="closeImportModal();window.location.href='index.html#feedback'" style="background:white;color:#495057;border:2px solid #6c757d;width:100%;font-size:0.82em;" data-i18n="journal.mods.importRequest">📣 Request a new import format</button>
       </div>
     </div>
   </div>
@@ -1214,19 +1214,19 @@
       <div style="font-size:1.8em; margin-bottom:10px;">😴</div>
       <!-- Native content -->
       <div id="sleepSyncNative">
-        <div style="font-weight:600; font-size:1.05em; margin-bottom:8px;">Import health data</div>
-        <p style="color:#6c757d; font-size:0.9em; margin-bottom:16px;">Import data from your phone's health app.</p>
+        <div style="font-weight:600; font-size:1.05em; margin-bottom:8px;" data-i18n="journal.mods.importHealthTitle">Import health data</div>
+        <p style="color:#6c757d; font-size:0.9em; margin-bottom:16px;" data-i18n="journal.mods.importHealthDesc">Import data from your phone's health app.</p>
         <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:4px;">
-          <button class="confirm-btn" onclick="doSleepOnlySync()" style="background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);">😴 Import sleep</button>
-          <button class="confirm-btn confirm-btn-no" onclick="closeSleepSyncModal()">Close</button>
+          <button class="confirm-btn" onclick="doSleepOnlySync()" style="background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);" data-i18n="journal.mods.importSleep">😴 Import sleep</button>
+          <button class="confirm-btn confirm-btn-no" onclick="closeSleepSyncModal()" data-i18n="common.close">Close</button>
         </div>
       </div>
       <!-- Web content -->
       <div id="sleepSyncWeb" style="display:none;">
-        <div style="font-weight:600; font-size:1.05em; margin-bottom:8px;">Mobile app only</div>
-        <p style="color:#6c757d; font-size:0.9em; margin-bottom:20px;">Sleep data can only be synced on the mobile app.</p>
+        <div style="font-weight:600; font-size:1.05em; margin-bottom:8px;" data-i18n="journal.mods.mobileOnly">Mobile app only</div>
+        <p style="color:#6c757d; font-size:0.9em; margin-bottom:20px;" data-i18n="journal.mods.sleepMobileOnly">Sleep data can only be synced on the mobile app.</p>
         <div class="confirm-buttons">
-          <button class="confirm-btn confirm-btn-no" onclick="closeSleepSyncModal()">Close</button>
+          <button class="confirm-btn confirm-btn-no" onclick="closeSleepSyncModal()" data-i18n="common.close">Close</button>
         </div>
       </div>
     </div>
@@ -1237,18 +1237,18 @@
     <div class="confirm-content" style="max-width:320px; text-align:center;">
       <div style="font-size:1.8em; margin-bottom:10px;">⚡</div>
       <div id="energySyncNative">
-        <div style="font-weight:600; font-size:1.05em; margin-bottom:8px;">Import health data</div>
-        <p style="color:#6c757d; font-size:0.9em; margin-bottom:16px;">Import data from your phone's health app.</p>
+        <div style="font-weight:600; font-size:1.05em; margin-bottom:8px;" data-i18n="journal.mods.importHealthTitle">Import health data</div>
+        <p style="color:#6c757d; font-size:0.9em; margin-bottom:16px;" data-i18n="journal.mods.importHealthDesc">Import data from your phone's health app.</p>
         <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:4px;">
-          <button class="confirm-btn" onclick="doStepsOnlySync()" style="background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);">🏃 Import steps</button>
-          <button class="confirm-btn confirm-btn-no" onclick="closeEnergySyncModal()">Close</button>
+          <button class="confirm-btn" onclick="doStepsOnlySync()" style="background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);" data-i18n="journal.mods.importSteps">🏃 Import steps</button>
+          <button class="confirm-btn confirm-btn-no" onclick="closeEnergySyncModal()" data-i18n="common.close">Close</button>
         </div>
       </div>
       <div id="energySyncWeb" style="display:none;">
-        <div style="font-weight:600; font-size:1.05em; margin-bottom:8px;">Mobile app only</div>
-        <p style="color:#6c757d; font-size:0.9em; margin-bottom:20px;">Step data can only be synced on the mobile app.</p>
+        <div style="font-weight:600; font-size:1.05em; margin-bottom:8px;" data-i18n="journal.mods.mobileOnly">Mobile app only</div>
+        <p style="color:#6c757d; font-size:0.9em; margin-bottom:20px;" data-i18n="journal.mods.stepMobileOnly">Step data can only be synced on the mobile app.</p>
         <div class="confirm-buttons">
-          <button class="confirm-btn confirm-btn-no" onclick="closeEnergySyncModal()">Close</button>
+          <button class="confirm-btn confirm-btn-no" onclick="closeEnergySyncModal()" data-i18n="common.close">Close</button>
         </div>
       </div>
     </div>
@@ -1260,25 +1260,25 @@
 
       <!-- MAIN SETTINGS PANEL -->
       <div id="settingsMainPanel" style="position:relative;">
-        <h3>⚙️ Settings</h3>
+        <h3 data-i18n="journal.settings.title">⚙️ Settings</h3>
         <div style="text-align:center;margin:-4px 0 16px;">
           <img id="settingsLogoImg" src="images/logos/good_logo.png" alt="" style="width:80px;height:80px;object-fit:contain;">
         </div>
 
         <!-- Web/PWA message (shown when not in native app) -->
         <div id="settingsWebContent" style="display: none; text-align: center; padding: 10px 0 20px;">
-          <div style="font-weight: 600; font-size: 1.1em; color: #495057; margin-bottom: 10px;">
+          <div style="font-weight: 600; font-size: 1.1em; color: #495057; margin-bottom: 10px;" data-i18n="journal.settings.fullExp">
             Get the Full Experience
           </div>
-          <div style="color: #6c757d; font-size: 0.95em; line-height: 1.6; margin-bottom: 20px;">
+          <div style="color: #6c757d; font-size: 0.95em; line-height: 1.6; margin-bottom: 20px;" data-i18n="journal.settings.fullExpDesc">
             Download the BipolarBear app for daily reminders, haptic feedback, and more native features.
           </div>
           <div style="display: flex; flex-direction: column; gap: 10px;">
             <a href="https://apps.apple.com/gb/app/bipolar-bear/id6766637453" target="_blank" rel="noopener" style="display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px 20px; background: #000; color: white; border-radius: 10px; text-decoration: none; font-weight: 600;">
-              🍎 Download on App Store
+              <span data-i18n="journal.settings.appStore">🍎 Download on App Store</span>
             </a>
             <a href="https://play.google.com/store/apps/details?id=com.bipolarbear.app" target="_blank" rel="noopener" style="display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px 20px; background: #01875f; color: white; border-radius: 10px; text-decoration: none; font-weight: 600;">
-              🤖 Get it on Google Play
+              <span data-i18n="journal.settings.googlePlay">🤖 Get it on Google Play</span>
             </a>
           </div>
         </div>
@@ -1291,8 +1291,8 @@
           <details id="customiseFormDetails" ontoggle="if(this.open){_onCustomiseDetailsOpen();localStorage.removeItem('bbCustomiseFormCollapsed');}else{localStorage.setItem('bbCustomiseFormCollapsed','1');}">
             <summary style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;padding:2px 0;">
               <div>
-                <div style="font-weight:600;color:#495057;font-size:0.95em;">📋 Customise form</div>
-                <div style="color:#6c757d;font-size:0.82em;margin-top:2px;">Choose which fields appear</div>
+                <div style="font-weight:600;color:#495057;font-size:0.95em;" data-i18n="journal.settings.customise">📋 Customise form</div>
+                <div style="color:#6c757d;font-size:0.82em;margin-top:2px;" data-i18n="journal.settings.customiseDesc">Choose which fields appear</div>
               </div>
               <span style="color:#6c757d;font-size:1em;line-height:1;">▸</span>
             </summary>
@@ -1301,19 +1301,19 @@
         </div>
 
         <div style="text-align: center; display: flex; justify-content: center; gap: 16px; margin-bottom: 14px;">
-          <button onclick="showAchievementsPanel()" style="background: none; border: none; color: #6c757d; font-size: 0.82em; cursor: pointer; padding: 4px 8px; letter-spacing: 0.02em;">🏅 Achievements</button>
+          <button onclick="showAchievementsPanel()" style="background: none; border: none; color: #6c757d; font-size: 0.82em; cursor: pointer; padding: 4px 8px; letter-spacing: 0.02em;" data-i18n="journal.settings.achievements">🏅 Achievements</button>
           <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
             <div id="advancedSettingsBadgeHint" style="display:none;flex-direction:row;align-items:center;gap:3px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-bottom:2px;">
               <span style="font-size:0.78em;font-weight:700;font-style:italic;color:var(--brand-primary);font-family:'Georgia',serif;" data-i18n="journal.hint.clickHere">🐻 Click here</span>
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><line x1="8" y1="2" x2="8" y2="13" stroke="var(--brand-primary)" stroke-width="2.5" stroke-linecap="round"/><polyline points="3,8 8,13 13,8" stroke="var(--brand-primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
             </div>
-            <button id="advancedSettingsBtn" onclick="openAdvancedSettings()" style="background: none; border: none; color: #6c757d; font-size: 0.82em; cursor: pointer; padding: 4px 8px; letter-spacing: 0.02em;">🛠️ Advanced ▸</button>
+            <button id="advancedSettingsBtn" onclick="openAdvancedSettings()" style="background: none; border: none; color: #6c757d; font-size: 0.82em; cursor: pointer; padding: 4px 8px; letter-spacing: 0.02em;" data-i18n="journal.settings.advanced">🛠️ Advanced ▸</button>
           </div>
         </div>
 
         <!-- Guest-only: signing in is optional and only backs up data (hidden once signed in) -->
-        <button id="settingsGuestSignIn" onclick="closeSettingsModal();window.showAuthModal&&window.showAuthModal()" style="display:none;width:100%;padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:10px;font-size:0.92em;font-weight:700;cursor:pointer;margin-bottom:6px;-webkit-tap-highlight-color:transparent;">☁️ Sign in to back up your data</button>
-        <div id="settingsGuestSignInNote" style="display:none;color:#6c757d;font-size:0.78em;text-align:center;margin-bottom:14px;">Optional — everything works without an account. Sign in to sync across devices.</div>
+        <button id="settingsGuestSignIn" onclick="closeSettingsModal();window.showAuthModal&&window.showAuthModal()" style="display:none;width:100%;padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:10px;font-size:0.92em;font-weight:700;cursor:pointer;margin-bottom:6px;-webkit-tap-highlight-color:transparent;" data-i18n="journal.settings.guestSignIn">☁️ Sign in to back up your data</button>
+        <div id="settingsGuestSignInNote" style="display:none;color:#6c757d;font-size:0.78em;text-align:center;margin-bottom:14px;" data-i18n="journal.settings.guestSignInNote">Optional — everything works without an account. Sign in to sync across devices.</div>
 
         <div style="margin-top:4px;text-align:center;">
           <div style="color: #6c757d; font-size: 0.78em; line-height: 1.8;">
@@ -1330,7 +1330,7 @@
       <div id="settingsMobilePanel" style="display: none; text-align: left;">
         <div style="display:flex;align-items:center;margin-bottom:16px;">
           <div style="min-width:52px;"></div>
-          <h3 style="margin:0;flex:1;text-align:center;">Mobile Settings</h3>
+          <h3 style="margin:0;flex:1;text-align:center;" data-i18n="journal.settings.mobileTitle">Mobile Settings</h3>
           <div style="min-width:52px;"></div>
         </div>
 
@@ -1338,17 +1338,17 @@
 
         <!-- Daily Reminder -->
         <div style="margin-bottom: 24px;">
-          <div style="font-weight: 600; margin-bottom: 8px; color: #495057;">🔔 Daily Mood Reminder</div>
+          <div style="font-weight: 600; margin-bottom: 8px; color: #495057;" data-i18n="journal.settings.dailyReminder">🔔 Daily Mood Reminder</div>
           <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
-            <label style="flex: 1; color: #6c757d; font-size: 0.95em;">Remind me at:</label>
+            <label style="flex: 1; color: #6c757d; font-size: 0.95em;" data-i18n="journal.settings.remindAt">Remind me at:</label>
             <input type="time" id="reminderTime" value="07:00" onchange="_persistReminderSettings()" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1em; color: #495057;">
           </div>
           <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
-            <label for="reminderEnabled" style="flex: 1; color: #6c757d; font-size: 0.95em; cursor: pointer;">Reminders on:</label>
+            <label for="reminderEnabled" style="flex: 1; color: #6c757d; font-size: 0.95em; cursor: pointer;" data-i18n="journal.settings.remindersOn">Reminders on:</label>
             <label class="bb-switch"><input type="checkbox" id="reminderEnabled" onchange="_onReminderToggleChange()"><span class="bb-slider"></span></label>
           </div>
           <div style="display: flex; align-items: center; gap: 12px;">
-            <label for="weeklySummaryEnabled" style="flex: 1; color: #6c757d; font-size: 0.95em; cursor: pointer;">Weekly summary (Sundays):</label>
+            <label for="weeklySummaryEnabled" style="flex: 1; color: #6c757d; font-size: 0.95em; cursor: pointer;" data-i18n="journal.settings.weeklySummary">Weekly summary (Sundays):</label>
             <label class="bb-switch"><input type="checkbox" id="weeklySummaryEnabled" onchange="_onWeeklyToggleChange()" checked><span class="bb-slider"></span></label>
           </div>
         </div>
@@ -1369,8 +1369,8 @@
         <hr style="border: none; border-top: 1px solid #e9ecef; margin-bottom: 20px;">
 
         <div style="display:flex;gap:10px;">
-          <button onclick="closeMobileSettings()" style="flex:1;background:rgba(255,149,0,0.1);border:1.5px solid var(--brand-primary);color:var(--brand-primary);font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">← Back</button>
-          <button onclick="_openFocusModeSettings()" style="flex:1;background:rgba(108,117,125,0.08);border:1.5px solid #adb5bd;color:#495057;font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">Focus Mode →</button>
+          <button onclick="closeMobileSettings()" style="flex:1;background:rgba(255,149,0,0.1);border:1.5px solid var(--brand-primary);color:var(--brand-primary);font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;" data-i18n="common.back">← Back</button>
+          <button onclick="_openFocusModeSettings()" style="flex:1;background:rgba(108,117,125,0.08);border:1.5px solid #adb5bd;color:#495057;font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;" data-i18n="journal.settings.focusModeBtn">Focus Mode →</button>
         </div>
 
         <div style="margin-top:16px;text-align:center;">
@@ -1383,7 +1383,7 @@
       <div id="settingsAdvancedPanel" style="display: none; text-align: left;">
         <div style="display:flex;align-items:center;margin-bottom:16px;">
           <div style="min-width:52px;"></div>
-          <h3 style="margin:0;flex:1;text-align:center;">Focus Mode</h3>
+          <h3 style="margin:0;flex:1;text-align:center;" data-i18n="journal.settings.focusModeTitle">Focus Mode</h3>
           <div style="min-width:52px;"></div>
         </div>
 
@@ -1392,8 +1392,8 @@
         <div style="border: 1.5px solid #e9ecef; border-radius: 12px; padding: 12px 14px; margin-bottom: 16px;">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0;">
             <div>
-              <div style="font-weight: 600; color: #495057; font-size: 0.95em;">🎯 Focus mode</div>
-              <div style="color: #6c757d; font-size: 0.82em; margin-top: 2px;">Only one question at a time</div>
+              <div style="font-weight: 600; color: #495057; font-size: 0.95em;" data-i18n="journal.settings.focusMode">🎯 Focus mode</div>
+              <div style="color: #6c757d; font-size: 0.82em; margin-top: 2px;" data-i18n="journal.settings.focusModeDesc">Only one question at a time</div>
             </div>
             <label class="bb-switch"><input type="checkbox" id="focusModeToggle" onchange="_toggleFocusedMode()"><span class="bb-slider"></span></label>
           </div>
@@ -1401,15 +1401,15 @@
           <div id="focusModeSubOptions" style="display:none; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e9ecef;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
               <div>
-                <div style="font-weight: 600; color: #495057; font-size: 0.95em;">⏸ Confirm each step</div>
-                <div style="color: #6c757d; font-size: 0.82em; margin-top: 2px;">Show a Next button instead of auto-advancing</div>
+                <div style="font-weight: 600; color: #495057; font-size: 0.95em;" data-i18n="journal.settings.confirmStep">⏸ Confirm each step</div>
+                <div style="color: #6c757d; font-size: 0.82em; margin-top: 2px;" data-i18n="journal.settings.confirmStepDesc">Show a Next button instead of auto-advancing</div>
               </div>
               <label class="bb-switch"><input type="checkbox" id="fmConfirmStepToggle" onchange="_toggleFmConfirmStep()"><span class="bb-slider"></span></label>
             </div>
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0;">
               <div>
-                <div style="font-weight: 600; color: #495057; font-size: 0.95em;">📝 Elaborate Responses</div>
-                <div style="color: #6c757d; font-size: 0.82em; margin-top: 2px;">Add optional notes to each step &amp; set tomorrow's intention</div>
+                <div style="font-weight: 600; color: #495057; font-size: 0.95em;" data-i18n="journal.settings.elaborate">📝 Elaborate Responses</div>
+                <div style="color: #6c757d; font-size: 0.82em; margin-top: 2px;" data-i18n="journal.settings.elaborateDesc">Add optional notes to each step &amp; set tomorrow's intention</div>
               </div>
               <label class="bb-switch"><input type="checkbox" id="elaborateResponsesToggle" onchange="_toggleElaborateResponses()"><span class="bb-slider"></span></label>
             </div>
@@ -1419,8 +1419,8 @@
         <hr style="border: none; border-top: 1px solid #e9ecef; margin-bottom: 16px;">
 
         <div style="display:flex;gap:10px;">
-          <button onclick="closeAdvancedSettings()" style="flex:1;background:rgba(255,149,0,0.1);border:1.5px solid var(--brand-primary);color:var(--brand-primary);font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">← Back</button>
-          <button onclick="openAdvancedJournal()" style="flex:1;background:rgba(108,117,125,0.08);border:1.5px solid #adb5bd;color:#495057;font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">Journal →</button>
+          <button onclick="closeAdvancedSettings()" style="flex:1;background:rgba(255,149,0,0.1);border:1.5px solid var(--brand-primary);color:var(--brand-primary);font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;" data-i18n="common.back">← Back</button>
+          <button onclick="openAdvancedJournal()" style="flex:1;background:rgba(108,117,125,0.08);border:1.5px solid #adb5bd;color:#495057;font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;" data-i18n="journal.settings.journalBtn">Journal →</button>
         </div>
 
         <div style="margin-top:16px;text-align:center;">
@@ -1437,7 +1437,7 @@
       <div id="settingsAdvancedJournalPanel" style="display: none; text-align: left;">
         <div style="display:flex;align-items:center;margin-bottom:16px;">
           <div style="min-width:52px;"></div>
-          <h3 style="margin:0;flex:1;text-align:center;">Journal Options</h3>
+          <h3 style="margin:0;flex:1;text-align:center;" data-i18n="journal.settings.journalOptions">Journal Options</h3>
           <div style="min-width:52px;"></div>
         </div>
 
@@ -1453,24 +1453,24 @@
 
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
           <div>
-            <div style="font-weight: 600; color: #495057; font-size: 0.95em;">🔗 Mood Linking</div>
-            <div style="color: #6c757d; font-size: 0.82em; margin-top: 2px;">Experimental: Link two moods to show a variation in mood</div>
+            <div style="font-weight: 600; color: #495057; font-size: 0.95em;" data-i18n="journal.settings.moodLinking">🔗 Mood Linking</div>
+            <div style="color: #6c757d; font-size: 0.82em; margin-top: 2px;" data-i18n="journal.settings.moodLinkingDesc">Experimental: Link two moods to show a variation in mood</div>
           </div>
           <label class="bb-switch"><input type="checkbox" id="moodLinkingToggle" onchange="_toggleMoodLinking()"><span class="bb-slider"></span></label>
         </div>
 
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
           <div>
-            <div style="font-weight: 600; color: #495057; font-size: 0.95em;">🐻 Bear suggested mood</div>
-            <div style="color: #6c757d; font-size: 0.82em; margin-top: 2px;">Experimental: Suggest a mood state before saving</div>
+            <div style="font-weight: 600; color: #495057; font-size: 0.95em;" data-i18n="journal.settings.bearSuggested">🐻 Bear suggested mood</div>
+            <div style="color: #6c757d; font-size: 0.82em; margin-top: 2px;" data-i18n="journal.settings.bearSuggestedDesc">Experimental: Suggest a mood state before saving</div>
           </div>
           <label class="bb-switch"><input type="checkbox" id="moodSuggestionToggle" onchange="_toggleMoodSuggestion()"><span class="bb-slider"></span></label>
         </div>
 
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
           <div>
-            <div style="font-weight: 600; color: #495057; font-size: 0.95em;">🕵️ Incognito Mode</div>
-            <div style="color: #6c757d; font-size: 0.82em; margin-top: 2px;">Hide entries from PDF export by default</div>
+            <div style="font-weight: 600; color: #495057; font-size: 0.95em;" data-i18n="journal.settings.incognito">🕵️ Incognito Mode</div>
+            <div style="color: #6c757d; font-size: 0.82em; margin-top: 2px;" data-i18n="journal.settings.incognitoDesc">Hide entries from PDF export by default</div>
           </div>
           <label class="bb-switch"><input type="checkbox" id="incognitoModeToggle" onchange="_toggleIncognitoMode()"><span class="bb-slider"></span></label>
         </div>
@@ -1478,8 +1478,8 @@
         <hr style="border: none; border-top: 1px solid #e9ecef; margin-bottom: 16px;">
 
         <div style="display:flex;gap:10px;">
-          <button onclick="closeAdvancedJournal()" style="flex:1;background:rgba(255,149,0,0.1);border:1.5px solid var(--brand-primary);color:var(--brand-primary);font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">← Back</button>
-          <button onclick="openAdvancedMore()" style="flex:1;background:rgba(108,117,125,0.08);border:1.5px solid #adb5bd;color:#495057;font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">More →</button>
+          <button onclick="closeAdvancedJournal()" style="flex:1;background:rgba(255,149,0,0.1);border:1.5px solid var(--brand-primary);color:var(--brand-primary);font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;" data-i18n="common.back">← Back</button>
+          <button onclick="openAdvancedMore()" style="flex:1;background:rgba(108,117,125,0.08);border:1.5px solid #adb5bd;color:#495057;font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;" data-i18n="journal.settings.moreBtn">More →</button>
         </div>
 
         <div style="margin-top:16px;text-align:center;">
@@ -1496,7 +1496,7 @@
       <div id="settingsAdvancedMorePanel" style="display: none; text-align: left;">
         <div style="display:flex;align-items:center;margin-bottom:16px;">
           <div style="min-width:52px;"></div>
-          <h3 style="margin:0;flex:1;text-align:center;">Stats</h3>
+          <h3 style="margin:0;flex:1;text-align:center;" data-i18n="journal.settings.statsTitle">Stats</h3>
           <div style="min-width:52px;"></div>
         </div>
 
@@ -1504,18 +1504,18 @@
 
         <!-- Stats Start Date -->
         <div style="margin-bottom: 16px;">
-          <div style="font-weight: 600; margin-bottom: 6px; color: #495057; font-size: 0.95em;">🗓️ All-Time Stats Start Date</div>
-          <div style="color: #6c757d; font-size: 0.82em; margin-bottom: 8px;">Stats, charts and PDF all-time column will start from this date without deleting old entries.</div>
+          <div style="font-weight: 600; margin-bottom: 6px; color: #495057; font-size: 0.95em;" data-i18n="journal.settings.statsStartDate">🗓️ All-Time Stats Start Date</div>
+          <div style="color: #6c757d; font-size: 0.82em; margin-bottom: 8px;" data-i18n="journal.settings.statsStartDateDesc">Stats, charts and PDF all-time column will start from this date without deleting old entries.</div>
           <div style="display: flex; gap: 8px; align-items: center;">
             <input type="date" id="statsStartDateInput" style="flex: 1; padding: 8px 10px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em; color: #495057;">
-            <button onclick="clearStatsStartDate()" style="padding: 8px 12px; background: white; color: #6c757d; border: 2px solid #e9ecef; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 600; white-space: nowrap;">Clear</button>
-            <button onclick="saveStatsStartDate()" class="btn-outline-orange" style="padding: 8px 12px; background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary); border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 600; white-space: nowrap;">Save</button>
+            <button onclick="clearStatsStartDate()" style="padding: 8px 12px; background: white; color: #6c757d; border: 2px solid #e9ecef; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 600; white-space: nowrap;" data-i18n="journal.settings.clear">Clear</button>
+            <button onclick="saveStatsStartDate()" class="btn-outline-orange" style="padding: 8px 12px; background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary); border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 600; white-space: nowrap;" data-i18n="common.save">Save</button>
           </div>
         </div>
 
         <div style="display:flex;gap:10px;">
-          <button onclick="closeAdvancedMore()" style="flex:1;background:rgba(255,149,0,0.1);border:1.5px solid var(--brand-primary);color:var(--brand-primary);font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">← Back</button>
-          <button onclick="openAdvancedMore2()" style="flex:1;background:rgba(108,117,125,0.08);border:1.5px solid #adb5bd;color:#495057;font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">Delete →</button>
+          <button onclick="closeAdvancedMore()" style="flex:1;background:rgba(255,149,0,0.1);border:1.5px solid var(--brand-primary);color:var(--brand-primary);font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;" data-i18n="common.back">← Back</button>
+          <button onclick="openAdvancedMore2()" style="flex:1;background:rgba(108,117,125,0.08);border:1.5px solid #adb5bd;color:#495057;font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;" data-i18n="journal.settings.deleteBtn">Delete →</button>
         </div>
 
         <div style="margin-top:16px;text-align:center;">
@@ -1532,25 +1532,25 @@
       <div id="settingsAdvancedMore2Panel" style="display: none; text-align: left;">
         <div style="display:flex;align-items:center;margin-bottom:16px;">
           <div style="min-width:52px;"></div>
-          <h3 style="margin:0;flex:1;text-align:center;">Danger Zone</h3>
+          <h3 style="margin:0;flex:1;text-align:center;" data-i18n="journal.settings.dangerTitle">Danger Zone</h3>
           <div style="min-width:52px;"></div>
         </div>
 
         <hr style="border: none; border-top: 1px solid #e9ecef; margin-bottom: 16px;">
 
         <div id="fullResetSection" style="margin-bottom: 16px;">
-          <div style="font-weight: 600; margin-bottom: 6px; color: #495057; font-size: 0.95em;">🗑️ Full Reset</div>
-          <div style="color: #6c757d; font-size: 0.82em; margin-bottom: 10px;">Permanently delete all journal entries and reset all settings to their defaults. This cannot be undone.</div>
-          <button onclick="closeSettingsModal(); confirmDeleteAll();" style="width:100%;background:rgba(201,42,42,0.08);border:1.5px solid #c92a2a;color:#c92a2a;font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">🗑️ Delete All Data &amp; Reset Settings</button>
+          <div style="font-weight: 600; margin-bottom: 6px; color: #495057; font-size: 0.95em;" data-i18n="journal.settings.fullReset">🗑️ Full Reset</div>
+          <div style="color: #6c757d; font-size: 0.82em; margin-bottom: 10px;" data-i18n="journal.settings.fullResetDesc">Permanently delete all journal entries and reset all settings to their defaults. This cannot be undone.</div>
+          <button onclick="closeSettingsModal(); confirmDeleteAll();" style="width:100%;background:rgba(201,42,42,0.08);border:1.5px solid #c92a2a;color:#c92a2a;font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;" data-i18n="journal.settings.fullResetBtn">🗑️ Delete All Data &amp; Reset Settings</button>
         </div>
         <div id="fullResetLocked" style="display:none;margin-bottom:16px;">
-          <div style="font-weight:600;margin-bottom:6px;color:#495057;font-size:0.95em;">🗑️ Full Reset</div>
-          <div style="color:#6c757d;font-size:0.82em;padding:10px;border:1.5px solid #dee2e6;border-radius:20px;text-align:center;">🔒 Account cannot be deleted</div>
+          <div style="font-weight:600;margin-bottom:6px;color:#495057;font-size:0.95em;" data-i18n="journal.settings.fullReset">🗑️ Full Reset</div>
+          <div style="color:#6c757d;font-size:0.82em;padding:10px;border:1.5px solid #dee2e6;border-radius:20px;text-align:center;" data-i18n="account.deleteLocked">🔒 Account cannot be deleted</div>
         </div>
 
         <hr style="border: none; border-top: 1px solid #e9ecef; margin-bottom: 16px;">
 
-        <button onclick="closeAdvancedMore2()" style="width:100%;background:rgba(255,149,0,0.1);border:1.5px solid var(--brand-primary);color:var(--brand-primary);font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;">← Back</button>
+        <button onclick="closeAdvancedMore2()" style="width:100%;background:rgba(255,149,0,0.1);border:1.5px solid var(--brand-primary);color:var(--brand-primary);font-size:0.9em;cursor:pointer;padding:10px;font-weight:600;border-radius:20px;" data-i18n="common.back">← Back</button>
 
         <div style="margin-top:16px;text-align:center;">
           <div style="color: #6c757d; font-size: 0.78em; line-height: 1.8;">
@@ -1564,11 +1564,11 @@
 
       <!-- ACHIEVEMENTS PANEL -->
       <div id="settingsAchievementsPanel" style="display: none;">
-        <h3 style="margin: 0 0 4px; text-align: center;">🏅 Achievements</h3>
+        <h3 style="margin: 0 0 4px; text-align: center;" data-i18n="journal.settings.achievements">🏅 Achievements</h3>
         <div id="achievementsCount" style="text-align:center;color:#6c757d;font-size:0.85em;margin-bottom:16px;"></div>
         <div id="achievementsGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-height:calc(85dvh - 240px);overflow-y:auto;overflow-x:hidden;"></div>
         <button id="achNotifToggleBtn" onclick="toggleAchievementNotifications()" style="margin-top: 16px; width: 100%; background: white; color: #6c757d; border: 1.5px solid #dee2e6; font-size: 0.85em; cursor: pointer; padding: 9px; font-weight: 600; border-radius: 20px;"></button>
-        <button onclick="closeAchievementsPanel()" style="margin-top: 10px; width: 100%; background: rgba(255,149,0,0.1); border: 1.5px solid var(--brand-primary); color: var(--brand-primary); font-size: 0.9em; cursor: pointer; padding: 10px; font-weight: 600; border-radius: 20px;">← Back</button>
+        <button onclick="closeAchievementsPanel()" style="margin-top: 10px; width: 100%; background: rgba(255,149,0,0.1); border: 1.5px solid var(--brand-primary); color: var(--brand-primary); font-size: 0.9em; cursor: pointer; padding: 10px; font-weight: 600; border-radius: 20px;" data-i18n="common.back">← Back</button>
       </div>
 
     </div>
@@ -1581,7 +1581,7 @@
       <div class="confirm-buttons" style="margin-top:16px;">
         <button id="calDayDeleteBtn" class="confirm-btn confirm-btn-yes" style="display:none;" onclick="deleteFromCalDay()">🗑️</button>
         <button id="calDayEditBtn" class="confirm-btn confirm-btn-no" style="display:none;" onclick="closeCalDayModal();openEditInForm(window._calDayEntry)">✏️</button>
-        <button class="confirm-btn confirm-btn-no" onclick="closeCalDayModal()">Close</button>
+        <button class="confirm-btn confirm-btn-no" onclick="closeCalDayModal()" data-i18n="common.close">Close</button>
       </div>
     </div>
   </div>
@@ -1589,28 +1589,28 @@
   <!-- Personal Details Modal -->
   <div class="confirm-modal" id="personalDetailsModal">
     <div class="confirm-content" style="max-width: 420px; max-height: 90vh; overflow-y: auto;">
-      <h3>👤 Personal Details</h3>
-      
-      <div style="color: #6c757d; font-size: 0.85em; margin-bottom: 16px; font-style: italic;">
+      <h3 data-i18n="pd.title">👤 Personal Details</h3>
+
+      <div style="color: #6c757d; font-size: 0.85em; margin-bottom: 16px; font-style: italic;" data-i18n="pd.subtitle">
         All fields are optional. This information will appear on exported PDF reports for your healthcare provider.
       </div>
-      
+
       <div style="display: grid; gap: 10px;">
-        <input type="text" id="personalName" placeholder="Name" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
-        <input type="text" id="personalDOB" placeholder="Date of Birth (e.g., 15 Jan 1990)" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
-        <input type="text" id="personalMedicalNum" placeholder="Medical # / NHS Number" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
-        <input type="text" id="personalDiagnosis" placeholder="Diagnosed as (e.g., Bipolar I, Bipolar II)" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
-        <input type="text" id="personalDiagnosisDate" placeholder="Diagnosis Date (e.g., March 2020)" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
-        <input type="text" id="personalAddress" placeholder="Address" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
-        <input type="tel" id="personalMobile" placeholder="Mobile Number" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
-        <input type="email" id="personalEmail" placeholder="Email" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
-        <input type="text" id="personalEmergencyContact" placeholder="Emergency Contact (name & number)" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
-        <textarea id="personalNotes" placeholder="Notes (optional)" rows="3" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em; resize: vertical; font-family: inherit;"></textarea>
+        <input type="text" id="personalName" placeholder="Name" data-i18n-placeholder="pd.name" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
+        <input type="text" id="personalDOB" placeholder="Date of Birth (e.g., 15 Jan 1990)" data-i18n-placeholder="pd.dob" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
+        <input type="text" id="personalMedicalNum" placeholder="Medical # / NHS Number" data-i18n-placeholder="pd.medNum" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
+        <input type="text" id="personalDiagnosis" placeholder="Diagnosed as (e.g., Bipolar I, Bipolar II)" data-i18n-placeholder="pd.diagnosis" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
+        <input type="text" id="personalDiagnosisDate" placeholder="Diagnosis Date (e.g., March 2020)" data-i18n-placeholder="pd.diagDate" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
+        <input type="text" id="personalAddress" placeholder="Address" data-i18n-placeholder="pd.address" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
+        <input type="tel" id="personalMobile" placeholder="Mobile Number" data-i18n-placeholder="pd.mobile" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
+        <input type="email" id="personalEmail" placeholder="Email" data-i18n-placeholder="pd.email" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
+        <input type="text" id="personalEmergencyContact" placeholder="Emergency Contact (name & number)" data-i18n-placeholder="pd.emergency" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
+        <textarea id="personalNotes" placeholder="Notes (optional)" data-i18n-placeholder="pd.notes" rows="3" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em; resize: vertical; font-family: inherit;"></textarea>
       </div>
 
       <div class="confirm-buttons" style="margin-top: 20px;">
-        <button class="confirm-btn" onclick="savePersonalDetails()" style="background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary);">Save</button>
-        <button class="confirm-btn confirm-btn-no" onclick="closePersonalDetailsModal()">Close</button>
+        <button class="confirm-btn" onclick="savePersonalDetails()" style="background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary);" data-i18n="common.save">Save</button>
+        <button class="confirm-btn confirm-btn-no" onclick="closePersonalDetailsModal()" data-i18n="common.close">Close</button>
       </div>
     </div>
   </div>
@@ -1618,25 +1618,25 @@
   <!-- Field Picker Modal -->
   <div class="confirm-modal" id="fieldPickerModal" style="background:rgba(0,0,0,0.72);" onclick="if(event.target===this)closeFieldPicker()">
     <div class="confirm-content" style="max-width:340px;display:flex;flex-direction:column;max-height:82dvh;overflow:hidden;">
-      <h3 style="margin-bottom:4px;">📊 Track Data</h3>
-      <p style="color:#6c757d;font-size:0.82em;margin-bottom:14px;">Choose which fields to show when logging.</p>
+      <h3 style="margin-bottom:4px;" data-i18n="journal.mods.fieldPickerTitle">📊 Track Data</h3>
+      <p style="color:#6c757d;font-size:0.82em;margin-bottom:14px;" data-i18n="journal.mods.fieldPickerDesc">Choose which fields to show when logging.</p>
       <div id="fieldPickerList" style="flex:1;min-height:0;display:flex;flex-direction:column;gap:2px;text-align:left;overflow-y:auto;box-shadow:inset 0 -16px 12px -12px rgba(0,0,0,0.06);"></div>
       <!-- Add new field form — outside the scrollable list so it's always accessible -->
       <div id="fieldPickerAddRow" style="flex-shrink:0;padding:8px 0 2px;border-top:1px solid #f0f0f0;margin-top:4px;"></div>
       <div class="confirm-buttons" style="margin-top:10px;flex-shrink:0;">
-        <button class="confirm-btn confirm-btn-no" onclick="closeFieldPicker()">Done</button>
+        <button class="confirm-btn confirm-btn-no" onclick="closeFieldPicker()" data-i18n="journal.mods.done">Done</button>
       </div>
     </div>
   </div>
 
   <div class="confirm-modal" id="deleteCustomFieldModal" style="z-index:1200;">
     <div class="confirm-content" style="max-width:340px;">
-      <h3>Remove Field?</h3>
+      <h3 data-i18n="journal.mods.removeFieldTitle">Remove Field?</h3>
       <p id="deleteCustomFieldMsg" style="font-size:0.88em;color:#495057;margin-bottom:6px;"></p>
-      <p style="font-size:0.82em;color:#dc3545;margin-bottom:0;">This will permanently remove the field and all corresponding data from your entries, statistics, and PDF export. This cannot be undone.</p>
+      <p style="font-size:0.82em;color:#dc3545;margin-bottom:0;" data-i18n="journal.mods.removeFieldDesc">This will permanently remove the field and all corresponding data from your entries, statistics, and PDF export. This cannot be undone.</p>
       <div class="confirm-buttons" style="margin-top:20px;">
-        <button class="confirm-btn confirm-btn-no" onclick="closeDeleteCustomFieldModal()">Cancel</button>
-        <button class="confirm-btn confirm-btn-yes" onclick="confirmDeleteCustomField()">Remove</button>
+        <button class="confirm-btn confirm-btn-no" onclick="closeDeleteCustomFieldModal()" data-i18n="common.cancel">Cancel</button>
+        <button class="confirm-btn confirm-btn-yes" onclick="confirmDeleteCustomField()" data-i18n="common.remove">Remove</button>
       </div>
     </div>
   </div>

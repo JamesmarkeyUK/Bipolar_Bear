@@ -619,7 +619,82 @@
 //       behind the top of the "You'll post as…" monika card (top half only,
 //       from the blindfold up; the card body hides the rest). New .monika-stage
 //       wrapper + .monika-bear in welcome-anonymous.html / css/welcome.css.
-const CACHE_NAME = 'bipolarbear-v144';
+// v144: App Store review fixes for Bipolar Bear 1.2 (build 23).
+//       5.1.1(v) — account deletion was only reachable from the home profile
+//       modal and the journal Danger Zone; the reviewer found neither. The
+//       shared account modal (fab.js, shown on index/journal/survival-kit) now
+//       carries a "🗑️ Delete account" button. index/journal delegate to their
+//       existing confirmDeleteAll(); survival-kit has no delete flow of its own
+//       so it hands off via index.html?deleteAccount=1 (js/index.js).
+//       1.2 — signed-in BipolarBear users skipped anonymous.html's verify
+//       screen, and with it the 18+/zero-tolerance checkbox, so they reached
+//       the board having agreed to nothing. New screen-agree gates that path;
+//       agreement persists as bbAnon_agreedTerms + anonProfile.termsAccepted.
+//       Also removed the Bipolar Anonymous section from survival-kit.html
+//       (board stays on the home screen); its Bipolar UK Groups link moved to
+//       the crisis box, and the kit's section count drops 13 → 12.
+//       Touches fab.js, js/index.js, index.html, survival-kit.html,
+//       js/survival-kit.js, anonymous.html, js/anonymous.js, js/shared/i18n.js.
+// v145: Translate v144's five new i18n keys into the other 9 locales. They
+//       were added in English only, so t()'s English fallback rendered them
+//       in English beside correctly-translated neighbours (e.g. a Dutch user
+//       saw "← Startpagina" above an English "Before you join 👋"). Adds
+//       anon.agree.{title,sub,continue} and account.{deleteAccount,deleteLocked}
+//       to es/fr/de/it/pt/nl/pl/sv/zh. Touches js/shared/i18n.js (precached).
+// v146: i18n audit — fab.js pass. The shared FAB dock (index/journal/
+//       survival-kit) had six fully-English modals (Crisis, Security, Coffee,
+//       Celebrity, Goals, Stats), English tooltips, the add-to-dock picker
+//       labels, and hardcoded confirm/alert/toast/error strings. Wire them all
+//       to a new fab.* i18n namespace across all 10 locales. Touches fab.js +
+//       js/shared/i18n.js (both precached).
+// v147: i18n audit — index page pass. The home Profile/Account/Danger modal,
+//       offline banner, PIN E2EE panel, footer, account status messages, PIN
+//       errors + disable/reset confirms, streak/anon/survival badges, tutorial
+//       & welcome modals, reset-dock dialog, celebration toasts and logo hints
+//       were all hardcoded English. Wire index.html + js/index.js to new home.*
+//       and pin.* keys (reusing account.msg.*, pin.incorrect, common.*, fab.*)
+//       across all 10 locales. Deferred: the delete-account confirm/alert flow
+//       and the What's-New changelog headlines. Touches index.html, js/index.js,
+//       js/shared/i18n.js (all precached).
+// v148: i18n audit — journal Settings stack. The entire settings modal
+//       (main panel, mobile/reminder panel, Focus Mode, Journal Options,
+//       Stats, Danger Zone, Achievements) was hardcoded English. Wire
+//       journal.html to a new journal.settings.* namespace (42 keys) across
+//       all 10 locales, reusing common.back/save and account.deleteLocked.
+//       Touches journal.html + js/shared/i18n.js (both precached).
+// v149: i18n audit — journal medication/goals/budget/export/import modals
+//       wired to a new journal.mods.* namespace. English source added and
+//       HTML wired; the 9 non-English locales land in v150.
+//       Touches journal.html + js/shared/i18n.js (both precached).
+// v150: i18n audit — journal.mods translated into es/fr/de/it/pt/nl/pl/sv/zh.
+//       Completes v149. Touches js/shared/i18n.js (precached).
+// v151: i18n audit — journal Personal Details, Field Picker, Calendar-day
+//       and Remove-field modals. Personal Details reuses the existing pd.*
+//       namespace; the picker/remove-field add 5 keys to journal.mods across
+//       all 10 locales. Touches journal.html + js/shared/i18n.js (precached).
+// v152: i18n audit — journal calendar/stat/depressed-support/favourites/PIN/
+//       anniversary modals wired to journal.mods.* (15 new keys) + reused
+//       pin.title/pin.forgot. English source + HTML wired here; the 9
+//       non-English locales land in v153. Touches journal.html + i18n.js.
+// v153: i18n audit — translate v152's 15 journal.mods keys (calendar,
+//       depressed-support, favourites, PIN setup, anniversary) into the 9
+//       non-English locales. Completes v152. Touches js/shared/i18n.js.
+// v154: i18n audit — journal header tooltips (Survival Kit, Change date,
+//       Favourite), the offline banner, and the focused-mode card (Switch to
+//       focused, Exit/Skip/Next, Reduced motion + tooltip, Go-to-save, Delete
+//       draft) wired to 12 new journal.mods keys across all 10 locales. Also
+//       routes journal.js's runtime fmSkipBtn label through journal.mods.fmSkip.
+//       Touches journal.html, js/journal.js, js/shared/i18n.js (all precached).
+// v155: i18n audit — journal health-sync modals (sleep + steps import,
+//       "Mobile app only" web fallbacks) wired to 7 new journal.mods keys
+//       across all 10 locales. Completes the journal.html static-text pass;
+//       the JS-branded healthSyncLabel/Desc stay in journal.js. Touches
+//       journal.html + js/shared/i18n.js (both precached).
+// v156: Full Mood Spectrum — new advanced setting to track mood on a 0–10 scale
+//       (spinnable wheel in focused mode, slider in the standard form) instead
+//       of the five fixed moods. Touches journal.html, js/journal.js,
+//       css/journal.css (all precached).
+const CACHE_NAME = 'bipolarbear-v156';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
