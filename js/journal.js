@@ -2871,7 +2871,7 @@ window.addEventListener('pageshow', () => {
       const _pfLimitedNote = statsTimeframe !== 'all' ? `<div style="font-size:0.75em;color:#adb5bd;margin-top:2px;">Based on ${statsTimeframe}d data — limited insights</div>` : '';
       document.getElementById('streakStats').innerHTML = (localStorage.getItem('showMoodSuggestion') === '1' && statsEntries.length > 0)
         ? `<div style="text-align:center;margin:8px 0 16px;">
-            <button onclick="showPersonalisedFeedback()" style="background:none;border:none;color:var(--brand-primary);font-size:0.88em;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:4px 0;"><img src="images/moods/AI_Bear.png" style="max-width: 50px" > <br>Personalised Feedback (Experimental)</button><br>
+            <button onclick="showPersonalisedFeedback()" style="background:none;border:none;color:var(--brand-primary);font-size:0.88em;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:4px 0;"><img src="images/moods/AI_Bear.png" style="max-width: 50px" > <br>${BB.t('journal.ui.personalisedFeedback')}</button><br>
             ${_pfLimitedNote}
            </div>`
         : '';
@@ -5104,7 +5104,7 @@ window.addEventListener('pageshow', () => {
                 </div>`;
               }).join('');
               _quickNotesHtml = `<div style="background:#f0f7ff;border-radius:10px;padding:10px 14px;margin-bottom:14px;border-left:3px solid #5b8dee;">
-                <p style="font-size:0.75em;font-weight:700;color:#5b8dee;margin:0 0 7px;text-transform:uppercase;letter-spacing:0.3px;">📝 Your notes</p>
+                <p style="font-size:0.75em;font-weight:700;color:#5b8dee;margin:0 0 7px;text-transform:uppercase;letter-spacing:0.3px;">${BB.t('journal.ui.yourNotes')}</p>
                 ${_noteRows}
               </div>`;
             }
@@ -5123,7 +5123,7 @@ window.addEventListener('pageshow', () => {
                 if (_pe && _pe.intention) {
                   const _piClean = _pe.intention.split(/\n?_{3,}\n/)[0].trim();
                   if (_piClean) {
-                    _prevIntentionHtml = `<div style="background:var(--brand-tint);border-radius:10px;padding:10px 14px;margin-bottom:14px;border-left:3px solid var(--brand-primary);"><p style="font-size:0.75em;font-weight:700;color:var(--brand-primary);margin:0 0 3px;text-transform:uppercase;letter-spacing:0.3px;">🌅 Your intention was…</p><p style="font-size:0.85em;color:#495057;margin:0;line-height:1.4;font-style:italic;">${_piClean.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p></div>`;
+                    _prevIntentionHtml = `<div style="background:var(--brand-tint);border-radius:10px;padding:10px 14px;margin-bottom:14px;border-left:3px solid var(--brand-primary);"><p style="font-size:0.75em;font-weight:700;color:var(--brand-primary);margin:0 0 3px;text-transform:uppercase;letter-spacing:0.3px;">${BB.t('journal.ui.yourIntention')}</p><p style="font-size:0.85em;color:#495057;margin:0;line-height:1.4;font-style:italic;">${_piClean.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p></div>`;
                   }
                 }
               }
@@ -5133,10 +5133,10 @@ window.addEventListener('pageshow', () => {
           if (selectedLinkedMood) {
             _linkedChip = '';
           } else if (_fmLinkMoodPickerOpen && selectedMood) {
-            _linkedChip = `<p style="text-align:center;font-size:0.82em;color:var(--brand-primary);font-weight:600;margin-top:12px;margin-bottom:0;">🔗 Now tap another mood to link it</p>
+            _linkedChip = `<p style="text-align:center;font-size:0.82em;color:var(--brand-primary);font-weight:600;margin-top:12px;margin-bottom:0;">${BB.t('journal.ui.nowTapLink')}</p>
               <p style="text-align:center;font-size:0.72em;color:#adb5bd;margin-top:4px;margin-bottom:0;">Tap <strong>${cap(selectedMood)}</strong> again to skip &nbsp;<button onclick="_fmLinkMoodPickerOpen=false;_renderFocusedStep();" style="background:none;border:none;color:#adb5bd;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:0;text-decoration:underline;">Cancel</button></p>`;
           } else if (selectedMood && localStorage.getItem('moodLinkingEnabled') === '1') {
-            _linkedChip = `<p style="text-align:center;font-size:0.72em;color:#adb5bd;margin-top:8px;margin-bottom:0;">Hold to link a secondary mood</p>`;
+            _linkedChip = `<p style="text-align:center;font-size:0.72em;color:#adb5bd;margin-top:8px;margin-bottom:0;">${BB.t('journal.ui.holdToLink')}</p>`;
           }
           // Full mood spectrum — render an 11-point (0–10) wheel instead of the
           // five fixed moods. Each stop maps to a legacy category for its image/colour.
@@ -5447,7 +5447,7 @@ window.addEventListener('pageshow', () => {
               const _goalsNoteHtml = localStorage.getItem('elaborateResponsesEnabled') === 'true' && selectedGoals === 'none'
                 ? `<div style="grid-column:1/-1;margin-bottom:4px;"><input type="text" id="fmGoalsNoteInput" placeholder="${BB.t('journal.placeholder.moreDetails')}" value="${_goalsNoteVal.replace(/"/g,'&quot;')}" style="width:100%;border:1.5px solid #e9ecef;border-radius:10px;padding:6px 10px;font-size:0.85em;font-family:inherit;box-sizing:border-box;outline:none;" oninput="selectedStepNotes['goals']=this.value;saveDraft();"></div>`
                 : '';
-              _md += `<span onclick="${_goalsTitleClick}" style="font-size:0.88em;font-weight:600;color:#495057;white-space:nowrap;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">🏅 Goal progress?</span>
+              _md += `<span onclick="${_goalsTitleClick}" style="font-size:0.88em;font-weight:600;color:#495057;white-space:nowrap;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">${BB.t('journal.ui.goalProgress')}</span>
               <div style="display:flex;gap:6px;">${_btns([
                   {label:'❌<br>No',  color:'var(--brand-primary)', sel:selectedGoals==='none', set:"selectedGoals='none';_fmCheckMoreData()"},
                   {label:'✅<br>On track', color:'var(--brand-primary)', sel:selectedGoals==='some', set:"selectedGoals='some';_fmCheckMoreData()"},
@@ -5480,7 +5480,7 @@ window.addEventListener('pageshow', () => {
               const _outsideNoteHtml = localStorage.getItem('elaborateResponsesEnabled') === 'true' && selectedOutside === 'no'
                 ? `<div style="grid-column:1/-1;margin-bottom:4px;"><input type="text" id="fmOutsideNoteInput" placeholder="${BB.t('journal.placeholder.moreDetails')}" value="${_outsideNoteVal.replace(/"/g,'&quot;')}" style="width:100%;border:1.5px solid #e9ecef;border-radius:10px;padding:6px 10px;font-size:0.85em;font-family:inherit;box-sizing:border-box;outline:none;" oninput="selectedStepNotes['outside']=this.value;saveDraft();"></div>`
                 : '';
-              _md += `<span style="font-size:0.88em;font-weight:600;color:#495057;white-space:nowrap;">🌤️ Outside</span>
+              _md += `<span style="font-size:0.88em;font-weight:600;color:#495057;white-space:nowrap;">${BB.t('journal.ui.outside')}</span>
               <div style="display:flex;gap:6px;">${_btns([
                   {label:'🏠<br>No',  color:'var(--brand-primary)', sel:selectedOutside==='no',  set:"selectedOutside='no';_fmCheckMoreData()"},
                   {label:'🌤️<br>Yes', color:'var(--brand-primary)', sel:selectedOutside==='yes', set:"selectedOutside='yes';_fmCheckMoreData()"},
@@ -5509,7 +5509,7 @@ window.addEventListener('pageshow', () => {
               const _budgetNoteHtml = localStorage.getItem('elaborateResponsesEnabled') === 'true' && selectedBudget === 'no'
                 ? `<div style="grid-column:1/-1;margin-bottom:4px;"><input type="text" id="fmBudgetNoteInput" placeholder="${BB.t('journal.placeholder.budgetNote')}" value="${_budgetNoteVal.replace(/"/g,'&quot;')}" style="width:100%;border:1.5px solid #e9ecef;border-radius:10px;padding:6px 10px;font-size:0.85em;font-family:inherit;box-sizing:border-box;outline:none;" oninput="selectedStepNotes['budget']=this.value;saveDraft();"></div>`
                 : '';
-              _md += `<span onclick="${_budgetTitleClick}" style="font-size:0.88em;font-weight:600;color:#495057;white-space:nowrap;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">💰 Budget on track?</span>
+              _md += `<span onclick="${_budgetTitleClick}" style="font-size:0.88em;font-weight:600;color:#495057;white-space:nowrap;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">${BB.t('journal.ui.budgetOnTrack')}</span>
               <div style="display:flex;gap:6px;">${_btns([
                   {label:'❌<br>Over',     color:'var(--brand-primary)', sel:selectedBudget==='no',  set:"selectedBudget='no';_fmCheckMoreData()"},
                   {label:'✅<br>On track', color:'var(--brand-primary)', sel:selectedBudget==='yes', set:"selectedBudget='yes';_fmCheckMoreData()"},
@@ -5535,17 +5535,17 @@ window.addEventListener('pageshow', () => {
           const _showCfHint = !BB.storage.get('CustomFieldHintDone');
           const _cfHintHtml = _showCfHint
             ? `<div id="fmCustomFieldHint" style="display:flex;flex-direction:column;align-items:center;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-top:6px;">
-                <span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,149,0,0.9);white-space:nowrap;font-family:'Georgia',serif;">🐻 Customise your data fields</span>
+                <span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,149,0,0.9);white-space:nowrap;font-family:'Georgia',serif;">${BB.t('journal.ui.customiseFields')}</span>
                 <svg width="24" height="22" viewBox="0 0 24 22" fill="none">
                   <path d="M12,2 Q8,12 12,20" stroke="rgba(255,149,0,0.7)" stroke-width="2" stroke-linecap="round" fill="none"/>
                   <polyline points="7,16 12,21 17,16" stroke="rgba(255,149,0,0.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
                 </svg>
               </div>` : '';
           if (!_builtIn.length && !_custFields.length)
-            return `<p style="text-align:center;color:#6c757d;font-size:0.9em;margin:0 0 16px;">Would you like to track other things?</p>
+            return `<p style="text-align:center;color:#6c757d;font-size:0.9em;margin:0 0 16px;">${BB.t('journal.ui.wouldYouTrack')}</p>
               <div style="text-align:center;margin-bottom:12px;">
                 ${_cfHintHtml}
-                <button onclick="showFieldPicker()" style="padding:10px 22px;background:rgba(255,149,0,0.08);border:2px dashed var(--brand-primary);border-radius:12px;color:var(--brand-primary);font-size:0.9em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">+ Add tracking fields</button>
+                <button onclick="showFieldPicker()" style="padding:10px 22px;background:rgba(255,149,0,0.08);border:2px dashed var(--brand-primary);border-radius:12px;color:var(--brand-primary);font-size:0.9em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">${BB.t('journal.ui.addTrackingFields')}</button>
               </div>`;
           return `<div style="display:grid;grid-template-columns:min-content 1fr;gap:8px 10px;align-items:center;">${_md}</div>
             <div style="display:flex;flex-direction:column;align-items:center;margin-top:10px;">
@@ -5642,7 +5642,7 @@ window.addEventListener('pageshow', () => {
           const _est2Label = _est.secondMood ? _FM_MOOD_LABELS[_est.secondMood] : null;
           const _mkMoodBtn = (m, lbl, col) => {
             if (!m) return '';
-            if (_fmPrevMood && selectedMood === m) return `<button onclick="_fmUndoSuggestedMood()" style="padding:4px 10px;background:#6c757d;color:white;border:none;border-radius:8px;font-size:0.78em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">↩ Undo</button>`;
+            if (_fmPrevMood && selectedMood === m) return `<button onclick="_fmUndoSuggestedMood()" style="padding:4px 10px;background:#6c757d;color:white;border:none;border-radius:8px;font-size:0.78em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">${BB.t('journal.ui.undo')}</button>`;
             if (selectedMood !== m) return `<button onclick="_fmApplySuggestedMood('${m}')" style="padding:4px 10px;background:${col};color:white;border:none;border-radius:8px;font-size:0.78em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Use ${lbl}</button>`;
             return '';
           };
@@ -5651,7 +5651,7 @@ window.addEventListener('pageshow', () => {
               <div style="display:flex;align-items:center;background:rgba(255,149,0,0.06);">
                 <button onclick="var p=this.parentElement.nextElementSibling;p.style.display=p.style.display==='none'?'block':'none';this.querySelector('.bb-chev').style.transform=p.style.display==='none'?'rotate(0deg)':'rotate(180deg)';"
                   style="flex:1;padding:11px 14px;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;-webkit-tap-highlight-color:transparent;">
-                  <span style="font-size:0.88em;color:#6c757d;font-weight:500;">🐻 Bipolar Bear thinks that you might be...</span>
+                  <span style="font-size:0.88em;color:#6c757d;font-weight:500;">${BB.t('journal.ui.bbThinksMightBe')}</span>
                   <button onclick="document.getElementById('moodCalcInfoModal').classList.add('active')" style="background:none;border:none;color:#adb5bd;font-size:0.82em;cursor:pointer;padding:0 4px;-webkit-tap-highlight-color:transparent;line-height:1;flex-shrink:0;" title="How is this calculated?">ℹ️</button>
                   <span class="bb-chev" style="font-size:0.7em;color:#adb5bd;transition:transform 0.2s;margin-left:6px;">▼</span>
                 </button>
@@ -5664,14 +5664,14 @@ window.addEventListener('pageshow', () => {
                   ${_mkMoodBtn(_est.mood, _estLabel, _estColor)}
                   ${_est.secondMood ? `<span style="font-size:0.82em;color:#adb5bd;">or</span><span style="font-weight:700;font-size:1em;color:${_est2Color};">${_est2Label}</span>${_mkMoodBtn(_est.secondMood, _est2Label, _est2Color)}` : ''}
                 </div>
-                <div style="font-size:0.72em;color:#adb5bd;line-height:1.4;">Experimental: Based on your responses. This is only a rudimentary observation — not a diagnosis.</div>
+                <div style="font-size:0.72em;color:#adb5bd;line-height:1.4;">${BB.t('journal.ui.experimentalFeedback2')}</div>
               </div>
             </div>`;
           const _incogOn = localStorage.getItem('incognitoMode') === 'true';
           const _privBorder = selectedPdfHide ? 'border:1.5px solid var(--brand-primary);' : 'border:1.5px solid #e9ecef;';
           const _privRow = _incogOn ? `
             <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding:10px 14px;background:#f8f9fa;border-radius:12px;${_privBorder}">
-              <span style="font-size:0.88em;color:#6c757d;">🕵️ Hide from PDF export</span>
+              <span style="font-size:0.88em;color:#6c757d;">${BB.t('journal.ui.hideFromPdf')}</span>
               <label class="bb-switch" style="margin:0;"><input type="checkbox" ${selectedPdfHide?'checked':''} onchange="_fmTogglePdfHide()"><span class="bb-slider"></span></label>
             </div>` : '';
           const _doneDate = (() => { try { const _dv = document.getElementById('entryDate')?.value; if (!_dv) return ''; const _dd = new Date(_dv+'T00:00:00'); return _dd.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'}); } catch(_){return '';} })();
@@ -6553,7 +6553,7 @@ window.addEventListener('pageshow', () => {
       if (sorted.length < 7) {
         body.innerHTML = `<div style="text-align:center;padding:30px 0;color:#6c757d;">
           <div style="font-size:2em;margin-bottom:12px;">📊</div>
-          <div>Keep journalling — at least 7 days of entries are needed to generate insights.</div>
+          <div>${BB.t('journal.ui.keepJournalling7')}</div>
         </div>`;
         modal.classList.add('active');
         return;
@@ -6566,7 +6566,7 @@ window.addEventListener('pageshow', () => {
       if (insights.length === 0) {
         body.innerHTML = _limitedBanner + `<div style="text-align:center;padding:30px 0;color:#6c757d;">
           <div style="font-size:2em;margin-bottom:12px;">📊</div>
-          <div>No strong patterns detected yet. Keep journalling consistently for more personalised insights.</div>
+          <div>${BB.t('journal.ui.noStrongPatterns')}</div>
         </div>`;
       } else {
         body.innerHTML = _limitedBanner + insights.map(i => `
@@ -6728,7 +6728,7 @@ window.addEventListener('pageshow', () => {
       if (!toggleSection || toggleSection.style.display === 'none') return;
       const hint = document.createElement('div');
       hint.id = 'calendarUnlockedHint';
-      hint.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="8" y1="13" x2="8" y2="2" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round"/><polyline points="3,7 8,2 13,7" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,255,255,0.9);font-family:'Georgia',serif;letter-spacing:0.01em;">New: Access the calendar and statistics</span>`;
+      hint.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="8" y1="13" x2="8" y2="2" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round"/><polyline points="3,7 8,2 13,7" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,255,255,0.9);font-family:'Georgia',serif;letter-spacing:0.01em;">${BB.t('journal.ui.newCalendarStats')}</span>`;
       Object.assign(hint.style, {
         display:'flex', flexDirection:'column', alignItems:'center', gap:'2px',
         marginTop:'6px', pointerEvents:'none',
@@ -6758,8 +6758,8 @@ window.addEventListener('pageshow', () => {
         if (existing) existing.remove();
         const toast = document.createElement('div');
         toast.id = 'achievementToast';
-        const extraLabel = totalUnlocked > 1 ? `<div style="font-size:0.75em;color:rgba(255,255,255,0.8);margin-top:4px;">+${totalUnlocked - 1} more — tap to view all</div>` : '<div style="font-size:0.75em;color:rgba(255,255,255,0.8);margin-top:4px;">Tap to view</div>';
-        toast.innerHTML = `<div style="font-size:2em;margin-bottom:4px;">${ach.emoji}</div><div style="font-weight:700;font-size:0.95em;margin-bottom:2px;">Achievement Unlocked!</div><div style="font-weight:600;font-size:0.88em;">${ach.title}</div><div style="font-size:0.78em;color:rgba(255,255,255,0.85);margin-top:2px;">${ach.desc}</div>${extraLabel}`;
+        const extraLabel = totalUnlocked > 1 ? `<div style="font-size:0.75em;color:rgba(255,255,255,0.8);margin-top:4px;">+${totalUnlocked - 1} more — tap to view all</div>` : '<div style="font-size:0.75em;color:rgba(255,255,255,0.8);margin-top:4px;">' + BB.t('journal.ui.tapToView') + '</div>';
+        toast.innerHTML = `<div style="font-size:2em;margin-bottom:4px;">${ach.emoji}</div><div style="font-weight:700;font-size:0.95em;margin-bottom:2px;">${BB.t('journal.ui.achievementUnlocked')}</div><div style="font-weight:600;font-size:0.88em;">${ach.title}</div><div style="font-size:0.78em;color:rgba(255,255,255,0.85);margin-top:2px;">${ach.desc}</div>${extraLabel}`;
         Object.assign(toast.style, {
           position:'fixed', bottom:'90px', left:'50%', transform:'translateX(-50%) translateY(10px)',
           background:'linear-gradient(135deg,var(--brand-primary-mid),var(--brand-primary-light))', color:'white',
@@ -7591,7 +7591,7 @@ window.addEventListener('pageshow', () => {
           html += `<div style="margin-top:10px;border-radius:10px;border:1px solid rgba(255,149,0,0.2);overflow:hidden;">
             <button onclick="var b=this.nextElementSibling;var open=b.style.display!=='none';b.style.display=open?'none':'block';this.querySelector('.bb-chev-d').style.transform=open?'rotate(0deg)':'rotate(180deg)';"
               style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:rgba(255,149,0,0.06);border:none;cursor:pointer;font-size:0.85em;color:#6c757d;-webkit-tap-highlight-color:transparent;">
-              <span>🐻 Bipolar Bear thought…</span>
+              <span>${BB.t('journal.ui.bbThought')}</span>
               <span class="bb-chev-d" style="font-size:0.7em;color:#adb5bd;transition:transform 0.2s;">▼</span>
             </button>
             <div style="display:none;padding:10px 12px;background:rgba(255,149,0,0.04);">
@@ -7600,7 +7600,7 @@ window.addEventListener('pageshow', () => {
                 <span style="font-weight:700;color:${_estColor};">${_estLabel}</span>
                 ${_est.secondMood ? `<span style="font-size:0.82em;color:#adb5bd;">or</span><img src="images/moods/${_est.secondMood}.png" style="width:26px;height:26px;object-fit:contain;"><span style="font-weight:700;color:${_est2Color};">${_est2Label}</span>` : ''}
               </div>
-              <div style="font-size:0.72em;color:#adb5bd;line-height:1.4;">Experimental · Based on logged data. Not a diagnosis.</div>
+              <div style="font-size:0.72em;color:#adb5bd;line-height:1.4;">${BB.t('journal.ui.experimentalFeedback1')}</div>
             </div>
           </div>`;
         }
@@ -11540,7 +11540,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
         const _storedLabel = f.renameable ? (localStorage.getItem('_labelOverride_' + f.key) || null) : null;
         const _displayLabel = _storedLabel || f.label;
         const labelHtml = f.synced
-          ? `<span style="font-size:0.92em;color:#495057;">${_displayLabel}</span><span style="font-size:0.72em;color:#adb5bd;margin-left:5px;font-weight:500;letter-spacing:0.01em;">⚙ configurable</span>`
+          ? `<span style="font-size:0.92em;color:#495057;">${_displayLabel}</span><span style="font-size:0.72em;color:#adb5bd;margin-left:5px;font-weight:500;letter-spacing:0.01em;">${BB.t('journal.ui.configurable')}</span>`
           : f.sublabel
           ? `<span style="font-size:0.92em;color:#495057;">${_displayLabel}</span><span style="font-size:0.72em;color:#adb5bd;margin-left:5px;font-weight:500;letter-spacing:0.01em;">⚙ ${f.sublabel}</span>`
           : `<span style="font-size:0.92em;color:#495057;">${_displayLabel}</span>`;
