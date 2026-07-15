@@ -647,7 +647,16 @@
 //       labels, and hardcoded confirm/alert/toast/error strings. Wire them all
 //       to a new fab.* i18n namespace across all 10 locales. Touches fab.js +
 //       js/shared/i18n.js (both precached).
-const CACHE_NAME = 'bipolarbear-v146';
+// v147: i18n audit — index page pass. The home Profile/Account/Danger modal,
+//       offline banner, PIN E2EE panel, footer, account status messages, PIN
+//       errors + disable/reset confirms, streak/anon/survival badges, tutorial
+//       & welcome modals, reset-dock dialog, celebration toasts and logo hints
+//       were all hardcoded English. Wire index.html + js/index.js to new home.*
+//       and pin.* keys (reusing account.msg.*, pin.incorrect, common.*, fab.*)
+//       across all 10 locales. Deferred: the delete-account confirm/alert flow
+//       and the What's-New changelog headlines. Touches index.html, js/index.js,
+//       js/shared/i18n.js (all precached).
+const CACHE_NAME = 'bipolarbear-v147';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

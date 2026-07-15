@@ -40,6 +40,18 @@ function _escHtml(s) {
 }
 
 /**
+ * Translate an i18n key, falling back to the given English literal if the
+ * i18n module hasn't loaded yet. `vars` are interpolated by BB.t.
+ * @param {string} key
+ * @param {string} fallback English text to show if i18n is unavailable
+ * @param {Object} [vars]
+ * @returns {string}
+ */
+function _tr(key, fallback, vars) {
+  return (window.BB && window.BB.t) ? window.BB.t(key, vars) : fallback;
+}
+
+/**
  * Style the dock's single auth FAB (#bbAuthFab, injected by fab.js) for the
  * current auth state: solid orange "profile" look when signed in, white-outline
  * "sign in" look when signed out. Click behaviour is wired separately via
@@ -174,7 +186,7 @@ setTimeout(function () {
               const _lastVisit = parseInt(BB.storage.get('AnonLastVisit') || '0', 10);
               if (_badge) {
                 if (!_lastVisit) {
-                  _badge.textContent  = '💬 Tap to join the community';
+                  _badge.textContent  = _tr('home.anonTapJoin', '💬 Tap to join the community');
                   _revealBadge(_badge, 'block');
                 } else if (!navigator.onLine) {
                   // Offline — skip the live count, hide the row after the
@@ -189,8 +201,8 @@ setTimeout(function () {
                       const _myMonika  = BB.storage.get('Anon_monika') || '';
                   const _newCount = snap.docs.filter(d => !d.data().deleted && (_myMonika ? d.data().name !== _myMonika : true)).length;
                       _badge.textContent   = _newCount > 0
-                        ? '💬 ' + _newCount + ' new message' + (_newCount === 1 ? '' : 's')
-                        : '✓ No new messages';
+                        ? _tr('home.anonNewMessages', '💬 ' + _newCount + ' new messages', { n: _newCount })
+                        : _tr('home.anonNoMessages', '✓ No new messages');
                       _revealBadge(_badge, 'block');
                     })
                     .catch(() => {});
@@ -322,12 +334,12 @@ setTimeout(function () {
                     const _myMonika = BB.storage.get('Anon_monika') || '';
                     const _newCount = snap.docs.filter(dd => !dd.data().deleted && (_myMonika ? dd.data().name !== _myMonika : true)).length;
                     _badge2.textContent = _newCount > 0
-                      ? '💬 ' + _newCount + ' new message' + (_newCount === 1 ? '' : 's')
-                      : '✓ No new messages';
+                      ? _tr('home.anonNewMessages', '💬 ' + _newCount + ' new messages', { n: _newCount })
+                      : _tr('home.anonNoMessages', '✓ No new messages');
                     _revealBadge(_badge2, 'block');
                   }).catch(() => {});
               } else if (_badge2 && !_lastVisit2) {
-                _badge2.textContent = '💬 Tap to join the community';
+                _badge2.textContent = _tr('home.anonTapJoin', '💬 Tap to join the community');
                 _revealBadge(_badge2, 'block');
               }
             }
@@ -500,9 +512,9 @@ setTimeout(function () {
       overlay.id = 'tutorialCompleteModal';
       overlay.innerHTML = `<div style="background:linear-gradient(135deg,var(--brand-primary-mid),var(--brand-primary-light));border-radius:20px;padding:28px 32px;text-align:center;max-width:300px;width:calc(100vw - 64px);box-shadow:0 12px 48px rgba(255,107,0,0.55);">
         <div style="font-size:2.6em;margin-bottom:10px;">🎓</div>
-        <div style="font-weight:800;font-size:1.1em;color:white;margin-bottom:6px;">Tutorial Complete!</div>
-        <div style="font-size:0.88em;color:rgba(255,255,255,0.9);line-height:1.5;margin-bottom:16px;">Done for now! There will be a few more hints as you progress.</div>
-        <div style="font-size:0.78em;color:rgba(255,255,255,0.65);">Tap to dismiss</div>
+        <div style="font-weight:800;font-size:1.1em;color:white;margin-bottom:6px;">${_tr('home.tutorialCompleteTitle', 'Tutorial Complete!')}</div>
+        <div style="font-size:0.88em;color:rgba(255,255,255,0.9);line-height:1.5;margin-bottom:16px;">${_tr('home.tutorialCompleteBody', 'Done for now! There will be a few more hints as you progress.')}</div>
+        <div style="font-size:0.78em;color:rgba(255,255,255,0.65);">${_tr('home.tapDismiss', 'Tap to dismiss')}</div>
       </div>`;
       Object.assign(overlay.style, {
         position:'fixed', inset:'0', display:'flex', alignItems:'center', justifyContent:'center',
@@ -993,9 +1005,9 @@ setTimeout(function () {
         textAlign: 'left',
       });
       tip.innerHTML =
-        '<div style="font-weight:800;margin-bottom:8px;">Your counters</div>' +
-        '<div style="margin-bottom:8px;">🔥 <strong>Streak</strong> — consecutive days you\'ve logged your mood. Resets if you miss a day.</div>' +
-        '<div>🧘 <strong>Stability</strong> — consecutive days you\'ve logged your mood as <em>Stable</em>, counted back from your most recent entry. Resets when any other mood is logged.</div>';
+        '<div style="font-weight:800;margin-bottom:8px;">' + _tr('home.counterTipTitle', 'Your counters') + '</div>' +
+        '<div style="margin-bottom:8px;">' + _tr('home.counterTipStreak', "🔥 Streak — consecutive days you've logged your mood. Resets if you miss a day.") + '</div>' +
+        '<div>' + _tr('home.counterTipStability', "🧘 Stability — consecutive days you've logged your mood as Stable, counted back from your most recent entry. Resets when any other mood is logged.") + '</div>';
 
       // Insert after badge
       badge.style.position = 'relative';
@@ -1074,7 +1086,7 @@ setTimeout(function () {
       if (_amBadge) { _amBadge.classList.remove('bb-skeleton'); _amBadge.style.display = 'none'; }
       // Reset survival kit progress count to default (4 always-complete sections = 4/12)
       const _sp = document.getElementById('survivalProgress');
-      if (_sp) { _sp.classList.remove('bb-skeleton'); _sp.textContent = '4 / 12 sections complete'; }
+      if (_sp) { _sp.classList.remove('bb-skeleton'); _sp.textContent = _tr('home.survivalProgress', '4 / 12 sections complete', { c: 4 }); }
 
       if (auth) auth.signOut();
     }
@@ -1154,9 +1166,9 @@ setTimeout(function () {
     // ('1' = on). Unset/'0' = off, so the home screen shows only the Journal
     // until the user activates them here. Journal is always on (locked).
     const _HOME_BTN_TOGGLES = [
-      { id: 'journal',  icon: '📔', label: 'Journal', locked: true,  flag: null },
-      { id: 'survival', icon: '🆘', label: 'Survival', locked: false, flag: 'SurvivalBtnEnabled' },
-      { id: 'anon',     icon: '💬', label: 'Anonymous', locked: false, flag: 'AnonBtnEnabled' },
+      { id: 'journal',  icon: '📔', label: 'Journal', labelKey: 'home.toggleJournal', locked: true,  flag: null },
+      { id: 'survival', icon: '🆘', label: 'Survival', labelKey: 'home.toggleSurvival', locked: false, flag: 'SurvivalBtnEnabled' },
+      { id: 'anon',     icon: '💬', label: 'Anonymous', labelKey: 'home.toggleAnonymous', locked: false, flag: 'AnonBtnEnabled' },
     ];
 
     /**
@@ -1183,8 +1195,8 @@ setTimeout(function () {
         const _cursor = t.locked ? 'default' : 'pointer';
         const _lock   = t.locked ? '<span style="position:absolute;top:4px;right:6px;font-size:0.7em;">🔒</span>' : '';
         const _isNew  = _newHintOn && !t.locked && !on;
-        const _pill   = _isNew ? '<span class="bb-new-pill">NEW</span>' : '';
-        return `<button${_click}${_isNew ? ' class="bb-new-toggle"' : ''} style="position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 14px;border-radius:12px;border:1.5px solid ${_border};background:${_bg};color:${_color};cursor:${_cursor};font-size:0.82em;font-weight:600;min-width:64px;-webkit-tap-highlight-color:transparent;">${_lock}${_pill}<span style="font-size:1.3em;">${t.icon}</span><span>${t.label}</span></button>`;
+        const _pill   = _isNew ? `<span class="bb-new-pill">${_tr('home.newPill', 'NEW')}</span>` : '';
+        return `<button${_click}${_isNew ? ' class="bb-new-toggle"' : ''} style="position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 14px;border-radius:12px;border:1.5px solid ${_border};background:${_bg};color:${_color};cursor:${_cursor};font-size:0.82em;font-weight:600;min-width:64px;-webkit-tap-highlight-color:transparent;">${_lock}${_pill}<span style="font-size:1.3em;">${t.icon}</span><span>${_tr(t.labelKey, t.label)}</span></button>`;
       }).join('');
     }
 
@@ -1264,14 +1276,14 @@ setTimeout(function () {
       }
       if (name === 'danger') {
         const signedIn = !!currentUser;
-        const _t = document.getElementById('idxDangerTitle');
-        const _d = document.getElementById('idxDangerDesc');
-        const _b = document.getElementById('idxDangerBtnLabel');
-        if (_t) _t.textContent = signedIn ? 'Delete Account' : 'Full Reset';
-        if (_d) _d.textContent = signedIn
-          ? 'Permanently delete your account, all journal entries, and reset everything on this device. This cannot be undone.'
-          : 'Permanently delete all journal entries and reset all settings to their defaults on this device. This cannot be undone.';
-        if (_b) _b.textContent = signedIn ? '🗑️ Delete Account & Reset' : '🗑️ Delete All Data & Reset';
+        const _dt = document.getElementById('idxDangerTitle');
+        const _dd = document.getElementById('idxDangerDesc');
+        const _db = document.getElementById('idxDangerBtnLabel');
+        if (_dt) _dt.textContent = signedIn ? _tr('home.danger.deleteTitle', 'Delete Account') : _tr('home.danger.resetTitle', 'Full Reset');
+        if (_dd) _dd.textContent = signedIn
+          ? _tr('home.danger.deleteDesc', 'Permanently delete your account, all journal entries, and reset everything on this device. This cannot be undone.')
+          : _tr('home.danger.resetDesc', 'Permanently delete all journal entries and reset all settings to their defaults on this device. This cannot be undone.');
+        if (_db) _db.textContent = signedIn ? _tr('home.danger.deleteBtn', '🗑️ Delete Account & Reset') : _tr('home.danger.resetBtn', '🗑️ Delete All Data & Reset');
       }
     }
     window._profileShowPanel = _profileShowPanel;
@@ -1353,13 +1365,13 @@ setTimeout(function () {
       if (!user) return;
       const currentPass = (document.getElementById('idxCurrentPass').value || '').trim();
       const newPass     = (document.getElementById('idxNewPass').value     || '').trim();
-      if (!currentPass || !newPass) { _idxProfileShowMsg('⚠️ Please fill in both fields.', false); return; }
-      if (newPass.length < 6)       { _idxProfileShowMsg('⚠️ New password must be at least 6 characters.', false); return; }
+      if (!currentPass || !newPass) { _idxProfileShowMsg(_tr('account.msg.fillBothFields', '⚠️ Please fill in both fields.'), false); return; }
+      if (newPass.length < 6)       { _idxProfileShowMsg(_tr('account.msg.passwordTooShort', '⚠️ New password must be at least 6 characters.'), false); return; }
       const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPass);
       user.reauthenticateWithCredential(credential)
         .then(() => user.updatePassword(newPass))
         .then(() => {
-          _idxProfileShowMsg('✅ Password updated successfully.', true);
+          _idxProfileShowMsg(_tr('account.msg.passwordUpdated', '✅ Password updated successfully.'), true);
           document.getElementById('idxPassFields').style.display = 'none';
           document.getElementById('idxPassToggleBtn').style.display = '';
           document.getElementById('idxCurrentPass').value = '';
@@ -1367,7 +1379,7 @@ setTimeout(function () {
         })
         .catch(err => {
           const wrongPass = err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential';
-          _idxProfileShowMsg('⚠️ ' + (wrongPass ? 'Current password is incorrect.' : (err.message || 'Could not update password.')), false);
+          _idxProfileShowMsg(wrongPass ? _tr('account.msg.wrongPassword', '⚠️ Current password is incorrect.') : (err.message ? '⚠️ ' + err.message : _tr('account.msg.passwordUpdateFailed', '⚠️ Could not update password.')), false);
         });
     };
 
@@ -1376,13 +1388,13 @@ setTimeout(function () {
       if (!user) return;
       const newEmail = (document.getElementById('idxNewEmail').value  || '').trim();
       const pass     = (document.getElementById('idxEmailPass').value || '').trim();
-      if (!newEmail || !pass) { _idxProfileShowMsg('⚠️ Please fill in both fields.', false); return; }
-      if (!newEmail.includes('@') || !newEmail.includes('.')) { _idxProfileShowMsg('⚠️ Please enter a valid email address.', false); return; }
+      if (!newEmail || !pass) { _idxProfileShowMsg(_tr('account.msg.fillBothFields', '⚠️ Please fill in both fields.'), false); return; }
+      if (!newEmail.includes('@') || !newEmail.includes('.')) { _idxProfileShowMsg(_tr('account.msg.invalidEmail', '⚠️ Please enter a valid email address.'), false); return; }
       const credential = firebase.auth.EmailAuthProvider.credential(user.email, pass);
       user.reauthenticateWithCredential(credential)
         .then(() => user.updateEmail(newEmail))
         .then(() => {
-          _idxProfileShowMsg('✅ Email updated to ' + newEmail, true);
+          _idxProfileShowMsg(_tr('account.msg.emailUpdated', '✅ Email updated to ' + newEmail, { email: newEmail }), true);
           const _e1 = document.getElementById('idxProfileEmail');
           const _e2 = document.getElementById('idxProfileEmailCustomise');
           if (_e1) _e1.textContent = newEmail;
@@ -1395,7 +1407,7 @@ setTimeout(function () {
         .catch(err => {
           const wrongPass = err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential';
           const inUse     = err.code === 'auth/email-already-in-use';
-          _idxProfileShowMsg('⚠️ ' + (wrongPass ? 'Current password is incorrect.' : inUse ? 'That email is already in use.' : (err.message || 'Could not update email.')), false);
+          _idxProfileShowMsg(wrongPass ? _tr('account.msg.wrongPassword', '⚠️ Current password is incorrect.') : inUse ? _tr('account.msg.emailInUse', '⚠️ That email is already in use.') : (err.message ? '⚠️ ' + err.message : _tr('account.msg.emailUpdateFailed', '⚠️ Could not update email.')), false);
         });
     };
 
@@ -1654,9 +1666,9 @@ setTimeout(function () {
       if (_logoHintEl && _logoHintEl.style.display !== 'none') {
         _logoHintEl.style.animation = 'none';
         _logoHintEl.style.opacity = '1';
-        if (clickCount === 1 && _logoHintText) _logoHintText.textContent = 'Click me again!';
-        else if (clickCount === 2 && _logoHintText) _logoHintText.textContent = 'and again…';
-        else if (clickCount >= 3 && _logoHintText) _logoHintText.textContent = 'tap quicker…';
+        if (clickCount === 1 && _logoHintText) _logoHintText.textContent = _tr('home.logoHintAgain', 'Click me again!');
+        else if (clickCount === 2 && _logoHintText) _logoHintText.textContent = _tr('home.logoHintAndAgain', 'and again…');
+        else if (clickCount >= 3 && _logoHintText) _logoHintText.textContent = _tr('home.logoHintQuicker', 'tap quicker…');
       }
 
       logoImg.style.transition = 'transform 0.1s ease';
@@ -1694,11 +1706,11 @@ setTimeout(function () {
             // Confirm dock reset
             const _confirmOverlay = document.createElement('div');
             _confirmOverlay.innerHTML = `<div style="background:white;border-radius:20px;padding:24px 24px 20px;text-align:center;max-width:290px;width:calc(100vw - 64px);box-shadow:0 12px 48px rgba(0,0,0,0.25);">
-              <div style="font-weight:800;font-size:1em;color:#333;margin-bottom:10px;">Reset Dock?</div>
-              <div style="font-size:0.88em;color:#666;line-height:1.55;margin-bottom:18px;">This will restore all hidden dock buttons back to their default positions.</div>
+              <div style="font-weight:800;font-size:1em;color:#333;margin-bottom:10px;">${_tr('home.resetDockTitle', 'Reset Dock?')}</div>
+              <div style="font-size:0.88em;color:#666;line-height:1.55;margin-bottom:18px;">${_tr('home.resetDockBody', 'This will restore all hidden dock buttons back to their default positions.')}</div>
               <div style="display:flex;gap:10px;">
-                <button id="_dockCancelBtn" style="flex:1;padding:11px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-weight:600;font-size:0.9em;cursor:pointer;">Cancel</button>
-                <button id="_dockConfirmBtn" style="flex:1;padding:11px;background:var(--brand-primary);color:white;border:none;border-radius:10px;font-weight:600;font-size:0.9em;cursor:pointer;">Reset</button>
+                <button id="_dockCancelBtn" style="flex:1;padding:11px;background:#f8f9fa;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-weight:600;font-size:0.9em;cursor:pointer;">${_tr('common.cancel', 'Cancel')}</button>
+                <button id="_dockConfirmBtn" style="flex:1;padding:11px;background:var(--brand-primary);color:white;border:none;border-radius:10px;font-weight:600;font-size:0.9em;cursor:pointer;">${_tr('home.resetDockConfirm', 'Reset')}</button>
               </div>
             </div>`;
             Object.assign(_confirmOverlay.style, {
@@ -1713,7 +1725,7 @@ setTimeout(function () {
               _applyOnboardingGating();
               const _t = document.createElement('div');
               Object.assign(_t.style, { position:'fixed', top:'calc(env(safe-area-inset-top,0px) + 12px)', left:'50%', transform:'translateX(-50%)', background:'var(--brand-primary)', color:'white', padding:'10px 20px', borderRadius:'20px', fontWeight:'700', fontSize:'0.9em', zIndex:'9999', whiteSpace:'nowrap', boxShadow:'0 4px 16px rgba(0,0,0,0.2)', pointerEvents:'none' });
-              _t.textContent = '✅ Dock reset';
+              _t.textContent = _tr('home.toastDockReset', '✅ Dock reset');
               document.body.appendChild(_t);
               setTimeout(() => _t.remove(), 2000);
             });
@@ -1734,7 +1746,7 @@ setTimeout(function () {
             _applyOnboardingGating();
             const _t = document.createElement('div');
             Object.assign(_t.style, { position:'fixed', top:'calc(env(safe-area-inset-top,0px) + 12px)', left:'50%', transform:'translateX(-50%)', background:'var(--brand-primary)', color:'white', padding:'10px 20px', borderRadius:'20px', fontWeight:'700', fontSize:'0.9em', zIndex:'9999', whiteSpace:'nowrap', boxShadow:'0 4px 16px rgba(0,0,0,0.2)', pointerEvents:'none' });
-            _t.textContent = '✅ Tutorial skipped — enjoy the app!';
+            _t.textContent = _tr('home.toastTutorialSkipped', '✅ Tutorial skipped — enjoy the app!');
             document.body.appendChild(_t);
             setTimeout(() => _t.remove(), 2800);
           }
@@ -1832,8 +1844,8 @@ setTimeout(function () {
         if (_arr('myCommitments')) _c++;
         if (_arr('customReminders')) _c++;
         _prog.textContent = _c >= 12
-          ? '✓ All sections completed'
-          : _c + ' / 12 sections complete';
+          ? _tr('home.survivalAllDone', '✓ All sections completed')
+          : _tr('home.survivalProgress', _c + ' / 12 sections complete', { c: _c });
         _revealBadge(_prog, 'block');
       }
     })();
@@ -1919,7 +1931,7 @@ setTimeout(function () {
             logoImg.style.transform = '';
             // Celebration
             launchConfetti(18, ['var(--brand-primary)', 'var(--brand-primary-dark)', '#ffd43b', '#ffffff', '#ff8c42']);
-            if (_firstFind) showToast('🎨 Easter egg found!', 'var(--brand-primary)');
+            if (_firstFind) showToast(_tr('home.toastEasterEgg', '🎨 Easter egg found!'), 'var(--brand-primary)');
           }, 200);
         }, 300);
       }
@@ -1936,16 +1948,16 @@ setTimeout(function () {
           if (_bothFired) return;
           _bothFired = true;
           launchConfetti(90, _bothColors);
-          showToast('🎉 All done today — great work!', 'linear-gradient(135deg,var(--brand-primary-light),var(--brand-primary-mid))');
+          showToast(_tr('home.toastAllDone', '🎉 All done today — great work!'), 'linear-gradient(135deg,var(--brand-primary-light),var(--brand-primary-mid))');
         } else if (type === 'journal') {
           if (_bothFired) return; // combined already fired, skip individual
           launchConfetti(45, _journalColors);
-          showToast('📔 Journal up to date!', 'linear-gradient(135deg,var(--brand-primary-light),var(--brand-primary-mid))');
+          showToast(_tr('home.toastJournalUpToDate', '📔 Journal up to date!'), 'linear-gradient(135deg,var(--brand-primary-light),var(--brand-primary-mid))');
         } else if (type === 'survival') {
           if (BB.storage.get('SurvivalCelebDone') === '1') return;
           BB.storage.set('SurvivalCelebDone', '1');
           launchConfetti(45, _survivalColors);
-          showToast('🆘 Survival kit filled in!', 'linear-gradient(135deg,var(--brand-primary-light),var(--brand-primary-mid))');
+          showToast(_tr('home.toastSurvivalFilled', '🆘 Survival kit filled in!'), 'linear-gradient(135deg,var(--brand-primary-light),var(--brand-primary-mid))');
         }
       }
 
@@ -2036,9 +2048,9 @@ function _handleIndexJournalNav() {
       overlay.id = 'bbWelcomeModal';
       overlay.innerHTML = `<div style="background:linear-gradient(135deg,var(--brand-primary-mid),var(--brand-primary-light));border-radius:20px;padding:28px 28px 24px;text-align:center;max-width:300px;width:calc(100vw - 64px);box-shadow:0 12px 48px rgba(255,107,0,0.55);">
         <div style="font-size:2.4em;margin-bottom:10px;">🐻</div>
-        <div style="font-weight:800;font-size:1.05em;color:white;margin-bottom:10px;line-height:1.4;">Welcome to your BipolarBear.app!</div>
-        <div style="font-size:0.88em;color:rgba(255,255,255,0.92);line-height:1.55;margin-bottom:18px;">This will be your mood journal and personalised survival kit going forward.<br><br>I'm here to help you get started. Let's go!</div>
-        <div style="font-size:0.78em;color:rgba(255,255,255,0.65);">Tap to dismiss</div>
+        <div style="font-weight:800;font-size:1.05em;color:white;margin-bottom:10px;line-height:1.4;">${_tr('home.welcomeTitle', 'Welcome to your BipolarBear.app!')}</div>
+        <div style="font-size:0.88em;color:rgba(255,255,255,0.92);line-height:1.55;margin-bottom:18px;">${_tr('home.welcomeBody', "This will be your mood journal and personalised survival kit going forward. I'm here to help you get started. Let's go!")}</div>
+        <div style="font-size:0.78em;color:rgba(255,255,255,0.65);">${_tr('home.tapDismiss', 'Tap to dismiss')}</div>
       </div>`;
       Object.assign(overlay.style, {
         position:'fixed', inset:'0', display:'flex', alignItems:'center', justifyContent:'center',
@@ -2212,7 +2224,7 @@ function _handleIndexJournalNav() {
             new Promise(r => setTimeout(() => r(null), 3000)),
           ]) : null;
           if (_idxPinBuf !== stored) {
-            document.getElementById('idxPinError').textContent = 'Incorrect PIN. Try again.';
+            document.getElementById('idxPinError').textContent = _tr('pin.incorrect', 'Incorrect PIN. Try again.');
             setTimeout(() => { _idxPinBuf = ''; _idxRenderDots(0); document.getElementById('idxPinError').textContent = ''; }, 800);
             return;
           }
@@ -2220,7 +2232,7 @@ function _handleIndexJournalNav() {
           document.getElementById('guestPinOverlay').style.display = 'none';
           return;
         } catch(e) {
-          document.getElementById('idxPinError').textContent = 'Verification failed. Try again.';
+          document.getElementById('idxPinError').textContent = _tr('pin.verifyFailed', 'Verification failed. Try again.');
           setTimeout(() => { _idxPinBuf = ''; _idxRenderDots(0); document.getElementById('idxPinError').textContent = ''; }, 1200);
           return;
         }
@@ -2229,7 +2241,7 @@ function _handleIndexJournalNav() {
       // Guest PIN: verify against localStorage
       const saved = BB.storage.get('PinCode');
       if (_idxPinBuf !== saved) {
-        document.getElementById('idxPinError').textContent = 'Incorrect PIN. Try again.';
+        document.getElementById('idxPinError').textContent = _tr('pin.incorrect', 'Incorrect PIN. Try again.');
         setTimeout(() => {
           _idxPinBuf = '';
           _idxRenderDots(0);
@@ -2342,7 +2354,7 @@ function _handleIndexJournalNav() {
     async function idxPinForgot() {
       const _isNat = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
       if (_isNat && BB.storage.get('NativePinEnabled') === '1') {
-        if (!confirm('This will disable the app PIN. Your journal data stays safe.\n\nContinue?')) return;
+        if (!confirm(_tr('pin.disableConfirm', 'This will disable the app PIN. Your journal data stays safe.\n\nContinue?'))) return;
         BB.storage.remove('NativePinEnabled');
         await (window.Capacitor?.Plugins?.SecureStorage?.removeItem('bb_native_pin') ?? Promise.resolve()).catch(() => {});
         sessionStorage.setItem('bbPinUnlocked', '1');
@@ -2350,7 +2362,7 @@ function _handleIndexJournalNav() {
         return;
       }
       // Guest PIN: full wipe (PIN is the encryption key — no recovery possible)
-      if (!confirm('Your PIN is the encryption key for your journal. Without it, your entries cannot be recovered.\n\nThis will permanently delete all your data and start fresh.\n\nAre you absolutely sure?')) return;
-      if (!confirm('Last chance — all entries and data will be deleted. Continue?')) return;
+      if (!confirm(_tr('pin.resetConfirm1', 'Your PIN is the encryption key for your journal. Without it, your entries cannot be recovered.\n\nThis will permanently delete all your data and start fresh.\n\nAre you absolutely sure?'))) return;
+      if (!confirm(_tr('pin.resetConfirm2', 'Last chance — all entries and data will be deleted. Continue?'))) return;
       window._nukeGuestData();
     }
