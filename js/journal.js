@@ -1595,9 +1595,9 @@ window.addEventListener('pageshow', () => {
       1: 'Severely depressed',
       2: 'Depressed',
       3: 'Depressed',
-      4: 'Slightly low but stable',
+      4: 'Sad but stable',
       5: 'Stable',
-      6: 'Slightly high but stable',
+      6: 'Happy but stable',
       7: 'Hypomanic',
       8: 'Hypomanic',
       9: 'Manic',
@@ -5146,7 +5146,7 @@ window.addEventListener('pageshow', () => {
               init: n === _initN,
               onclick: `_fmSpectrumTap(${n})`,
             })));
-            return `${_quickNotesHtml}${_prevIntentionHtml}${_fmHeroHtml()}${_spectrumWheel}
+            return `${_quickNotesHtml}${_prevIntentionHtml}${_fmHeroHtml()}<div class="fm-spectrum-wheel">${_spectrumWheel}</div>
             ${_showChooseMoodHint ? `<div id="_fmChooseMoodHintEl" style="display:flex;flex-direction:column;align-items:center;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-top:8px;">
               <svg width="24" height="22" viewBox="0 0 24 22" fill="none">
                 <path d="M 12,20 Q 8,10 12,2" stroke="rgba(255,149,0,0.7)" stroke-width="2" stroke-linecap="round" fill="none"/>

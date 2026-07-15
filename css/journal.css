@@ -619,6 +619,18 @@
     .fm-wheel-btn img { width: 36px; height: 36px; object-fit: contain; }
     .fm-wheel-label { white-space: nowrap; }
     .fm-wheel-sub { font-size: 0.72em; font-weight: 600; opacity: 0.85; }
+    /* Full mood spectrum labels ("Slightly low but stable" …) are long, so wrap
+       them onto two lines at a fixed pill width instead of letting the pill grow
+       wide. Fixed width + min-height keeps every stop the same size. */
+    .fm-spectrum-wheel .fm-wheel-btn { width: 88px; }
+    .fm-spectrum-wheel .fm-wheel-label {
+      white-space: normal;
+      line-height: 1.12;
+      text-align: center;
+      font-size: 0.82em;
+      min-height: 2.24em;
+      display: flex; align-items: center; justify-content: center;
+    }
 
     /* ── Regular form: compact hero readout on synced steps ── */
     .step-hero {
