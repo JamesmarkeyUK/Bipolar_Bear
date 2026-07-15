@@ -690,35 +690,35 @@
 //       across all 10 locales. Completes the journal.html static-text pass;
 //       the JS-branded healthSyncLabel/Desc stay in journal.js. Touches
 //       journal.html + js/shared/i18n.js (both precached).
-// v156: i18n audit — survival-kit. Wire the two <video> fallback strings to
+// v156: Full Mood Spectrum — new advanced setting to track mood on a 0–10 scale
+//       (spinnable wheel in focused mode, slider in the standard form) instead
+//       of the five fixed moods. Touches journal.html, js/journal.js,
+//       css/journal.css (all precached). [merged from origin/main, PR #84]
+// v157: i18n audit — survival-kit. Wire the two <video> fallback strings to
 //       the existing sk.memories.videoFallback key, and the med-accordion
 //       "NHS info ↗" link to the existing anon.wiki.nhsInfo (same text, already
-//       translated in all 10 locales). survival-kit.html was already ~226
-//       data-i18n deep; these were the last visible gaps. Mood-image alt text
-//       (screen-reader only) and seed quote/med data are intentionally left.
-//       Touches survival-kit.html + js/survival-kit.js (both precached).
-// v157: i18n audit — anonymous board moderation overlays. Wire the Mute, Ban
+//       translated in all 10 locales). Touches survival-kit.html +
+//       js/survival-kit.js (both precached).
+// v158: i18n audit — anonymous board moderation overlays. Wire the Mute, Ban
 //       and Comments (thread) sheets to a new anon.mute/ban/thread namespace,
 //       and route anonymous.js's name-interpolated mute/ban bodies through it
-//       (via _wt now forwarding {name}). English source + HTML/JS wired here;
-//       the 9 non-English locales land in v158. Touches anonymous.html,
+//       (via _wt now forwarding {name}). Touches anonymous.html,
 //       js/anonymous.js, js/shared/i18n.js (all precached).
-// v158: i18n audit — translate v157's anon.mute/ban/thread overlay keys into
-//       the 9 non-English locales (with the {name} interpolation token
-//       preserved). Completes v157. Touches js/shared/i18n.js.
-// v159: i18n audit — translate the anonymous About-screen help sections
-//       (Community guidelines, Post actions, Moderators-only lists + labels)
-//       into the 9 non-English locales, preserving all <br>/<strong>/&nbsp;
-//       markup and the 18+/zero-tolerance meaning. Completes v158's About
-//       wiring. Touches js/shared/i18n.js.
-// v160: i18n audit — anonymous board FAB tooltips (moniker settings, About,
+// v159: i18n audit — translate the anon.mute/ban/thread overlay keys into the
+//       9 non-English locales (with the {name} interpolation token preserved).
+//       Touches js/shared/i18n.js.
+// v160: i18n audit — anonymous About-screen help sections (Community
+//       guidelines, Post actions, Moderators-only lists + labels) wired and
+//       translated into all 10 locales, preserving <br>/<strong>/&nbsp; markup
+//       and the 18+/zero-tolerance meaning. Touches anonymous.html +
+//       js/shared/i18n.js.
+// v161: i18n audit — anonymous board FAB tooltips (moniker settings, About,
 //       Announcements, Write a post, Search wiki, General Chat, Privacy info)
 //       wired to a new anon.tips namespace across all 10 locales, plus the
 //       "Loading posts…" empty-state to the existing anon.board.loading. This
-//       completes anonymous.html's static-text i18n pass (data-i18n up to 139);
-//       remaining anonymous work is js/anonymous.js runtime toasts/errors.
+//       completes anonymous.html's static-text i18n pass (data-i18n up to 139).
 //       Touches anonymous.html + js/shared/i18n.js.
-const CACHE_NAME = 'bipolarbear-v160';
+const CACHE_NAME = 'bipolarbear-v161';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
