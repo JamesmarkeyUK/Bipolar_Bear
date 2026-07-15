@@ -2494,9 +2494,9 @@ window.addEventListener('pageshow', () => {
                 <div style="display:flex; align-items:center; gap:8px; flex-shrink:0; margin-left:8px;">
                   <img src="${_moodImg(entry.mood)}" alt="${_moodLabelOf(entry.mood)}" class="entry-mood" style="width:32px;height:32px;object-fit:contain;">
                   ${entry.linkedMood ? `<img src="${_moodImg(entry.linkedMood)}" alt="${_moodLabelOf(entry.linkedMood)}" style="width:22px;height:22px;object-fit:contain;opacity:0.75;margin-left:-4px;" title="Also: ${_moodLabelOf(entry.linkedMood)}">` : ''}
-                  ${entry.pdfHide ? `<span style="font-size:1em;line-height:1;opacity:0.7;" title="Private">🕵️</span>` : ''}
-                  ${entry.favourite ? `<span style="font-size:1em;color:var(--brand-primary);line-height:1;" title="Favourite">★</span>` : ''}
-                  <button class="edit-btn" id="edit-${actualIndex}" title="Edit entry" style="background:none; border:none; cursor:pointer; font-size:1.1em; padding:4px;">✏️</button>
+                  ${entry.pdfHide ? `<span style="font-size:1em;line-height:1;opacity:0.7;" title="${BB.t('journal.ui.privateTitle')}">🕵️</span>` : ''}
+                  ${entry.favourite ? `<span style="font-size:1em;color:var(--brand-primary);line-height:1;" title="${BB.t('journal.ui.favouriteTitle')}">★</span>` : ''}
+                  <button class="edit-btn" id="edit-${actualIndex}" title="${BB.t('journal.ui.editEntry')}" style="background:none; border:none; cursor:pointer; font-size:1.1em; padding:4px;">✏️</button>
                   <button class="delete-btn" id="delete-${actualIndex}">×</button>
                 </div>
               </div>
@@ -2548,9 +2548,9 @@ window.addEventListener('pageshow', () => {
         const paginationHtml = `
           <div style="margin-top: 15px;">
             <div class="pagination" style="justify-content: center; margin-bottom: 10px; flex-wrap:wrap; gap:4px;">
-              <button class="pagination-btn" onclick="goToPage(1)" ${currentPage === 1 ? 'disabled' : ''} title="First">«</button>
+              <button class="pagination-btn" onclick="goToPage(1)" ${currentPage === 1 ? 'disabled' : ''} title="${BB.t('journal.ui.firstPage')}">«</button>
               ${_pageButtons}
-              <button class="pagination-btn" onclick="goToPage(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''} title="Last">»</button>
+              <button class="pagination-btn" onclick="goToPage(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''} title="${BB.t('journal.ui.lastPage')}">»</button>
             </div>
             <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
               <button onclick="exportPDF()" class="btn-export-pdf" style="padding: 10px 20px; background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary); border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">${BB.t('journal.ui.exportPdf')}</button>
@@ -5100,7 +5100,7 @@ window.addEventListener('pageshow', () => {
                 const _border = i > 0 ? 'margin-top:7px;padding-top:7px;border-top:1px solid rgba(74,158,255,0.2);' : '';
                 return `<div style="display:flex;align-items:flex-start;gap:8px;${_border}">
                   <p style="flex:1;font-size:0.85em;color:#495057;margin:0;line-height:1.45;">${_esc}</p>
-                  <button onclick="_dismissQuickNote('${n.id}')" style="background:none;border:none;color:#adb5bd;font-size:1em;cursor:pointer;padding:0;line-height:1;flex-shrink:0;-webkit-tap-highlight-color:transparent;" title="Dismiss">✕</button>
+                  <button onclick="_dismissQuickNote('${n.id}')" style="background:none;border:none;color:#adb5bd;font-size:1em;cursor:pointer;padding:0;line-height:1;flex-shrink:0;-webkit-tap-highlight-color:transparent;" title="${BB.t('journal.ui.dismiss')}">✕</button>
                 </div>`;
               }).join('');
               _quickNotesHtml = `<div style="background:#f0f7ff;border-radius:10px;padding:10px 14px;margin-bottom:14px;border-left:3px solid #5b8dee;">
@@ -5652,7 +5652,7 @@ window.addEventListener('pageshow', () => {
                 <button onclick="var p=this.parentElement.nextElementSibling;p.style.display=p.style.display==='none'?'block':'none';this.querySelector('.bb-chev').style.transform=p.style.display==='none'?'rotate(0deg)':'rotate(180deg)';"
                   style="flex:1;padding:11px 14px;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;-webkit-tap-highlight-color:transparent;">
                   <span style="font-size:0.88em;color:#6c757d;font-weight:500;">${BB.t('journal.ui.bbThinksMightBe')}</span>
-                  <button onclick="document.getElementById('moodCalcInfoModal').classList.add('active')" style="background:none;border:none;color:#adb5bd;font-size:0.82em;cursor:pointer;padding:0 4px;-webkit-tap-highlight-color:transparent;line-height:1;flex-shrink:0;" title="How is this calculated?">ℹ️</button>
+                  <button onclick="document.getElementById('moodCalcInfoModal').classList.add('active')" style="background:none;border:none;color:#adb5bd;font-size:0.82em;cursor:pointer;padding:0 4px;-webkit-tap-highlight-color:transparent;line-height:1;flex-shrink:0;" title="${BB.t('journal.ui.howCalculated')}">ℹ️</button>
                   <span class="bb-chev" style="font-size:0.7em;color:#adb5bd;transition:transform 0.2s;margin-left:6px;">▼</span>
                 </button>
                 <button onclick="document.getElementById('hideSuggestionModal').classList.add('active')"
@@ -5698,7 +5698,7 @@ window.addEventListener('pageshow', () => {
               </button>
             </div>`;
           return `${_heroHtml}${_doneDate ? `<div style="text-align:center;font-size:0.92em;color:#6c757d;margin-bottom:10px;">📅 ${_doneDate}</div>` : ''}<div style="display:block;background:#f8f9fa;border-radius:14px;padding:16px;border-left:4px solid ${mc};max-width:100%;text-align:left;">
-            ${rows.map(r=>{const idx=_fmSteps.findIndex(s=>s.id===r.step);const editBtn=idx>=0?`<button onclick="_fmReturnToDone=true;_fmGoTo(${idx})" style="background:none;border:none;color:#6c757d;font-size:0.82em;cursor:pointer;padding:2px 4px;-webkit-tap-highlight-color:transparent;flex-shrink:0;" title="Edit">✏️</button>`:'';if(r.note){return `<details style="padding:3px 0;"><summary style="display:flex;align-items:center;flex-wrap:nowrap;gap:6px;font-size:0.9em;color:#495057;min-width:0;cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;">${r.wrap?`<span style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap;word-break:break-word;flex:1;">${r.text}</span>`:`<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;">${r.text}</span>`}${editBtn}<span style="font-size:0.65em;color:#adb5bd;flex-shrink:0;margin-left:2px;transition:transform 0.15s;" class="bb-note-chev">▶</span></summary><div style="font-size:0.82em;color:#495057;padding:5px 0 3px 12px;font-style:italic;word-break:break-word;line-height:1.4;">📝 ${r.note}</div></details>`;}return r.wrap?`<div style="padding:3px 0;"><div style="display:flex;align-items:center;gap:8px;font-size:0.9em;color:#495057;"><span style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap;word-break:break-word;flex:1;">${r.text}</span>${editBtn}</div></div>`:`<div style="padding:3px 0;"><div style="display:flex;align-items:center;flex-wrap:nowrap;gap:6px;font-size:0.9em;color:#495057;min-width:0;"><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;">${r.text}</span>${editBtn}</div></div>`;}).join('')}
+            ${rows.map(r=>{const idx=_fmSteps.findIndex(s=>s.id===r.step);const editBtn=idx>=0?`<button onclick="_fmReturnToDone=true;_fmGoTo(${idx})" style="background:none;border:none;color:#6c757d;font-size:0.82em;cursor:pointer;padding:2px 4px;-webkit-tap-highlight-color:transparent;flex-shrink:0;" title="${BB.t('journal.ui.editTitle')}">✏️</button>`:'';if(r.note){return `<details style="padding:3px 0;"><summary style="display:flex;align-items:center;flex-wrap:nowrap;gap:6px;font-size:0.9em;color:#495057;min-width:0;cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;">${r.wrap?`<span style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap;word-break:break-word;flex:1;">${r.text}</span>`:`<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;">${r.text}</span>`}${editBtn}<span style="font-size:0.65em;color:#adb5bd;flex-shrink:0;margin-left:2px;transition:transform 0.15s;" class="bb-note-chev">▶</span></summary><div style="font-size:0.82em;color:#495057;padding:5px 0 3px 12px;font-style:italic;word-break:break-word;line-height:1.4;">📝 ${r.note}</div></details>`;}return r.wrap?`<div style="padding:3px 0;"><div style="display:flex;align-items:center;gap:8px;font-size:0.9em;color:#495057;"><span style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap;word-break:break-word;flex:1;">${r.text}</span>${editBtn}</div></div>`:`<div style="padding:3px 0;"><div style="display:flex;align-items:center;flex-wrap:nowrap;gap:6px;font-size:0.9em;color:#495057;min-width:0;"><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;">${r.text}</span>${editBtn}</div></div>`;}).join('')}
           </div>${_privRow}${_suggestion}${_actions}`;
         }
 
@@ -7412,9 +7412,9 @@ window.addEventListener('pageshow', () => {
         if (isToday || isYesterday || isTomorrow || isBirthday) {
           extraStyle = 'flex-direction:column;gap:1px;';
           if (isToday && isBirthday) displayText = `<span style="line-height:1;">${d}</span><span style="font-size:0.55em;line-height:1;"><span style="font-size:1.3em;">🎂</span></span>`;
-          else if (isToday) displayText = `<span style="line-height:1;">${d}</span><span style="font-size:0.55em;line-height:1;">today</span>`;
-          else if (isYesterday) displayText = `<span style="line-height:1;">${d}</span><span style="font-size:0.55em;line-height:1;">yest.</span>`;
-          else if (isTomorrow) displayText = `<span style="line-height:1;">${d}</span><span style="font-size:0.55em;line-height:1;">tmrw</span>`;
+          else if (isToday) displayText = `<span style="line-height:1;">${d}</span><span style="font-size:0.55em;line-height:1;">${BB.t('journal.ui.today')}</span>`;
+          else if (isYesterday) displayText = `<span style="line-height:1;">${d}</span><span style="font-size:0.55em;line-height:1;">${BB.t('journal.ui.yesterday')}</span>`;
+          else if (isTomorrow) displayText = `<span style="line-height:1;">${d}</span><span style="font-size:0.55em;line-height:1;">${BB.t('journal.ui.tomorrow')}</span>`;
           else if (isBirthday) displayText = `<span style="line-height:1;">${d}</span><span style="font-size:0.8em;line-height:1;">🎂</span>`;
         }
         cells += `<div ${!isFuture ? `onclick="showCalDayDetail('${key}')" class="cal-cell"` : ''} style="aspect-ratio:1;overflow:hidden;background:${bg};border-radius:6px;border:${border};display:flex;align-items:center;justify-content:center;${extraStyle}font-size:0.7em;color:${color};font-weight:600;opacity:${opacity};${!isFuture?'cursor:pointer;':''}">${displayText}</div>`;
@@ -9925,7 +9925,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
           </button>
           <div id="tfCustomRow" style="display:none;padding:8px 14px 12px;border-top:1px solid #f1f3f5;">
             <div style="display:flex;gap:6px;align-items:center;">
-              <input id="tfCustomInput" type="number" min="1" max="3650" placeholder="e.g. 180"
+              <input id="tfCustomInput" type="number" min="1" max="3650" placeholder="${BB.t('journal.ui.eg180')}"
                 style="width:90px;padding:7px 10px;border:1.5px solid #dee2e6;border-radius:8px;font-size:0.95em;outline:none;"
                 onkeydown="if(event.key==='Enter')_tfPickerSelectCustom()"
                 onclick="event.stopPropagation()">
@@ -10054,7 +10054,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
             <div class="medication-dose">${med.dosage || ''}</div>
           </div>
           <div style="display:flex;gap:6px;align-items:center;">
-            <button class="medication-edit" data-med-index="${index}" title="Edit" style="background:none;border:none;font-size:1.1em;cursor:pointer;padding:4px;">✏️</button>
+            <button class="medication-edit" data-med-index="${index}" title="${BB.t('journal.ui.editTitle')}" style="background:none;border:none;font-size:1.1em;cursor:pointer;padding:4px;">✏️</button>
             <button class="medication-delete" data-med-index="${index}" style="font-size:1.1em;">×</button>
           </div>
         </div>
@@ -11551,7 +11551,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
             ).join('');
             return `<div style="padding:8px 4px 6px;border-bottom:1px solid #f0f0f0;background:#fafafa;">
               <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <button id="editEmojiPickerBtn" onclick="toggleEditEmojiPicker()" title="Pick emoji" style="width:38px;height:38px;min-width:38px;border-radius:8px;border:1.5px solid #e9ecef;background:#fff;font-size:1.2em;cursor:pointer;-webkit-tap-highlight-color:transparent;">${_editingFieldEmoji || f.label.split(' ')[0]}</button>
+                <button id="editEmojiPickerBtn" onclick="toggleEditEmojiPicker()" title="${BB.t('journal.ui.pickEmoji')}" style="width:38px;height:38px;min-width:38px;border-radius:8px;border:1.5px solid #e9ecef;background:#fff;font-size:1.2em;cursor:pointer;-webkit-tap-highlight-color:transparent;">${_editingFieldEmoji || f.label.split(' ')[0]}</button>
                 <input id="builtinFieldEditInput" type="text" value="${_storedLabel ? _storedLabel.replace(/^\S+\s*/, '') : f.label.replace(/^\S+\s*/, '')}" maxlength="20"
                   style="flex:1;height:38px;padding:0 10px;border:1.5px solid #e9ecef;border-radius:8px;font-size:0.9em;outline:none;box-sizing:border-box;"
                   onkeydown="if(event.key==='Enter')saveBuiltinFieldLabel('${f.key}')">
@@ -11599,7 +11599,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
         if (_editingFieldId === f.id) {
           return `<div style="padding:8px 4px 6px;border-bottom:1px solid #f0f0f0;background:#fafafa;">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-              <button id="editEmojiPickerBtn" onclick="toggleEditEmojiPicker()" title="Pick emoji" style="width:38px;height:38px;min-width:38px;border-radius:8px;border:1.5px solid #e9ecef;background:#fff;font-size:1.2em;cursor:pointer;-webkit-tap-highlight-color:transparent;">${_editingFieldEmoji || '🏷️'}</button>
+              <button id="editEmojiPickerBtn" onclick="toggleEditEmojiPicker()" title="${BB.t('journal.ui.pickEmoji')}" style="width:38px;height:38px;min-width:38px;border-radius:8px;border:1.5px solid #e9ecef;background:#fff;font-size:1.2em;cursor:pointer;-webkit-tap-highlight-color:transparent;">${_editingFieldEmoji || '🏷️'}</button>
               <input id="customFieldEditInput" type="text" value="${f.label}" maxlength="15"
                 style="flex:1;height:38px;padding:0 10px;border:1.5px solid #e9ecef;border-radius:8px;font-size:0.9em;outline:none;box-sizing:border-box;"
                 onkeydown="if(event.key==='Enter')saveCustomFieldEdit()">
@@ -11627,8 +11627,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
       ).join('');
       const addForm = `<div id="customFieldAddRow" style="padding:10px 4px 6px;">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <button id="emojiPickerBtn" onclick="toggleEmojiPicker()" title="Pick emoji" style="width:38px;height:38px;min-width:38px;border-radius:8px;border:1.5px solid #e9ecef;background:#fafafa;font-size:1.2em;cursor:pointer;-webkit-tap-highlight-color:transparent;">${_pickerEmoji || '🏷️'}</button>
-          <input id="customFieldInput" type="text" placeholder="Field name… (max 15)" maxlength="15"
+          <button id="emojiPickerBtn" onclick="toggleEmojiPicker()" title="${BB.t('journal.ui.pickEmoji')}" style="width:38px;height:38px;min-width:38px;border-radius:8px;border:1.5px solid #e9ecef;background:#fafafa;font-size:1.2em;cursor:pointer;-webkit-tap-highlight-color:transparent;">${_pickerEmoji || '🏷️'}</button>
+          <input id="customFieldInput" type="text" placeholder="${BB.t('journal.ui.fieldNameMax')}" maxlength="15"
             style="flex:1;height:38px;padding:0 10px;border:1.5px solid #e9ecef;border-radius:8px;font-size:0.9em;outline:none;box-sizing:border-box;"
             onkeydown="if(event.key==='Enter')addCustomField()">
           <button onclick="addCustomField()" style="height:38px;box-sizing:border-box;background:var(--brand-primary);color:white;border:none;border-radius:8px;padding:0 12px;font-size:0.85em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">Add</button>
