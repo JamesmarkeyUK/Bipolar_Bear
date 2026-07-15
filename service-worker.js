@@ -703,7 +703,10 @@
 //       (via _wt now forwarding {name}). English source + HTML/JS wired here;
 //       the 9 non-English locales land in v158. Touches anonymous.html,
 //       js/anonymous.js, js/shared/i18n.js (all precached).
-const CACHE_NAME = 'bipolarbear-v157';
+// v158: i18n audit — translate v157's anon.mute/ban/thread overlay keys into
+//       the 9 non-English locales (with the {name} interpolation token
+//       preserved). Completes v157. Touches js/shared/i18n.js.
+const CACHE_NAME = 'bipolarbear-v158';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

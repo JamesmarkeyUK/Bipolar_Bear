@@ -1504,6 +1504,9 @@
         selfDelete: { title: '¿Eliminar tu publicación?', sub: 'Esto eliminará permanentemente tu publicación. No se puede deshacer.', keep: 'Conservarla', remove: 'Eliminar publicación' },
         adminDelete: { title: '¿Eliminar Publicación?', sub: 'Esta publicación será reemplazada con "eliminado por admin".', cancel: 'Cancelar', delete: 'Eliminar 🗑️' },
         about: { subtitle: 'Un espacio seguro para personas con bipolar', body: 'Esta es una comunidad anónima para personas con trastorno bipolar.', guidelinesTitle: 'Normas de la comunidad', poweredTitle: 'Desarrollado por BipolarBear', poweredBody: 'BipolarBear es un diario de ánimo gratuito para personas con trastorno bipolar.', discover: '🐻 Descubrir BipolarBear →', close: 'Cerrar' },
+        mute: { title: '¿Silenciar a este usuario?', body: 'Todas sus publicaciones y comentarios se ocultarán en este dispositivo. Puedes dejar de silenciarlo en cualquier momento desde la pantalla Acerca de.', bodyNamed: '¿Ocultar todas las publicaciones y comentarios de {name} en este dispositivo? Puedes dejar de silenciarlo en cualquier momento desde la pantalla Acerca de.', confirm: 'Silenciar 🙈' },
+        ban: { title: '¿Vetar a este usuario?', body: 'Sus publicaciones existentes se eliminarán y no podrá volver a publicar ni comentar.', bodyNamed: '¿Vetar a {name}? Sus publicaciones existentes se eliminarán y no podrá volver a publicar ni comentar.', confirm: 'Vetar 🚫' },
+        thread: { title: 'Comentarios', placeholder: 'Añade un comentario…', send: 'Enviar 💛' },
       },
       journal: {
         hint: {
@@ -1965,6 +1968,9 @@
           medSubBbAdd: 'Ajoutez vos médicaments actuels. Les modifications mettront aussi à jour votre application BipolarBear.',
         },
         time: { now: 'à l\'instant' },
+        mute: { title: 'Masquer cet utilisateur ?', body: 'Tous ses posts et commentaires seront masqués sur cet appareil. Vous pouvez le réafficher à tout moment depuis l\'écran À propos.', bodyNamed: 'Masquer tous les posts et commentaires de {name} sur cet appareil ? Vous pouvez le réafficher à tout moment depuis l\'écran À propos.', confirm: 'Masquer 🙈' },
+        ban: { title: 'Bannir cet utilisateur ?', body: 'Ses posts existants seront supprimés et il ne pourra plus publier ni commenter.', bodyNamed: 'Bannir {name} ? Ses posts existants seront supprimés et il ne pourra plus publier ni commenter.', confirm: 'Bannir 🚫' },
+        thread: { title: 'Commentaires', placeholder: 'Ajouter un commentaire…', send: 'Envoyer 💛' },
       },
       journal: {
         hint: {
@@ -2940,6 +2946,9 @@
         selfDelete: { title: 'Ihren Beitrag entfernen?', sub: 'Dies löscht Ihren Beitrag dauerhaft. Kann nicht rückgängig gemacht werden.', keep: 'Behalten', remove: 'Beitrag entfernen' },
         adminDelete: { title: 'Beitrag löschen?', sub: 'Dieser Beitrag wird durch "von Admin gelöscht" ersetzt.', cancel: 'Abbrechen', delete: 'Löschen 🗑️' },
         about: { subtitle: 'Ein sicherer Ort für Menschen mit Bipolar', body: 'Eine anonyme Community für Menschen mit bipolarer Störung.', guidelinesTitle: 'Community-Richtlinien', poweredTitle: 'Powered by BipolarBear', poweredBody: 'BipolarBear ist ein kostenloses Stimmungstagebuch für Menschen mit bipolarer Störung.', discover: '🐻 BipolarBear entdecken →', close: 'Schließen' },
+        mute: { title: 'Diesen Benutzer stummschalten?', body: 'Alle seine Beiträge und Kommentare werden auf diesem Gerät ausgeblendet. Sie können die Stummschaltung jederzeit über den Info-Bildschirm aufheben.', bodyNamed: 'Alle Beiträge und Kommentare von {name} auf diesem Gerät ausblenden? Sie können die Stummschaltung jederzeit über den Info-Bildschirm aufheben.', confirm: 'Stummschalten 🙈' },
+        ban: { title: 'Diesen Benutzer sperren?', body: 'Seine vorhandenen Beiträge werden entfernt und er kann nicht mehr posten oder kommentieren.', bodyNamed: '{name} sperren? Seine vorhandenen Beiträge werden entfernt und er kann nicht mehr posten oder kommentieren.', confirm: 'Sperren 🚫' },
+        thread: { title: 'Kommentare', placeholder: 'Kommentar hinzufügen…', send: 'Senden 💛' },
       },
       journal: {
         hint: {
@@ -3305,6 +3314,9 @@
         selfDelete: { title: 'Rimuovere il tuo post?', sub: 'Questo eliminerà definitivamente il tuo post. Non può essere annullato.', keep: 'Tienilo', remove: 'Rimuovi post' },
         adminDelete: { title: 'Eliminare il Post?', sub: 'Questo post sarà sostituito con "eliminato dall\'admin".', cancel: 'Annulla', delete: 'Elimina 🗑️' },
         about: { subtitle: 'Uno spazio sicuro per le persone con bipolare', body: 'Una comunità anonima per persone con disturbo bipolare.', guidelinesTitle: 'Linee guida della comunità', poweredTitle: 'Powered by BipolarBear', poweredBody: 'BipolarBear è un diario dell\'umore gratuito per persone con disturbo bipolare.', discover: '🐻 Scopri BipolarBear →', close: 'Chiudi' },
+        mute: { title: 'Silenziare questo utente?', body: 'Tutti i suoi post e commenti saranno nascosti su questo dispositivo. Puoi riattivarlo in qualsiasi momento dalla schermata Informazioni.', bodyNamed: 'Nascondere tutti i post e i commenti di {name} su questo dispositivo? Puoi riattivarlo in qualsiasi momento dalla schermata Informazioni.', confirm: 'Silenzia 🙈' },
+        ban: { title: 'Bandire questo utente?', body: 'I suoi post esistenti saranno rimossi e non potrà più pubblicare né commentare.', bodyNamed: 'Bandire {name}? I suoi post esistenti saranno rimossi e non potrà più pubblicare né commentare.', confirm: 'Bandisci 🚫' },
+        thread: { title: 'Commenti', placeholder: 'Aggiungi un commento…', send: 'Invia 💛' },
       },
       journal: {
         hint: {
@@ -3670,6 +3682,9 @@
         selfDelete: { title: 'Remover sua publicação?', sub: 'Isso excluirá permanentemente sua publicação. Não pode ser desfeito.', keep: 'Manter', remove: 'Remover publicação' },
         adminDelete: { title: 'Excluir Publicação?', sub: 'Esta publicação será substituída por "excluído pelo admin".', cancel: 'Cancelar', delete: 'Excluir 🗑️' },
         about: { subtitle: 'Um espaço seguro para pessoas com transtorno bipolar', body: 'Uma comunidade anônima para pessoas com transtorno bipolar.', guidelinesTitle: 'Diretrizes da comunidade', poweredTitle: 'Desenvolvido por BipolarBear', poweredBody: 'BipolarBear é um diário de humor gratuito para pessoas com transtorno bipolar.', discover: '🐻 Descobrir BipolarBear →', close: 'Fechar' },
+        mute: { title: 'Silenciar este usuário?', body: 'Todas as suas publicações e comentários serão ocultados neste dispositivo. Você pode reativá-lo a qualquer momento na tela Sobre.', bodyNamed: 'Ocultar todas as publicações e comentários de {name} neste dispositivo? Você pode reativá-lo a qualquer momento na tela Sobre.', confirm: 'Silenciar 🙈' },
+        ban: { title: 'Banir este usuário?', body: 'As suas publicações existentes serão removidas e ele não poderá mais publicar ou comentar.', bodyNamed: 'Banir {name}? As suas publicações existentes serão removidas e ele não poderá mais publicar ou comentar.', confirm: 'Banir 🚫' },
+        thread: { title: 'Comentários', placeholder: 'Adicionar um comentário…', send: 'Enviar 💛' },
       },
       journal: {
         hint: {
@@ -4035,6 +4050,9 @@
         selfDelete: { title: 'Uw bericht verwijderen?', sub: 'Dit verwijdert uw bericht permanent. Dit kan niet ongedaan worden gemaakt.', keep: 'Bewaren', remove: 'Bericht verwijderen' },
         adminDelete: { title: 'Bericht verwijderen?', sub: 'Dit bericht wordt vervangen door "verwijderd door admin".', cancel: 'Annuleren', delete: 'Verwijderen 🗑️' },
         about: { subtitle: 'Een veilige plek voor mensen met bipolariteit', body: 'Een anonieme community voor mensen met een bipolaire stoornis.', guidelinesTitle: 'Community richtlijnen', poweredTitle: 'Powered by BipolarBear', poweredBody: 'BipolarBear is een gratis stemmingsdagboek voor mensen met een bipolaire stoornis.', discover: '🐻 Ontdek BipolarBear →', close: 'Sluiten' },
+        mute: { title: 'Deze gebruiker dempen?', body: 'Al hun berichten en reacties worden op dit apparaat verborgen. U kunt ze op elk moment weer tonen via het scherm Over.', bodyNamed: 'Alle berichten en reacties van {name} op dit apparaat verbergen? U kunt ze op elk moment weer tonen via het scherm Over.', confirm: 'Dempen 🙈' },
+        ban: { title: 'Deze gebruiker verbannen?', body: 'Hun bestaande berichten worden verwijderd en ze kunnen niet meer plaatsen of reageren.', bodyNamed: '{name} verbannen? Hun bestaande berichten worden verwijderd en ze kunnen niet meer plaatsen of reageren.', confirm: 'Verbannen 🚫' },
+        thread: { title: 'Reacties', placeholder: 'Een reactie toevoegen…', send: 'Verzenden 💛' },
       },
       journal: {
         hint: {
@@ -4400,6 +4418,9 @@
         selfDelete: { title: 'Usunąć Twój wpis?', sub: 'To trwale usunie Twój wpis. Nie można tego cofnąć.', keep: 'Zachowaj', remove: 'Usuń wpis' },
         adminDelete: { title: 'Usunąć Wpis?', sub: 'Ten wpis zostanie zastąpiony przez "usunięty przez admina".', cancel: 'Anuluj', delete: 'Usuń 🗑️' },
         about: { subtitle: 'Bezpieczne miejsce dla osób z chorobą dwubiegunową', body: 'Anonimowa społeczność dla osób z chorobą dwubiegunową.', guidelinesTitle: 'Zasady społeczności', poweredTitle: 'Powered by BipolarBear', poweredBody: 'BipolarBear to bezpłatny dziennik nastroju dla osób z chorobą dwubiegunową.', discover: '🐻 Odkryj BipolarBear →', close: 'Zamknij' },
+        mute: { title: 'Wyciszyć tego użytkownika?', body: 'Wszystkie jego wpisy i komentarze zostaną ukryte na tym urządzeniu. W każdej chwili możesz cofnąć wyciszenie na ekranie O aplikacji.', bodyNamed: 'Ukryć wszystkie wpisy i komentarze użytkownika {name} na tym urządzeniu? W każdej chwili możesz cofnąć wyciszenie na ekranie O aplikacji.', confirm: 'Wycisz 🙈' },
+        ban: { title: 'Zbanować tego użytkownika?', body: 'Jego istniejące wpisy zostaną usunięte i nie będzie mógł już publikować ani komentować.', bodyNamed: 'Zbanować użytkownika {name}? Jego istniejące wpisy zostaną usunięte i nie będzie mógł już publikować ani komentować.', confirm: 'Zbanuj 🚫' },
+        thread: { title: 'Komentarze', placeholder: 'Dodaj komentarz…', send: 'Wyślij 💛' },
       },
       journal: {
         hint: {
@@ -4769,6 +4790,9 @@
         selfDelete: { title: 'Ta bort ditt inlägg?', sub: 'Detta tar bort ditt inlägg permanent. Kan inte ångras.', keep: 'Behåll det', remove: 'Ta bort inlägg' },
         adminDelete: { title: 'Ta bort Inlägg?', sub: 'Det här inlägget ersätts med "raderat av admin".', cancel: 'Avbryt', delete: 'Ta bort 🗑️' },
         about: { subtitle: 'Ett tryggt utrymme för människor med bipolaritet', body: 'En anonym gemenskap för människor med bipolärt syndrom.', guidelinesTitle: 'Gemenskapens riktlinjer', poweredTitle: 'Powered by BipolarBear', poweredBody: 'BipolarBear är en gratis stämningsdagbok för människor med bipolärt syndrom.', discover: '🐻 Upptäck BipolarBear →', close: 'Stäng' },
+        mute: { title: 'Tysta den här användaren?', body: 'Alla deras inlägg och kommentarer döljs på den här enheten. Du kan sluta tysta dem när som helst från Om-skärmen.', bodyNamed: 'Dölja alla inlägg och kommentarer från {name} på den här enheten? Du kan sluta tysta dem när som helst från Om-skärmen.', confirm: 'Tysta 🙈' },
+        ban: { title: 'Stänga av den här användaren?', body: 'Deras befintliga inlägg tas bort och de kommer inte att kunna posta eller kommentera igen.', bodyNamed: 'Stänga av {name}? Deras befintliga inlägg tas bort och de kommer inte att kunna posta eller kommentera igen.', confirm: 'Stäng av 🚫' },
+        thread: { title: 'Kommentarer', placeholder: 'Lägg till en kommentar…', send: 'Skicka 💛' },
       },
       journal: {
         hint: {
@@ -5134,6 +5158,9 @@
         selfDelete: { title: '删除您的帖子？', sub: '这将永久删除您的帖子，无法撤销。', keep: '保留', remove: '删除帖子' },
         adminDelete: { title: '删除帖子？', sub: '此帖子将被替换为"已由管理员删除"，无法撤销。', cancel: '取消', delete: '删除 🗑️' },
         about: { subtitle: '为双相情感障碍患者提供的安全空间', body: '这是一个为双相情感障碍患者提供的匿名同伴社区。', guidelinesTitle: '社区指南', poweredTitle: '由BipolarBear提供支持', poweredBody: 'BipolarBear是一款为双相情感障碍患者提供的免费情绪日记应用。', discover: '🐻 发现BipolarBear →', close: '关闭' },
+        mute: { title: '屏蔽此用户？', body: '他们的所有帖子和评论将在此设备上被隐藏。您可以随时在“关于”页面取消屏蔽。', bodyNamed: '在此设备上隐藏 {name} 的所有帖子和评论？您可以随时在“关于”页面取消屏蔽。', confirm: '屏蔽 🙈' },
+        ban: { title: '封禁此用户？', body: '他们现有的帖子将被移除，并且将无法再发帖或评论。', bodyNamed: '封禁 {name}？他们现有的帖子将被移除，并且将无法再发帖或评论。', confirm: '封禁 🚫' },
+        thread: { title: '评论', placeholder: '添加评论…', send: '发送 💛' },
       },
       journal: {
         hint: {
