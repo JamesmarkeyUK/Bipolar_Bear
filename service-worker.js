@@ -690,7 +690,14 @@
 //       across all 10 locales. Completes the journal.html static-text pass;
 //       the JS-branded healthSyncLabel/Desc stay in journal.js. Touches
 //       journal.html + js/shared/i18n.js (both precached).
-const CACHE_NAME = 'bipolarbear-v155';
+// v156: i18n audit — survival-kit. Wire the two <video> fallback strings to
+//       the existing sk.memories.videoFallback key, and the med-accordion
+//       "NHS info ↗" link to the existing anon.wiki.nhsInfo (same text, already
+//       translated in all 10 locales). survival-kit.html was already ~226
+//       data-i18n deep; these were the last visible gaps. Mood-image alt text
+//       (screen-reader only) and seed quote/med data are intentionally left.
+//       Touches survival-kit.html + js/survival-kit.js (both precached).
+const CACHE_NAME = 'bipolarbear-v156';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

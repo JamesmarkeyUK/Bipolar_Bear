@@ -581,7 +581,7 @@ function _sktMood(moodKey) {
         <button class="accordion-header" onclick="toggleAccordion(this)">${med.title}<span class="chevron">▼</span></button>
         <div class="accordion-body">
           <p>${med.body}</p>
-          <a href="${med.nhs}" target="_blank" class="link-btn secondary" style="font-size:0.82em; padding:6px 12px; margin-top:8px;">NHS info ↗</a>
+          <a href="${med.nhs}" target="_blank" class="link-btn secondary" style="font-size:0.82em; padding:6px 12px; margin-top:8px;">${_skt('anon.wiki.nhsInfo')}</a>
         </div>
       </div>`;
     }
