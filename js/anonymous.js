@@ -1309,7 +1309,7 @@ function openMedSettings() {
     await _anonSaveMedList(medList);
     _anonSaveProfile(); _bbSaveProfile();
     closeOv('ov-med');
-    showHint('Medication updated ✓');
+    showHint(_wt('anon.toast.medUpdated'));
   };
 
   openOv('ov-med');
@@ -3129,19 +3129,19 @@ function setupThread() {
     if (!text || !commentTargetId) return;
     // Banned users can't comment (Apple UGC 1.2).
     if (isBanned(profile.monika)) {
-      showHint('Your access to the community has been revoked.');
+      showHint(_wt('anon.toast.accessRevoked'));
       return;
     }
     // Content filter (Apple UGC 1.2).
     if (findBlockedTerm(text)) {
-      showHint('That comment may contain objectionable language. Please edit it. 💛');
+      showHint(_wt('anon.toast.commentObjectionable'));
       sendBtn.disabled = false;
       return;
     }
     // Per-thread gate (mirrors the compose gate): you can leave a comment, but
     // not a second one in a row — wait until someone else replies first.
     if (!profile.isAdmin && lastCommentAuthor && lastCommentAuthor === profile.monika) {
-      showHint('Please wait until someone else replies before commenting again.');
+      showHint(_wt('anon.toast.commentWait'));
       return;
     }
     _sending = true;
@@ -3186,7 +3186,7 @@ function setupThread() {
     } else {
       // Keep the typed text so the user can retry, and say what happened —
       // previously this failed silently and the comment just vanished.
-      showHint('Comment failed to send — please try again.');
+      showHint(_wt('anon.toast.commentFailed'));
       sendBtn.disabled = !ta.value.trim();
     }
     _sending = false;
@@ -3213,14 +3213,14 @@ async function handlePin(postId, tab) {
       existing.docs.forEach(doc => batch.update(doc.ref, { pinned: false }));
       batch.update(db.collection(BB_BRAND.collections.posts).doc(postId), { pinned: true });
       await batch.commit();
-      showHint('Post pinned 📌');
+      showHint(_wt('anon.toast.postPinned'));
     } else {
       await db.collection(BB_BRAND.collections.posts).doc(postId).update({ pinned: false });
-      showHint('Post unpinned');
+      showHint(_wt('anon.toast.postUnpinned'));
     }
   } catch (e) {
     console.error('[Admin] pin failed', e);
-    showHint('Failed to update pin');
+    showHint(_wt('anon.toast.pinFailed'));
   }
 }
 
@@ -3497,7 +3497,7 @@ function handleLike(btn) {
 
   // Block self-likes (allow un-liking if somehow previously liked, to clean up)
   if (!liked && btn.dataset.author === profile.monika) {
-    showHint("You can't like your own post 😊");
+    showHint(_wt('anon.toast.cantLikeOwn'));
     return;
   }
 
@@ -3536,21 +3536,21 @@ function pollCanPost() {
 // ─────────────────────────────────────────────────────────────────
 function setupFAB() {
   document.getElementById('fab-ann').addEventListener('click', () => {
-    if (currentTab === 'announcements') { showHint('Announcements already open'); return; }
+    if (currentTab === 'announcements') { showHint(_wt('anon.toast.annOpen')); return; }
     setTab('announcements');
   });
   document.getElementById('fab-gen').addEventListener('click', () => {
-    if (currentTab === 'general') { showHint('General chat already open'); return; }
+    if (currentTab === 'general') { showHint(_wt('anon.toast.genOpen')); return; }
     setTab('general');
   });
   document.getElementById('fab-compose').addEventListener('click', () => {
     if (isBanned(profile.monika)) {
-      showHint('Your access to the community has been revoked.');
+      showHint(_wt('anon.toast.accessRevoked'));
       return;
     }
     const latest = getLatestRealPost(currentTab);
     if (!profile.isAdmin && latest && latest.name === profile.monika && (latest.likes || 0) === 0) {
-      showHint('Please wait until someone else reacts to your message or posts another one.');
+      showHint(_wt('anon.toast.reactWait'));
       return;
     }
     document.getElementById('compose-ta').value = '';
@@ -3584,12 +3584,12 @@ function setupCompose() {
     if (!text) return;
     // Banned users can't post (Apple UGC 1.2 — ejected users stay out).
     if (isBanned(profile.monika)) {
-      showHint('Your access to the community has been revoked.');
+      showHint(_wt('anon.toast.accessRevoked'));
       return;
     }
     // Content filter (Apple UGC 1.2). Keep the overlay open so the user can edit.
     if (findBlockedTerm(text)) {
-      showHint('That post may contain objectionable language. Please edit it to keep the community safe. 💛');
+      showHint(_wt('anon.toast.postObjectionable'));
       post.disabled = false;
       return;
     }
@@ -3724,7 +3724,7 @@ function setupOverlayActions() {
         reportedBy: profile.monika, timestamp: firebase.firestore.FieldValue.serverTimestamp(),
       }).catch(() => {});
     }
-    showHint('SOS sent to moderators 🆘');
+    showHint(_wt('anon.toast.sosSent'));
   });
 
   // Report
@@ -3758,7 +3758,7 @@ function setupOverlayActions() {
       }
       reportCommentMeta = null;
       reportTargetId = '';
-      showHint('Report submitted — thank you 🙏');
+      showHint(_wt('anon.toast.reportSubmitted'));
     });
   });
 
@@ -3770,7 +3770,7 @@ function setupOverlayActions() {
     mutedUsers.add(muteTargetName);
     saveMuted();
     renderPosts(currentTab === 'general' ? assembleGeneralPosts(localPosts) : sortPosts(localPosts));
-    showHint(`[${muteTargetName}] muted — unmute from the About screen 🙈`);
+    showHint(_wt('anon.toast.mutedNamed', { name: `[${muteTargetName}]` }));
     muteTargetName = '';
   });
 
@@ -3789,7 +3789,7 @@ function setupOverlayActions() {
       localPosts = localPosts.filter(p => p.id !== selfDeleteId);
       renderPosts(currentTab === 'general' ? assembleGeneralPosts(localPosts) : sortPosts(localPosts));
     }
-    showHint('Post removed ✓');
+    showHint(_wt('anon.toast.postRemoved'));
   });
 
   // Admin delete
@@ -3823,7 +3823,7 @@ function adminDeletePost(id) {
     deletedByAdmin: true,
     deletedAt: firebase.firestore.FieldValue.serverTimestamp(),
   }).catch(err => console.error('[Admin] delete failed', err));
-  showHint('Post deleted 🛡️');
+  showHint(_wt('anon.toast.postDeleted'));
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -3849,7 +3849,7 @@ function adminBanUser(name) {
       deletedAt: firebase.firestore.FieldValue.serverTimestamp(),
     }).catch(() => {})))
     .catch(() => {});
-  showHint(`[${name}] banned and removed 🚫`);
+  showHint(_wt('anon.toast.bannedNamed', { name: `[${name}]` }));
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -4050,7 +4050,7 @@ async function deleteAnonAccount() {
     if (btn) { btn.disabled = false; btn.textContent = 'Delete forever'; }
     closeOv('ov-anon-delete');
     boot(null);
-    showHint('Your account has been deleted');
+    showHint(_wt('anon.toast.accountDeleted'));
   }
 }
 
@@ -4067,12 +4067,12 @@ document.getElementById('ms-stable-btn').addEventListener('click', openStableSet
 
 document.getElementById('ms-save').addEventListener('click', async () => {
   const newMonika = document.getElementById('ms-monika').value.trim();
-  if (newMonika.length < 2) { showHint('Moniker must be at least 2 characters'); return; }
+  if (newMonika.length < 2) { showHint(_wt('anon.toast.monikaTooShort')); return; }
 
   const oldMonika = profile.monika;
   try {
     if (await isMonikaInUse(newMonika, oldMonika)) {
-      showHint('That name is already taken');
+      showHint(_wt('anon.toast.nameTaken'));
       return;
     }
   } catch (e) { /* network error — allow through */ }
@@ -4086,7 +4086,7 @@ document.getElementById('ms-save').addEventListener('click', async () => {
 
   closeOv('ov-monika');
   renderUserPill();
-  showHint('Moniker updated ✓');
+  showHint(_wt('anon.toast.monikaUpdated'));
 
   // Update past Firestore posts authored by this user
   if (db && oldMonika) {
