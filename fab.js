@@ -67,8 +67,8 @@
    * @returns {void}
    */
   function _confirmDeleteGuestData() {
-    if (!confirm('This will permanently delete all your guest data — journal entries, settings, and preferences. There is no way to recover them.\n\nAre you absolutely sure?')) return;
-    if (!confirm('Last chance — everything will be deleted and you will start fresh. Continue?')) return;
+    if (!confirm(_bbT('fab.guestDelete1', 'This will permanently delete all your guest data — journal entries, settings, and preferences. There is no way to recover them.\n\nAre you absolutely sure?'))) return;
+    if (!confirm(_bbT('fab.guestDelete2', 'Last chance — everything will be deleted and you will start fresh. Continue?'))) return;
     _nukeGuestData();
   }
 
@@ -330,65 +330,65 @@
       <div class="fab-footer" aria-hidden="true"></div>
 
       <!-- Core default FABs -->
-      <button class="whatsapp-fab" id="chatFab" onclick="openChatModal()" title="Crisis support">🆘</button>
+      <button class="whatsapp-fab" id="chatFab" onclick="openChatModal()" title="Crisis support" data-i18n-title="fab.crisis.tooltip">🆘</button>
       <div id="chatModal" class="bb-fab-modal" onclick="if(event.target===this)closeChatModal()">
         <div style="background:white;border-radius:20px;padding:24px 24px 20px;text-align:center;max-width:300px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);">
           <div style="font-size:2em;margin-bottom:8px;">🆘</div>
-          <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:6px;">Crisis Support</div>
-          <p style="font-size:0.84em;color:#6c757d;margin-bottom:14px;">If you're struggling and need to talk to someone:</p>
+          <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:6px;" data-i18n="fab.crisis.title">Crisis Support</div>
+          <p style="font-size:0.84em;color:#6c757d;margin-bottom:14px;" data-i18n="fab.crisis.body">If you're struggling and need to talk to someone:</p>
           <a href="tel:116123" style="display:flex;align-items:center;gap:12px;padding:13px 14px;background:#f8f9fa;border-radius:12px;text-decoration:none;color:#212529;margin-bottom:14px;text-align:left;">
             <span style="font-size:1.6em;line-height:1;">📞</span>
             <div>
               <div style="font-weight:700;font-size:0.95em;">Samaritans</div>
-              <div style="color:#6c757d;font-size:0.82em;margin-top:1px;">116 123 · Free · 24/7</div>
+              <div style="color:#6c757d;font-size:0.82em;margin-top:1px;" data-i18n="fab.crisis.samaritansInfo">116 123 · Free · 24/7</div>
             </div>
           </a>
           <div style="display:flex;flex-direction:column;gap:8px;">
-            <button onclick="closeChatModal()" style="padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:12px;font-weight:700;font-size:0.95em;cursor:pointer;">Close</button>
-            <button onclick="closeChatModal();window._showHidePermanently('chat')" style="padding:8px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;">🙈 Hide this button</button>
+            <button onclick="closeChatModal()" style="padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:12px;font-weight:700;font-size:0.95em;cursor:pointer;" data-i18n="common.close">Close</button>
+            <button onclick="closeChatModal();window._showHidePermanently('chat')" style="padding:8px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="common.hideButton">🙈 Hide this button</button>
           </div>
         </div>
       </div>
 
-      <button class="placeholder-fab" id="quickNoteFab" onclick="openSecurityModal()" title="Your data security">🔐</button>
+      <button class="placeholder-fab" id="quickNoteFab" onclick="openSecurityModal()" title="Your data security" data-i18n-title="fab.security.tooltip">🔐</button>
       <div id="securityModal" class="bb-fab-modal" onclick="if(event.target===this)closeSecurityModal()">
         <div style="background:white;border-radius:20px;padding:24px 24px 20px;text-align:center;max-width:300px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);">
           <div style="font-size:2em;margin-bottom:8px;">🔐</div>
-          <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:12px;">How your data stays safe</div>
+          <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:12px;" data-i18n="fab.security.title">How your data stays safe</div>
           <div style="text-align:left;font-size:0.84em;color:#495057;line-height:1.65;margin-bottom:16px;">
-            <p style="margin-bottom:8px;"><strong>🔑 Your PIN</strong> locks the app locally on your device. Without it, nobody can open Bipolar Bear — even if they have your phone.</p>
-            <p style="margin-bottom:8px;"><strong>🔒 Your password</strong> encrypts your journal entries before they ever leave your device. The data is scrambled using a key only you hold.</p>
-            <p style="margin-bottom:8px;"><strong>☁️ Firebase (our database)</strong> stores only the encrypted version. Even we can't read your entries — they're meaningless without your password.</p>
-            <p style="margin-bottom:0;"><strong>🛡️ End-to-end encryption</strong> means your data is protected at every step — on your device, in transit, and in storage.</p>
+            <p style="margin-bottom:8px;" data-i18n-html="fab.security.pinBody"><strong>🔑 Your PIN</strong> locks the app locally on your device. Without it, nobody can open Bipolar Bear — even if they have your phone.</p>
+            <p style="margin-bottom:8px;" data-i18n-html="fab.security.passwordBody"><strong>🔒 Your password</strong> encrypts your journal entries before they ever leave your device. The data is scrambled using a key only you hold.</p>
+            <p style="margin-bottom:8px;" data-i18n-html="fab.security.firebaseBody"><strong>☁️ Firebase (our database)</strong> stores only the encrypted version. Even we can't read your entries — they're meaningless without your password.</p>
+            <p style="margin-bottom:0;" data-i18n-html="fab.security.e2eeBody"><strong>🛡️ End-to-end encryption</strong> means your data is protected at every step — on your device, in transit, and in storage.</p>
           </div>
           <div style="display:flex;flex-direction:column;gap:10px;">
-            <button onclick="closeSecurityModal()" style="padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:12px;font-weight:700;font-size:0.95em;cursor:pointer;">Got it</button>
-            <button onclick="closeSecurityModal();window._showHidePermanently('quicknote')" style="padding:10px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;">🙈 Hide this button</button>
+            <button onclick="closeSecurityModal()" style="padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:12px;font-weight:700;font-size:0.95em;cursor:pointer;" data-i18n="common.gotIt">Got it</button>
+            <button onclick="closeSecurityModal();window._showHidePermanently('quicknote')" style="padding:10px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="common.hideButton">🙈 Hide this button</button>
           </div>
         </div>
       </div>
 
-      <button class="coffee-fab" id="coffeeFab" onclick="openCoffeeModal()" title="Support Bipolar Bear">☕</button>
+      <button class="coffee-fab" id="coffeeFab" onclick="openCoffeeModal()" title="Support Bipolar Bear" data-i18n-title="fab.coffee.tooltip">☕</button>
       <div id="coffeeModal2" class="bb-fab-modal" onclick="if(event.target===this)closeCoffeeModal()">
         <div style="background:white;border-radius:20px;padding:24px 24px 20px;text-align:center;max-width:300px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);">
           <div style="font-size:2em;margin-bottom:8px;">☕</div>
-          <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:8px;">Keep Bipolar Bear Going</div>
-          <p style="font-size:0.88em;color:#6c757d;line-height:1.55;margin-bottom:6px;">Running BipolarBear costs around <strong>£25/month</strong> for servers, hosting and services.</p>
+          <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:8px;" data-i18n="fab.coffee.title">Keep Bipolar Bear Going</div>
+          <p style="font-size:0.88em;color:#6c757d;line-height:1.55;margin-bottom:6px;" data-i18n-html="fab.coffee.body">Running BipolarBear costs around <strong>£25/month</strong> for servers, hosting and services.</p>
           <p id="bbCoffeeFundedText" style="font-size:0.82em;color:var(--brand-primary);font-weight:600;margin-bottom:16px;display:none;"></p>
           <div style="display:flex;flex-direction:column;gap:10px;">
             <a href="https://buymeacoffee.com/jamesmarkey" target="_blank" rel="noopener noreferrer" onclick="closeCoffeeModal()"
               style="display:block;padding:13px;background:var(--brand-primary);color:white;border-radius:12px;text-decoration:none;font-weight:700;font-size:0.95em;text-align:center;">
-              ☕ Send me a coffee
+              <span data-i18n="fab.coffee.send">☕ Send me a coffee</span>
             </a>
             <button onclick="window._showHidePermanently('coffee')"
-              style="padding:10px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+              style="padding:10px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="common.hideButton">
               🙈 Hide this button
             </button>
           </div>
         </div>
       </div>
 
-      <button class="feedback-fab" onclick="openFabFeedback()" title="Send feedback">📣</button>
+      <button class="feedback-fab" onclick="openFabFeedback()" title="Send feedback" data-i18n-title="fab.feedbackTip">📣</button>
       <div class="bb-feedback-modal" id="bbFabFeedbackModal" onclick="if(event.target===this)closeFabFeedback()">
         <div class="bb-feedback-content">
           <h3 style="margin-bottom:4px;color:#333;" data-i18n="feedback.title">Share Feedback</h3>
@@ -479,17 +479,17 @@
       <!-- Celebrity modal -->
       <div id="bbCelebModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeCelebModal();">
         <div style="background:white;border-radius:20px;padding:24px;max-width:300px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);text-align:center;">
-          <div style="font-size:0.78em;color:#adb5bd;margin-bottom:12px;font-style:italic;">Famous people with bipolar disorder</div>
+          <div style="font-size:0.78em;color:#adb5bd;margin-bottom:12px;font-style:italic;" data-i18n="fab.celeb.subtitle">Famous people with bipolar disorder</div>
           <div id="bbCelebPhotoWrap" style="width:80px;height:80px;border-radius:50%;margin:0 auto 12px;overflow:hidden;background:#fff3e0;display:flex;align-items:center;justify-content:center;font-size:2.2em;">⭐</div>
           <div id="bbCelebName" style="font-weight:700;font-size:1.1em;color:#212529;margin-bottom:4px;"></div>
           <div id="bbCelebField" style="color:#6c757d;font-size:0.85em;margin-bottom:16px;"></div>
           <div style="display:flex;gap:8px;margin-bottom:12px;">
-            <button onclick="nextCeleb()" style="flex:1;padding:10px;background:#f8f9fa;color:#495057;border:1.5px solid #e9ecef;border-radius:12px;font-weight:600;font-size:0.9em;cursor:pointer;">Next ›</button>
-            <a id="bbCelebWiki" href="#" target="_blank" rel="noopener noreferrer" style="flex:1;padding:10px;background:var(--brand-primary);color:white;border-radius:12px;font-weight:700;font-size:0.9em;text-decoration:none;display:flex;align-items:center;justify-content:center;">Wikipedia ↗</a>
+            <button onclick="nextCeleb()" style="flex:1;padding:10px;background:#f8f9fa;color:#495057;border:1.5px solid #e9ecef;border-radius:12px;font-weight:600;font-size:0.9em;cursor:pointer;" data-i18n="fab.celeb.next">Next ›</button>
+            <a id="bbCelebWiki" href="#" target="_blank" rel="noopener noreferrer" style="flex:1;padding:10px;background:var(--brand-primary);color:white;border-radius:12px;font-weight:700;font-size:0.9em;text-decoration:none;display:flex;align-items:center;justify-content:center;" data-i18n="fab.celeb.wiki">Wikipedia ↗</a>
           </div>
           <div style="display:flex;gap:8px;">
-            <button onclick="closeCelebModal()" style="flex:1;padding:10px;background:#f8f9fa;color:#6c757d;border:none;border-radius:12px;font-size:0.85em;cursor:pointer;">Close</button>
-            <button onclick="closeCelebModal();window._hideExtraFab('celeb')" style="flex:1;padding:10px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;">🙈 Hide this button</button>
+            <button onclick="closeCelebModal()" style="flex:1;padding:10px;background:#f8f9fa;color:#6c757d;border:none;border-radius:12px;font-size:0.85em;cursor:pointer;" data-i18n="common.close">Close</button>
+            <button onclick="closeCelebModal();window._hideExtraFab('celeb')" style="flex:1;padding:10px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;" data-i18n="common.hideButton">🙈 Hide this button</button>
           </div>
         </div>
       </div>
@@ -498,11 +498,11 @@
       <div id="bbGoalsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeGoalsModal();">
         <div style="background:white;border-radius:20px;padding:24px;max-width:320px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);max-height:80dvh;overflow-y:auto;">
           <div style="font-size:1.8em;text-align:center;margin-bottom:8px;">🎯</div>
-          <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:16px;text-align:center;">My Goals</div>
+          <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:16px;text-align:center;" data-i18n="fab.goals.title">My Goals</div>
           <div id="bbGoalsList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;"></div>
-          <a href="survival-kit.html#goals" style="display:block;text-align:center;color:var(--brand-primary);font-size:0.88em;text-decoration:none;margin-bottom:14px;padding:10px;border:1.5px solid #ffe0b2;border-radius:10px;">Manage goals in Survival Kit ↗</a>
-          <button onclick="closeGoalsModal()" style="display:block;width:100%;padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:12px;font-weight:700;cursor:pointer;margin-bottom:8px;">Close</button>
-          <button onclick="closeGoalsModal();window._hideExtraFab('goals')" style="display:block;width:100%;padding:8px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;">🙈 Hide this button</button>
+          <a href="survival-kit.html#goals" style="display:block;text-align:center;color:var(--brand-primary);font-size:0.88em;text-decoration:none;margin-bottom:14px;padding:10px;border:1.5px solid #ffe0b2;border-radius:10px;" data-i18n="fab.goals.manage">Manage goals in Survival Kit ↗</a>
+          <button onclick="closeGoalsModal()" style="display:block;width:100%;padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:12px;font-weight:700;cursor:pointer;margin-bottom:8px;" data-i18n="common.close">Close</button>
+          <button onclick="closeGoalsModal();window._hideExtraFab('goals')" style="display:block;width:100%;padding:8px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;" data-i18n="common.hideButton">🙈 Hide this button</button>
         </div>
       </div>
 
@@ -510,11 +510,11 @@
       <div id="bbStatsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)this.style.display='none';">
         <div style="background:white;border-radius:20px;padding:24px;max-width:300px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);text-align:center;">
           <div style="font-size:2em;margin-bottom:8px;">📊</div>
-          <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:8px;">Mood Statistics</div>
-          <p style="font-size:0.85em;color:#6c757d;margin-bottom:18px;">View your mood patterns, streaks, and trends in the journal.</p>
-          <button onclick="document.getElementById('bbStatsModal').style.display='none';window.location.href='journal.html?openStats=1'" style="display:block;width:100%;padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:12px;font-weight:700;cursor:pointer;margin-bottom:8px;">Open Statistics ↗</button>
-          <button onclick="document.getElementById('bbStatsModal').style.display='none'" style="display:block;width:100%;padding:10px;background:#f8f9fa;color:#6c757d;border:none;border-radius:12px;font-size:0.9em;cursor:pointer;margin-bottom:8px;">Cancel</button>
-          <button onclick="document.getElementById('bbStatsModal').style.display='none';window._hideExtraFab('stats')" style="display:block;width:100%;padding:8px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;">🙈 Hide this button</button>
+          <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:8px;" data-i18n="fab.stats.title">Mood Statistics</div>
+          <p style="font-size:0.85em;color:#6c757d;margin-bottom:18px;" data-i18n="fab.stats.body">View your mood patterns, streaks, and trends in the journal.</p>
+          <button onclick="document.getElementById('bbStatsModal').style.display='none';window.location.href='journal.html?openStats=1'" style="display:block;width:100%;padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:12px;font-weight:700;cursor:pointer;margin-bottom:8px;" data-i18n="fab.stats.open">Open Statistics ↗</button>
+          <button onclick="document.getElementById('bbStatsModal').style.display='none'" style="display:block;width:100%;padding:10px;background:#f8f9fa;color:#6c757d;border:none;border-radius:12px;font-size:0.9em;cursor:pointer;margin-bottom:8px;" data-i18n="common.cancel">Cancel</button>
+          <button onclick="document.getElementById('bbStatsModal').style.display='none';window._hideExtraFab('stats')" style="display:block;width:100%;padding:8px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;" data-i18n="common.hideButton">🙈 Hide this button</button>
         </div>
       </div>
 
@@ -577,7 +577,7 @@
               <option value="zh">🇨🇳 中文</option>
             </select>
           </div>
-          <button onclick="(window._fabOpenPersonalInfo||function(){})()" style="width:100%;padding:12px;background:white;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;margin-bottom:10px;-webkit-tap-highlight-color:transparent;">👤 Personal information</button>
+          <button onclick="(window._fabOpenPersonalInfo||function(){})()" style="width:100%;padding:12px;background:white;color:#495057;border:2px solid #e9ecef;border-radius:10px;font-size:0.95em;font-weight:600;cursor:pointer;margin-bottom:10px;-webkit-tap-highlight-color:transparent;" data-i18n="fab.personalInfo">👤 Personal information</button>
           <!-- App Store guideline 5.1.1(v): account deletion must be reachable
                from wherever account management lives. This modal is the only
                account UI on survival-kit, and the one reviewers find first on
@@ -752,7 +752,7 @@
       if (localStorage.getItem(_def.hiddenKey) === '1') {
         const _btn = document.createElement('button');
         _btn.style.cssText = 'display:flex;align-items:center;gap:14px;width:100%;padding:13px 14px;background:#f8f9fa;border:1.5px solid #e9ecef;border-radius:14px;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;';
-        _btn.innerHTML = `<span style="font-size:1.6em;line-height:1;">${_def.icon}</span><div><div style="font-weight:700;font-size:0.95em;color:#212529;">${_def.label}</div><div style="font-size:0.8em;color:#adb5bd;margin-top:2px;">${_def.desc}</div></div>`;
+        _btn.innerHTML = `<span style="font-size:1.6em;line-height:1;">${_def.icon}</span><div><div style="font-weight:700;font-size:0.95em;color:#212529;">${_bbT('fab.picker.' + _def.id + 'Label', _def.label)}</div><div style="font-size:0.8em;color:#adb5bd;margin-top:2px;">${_bbT('fab.picker.' + _def.id + 'Desc', _def.desc)}</div></div>`;
         _btn.addEventListener('click', () => {
           localStorage.removeItem(_def.hiddenKey);
           for (let s = 1; s <= 4; s++) {
@@ -775,7 +775,7 @@
       if (!_assignedExtras.has(_extra.id)) {
         const _btn = document.createElement('button');
         _btn.style.cssText = 'display:flex;align-items:center;gap:14px;width:100%;padding:13px 14px;background:#f8f9fa;border:1.5px solid #e9ecef;border-radius:14px;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;';
-        _btn.innerHTML = `<span style="font-size:1.6em;line-height:1;">${_extra.icon}</span><div><div style="font-weight:700;font-size:0.95em;color:#212529;">${_extra.label}</div><div style="font-size:0.8em;color:#adb5bd;margin-top:2px;">${_extra.desc}</div></div>`;
+        _btn.innerHTML = `<span style="font-size:1.6em;line-height:1;">${_extra.icon}</span><div><div style="font-weight:700;font-size:0.95em;color:#212529;">${_bbT('fab.picker.' + _extra.id + 'Label', _extra.label)}</div><div style="font-size:0.8em;color:#adb5bd;margin-top:2px;">${_bbT('fab.picker.' + _extra.id + 'Desc', _extra.desc)}</div></div>`;
         _btn.addEventListener('click', () => {
           for (let s = 1; s <= 4; s++) {
             if (BB.storage.get('FabSlot_' + s) === _extra.id) BB.storage.remove('FabSlot_' + s);
@@ -789,7 +789,7 @@
       }
     });
     if (!_opts.firstChild) {
-      _opts.innerHTML = '<div style="text-align:center;color:#adb5bd;font-size:0.9em;padding:16px 0;">No buttons available to add.</div>';
+      _opts.innerHTML = '<div style="text-align:center;color:#adb5bd;font-size:0.9em;padding:16px 0;">' + _bbT('fab.pickerEmpty', 'No buttons available to add.') + '</div>';
     }
     const _m = document.getElementById('bbFabPickerModal');
     if (_m) _m.style.display = 'flex';
@@ -841,7 +841,7 @@
           const d = _snap.data();
           const pct = d.totalFunded && d.monthlyTarget ? Math.round((d.totalFunded / d.monthlyTarget) * 100) : null;
           const _el = document.getElementById('bbCoffeeFundedText');
-          if (_el && pct !== null) { _el.textContent = pct + '% of this month funded — thank you!'; _el.style.display = ''; }
+          if (_el && pct !== null) { _el.textContent = (window.BB && window.BB.t) ? window.BB.t('fab.coffee.funded', { pct: pct }) : (pct + '% of this month funded — thank you!'); _el.style.display = ''; }
         }
       } catch (e) {}
     }
@@ -899,7 +899,7 @@
       // Firestore document limit ~1MB; base64 JPEG should be well under that.
       // Guard anyway: ~750 KB of base64 ≈ 1MB binary.
       if (dataUrl.length > 768000) {
-        if (errEl) { errEl.textContent = 'Screenshot is too large — please crop or resize it first.'; errEl.style.display = ''; }
+        if (errEl) { errEl.textContent = _bbT('fab.fb.imgTooLarge', 'Screenshot is too large — please crop or resize it first.'); errEl.style.display = ''; }
         input.value = '';
         return;
       }
@@ -907,7 +907,7 @@
       if (thumb) thumb.src = dataUrl;
       if (preview) preview.style.display = '';
     } catch (_) {
-      if (errEl) { errEl.textContent = 'Could not read image — please try a different file.'; errEl.style.display = ''; }
+      if (errEl) { errEl.textContent = _bbT('fab.fb.imgUnreadable', 'Could not read image — please try a different file.'); errEl.style.display = ''; }
       input.value = '';
     }
   };
@@ -977,8 +977,8 @@
     const _errEl = document.getElementById('bbFbError');
     const _msgEl = document.getElementById('bbFbMessage');
     const _msg = _msgEl ? _msgEl.value.trim() : '';
-    if (!_fbType) { if (_errEl) { _errEl.textContent = 'Please pick a type.'; _errEl.style.display = ''; } return; }
-    if (!_msg)    { if (_errEl) { _errEl.textContent = 'Please write something first.'; _errEl.style.display = ''; } return; }
+    if (!_fbType) { if (_errEl) { _errEl.textContent = _bbT('fab.fb.pickType', 'Please pick a type.'); _errEl.style.display = ''; } return; }
+    if (!_msg)    { if (_errEl) { _errEl.textContent = _bbT('fab.fb.writeFirst', 'Please write something first.'); _errEl.style.display = ''; } return; }
     const _notifyEl = document.getElementById('bbFbNotify');
     const _emailEl  = document.getElementById('bbFbEmail');
     const payload = {
@@ -998,9 +998,9 @@
         await _db.collection('feedback').add(payload);
       }
       window.closeFabFeedback();
-      alert('Thanks for your feedback! 🐻');
+      alert(_bbT('fab.fb.thanks', 'Thanks for your feedback! 🐻'));
     } catch (e) {
-      if (_errEl) { _errEl.textContent = 'Could not send — please try again.'; _errEl.style.display = ''; }
+      if (_errEl) { _errEl.textContent = _bbT('fab.fb.sendFail', 'Could not send — please try again.'); _errEl.style.display = ''; }
     }
   };
 
@@ -1033,7 +1033,7 @@
       let _goals = [];
       try { _goals = JSON.parse(localStorage.getItem('dailyGoals') || '[]'); } catch (e) {}
       if (_goals.length === 0) {
-        _list.innerHTML = '<div style="text-align:center;color:#adb5bd;font-size:0.9em;padding:16px 0;">No goals added yet.<br>Add goals in the Survival Kit.</div>';
+        _list.innerHTML = '<div style="text-align:center;color:#adb5bd;font-size:0.9em;padding:16px 0;">' + _bbT('fab.goals.empty', 'No goals added yet.<br>Add goals in the Survival Kit.') + '</div>';
       } else {
         _list.innerHTML = _goals.map(g => `<div style="padding:12px 14px;background:#fff3e0;border-radius:12px;font-size:0.9em;color:#333;border-left:3px solid var(--brand-primary);">${g.text || g.title || String(g)}</div>`).join('');
       }
@@ -1135,7 +1135,7 @@
     _notes.push({ text: _text, ts: Date.now(), id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5) });
     BB.storage.set('QuickNotes', JSON.stringify(_notes));
     const _t = document.createElement('div');
-    _t.textContent = '📝 Note saved!';
+    _t.textContent = _bbT('fab.noteSaved', '📝 Note saved!');
     Object.assign(_t.style, { position: 'fixed', bottom: '80px', left: '50%', transform: 'translateX(-50%)',
       background: 'rgba(0,0,0,0.72)', color: 'white', padding: '9px 18px', borderRadius: '20px',
       fontSize: '0.85em', fontWeight: '600', zIndex: '9999', pointerEvents: 'none', whiteSpace: 'nowrap' });

@@ -641,7 +641,13 @@
 //       saw "← Startpagina" above an English "Before you join 👋"). Adds
 //       anon.agree.{title,sub,continue} and account.{deleteAccount,deleteLocked}
 //       to es/fr/de/it/pt/nl/pl/sv/zh. Touches js/shared/i18n.js (precached).
-const CACHE_NAME = 'bipolarbear-v145';
+// v146: i18n audit — fab.js pass. The shared FAB dock (index/journal/
+//       survival-kit) had six fully-English modals (Crisis, Security, Coffee,
+//       Celebrity, Goals, Stats), English tooltips, the add-to-dock picker
+//       labels, and hardcoded confirm/alert/toast/error strings. Wire them all
+//       to a new fab.* i18n namespace across all 10 locales. Touches fab.js +
+//       js/shared/i18n.js (both precached).
+const CACHE_NAME = 'bipolarbear-v146';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
