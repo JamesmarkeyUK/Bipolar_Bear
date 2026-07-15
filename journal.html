@@ -242,6 +242,26 @@
         </button>
       </div>
 
+      <!-- Full mood spectrum control (shown instead of the five buttons when the
+           "Full Mood Spectrum" advanced setting is on). Slide 0–10 to pick a mood. -->
+      <div id="moodSpectrumControl" class="mood-spectrum-control" style="display:none;">
+        <div class="msc-readout" id="mscReadout">
+          <img id="mscImg" class="msc-img" src="images/moods/stable.png" alt="">
+          <div class="msc-text">
+            <div id="mscValue" class="msc-value">5</div>
+            <div id="mscLabel" class="msc-label">Stable</div>
+          </div>
+        </div>
+        <input type="range" id="mscSlider" class="msc-slider" min="0" max="10" step="1" value="5"
+               oninput="_onSpectrumChange(this.value)" aria-label="Mood on a 0 to 10 spectrum">
+        <div class="msc-scale">
+          <span>0 · Severely down</span>
+          <span>5 · Stable</span>
+          <span>10 · Manic</span>
+        </div>
+        <div id="mscHint" class="msc-hint">Slide to choose your mood</div>
+      </div>
+
       <div id="moodSelectorTip" style="display:none;text-align:center;font-size:0.82em;color:#6c757d;margin-bottom:8px;"></div>
 
       <div class="form-group hidden-until-mood" id="sleepSection">
@@ -694,7 +714,11 @@
       <h3 style="margin-bottom:16px;">📋 Changelog</h3>
       <div style="text-align:left; font-size:0.9em; color:#495057; line-height:1.7;">
         <div style="margin-bottom:14px;">
-          <strong style="color:var(--brand-primary);">v1.24</strong><br>
+          <strong style="color:var(--brand-primary);">v1.25</strong><br>
+          • 🎚️ New advanced setting: <strong>Full Mood Spectrum</strong> — track your mood on a 0–10 scale (e.g. 4 = sad but stable) by spinning a wheel or sliding, instead of the five fixed moods. Turn it on under Advanced → Journal Options<br>
+        </div>
+        <div style="margin-bottom:14px;">
+          <strong style="color:#6c757d;">v1.24</strong><br>
           • 🎨 The medication step now starts on "Taken" (the most common answer) instead of "Unsure"<br>
           • ✨ The home screen shows a tick next to Bipolar Anonymous once you've posted or commented on the board today<br>
           • 🎨 Bipolar Anonymous: admins now post as "Bipolar Bear Admin", and a new "Post actions" box on the About screen explains every button (💛 Like, 💬 Comment, 🆘 SOS, 🚨 Report, 🙈 Mute, 🗑️ Remove)<br>
@@ -1067,6 +1091,13 @@
           <option value="low" data-i18n="journal.editMood.low">😔 Low</option>
           <option value="depressed" data-i18n="journal.editMood.depressed">🌧️ Depressed</option>
         </select>
+        <!-- Full mood spectrum: 0–10 numeric editor, shown instead of the select
+             when the entry uses the spectrum (see openEditModal / saveEditedEntry). -->
+        <div id="editEntryMoodSpectrumWrap" style="display:none; margin-top:6px;">
+          <input type="range" id="editEntryMoodNum" min="0" max="10" step="1" value="5"
+                 oninput="_onEditSpectrumInput(this.value)" style="width:100%;">
+          <div id="editEntryMoodNumLabel" style="text-align:center; font-weight:600; color:#495057; font-size:0.9em; margin-top:4px;">5 · Stable</div>
+        </div>
       </div>
       <div style="margin-bottom: 12px;">
         <label style="font-weight:600; color:#495057;" data-i18n="journal.energyRange">Energy (0–10)</label>
@@ -1411,6 +1442,14 @@
         </div>
 
         <hr style="border: none; border-top: 1px solid #e9ecef; margin-bottom: 16px;">
+
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+          <div>
+            <div style="font-weight: 600; color: #495057; font-size: 0.95em;">🎚️ Full Mood Spectrum</div>
+            <div style="color: #6c757d; font-size: 0.82em; margin-top: 2px;">Advanced: Pick your mood on a 0–10 wheel (e.g. 4 = sad but stable) instead of five fixed moods</div>
+          </div>
+          <label class="bb-switch"><input type="checkbox" id="moodSpectrumToggle" onchange="_toggleMoodSpectrum()"><span class="bb-slider"></span></label>
+        </div>
 
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
           <div>

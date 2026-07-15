@@ -690,7 +690,11 @@
 //       across all 10 locales. Completes the journal.html static-text pass;
 //       the JS-branded healthSyncLabel/Desc stay in journal.js. Touches
 //       journal.html + js/shared/i18n.js (both precached).
-const CACHE_NAME = 'bipolarbear-v155';
+// v156: Full Mood Spectrum — new advanced setting to track mood on a 0–10 scale
+//       (spinnable wheel in focused mode, slider in the standard form) instead
+//       of the five fixed moods. Touches journal.html, js/journal.js,
+//       css/journal.css (all precached).
+const CACHE_NAME = 'bipolarbear-v156';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
