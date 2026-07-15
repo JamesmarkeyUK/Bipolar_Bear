@@ -707,13 +707,13 @@ function setupVerify() {
         document.getElementById('step-email').style.display = 'none';
         document.getElementById('step-code').style.display  = 'block';
         document.getElementById('code-sent-label').textContent =
-          'Enter your demo access code to continue.';
+          _wt('anon.verifyMsg.demoCode');
         resetBoxes();
         boxes[0].focus();
         return;
       }
       if (!window._anonSendCode) {
-        throw new Error('Verification service unavailable — please try again in a moment.');
+        throw new Error(_wt('anon.verifyMsg.serviceUnavailable'));
       }
       const result = await window._anonSendCode({ email });
       _sessionId    = result.data.sessionId;
@@ -721,7 +721,7 @@ function setupVerify() {
       document.getElementById('step-email').style.display = 'none';
       document.getElementById('step-code').style.display  = 'block';
       document.getElementById('code-sent-label').innerHTML =
-        `Code sent to <strong>${esc(email)}</strong>. Check your inbox (and spam folder).`;
+        _wt('anon.verifyMsg.codeSent', { email: `<strong>${esc(email)}</strong>` });
       resetBoxes();
       boxes[0].focus();
     } catch (err) {
@@ -729,11 +729,11 @@ function setupVerify() {
       sendBtn.textContent = origText;
       const errCode = err.code || '';
       if (errCode === 'functions/resource-exhausted') {
-        showError('Too many code requests. Please wait 10 minutes and try again.');
+        showError(_wt('anon.verifyMsg.tooManyRequests'));
       } else if (errCode === 'functions/invalid-argument') {
-        showError('Please enter a valid email address.');
+        showError(_wt('anon.verifyMsg.invalidEmail'));
       } else {
-        showError(err.message || 'Could not send verification code. Please try again.');
+        showError(err.message || _wt('anon.verifyMsg.couldNotSend'));
       }
     }
   }
@@ -785,7 +785,7 @@ function setupVerify() {
       if (_pendingEmail.toLowerCase() === REVIEW_EMAIL) {
         // Reviewer bypass: validate the fixed demo code locally, then make sure
         // an anonymous auth session exists so the reviewer can post and comment.
-        if (code !== REVIEW_CODE) throw new Error('Incorrect demo code. Please try again.');
+        if (code !== REVIEW_CODE) throw new Error(_wt('anon.verifyMsg.incorrectDemo'));
         await _ensureAuthSession();
       } else {
         await window._anonVerifyCode({ sessionId: _sessionId, code });
@@ -855,21 +855,21 @@ function setupVerify() {
       const errCode = err.code || '';
       if (errCode === 'functions/unauthenticated') {
         // Wrong code — message already includes "X attempts remaining"
-        showError(err.message || 'Incorrect code. Please try again.');
+        showError(err.message || _wt('anon.verifyMsg.incorrectCode'));
         resetBoxes();
         boxes[0].focus();
       } else if (errCode === 'functions/deadline-exceeded') {
-        showError('This code has expired. Sending a new one…');
+        showError(_wt('anon.verifyMsg.codeExpired'));
         resetBoxes();
         setTimeout(() => doSend(_pendingEmail), 1200);
       } else if (errCode === 'functions/resource-exhausted') {
-        showError('Too many incorrect attempts. Please request a new code.');
+        showError(_wt('anon.verifyMsg.tooManyAttempts'));
         goToEmailStep();
       } else if (errCode === 'functions/not-found') {
-        showError('Verification session not found. Please start again.');
+        showError(_wt('anon.verifyMsg.sessionNotFound'));
         goToEmailStep();
       } else {
-        showError(err.message || 'Verification failed. Please try again.');
+        showError(err.message || _wt('anon.verifyMsg.verifyFailed'));
         resetBoxes();
         boxes[0].focus();
       }

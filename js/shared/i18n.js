@@ -478,6 +478,20 @@
           nameTaken: 'That name is already taken',
           monikaUpdated: 'Moniker updated ✓',
         },
+        verifyMsg: {
+          demoCode: 'Enter your demo access code to continue.',
+          serviceUnavailable: 'Verification service unavailable — please try again in a moment.',
+          codeSent: 'Code sent to {email}. Check your inbox (and spam folder).',
+          tooManyRequests: 'Too many code requests. Please wait 10 minutes and try again.',
+          invalidEmail: 'Please enter a valid email address.',
+          couldNotSend: 'Could not send verification code. Please try again.',
+          incorrectDemo: 'Incorrect demo code. Please try again.',
+          incorrectCode: 'Incorrect code. Please try again.',
+          codeExpired: 'This code has expired. Sending a new one…',
+          tooManyAttempts: 'Too many incorrect attempts. Please request a new code.',
+          sessionNotFound: 'Verification session not found. Please start again.',
+          verifyFailed: 'Verification failed. Please try again.',
+        },
       },
       journal: {
         hint: {
