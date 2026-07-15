@@ -718,7 +718,11 @@
 //       "Loading posts…" empty-state to the existing anon.board.loading. This
 //       completes anonymous.html's static-text i18n pass (data-i18n up to 139).
 //       Touches anonymous.html + js/shared/i18n.js.
-const CACHE_NAME = 'bipolarbear-v161';
+// v162: i18n audit — translate v161's anon.toast namespace (24 anonymous-board
+//       runtime showHint toasts: moderation warnings, pin/SOS/report, mute/ban
+//       with {name}, moniker/account messages) into the 9 non-English locales.
+//       Touches js/shared/i18n.js.
+const CACHE_NAME = 'bipolarbear-v162';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
