@@ -668,7 +668,11 @@
 //       Touches journal.html + js/shared/i18n.js (both precached).
 // v150: i18n audit — journal.mods translated into es/fr/de/it/pt/nl/pl/sv/zh.
 //       Completes v149. Touches js/shared/i18n.js (precached).
-const CACHE_NAME = 'bipolarbear-v150';
+// v151: i18n audit — journal Personal Details, Field Picker, Calendar-day
+//       and Remove-field modals. Personal Details reuses the existing pd.*
+//       namespace; the picker/remove-field add 5 keys to journal.mods across
+//       all 10 locales. Touches journal.html + js/shared/i18n.js (precached).
+const CACHE_NAME = 'bipolarbear-v151';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

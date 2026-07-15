@@ -1542,7 +1542,7 @@
       <div class="confirm-buttons" style="margin-top:16px;">
         <button id="calDayDeleteBtn" class="confirm-btn confirm-btn-yes" style="display:none;" onclick="deleteFromCalDay()">🗑️</button>
         <button id="calDayEditBtn" class="confirm-btn confirm-btn-no" style="display:none;" onclick="closeCalDayModal();openEditInForm(window._calDayEntry)">✏️</button>
-        <button class="confirm-btn confirm-btn-no" onclick="closeCalDayModal()">Close</button>
+        <button class="confirm-btn confirm-btn-no" onclick="closeCalDayModal()" data-i18n="common.close">Close</button>
       </div>
     </div>
   </div>
@@ -1550,28 +1550,28 @@
   <!-- Personal Details Modal -->
   <div class="confirm-modal" id="personalDetailsModal">
     <div class="confirm-content" style="max-width: 420px; max-height: 90vh; overflow-y: auto;">
-      <h3>👤 Personal Details</h3>
-      
-      <div style="color: #6c757d; font-size: 0.85em; margin-bottom: 16px; font-style: italic;">
+      <h3 data-i18n="pd.title">👤 Personal Details</h3>
+
+      <div style="color: #6c757d; font-size: 0.85em; margin-bottom: 16px; font-style: italic;" data-i18n="pd.subtitle">
         All fields are optional. This information will appear on exported PDF reports for your healthcare provider.
       </div>
-      
+
       <div style="display: grid; gap: 10px;">
-        <input type="text" id="personalName" placeholder="Name" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
-        <input type="text" id="personalDOB" placeholder="Date of Birth (e.g., 15 Jan 1990)" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
-        <input type="text" id="personalMedicalNum" placeholder="Medical # / NHS Number" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
-        <input type="text" id="personalDiagnosis" placeholder="Diagnosed as (e.g., Bipolar I, Bipolar II)" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
-        <input type="text" id="personalDiagnosisDate" placeholder="Diagnosis Date (e.g., March 2020)" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
-        <input type="text" id="personalAddress" placeholder="Address" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
-        <input type="tel" id="personalMobile" placeholder="Mobile Number" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
-        <input type="email" id="personalEmail" placeholder="Email" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
-        <input type="text" id="personalEmergencyContact" placeholder="Emergency Contact (name & number)" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
-        <textarea id="personalNotes" placeholder="Notes (optional)" rows="3" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em; resize: vertical; font-family: inherit;"></textarea>
+        <input type="text" id="personalName" placeholder="Name" data-i18n-placeholder="pd.name" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
+        <input type="text" id="personalDOB" placeholder="Date of Birth (e.g., 15 Jan 1990)" data-i18n-placeholder="pd.dob" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
+        <input type="text" id="personalMedicalNum" placeholder="Medical # / NHS Number" data-i18n-placeholder="pd.medNum" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
+        <input type="text" id="personalDiagnosis" placeholder="Diagnosed as (e.g., Bipolar I, Bipolar II)" data-i18n-placeholder="pd.diagnosis" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
+        <input type="text" id="personalDiagnosisDate" placeholder="Diagnosis Date (e.g., March 2020)" data-i18n-placeholder="pd.diagDate" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
+        <input type="text" id="personalAddress" placeholder="Address" data-i18n-placeholder="pd.address" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
+        <input type="tel" id="personalMobile" placeholder="Mobile Number" data-i18n-placeholder="pd.mobile" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
+        <input type="email" id="personalEmail" placeholder="Email" data-i18n-placeholder="pd.email" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
+        <input type="text" id="personalEmergencyContact" placeholder="Emergency Contact (name & number)" data-i18n-placeholder="pd.emergency" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em;">
+        <textarea id="personalNotes" placeholder="Notes (optional)" data-i18n-placeholder="pd.notes" rows="3" style="padding: 8px 12px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 0.95em; resize: vertical; font-family: inherit;"></textarea>
       </div>
 
       <div class="confirm-buttons" style="margin-top: 20px;">
-        <button class="confirm-btn" onclick="savePersonalDetails()" style="background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary);">Save</button>
-        <button class="confirm-btn confirm-btn-no" onclick="closePersonalDetailsModal()">Close</button>
+        <button class="confirm-btn" onclick="savePersonalDetails()" style="background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary);" data-i18n="common.save">Save</button>
+        <button class="confirm-btn confirm-btn-no" onclick="closePersonalDetailsModal()" data-i18n="common.close">Close</button>
       </div>
     </div>
   </div>
@@ -1579,25 +1579,25 @@
   <!-- Field Picker Modal -->
   <div class="confirm-modal" id="fieldPickerModal" style="background:rgba(0,0,0,0.72);" onclick="if(event.target===this)closeFieldPicker()">
     <div class="confirm-content" style="max-width:340px;display:flex;flex-direction:column;max-height:82dvh;overflow:hidden;">
-      <h3 style="margin-bottom:4px;">📊 Track Data</h3>
-      <p style="color:#6c757d;font-size:0.82em;margin-bottom:14px;">Choose which fields to show when logging.</p>
+      <h3 style="margin-bottom:4px;" data-i18n="journal.mods.fieldPickerTitle">📊 Track Data</h3>
+      <p style="color:#6c757d;font-size:0.82em;margin-bottom:14px;" data-i18n="journal.mods.fieldPickerDesc">Choose which fields to show when logging.</p>
       <div id="fieldPickerList" style="flex:1;min-height:0;display:flex;flex-direction:column;gap:2px;text-align:left;overflow-y:auto;box-shadow:inset 0 -16px 12px -12px rgba(0,0,0,0.06);"></div>
       <!-- Add new field form — outside the scrollable list so it's always accessible -->
       <div id="fieldPickerAddRow" style="flex-shrink:0;padding:8px 0 2px;border-top:1px solid #f0f0f0;margin-top:4px;"></div>
       <div class="confirm-buttons" style="margin-top:10px;flex-shrink:0;">
-        <button class="confirm-btn confirm-btn-no" onclick="closeFieldPicker()">Done</button>
+        <button class="confirm-btn confirm-btn-no" onclick="closeFieldPicker()" data-i18n="journal.mods.done">Done</button>
       </div>
     </div>
   </div>
 
   <div class="confirm-modal" id="deleteCustomFieldModal" style="z-index:1200;">
     <div class="confirm-content" style="max-width:340px;">
-      <h3>Remove Field?</h3>
+      <h3 data-i18n="journal.mods.removeFieldTitle">Remove Field?</h3>
       <p id="deleteCustomFieldMsg" style="font-size:0.88em;color:#495057;margin-bottom:6px;"></p>
-      <p style="font-size:0.82em;color:#dc3545;margin-bottom:0;">This will permanently remove the field and all corresponding data from your entries, statistics, and PDF export. This cannot be undone.</p>
+      <p style="font-size:0.82em;color:#dc3545;margin-bottom:0;" data-i18n="journal.mods.removeFieldDesc">This will permanently remove the field and all corresponding data from your entries, statistics, and PDF export. This cannot be undone.</p>
       <div class="confirm-buttons" style="margin-top:20px;">
-        <button class="confirm-btn confirm-btn-no" onclick="closeDeleteCustomFieldModal()">Cancel</button>
-        <button class="confirm-btn confirm-btn-yes" onclick="confirmDeleteCustomField()">Remove</button>
+        <button class="confirm-btn confirm-btn-no" onclick="closeDeleteCustomFieldModal()" data-i18n="common.cancel">Cancel</button>
+        <button class="confirm-btn confirm-btn-yes" onclick="confirmDeleteCustomField()" data-i18n="common.remove">Remove</button>
       </div>
     </div>
   </div>
