@@ -5604,14 +5604,14 @@ window.addEventListener('pageshow', () => {
             // Mood is shown as the big bear hero above, not as a list row.
             // Sleep first — mirrors the ask order of the steps.
             selectedSleep != null
-              ? { text:`🛌 Sleep: ${sLabel}${selectedSleepQuality ? ` · ${selectedSleepQuality === 'good' ? '😊 Good' : selectedSleepQuality === 'unsure' ? '😐 OK' : '😴 Bad'}` : ''}`, step:'sleep', note:_sn('sleep') }
-              : { text:`<span style="color:#adb5bd;">🛌 Sleep: —</span>`, step:'sleep' },
+              ? { text:`${BB.t('journal.ui.sleepLabel')} ${sLabel}${selectedSleepQuality ? ` · ${selectedSleepQuality === 'good' ? BB.t('journal.ui.sleepGood') : selectedSleepQuality === 'unsure' ? BB.t('journal.ui.sleepOk') : BB.t('journal.ui.sleepBad')}` : ''}`, step:'sleep', note:_sn('sleep') }
+              : { text:`<span style="color:#adb5bd;">${BB.t('journal.ui.sleepLabel')} —</span>`, step:'sleep' },
             _fmEnergyClear
-              ? { text:`<span style="color:#adb5bd;">Energy: —</span>`, step:'energy' }
-              : { text:`Energy: ${eLabel}${_doneStepsStr}`, step:'energy', note:_sn('energy') },
+              ? { text:`<span style="color:#adb5bd;">${BB.t('journal.ui.energyLabel')} —</span>`, step:'energy' }
+              : { text:`${BB.t('journal.ui.energyLabel')} ${eLabel}${_doneStepsStr}`, step:'energy', note:_sn('energy') },
             selectedMedication
-              ? { text:selectedMedication==='taken'?'✅ Medication taken':selectedMedication==='unsure'?'🤷 Medication unsure':'❌ Medication not taken', step:'medication', note:_sn('medication') }
-              : { text:`<span style="color:#adb5bd;">💊 Medication: —</span>`, step:'medication' },
+              ? { text:selectedMedication==='taken'?BB.t('journal.ui.medTaken'):selectedMedication==='unsure'?BB.t('journal.ui.medUnsure'):BB.t('journal.ui.medNotTaken'), step:'medication', note:_sn('medication') }
+              : { text:`<span style="color:#adb5bd;">${BB.t('journal.ui.medicationLabel')} —</span>`, step:'medication' },
             (()=>{
               const _G='#2ECC40',_R='#FF4136',_N='#adb5bd';
               const _tc = (k) => (window.BB && BB.t) ? BB.t(k) : k;
