@@ -1515,7 +1515,7 @@ function setTab(tab) {
 // ─────────────────────────────────────────────────────────────────
 let _wikiSection = 'meds';
 const _wikiCache = { groups: null, posts: null };
-function _wt(key) { return (window.BB && window.BB.t) ? window.BB.t(key) : key; }
+function _wt(key, vars) { return (window.BB && window.BB.t) ? window.BB.t(key, vars) : key; }
 
 // Map hostnames to friendly source names shown next to wiki links.
 const _WIKI_SOURCE_NAMES = {
@@ -3091,7 +3091,7 @@ function setupThread() {
     if ('cmute' in d) {
       muteTargetName = author;
       document.getElementById('mute-body').innerHTML =
-        `Hide all posts and comments from <strong>[${esc(author)}]</strong> on this device? You can unmute them any time from the About screen.`;
+        _wt('anon.mute.bodyNamed', { name: `<strong>[${esc(author)}]</strong>` });
       openOv('ov-mute');
     } else if ('csos' in d) {
       sosTargetName = author;
@@ -3101,7 +3101,7 @@ function setupThread() {
     } else if ('cban' in d) {
       adminBanName = author;
       document.getElementById('aban-body').innerHTML =
-        `Ban <strong>[${esc(author)}]</strong>? Their existing posts will be removed and they won't be able to post or comment again.`;
+        _wt('anon.ban.bodyNamed', { name: `<strong>[${esc(author)}]</strong>` });
       openOv('ov-admin-ban');
     } else if ('creport' in d) {
       reportCommentMeta = {
@@ -3318,7 +3318,7 @@ function renderPosts(posts) {
     btn.addEventListener('click', () => {
       muteTargetName = btn.dataset.mute;
       document.getElementById('mute-body').innerHTML =
-        `Hide all posts and comments from <strong>[${esc(muteTargetName)}]</strong> on this device? You can unmute them any time from the About screen.`;
+        _wt('anon.mute.bodyNamed', { name: `<strong>[${esc(muteTargetName)}]</strong>` });
       openOv('ov-mute');
     });
   });
@@ -3345,7 +3345,7 @@ function renderPosts(posts) {
     btn.addEventListener('click', () => {
       adminBanName = btn.dataset.ban;
       document.getElementById('aban-body').innerHTML =
-        `Ban <strong>[${esc(adminBanName)}]</strong>? Their existing posts will be removed and they won't be able to post or comment again.`;
+        _wt('anon.ban.bodyNamed', { name: `<strong>[${esc(adminBanName)}]</strong>` });
       openOv('ov-admin-ban');
     });
   });

@@ -697,7 +697,13 @@
 //       data-i18n deep; these were the last visible gaps. Mood-image alt text
 //       (screen-reader only) and seed quote/med data are intentionally left.
 //       Touches survival-kit.html + js/survival-kit.js (both precached).
-const CACHE_NAME = 'bipolarbear-v156';
+// v157: i18n audit — anonymous board moderation overlays. Wire the Mute, Ban
+//       and Comments (thread) sheets to a new anon.mute/ban/thread namespace,
+//       and route anonymous.js's name-interpolated mute/ban bodies through it
+//       (via _wt now forwarding {name}). English source + HTML/JS wired here;
+//       the 9 non-English locales land in v158. Touches anonymous.html,
+//       js/anonymous.js, js/shared/i18n.js (all precached).
+const CACHE_NAME = 'bipolarbear-v157';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

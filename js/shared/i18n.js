@@ -441,6 +441,9 @@
           medSubBbAdd: 'Add your current medications. Changes will also update your BipolarBear app.',
         },
         time: { now: 'now' },
+        mute: { title: 'Mute this user?', body: 'All their posts and comments will be hidden on this device. You can unmute them any time from the About screen.', bodyNamed: 'Hide all posts and comments from {name} on this device? You can unmute them any time from the About screen.', confirm: 'Mute 🙈' },
+        ban: { title: 'Ban this user?', body: "Their existing posts will be removed and they won't be able to post or comment again.", bodyNamed: "Ban {name}? Their existing posts will be removed and they won't be able to post or comment again.", confirm: 'Ban 🚫' },
+        thread: { title: 'Comments', placeholder: 'Add a comment…', send: 'Send 💛' },
       },
       journal: {
         hint: {
