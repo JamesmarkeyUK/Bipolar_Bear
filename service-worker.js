@@ -664,9 +664,11 @@
 //       Touches journal.html + js/shared/i18n.js (both precached).
 // v149: i18n audit — journal medication/goals/budget/export/import modals
 //       wired to a new journal.mods.* namespace. English source added and
-//       HTML wired; the 9 non-English locales land in the next commit.
+//       HTML wired; the 9 non-English locales land in v150.
 //       Touches journal.html + js/shared/i18n.js (both precached).
-const CACHE_NAME = 'bipolarbear-v149';
+// v150: i18n audit — journal.mods translated into es/fr/de/it/pt/nl/pl/sv/zh.
+//       Completes v149. Touches js/shared/i18n.js (precached).
+const CACHE_NAME = 'bipolarbear-v150';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
