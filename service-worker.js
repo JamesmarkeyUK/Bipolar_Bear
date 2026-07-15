@@ -744,7 +744,14 @@
 //       medications buttons, favourites/meds/goals/missing-entries empty-states,
 //       install-app banner, Current Streak stat) translated into all 10 locales.
 //       Touches js/journal.js + js/shared/i18n.js.
-const CACHE_NAME = 'bipolarbear-v166';
+// v167: i18n audit — 32 more journal.ui labels translated into all 10 locales:
+//       mood-form field toggles (goal/outside/budget/customise/add-fields/
+//       hide-from-PDF/notes/intention/link chips/undo), personalised-feedback +
+//       Bipolar-Bear-thinks blocks with experimental disclaimers, achievement
+//       toast, calendar-unlock hint, insights empty-states, and the mood-summary
+//       Sleep/Energy/Medication row labels + quality/status enums.
+//       Touches js/shared/i18n.js.
+const CACHE_NAME = 'bipolarbear-v167';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
