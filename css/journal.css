@@ -619,18 +619,29 @@
     .fm-wheel-btn img { width: 36px; height: 36px; object-fit: contain; }
     .fm-wheel-label { white-space: nowrap; }
     .fm-wheel-sub { font-size: 0.72em; font-weight: 600; opacity: 0.85; }
-    /* Full mood spectrum labels ("Slightly low but stable" …) are long, so wrap
-       them onto two lines at a fixed pill width instead of letting the pill grow
-       wide. Fixed width + min-height keeps every stop the same size. */
-    .fm-spectrum-wheel .fm-wheel-btn { width: 88px; }
+    /* Full mood spectrum labels ("Sad but stable" …) are long, so wrap them onto
+       multiple lines at a fixed pill width instead of letting the pill grow wide.
+       Fixed width + min-height keeps every stop the same size. */
+    .fm-spectrum-wheel .fm-wheel-btn { width: 82px; }
     .fm-spectrum-wheel .fm-wheel-label {
       white-space: normal;
-      line-height: 1.12;
+      overflow-wrap: break-word;
+      line-height: 1.1;
       text-align: center;
-      font-size: 0.82em;
-      min-height: 2.24em;
+      font-size: 0.8em;
+      min-height: 2.2em;
       display: flex; align-items: center; justify-content: center;
     }
+    /* The 0–10 number shown on every stop (disambiguates same-named stops). */
+    .fm-spectrum-wheel .fm-wheel-sub {
+      margin-top: 2px;
+      min-width: 18px;
+      padding: 0 5px;
+      border-radius: 9px;
+      background: rgba(0,0,0,0.06);
+      font-size: 0.72em; font-weight: 700; opacity: 1;
+    }
+    .fm-spectrum-wheel .fm-wheel-btn.sel .fm-wheel-sub { background: rgba(255,255,255,0.3); color: #fff; }
 
     /* ── Regular form: compact hero readout on synced steps ── */
     .step-hero {

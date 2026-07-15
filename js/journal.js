@@ -4912,6 +4912,11 @@ window.addEventListener('pageshow', () => {
       const committed = _fmWheelCommittedVal(step.id);
       const isCommitted = committed !== null && String(committed) === val;
       let valueHtml = btn.dataset.label;
+      // Spectrum mood: append the 0–10 number so the hero distinguishes stops
+      // that share a name (e.g. 7 vs 8 both "Hypomanic").
+      if (step.id === 'mood' && _spectrumEnabled() && _isNumericMood(btn.dataset.val)) {
+        valueHtml = `${btn.dataset.label} <span style="opacity:0.6;font-weight:700;">(${btn.dataset.val})</span>`;
+      }
       let badge = null;
       // Steps for the entry being edited / the current form date — never the
       // stale count from a previous focused-mode session on another date.
@@ -5141,6 +5146,10 @@ window.addEventListener('pageshow', () => {
               val: n,
               img: _moodImg(n),
               label: SPECTRUM_LABELS[n],
+              // Show the 0–10 number on every stop so adjacent stops that share a
+              // name (0/1 severely depressed, 2/3 depressed, 7/8 hypomanic, 9/10
+              // manic) are still distinguishable.
+              sub: String(n),
               color: _FM_MOOD_COLORS[_moodCat(n)],
               cls: (selectedMood != null && selectedMood !== '' && Number(selectedMood) === n) ? 'sel' : '',
               init: n === _initN,
