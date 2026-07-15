@@ -662,7 +662,11 @@
 //       journal.html to a new journal.settings.* namespace (42 keys) across
 //       all 10 locales, reusing common.back/save and account.deleteLocked.
 //       Touches journal.html + js/shared/i18n.js (both precached).
-const CACHE_NAME = 'bipolarbear-v148';
+// v149: i18n audit — journal medication/goals/budget/export/import modals
+//       wired to a new journal.mods.* namespace. English source added and
+//       HTML wired; the 9 non-English locales land in the next commit.
+//       Touches journal.html + js/shared/i18n.js (both precached).
+const CACHE_NAME = 'bipolarbear-v149';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

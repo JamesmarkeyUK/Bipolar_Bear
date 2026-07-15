@@ -963,21 +963,21 @@
 
   <div class="confirm-modal" id="medicationModal">
     <div class="confirm-content" style="max-width: 500px;">
-      <h3>My Medications</h3>
-      <p style="color: #6c757d; margin-bottom: 20px;">Track your current medications and dosages</p>
+      <h3 data-i18n="journal.mods.medTitle">My Medications</h3>
+      <p style="color: #6c757d; margin-bottom: 20px;" data-i18n="journal.mods.medDesc">Track your current medications and dosages</p>
       
       <div id="medicationList" style="margin-bottom: 20px; max-height: 300px; overflow-y: auto;">
         <!-- Medications will be listed here -->
       </div>
       
       <div style="margin-bottom: 15px;">
-        <input type="text" id="newMedName" placeholder="Medication name" style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 8px; margin-bottom: 10px; font-size: 1em;">
-        <input type="text" id="newMedDose" placeholder="Dosage (e.g., 10mg, twice daily)" style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1em;">
+        <input type="text" id="newMedName" placeholder="Medication name" data-i18n-placeholder="journal.mods.medNamePlaceholder" style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 8px; margin-bottom: 10px; font-size: 1em;">
+        <input type="text" id="newMedDose" placeholder="Dosage (e.g., 10mg, twice daily)" data-i18n-placeholder="journal.mods.medDosePlaceholder" style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1em;">
       </div>
       
       <div class="confirm-buttons">
-        <button class="confirm-btn" onclick="addMedication()" style="background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary);">Add Medication</button>
-        <button class="confirm-btn confirm-btn-no" onclick="closeMedicationModal()">Close</button>
+        <button class="confirm-btn" onclick="addMedication()" style="background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary);" data-i18n="journal.mods.addMed">Add Medication</button>
+        <button class="confirm-btn confirm-btn-no" onclick="closeMedicationModal()" data-i18n="common.close">Close</button>
       </div>
     </div>
   </div>
@@ -985,15 +985,15 @@
   <!-- Goals List Modal -->
   <div class="confirm-modal" id="goalsModal">
     <div class="confirm-content" style="max-width: 500px;">
-      <h3>🏅 Today's Goals</h3>
-      <p style="color: #6c757d; margin-bottom: 20px;">Your daily goals — track whether you hit them each day</p>
+      <h3 data-i18n="journal.mods.goalsTitle">🏅 Today's Goals</h3>
+      <p style="color: #6c757d; margin-bottom: 20px;" data-i18n="journal.mods.goalsDesc">Your daily goals — track whether you hit them each day</p>
       <div id="goalsList" style="margin-bottom: 20px; max-height: 300px; overflow-y: auto;"></div>
       <div style="margin-bottom: 15px;">
-        <input type="text" id="newGoalText" placeholder="New goal (e.g. Go to the gym)" style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1em; box-sizing: border-box;">
+        <input type="text" id="newGoalText" placeholder="New goal (e.g. Go to the gym)" data-i18n-placeholder="journal.mods.goalPlaceholder" style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1em; box-sizing: border-box;">
       </div>
       <div class="confirm-buttons">
-        <button class="confirm-btn" onclick="addGoal()" style="background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary);">Add Goal</button>
-        <button class="confirm-btn confirm-btn-no" onclick="closeGoalsModal()">Close</button>
+        <button class="confirm-btn" onclick="addGoal()" style="background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary);" data-i18n="journal.mods.addGoal">Add Goal</button>
+        <button class="confirm-btn confirm-btn-no" onclick="closeGoalsModal()" data-i18n="common.close">Close</button>
       </div>
     </div>
   </div>
@@ -1001,12 +1001,12 @@
   <!-- Budget Modal -->
   <div class="confirm-modal" id="budgetModal" onclick="if(event.target===this)closeBudgetModal()">
     <div class="confirm-content" style="max-width:400px;">
-      <h3 style="margin-bottom:8px;">💰 Daily Budget</h3>
-      <p style="color:#6c757d;font-size:0.88em;margin:0 0 16px;">Set a daily spending limit — you'll be asked if you kept to it when logging each entry.</p>
-      <input type="text" id="budgetInput" placeholder="e.g. £50 daily" onkeydown="if(event.key==='Enter')saveBudgetSetting()" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;box-sizing:border-box;outline:none;margin-bottom:16px;">
+      <h3 style="margin-bottom:8px;" data-i18n="journal.mods.budgetTitle">💰 Daily Budget</h3>
+      <p style="color:#6c757d;font-size:0.88em;margin:0 0 16px;" data-i18n="journal.mods.budgetDesc">Set a daily spending limit — you'll be asked if you kept to it when logging each entry.</p>
+      <input type="text" id="budgetInput" placeholder="e.g. £50 daily" data-i18n-placeholder="journal.mods.budgetPlaceholder" onkeydown="if(event.key==='Enter')saveBudgetSetting()" style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:8px;font-size:0.95em;box-sizing:border-box;outline:none;margin-bottom:16px;">
       <div class="confirm-buttons">
-        <button class="confirm-btn confirm-btn-no" onclick="closeBudgetModal()">Cancel</button>
-        <button class="confirm-btn confirm-btn-yes" onclick="saveBudgetSetting()" style="background:var(--brand-primary);border-color:var(--brand-primary);color:white;">Save</button>
+        <button class="confirm-btn confirm-btn-no" onclick="closeBudgetModal()" data-i18n="common.cancel">Cancel</button>
+        <button class="confirm-btn confirm-btn-yes" onclick="saveBudgetSetting()" style="background:var(--brand-primary);border-color:var(--brand-primary);color:white;" data-i18n="common.save">Save</button>
       </div>
     </div>
   </div>
@@ -1014,16 +1014,16 @@
   <!-- Export Format Selection Modal -->
   <div class="confirm-modal" id="exportModal">
     <div class="confirm-content">
-      <h3>Choose Export Format</h3>
-      <p style="margin-bottom: 25px; color: #6c757d;">Select the format for your backup</p>
+      <h3 data-i18n="journal.mods.exportTitle">Choose Export Format</h3>
+      <p style="margin-bottom: 25px; color: #6c757d;" data-i18n="journal.mods.exportDesc">Select the format for your backup</p>
       <div class="confirm-buttons" style="flex-direction: column; gap: 15px;">
-        <button class="confirm-btn" onclick="document.getElementById('exportModal').classList.remove('active');exportData()" style="background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary); width: 100%;">
+        <button class="confirm-btn" onclick="document.getElementById('exportModal').classList.remove('active');exportData()" style="background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary); width: 100%;" data-i18n="journal.mods.exportJson">
           🐻 Bipolar Bear (.json)
         </button>
-        <button class="confirm-btn" onclick="document.getElementById('exportModal').classList.remove('active');exportDataCSV()" style="background: white; color: #51cf66; border: 2px solid #51cf66; width: 100%;">
+        <button class="confirm-btn" onclick="document.getElementById('exportModal').classList.remove('active');exportDataCSV()" style="background: white; color: #51cf66; border: 2px solid #51cf66; width: 100%;" data-i18n="journal.mods.exportCsv">
           📄 Open CSV (.csv)
         </button>
-        <button class="confirm-btn confirm-btn-no" onclick="document.getElementById('exportModal').classList.remove('active')" style="width: 100%;">Cancel</button>
+        <button class="confirm-btn confirm-btn-no" onclick="document.getElementById('exportModal').classList.remove('active')" style="width: 100%;" data-i18n="common.cancel">Cancel</button>
       </div>
     </div>
   </div>
@@ -1031,17 +1031,17 @@
   <!-- Import Format Selection Modal -->
   <div class="confirm-modal" id="importModal">
     <div class="confirm-content">
-      <h3>Choose Import Format</h3>
-      <p style="margin-bottom: 25px; color: #6c757d;">Select the format of your data file</p>
+      <h3 data-i18n="journal.mods.importTitle">Choose Import Format</h3>
+      <p style="margin-bottom: 25px; color: #6c757d;" data-i18n="journal.mods.importDesc">Select the format of your data file</p>
       <div class="confirm-buttons" style="flex-direction: column; gap: 15px;">
-        <button class="confirm-btn" onclick="selectImportFormat('bipolarbear')" style="background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary); width: 100%;">
+        <button class="confirm-btn" onclick="selectImportFormat('bipolarbear')" style="background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary); width: 100%;" data-i18n="journal.mods.importJson">
           🐻 BipolarBear Format (.json)
         </button>
-        <button class="confirm-btn" onclick="selectImportFormat('daylio')" style="background: white; color: #4dabf7; border: 2px solid #4dabf7; width: 100%;">
+        <button class="confirm-btn" onclick="selectImportFormat('daylio')" style="background: white; color: #4dabf7; border: 2px solid #4dabf7; width: 100%;" data-i18n="journal.mods.importDaylio">
           📊 Daylio Export (.csv)
         </button>
-        <button class="confirm-btn confirm-btn-no" onclick="closeImportModal()" style="width: 100%;">Cancel</button>
-        <button class="confirm-btn" onclick="closeImportModal();window.location.href='index.html#feedback'" style="background:white;color:#495057;border:2px solid #6c757d;width:100%;font-size:0.82em;">📣 Request a new import format</button>
+        <button class="confirm-btn confirm-btn-no" onclick="closeImportModal()" style="width: 100%;" data-i18n="common.cancel">Cancel</button>
+        <button class="confirm-btn" onclick="closeImportModal();window.location.href='index.html#feedback'" style="background:white;color:#495057;border:2px solid #6c757d;width:100%;font-size:0.82em;" data-i18n="journal.mods.importRequest">📣 Request a new import format</button>
       </div>
     </div>
   </div>
