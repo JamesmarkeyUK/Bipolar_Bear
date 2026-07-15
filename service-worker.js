@@ -751,7 +751,13 @@
 //       toast, calendar-unlock hint, insights empty-states, and the mood-summary
 //       Sleep/Energy/Medication row labels + quality/status enums.
 //       Touches js/shared/i18n.js.
-const CACHE_NAME = 'bipolarbear-v167';
+// v168: i18n audit — final journal.js chrome (14 journal.ui keys): attribute
+//       tooltips (Private/Favourite/Edit entry/First/Last/Dismiss/how-calculated/
+//       Edit/Pick emoji), input placeholders (e.g. 180, Field name), and the
+//       mini-calendar today/yest./tmrw day labels — translated into all 10
+//       locales. This completes journal.js's runtime-string i18n pass (62
+//       journal.ui + 64 journal.dlg keys). Touches js/journal.js + i18n.js.
+const CACHE_NAME = 'bipolarbear-v168';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
