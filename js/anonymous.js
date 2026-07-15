@@ -1452,7 +1452,7 @@ function _applyComposeBanGate() {
   const banned = isBanned(profile.monika);
   fab.style.filter  = banned ? 'grayscale(1)' : '';
   fab.style.opacity = banned ? '0.45' : '';
-  fab.title = banned ? 'Posting disabled — your access has been revoked' : 'Write a post';
+  fab.title = banned ? _wt('anon.modbtn.postingDisabled') : _wt('anon.tips.compose');
 }
 
 function saveLastSeen(tab) {
@@ -2520,10 +2520,10 @@ function sortPosts(posts) {
 function todaySystemPost() {
   const h = new Date().getHours();
   let icon, text;
-  if      (h >= 5  && h < 12) { icon = '☀️';  text = 'Good morning. You are loved. Have a good day. 💛'; }
-  else if (h >= 12 && h < 17) { icon = '🌤️'; text = 'Hope your afternoon is going well. You\'re doing great. 💛'; }
-  else if (h >= 17 && h < 21) { icon = '🌙';  text = 'Good evening. Be kind to yourself tonight. 💛'; }
-  else                         { icon = '⭐';  text = 'Still awake? Take care of yourself — you matter. 💛'; }
+  if      (h >= 5  && h < 12) { icon = '☀️';  text = _wt('anon.feed.greetMorning'); }
+  else if (h >= 12 && h < 17) { icon = '🌤️'; text = _wt('anon.feed.greetAfternoon'); }
+  else if (h >= 17 && h < 21) { icon = '🌙';  text = _wt('anon.feed.greetEvening'); }
+  else                         { icon = '⭐';  text = _wt('anon.feed.greetNight'); }
   return { id: 'sys_daily', isSystem: true, icon, text };
 }
 
@@ -2533,23 +2533,27 @@ function todaySystemPost() {
 // examples stay fresh — the same cadence real posts age out on. Keep entries
 // warm, supportive and non-clinical.
 const SEED_POOL = [
-  { name: 'SunnyDaze',  streak: 42, likes: 5, med: 'Lithium',     grad1: YELLOW_LT, grad2: YELLOW_DARK, initials: 'SD', text: 'Today was really hard but I made it through. Small wins 💛' },
-  { name: 'NightOwl',   streak: 7,  likes: 3, med: '',            grad1: '#64b5f6', grad2: '#1565c0',   initials: 'NO', text: 'Anyone else struggle with mornings? Takes me until noon to feel human 😅' },
-  { name: 'QuietTide',  streak: 15, likes: 4, med: '',            grad1: '#81c784', grad2: '#2e7d32',   initials: 'QT', text: 'Started a five-minute walk each morning. Tiny, but it helps me feel human again.' },
-  { name: 'PaperMoon',  streak: 63, likes: 8, med: 'Lamotrigine', grad1: '#ba68c8', grad2: '#6a1b9a',   initials: 'PM', text: 'Reminder to myself: a flat day is not a failed day. Just resting. 💛' },
-  { name: 'RiverStone', streak: 21, likes: 6, med: '',            grad1: '#4dd0e1', grad2: '#00838f',   initials: 'RS', text: 'Told someone how I was actually doing today instead of "fine". Felt lighter after.' },
-  { name: 'EmberGlow',  streak: 3,  likes: 2, med: 'Quetiapine',  grad1: '#ff8a65', grad2: '#d84315',   initials: 'EG', text: 'Rough week, but I kept my meds routine and ate something green. Counting it as a win.' },
-  { name: 'MapleHush',  streak: 30, likes: 7, med: '',            grad1: '#f06292', grad2: '#ad1457',   initials: 'MH', text: 'Made a playlist for the low days. Music gets me through more than I like to admit.' },
-  { name: 'DriftWood',  streak: 9,  likes: 5, med: '',            grad1: '#9575cd', grad2: '#4527a0',   initials: 'DW', text: "Learning that asking for help isn't losing. Rang my sister today and just talked. 💛" },
+  { name: 'SunnyDaze',  streak: 42, likes: 5, med: 'Lithium',     grad1: YELLOW_LT, grad2: YELLOW_DARK, initials: 'SD', textKey: 'anon.seed.s1' },
+  { name: 'NightOwl',   streak: 7,  likes: 3, med: '',            grad1: '#64b5f6', grad2: '#1565c0',   initials: 'NO', textKey: 'anon.seed.s2' },
+  { name: 'QuietTide',  streak: 15, likes: 4, med: '',            grad1: '#81c784', grad2: '#2e7d32',   initials: 'QT', textKey: 'anon.seed.s3' },
+  { name: 'PaperMoon',  streak: 63, likes: 8, med: 'Lamotrigine', grad1: '#ba68c8', grad2: '#6a1b9a',   initials: 'PM', textKey: 'anon.seed.s4' },
+  { name: 'RiverStone', streak: 21, likes: 6, med: '',            grad1: '#4dd0e1', grad2: '#00838f',   initials: 'RS', textKey: 'anon.seed.s5' },
+  { name: 'EmberGlow',  streak: 3,  likes: 2, med: 'Quetiapine',  grad1: '#ff8a65', grad2: '#d84315',   initials: 'EG', textKey: 'anon.seed.s6' },
+  { name: 'MapleHush',  streak: 30, likes: 7, med: '',            grad1: '#f06292', grad2: '#ad1457',   initials: 'MH', textKey: 'anon.seed.s7' },
+  { name: 'DriftWood',  streak: 9,  likes: 5, med: '',            grad1: '#9575cd', grad2: '#4527a0',   initials: 'DW', textKey: 'anon.seed.s8' },
 ];
 
 function seedPosts() {
   // Deterministic per-device from the clock — every POST_RETENTION_DAYS the
   // window advances and the next consecutive pair shows. SEED_POOL has an even
-  // length so pairs never straddle the wrap.
+  // length so pairs never straddle the wrap. `text` is resolved from textKey at
+  // render time so the sample posts follow the active UI language.
   const period = Math.floor(Date.now() / (POST_RETENTION_DAYS * DAY_MS));
   const pick = i => SEED_POOL[(period * 2 + i) % SEED_POOL.length];
-  return [0, 1].map(i => ({ id: 'seed_' + (i + 1), isSeed: true, tab: 'general', timestamp: null, ...pick(i) }));
+  return [0, 1].map(i => {
+    const s = pick(i);
+    return { id: 'seed_' + (i + 1), isSeed: true, tab: 'general', timestamp: null, ...s, text: _wt(s.textKey) };
+  });
 }
 
 // A quiet note at the very bottom of the General feed telling users their posts
@@ -2788,7 +2792,7 @@ function listenPosts() {
   }
 
   document.getElementById('post-list').innerHTML =
-    '<div class="empty-state">Loading…</div>';
+    '<div class="empty-state">' + esc(_wt('anon.ui.loading')) + '</div>';
 
   // Run one listener per tab simultaneously so badge counts stay live
   // even when the user is looking at the other tab.
@@ -2819,8 +2823,8 @@ function listenPosts() {
 
 function announcementPosts() {
   return [
-    { id: 'ann1', isAnnouncement: true, text: '📢 Welcome to BipolarBear Anonymous! Be kind, be you, be safe. 💛', timestamp: null },
-    { id: 'ann2', isAnnouncement: true, text: '📢 You can now show your medication on your profile — helping others feel less alone.', timestamp: null },
+    { id: 'ann1', isAnnouncement: true, text: _wt('anon.feed.annWelcome'), timestamp: null },
+    { id: 'ann2', isAnnouncement: true, text: _wt('anon.feed.annMedProfile'), timestamp: null },
   ];
 }
 
@@ -2871,7 +2875,7 @@ async function openThread(postId) {
 
   document.getElementById('thread-original-post').innerHTML = renderThreadHeader(post);
   document.getElementById('thread-comments-list').innerHTML =
-    '<div class="empty-state" style="padding:24px 0;">Loading comments…</div>';
+    '<div class="empty-state" style="padding:24px 0;">' + esc(_wt('anon.ui.loadingComments')) + '</div>';
 
   const ta = document.getElementById('thread-ta');
   ta.value = '';
@@ -2883,7 +2887,7 @@ async function openThread(postId) {
   if (currentThreadUnsub) { currentThreadUnsub(); currentThreadUnsub = null; }
   if (!db) {
     document.getElementById('thread-comments-list').innerHTML =
-      '<div class="empty-state" style="padding:24px 0 16px;">No comments yet — be the first! 💛</div>';
+      '<div class="empty-state" style="padding:24px 0 16px;">' + esc(_wt('anon.ui.noComments')) + '</div>';
     return;
   }
 
@@ -2956,16 +2960,16 @@ function setDeleteOverlayMode(which, isComment) {
   }
   if (which === 'self') {
     document.querySelector('#ov-self-delete .sheet-title').textContent =
-      isComment ? 'Remove your comment?' : _delOverlayCopy.selfTitle;
+      isComment ? _wt('anon.feed.removeCommentTitle') : _delOverlayCopy.selfTitle;
     document.querySelector('#ov-self-delete .sheet-sub').textContent =
-      isComment ? "This will permanently delete your comment. This can't be undone." : _delOverlayCopy.selfSub;
+      isComment ? _wt('anon.feed.removeCommentSub') : _delOverlayCopy.selfSub;
     document.getElementById('sdel-confirm').textContent =
-      isComment ? 'Remove comment' : _delOverlayCopy.selfBtn;
+      isComment ? _wt('anon.feed.removeCommentBtn') : _delOverlayCopy.selfBtn;
   } else {
     document.querySelector('#ov-admin-delete .sheet-title').textContent =
-      isComment ? 'Delete comment?' : _delOverlayCopy.adminTitle;
+      isComment ? _wt('anon.feed.deleteCommentTitle') : _delOverlayCopy.adminTitle;
     document.querySelector('#ov-admin-delete .sheet-sub').textContent =
-      isComment ? "This comment will be permanently removed and can't be undone." : _delOverlayCopy.adminSub;
+      isComment ? _wt('anon.feed.deleteCommentSub') : _delOverlayCopy.adminSub;
   }
 }
 
@@ -2987,7 +2991,7 @@ function renderThreadHeader(p) {
       <div class="post-header">
         <div class="post-avatar">
           <div class="post-av-circle" style="background:linear-gradient(135deg,${YELLOW_LT},${YELLOW_DARK});">💬</div>
-          <div><div class="post-name">Today's topic</div></div>
+          <div><div class="post-name">${esc(_wt('anon.feed.todayTopic'))}</div></div>
         </div>
         <span class="post-time">${p.timestamp ? timeAgo(p.timestamp) : _wt('anon.time.now')}</span>
       </div>
@@ -3039,17 +3043,17 @@ function renderComment(c) {
   // Moderation controls (mirror the feed post controls). Actions read the
   // comment id / author from the .comment-card dataset, so buttons stay light.
   const selfDeleteBtn = isMine && !profile.isAdmin
-    ? `<button class="icon-btn" data-cselfdelete title="Remove your comment" style="opacity:0.4;">🗑️</button>` : '';
+    ? `<button class="icon-btn" data-cselfdelete title="${esc(_wt('anon.modbtn.selfDeleteComment'))}" style="opacity:0.4;">🗑️</button>` : '';
   const adminDeleteBtn = profile.isAdmin
-    ? `<button class="icon-btn" data-cdelete title="Delete comment (admin)">🗑️</button>` : '';
+    ? `<button class="icon-btn" data-cdelete title="${esc(_wt('anon.modbtn.deleteComment'))}">🗑️</button>` : '';
   const banBtn = profile.isAdmin && !isMine
-    ? `<button class="icon-btn" data-cban title="Ban this user (admin)">🚫</button>` : '';
+    ? `<button class="icon-btn" data-cban title="${esc(_wt('anon.modbtn.banUser'))}">🚫</button>` : '';
   const sosBtn = !isMine
-    ? `<button class="icon-btn" data-csos title="Send SOS flag">🆘</button>` : '';
+    ? `<button class="icon-btn" data-csos title="${esc(_wt('anon.modbtn.sosFlag'))}">🆘</button>` : '';
   const reportBtn = !isMine
-    ? `<button class="icon-btn" data-creport title="Report comment">🚨</button>` : '';
+    ? `<button class="icon-btn" data-creport title="${esc(_wt('anon.modbtn.reportComment'))}">🚨</button>` : '';
   const muteBtn = !isMine
-    ? `<button class="icon-btn" data-cmute title="Mute this user">🙈</button>` : '';
+    ? `<button class="icon-btn" data-cmute title="${esc(_wt('anon.modbtn.muteUser'))}">🙈</button>` : '';
   return `<div class="comment-card" data-cid="${esc(c.id)}" data-author="${esc(c.name)}">
     <div class="comment-header">
       <div class="post-av-circle" style="width:28px;height:28px;font-size:11px;flex-shrink:0;background:linear-gradient(135deg,${g1},${g2});">${esc(av)}</div>
@@ -3301,7 +3305,7 @@ function renderPosts(posts) {
     btn.addEventListener('click', () => {
       sosTargetName = btn.dataset.sos;
       document.getElementById('sos-body').innerHTML =
-        `Are you worried about <strong>[${esc(sosTargetName)}]</strong>? A moderator will be notified to check in. Only use this if genuinely concerned.`;
+        _wt('anon.sos.bodyNamed', { name: `<strong>[${esc(sosTargetName)}]</strong>` });
       openOv('ov-sos');
     });
   });
@@ -3370,10 +3374,10 @@ function renderSystem(p) {
 function renderTopic(p) {
   const replies = num(p.commentCount, 0);
   const cta = replies
-    ? `${replies} ${replies === 1 ? 'reply' : 'replies'} · tap to join 💛`
-    : 'Tap to share your thoughts 💛';
+    ? _wt('anon.feed.topicCtaReplies', { count: replies, word: replies === 1 ? _wt('anon.feed.replyOne') : _wt('anon.feed.replyMany') })
+    : _wt('anon.feed.topicCtaNone');
   return `<div class="topic-card" data-comment="${esc(p.id)}">
-    <div class="topic-head"><span class="topic-emoji">💬</span><span class="topic-label">Today's topic</span></div>
+    <div class="topic-head"><span class="topic-emoji">💬</span><span class="topic-label">${esc(_wt('anon.feed.todayTopic'))}</span></div>
     <div class="topic-text">${esc(p.text)}</div>
     <div class="topic-cta">${cta}</div>
   </div>`;
@@ -3387,14 +3391,14 @@ function renderArchivedTopic(p) {
   const likes        = num(p.likes, 0);
   const commentCount = num(p.commentCount, 0);
   const deleteBtn    = profile.isAdmin
-    ? `<button class="icon-btn" data-delete="${esc(p.id)}" title="Delete post (admin)">🗑️</button>` : '';
+    ? `<button class="icon-btn" data-delete="${esc(p.id)}" title="${esc(_wt('anon.modbtn.deletePost'))}">🗑️</button>` : '';
   return `<div class="post-card">
     <div class="post-header">
       <div class="post-avatar">
         <div class="post-av-circle" style="background:linear-gradient(135deg,${YELLOW_LT},${YELLOW_DARK});">🐻</div>
         <div>
           <div class="post-name">[BipolarBear]<span class="admin-badge">ADMIN</span></div>
-          <div class="post-med" style="color:var(--muted);">💬 Past daily topic</div>
+          <div class="post-med" style="color:var(--muted);">💬 ${esc(_wt('anon.feed.pastTopic'))}</div>
         </div>
       </div>
       <span class="post-time">${p.timestamp ? timeAgo(p.timestamp) : _wt('anon.time.now')}</span>
@@ -3404,7 +3408,7 @@ function renderArchivedTopic(p) {
       <button class="like-btn ${liked ? 'liked' : ''}" data-id="${esc(p.id)}" data-likes="${likes}" data-author="BipolarBear">
         💛 <span>${likes}</span>
       </button>
-      <button class="comment-btn" data-comment="${esc(p.id)}" title="View comments">💬${commentCount > 0 ? ` <span>${commentCount}</span>` : ''}</button>
+      <button class="comment-btn" data-comment="${esc(p.id)}" title="${esc(_wt('anon.modbtn.viewComments'))}">💬${commentCount > 0 ? ` <span>${commentCount}</span>` : ''}</button>
       <div style="flex:1"></div>
       ${deleteBtn}
     </div>
@@ -3416,7 +3420,7 @@ function renderArchivedTopic(p) {
 function renderFeedFooter() {
   const days = POST_RETENTION_DAYS;
   return `<div class="feed-footer" style="text-align:center;padding:18px 16px 10px;font-size:12px;line-height:1.5;color:var(--muted);">
-    💛 Posts and replies here automatically disappear after ${days} days.
+    ${esc(_wt('anon.feed.footer', { days }))}
   </div>`;
 }
 
@@ -3432,7 +3436,7 @@ function renderAnnouncement(p) {
 
 function renderPost(p) {
   if (p.deleted) {
-    return `<div class="post-card"><div class="post-deleted">🛡️ This post was deleted by an admin</div></div>`;
+    return `<div class="post-card"><div class="post-deleted">🛡️ ${esc(_wt('anon.feed.postDeleted'))}</div></div>`;
   }
   const liked        = likedPosts.has(p.id);
   const likes        = num(p.likes, 0);
@@ -3445,16 +3449,16 @@ function renderPost(p) {
   const g2           = safeColor(p.grad2, YELLOW_DARK);
   const av           = p.initials || initials(p.name);
   const deleteBtn    = profile.isAdmin && !p.isSeed
-    ? `<button class="icon-btn" data-delete="${esc(p.id)}" title="Delete post (admin)">🗑️</button>` : '';
+    ? `<button class="icon-btn" data-delete="${esc(p.id)}" title="${esc(_wt('anon.modbtn.deletePost'))}">🗑️</button>` : '';
   const banBtn       = profile.isAdmin && !p.isSeed && p.name !== profile.monika
-    ? `<button class="icon-btn" data-ban="${esc(p.name)}" title="Ban this user (admin)">🚫</button>` : '';
+    ? `<button class="icon-btn" data-ban="${esc(p.name)}" title="${esc(_wt('anon.modbtn.banUser'))}">🚫</button>` : '';
   const pinBtn       = profile.isAdmin && !p.isSeed
-    ? `<button class="icon-btn${p.pinned ? ' pin-active' : ''}" data-pin="${esc(p.id)}" data-tab="${esc(p.tab || currentTab)}" title="${p.pinned ? 'Unpin post' : 'Pin to top'}">📌</button>` : '';
+    ? `<button class="icon-btn${p.pinned ? ' pin-active' : ''}" data-pin="${esc(p.id)}" data-tab="${esc(p.tab || currentTab)}" title="${esc(p.pinned ? _wt('anon.modbtn.unpinPost') : _wt('anon.modbtn.pinPost'))}">📌</button>` : '';
   const selfDeleteBtn = !p.isSeed && !profile.isAdmin && p.name === profile.monika && isSelfDeleteEligible(p)
-    ? `<button class="icon-btn" data-selfdelete="${esc(p.id)}" title="Remove your post" style="opacity:0.4;">🗑️</button>` : '';
+    ? `<button class="icon-btn" data-selfdelete="${esc(p.id)}" title="${esc(_wt('anon.modbtn.selfDeletePost'))}" style="opacity:0.4;">🗑️</button>` : '';
   const commentBtn   = !p.isSeed
-    ? `<button class="comment-btn" data-comment="${esc(p.id)}" title="View comments">💬${commentCount > 0 ? ` <span>${commentCount}</span>` : ''}</button>` : '';
-  const pinnedBadge  = p.pinned ? '<div class="pinned-badge">📌 Pinned</div>' : '';
+    ? `<button class="comment-btn" data-comment="${esc(p.id)}" title="${esc(_wt('anon.modbtn.viewComments'))}">💬${commentCount > 0 ? ` <span>${commentCount}</span>` : ''}</button>` : '';
+  const pinnedBadge  = p.pinned ? `<div class="pinned-badge">📌 ${esc(_wt('anon.modbtn.pinnedBadge'))}</div>` : '';
   const postBday     = _birthdayCompact(p.joinedAt || '');
   return `<div class="post-card${p.pinned ? ' post-pinned' : ''}">
     ${pinnedBadge}
@@ -3470,7 +3474,7 @@ function renderPost(p) {
     </div>
     <div class="post-text">${esc(p.text)}</div>
     <div class="post-actions">
-      <button class="like-btn ${liked ? 'liked' : ''}" data-id="${esc(p.id)}" data-likes="${likes}" data-author="${esc(p.name)}"${p.name === profile.monika ? ' data-self="true" style="opacity:0.35;cursor:default;" title="You cannot like your own post"' : ''}>
+      <button class="like-btn ${liked ? 'liked' : ''}" data-id="${esc(p.id)}" data-likes="${likes}" data-author="${esc(p.name)}"${p.name === profile.monika ? ` data-self="true" style="opacity:0.35;cursor:default;" title="${esc(_wt('anon.modbtn.cannotLikeOwn'))}"` : ''}>
         💛 <span>${likes}</span>
       </button>
       ${commentBtn}
@@ -3479,9 +3483,9 @@ function renderPost(p) {
       ${pinBtn}
       ${deleteBtn}
       ${banBtn}
-      ${p.name !== profile.monika ? `<button class="icon-btn" data-sos="${esc(p.name)}" title="Send SOS flag">🆘</button>` : ''}
-      ${p.name !== profile.monika ? `<button class="icon-btn" data-report="${esc(p.id)}" title="Report post">🚨</button>` : ''}
-      ${p.name !== profile.monika ? `<button class="icon-btn" data-mute="${esc(p.name)}" title="Mute this user">🙈</button>` : ''}
+      ${p.name !== profile.monika ? `<button class="icon-btn" data-sos="${esc(p.name)}" title="${esc(_wt('anon.modbtn.sosFlag'))}">🆘</button>` : ''}
+      ${p.name !== profile.monika ? `<button class="icon-btn" data-report="${esc(p.id)}" title="${esc(_wt('anon.modbtn.reportPost'))}">🚨</button>` : ''}
+      ${p.name !== profile.monika ? `<button class="icon-btn" data-mute="${esc(p.name)}" title="${esc(_wt('anon.modbtn.muteUser'))}">🙈</button>` : ''}
     </div>
   </div>`;
 }
@@ -4059,7 +4063,7 @@ if (_isAnonymousApp) {
   // "Discover BipolarBear" is already in the info popup — don't duplicate it here.
   _msHomeBtn.style.display = 'none';
 } else {
-  _msHomeBtn.textContent = '← Back to Bipolar Bear';
+  _msHomeBtn.textContent = '← ' + _wt('anon.ui.backToBB');
   _msHomeBtn.addEventListener('click', () => { location.href = 'index.html'; });
 }
 document.getElementById('ms-med-btn').addEventListener('click', openMedSettings);
