@@ -761,7 +761,10 @@
 //       focused-mode "Tap {mood} again to skip" link hint (with interpolation;
 //       Cancel reuses common.cancel) wired + translated into all 10 locales.
 //       Touches js/journal.js + js/shared/i18n.js.
-const CACHE_NAME = 'bipolarbear-v169';
+// v170: i18n audit — anonymous board "Unmute" button in the muted-users list
+//       (About overlay) wired to anon.mute.unmute and translated into all 10
+//       locales. Touches js/anonymous.js + js/shared/i18n.js.
+const CACHE_NAME = 'bipolarbear-v170';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

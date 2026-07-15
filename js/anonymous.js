@@ -388,7 +388,7 @@ function renderMutedList() {
   listEl.innerHTML = [...mutedUsers].map(n => `
     <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;">
       <span>🙈 [${esc(n)}]</span>
-      <button class="btn-secondary" data-unmute="${esc(n)}" style="padding:4px 12px;font-size:12px;">Unmute</button>
+      <button class="btn-secondary" data-unmute="${esc(n)}" style="padding:4px 12px;font-size:12px;">${esc(_wt('anon.mute.unmute'))}</button>
     </div>`).join('');
   listEl.querySelectorAll('[data-unmute]').forEach(btn => {
     btn.addEventListener('click', () => {
