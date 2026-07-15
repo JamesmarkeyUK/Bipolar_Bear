@@ -2553,24 +2553,24 @@ window.addEventListener('pageshow', () => {
               <button class="pagination-btn" onclick="goToPage(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''} title="Last">»</button>
             </div>
             <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-              <button onclick="exportPDF()" class="btn-export-pdf" style="padding: 10px 20px; background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary); border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">📄 Export PDF</button>
-              <button onclick="document.getElementById('exportModal').classList.add('active')" class="btn-export-backup" style="padding: 10px 20px; background: white; color: #51cf66; border: 2px solid #51cf66; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">Backup data</button>
-              <button onclick="showImportModal()" class="btn-export-import" style="padding: 10px 20px; background: white; color: #74c0fc; border: 2px solid #74c0fc; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">Import</button>
+              <button onclick="exportPDF()" class="btn-export-pdf" style="padding: 10px 20px; background: white; color: var(--brand-primary); border: 2px solid var(--brand-primary); border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">${BB.t('journal.ui.exportPdf')}</button>
+              <button onclick="document.getElementById('exportModal').classList.add('active')" class="btn-export-backup" style="padding: 10px 20px; background: white; color: #51cf66; border: 2px solid #51cf66; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">${BB.t('journal.ui.backupData')}</button>
+              <button onclick="showImportModal()" class="btn-export-import" style="padding: 10px 20px; background: white; color: #74c0fc; border: 2px solid #74c0fc; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">${BB.t('journal.ui.importBtn')}</button>
             </div>
             <div style="margin-top:16px;padding-top:14px;border-top:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;gap:12px;">
               ${currentUser ? `
                 <span style="font-size:0.82em;color:#6c757d;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${currentUser.email || ''}</span>
-                <button onclick="logout()" class="logout-btn-list" style="flex-shrink:0;padding:7px 14px;background:white;color:#adb5bd;border:1.5px solid #dee2e6;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.85em;-webkit-tap-highlight-color:transparent;">Logout</button>
+                <button onclick="logout()" class="logout-btn-list" style="flex-shrink:0;padding:7px 14px;background:white;color:#adb5bd;border:1.5px solid #dee2e6;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.85em;-webkit-tap-highlight-color:transparent;">${BB.t('journal.ui.logout')}</button>
               ` : `
-                <span style="font-size:0.82em;color:#adb5bd;font-style:italic;">Login to backup data online</span>
-                <button onclick="window.showAuthModal()" style="flex-shrink:0;padding:7px 14px;background:var(--brand-primary);color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.85em;-webkit-tap-highlight-color:transparent;">Sign In / Up</button>
+                <span style="font-size:0.82em;color:#adb5bd;font-style:italic;">${BB.t('journal.ui.loginToBackup')}</span>
+                <button onclick="window.showAuthModal()" style="flex-shrink:0;padding:7px 14px;background:var(--brand-primary);color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.85em;-webkit-tap-highlight-color:transparent;">${BB.t('journal.ui.signInUp')}</button>
               `}
             </div>
             <div style="text-align:center;margin-top:8px;position:relative;display:inline-block;width:100%;">
-              <button onclick="_dismissPersonalDetailsHint();showPersonalDetailsModal()" style="background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;padding:4px 8px;text-decoration:underline;text-underline-offset:2px;-webkit-tap-highlight-color:transparent;">👤 Your personal details</button>
+              <button onclick="_dismissPersonalDetailsHint();showPersonalDetailsModal()" style="background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;padding:4px 8px;text-decoration:underline;text-underline-offset:2px;-webkit-tap-highlight-color:transparent;">${BB.t('journal.ui.personalDetailsBtn')}</button>
               ${BB.storage.get('PersonalHintDone') !== '1' ? `<div id="personalDetailsJournalHint" style="display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-top:2px;">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="8" y1="13" x2="8" y2="2" stroke="var(--brand-primary)" stroke-width="2" stroke-linecap="round"/><polyline points="3,7 8,2 13,7" stroke="var(--brand-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-                <span style="font-size:0.72em;font-weight:700;font-style:italic;color:var(--brand-primary);font-family:'Georgia',serif;letter-spacing:0.01em;">🐻 Add your details here</span>
+                <span style="font-size:0.72em;font-weight:700;font-style:italic;color:var(--brand-primary);font-family:'Georgia',serif;letter-spacing:0.01em;">${BB.t('journal.ui.addDetailsHere')}</span>
               </div>` : ''}
             </div>
           </div>
@@ -2984,7 +2984,7 @@ window.addEventListener('pageshow', () => {
       const favs = _allEntries.filter(e => e.favourite).sort((a, b) => b.timestamp - a.timestamp);
       const el = document.getElementById('favouritesList');
       if (favs.length === 0) {
-        el.innerHTML = '<p style="text-align:center;color:#6c757d;font-style:italic;margin:16px 0;">No favourite entries yet. Tap ☆ on the form to save one.</p>';
+        el.innerHTML = '<p style="text-align:center;color:#6c757d;font-style:italic;margin:16px 0;">' + BB.t('journal.ui.noFavYet') + '</p>';
       } else {
         el.innerHTML = favs.map(entry => {
           const d = new Date(entry.date);
@@ -3090,7 +3090,7 @@ window.addEventListener('pageshow', () => {
       document.getElementById('favAnniversaryTitle').textContent = `⭐ On this day — ${monthNames[month-1]} ${day}`;
       const el = document.getElementById('favAnniversaryList');
       if (favs.length === 0) {
-        el.innerHTML = '<p style="text-align:center;color:#6c757d;font-style:italic;margin:16px 0;">No favourite entries for this date.</p>';
+        el.innerHTML = '<p style="text-align:center;color:#6c757d;font-style:italic;margin:16px 0;">' + BB.t('journal.ui.noFavForDate') + '</p>';
       } else {
         el.innerHTML = favs.map(entry => {
           const d = new Date(entry.date);
@@ -5294,7 +5294,7 @@ window.addEventListener('pageshow', () => {
           // user's med list directly above the "Manage medications" link.
           const _manageRow = `<div class="fm-meds-manage">
               ${medListHtml}
-              <button id="manageMedsBtn" onclick="_dismissMedHint();showMedicationList()" style="background:none;border:none;color:${_medHintDone ? 'var(--brand-primary)' : 'rgba(255,255,255,0.9)'};font-size:0.8em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;text-decoration:underline;text-underline-offset:2px;">✏️ Manage medications</button>
+              <button id="manageMedsBtn" onclick="_dismissMedHint();showMedicationList()" style="background:none;border:none;color:${_medHintDone ? 'var(--brand-primary)' : 'rgba(255,255,255,0.9)'};font-size:0.8em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;text-decoration:underline;text-underline-offset:2px;">${BB.t('journal.ui.manageMeds')}</button>
               ${_medHintDone ? '' : `<div id="medHintEl" style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:4px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="8" y1="13" x2="8" y2="2" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round"/><polyline points="3,7 8,2 13,7" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,255,255,0.9);font-family:'Georgia',serif;letter-spacing:0.01em;text-shadow:0 1px 4px rgba(0,0,0,0.5);">${BB.t('journal.hint.logMed')}</span></div>`}
             </div>`;
           // Built as a real 5-pill wheel — Not taken, Not taken, Unsure,
@@ -7989,7 +7989,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
             </div>
             <div class="stat-card" style="flex-shrink: 0; width: 130px; min-width: 100px; align-self: center; text-align: center;">
               <div class="stat-number">🔥 ${streak}</div>
-              <div class="stat-label">Current Streak</div>
+              <div class="stat-label">${BB.t('journal.ui.currentStreak')}</div>
             </div>
           </div>
         </div>
@@ -10043,7 +10043,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
       const listContainer = document.getElementById('medicationList');
 
       if (medications.length === 0) {
-        listContainer.innerHTML = '<div style="text-align: center; color: #6c757d; padding: 20px;">No medications added yet</div>';
+        listContainer.innerHTML = '<div style="text-align: center; color: #6c757d; padding: 20px;">' + BB.t('journal.ui.noMedsYet') + '</div>';
         return;
       }
 
@@ -10543,7 +10543,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
       const goals = JSON.parse(localStorage.getItem('dailyGoals') || '[]');
       const container = document.getElementById('goalsList');
       if (goals.length === 0) {
-        container.innerHTML = '<p style="color:#6c757d; text-align:center; font-style:italic;">No goals yet. Add one below!</p>';
+        container.innerHTML = '<p style="color:#6c757d; text-align:center; font-style:italic;">' + BB.t('journal.ui.noGoalsYet') + '</p>';
         return;
       }
       container.innerHTML = goals.map((g, i) => `
@@ -10808,7 +10808,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
         const listContainer = document.getElementById('missingDatesList');
         
         if (missingDates.length === 0) {
-          listContainer.innerHTML = '<div style="text-align: center; color: #000; padding: 20px; font-weight: 600;">🎉 No missing entries in the last 30 days!</div>';
+          listContainer.innerHTML = '<div style="text-align: center; color: #000; padding: 20px; font-weight: 600;">' + BB.t('journal.ui.noMissing30') + '</div>';
         } else {
           listContainer.innerHTML = missingDates.map(date => {
             const dateStr = date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -13315,7 +13315,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
       `;
       
       installBanner.innerHTML = `
-        <div style="font-weight: 600; margin-bottom: 10px;">📱 Install BipolarBear App</div>
+        <div style="font-weight: 600; margin-bottom: 10px;">${BB.t('journal.ui.installApp')}</div>
         <div style="font-size: 0.9em; margin-bottom: 15px; opacity: 0.95;">
           Track offline, faster loading, app-like experience
         </div>
