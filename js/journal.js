@@ -1650,7 +1650,7 @@ window.addEventListener('pageshow', () => {
       }
       return _moodCatLabel(m);
     }
-    // Label with the number appended for spectrum moods, e.g. "Slightly low but stable (4)".
+    // Label with the number appended for spectrum moods, e.g. "Sad but stable (4)".
     function _moodLabelNum(m) {
       return _isNumericMood(m) ? `${_moodLabelOf(m)} (${_fmtMoodNum(m)})` : _moodLabelOf(m);
     }
