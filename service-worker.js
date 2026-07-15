@@ -706,7 +706,12 @@
 // v158: i18n audit — translate v157's anon.mute/ban/thread overlay keys into
 //       the 9 non-English locales (with the {name} interpolation token
 //       preserved). Completes v157. Touches js/shared/i18n.js.
-const CACHE_NAME = 'bipolarbear-v158';
+// v159: i18n audit — translate the anonymous About-screen help sections
+//       (Community guidelines, Post actions, Moderators-only lists + labels)
+//       into the 9 non-English locales, preserving all <br>/<strong>/&nbsp;
+//       markup and the 18+/zero-tolerance meaning. Completes v158's About
+//       wiring. Touches js/shared/i18n.js.
+const CACHE_NAME = 'bipolarbear-v159';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
