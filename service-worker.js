@@ -672,7 +672,11 @@
 //       and Remove-field modals. Personal Details reuses the existing pd.*
 //       namespace; the picker/remove-field add 5 keys to journal.mods across
 //       all 10 locales. Touches journal.html + js/shared/i18n.js (precached).
-const CACHE_NAME = 'bipolarbear-v151';
+// v152: i18n audit — journal calendar/stat/depressed-support/favourites/PIN/
+//       anniversary modals wired to journal.mods.* (15 new keys) + reused
+//       pin.title/pin.forgot. English source + HTML wired here; the 9
+//       non-English locales land in v153. Touches journal.html + i18n.js.
+const CACHE_NAME = 'bipolarbear-v152';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
