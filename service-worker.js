@@ -722,7 +722,12 @@
 //       runtime showHint toasts: moderation warnings, pin/SOS/report, mute/ban
 //       with {name}, moniker/account messages) into the 9 non-English locales.
 //       Touches js/shared/i18n.js.
-const CACHE_NAME = 'bipolarbear-v162';
+// v163: i18n audit — anonymous board email-verification screen messages (12
+//       anon.verifyMsg strings: code sent/expired, incorrect/invalid, service
+//       unavailable, rate-limit, demo-code) wired to a new anon.verifyMsg
+//       namespace and translated into all 10 locales. Touches js/anonymous.js +
+//       js/shared/i18n.js.
+const CACHE_NAME = 'bipolarbear-v163';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
