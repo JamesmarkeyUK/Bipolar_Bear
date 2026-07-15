@@ -1855,6 +1855,8 @@
           pickEmoji: "Elegir emoji",
           eg180: "p. ej. 180",
           fieldNameMax: "Nombre del campo… (máx. 15)",
+          errorLoading: "Error al cargar las entradas",
+          tapAgainSkip: "Toca {mood} otra vez para omitir",
         },
         dlg: {
           localStorageDisabled: "localStorage está desactivado en tu navegador. Activa las cookies/el almacenamiento en la configuración de tu navegador.",
@@ -2501,6 +2503,8 @@
           pickEmoji: "Choisir un emoji",
           eg180: "ex. 180",
           fieldNameMax: "Nom du champ… (max 15)",
+          errorLoading: "Erreur lors du chargement des entrées",
+          tapAgainSkip: "Touche encore {mood} pour passer",
         },
         dlg: {
           localStorageDisabled: "localStorage est désactivé dans ton navigateur. Active les cookies/le stockage dans les paramètres de ton navigateur.",
@@ -3661,6 +3665,8 @@
           pickEmoji: "Emoji wählen",
           eg180: "z. B. 180",
           fieldNameMax: "Feldname… (max. 15)",
+          errorLoading: "Fehler beim Laden der Einträge",
+          tapAgainSkip: "Tippe nochmal auf {mood} zum Überspringen",
         },
         dlg: {
           localStorageDisabled: "localStorage ist in deinem Browser deaktiviert. Bitte aktiviere Cookies/Speicher in den Einstellungen deines Browsers.",
@@ -4211,6 +4217,8 @@
           pickEmoji: "Scegli emoji",
           eg180: "es. 180",
           fieldNameMax: "Nome campo… (max 15)",
+          errorLoading: "Errore durante il caricamento delle voci",
+          tapAgainSkip: "Tocca di nuovo {mood} per saltare",
         },
         dlg: {
           localStorageDisabled: "localStorage è disattivato nel tuo browser. Attiva i cookie/l'archiviazione nelle impostazioni del browser.",
@@ -4761,6 +4769,8 @@
           pickEmoji: "Escolher emoji",
           eg180: "ex. 180",
           fieldNameMax: "Nome do campo… (máx. 15)",
+          errorLoading: "Erro ao carregar as entradas",
+          tapAgainSkip: "Toca em {mood} de novo para pular",
         },
         dlg: {
           localStorageDisabled: "O localStorage está desativado no teu navegador. Ativa os cookies/o armazenamento nas configurações do navegador.",
@@ -5311,6 +5321,8 @@
           pickEmoji: "Emoji kiezen",
           eg180: "bijv. 180",
           fieldNameMax: "Veldnaam… (max. 15)",
+          errorLoading: "Fout bij het laden van items",
+          tapAgainSkip: "Tik nog eens op {mood} om over te slaan",
         },
         dlg: {
           localStorageDisabled: "localStorage is uitgeschakeld in je browser. Schakel cookies/opslag in bij je browserinstellingen.",
@@ -5861,6 +5873,8 @@
           pickEmoji: "Wybierz emoji",
           eg180: "np. 180",
           fieldNameMax: "Nazwa pola… (maks. 15)",
+          errorLoading: "Błąd podczas ładowania wpisów",
+          tapAgainSkip: "Dotknij {mood} ponownie, aby pominąć",
         },
         dlg: {
           localStorageDisabled: "localStorage jest wyłączony w Twojej przeglądarce. Włącz pliki cookie/pamięć w ustawieniach przeglądarki.",
@@ -6415,6 +6429,8 @@
           pickEmoji: "Välj emoji",
           eg180: "t.ex. 180",
           fieldNameMax: "Fältnamn… (max 15)",
+          errorLoading: "Det gick inte att ladda posterna",
+          tapAgainSkip: "Tryck på {mood} igen för att hoppa över",
         },
         dlg: {
           localStorageDisabled: "localStorage är inaktiverat i din webbläsare. Aktivera cookies/lagring i webbläsarens inställningar.",
@@ -6965,6 +6981,8 @@
           pickEmoji: "选择表情",
           eg180: "例如 180",
           fieldNameMax: "字段名…（最多 15）",
+          errorLoading: "加载条目时出错",
+          tapAgainSkip: "再次点按 {mood} 即可跳过",
         },
         dlg: {
           localStorageDisabled: "你的浏览器已禁用 localStorage。请在浏览器设置中启用 Cookie/存储。",
