@@ -727,7 +727,13 @@
 //       unavailable, rate-limit, demo-code) wired to a new anon.verifyMsg
 //       namespace and translated into all 10 locales. Touches js/anonymous.js +
 //       js/shared/i18n.js.
-const CACHE_NAME = 'bipolarbear-v163';
+// v164: i18n audit — anonymous board feed & moderation runtime strings wired
+//       to new anon.modbtn (15 tooltips), anon.feed (greetings, Today's-topic,
+//       announcements, delete-overlay comment copy, footer, tombstone, reply
+//       CTA) and anon.seed (8 sample posts) namespaces, plus anon.ui.loading /
+//       loadingComments and anon.sos.bodyNamed — translated into all 10
+//       locales. Touches js/anonymous.js + js/shared/i18n.js.
+const CACHE_NAME = 'bipolarbear-v164';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
