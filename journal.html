@@ -1183,19 +1183,19 @@
       <div style="font-size:1.8em; margin-bottom:10px;">😴</div>
       <!-- Native content -->
       <div id="sleepSyncNative">
-        <div style="font-weight:600; font-size:1.05em; margin-bottom:8px;">Import health data</div>
-        <p style="color:#6c757d; font-size:0.9em; margin-bottom:16px;">Import data from your phone's health app.</p>
+        <div style="font-weight:600; font-size:1.05em; margin-bottom:8px;" data-i18n="journal.mods.importHealthTitle">Import health data</div>
+        <p style="color:#6c757d; font-size:0.9em; margin-bottom:16px;" data-i18n="journal.mods.importHealthDesc">Import data from your phone's health app.</p>
         <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:4px;">
-          <button class="confirm-btn" onclick="doSleepOnlySync()" style="background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);">😴 Import sleep</button>
-          <button class="confirm-btn confirm-btn-no" onclick="closeSleepSyncModal()">Close</button>
+          <button class="confirm-btn" onclick="doSleepOnlySync()" style="background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);" data-i18n="journal.mods.importSleep">😴 Import sleep</button>
+          <button class="confirm-btn confirm-btn-no" onclick="closeSleepSyncModal()" data-i18n="common.close">Close</button>
         </div>
       </div>
       <!-- Web content -->
       <div id="sleepSyncWeb" style="display:none;">
-        <div style="font-weight:600; font-size:1.05em; margin-bottom:8px;">Mobile app only</div>
-        <p style="color:#6c757d; font-size:0.9em; margin-bottom:20px;">Sleep data can only be synced on the mobile app.</p>
+        <div style="font-weight:600; font-size:1.05em; margin-bottom:8px;" data-i18n="journal.mods.mobileOnly">Mobile app only</div>
+        <p style="color:#6c757d; font-size:0.9em; margin-bottom:20px;" data-i18n="journal.mods.sleepMobileOnly">Sleep data can only be synced on the mobile app.</p>
         <div class="confirm-buttons">
-          <button class="confirm-btn confirm-btn-no" onclick="closeSleepSyncModal()">Close</button>
+          <button class="confirm-btn confirm-btn-no" onclick="closeSleepSyncModal()" data-i18n="common.close">Close</button>
         </div>
       </div>
     </div>
@@ -1206,18 +1206,18 @@
     <div class="confirm-content" style="max-width:320px; text-align:center;">
       <div style="font-size:1.8em; margin-bottom:10px;">⚡</div>
       <div id="energySyncNative">
-        <div style="font-weight:600; font-size:1.05em; margin-bottom:8px;">Import health data</div>
-        <p style="color:#6c757d; font-size:0.9em; margin-bottom:16px;">Import data from your phone's health app.</p>
+        <div style="font-weight:600; font-size:1.05em; margin-bottom:8px;" data-i18n="journal.mods.importHealthTitle">Import health data</div>
+        <p style="color:#6c757d; font-size:0.9em; margin-bottom:16px;" data-i18n="journal.mods.importHealthDesc">Import data from your phone's health app.</p>
         <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:4px;">
-          <button class="confirm-btn" onclick="doStepsOnlySync()" style="background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);">🏃 Import steps</button>
-          <button class="confirm-btn confirm-btn-no" onclick="closeEnergySyncModal()">Close</button>
+          <button class="confirm-btn" onclick="doStepsOnlySync()" style="background:white;color:var(--brand-primary);border:2px solid var(--brand-primary);" data-i18n="journal.mods.importSteps">🏃 Import steps</button>
+          <button class="confirm-btn confirm-btn-no" onclick="closeEnergySyncModal()" data-i18n="common.close">Close</button>
         </div>
       </div>
       <div id="energySyncWeb" style="display:none;">
-        <div style="font-weight:600; font-size:1.05em; margin-bottom:8px;">Mobile app only</div>
-        <p style="color:#6c757d; font-size:0.9em; margin-bottom:20px;">Step data can only be synced on the mobile app.</p>
+        <div style="font-weight:600; font-size:1.05em; margin-bottom:8px;" data-i18n="journal.mods.mobileOnly">Mobile app only</div>
+        <p style="color:#6c757d; font-size:0.9em; margin-bottom:20px;" data-i18n="journal.mods.stepMobileOnly">Step data can only be synced on the mobile app.</p>
         <div class="confirm-buttons">
-          <button class="confirm-btn confirm-btn-no" onclick="closeEnergySyncModal()">Close</button>
+          <button class="confirm-btn confirm-btn-no" onclick="closeEnergySyncModal()" data-i18n="common.close">Close</button>
         </div>
       </div>
     </div>

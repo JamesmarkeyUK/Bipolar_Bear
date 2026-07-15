@@ -685,7 +685,12 @@
 //       draft) wired to 12 new journal.mods keys across all 10 locales. Also
 //       routes journal.js's runtime fmSkipBtn label through journal.mods.fmSkip.
 //       Touches journal.html, js/journal.js, js/shared/i18n.js (all precached).
-const CACHE_NAME = 'bipolarbear-v154';
+// v155: i18n audit — journal health-sync modals (sleep + steps import,
+//       "Mobile app only" web fallbacks) wired to 7 new journal.mods keys
+//       across all 10 locales. Completes the journal.html static-text pass;
+//       the JS-branded healthSyncLabel/Desc stay in journal.js. Touches
+//       journal.html + js/shared/i18n.js (both precached).
+const CACHE_NAME = 'bipolarbear-v155';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
