@@ -2620,7 +2620,7 @@ window.addEventListener('pageshow', () => {
           updateDatePickerStatus([]);
         } else {
           console.error('Error loading entries:', error);
-          document.getElementById('entries').innerHTML = '<div class="no-entries">Error loading entries</div>';
+          document.getElementById('entries').innerHTML = '<div class="no-entries">' + BB.t('journal.ui.errorLoading') + '</div>';
         }
       } finally {
         clearTimeout(_loadSafetyTimer);
@@ -5134,7 +5134,7 @@ window.addEventListener('pageshow', () => {
             _linkedChip = '';
           } else if (_fmLinkMoodPickerOpen && selectedMood) {
             _linkedChip = `<p style="text-align:center;font-size:0.82em;color:var(--brand-primary);font-weight:600;margin-top:12px;margin-bottom:0;">${BB.t('journal.ui.nowTapLink')}</p>
-              <p style="text-align:center;font-size:0.72em;color:#adb5bd;margin-top:4px;margin-bottom:0;">Tap <strong>${cap(selectedMood)}</strong> again to skip &nbsp;<button onclick="_fmLinkMoodPickerOpen=false;_renderFocusedStep();" style="background:none;border:none;color:#adb5bd;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:0;text-decoration:underline;">Cancel</button></p>`;
+              <p style="text-align:center;font-size:0.72em;color:#adb5bd;margin-top:4px;margin-bottom:0;">${BB.t('journal.ui.tapAgainSkip', { mood: `<strong>${cap(selectedMood)}</strong>` })} &nbsp;<button onclick="_fmLinkMoodPickerOpen=false;_renderFocusedStep();" style="background:none;border:none;color:#adb5bd;font-size:0.9em;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:0;text-decoration:underline;">${BB.t('common.cancel')}</button></p>`;
           } else if (selectedMood && localStorage.getItem('moodLinkingEnabled') === '1') {
             _linkedChip = `<p style="text-align:center;font-size:0.72em;color:#adb5bd;margin-top:8px;margin-bottom:0;">${BB.t('journal.ui.holdToLink')}</p>`;
           }

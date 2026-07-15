@@ -608,6 +608,8 @@
           pickEmoji: 'Pick emoji',
           eg180: 'e.g. 180',
           fieldNameMax: 'Field name… (max 15)',
+          errorLoading: 'Error loading entries',
+          tapAgainSkip: 'Tap {mood} again to skip',
         },
         dlg: {
           localStorageDisabled: "localStorage is disabled in your browser. Please enable cookies/storage in your browser settings.",
