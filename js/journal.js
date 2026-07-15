@@ -2013,7 +2013,7 @@ window.addEventListener('pageshow', () => {
         localStorage.setItem('test', 'test');
         localStorage.removeItem('test');
       } catch(e) {
-        alert('localStorage is disabled in your browser. Please enable cookies/storage in your browser settings.');
+        alert(BB.t('journal.dlg.localStorageDisabled'));
         return;
       }
 
@@ -2157,13 +2157,13 @@ window.addEventListener('pageshow', () => {
         
         if (!currentUser) {
           // Guest mode error
-          alert(`Could not save to localStorage: ${error.message}\n\nPlease check if:\n- Private browsing is enabled\n- Cookies are blocked\n- Storage is full`);
+          alert(BB.t('journal.dlg.saveLocalFail', { msg: error.message }));
         } else if (error.code === 'permission-denied') {
-          alert('Could not save: Permission denied. Try signing out and back in again.');
+          alert(BB.t('journal.dlg.savePermDenied'));
         } else if (error.code === 'unavailable' || error.message?.includes('network')) {
-          alert('Network error. Please check your connection and try again.');
+          alert(BB.t('journal.dlg.saveNetwork'));
         } else {
-          alert('Oops! Could not save entry: ' + error.message);
+          alert(BB.t('journal.dlg.saveEntryFail') + error.message);
         }
       }
     }
@@ -2409,11 +2409,11 @@ window.addEventListener('pageshow', () => {
             }
           } catch (storageError) {
             console.error('localStorage corrupted:', storageError);
-            alert('⚠️ Your browser storage is corrupted. Click OK to reset it.\n\n(Any saved entries will be lost, but you can start fresh)');
+            alert(BB.t('journal.dlg.storageCorrupt'));
             try {
               localStorage.clear();
             } catch(clearError) {
-              alert('Could not clear storage. Please clear your browser data manually:\n\nFirefox: Ctrl+Shift+Del → Clear cookies and site data');
+              alert(BB.t('journal.dlg.storageClearFail'));
             }
           }
         }
@@ -3525,7 +3525,7 @@ window.addEventListener('pageshow', () => {
         _guestPinForgotReset();
         return;
       }
-      if (confirm('Reset PIN?\n\nThis will disable PIN lock. You can set a new one in Settings → Advanced.')) {
+      if (confirm(BB.t('journal.dlg.resetPin'))) {
         BB.storage.remove('PinCode');
         BB.storage.remove('PinEnabled');
         _syncPinToFirestore();
@@ -4165,8 +4165,8 @@ window.addEventListener('pageshow', () => {
       const Health = getPlugin('HealthPlugin');
       if (!Health) return;
       const msg = isAndroid()
-        ? "Health access couldn't be requested automatically.\n\nOpen Health Connect to grant Sleep and Steps access, then try again?"
-        : "iOS didn't show the Health permission sheet — this usually means access was set before (for example, before reinstalling the app).\n\nOpen Apple Health → Profile → Apps → BipolarBear and turn on Sleep and Steps. Open Health settings now?";
+        ? BB.t('journal.dlg.healthRecoverAndroid')
+        : BB.t('journal.dlg.healthRecoverIos');
       if (!confirm(msg)) return;
       try {
         if (isAndroid() && typeof Health.openHealthConnectSettings === 'function') {
@@ -8033,7 +8033,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
         }
 
         if (entries.length === 0) {
-          alert('No data to export yet!');
+          alert(BB.t('journal.dlg.noDataExport'));
           return;
         }
 
@@ -8077,10 +8077,10 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
             if (Share) {
               await Share.share({ title: 'BipolarBear Backup', url: result.uri, dialogTitle: 'Save or Share Your Backup' });
             } else {
-              alert('Backup saved to Documents folder! 💾\n\n' + filename);
+              alert(BB.t('journal.dlg.backupSavedDocs') + filename);
             }
           } else {
-            alert('Filesystem plugin not available.');
+            alert(BB.t('journal.dlg.fsPluginNA'));
           }
         } else {
           // Web: standard anchor download
@@ -8093,11 +8093,11 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
           a.click();
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
-          alert('Backup downloaded! 💾');
+          alert(BB.t('journal.dlg.backupDownloaded'));
         }
       } catch (error) {
         console.error('Error exporting:', error);
-        alert('Could not export data');
+        alert(BB.t('journal.dlg.exportFail'));
       }
     }
 
@@ -8115,7 +8115,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
             }
           }
         }
-        if (entries.length === 0) { alert('No data to export yet!'); return; }
+        if (entries.length === 0) { alert(BB.t('journal.dlg.noDataExport')); return; }
         entries.sort((a, b) => a.timestamp - b.timestamp);
 
         // Collect all custom field ids across entries
@@ -8159,8 +8159,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
             let binary = ''; bytes.forEach(b => binary += String.fromCharCode(b));
             const result = await Filesystem.writeFile({ path: filename, data: btoa(binary), directory: 'DOCUMENTS' });
             if (Share) await Share.share({ title: 'BipolarBear CSV Export', url: result.uri, dialogTitle: 'Save or Share Your Export' });
-            else alert('CSV saved to Documents folder! 💾\n\n' + filename);
-          } else { alert('Filesystem plugin not available.'); }
+            else alert(BB.t('journal.dlg.csvSavedDocs') + filename);
+          } else { alert(BB.t('journal.dlg.fsPluginNA')); }
         } else {
           const blob = new Blob([csvStr], { type: 'text/csv' });
           const url = URL.createObjectURL(blob);
@@ -8168,11 +8168,11 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
           a.href = url; a.download = filename;
           document.body.appendChild(a); a.click();
           document.body.removeChild(a); URL.revokeObjectURL(url);
-          alert('CSV downloaded! 💾');
+          alert(BB.t('journal.dlg.csvDownloaded'));
         }
       } catch (error) {
         console.error('Error exporting CSV:', error);
-        alert('Could not export data');
+        alert(BB.t('journal.dlg.exportFail'));
       }
     }
     window.exportDataCSV = exportDataCSV;
@@ -8262,7 +8262,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
       if (!recentEntriesPeriod) recentEntriesPeriod = '30d';
       try {
         if (typeof window.jspdf === 'undefined') {
-          alert('PDF library is loading... Please try again in a moment.');
+          alert(BB.t('journal.dlg.pdfLibLoading'));
           return;
         }
 
@@ -8293,7 +8293,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
           }
         }
 
-        if (entries.length === 0) { alert('No data to export yet!'); return; }
+        if (entries.length === 0) { alert(BB.t('journal.dlg.noDataExport')); return; }
         entries.sort((a, b) => a.timestamp - b.timestamp);
 
         const { jsPDF } = window.jspdf;
@@ -9167,14 +9167,14 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
                   dialogTitle: 'Save or Share Your Report'
                 });
               } else {
-                alert('PDF saved to Documents folder! 📄\n\n' + filename);
+                alert(BB.t('journal.dlg.pdfSavedDocs') + filename);
               }
             } else {
-              alert('Filesystem plugin not available. PDF export requires the Capacitor Filesystem plugin.');
+              alert(BB.t('journal.dlg.pdfFsPluginNA'));
             }
           } catch (nativeError) {
             console.error('Native PDF error:', nativeError);
-            alert('Could not save PDF: ' + nativeError.message);
+            alert(BB.t('journal.dlg.pdfSaveFail') + nativeError.message);
           }
         }
         // Mobile web
@@ -9189,7 +9189,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
             if (newWindow) {
               // Success - opened in new tab
               console.log('PDF opened in new tab');
-              alert('PDF opened! 📄\n\nTap the share button to save or print.');
+              alert(BB.t('journal.dlg.pdfOpened'));
               setTimeout(() => URL.revokeObjectURL(url), 30000);
             } else {
               // Popup blocked - try download link
@@ -9202,21 +9202,21 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
               document.body.removeChild(link);
               setTimeout(() => URL.revokeObjectURL(url), 100);
               console.log('PDF download triggered');
-              alert('PDF downloaded! Check your downloads folder. 📄');
+              alert(BB.t('journal.dlg.pdfDownloaded'));
             }
           } catch (mobileError) {
             console.error('Mobile PDF error:', mobileError);
-            alert('Could not create PDF: ' + mobileError.message);
+            alert(BB.t('journal.dlg.pdfCreateFail') + mobileError.message);
           }
         } else {
           // Desktop
           doc.save(filename);
           console.log('PDF saved:', filename);
-          alert('PDF report downloaded! 📄');
+          alert(BB.t('journal.dlg.pdfReportDownloaded'));
         }
       } catch (error) {
         console.error('Error exporting PDF:', error);
-        alert('Could not export PDF: ' + error.message);
+        alert(BB.t('journal.dlg.pdfExportFail') + error.message);
       }
     }
 
@@ -9251,7 +9251,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
           const settings = (!Array.isArray(parsed) && parsed.settings) ? parsed.settings : null;
 
           if (!Array.isArray(entries)) {
-            alert('Invalid backup file format');
+            alert(BB.t('journal.dlg.invalidBackup'));
             return;
           }
 
@@ -9320,12 +9320,12 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
             if (toggleBtn) toggleBtn.innerHTML = BB.t('journal.btn.closeJournal');
           }
           await loadEntries();
-          const settingsNote = settings ? ' Settings restored.' : '';
-          alert(`Successfully imported ${imported} entries!${settingsNote} 🎉`);
+          const settingsNote = settings ? BB.t('journal.dlg.settingsRestored') : '';
+          alert(BB.t('journal.dlg.importSuccess', { n: imported, note: settingsNote }));
           event.target.value = '';
         } catch (error) {
           console.error('Error importing:', error);
-          alert('Could not import data. Please check the file format.');
+          alert(BB.t('journal.dlg.importDataFail'));
         }
       };
 
@@ -9344,7 +9344,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
           
           // Skip header line
           if (lines.length < 2) {
-            alert('CSV file appears to be empty');
+            alert(BB.t('journal.dlg.csvEmpty'));
             return;
           }
 
@@ -9450,11 +9450,11 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
             if (tBtn) tBtn.innerHTML = BB.t('journal.btn.closeJournal');
           }
           await loadEntries();
-          alert(`Successfully imported ${imported} Daylio entries! 🎉\n\nNote: Energy, sleep, and medication data set to default values.`);
+          alert(BB.t('journal.dlg.daylioImportSuccess', { n: imported }));
           event.target.value = '';
         } catch (error) {
           console.error('Error importing Daylio data:', error);
-          alert('Could not import Daylio CSV. Please make sure it\'s exported from Daylio app.');
+          alert(BB.t('journal.dlg.daylioImportFail'));
         }
       };
       
@@ -9536,13 +9536,13 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
         } catch (error) {
           console.error('Error deleting:', error);
           nativeHaptic('error');
-          alert('Could not delete entry: ' + error.message);
+          alert(BB.t('journal.dlg.deleteEntryFail') + error.message);
         }
       }
     }
 
     function confirmResetSettings() {
-      if (!confirm('Reset all advanced settings to their defaults?\n\nYour journal entries and survival kit data will not be affected.')) return;
+      if (!confirm(BB.t('journal.dlg.resetSettings'))) return;
       const _keys = [
         'fmConfirmStep', 'fmAutoAdvance', 'fmAutoAdvanceMoreData',
         'elaborateResponsesEnabled', 'intentionEnabled',
@@ -9584,7 +9584,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
         }, { merge: true }).catch(() => {});
       }
       closeSettingsModal();
-      showToast('↺ Settings reset to defaults');
+      showToast(BB.t('journal.dlg.settingsResetToast'));
     }
     window.confirmResetSettings = confirmResetSettings;
 
@@ -9597,15 +9597,21 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
     function confirmDeleteAll() {
       const count = _allEntries.length;
       const isSignedIn = !!currentUser;
-      const accountLine = currentUser ? `Account: ${currentUser.email}\n` : `(Guest mode — browser storage)\n`;
+      const accountLine = currentUser
+        ? BB.t('journal.dlg.delAccountLine', { email: currentUser.email }) + '\n'
+        : BB.t('journal.dlg.delGuestLine') + '\n';
       const action = isSignedIn
-        ? `permanently delete your BipolarBear account, all ${count} entries, and reset everything`
-        : `permanently delete all ${count} entries AND reset all settings to defaults`;
-      const message = `⚠️ ${isSignedIn ? 'DELETE ACCOUNT' : 'FULL RESET'}?\n\n${accountLine}\nThis will ${action}.\n\nThis CANNOT be undone! Make sure to export a backup first.`;
+        ? BB.t('journal.dlg.delActionAccount', { count: count })
+        : BB.t('journal.dlg.delActionGuest', { count: count });
+      const message = BB.t('journal.dlg.delMessage', {
+        heading: isSignedIn ? BB.t('journal.dlg.delHeadingAccount') : BB.t('journal.dlg.delHeadingGuest'),
+        accountLine: accountLine,
+        action: action,
+      });
       if (!confirm(message)) return;
       const finalLine = isSignedIn
-        ? `FINAL WARNING: Permanently delete account ${currentUser.email} and all ${count} entries?\n\nThis CANNOT be undone.`
-        : `FINAL WARNING: Delete all ${count} entries and reset settings for guest?\n\nThis CANNOT be undone.`;
+        ? BB.t('journal.dlg.delFinalAccount', { email: currentUser.email, count: count })
+        : BB.t('journal.dlg.delFinalGuest', { count: count });
       if (!confirm(finalLine)) return;
       deleteAllEntries({ deleteAccount: isSignedIn });
     }
@@ -9635,13 +9641,13 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
       // confirm their password we abort BEFORE touching any data — leaves
       // them in a known-good state.
       if (deleteAccount && currentUser) {
-        const _pw = prompt('Re-enter your password to confirm account deletion:');
+        const _pw = prompt(BB.t('journal.dlg.reauthPrompt'));
         if (!_pw) return; // cancelled
         try {
           const _cred = firebase.auth.EmailAuthProvider.credential(currentUser.email, _pw);
           await currentUser.reauthenticateWithCredential(_cred);
         } catch (_e) {
-          alert('Wrong password. Account not deleted.');
+          alert(BB.t('journal.dlg.wrongPassword'));
           return;
         }
       }
@@ -9852,11 +9858,11 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
         }
 
         alert(deleteAccount
-          ? (_accountDeleted ? '✅ Account deleted.' : '⚠️ Data deleted but the auth account could not be removed. Please contact support.')
-          : `Successfully deleted ${deleted} entries.`);
+          ? (_accountDeleted ? BB.t('journal.dlg.accountDeleted') : BB.t('journal.dlg.accountDeleteAuthFail'))
+          : BB.t('journal.dlg.entriesDeleted', { n: deleted }));
       } catch (error) {
         console.error('Error deleting all entries:', error);
-        alert('Some cleanup steps failed: ' + error.message + '\n\nYou will be redirected to the home page so you can start fresh.');
+        alert(BB.t('journal.dlg.cleanupFailed', { msg: error.message }));
       } finally {
         // Always redirect to /index.html so the tutorial restarts. We hit
         // this finally regardless of whether the try succeeded or threw,
@@ -10123,8 +10129,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
       const name = document.getElementById('newMedName').value.trim();
       const dosage = document.getElementById('newMedDose').value.trim();
 
-      if (!name) { alert('Please enter a medication name'); return; }
-      if (!dosage) { alert('Please enter a dosage'); return; }
+      if (!name) { alert(BB.t('journal.dlg.enterMedName')); return; }
+      if (!dosage) { alert(BB.t('journal.dlg.enterDosage')); return; }
 
       const medications = JSON.parse(localStorage.getItem('currentMedList') || '[]');
       medications.push({ name, dosage });
@@ -10137,7 +10143,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
     }
 
     function deleteMedication(index) {
-      if (!confirm('Remove this medication from your list?')) return;
+      if (!confirm(BB.t('journal.dlg.removeMed'))) return;
 
       const medications = JSON.parse(localStorage.getItem('currentMedList') || '[]');
       medications.splice(index, 1);
@@ -10509,7 +10515,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
         closeEditModal();
         loadEntries();
       } catch(e) {
-        alert('Could not save changes: ' + e.message);
+        alert(BB.t('journal.dlg.saveChangesFail') + e.message);
       }
     }
 
@@ -10619,7 +10625,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
     }
 
     function deleteGoal(index) {
-      if (!confirm('Remove this goal?')) return;
+      if (!confirm(BB.t('journal.dlg.removeGoal'))) return;
       const goals = JSON.parse(localStorage.getItem('dailyGoals') || '[]');
       goals.splice(index, 1);
       localStorage.setItem('dailyGoals', JSON.stringify(goals));
@@ -10631,7 +10637,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
 
     function editGoal(index) {
       const goals = JSON.parse(localStorage.getItem('dailyGoals') || '[]');
-      const newText = prompt('Edit goal:', goals[index]);
+      const newText = prompt(BB.t('journal.dlg.editGoal'), goals[index]);
       if (newText === null || newText.trim() === '') return;
       goals[index] = newText.trim();
       localStorage.setItem('dailyGoals', JSON.stringify(goals));
@@ -10728,7 +10734,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
       addBtn.onclick = () => {
         const name = document.getElementById('newMedName').value.trim();
         const dosage = document.getElementById('newMedDose').value.trim();
-        if (!name || !dosage) { alert('Please fill in both fields'); return; }
+        if (!name || !dosage) { alert(BB.t('journal.dlg.fillBothFields')); return; }
         medications[index] = { ...med, name, dosage };
         localStorage.setItem('currentMedList', JSON.stringify(medications));
         syncMedListToFirestore(medications);
@@ -10747,7 +10753,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
         const entries = (_allEntries && _allEntries.length > 0) ? _allEntries : [];
 
         if (entries.length === 0) {
-          alert('No entries yet! Start tracking your mood to see missing dates.');
+          alert(BB.t('journal.dlg.noEntriesYet'));
           return;
         }
 
@@ -10821,7 +10827,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
         document.getElementById('missingDatesModal').classList.add('active');
       } catch (error) {
         console.error('Error showing missing dates:', error);
-        alert('Could not load missing dates: ' + error.message);
+        alert(BB.t('journal.dlg.loadMissingFail') + error.message);
       }
     }
 
@@ -12037,7 +12043,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
           await db.collection('personalDetails').doc(currentUser.uid).set(data, { merge: true });
         } catch(e) { console.warn('Could not save personal details to Firestore', e); }
       }
-      alert('✅ Personal details saved!');
+      alert(BB.t('journal.dlg.personalDetailsSaved'));
       closePersonalDetailsModal();
     }
 
@@ -12083,7 +12089,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
           // account deletion (the OS never re-prompts and there's no API to
           // revoke it), so this in-app confirmation is the consent gate the
           // next user on the device actually sees before notifications resume.
-          if (!confirm('Turn on notifications?\n\nBipolarBear will send reminders to this device.')) {
+          if (!confirm(BB.t('journal.dlg.turnOnNotifs'))) {
             const el = document.getElementById(toggleId);
             if (el) el.checked = false;
             return false;
@@ -12095,7 +12101,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
         if (display !== 'granted') {
           const el = document.getElementById(toggleId);
           if (el) el.checked = false;
-          alert('🔕 Notifications are blocked. Enable them in iOS Settings → BipolarBear → Notifications, then try again.');
+          alert(BB.t('journal.dlg.notifsBlocked'));
           // Refresh permission display in settings
           document.querySelectorAll('.settings-notif-info').forEach(el => el.textContent =
             `Notifications: ❌ Blocked in phone settings`);
@@ -13246,7 +13252,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                   // New version available
-                  if (confirm('New version available! Reload to update?')) {
+                  if (confirm(BB.t('journal.dlg.newVersion'))) {
                     newWorker.postMessage({ type: 'SKIP_WAITING' });
                     window.location.reload();
                   }
