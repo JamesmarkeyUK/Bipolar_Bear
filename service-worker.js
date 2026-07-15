@@ -739,7 +739,12 @@
 //       flow with {email}/{count} interpolation, med/goal dialogs, health-
 //       permission recovery, notification + new-version prompts) translated
 //       into all 10 locales. Touches js/journal.js + js/shared/i18n.js.
-const CACHE_NAME = 'bipolarbear-v165';
+// v166: i18n audit — journal.js high-visibility innerHTML labels (16 keys under
+//       journal.ui: export/import + account row, personal-details + manage-
+//       medications buttons, favourites/meds/goals/missing-entries empty-states,
+//       install-app banner, Current Streak stat) translated into all 10 locales.
+//       Touches js/journal.js + js/shared/i18n.js.
+const CACHE_NAME = 'bipolarbear-v166';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
