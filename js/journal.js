@@ -8368,9 +8368,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
           return arr.filter(e => e.timestamp >= cutoff);
         };
         const _periodLabel = period => {
-          if (period === 'alltime') return statsStartDate ? `All-time (from ${statsStartDate})` : 'All-time';
-          if (period === '365d') return 'Last Year';
-          return `${parseInt(period)}-Day`;
+          if (period === 'alltime') return statsStartDate ? `${BB.t('journal.pdf.periodAllTimeFrom')} ${statsStartDate})` : BB.t('journal.pdf.periodAllTime');
+          if (period === '365d') return BB.t('journal.pdf.periodLastYear');
+          return `${parseInt(period)}${BB.t('journal.pdf.periodDaySuffix')}`;
         };
         const allEntries = _filterByPeriod(entries, leftPeriod);
         const recent     = _filterByPeriod(entries, rightPeriod);
@@ -8431,7 +8431,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
           doc.setFontSize(18); doc.setFont(undefined, 'bold'); setColor([40,40,40]);
           doc.text('BipolarBear.app', margin, titleY);
           doc.setFontSize(11); doc.setFont(undefined, 'normal'); setColor([100,100,100]);
-          doc.text('Mood Tracker', margin, subtitleY);
+          doc.text(BB.t('journal.pdf.moodTracker'), margin, subtitleY);
           y = Math.max(38, logoStartY + logoH + 4);
           console.log('\u2705 Logo added to PDF');
         } catch(e) {
@@ -8440,7 +8440,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
           doc.setFontSize(18); doc.setFont(undefined, 'bold'); setColor([40,40,40]);
           doc.text('BipolarBear.app', margin, 14);
           doc.setFontSize(11); doc.setFont(undefined, 'normal'); setColor([100,100,100]);
-          doc.text('Mood Tracker', margin, 22);
+          doc.text(BB.t('journal.pdf.moodTracker'), margin, 22);
           y = 38;
         }
 
@@ -8491,8 +8491,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
 
           let headerY = y + 5;
           doc.setFontSize(7.5); doc.setFont(undefined, 'bold'); setColor([60,60,60]);
-          doc.text('PATIENT DETAILS', margin + 4, headerY);
-          doc.text('MEDICATIONS', col2 + 2, headerY);
+          doc.text(BB.t('journal.pdf.patientDetails').toUpperCase(), margin + 4, headerY);
+          doc.text(BB.t('journal.pdf.medications').toUpperCase(), col2 + 2, headerY);
           let contentY = headerY + 5;
 
           doc.setFontSize(7); doc.setFont(undefined, 'normal');
@@ -8501,28 +8501,28 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
           if (hasPersonalDetails) {
             let ldy = contentY;
             const lx = margin + 4; const lv = margin + 22;
-            if (personalName) { setColor(grey); doc.text('Name:', lx, ldy); setColor(dark); doc.text(personalName, lv, ldy); ldy += lineHeight; }
-            if (personalDOB) { setColor(grey); doc.text('DOB:', lx, ldy); setColor(dark); doc.text(personalDOB, lv, ldy); ldy += lineHeight; }
-            if (personalMedicalNum) { setColor(grey); doc.text('Medical #:', lx, ldy); setColor(dark); doc.text(personalMedicalNum, lv, ldy); ldy += lineHeight; }
-            if (personalDiagnosis) { setColor(grey); doc.text('Diagnosis:', lx, ldy); setColor(dark); doc.text(personalDiagnosis, lv, ldy); ldy += lineHeight; }
-            if (personalDiagnosisDate) { setColor(grey); doc.text('Diagnosed:', lx, ldy); setColor(dark); doc.text(personalDiagnosisDate, lv, ldy); ldy += lineHeight; }
+            if (personalName) { setColor(grey); doc.text(BB.t('journal.pdf.labelName'), lx, ldy); setColor(dark); doc.text(personalName, lv, ldy); ldy += lineHeight; }
+            if (personalDOB) { setColor(grey); doc.text(BB.t('journal.pdf.labelDOB'), lx, ldy); setColor(dark); doc.text(personalDOB, lv, ldy); ldy += lineHeight; }
+            if (personalMedicalNum) { setColor(grey); doc.text(BB.t('journal.pdf.labelMedicalNum'), lx, ldy); setColor(dark); doc.text(personalMedicalNum, lv, ldy); ldy += lineHeight; }
+            if (personalDiagnosis) { setColor(grey); doc.text(BB.t('journal.pdf.labelDiagnosis'), lx, ldy); setColor(dark); doc.text(personalDiagnosis, lv, ldy); ldy += lineHeight; }
+            if (personalDiagnosisDate) { setColor(grey); doc.text(BB.t('journal.pdf.labelDiagnosed'), lx, ldy); setColor(dark); doc.text(personalDiagnosisDate, lv, ldy); ldy += lineHeight; }
             if (personalAddress) {
-              setColor(grey); doc.text('Address:', lx, ldy); setColor(dark);
+              setColor(grey); doc.text(BB.t('journal.pdf.labelAddress'), lx, ldy); setColor(dark);
               const addrLines = doc.splitTextToSize(personalAddress, colW - 20);
               doc.text(addrLines, lv, ldy); ldy += lineHeight * addrLines.length;
             }
-            if (personalMobile) { setColor(grey); doc.text('Mobile:', lx, ldy); setColor(dark); doc.text(personalMobile, lv, ldy); ldy += lineHeight; }
-            if (personalEmail) { setColor(grey); doc.text('Email:', lx, ldy); setColor(dark); doc.text(personalEmail, lv, ldy); ldy += lineHeight; }
-            if (personalEmergencyContact) { setColor(grey); doc.text('Emergency:', lx, ldy); setColor(dark); doc.text(personalEmergencyContact, lv, ldy); ldy += lineHeight; }
+            if (personalMobile) { setColor(grey); doc.text(BB.t('journal.pdf.labelMobile'), lx, ldy); setColor(dark); doc.text(personalMobile, lv, ldy); ldy += lineHeight; }
+            if (personalEmail) { setColor(grey); doc.text(BB.t('journal.pdf.labelEmail'), lx, ldy); setColor(dark); doc.text(personalEmail, lv, ldy); ldy += lineHeight; }
+            if (personalEmergencyContact) { setColor(grey); doc.text(BB.t('journal.pdf.labelEmergency'), lx, ldy); setColor(dark); doc.text(personalEmergencyContact, lv, ldy); ldy += lineHeight; }
             if (personalNotes) {
-              setColor(grey); doc.text('Notes:', lx, ldy); setColor(dark);
+              setColor(grey); doc.text(BB.t('journal.pdf.labelNotes'), lx, ldy); setColor(dark);
               const notesLines = doc.splitTextToSize(personalNotes, colW - 20);
               doc.text(notesLines, lv, ldy);
             }
           } else {
             doc.setFont(undefined, 'italic'); setColor(grey);
-            doc.text('Add details via Settings > Advanced >', margin + 4, contentY);
-            doc.text('Personal Details (optional).', margin + 4, contentY + lineHeight);
+            doc.text(BB.t('journal.pdf.addDetailsLine1'), margin + 4, contentY);
+            doc.text(BB.t('journal.pdf.addDetailsLine2'), margin + 4, contentY + lineHeight);
           }
 
           // Right column: medications
@@ -8537,7 +8537,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
             });
           } else {
             doc.setFont(undefined, 'italic'); setColor(grey);
-            doc.text('No medications listed', col2 + 2, contentY);
+            doc.text(BB.t('journal.pdf.noMedications'), col2 + 2, contentY);
           }
 
           y += detailsHeight + 4;
@@ -8547,7 +8547,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
         setDraw(lightGrey); setFill([250,250,250]);
         doc.roundedRect(margin, y, pageW - margin*2, 18, 2, 2, 'FD');
         doc.setFontSize(8); doc.setFont(undefined, 'bold'); setColor(dark);
-        doc.text('REPORT INFORMATION', margin + 4, y + 5);
+        doc.text(BB.t('journal.pdf.reportInformation').toUpperCase(), margin + 4, y + 5);
         doc.setFont(undefined, 'normal'); setColor(grey); doc.setFontSize(7.5);
         const genDate = new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'});
         doc.text(`Generated: ${genDate}`, margin + 4, y + 10);
@@ -8562,51 +8562,51 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
         doc.roundedRect(margin, y, colW, avgStepsAll ? 52 : 47, 2, 2, 'FD');
         let ly = y + 6;
         doc.setFontSize(8); doc.setFont(undefined, 'bold'); setColor([60,60,60]);
-        doc.text((_periodLabel(leftPeriod) + ' SUMMARY').toUpperCase(), margin + 4, ly);
+        doc.text((_periodLabel(leftPeriod) + ' ' + BB.t('journal.pdf.summary')).toUpperCase(), margin + 4, ly);
         setDraw(orange); doc.setLineWidth(0.4);
         doc.line(margin + 4, ly + 1, margin + colW - 4, ly + 1);
         ly += 6;
 
         doc.setFontSize(7); doc.setFont(undefined, 'normal'); setColor(grey);
-        doc.text('Total Entries', margin + 4, ly);
+        doc.text(BB.t('journal.pdf.totalEntries'),margin + 4, ly);
         setColor(dark); doc.setFont(undefined, 'bold');
         doc.text(String(allEntries.length), margin + colW - 4, ly, { align: 'right' });
         ly += 5;
         
         doc.setFont(undefined, 'normal'); setColor(grey);
-        doc.text('Most Common Mood', margin + 4, ly);
+        doc.text(BB.t('journal.pdf.mostCommonMood'),margin + 4, ly);
         setColor(dark); doc.setFont(undefined, 'bold');
         doc.text(mostCommonAll ? mostCommonAll[0] : '-', margin + colW - 4, ly, { align: 'right' });
         ly += 5;
         
         doc.setFont(undefined, 'normal'); setColor(grey);
-        doc.text('Avg Energy Level', margin + 4, ly);
+        doc.text(BB.t('journal.pdf.avgEnergyLevel'),margin + 4, ly);
         setColor(dark); doc.setFont(undefined, 'bold');
         doc.text(`${avgEnergyAll}/10`, margin + colW - 4, ly, { align: 'right' });
         ly += 5;
         
         doc.setFont(undefined, 'normal'); setColor(grey);
-        doc.text('Avg Sleep Hours', margin + 4, ly);
+        doc.text(BB.t('journal.pdf.avgSleepHours'),margin + 4, ly);
         setColor(dark); doc.setFont(undefined, 'bold');
         doc.text(`${avgSleepAll}h`, margin + colW - 4, ly, { align: 'right' });
         ly += 5;
         
         doc.setFont(undefined, 'normal'); setColor(grey);
-        doc.text('Medication Adherence', margin + 4, ly);
+        doc.text(BB.t('journal.pdf.medicationAdherence'),margin + 4, ly);
         setColor(dark); doc.setFont(undefined, 'bold');
         const adherenceAll = allEntries.length ? ((medsTakenAll / allEntries.length) * 100).toFixed(0) : '0';
         doc.text(`${adherenceAll}%`, margin + colW - 4, ly, { align: 'right' });
         ly += 5;
 
         doc.setFont(undefined, 'normal'); setColor(grey);
-        doc.text('Goals Completed', margin + 4, ly);
+        doc.text(BB.t('journal.pdf.goalsCompleted'),margin + 4, ly);
         setColor(dark); doc.setFont(undefined, 'bold');
         const goalsAllPct = goalsAllTotal > 0 ? `${((goalsAllDone/goalsAllTotal)*100).toFixed(0)}%` : '-';
         doc.text(goalsAllPct, margin + colW - 4, ly, { align: 'right' });
         if (avgStepsAll) {
           ly += 5;
           doc.setFont(undefined, 'normal'); setColor(grey);
-          doc.text('Avg Daily Steps', margin + 4, ly);
+          doc.text(BB.t('journal.pdf.avgDailySteps'),margin + 4, ly);
           setColor(dark); doc.setFont(undefined, 'bold');
           doc.text(avgStepsAll, margin + colW - 4, ly, { align: 'right' });
         }
@@ -8616,51 +8616,51 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
         doc.roundedRect(col2, y, colW, avgStepsRecent ? 52 : 47, 2, 2, 'FD');
         let ry = y + 6;
         doc.setFontSize(8); doc.setFont(undefined, 'bold'); setColor([60,60,60]);
-        doc.text((_periodLabel(rightPeriod) + ' SUMMARY').toUpperCase(), col2 + 4, ry);
+        doc.text((_periodLabel(rightPeriod) + ' ' + BB.t('journal.pdf.summary')).toUpperCase(), col2 + 4, ry);
         setDraw(orange); doc.setLineWidth(0.4);
         doc.line(col2 + 4, ry + 1, col2 + colW - 4, ry + 1);
         ry += 6;
         
         doc.setFontSize(7); doc.setFont(undefined, 'normal'); setColor(grey);
-        doc.text('Total Entries', col2 + 4, ry);
+        doc.text(BB.t('journal.pdf.totalEntries'),col2 + 4, ry);
         setColor(dark); doc.setFont(undefined, 'bold');
         doc.text(String(recent.length), col2 + colW - 4, ry, { align: 'right' });
         ry += 5;
         
         doc.setFont(undefined, 'normal'); setColor(grey);
-        doc.text('Most Common Mood', col2 + 4, ry);
+        doc.text(BB.t('journal.pdf.mostCommonMood'),col2 + 4, ry);
         setColor(dark); doc.setFont(undefined, 'bold');
         doc.text(mostCommonRecent ? mostCommonRecent[0] : '-', col2 + colW - 4, ry, { align: 'right' });
         ry += 5;
         
         doc.setFont(undefined, 'normal'); setColor(grey);
-        doc.text('Avg Energy Level', col2 + 4, ry);
+        doc.text(BB.t('journal.pdf.avgEnergyLevel'),col2 + 4, ry);
         setColor(dark); doc.setFont(undefined, 'bold');
         doc.text(recent.length ? `${avgEnergyRecent}/10` : '-', col2 + colW - 4, ry, { align: 'right' });
         ry += 5;
         
         doc.setFont(undefined, 'normal'); setColor(grey);
-        doc.text('Avg Sleep Hours', col2 + 4, ry);
+        doc.text(BB.t('journal.pdf.avgSleepHours'),col2 + 4, ry);
         setColor(dark); doc.setFont(undefined, 'bold');
         doc.text(recent.length ? `${avgSleepRecent}h` : '-', col2 + colW - 4, ry, { align: 'right' });
         ry += 5;
         
         doc.setFont(undefined, 'normal'); setColor(grey);
-        doc.text('Medication Adherence', col2 + 4, ry);
+        doc.text(BB.t('journal.pdf.medicationAdherence'),col2 + 4, ry);
         setColor(dark); doc.setFont(undefined, 'bold');
         const adherenceRecent = recent.length ? ((medsTakenRecent / recent.length) * 100).toFixed(0) : '-';
         doc.text(recent.length ? `${adherenceRecent}%` : '-', col2 + colW - 4, ry, { align: 'right' });
         ry += 5;
 
         doc.setFont(undefined, 'normal'); setColor(grey);
-        doc.text('Goals Completed', col2 + 4, ry);
+        doc.text(BB.t('journal.pdf.goalsCompleted'),col2 + 4, ry);
         setColor(dark); doc.setFont(undefined, 'bold');
         const goalsRecentPct = goalsRecentTotal > 0 ? `${((goalsRecentDone/goalsRecentTotal)*100).toFixed(0)}%` : '-';
         doc.text(goalsRecentPct, col2 + colW - 4, ry, { align: 'right' });
         if (avgStepsRecent) {
           ry += 5;
           doc.setFont(undefined, 'normal'); setColor(grey);
-          doc.text('Avg Daily Steps', col2 + 4, ry);
+          doc.text(BB.t('journal.pdf.avgDailySteps'),col2 + 4, ry);
           setColor(dark); doc.setFont(undefined, 'bold');
           doc.text(avgStepsRecent, col2 + colW - 4, ry, { align: 'right' });
         }
@@ -8672,7 +8672,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
         doc.roundedRect(margin, y, colW, 50, 2, 2, 'FD');
         let ly2 = y + 6;
         doc.setFontSize(8); doc.setFont(undefined, 'bold'); setColor([60,60,60]);
-        doc.text((_periodLabel(leftPeriod) + ' MOOD DISTRIBUTION').toUpperCase(), margin + 4, ly2);
+        doc.text((_periodLabel(leftPeriod) + ' ' + BB.t('journal.pdf.moodDistribution')).toUpperCase(), margin + 4, ly2);
         setDraw(orange); doc.setLineWidth(0.4);
         doc.line(margin + 4, ly2 + 1, margin + colW - 4, ly2 + 1);
         ly2 += 7;
@@ -8682,7 +8682,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
         doc.roundedRect(col2, y, colW, 50, 2, 2, 'FD');
         let ry2 = y + 6;
         doc.setFontSize(8); doc.setFont(undefined, 'bold'); setColor([60,60,60]);
-        doc.text((_periodLabel(rightPeriod) + ' MOOD DISTRIBUTION').toUpperCase(), col2 + 4, ry2);
+        doc.text((_periodLabel(rightPeriod) + ' ' + BB.t('journal.pdf.moodDistribution')).toUpperCase(), col2 + 4, ry2);
         setDraw(orange); doc.setLineWidth(0.4);
         doc.line(col2 + 4, ry2 + 1, col2 + colW - 4, ry2 + 1);
         ry2 += 7;
@@ -8693,11 +8693,11 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
         // ── ADDITIONAL DATA — all-time + 30d columns ──
         {
           const adFields = [
-            { key: 'alcohol',  label: 'Alcohol',      yesLabel: 'drank'      },
-            { key: 'smoking',  label: 'Smoking',      yesLabel: 'smoked'     },
-            { key: 'drugs',    label: 'Drugs',        yesLabel: 'used'       },
-            { key: 'exercise', label: 'Exercise',     yesLabel: 'exercised'  },
-            { key: 'outside',  label: 'Went outside', yesLabel: 'went out'   },
+            { key: 'alcohol',  label: BB.t('journal.label.alcohol'),   yesLabel: 'drank'      },
+            { key: 'smoking',  label: BB.t('journal.label.smoking'),   yesLabel: 'smoked'     },
+            { key: 'drugs',    label: BB.t('journal.label.drugs'),     yesLabel: 'used'       },
+            { key: 'exercise', label: BB.t('journal.label.exercise'),  yesLabel: 'exercised'  },
+            { key: 'outside',  label: BB.t('journal.pdf.wentOutside'), yesLabel: 'went out'   },
           ];
           const MIN_DAYS = 3;
           const MAX_CUSTOM = 4;
@@ -8725,12 +8725,12 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
             doc.roundedRect(margin, y, colW, adBoxH, 2, 2, 'FD');
             let ay = y + 6;
             doc.setFontSize(8); doc.setFont(undefined, 'bold'); setColor([60,60,60]);
-            doc.text((_periodLabel(leftPeriod) + ' ADDITIONAL DATA').toUpperCase(), margin + 4, ay);
+            doc.text((_periodLabel(leftPeriod) + ' ' + BB.t('journal.pdf.additionalData')).toUpperCase(), margin + 4, ay);
             setDraw(orange); doc.setLineWidth(0.4);
             doc.line(margin + 4, ay + 1, margin + colW - 4, ay + 1);
             ay += 6; doc.setFontSize(7);
             if (allTracked.length === 0 && allCustomTracked.length === 0) {
-              setColor(grey); doc.setFont(undefined, 'italic'); doc.text('No data recorded', margin + 4, ay);
+              setColor(grey); doc.setFont(undefined, 'italic'); doc.text(BB.t('journal.pdf.noDataRecorded'), margin + 4, ay);
             } else {
               allTracked.forEach(f => {
                 const tracked = allEntries.filter(e => e[f.key]);
@@ -8754,12 +8754,12 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
             doc.roundedRect(col2, y, colW, adBoxH, 2, 2, 'FD');
             let ry = y + 6;
             doc.setFontSize(8); doc.setFont(undefined, 'bold'); setColor([60,60,60]);
-            doc.text((_periodLabel(rightPeriod) + ' ADDITIONAL DATA').toUpperCase(), col2 + 4, ry);
+            doc.text((_periodLabel(rightPeriod) + ' ' + BB.t('journal.pdf.additionalData')).toUpperCase(), col2 + 4, ry);
             setDraw(orange); doc.setLineWidth(0.4);
             doc.line(col2 + 4, ry + 1, col2 + colW - 4, ry + 1);
             ry += 6; doc.setFontSize(7);
             if (recentTracked.length === 0 && recentCustomTracked.length === 0) {
-              setColor(grey); doc.setFont(undefined, 'italic'); doc.text('No data for this period', col2 + 4, ry);
+              setColor(grey); doc.setFont(undefined, 'italic'); doc.text(BB.t('journal.pdf.noDataForPeriod'), col2 + 4, ry);
             } else {
               recentTracked.forEach(f => {
                 const tracked = recent.filter(e => e[f.key]);
@@ -8843,7 +8843,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
           doc.roundedRect(margin, y, pageW - margin*2, chartBoxHeight, 2, 2, 'FD');
           let chartY = y + 6;
           doc.setFontSize(8); doc.setFont(undefined, 'bold'); setColor([60,60,60]);
-          doc.text('12-MONTH MOOD TRENDS', margin + 4, chartY);
+          doc.text(BB.t('journal.pdf.moodTrends').toUpperCase(), margin + 4, chartY);
           setDraw(orange); doc.setLineWidth(0.4);
           doc.line(margin + 4, chartY + 1, pageW - margin - 4, chartY + 1);
           chartY += 8;
@@ -8870,7 +8870,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
           const keyItemWidth = 20;
           const totalKeyWidth = 10 + (moodOrder.length * keyItemWidth);
           const keyStartX = (pageW - totalKeyWidth) / 2;
-          doc.text('Key:', keyStartX, chartY);
+          doc.text(BB.t('journal.pdf.key'), keyStartX, chartY);
           let keyX = keyStartX + 10;
           moodOrder.forEach(mood => {
             setFill(moodColor(mood)); doc.rect(keyX, chartY - 2.5, 2.5, 2.5, 'F');
@@ -8888,7 +8888,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
           doc.roundedRect(margin, y, pageW - margin*2, tH, 2, 2, 'FD');
           let tY = y + 6;
           doc.setFontSize(8); doc.setFont(undefined, 'bold'); setColor([60,60,60]);
-          doc.text('12-MONTH SLEEP TRENDS (avg hours/night)', margin + 4, tY);
+          doc.text(BB.t('journal.pdf.sleepTrends').toUpperCase(), margin + 4, tY);
           setDraw([100,149,237]); doc.setLineWidth(0.4);
           doc.line(margin + 4, tY + 1, pageW - margin - 4, tY + 1);
           tY += 7;
@@ -8904,7 +8904,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
           doc.roundedRect(margin, y, pageW - margin*2, tH, 2, 2, 'FD');
           let tY = y + 6;
           doc.setFontSize(8); doc.setFont(undefined, 'bold'); setColor([60,60,60]);
-          doc.text('12-MONTH ENERGY TRENDS (avg /10)', margin + 4, tY);
+          doc.text(BB.t('journal.pdf.energyTrends').toUpperCase(), margin + 4, tY);
           setDraw(orange); doc.setLineWidth(0.4);
           doc.line(margin + 4, tY + 1, pageW - margin - 4, tY + 1);
           tY += 7;
@@ -8922,7 +8922,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
             doc.roundedRect(margin, y, pageW - margin*2, tH, 2, 2, 'FD');
             let tY = y + 6;
             doc.setFontSize(8); doc.setFont(undefined, 'bold'); setColor([60,60,60]);
-            doc.text('12-MONTH STEPS TRENDS (avg daily steps)', margin + 4, tY);
+            doc.text(BB.t('journal.pdf.stepsTrends').toUpperCase(), margin + 4, tY);
             setDraw([81,207,102]); doc.setLineWidth(0.4);
             doc.line(margin + 4, tY + 1, pageW - margin - 4, tY + 1);
             tY += 7;
@@ -8942,7 +8942,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
             doc.roundedRect(margin, y, pageW - margin*2, tH, 2, 2, 'FD');
             let tY = y + 6;
             doc.setFontSize(8); doc.setFont(undefined, 'bold'); setColor([60,60,60]);
-            doc.text('12-MONTH SLEEP QUALITY (% good)', margin + 4, tY);
+            doc.text(BB.t('journal.pdf.sleepQualityTrends').toUpperCase(), margin + 4, tY);
             setDraw([100,149,237]); doc.setLineWidth(0.4);
             doc.line(margin + 4, tY + 1, pageW - margin - 4, tY + 1);
             tY += 7;
@@ -8961,7 +8961,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
             doc.roundedRect(margin, y, pageW - margin*2, tH, 2, 2, 'FD');
             let tY = y + 6;
             doc.setFontSize(8); doc.setFont(undefined, 'bold'); setColor([60,60,60]);
-            doc.text('12-MONTH GOALS ON TRACK (% of logged days)', margin + 4, tY);
+            doc.text(BB.t('journal.pdf.goalsTrends').toUpperCase(), margin + 4, tY);
             setDraw(orange); doc.setLineWidth(0.4);
             doc.line(margin + 4, tY + 1, pageW - margin - 4, tY + 1);
             tY += 7;
@@ -8980,7 +8980,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
             doc.roundedRect(margin, y, pageW - margin*2, tH, 2, 2, 'FD');
             let tY = y + 6;
             doc.setFontSize(8); doc.setFont(undefined, 'bold'); setColor([60,60,60]);
-            doc.text('12-MONTH BUDGET KEPT (% of logged days)', margin + 4, tY);
+            doc.text(BB.t('journal.pdf.budgetTrends').toUpperCase(), margin + 4, tY);
             setDraw([81,207,102]); doc.setLineWidth(0.4);
             doc.line(margin + 4, tY + 1, pageW - margin - 4, tY + 1);
             tY += 7;
@@ -8999,14 +8999,14 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
 
             // Section header
             doc.setFontSize(9); doc.setFont(undefined, 'bold'); setColor(dark);
-            doc.text('PERSONALISED INSIGHTS (EXPERIMENTAL)', margin + 4, y);
+            doc.text(BB.t('journal.pdf.personalisedInsights').toUpperCase(), margin + 4, y);
             setDraw(orange); doc.setLineWidth(0.5);
             doc.line(margin + 4, y + 1, pageW - margin - 4, y + 1);
             y += 6;
 
             // Disclaimer
             doc.setFontSize(6.5); doc.setFont(undefined, 'italic'); setColor([160, 160, 160]);
-            doc.text('Observational patterns based on your journal data only. Not medical advice. Review with your healthcare provider.', margin + 4, y);
+            doc.text(BB.t('journal.pdf.insightsDisclaimer'), margin + 4, y);
             y += 7;
 
             pdfInsights.forEach(insight => {
@@ -9083,23 +9083,23 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
             ? `  ·  ${new Date(entry.recordedAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}${entry.recordedTz ? ' ' + entry.recordedTz : ''}`
             : '';
           const stepsStr    = entry.steps    != null ? `  ·  Steps ${Number(entry.steps).toLocaleString()}` : '';
-          const alcoholStr      = entry.alcohol     ? `  ·  Alcohol: ${entry.alcohol === 'yes' ? 'Yes' : 'No'}` : '';
-          const smokingStr      = entry.smoking     ? `  ·  Smoked: ${entry.smoking === 'yes' ? 'Yes' : 'No'}` : '';
-          const drugsStr        = entry.drugs       ? `  ·  Drugs: ${entry.drugs === 'yes' ? 'Yes' : 'No'}` : '';
-          const exerciseStr     = entry.exercise    ? `  ·  Exercise: ${entry.exercise === 'yes' ? 'Yes' : 'No'}` : '';
-          const _relLabel = v => v === 'high' ? 'More than usual' : v === 'medium' ? 'Normal' : 'Less than usual';
+          const alcoholStr      = entry.alcohol     ? `  ·  Alcohol: ${entry.alcohol === 'yes' ? BB.t('journal.value.yes') : BB.t('journal.value.no')}` : '';
+          const smokingStr      = entry.smoking     ? `  ·  Smoked: ${entry.smoking === 'yes' ? BB.t('journal.value.yes') : BB.t('journal.value.no')}` : '';
+          const drugsStr        = entry.drugs       ? `  ·  Drugs: ${entry.drugs === 'yes' ? BB.t('journal.value.yes') : BB.t('journal.value.no')}` : '';
+          const exerciseStr     = entry.exercise    ? `  ·  Exercise: ${entry.exercise === 'yes' ? BB.t('journal.value.yes') : BB.t('journal.value.no')}` : '';
+          const _relLabel = v => v === 'high' ? BB.t('journal.value.moreThanUsual') : v === 'medium' ? BB.t('journal.value.normal') : BB.t('journal.value.lessThanUsual');
           const anxietyStr      = entry.anxiety     ? `  ·  Anxiety: ${_relLabel(entry.anxiety)}` : '';
-          const irritabilityStr = entry.irritability ? `  ·  Irritability: ${entry.irritability === 'yes' ? 'More than usual' : entry.irritability === 'medium' ? 'Normal' : 'Less than usual'}` : '';
+          const irritabilityStr = entry.irritability ? `  ·  Irritability: ${entry.irritability === 'yes' ? BB.t('journal.value.moreThanUsual') : entry.irritability === 'medium' ? BB.t('journal.value.normal') : BB.t('journal.value.lessThanUsual')}` : '';
           const stressStr2      = entry.stress      ? `  ·  Stress: ${_relLabel(entry.stress)}` : '';
-          const outsideStr      = entry.outside     ? `  ·  Outside: ${entry.outside === 'yes' ? 'Yes' : 'No'}` : '';
-          const sleepQualityStr = entry.sleepQuality ? `  ·  Sleep quality: ${entry.sleepQuality === 'good' ? 'Good' : entry.sleepQuality === 'bad' ? 'Bad' : 'OK'}` : '';
+          const outsideStr      = entry.outside     ? `  ·  Outside: ${entry.outside === 'yes' ? BB.t('journal.value.yes') : BB.t('journal.value.no')}` : '';
+          const sleepQualityStr = entry.sleepQuality ? `  ·  Sleep quality: ${entry.sleepQuality === 'good' ? BB.t('journal.value.good') : entry.sleepQuality === 'bad' ? BB.t('journal.value.bad') : BB.t('journal.value.ok')}` : '';
           const customStr = Object.entries(entry.customFields || {})
             .map(([id, val]) => {
               const cf = getCustomFields().find(f => f.id === id);
-              return cf ? `  ·  ${cf.label}: ${val === 'yes' ? 'Yes' : 'No'}` : '';
+              return cf ? `  ·  ${cf.label}: ${val === 'yes' ? BB.t('journal.value.yes') : BB.t('journal.value.no')}` : '';
             }).filter(Boolean).join('');
           const _moodLabel = { manic:BB.t('mood.manic'), elevated:BB.t('mood.elevated'), stable:BB.t('mood.stable'), good:BB.t('mood.stable'), low:BB.t('mood.low'), depressed:BB.t('mood.depressed') };
-          const detail = `${_moodLabelNum(entry.mood)}  ·  Energy ${entry.energy}/10  ·  Sleep ${entry.sleep}h${sleepQualityStr}${stepsStr}  ·  Meds: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medication === 'unsure' ? 'Unsure' : (entry.medication || 'taken')}${anxietyStr}${irritabilityStr}${stressStr2}${alcoholStr}${smokingStr}${drugsStr}${exerciseStr}${outsideStr}${customStr}${recordedPart}`;
+          const detail = `${_moodLabelNum(entry.mood)}  ·  Energy ${entry.energy}/10  ·  Sleep ${entry.sleep}h${sleepQualityStr}${stepsStr}  ·  Meds: ${entry.medication === 'not-taken' ? BB.t('journal.pdf.noForgot') : entry.medication === 'unsure' ? BB.t('journal.pdf.unsure') : (entry.medication || 'taken')}${anxietyStr}${irritabilityStr}${stressStr2}${alcoholStr}${smokingStr}${drugsStr}${exerciseStr}${outsideStr}${customStr}${recordedPart}`;
           const detailLines = doc.splitTextToSize(detail, pageW - margin - (dotX + 35));
           doc.text(detailLines, dotX + 35, y);
           y += (detailLines.length - 1) * 4;
@@ -9132,10 +9132,10 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
           setDraw([200,200,200]); doc.setLineWidth(0.3);
           doc.line(margin, pageH - 12, pageW - margin, pageH - 12);
           doc.setFontSize(6); setColor([120,120,120]); doc.setFont(undefined, 'normal');
-          doc.text('BipolarBear.app Mood Tracker — For clinical consultation purposes', margin, pageH - 8);
+          doc.text(BB.t('journal.pdf.footerClinical'), margin, pageH - 8);
           doc.text(`Page ${p} of ${totalPages}`, pageW - margin, pageH - 8, { align: 'right' });
           doc.setFontSize(5.5); setColor([150,150,150]);
-          doc.text('This report should be reviewed with a qualified healthcare provider', margin, pageH - 4);
+          doc.text(BB.t('journal.pdf.footerReview'), margin, pageH - 4);
         }
 
         // Save

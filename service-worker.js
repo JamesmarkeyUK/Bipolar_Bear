@@ -786,7 +786,15 @@
 //       lp.meter.posts.p1 keys so the first paint matches the active language
 //       (welcome.js already swaps them at runtime). Store badges left as
 //       official assets. Touches welcome.html + welcome-anonymous.html.
-const CACHE_NAME = 'bipolarbear-v174';
+// v175: i18n — privacy.html brought into the i18n system (shared scripts +
+//       data-i18n on all 12 sections + a "convenience translation, English is
+//       authoritative" banner) and translated into all 10 locales (HTML tags,
+//       URLs, emails, GDPR/Firebase/Apple-Health terms preserved). Clinician PDF
+//       export report wired to a new journal.pdf namespace (section headers,
+//       patient-detail + metric labels, 12-month chart titles, disclaimers;
+//       reuses journal.value.*/label.* for shared words) and translated into all
+//       10 locales. Touches privacy.html, js/journal.js, js/shared/i18n.js.
+const CACHE_NAME = 'bipolarbear-v175';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
