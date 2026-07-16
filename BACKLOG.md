@@ -85,6 +85,48 @@ bbAnonWikiNominations/{auto}
 Snapshot `postText`/`postMonika` at nomination time so the wiki entry survives
 the original post's 7-day auto-deletion (`cleanOldPosts`).
 
+---
+
+## Publish the localised store listings (App Store Connect + Play Console)
+
+**Status:** Not started · **Area:** Store ops (no code) — copy lives in `store-assets/listing-localized.md`
+
+The app is fully localised in 10 languages (en + es/fr/de/it/pt/nl/pl/sv/zh:
+UI, the 96-article clinical wiki, `privacy.html`, and the clinician PDF export).
+Store *listings* do NOT inherit any of that — they're separate metadata you add
+per-locale by hand. Paste-ready copy for all 9 non-English locales (subtitle,
+promo text, keywords, description, v1.0 release notes) for **both** apps is
+already drafted and character-limit-checked in `store-assets/listing-localized.md`.
+
+### To do
+
+1. **App Store Connect** — for each app (`com.bipolarbear.app`,
+   `com.bipolaranonymous.app`): version/metadata pane → **add a Localization**
+   per language → paste subtitle / promo / keywords / description / "What's New"
+   from the file. Missing localisations fall back to the primary language, so
+   partial coverage is fine — do the biggest markets first (es/de/fr).
+2. **Google Play Console** — Grow → Store presence → **Main store listing →
+   Manage translations → Add languages** → paste title, short + full description,
+   graphics per language.
+3. **iOS "Languages" field (Capacitor caveat):** because localisation is
+   JavaScript, not native `.lproj` bundles, the App Store won't auto-detect the
+   supported languages. Add a `CFBundleLocalizations` array with all 10 locale
+   codes to the app's `Info.plist` in Xcode so the store lists them.
+4. **Screenshots:** optional per-locale. Reuse the English sets in
+   `store-assets/out/` for a first pass; localise captions later if wanted.
+5. **App Privacy / Data Safety:** answers are the same across locales — fill from
+   the table in `store-assets/listing.md` (posts on the anon board are PLAINTEXT
+   and public — declare that explicitly or Google rejects the listing).
+
+### Notes
+
+- A few tight fields (fr subtitle, de/it/pl keywords, sv subtitle) overran
+  Apple's caps; `listing-localized.md` gives a trimmed alternative inline for
+  each — use those.
+- The other 6 locales beyond es/fr/de are already in the same file (added
+  alongside the first three), so nothing further needs drafting.
+- Pure account-side work — no repo change required, no `CACHE_NAME` bump.
+
 ### Notes / open questions
 
 - **Both apps** get this automatically (shared `js/anonymous.js`) — the wiki tab
