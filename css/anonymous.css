@@ -611,6 +611,9 @@
       border-radius: 8px; padding: 10px 12px; margin-bottom: 14px;
       font-size: 12px; color: var(--muted); line-height: 1.5;
     }
+    .wiki-disclaimer-src {
+      display: inline-block; margin-top: 4px; font-size: 11px; opacity: 0.85;
+    }
     .wiki-card {
       background: #fff; border: 1px solid #eee; border-radius: 12px;
       margin-bottom: 8px; overflow: hidden;

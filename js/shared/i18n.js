@@ -229,6 +229,9 @@
           title: 'Before you join 👋',
           sub: 'This is a peer community. To keep it safe for everyone, please confirm you agree to the rules.',
           continue: 'Continue →',
+          line1: "I'm 18 or older and agree to the",
+          termsLink: 'Community Guidelines & Terms',
+          line2: '. There is zero tolerance for objectionable content or abusive behaviour.',
         },
         verify: {
           back: '← Home',
@@ -298,6 +301,7 @@
           lovedOnesDisclaimer: '💡 General information for partners, family, and friends. Your loved one\'s clinician should still be the first point of contact for medical questions.',
           nhsInfo: 'NHS info ↗',
           moreInfo: 'More info ↗',
+          ukGuidance: '📍 Based on UK-issued guidance (NHS, NICE, Bipolar UK). Services and terminology may differ where you live.',
           readOn: 'Read on {site} ↗',
           sourceLabel: 'Source:',
           aiSummaryBadge: 'AI summary',
@@ -1718,7 +1722,7 @@
         fb: { pickType: 'Elige un tipo.', writeFirst: 'Escribe algo primero.', thanks: '¡Gracias por tus comentarios! 🐻', sendFail: 'No se pudo enviar — inténtalo de nuevo.', imgTooLarge: 'La captura es demasiado grande — recórtala o redúcela primero.', imgUnreadable: 'No se pudo leer la imagen — prueba con otro archivo.' },
       },
       anon: {
-        agree: { title: 'Antes de unirte 👋', sub: 'Esta es una comunidad de apoyo entre iguales. Para mantenerla segura para todos, confirma que aceptas las reglas.', continue: 'Continuar →' },
+        agree: { title: 'Antes de unirte 👋', sub: 'Esta es una comunidad de apoyo entre iguales. Para mantenerla segura para todos, confirma que aceptas las reglas.', continue: 'Continuar →', line1: "Tengo 18 años o más y acepto las", termsLink: "Normas de la comunidad y Términos", line2: ". No se tolera ningún contenido objetable ni comportamiento abusivo." },
         verify: { back: '← Inicio', welcome: '¡Bienvenido! 👋', sub: 'Verifica tu correo para unirte a la comunidad. Tu identidad es privada.', sendCode: 'Enviar Código de Verificación', verify: 'Verificar →', changeEmail: '← Cambiar correo', resend: 'Reenviar código' },
         monika: { verified: '¡Correo Verificado!', chooseSub: 'Ahora elige tu <strong>Moniker</strong> — tu nombre anónimo. Máx. 10 caracteres.', postPreview: 'Así se verán tus publicaciones', btn: 'Ese soy yo →', placeholder: 'p.ej. SunnyDaze' },
         meds: { title: 'Visibilidad de Medicación', sub: '¿Deseas mostrar tu medicación actual junto a tus publicaciones?', yesLabel: 'Sí, mostrar mi medicación', yesSub: 'Otros pueden ver tu medicación — ayuda a sentirse menos solo', noLabel: 'No, mantenerlo privado', noSub: 'Solo se mostrará tu Moniker y racha' },
@@ -2302,7 +2306,7 @@
         fb: { pickType: 'Veuillez choisir un type.', writeFirst: "Veuillez d'abord écrire quelque chose.", thanks: 'Merci pour votre retour ! 🐻', sendFail: "Impossible d'envoyer — veuillez réessayer.", imgTooLarge: "La capture est trop grande — veuillez la recadrer ou la redimensionner d'abord.", imgUnreadable: "Impossible de lire l'image — veuillez essayer un autre fichier." },
       },
       anon: {
-        agree: { title: 'Avant de nous rejoindre 👋', sub: "Ceci est une communauté d'entraide entre pairs. Pour la garder sûre pour tous, veuillez confirmer que vous acceptez les règles.", continue: 'Continuer →' },
+        agree: { title: 'Avant de nous rejoindre 👋', sub: "Ceci est une communauté d'entraide entre pairs. Pour la garder sûre pour tous, veuillez confirmer que vous acceptez les règles.", continue: 'Continuer →', line1: "J'ai 18 ans ou plus et j'accepte les", termsLink: "Règles de la communauté et Conditions", line2: ". Aucune tolérance envers les contenus répréhensibles ou les comportements abusifs." },
         verify: { back: '← Accueil', welcome: 'Bienvenue 👋', sub: 'Vérifiez votre e-mail pour rejoindre la communauté. Votre identité reste privée.', sendCode: 'Envoyer le code de vérification', verify: 'Vérifier →', changeEmail: "← Changer l'e-mail", resend: 'Renvoyer le code' },
         monika: { verified: 'E-mail Vérifié !', chooseSub: 'Choisissez maintenant votre <strong>Moniker</strong> — votre nom anonyme. Max. 10 caractères.', postPreview: 'Vos posts ressembleront à ceci', btn: "C'est moi →", placeholder: 'ex. SunnyDaze' },
         meds: { title: 'Visibilité des Médicaments', sub: 'Souhaitez-vous afficher votre médicament actuel avec vos posts ?', yesLabel: 'Oui, afficher mes médicaments', yesSub: 'Les autres voient votre médicament — aide à se sentir moins seul', noLabel: 'Non, garder privé', noSub: 'Seuls votre Moniker et série seront affichés' },
@@ -3528,7 +3532,7 @@
         fb: { pickType: 'Bitte wählen Sie einen Typ.', writeFirst: 'Bitte schreiben Sie zuerst etwas.', thanks: 'Danke für Ihr Feedback! 🐻', sendFail: 'Senden fehlgeschlagen — bitte versuchen Sie es erneut.', imgTooLarge: 'Der Screenshot ist zu groß — bitte zuschneiden oder verkleinern.', imgUnreadable: 'Bild konnte nicht gelesen werden — bitte versuchen Sie eine andere Datei.' },
       },
       anon: {
-        agree: { title: 'Bevor Sie beitreten 👋', sub: 'Dies ist eine Peer-Community. Um sie für alle sicher zu halten, bestätigen Sie bitte, dass Sie den Regeln zustimmen.', continue: 'Weiter →' },
+        agree: { title: 'Bevor Sie beitreten 👋', sub: 'Dies ist eine Peer-Community. Um sie für alle sicher zu halten, bestätigen Sie bitte, dass Sie den Regeln zustimmen.', continue: 'Weiter →', line1: "Ich bin 18 Jahre oder älter und akzeptiere die", termsLink: "Community-Richtlinien und Nutzungsbedingungen", line2: ". Es gilt keinerlei Toleranz gegenüber anstößigen Inhalten oder missbräuchlichem Verhalten." },
         verify: { back: '← Startseite', welcome: 'Willkommen 👋', sub: 'Bestätigen Sie Ihre E-Mail. Ihre Identität bleibt privat.', sendCode: 'Bestätigungscode senden', verify: 'Bestätigen →', changeEmail: '← E-Mail ändern', resend: 'Code erneut senden' },
         monika: { verified: 'E-Mail Bestätigt!', chooseSub: 'Wählen Sie Ihren <strong>Moniker</strong> — Ihren anonymen Namen. Max. 10 Zeichen.', postPreview: 'So werden Ihre Beiträge aussehen', btn: 'Das bin ich →', placeholder: 'z.B. SunnyDaze' },
         meds: { title: 'Medikamenten-Sichtbarkeit', sub: 'Möchten Sie Ihre aktuellen Medikamente neben Ihren Beiträgen anzeigen?', yesLabel: 'Ja, meine Medikamente anzeigen', yesSub: 'Andere können Ihre Medikamente sehen — hilft weniger allein zu fühlen', noLabel: 'Nein, privat halten', noSub: 'Nur Ihre Moniker und Streak werden angezeigt' },
@@ -4080,7 +4084,7 @@
         fb: { pickType: 'Scegli un tipo.', writeFirst: 'Scrivi prima qualcosa.', thanks: 'Grazie per il tuo feedback! 🐻', sendFail: 'Invio non riuscito — riprova.', imgTooLarge: 'Lo screenshot è troppo grande — ritaglialo o ridimensionalo prima.', imgUnreadable: 'Impossibile leggere l\'immagine — prova con un altro file.' },
       },
       anon: {
-        agree: { title: 'Prima di unirti 👋', sub: 'Questa è una comunità di supporto tra pari. Per mantenerla sicura per tutti, conferma di accettare le regole.', continue: 'Continua →' },
+        agree: { title: 'Prima di unirti 👋', sub: 'Questa è una comunità di supporto tra pari. Per mantenerla sicura per tutti, conferma di accettare le regole.', continue: 'Continua →', line1: "Ho 18 anni o più e accetto le", termsLink: "Linee guida della community e Termini", line2: ". Non è tollerato alcun contenuto discutibile o comportamento offensivo." },
         verify: { back: '← Home', welcome: 'Benvenuto 👋', sub: 'Verifica la tua email per unirti alla comunità. La tua identità rimane privata.', sendCode: 'Invia codice di verifica', verify: 'Verifica →', changeEmail: '← Cambia email', resend: 'Invia di nuovo il codice' },
         monika: { verified: 'Email Verificata!', chooseSub: 'Ora scegli il tuo <strong>Moniker</strong> — il tuo nome anonimo. Max 10 caratteri.', postPreview: 'I tuoi post appariranno così', btn: 'Sono io →', placeholder: 'es. SunnyDaze' },
         meds: { title: 'Visibilità Farmaci', sub: 'Vuoi mostrare il tuo farmaco attuale accanto ai tuoi post?', yesLabel: 'Sì, mostra i miei farmaci', yesSub: 'Gli altri possono vedere il tuo farmaco — aiuta a sentirsi meno soli', noLabel: 'No, tieni privato', noSub: 'Veranno mostrati solo il tuo Moniker e la serie' },
@@ -4632,7 +4636,7 @@
         fb: { pickType: 'Escolha um tipo.', writeFirst: 'Escreva algo primeiro.', thanks: 'Obrigado pelos seus comentários! 🐻', sendFail: 'Não foi possível enviar — tente novamente.', imgTooLarge: 'A captura é demasiado grande — recorte-a ou redimensione-a primeiro.', imgUnreadable: 'Não foi possível ler a imagem — tente outro ficheiro.' },
       },
       anon: {
-        agree: { title: 'Antes de entrar 👋', sub: 'Esta é uma comunidade de apoio entre pares. Para mantê-la segura para todos, confirme que concorda com as regras.', continue: 'Continuar →' },
+        agree: { title: 'Antes de entrar 👋', sub: 'Esta é uma comunidade de apoio entre pares. Para mantê-la segura para todos, confirme que concorda com as regras.', continue: 'Continuar →', line1: "Tenho 18 anos ou mais e aceito as", termsLink: "Diretrizes da comunidade e Termos", line2: ". Há tolerância zero para conteúdo censurável ou comportamento abusivo." },
         verify: { back: '← Início', welcome: 'Bem-vindo 👋', sub: 'Verifique seu e-mail para entrar na comunidade. Sua identidade é privada.', sendCode: 'Enviar Código de Verificação', verify: 'Verificar →', changeEmail: '← Alterar e-mail', resend: 'Reenviar código' },
         monika: { verified: 'E-mail Verificado!', chooseSub: 'Agora escolha seu <strong>Moniker</strong> — seu nome anônimo. Máx. 10 caracteres.', postPreview: 'Suas publicações ficarão assim', btn: 'Sou eu →', placeholder: 'ex. SunnyDaze' },
         meds: { title: 'Visibilidade de Medicação', sub: 'Deseja mostrar sua medicação atual junto às suas publicações?', yesLabel: 'Sim, mostrar minha medicação', yesSub: 'Outros podem ver sua medicação — ajuda a sentir-se menos sozinho', noLabel: 'Não, manter privado', noSub: 'Apenas seu Moniker e sequência serão mostrados' },
@@ -5184,7 +5188,7 @@
         fb: { pickType: 'Kies een type.', writeFirst: 'Schrijf eerst iets.', thanks: 'Bedankt voor uw feedback! 🐻', sendFail: 'Verzenden mislukt — probeer het opnieuw.', imgTooLarge: 'De schermafbeelding is te groot — snijd deze eerst bij of verklein deze.', imgUnreadable: 'Kan afbeelding niet lezen — probeer een ander bestand.' },
       },
       anon: {
-        agree: { title: 'Voordat u deelneemt 👋', sub: 'Dit is een lotgenotengemeenschap. Om het voor iedereen veilig te houden, bevestig dat u akkoord gaat met de regels.', continue: 'Doorgaan →' },
+        agree: { title: 'Voordat u deelneemt 👋', sub: 'Dit is een lotgenotengemeenschap. Om het voor iedereen veilig te houden, bevestig dat u akkoord gaat met de regels.', continue: 'Doorgaan →', line1: "Ik ben 18 jaar of ouder en ga akkoord met de", termsLink: "Communityrichtlijnen en Voorwaarden", line2: ". Er geldt geen enkele tolerantie voor aanstootgevende inhoud of grensoverschrijdend gedrag." },
         verify: { back: '← Startpagina', welcome: 'Welkom 👋', sub: 'Verifieer uw e-mail om deel te nemen. Uw identiteit blijft privé.', sendCode: 'Verificatiecode versturen', verify: 'Verifiëren →', changeEmail: '← E-mail wijzigen', resend: 'Code opnieuw verzenden' },
         monika: { verified: 'E-mail Geverifieerd!', chooseSub: 'Kies nu uw <strong>Moniker</strong> — uw anonieme naam. Max. 10 tekens.', postPreview: 'Uw berichten zullen er zo uitzien', btn: 'Dat ben ik →', placeholder: 'bijv. SunnyDaze' },
         meds: { title: 'Zichtbaarheid Medicatie', sub: 'Wilt u uw huidige medicatie tonen bij uw berichten?', yesLabel: 'Ja, mijn medicatie tonen', yesSub: 'Anderen kunnen uw medicatie zien — helpt minder alleen te voelen', noLabel: 'Nee, privé houden', noSub: 'Alleen uw Moniker en reeks worden getoond' },
@@ -5736,7 +5740,7 @@
         fb: { pickType: 'Wybierz typ.', writeFirst: 'Najpierw coś napisz.', thanks: 'Dziękujemy za opinię! 🐻', sendFail: 'Nie udało się wysłać — spróbuj ponownie.', imgTooLarge: 'Zrzut ekranu jest za duży — najpierw przytnij go lub zmniejsz.', imgUnreadable: 'Nie udało się odczytać obrazu — spróbuj innego pliku.' },
       },
       anon: {
-        agree: { title: 'Zanim dołączysz 👋', sub: 'To społeczność wsparcia rówieśniczego. Aby była bezpieczna dla wszystkich, potwierdź, że akceptujesz zasady.', continue: 'Kontynuuj →' },
+        agree: { title: 'Zanim dołączysz 👋', sub: 'To społeczność wsparcia rówieśniczego. Aby była bezpieczna dla wszystkich, potwierdź, że akceptujesz zasady.', continue: 'Kontynuuj →', line1: "Mam 18 lat lub więcej i akceptuję", termsLink: "Zasady społeczności i Regulamin", line2: ". Obowiązuje zerowa tolerancja dla treści budzących sprzeciw lub obraźliwego zachowania." },
         verify: { back: '← Strona główna', welcome: 'Witaj 👋', sub: 'Zweryfikuj e-mail, aby dołączyć do społeczności. Twoja tożsamość pozostaje prywatna.', sendCode: 'Wyślij kod weryfikacyjny', verify: 'Weryfikuj →', changeEmail: '← Zmień e-mail', resend: 'Wyślij ponownie' },
         monika: { verified: 'E-mail Zweryfikowany!', chooseSub: 'Teraz wybierz swój <strong>Moniker</strong> — anonimową nazwę. Maks. 10 znaków.', postPreview: 'Twoje wpisy będą wyglądać tak', btn: 'To ja →', placeholder: 'np. SunnyDaze' },
         meds: { title: 'Widoczność Leków', sub: 'Czy chcesz pokazywać swoje leki przy wpisach?', yesLabel: 'Tak, pokaż moje leki', yesSub: 'Inni widzą Twoje leki — pomaga czuć się mniej samotnie', noLabel: 'Nie, zachowaj prywatność', noSub: 'Tylko Twoja Moniker i seria będą widoczne' },
@@ -6292,7 +6296,7 @@
         fb: { pickType: 'Välj en typ.', writeFirst: 'Skriv något först.', thanks: 'Tack för din feedback! 🐻', sendFail: 'Det gick inte att skicka — försök igen.', imgTooLarge: 'Skärmbilden är för stor — beskär eller förminska den först.', imgUnreadable: 'Det gick inte att läsa bilden — prova en annan fil.' },
       },
       anon: {
-        agree: { title: 'Innan du går med 👋', sub: 'Detta är en gemenskap för kamratstöd. För att hålla den säker för alla, bekräfta att du godkänner reglerna.', continue: 'Fortsätt →' },
+        agree: { title: 'Innan du går med 👋', sub: 'Detta är en gemenskap för kamratstöd. För att hålla den säker för alla, bekräfta att du godkänner reglerna.', continue: 'Fortsätt →', line1: "Jag är 18 år eller äldre och godkänner", termsLink: "Gemenskapsriktlinjer och Villkor", line2: ". Det råder nolltolerans mot stötande innehåll eller kränkande beteende." },
         verify: { back: '← Hem', welcome: 'Välkommen 👋', sub: 'Verifiera din e-post för att gå med i gemenskapen. Din identitet förblir privat.', sendCode: 'Skicka verifieringskod', verify: 'Verifiera →', changeEmail: '← Byt e-post', resend: 'Skicka om koden' },
         monika: { verified: 'E-post Verifierad!', chooseSub: 'Välj nu din <strong>Moniker</strong> — ditt anonyma namn. Max 10 tecken.', postPreview: 'Dina inlägg kommer se ut så här', btn: 'Det är jag →', placeholder: 't.ex. SunnyDaze' },
         meds: { title: 'Synlighet för Mediciner', sub: 'Vill du visa din nuvarande medicin med dina inlägg?', yesLabel: 'Ja, visa min medicinering', yesSub: 'Andra kan se din medicin — hjälper folk att känna sig mindre ensamma', noLabel: 'Nej, håll det privat', noSub: 'Bara din Moniker och serie visas' },
@@ -6844,7 +6848,7 @@
         fb: { pickType: '请选择一个类型。', writeFirst: '请先写点什么。', thanks: '感谢您的反馈！🐻', sendFail: '无法发送——请重试。', imgTooLarge: '截图太大——请先裁剪或缩小。', imgUnreadable: '无法读取图片——请尝试其他文件。' },
       },
       anon: {
-        agree: { title: '加入之前 👋', sub: '这是一个同伴互助社区。为了让每个人都安全，请确认您同意这些规则。', continue: '继续 →' },
+        agree: { title: '加入之前 👋', sub: '这是一个同伴互助社区。为了让每个人都安全，请确认您同意这些规则。', continue: '继续 →', line1: "我已年满 18 周岁，并同意", termsLink: "社区准则和条款", line2: "。对于不良内容或辱骂行为，我们采取零容忍政策。" },
         verify: { back: '← 首页', welcome: '欢迎 👋', sub: '验证您的邮箱以加入社区。您的身份将保持私密。', sendCode: '发送验证码', verify: '验证 →', changeEmail: '← 更换邮箱', resend: '重新发送验证码' },
         monika: { verified: '邮箱已验证！', chooseSub: '现在选择您的<strong>Moniker</strong> — 您的匿名社区名称。最多10个字符。', postPreview: '您的帖子将如此显示', btn: '就是我 →', placeholder: '如 SunnyDaze' },
         meds: { title: '药物可见性', sub: '您是否希望在帖子旁边显示您当前的药物？', yesLabel: '是，显示我的药物', yesSub: '其他人可以看到您的药物——帮助人们感觉不那么孤单', noLabel: '不，保持私密', noSub: '只显示您的Moniker和连续天数' },

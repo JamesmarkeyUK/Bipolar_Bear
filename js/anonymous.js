@@ -2326,15 +2326,31 @@ const _LOVED_ONES = [
   }
 ];
 
+// Wiki articles are authored in English (the arrays below double as the search
+// source + English fallback). Translations live under anon.wiki.a.<slug>_<field>
+// keyed by a deterministic slug of the English title, so no per-article id is
+// needed. _wikiTxt returns the active-locale string, or the English source when
+// that locale has no translation for the key.
+function _wikiSlug(t) {
+  return String(t).toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 40);
+}
+function _wikiTxt(obj, field) {
+  if (!obj || !obj[field]) return (obj && obj[field]) || '';
+  const k = 'anon.wiki.a.' + _wikiSlug(obj.title) + '_' + field;
+  const v = _wt(k);
+  return v === k ? obj[field] : v;
+}
+
 function _renderWikiSimpleCards(items, disclaimerKey, defaultLinkLabelKey) {
   const body = document.getElementById('wiki-body');
   if (!body) return;
   const disclaimer = disclaimerKey
-    ? `<div class="wiki-disclaimer">${esc(_wt(disclaimerKey))}</div>`
+    ? `<div class="wiki-disclaimer">${esc(_wt(disclaimerKey))}<br><span class="wiki-disclaimer-src">${esc(_wt('anon.wiki.ukGuidance'))}</span></div>`
     : '';
   const defaultLabel = _wt(defaultLinkLabelKey || 'anon.wiki.moreInfo');
   body.innerHTML = disclaimer + items.map(c => {
-    const search = (c.title + ' ' + c.body + ' ' + (c.keys || []).join(' ')).toLowerCase();
+    const _t = _wikiTxt(c, 'title'), _b = _wikiTxt(c, 'body');
+    const search = (_t + ' ' + c.title + ' ' + _b + ' ' + (c.keys || []).join(' ')).toLowerCase();
     const link = c.link || c.nhs;
     const sourceMeta = _wikiSourceMetaHtml(link, c.source);
     const linkLabel = c.linkLabel || _wikiLinkLabel(link, defaultLabel);
@@ -2346,12 +2362,12 @@ function _renderWikiSimpleCards(items, disclaimerKey, defaultLinkLabelKey) {
     const bodyHtml = c.cover
       ? `<div class="wiki-media-row">
           <img class="wiki-media-cover" src="${esc(c.cover)}" alt="" loading="lazy" onerror="this.closest('.wiki-media-row').classList.add('wiki-media-row--no-cover')">
-          <p class="wiki-media-text">${esc(c.body)}</p>
+          <p class="wiki-media-text">${esc(_b)}</p>
         </div>`
-      : `<p>${esc(c.body)}</p>`;
+      : `<p>${esc(_b)}</p>`;
     return `
       <details class="wiki-card" data-wiki-search="${esc(search)}">
-        <summary>${esc(c.title)}<span class="wiki-chev">▼</span></summary>
+        <summary>${esc(_t)}<span class="wiki-chev">▼</span></summary>
         <div class="wiki-card-body">
           ${bodyHtml}
           ${sourceMeta}
@@ -2376,16 +2392,17 @@ function renderWikiConditions() {
   const body = document.getElementById('wiki-body');
   if (!body) return;
   body.innerHTML = `
-    <div class="wiki-disclaimer">${esc(_wt('anon.wiki.conditionsDisclaimer'))}</div>
+    <div class="wiki-disclaimer">${esc(_wt('anon.wiki.conditionsDisclaimer'))}<br><span class="wiki-disclaimer-src">${esc(_wt('anon.wiki.ukGuidance'))}</span></div>
     ${_CONDITIONS.map(c => {
-      const search = (c.title + ' ' + c.body + ' ' + (c.keys || []).join(' ')).toLowerCase();
+      const _t = _wikiTxt(c, 'title'), _b = _wikiTxt(c, 'body');
+      const search = (_t + ' ' + c.title + ' ' + _b + ' ' + (c.keys || []).join(' ')).toLowerCase();
       const sourceMeta = _wikiSourceMetaHtml(c.nhs, c.source);
       const linkLabel = _wikiLinkLabel(c.nhs, _wt('anon.wiki.nhsInfo'));
       return `
         <details class="wiki-card" data-wiki-search="${esc(search)}">
-          <summary>${esc(c.title)}<span class="wiki-chev">▼</span></summary>
+          <summary>${esc(_t)}<span class="wiki-chev">▼</span></summary>
           <div class="wiki-card-body">
-            <p>${esc(c.body)}</p>
+            <p>${esc(_b)}</p>
             ${sourceMeta}
             <a href="${esc(c.nhs)}" target="_blank" rel="noopener" class="wiki-link-btn">${esc(linkLabel)}</a>
           </div>
@@ -2400,16 +2417,17 @@ function renderWikiMeds() {
   if (!body) return;
   const meds = (window.BB && window.BB.medications && window.BB.medications.list) || [];
   body.innerHTML = `
-    <div class="wiki-disclaimer">${esc(_wt('anon.wiki.medsDisclaimer'))}</div>
+    <div class="wiki-disclaimer">${esc(_wt('anon.wiki.medsDisclaimer'))}<br><span class="wiki-disclaimer-src">${esc(_wt('anon.wiki.ukGuidance'))}</span></div>
     ${meds.map(m => {
-      const search = (m.title + ' ' + m.body + ' ' + (m.keys || []).join(' ')).toLowerCase();
+      const _t = _wikiTxt(m, 'title'), _b = _wikiTxt(m, 'body');
+      const search = (_t + ' ' + m.title + ' ' + _b + ' ' + (m.keys || []).join(' ')).toLowerCase();
       const sourceMeta = _wikiSourceMetaHtml(m.nhs, m.source);
       const linkLabel = _wikiLinkLabel(m.nhs, _wt('anon.wiki.nhsInfo'));
       return `
         <details class="wiki-card" data-wiki-search="${esc(search)}">
-          <summary>${esc(m.title)}<span class="wiki-chev">▼</span></summary>
+          <summary>${esc(_t)}<span class="wiki-chev">▼</span></summary>
           <div class="wiki-card-body">
-            <p>${esc(m.body)}</p>
+            <p>${esc(_b)}</p>
             ${sourceMeta}
             <a href="${esc(m.nhs)}" target="_blank" rel="noopener" class="wiki-link-btn">${esc(linkLabel)}</a>
           </div>

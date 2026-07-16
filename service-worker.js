@@ -764,7 +764,14 @@
 // v170: i18n audit — anonymous board "Unmute" button in the muted-users list
 //       (About overlay) wired to anon.mute.unmute and translated into all 10
 //       locales. Touches js/anonymous.js + js/shared/i18n.js.
-const CACHE_NAME = 'bipolarbear-v170';
+// v171: i18n — anonymous board 18+/Terms consent gate (screen-verify +
+//       screen-agree) split into anon.agree.line1/termsLink/line2 and translated
+//       into all 10 locales (age + zero-tolerance meaning preserved). Wiki
+//       articles wired to translate via _wikiTxt (English arrays remain the
+//       source + fallback) and every wiki section now shows a "based on
+//       UK-issued guidance" note (anon.wiki.ukGuidance). Touches anonymous.html,
+//       js/anonymous.js, css/anonymous.css, js/shared/i18n.js.
+const CACHE_NAME = 'bipolarbear-v171';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
