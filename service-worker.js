@@ -794,7 +794,14 @@
 //       patient-detail + metric labels, 12-month chart titles, disclaimers;
 //       reuses journal.value.*/label.* for shared words) and translated into all
 //       10 locales. Touches privacy.html, js/journal.js, js/shared/i18n.js.
-const CACHE_NAME = 'bipolarbear-v176';
+// v177: journal form-mode layout refinements — dropped the big floating emoji +
+//       value readout from the energy/sleep steps (step count + sleep time
+//       already sit in the section headers), leaving only the compact "✓ Synced
+//       from …" badge when health data is present. Energy buttons now show emoji
+//       + short symbol (- -, -, Normal, +, ++) so each fits one line, and the
+//       three medication responses are a 3-across single-line row. Touches
+//       js/journal.js, css/journal.css.
+const CACHE_NAME = 'bipolarbear-v177';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

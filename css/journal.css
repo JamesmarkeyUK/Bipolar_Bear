@@ -1161,10 +1161,13 @@
 
     .medication-selector {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
       margin-top: 8px;
     }
+
+    /* Keep the three medication responses on a single line each */
+    .medication-selector .medication-btn { white-space: nowrap; padding-left: 4px; padding-right: 4px; }
 
     .medication-btn {
       padding: 15px 8px;
@@ -1549,16 +1552,16 @@
       }
 
       .medication-selector {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 10px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
       }
 
-      .medication-btn {
-        padding: 12px;
-        flex: 0 0 calc(50% - 5px);
-        max-width: calc(50% - 5px);
+      /* Three-across, single line each — shrink to fit "❌ No / Forgot" */
+      .medication-selector .medication-btn {
+        padding: 12px 3px;
+        font-size: 0.72em;
+        white-space: nowrap;
       }
 
       /* More data section: buttons fill their grid columns */

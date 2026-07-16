@@ -895,12 +895,15 @@ window.addEventListener('pageshow', () => {
       const energySelector = document.getElementById('energySelector');
       if (!energySelector) return;
 
+      // Compact single-line labels: emoji (pulled from the full i18n label) +
+      // a short symbol, so all five buttons sit on one line each.
+      const _enEmoji = key => (BB.t(key).split(' ')[0] || '');
       const energyRanges = [
-        { label: BB.t('journal.energy.notEnough'), value: 0 },
-        { label: BB.t('journal.energy.less'), value: 3 },
-        { label: BB.t('journal.energy.normal'), value: 5 },
-        { label: BB.t('journal.energy.more'), value: 7 },
-        { label: BB.t('journal.energy.tooMuch'), value: 10 }
+        { label: `${_enEmoji('journal.energy.notEnough')} - -`, value: 0 },
+        { label: `${_enEmoji('journal.energy.less')} -`, value: 3 },
+        { label: `${_enEmoji('journal.energy.normal')} ${BB.t('journal.value.normal')}`, value: 5 },
+        { label: `${_enEmoji('journal.energy.more')} +`, value: 7 },
+        { label: `${_enEmoji('journal.energy.tooMuch')} ++`, value: 10 }
       ];
       
       energyRanges.forEach(range => {
@@ -5048,39 +5051,37 @@ window.addEventListener('pageshow', () => {
       _fmMoodSuggestion = score < 0 ? 'low' : score > 0 ? 'elevated' : 'stable';
     }
 
-    // ── Regular (full) form: hero readout on the energy + sleep steps ──
+    // ── Regular (full) form: synced badge on the energy + sleep steps ──
+    // The big floating emoji + value readout were removed by request; the step
+    // count / sleep time already live in the section headers. Only the compact
+    // "✓ Synced from …" badge remains, and just when health data is present.
     function _updateEnergyHero() {
       const hero = document.getElementById('energyStepHero');
       if (!hero) return;
-      const lvl = _FM_ENERGY_LEVELS.find(l => l.val === selectedEnergy);
-      if (!lvl) { hero.style.display = 'none'; return; }
-      const [emoji, ...rest] = lvl.label.split(' ');
+      const emojiEl = document.getElementById('energyHeroEmoji');
+      const valEl   = document.getElementById('energyHeroValue');
+      if (emojiEl) emojiEl.textContent = '';
+      if (valEl)   valEl.textContent = '';
       let steps = null;
       const _dv = document.getElementById('entryDate')?.value;
       if (_dv && window._healthStepsByDate && window._healthStepsByDate[_dv] != null) steps = window._healthStepsByDate[_dv];
-      hero.style.display = '';
-      document.getElementById('energyHeroEmoji').textContent = emoji;
-      document.getElementById('energyHeroValue').innerHTML =
-        steps != null ? BB.t('journal.sync.steps', { n: Number(steps).toLocaleString() }) : rest.join(' ');
       const badgeEl = document.getElementById('energyHeroBadge');
       badgeEl.textContent = '✓ ' + _syncSourceLabel();
       badgeEl.style.display = steps != null ? '' : 'none';
+      hero.style.display = steps != null ? '' : 'none';
     }
 
     function _updateSleepHero() {
       const hero = document.getElementById('sleepStepHero');
       if (!hero) return;
-      if (selectedSleep == null) { hero.style.display = 'none'; return; }
-      const range = _FM_SLEEP_RANGES.find(r => r.val === _fmSleepBucketOf(selectedSleep));
-      if (!range) { hero.style.display = 'none'; return; }
-      const [emoji, ...rest] = range.label.split(' ');
-      hero.style.display = '';
-      document.getElementById('sleepHeroEmoji').textContent = emoji;
-      document.getElementById('sleepHeroValue').innerHTML =
-        _sleepHealthSynced ? _fmFmtSleepHM(selectedSleep) : rest.join(' ');
+      const emojiEl = document.getElementById('sleepHeroEmoji');
+      const valEl   = document.getElementById('sleepHeroValue');
+      if (emojiEl) emojiEl.textContent = '';
+      if (valEl)   valEl.textContent = '';
       const badgeEl = document.getElementById('sleepHeroBadge');
       badgeEl.textContent = '✓ ' + _syncSourceLabel();
       badgeEl.style.display = _sleepHealthSynced ? '' : 'none';
+      hero.style.display = _sleepHealthSynced ? '' : 'none';
     }
 
     function _fmRenderContent(step) {
