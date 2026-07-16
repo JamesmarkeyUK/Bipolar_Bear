@@ -3285,9 +3285,9 @@ function renderPosts(posts) {
   // Posts are sorted newest-first (sortPosts), so the first deleted in iteration is
   // the most recent. Prevents a wall of "post was deleted" entries when an admin
   // removes several spam posts in a row.
-  // The "deleted by an admin" tombstone is also short-lived: once 24 hours have
+  // The "deleted by an admin" tombstone is also short-lived: once an hour has
   // passed since deletedAt, the post drops out of the feed entirely.
-  const DELETED_TOMBSTONE_MS = 24 * 60 * 60 * 1000; // show "deleted by admin" for max 24h
+  const DELETED_TOMBSTONE_MS = 60 * 60 * 1000; // show "deleted by admin" for max 1h
   const _now = Date.now();
   let _keptDeletedTombstone = false;
   let _nextTombstoneExpiry = 0;
