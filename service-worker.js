@@ -780,7 +780,13 @@
 //       the translated "based on UK-issued guidance" notice. Clinical meaning,
 //       drug names, and UK service references (NHS/NICE/CMHT/Section 3/Bipolar
 //       UK/Samaritans) preserved. Touches js/shared/i18n.js.
-const CACHE_NAME = 'bipolarbear-v173';
+// v174: i18n — landing pages (welcome.html + welcome-anonymous.html) had three
+//       untagged initial-paint strings (mood-meter name/tag + sample post);
+//       tagged them to reuse the existing translated lp.meter.stable.* /
+//       lp.meter.posts.p1 keys so the first paint matches the active language
+//       (welcome.js already swaps them at runtime). Store badges left as
+//       official assets. Touches welcome.html + welcome-anonymous.html.
+const CACHE_NAME = 'bipolarbear-v174';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
