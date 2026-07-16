@@ -764,7 +764,9 @@
 // v170: i18n audit — anonymous board "Unmute" button in the muted-users list
 //       (About overlay) wired to anon.mute.unmute and translated into all 10
 //       locales. Touches js/anonymous.js + js/shared/i18n.js.
-const CACHE_NAME = 'bipolarbear-v170';
+// v171: anonymous board admin-delete tombstone lifetime reverted 24h → 1h
+//       (DELETED_TOMBSTONE_MS). Touches js/anonymous.js.
+const CACHE_NAME = 'bipolarbear-v171';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
