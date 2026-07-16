@@ -346,6 +346,656 @@ Ein ruhiges, anonymes Peer-Support-Board für Menschen, die mit einer bipolaren 
 
 ---
 
+# 3. Additional locales — Bipolar Bear (`com.bipolarbear.app`)
+
+## Italian (it)
+
+### Subtitle (max 30)
+```
+Diario dell'umore + kit
+```
+`23 chars`
+
+### Promotional text (max 170)
+```
+Un diario dell'umore privato e cifrato per convivere con il disturbo bipolare, con un kit di strumenti di supporto e una comunità anonima tra pari.
+```
+`146 chars`
+
+### Keywords (max 100)
+```
+bipolare,umore,diario,salute mentale,depressione,mania,benessere,monitoraggio,supporto,autocura
+```
+`95 chars`
+
+### Description (max 4000)
+```
+Bipolar Bear è un diario dell'umore gratuito e privato, pensato per le persone che convivono con il disturbo bipolare.
+
+Registra ogni giorno il tuo umore, la tua energia e il tuo sonno, individua gli schemi che contano e crea un kit di sopravvivenza con strumenti di supporto a cui ricorrere nei giorni difficili.
+
+I TUOI DATI SONO TUOI
+Le voci del diario sono cifrate end-to-end. Solo tu puoi leggerle: né noi né nessun altro. Le tue note, i tuoi stati d'animo e tutto ciò che registri vengono cifrati sul tuo dispositivo prima ancora di uscirne.
+
+COSA TROVI
+• Diario dell'umore quotidiano — registra umore, energia, sonno e note libere in pochi secondi
+• Schemi e statistiche — osserva le tendenze nel tempo, così tu e la tua équipe medica potete cogliere i primi segnali d'allarme
+• Kit di sopravvivenza — raccogli risorse di supporto, obiettivi, farmaci e ricordi importanti in un unico posto
+• Modalità concentrata — riduci l'app all'essenziale nei giorni più pesanti
+• Esportazione in PDF — condividi un riepilogo chiaro con il tuo medico o psichiatra
+• Comunità anonima — una bacheca facoltativa e anonima per parlare con chi capisce davvero
+• Serie e promemoria gentili — mantieni l'abitudine senza pressioni
+
+Bipolar Bear non è un dispositivo medico e non fornisce consigli medici. È uno strumento per aiutarti a notare, riflettere e restare in contatto, accanto alle cure dei tuoi professionisti della salute.
+
+Gratis. Senza pubblicità. Senza vendere i tuoi dati.
+```
+
+### What's New — v1.0
+```
+Benvenuto in Bipolar Bear! Questa è la nostra prima versione.
+
+• Diario dell'umore privato e cifrato end-to-end — registra umore, energia e sonno
+• Schemi e statistiche per cogliere i tuoi primi segnali d'allarme
+• Un kit di sopravvivenza per strumenti di supporto, obiettivi, farmaci e ricordi
+• Modalità concentrata per i giorni pesanti
+• Esportazione in PDF da condividere con la tua équipe medica
+• Una comunità anonima facoltativa
+
+Grazie di essere qui. Ci farebbe piacere il tuo parere: trovi un'opzione di feedback dentro l'app.
+```
+
+## Portuguese (pt)
+
+### Subtitle (max 30)
+```
+Diário de humor + kit apoio
+```
+`27 chars`
+
+### Promotional text (max 170)
+```
+Um diário de humor privado e cifrado para viver com perturbação bipolar, com um kit de ferramentas de apoio e uma comunidade anónima de pares.
+```
+`141 chars`
+
+### Keywords (max 100)
+```
+bipolar,humor,diário,saúde mental,depressão,mania,bem-estar,registo,apoio,autocuidado,monitorização
+```
+`99 chars`
+
+### Description (max 4000)
+```
+O Bipolar Bear é um diário de humor gratuito e privado, criado para pessoas que vivem com perturbação bipolar.
+
+Regista o teu humor, a tua energia e o teu sono dia após dia, descobre os padrões que importam e cria um kit de sobrevivência com ferramentas de apoio a que possas recorrer nos dias difíceis.
+
+OS TEUS DADOS SÃO TEUS
+As entradas do diário são cifradas de ponta a ponta. Só tu as podes ler — nem nós, nem mais ninguém. As tuas notas, os teus estados de humor e tudo o que registas são cifrados no teu dispositivo antes de sequer saírem dele.
+
+O QUE ENCONTRAS
+• Diário de humor diário — regista humor, energia, sono e notas livres em segundos
+• Padrões e estatísticas — vê as tendências ao longo do tempo, para que tu e a tua equipa de saúde detetem sinais de alerta precoces
+• Kit de sobrevivência — reúne recursos de apoio, objetivos, medicação e memórias importantes num só lugar
+• Modo focado — reduz a app ao essencial nos dias avassaladores
+• Exportação em PDF — partilha um resumo claro com o teu médico ou psiquiatra
+• Comunidade anónima — um mural opcional e anónimo para falar com quem compreende
+• Sequências e lembretes gentis — mantém o hábito sem pressão
+
+O Bipolar Bear não é um dispositivo médico e não dá aconselhamento médico. É uma ferramenta para te ajudar a notar, refletir e manter-te ligado — a par do acompanhamento dos teus profissionais de saúde.
+
+Grátis. Sem anúncios. Sem vender os teus dados.
+```
+
+### What's New — v1.0
+```
+Bem-vindo ao Bipolar Bear! Esta é a nossa primeira versão.
+
+• Diário de humor privado e cifrado de ponta a ponta — regista humor, energia e sono
+• Padrões e estatísticas para detetar os teus sinais de alerta precoces
+• Um kit de sobrevivência para ferramentas de apoio, objetivos, medicação e memórias
+• Modo focado para os dias avassaladores
+• Exportação em PDF para partilhar com a tua equipa de saúde
+• Uma comunidade anónima opcional
+
+Obrigado por estares aqui. Adorávamos a tua opinião: há uma opção de feedback dentro da app.
+```
+
+## Dutch (nl)
+
+### Subtitle (max 30)
+```
+Stemmingsdagboek & toolkit
+```
+`26 chars`
+
+### Promotional text (max 170)
+```
+Een privé, versleuteld stemmingsdagboek voor het leven met een bipolaire stoornis, met een toolkit vol copingmiddelen en een anonieme lotgenotencommunity.
+```
+`153 chars`
+
+### Keywords (max 100)
+```
+bipolair,stemming,dagboek,geestelijke gezondheid,depressie,manie,welzijn,tracker,steun,zelfzorg
+```
+`95 chars`
+
+### Description (max 4000)
+```
+Bipolar Bear is een gratis, privé stemmingsdagboek voor mensen die leven met een bipolaire stoornis.
+
+Houd dag voor dag je stemming, energie en slaap bij, ontdek de patronen die ertoe doen en bouw een survivalkit op met copingmiddelen waar je op de moeilijke dagen naar kunt grijpen.
+
+JOUW GEGEVENS BLIJVEN VAN JOU
+Dagboekvermeldingen zijn end-to-end versleuteld. Alleen jij kunt ze lezen — wij niet, niemand anders. Je notities, je stemmingen en alles wat je vastlegt worden op je apparaat versleuteld voordat ze het ooit verlaten.
+
+WAT JE VINDT
+• Dagelijks stemmingsdagboek — leg stemming, energie, slaap en vrije notities in seconden vast
+• Patronen & statistieken — zie trends in de tijd, zodat jij en je behandelteam vroege waarschuwingssignalen opmerken
+• Survivalkit — verzamel copingmiddelen, doelen, medicatie en betekenisvolle herinneringen op één plek
+• Gerichte modus — breng de app terug tot het essentiële op overweldigende dagen
+• PDF-export — deel een helder overzicht met je arts of psychiater
+• Anonieme community — een optioneel, anoniem prikbord om te praten met mensen die het snappen
+• Reeksen & zachte herinneringen — blijf in je ritme, zonder druk
+
+Bipolar Bear is geen medisch hulpmiddel en geeft geen medisch advies. Het is een hulpmiddel om te helpen opmerken, reflecteren en verbonden blijven — naast de zorg van je zorgverleners.
+
+Gratis. Geen advertenties. We verkopen je gegevens niet.
+```
+
+### What's New — v1.0
+```
+Welkom bij Bipolar Bear! Dit is onze eerste versie.
+
+• Privé, end-to-end versleuteld stemmingsdagboek — leg stemming, energie en slaap vast
+• Patronen en statistieken om je vroege waarschuwingssignalen te herkennen
+• Een survivalkit voor copingmiddelen, doelen, medicatie en herinneringen
+• Gerichte modus voor overweldigende dagen
+• PDF-export om te delen met je behandelteam
+• Een optionele anonieme community
+
+Fijn dat je er bent. We horen graag je mening — er zit een feedbackoptie in de app.
+```
+
+## Polish (pl)
+
+### Subtitle (max 30)
+```
+Dziennik nastroju + narzędzia
+```
+`29 chars`
+
+### Promotional text (max 170)
+```
+Prywatny, szyfrowany dziennik nastroju dla osób z chorobą afektywną dwubiegunową, z zestawem narzędzi do radzenia sobie i anonimową społecznością wsparcia.
+```
+`153 chars`
+
+### Keywords (max 100)
+```
+choroba dwubiegunowa,nastrój,dziennik,zdrowie psychiczne,depresja,mania,dobrostan,wsparcie,bipolar
+```
+`97 chars`
+
+### Description (max 4000)
+```
+Bipolar Bear to bezpłatny, prywatny dziennik nastroju stworzony dla osób żyjących z chorobą afektywną dwubiegunową.
+
+Zapisuj dzień po dniu swój nastrój, energię i sen, dostrzegaj ważne wzorce i buduj zestaw ratunkowy z narzędziami do radzenia sobie, po które możesz sięgnąć w trudne dni.
+
+TWOJE DANE NALEŻĄ DO CIEBIE
+Wpisy w dzienniku są szyfrowane end-to-end. Tylko Ty możesz je odczytać — nie my, nikt inny. Twoje notatki, nastroje i wszystko, co zapisujesz, są szyfrowane na Twoim urządzeniu, zanim je opuszczą.
+
+CO ZNAJDZIESZ W ŚRODKU
+• Codzienny dziennik nastroju — zapisuj nastrój, energię, sen i dowolne notatki w kilka sekund
+• Wzorce i statystyki — obserwuj trendy w czasie, by Ty i Twój zespół leczący dostrzegli wczesne sygnały ostrzegawcze
+• Zestaw ratunkowy — zbierz techniki radzenia sobie, cele, leki i ważne wspomnienia w jednym miejscu
+• Tryb skupienia — ogranicz aplikację do tego, co niezbędne, w przytłaczające dni
+• Eksport do PDF — udostępnij czytelne podsumowanie swojemu lekarzowi lub psychiatrze
+• Anonimowa społeczność — opcjonalna, anonimowa tablica, by porozmawiać z osobami, które rozumieją
+• Serie i łagodne przypomnienia — utrzymaj nawyk bez presji
+
+Bipolar Bear nie jest wyrobem medycznym i nie udziela porad medycznych. To narzędzie, które pomaga zauważać, refleksyjnie podchodzić i pozostawać w kontakcie — obok opieki Twoich specjalistów.
+
+Bezpłatnie. Bez reklam. Bez sprzedawania Twoich danych.
+```
+
+### What's New — v1.0
+```
+Witamy w Bipolar Bear! To nasza pierwsza wersja.
+
+• Prywatny, szyfrowany end-to-end dziennik nastroju — zapisuj nastrój, energię i sen
+• Wzorce i statystyki, aby rozpoznać wczesne sygnały ostrzegawcze
+• Zestaw ratunkowy na techniki radzenia sobie, cele, leki i wspomnienia
+• Tryb skupienia na przytłaczające dni
+• Eksport do PDF do udostępnienia zespołowi leczącemu
+• Opcjonalna anonimowa społeczność
+
+Dziękujemy, że jesteś. Chętnie poznamy Twoją opinię — opcja przekazania uwag jest w aplikacji.
+```
+
+## Swedish (sv)
+
+### Subtitle (max 30)
+```
+Humördagbok & verktygslåda
+```
+`26 chars`
+
+### Promotional text (max 170)
+```
+En privat, krypterad humördagbok för att leva med bipolär sjukdom, med en verktygslåda av hanteringsstöd och en anonym gemenskap med likasinnade.
+```
+`144 chars`
+
+### Keywords (max 100)
+```
+bipolär,humör,dagbok,psykisk hälsa,depression,mani,välbefinnande,tracker,stöd,egenvård,humördagbok
+```
+`98 chars`
+
+### Description (max 4000)
+```
+Bipolar Bear är en gratis, privat humördagbok för dig som lever med bipolär sjukdom.
+
+Registrera ditt humör, din energi och din sömn dag för dag, upptäck mönstren som spelar roll och bygg en överlevnadslåda med hanteringsverktyg att ta till på de svåra dagarna.
+
+DINA DATA ÄR DINA
+Dagboksinlägg är totalsträckskrypterade (end-to-end). Bara du kan läsa dem — inte vi, ingen annan. Dina anteckningar, ditt humör och allt du loggar krypteras på din enhet innan det ens lämnar den.
+
+VAD SOM FINNS INUTI
+• Daglig humördagbok — logga humör, energi, sömn och fria anteckningar på några sekunder
+• Mönster och statistik — se trender över tid så att du och ditt vårdteam kan upptäcka tidiga varningstecken
+• Överlevnadslåda — samla hanteringsresurser, mål, mediciner och viktiga minnen på ett ställe
+• Fokusläge — skala ner appen till det nödvändiga på överväldigande dagar
+• PDF-export — dela en tydlig sammanfattning med din läkare eller psykiater
+• Anonym gemenskap — en valfri, anonym anslagstavla för att prata med andra som förstår
+• Serier och milda påminnelser — håll vanan vid liv utan press
+
+Bipolar Bear är inte en medicinteknisk produkt och ger inte medicinska råd. Det är ett verktyg som hjälper dig att märka, reflektera och hålla kontakten — vid sidan av vården från dina vårdgivare.
+
+Gratis. Inga annonser. Vi säljer inte dina data.
+```
+
+### What's New — v1.0
+```
+Välkommen till Bipolar Bear! Det här är vår första version.
+
+• Privat, totalsträckskrypterad humördagbok — logga humör, energi och sömn
+• Mönster och statistik för att upptäcka dina tidiga varningstecken
+• En överlevnadslåda för hanteringsverktyg, mål, mediciner och minnen
+• Fokusläge för överväldigande dagar
+• PDF-export att dela med ditt vårdteam
+• En valfri anonym gemenskap
+
+Tack för att du är här. Vi vill gärna höra vad du tycker — det finns en återkopplingsfunktion i appen.
+```
+
+## Chinese, Simplified (zh)
+
+### Subtitle (max 30)
+```
+情绪日记与自助工具包
+```
+`9 chars`
+
+### Promotional text (max 170)
+```
+一款私密、加密的情绪日记，专为双相情感障碍人群打造，附带一套应对工具包和一个匿名的同伴支持社区。
+```
+`46 chars`
+
+### Keywords (max 100)
+```
+双相情感障碍,躁郁症,情绪,日记,心理健康,抑郁,躁狂,情绪追踪,自我照顾,身心健康,支持
+```
+`43 chars`
+
+### Description (max 4000)
+```
+Bipolar Bear 是一款免费、私密的情绪日记，专为与双相情感障碍共处的人群打造。
+
+逐日记录你的情绪、精力和睡眠，发现真正重要的规律，并建立一个应对工具包，在艰难的日子里随手可用。
+
+你的数据属于你
+日记条目采用端到端加密。只有你能读到——我们不能，其他任何人也不能。你的笔记、情绪以及记录的一切，在离开设备之前就已在本地加密。
+
+应用内容
+• 每日情绪日记——数秒内记录情绪、精力、睡眠和自由文字
+• 规律与统计——查看长期趋势，帮助你和你的医疗团队发现早期预警信号
+• 生存工具包——把应对资源、目标、用药和重要回忆集中在一处
+• 专注模式——在难以招架的日子里，把应用精简到最必要的部分
+• PDF 导出——与你的医生或精神科医生分享一份清晰的摘要
+• 匿名社区——一个可选的匿名留言板，与真正懂你的人交流
+• 连续记录与温和提醒——毫无压力地保持习惯
+
+Bipolar Bear 不是医疗器械，也不提供医疗建议。它是一个帮助你觉察、反思并保持联系的工具，与你的医疗专业人员的照护相辅相成。
+
+免费使用。没有广告。绝不出售你的数据。
+```
+
+### What's New — v1.0
+```
+欢迎使用 Bipolar Bear！这是我们的首个版本。
+
+• 私密、端到端加密的情绪日记——记录情绪、精力和睡眠
+• 规律与统计，帮助你发现早期预警信号
+• 一个用于应对工具、目标、用药和回忆的生存工具包
+• 面向难熬日子的专注模式
+• 可与医疗团队分享的 PDF 导出
+• 一个可选的匿名社区
+
+感谢你的到来。我们很想听听你的意见——应用内就有反馈入口。
+```
+
+---
+
+# 4. Additional locales — Bipolar Anonymous (`com.bipolaranonymous.app`)
+
+## Italian (it)
+
+### Subtitle (max 30)
+```
+Comunità anonima tra pari
+```
+`25 chars`
+
+### Promotional text (max 170)
+```
+Uno spazio anonimo di supporto tra pari per chi convive con il disturbo bipolare. Nessun nome reale, nessun giudizio: solo persone che capiscono.
+```
+`144 chars`
+
+### Keywords (max 100)
+```
+bipolare,anonimo,comunità,supporto tra pari,salute mentale,depressione,mania,forum,supporto,benessere
+```
+`101 chars — TOO LONG. Trim to:`
+```
+bipolare,anonimo,comunità,supporto tra pari,salute mentale,depressione,mania,forum,benessere
+```
+`92 chars`
+
+### Description (max 4000)
+```
+Bipolar Anonymous è una comunità gratuita e anonima di supporto tra pari per chi convive con il disturbo bipolare.
+
+Scegli un monika, condividi ciò che stai attraversando e connettiti con persone che capiscono davvero: nessun nome reale, nessun profilo da mantenere, nessun giudizio.
+
+COME FUNZIONA
+• Pubblica e rispondi in modo anonimo con il monika che scegli
+• Leggi ciò che vivono gli altri e offri il tuo supporto
+• Una bacheca calma e semplice, senza il rumore dei social
+
+UNA NOTA SULLA PRIVACY
+I post sulla bacheca sono pubblici agli altri utenti dell'app e vengono archiviati in chiaro (non sono cifrati end-to-end). Ti preghiamo di non condividere nulla che ti identifichi personalmente. Il tuo account è collegato solo a un hash della tua email, usato per riconoscerti tra i dispositivi.
+
+Bipolar Anonymous è supporto tra pari, non assistenza professionale. Non fornisce consigli medici e non sostituisce le cure. Se sei in crisi, contatta i servizi di emergenza della tua zona o una linea di ascolto.
+
+Gratis. Senza pubblicità.
+```
+
+### What's New — v1.0
+```
+Benvenuto in Bipolar Anonymous — la nostra prima versione.
+
+Una bacheca calma e anonima di supporto tra pari per chi convive con il disturbo bipolare. Scegli un monika, condividi ciò che stai attraversando e connettiti con chi capisce. Nessun nome reale, nessun giudizio.
+
+Ci farebbe piacere il tuo parere.
+```
+
+## Portuguese (pt)
+
+### Subtitle (max 30)
+```
+Comunidade anónima de pares
+```
+`27 chars`
+
+### Promotional text (max 170)
+```
+Um espaço anónimo de apoio entre pares para quem vive com perturbação bipolar. Sem nomes reais, sem julgamentos — apenas pessoas que compreendem.
+```
+`143 chars`
+
+### Keywords (max 100)
+```
+bipolar,anónimo,comunidade,apoio entre pares,saúde mental,depressão,mania,fórum,apoio,bem-estar
+```
+`95 chars`
+
+### Description (max 4000)
+```
+O Bipolar Anonymous é uma comunidade gratuita e anónima de apoio entre pares para pessoas que vivem com perturbação bipolar.
+
+Escolhe um monika, partilha o que estás a passar e liga-te a pessoas que realmente compreendem — sem nomes reais, sem perfis para manter, sem julgamentos.
+
+COMO FUNCIONA
+• Publica e responde de forma anónima com o monika à tua escolha
+• Lê o que os outros estão a passar e oferece o teu apoio
+• Um mural calmo e simples, sem o ruído das redes sociais
+
+UMA NOTA SOBRE PRIVACIDADE
+As publicações no mural são públicas para outros utilizadores da app e são armazenadas em texto simples (não são cifradas de ponta a ponta). Por favor, não partilhes nada que te identifique. A tua conta está ligada apenas a um hash do teu e-mail, usado para te reconhecer entre dispositivos.
+
+O Bipolar Anonymous é apoio entre pares, não acompanhamento profissional. Não dá aconselhamento médico nem substitui tratamento. Se estiveres em crise, contacta os serviços de emergência da tua zona ou uma linha de apoio.
+
+Grátis. Sem anúncios.
+```
+
+### What's New — v1.0
+```
+Bem-vindo ao Bipolar Anonymous — a nossa primeira versão.
+
+Um mural calmo e anónimo de apoio entre pares para pessoas que vivem com perturbação bipolar. Escolhe um monika, partilha o que estás a passar e liga-te a quem compreende. Sem nomes reais, sem julgamentos.
+
+Adorávamos a tua opinião.
+```
+
+## Dutch (nl)
+
+### Subtitle (max 30)
+```
+Anonieme lotgenotengroep
+```
+`24 chars`
+
+### Promotional text (max 170)
+```
+Een anoniem prikbord voor lotgenoten die leven met een bipolaire stoornis. Geen echte namen, geen oordeel — gewoon mensen die het begrijpen.
+```
+`139 chars`
+
+### Keywords (max 100)
+```
+bipolair,anoniem,community,lotgenoten,geestelijke gezondheid,depressie,manie,forum,steun,welzijn
+```
+`96 chars`
+
+### Description (max 4000)
+```
+Bipolar Anonymous is een gratis, anonieme lotgenotencommunity voor mensen die leven met een bipolaire stoornis.
+
+Kies een monika, deel wat je doormaakt en maak contact met mensen die het écht begrijpen — geen echte namen, geen profielen om bij te houden, geen oordeel.
+
+HOE HET WERKT
+• Plaats en reageer anoniem onder een monika naar keuze
+• Lees wat anderen doormaken en bied steun
+• Een rustig, eenvoudig prikbord, zonder de drukte van social media
+
+EEN OPMERKING OVER PRIVACY
+Berichten op het prikbord zijn zichtbaar voor andere gebruikers van de app en worden in platte tekst opgeslagen (ze zijn niet end-to-end versleuteld). Deel alsjeblieft niets wat je persoonlijk identificeert. Je account is alleen gekoppeld aan een hash van je e-mailadres, gebruikt om je op verschillende apparaten te herkennen.
+
+Bipolar Anonymous is lotgenotensteun, geen professionele zorg. De app geeft geen medisch advies en vervangt geen behandeling. Ben je in crisis, neem dan contact op met de hulpdiensten in je regio of een crisislijn.
+
+Gratis. Geen advertenties.
+```
+
+### What's New — v1.0
+```
+Welkom bij Bipolar Anonymous — onze eerste versie.
+
+Een rustig, anoniem prikbord voor lotgenoten die leven met een bipolaire stoornis. Kies een monika, deel wat je doormaakt en maak contact met mensen die het begrijpen. Geen echte namen, geen oordeel.
+
+We horen graag je mening.
+```
+
+## Polish (pl)
+
+### Subtitle (max 30)
+```
+Anonimowa społeczność
+```
+`21 chars`
+
+### Promotional text (max 170)
+```
+Anonimowa tablica wsparcia dla osób z chorobą afektywną dwubiegunową. Bez prawdziwych imion, bez oceniania — po prostu ludzie, którzy rozumieją.
+```
+`142 chars`
+
+### Keywords (max 100)
+```
+choroba dwubiegunowa,anonimowo,społeczność,wsparcie rówieśnicze,zdrowie psychiczne,depresja,mania,forum
+```
+`102 chars — TOO LONG. Trim to:`
+```
+choroba dwubiegunowa,anonimowo,społeczność,wsparcie,zdrowie psychiczne,depresja,mania,forum,bipolar
+```
+`98 chars`
+
+### Description (max 4000)
+```
+Bipolar Anonymous to bezpłatna, anonimowa społeczność wsparcia rówieśniczego dla osób żyjących z chorobą afektywną dwubiegunową.
+
+Wybierz monika, podziel się tym, przez co przechodzisz, i połącz się z ludźmi, którzy naprawdę rozumieją — bez prawdziwych imion, bez profili do utrzymywania, bez oceniania.
+
+JAK TO DZIAŁA
+• Publikuj i odpowiadaj anonimowo pod wybraną przez siebie monika
+• Czytaj, przez co przechodzą inni, i oferuj wsparcie
+• Spokojna, prosta tablica, bez zgiełku mediów społecznościowych
+
+UWAGA O PRYWATNOŚCI
+Wpisy na tablicy są widoczne dla innych użytkowników aplikacji i przechowywane jako zwykły tekst (nie są szyfrowane end-to-end). Prosimy, nie udostępniaj niczego, co pozwala Cię zidentyfikować. Twoje konto jest powiązane wyłącznie z hashem Twojego adresu e-mail, używanym do rozpoznawania Cię między urządzeniami.
+
+Bipolar Anonymous to wsparcie rówieśnicze, a nie opieka profesjonalna. Aplikacja nie udziela porad medycznych ani nie zastępuje leczenia. Jeśli jesteś w kryzysie, skontaktuj się z lokalnymi służbami ratunkowymi lub telefonem zaufania.
+
+Bezpłatnie. Bez reklam.
+```
+
+### What's New — v1.0
+```
+Witamy w Bipolar Anonymous — to nasza pierwsza wersja.
+
+Spokojna, anonimowa tablica wsparcia rówieśniczego dla osób żyjących z chorobą afektywną dwubiegunową. Wybierz monika, podziel się tym, przez co przechodzisz, i połącz się z ludźmi, którzy rozumieją. Bez prawdziwych imion, bez oceniania.
+
+Chętnie poznamy Twoją opinię.
+```
+
+## Swedish (sv)
+
+### Subtitle (max 30)
+```
+Anonym gemenskap för likasinnade
+```
+`32 chars — TOO LONG. Use:`
+```
+Anonym gemenskap
+```
+`16 chars`
+
+### Promotional text (max 170)
+```
+En anonym anslagstavla med likasinnade för dig som lever med bipolär sjukdom. Inga riktiga namn, inget dömande — bara människor som förstår.
+```
+`138 chars`
+
+### Keywords (max 100)
+```
+bipolär,anonym,gemenskap,likasinnade,psykisk hälsa,depression,mani,forum,stöd,välbefinnande
+```
+`91 chars`
+
+### Description (max 4000)
+```
+Bipolar Anonymous är en gratis, anonym gemenskap med likasinnade för dig som lever med bipolär sjukdom.
+
+Välj en monika, dela det du går igenom och få kontakt med människor som verkligen förstår — inga riktiga namn, inga profiler att sköta, inget dömande.
+
+SÅ FUNGERAR DET
+• Publicera och svara anonymt under en monika du väljer
+• Läs vad andra går igenom och erbjud stöd
+• En lugn, enkel anslagstavla — utan sociala mediers brus
+
+EN NOT OM INTEGRITET
+Inlägg på anslagstavlan är synliga för andra användare av appen och lagras i klartext (de är inte totalsträckskrypterade). Dela inget som identifierar dig personligen. Ditt konto är kopplat endast till en hash av din e-postadress, som används för att känna igen dig mellan enheter.
+
+Bipolar Anonymous är stöd mellan likasinnade, inte professionell vård. Appen ger inte medicinska råd och ersätter inte behandling. Om du är i kris, kontakta larmtjänsten där du bor eller en stödlinje.
+
+Gratis. Inga annonser.
+```
+
+### What's New — v1.0
+```
+Välkommen till Bipolar Anonymous — vår första version.
+
+En lugn, anonym anslagstavla med likasinnade för dig som lever med bipolär sjukdom. Välj en monika, dela det du går igenom och få kontakt med människor som förstår. Inga riktiga namn, inget dömande.
+
+Vi vill gärna höra vad du tycker.
+```
+
+## Chinese, Simplified (zh)
+
+### Subtitle (max 30)
+```
+匿名同伴支持社区
+```
+`7 chars`
+
+### Promotional text (max 170)
+```
+一个面向双相情感障碍人群的匿名同伴支持留言板。没有真实姓名，没有评判——只有真正懂你的人。
+```
+`43 chars`
+
+### Keywords (max 100)
+```
+双相情感障碍,躁郁症,匿名,社区,同伴支持,心理健康,抑郁,躁狂,论坛,互助
+```
+`36 chars`
+
+### Description (max 4000)
+```
+Bipolar Anonymous 是一个面向与双相情感障碍共处人群的免费匿名同伴支持社区。
+
+选一个 monika，分享你正在经历的一切，与真正理解你的人建立联系——没有真实姓名，没有需要维护的个人资料，没有评判。
+
+如何运作
+• 用你选择的 monika 匿名发帖和回复
+• 阅读他人的经历并给予支持
+• 一个平静、简洁的留言板，没有社交媒体的喧嚣
+
+关于隐私的说明
+留言板上的帖子对应用的其他用户公开，并以明文形式存储（未采用端到端加密）。请不要分享任何能识别你个人身份的内容。你的账户仅与你邮箱的哈希值关联，用于在不同设备间识别你。
+
+Bipolar Anonymous 提供的是同伴支持，而非专业医疗照护。它不提供医疗建议，也不能替代治疗。如果你正处于危机中，请联系你所在地区的紧急服务或危机热线。
+
+免费使用。没有广告。
+```
+
+### What's New — v1.0
+```
+欢迎使用 Bipolar Anonymous——我们的首个版本。
+
+一个面向与双相情感障碍共处人群的平静、匿名的同伴支持留言板。选一个 monika，分享你正在经历的一切，与理解你的人建立联系。没有真实姓名，没有评判。
+
+我们很想听听你的意见。
+```
+
+---
+
 # Notes
 
 - **URLs** (Support / Marketing / Privacy Policy) are the same for every locale —
