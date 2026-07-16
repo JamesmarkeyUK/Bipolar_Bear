@@ -771,7 +771,14 @@
 //       source + fallback) and every wiki section now shows a "based on
 //       UK-issued guidance" note (anon.wiki.ukGuidance). Touches anonymous.html,
 //       js/anonymous.js, css/anonymous.css, js/shared/i18n.js.
-const CACHE_NAME = 'bipolarbear-v171';
+// v172: i18n — full clinical wiki corpus translated into all 9 non-English
+//       locales: 96 articles (conditions, therapies, lifestyle, warning signs,
+//       side effects, hospital, workplace, pregnancy, media, loved-ones, and the
+//       8 medication entries) — titles + bodies — under anon.wiki.a.<slug>, plus
+//       the translated "based on UK-issued guidance" notice. Clinical meaning,
+//       drug names, and UK service references (NHS/NICE/CMHT/Section 3/Bipolar
+//       UK/Samaritans) preserved. Touches js/shared/i18n.js.
+const CACHE_NAME = 'bipolarbear-v172';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
