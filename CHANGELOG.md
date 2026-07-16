@@ -1,6 +1,7 @@
 # BipolarBear Changelog
 
 ## v1.24
+- 🐛 Focused mode: the **active mood pill's highlight ring** no longer gets clipped by the neighbouring pill to its right — the centred pill now sits above its siblings (`position:relative` + `z-index`, still under the dial arrow) so its full border/outline renders. Touches `css/journal.css`, `service-worker.js` (`CACHE_NAME` v176)
 - 🎭 Anonymous board: admin authors are now masked as **"Bipolar Bear Admin"** everywhere on the board (feed posts, thread headers, comments) instead of showing an individual admin monika — presents moderation as one consistent voice. Touches `js/anonymous.js`
 - ✨ Anonymous board: a **"Post actions"** guide box added to the ℹ️ About screen, explaining every post-action button (💛 Like, 💬 Comment, 🆘 SOS, 🚨 Report, 🙈 Mute, 🗑️ Remove) plus a "Moderators only" sub-section for the admin buttons (📌 Pin, 🗑️ Delete, 🚫 Ban). Touches `anonymous.html`
 - 🎨 Focused mode: the medication wheel now defaults to **"Taken"** (the most common answer) instead of "Unsure"

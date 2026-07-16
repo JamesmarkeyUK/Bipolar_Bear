@@ -794,7 +794,7 @@
 //       patient-detail + metric labels, 12-month chart titles, disclaimers;
 //       reuses journal.value.*/label.* for shared words) and translated into all
 //       10 locales. Touches privacy.html, js/journal.js, js/shared/i18n.js.
-const CACHE_NAME = 'bipolarbear-v175';
+const CACHE_NAME = 'bipolarbear-v176';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
