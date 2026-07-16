@@ -586,9 +586,15 @@
       box-sizing: border-box;
     }
     /* Centred pill: framed like the slot of a spinner dial — its own border
-       plus an offset outer ring, under the fixed dial arrow. */
+       plus an offset outer ring, under the fixed dial arrow.
+       position:relative + z-index lifts its border/outline ring above the
+       neighbouring pills (which, being later in the DOM, would otherwise
+       paint over the right edge of the ring). Kept below the dial arrow's
+       z-index:2 so the needle still sits on top. */
     .fm-wheel-btn.center {
       --arc-scale: 1.08;
+      position: relative;
+      z-index: 1;
       border-color: var(--wb-color, var(--brand-primary));
       outline: 2px solid var(--wb-color, var(--brand-primary));
       outline-offset: 3px;
