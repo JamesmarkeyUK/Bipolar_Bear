@@ -805,7 +805,13 @@
 //       #84) reaches the store build alongside the journal form-mode layout
 //       refinements already cached at v177. Version-bump invalidation only; no
 //       new precached assets beyond v177.
-const CACHE_NAME = 'bipolarbear-v178';
+// v179: PDF export fixes (js/journal.js). Left-column mood distribution now
+//       divides period-filtered mood counts by that period's own entry total
+//       (allEntries.length) instead of the all-time count, so a 30-day column
+//       no longer reads "3% stable / 0% low". Additional Data rows now show an
+//       explicit "N yes · N no · N untracked" breakdown per field instead of a
+//       single ambiguous "Nd · N% <verb>" figure.
+const CACHE_NAME = 'bipolarbear-v179';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
