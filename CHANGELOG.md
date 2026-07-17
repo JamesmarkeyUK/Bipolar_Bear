@@ -1,5 +1,10 @@
 # BipolarBear Changelog
 
+## v1.25
+- 🎚️ New advanced setting: **Full Mood Spectrum** — track your mood on a 0–10 scale (e.g. 4 = sad but stable) by spinning a wheel or sliding, instead of the five fixed moods. Turn it on under Advanced → Journal Options (#84). Touches `js/journal.js`, `css/journal.css`, `journal.html`
+- 🎨 Journal (classic form): cleaner energy / sleep / medication rows — dropped the big floating emoji + value readout from the energy and sleep steps (the step count and sleep time already sit in the section headers, leaving only the compact "✓ Synced from …" badge when health data is present); energy buttons now show the emoji plus a short symbol (`- -`, `-`, Normal, `+`, `++`) so each fits one line; the three medication responses (No / Forgot, Unsure, Taken) are a 3-across single-line row. Touches `js/journal.js`, `css/journal.css`, `service-worker.js` (`CACHE_NAME` v177)
+- Version bump: `_APP_VERSION` 1.25, `version.json` web channel 1.25, iOS (app+widget) + Android build 25, `service-worker.js` `CACHE_NAME` v178
+
 ## v1.24
 - 🐛 Focused mode: the **active mood pill's highlight ring** no longer gets clipped by the neighbouring pill to its right — the centred pill now sits above its siblings (`position:relative` + `z-index`, still under the dial arrow) so its full border/outline renders. Touches `css/journal.css`, `service-worker.js` (`CACHE_NAME` v176)
 - 🎭 Anonymous board: admin authors are now masked as **"Bipolar Bear Admin"** everywhere on the board (feed posts, thread headers, comments) instead of showing an individual admin monika — presents moderation as one consistent voice. Touches `js/anonymous.js`

@@ -801,7 +801,11 @@
 //       + short symbol (- -, -, Normal, +, ++) so each fits one line, and the
 //       three medication responses are a 3-across single-line row. Touches
 //       js/journal.js, css/journal.css.
-const CACHE_NAME = 'bipolarbear-v177';
+// v178: release 1.25 — Full Mood Spectrum (0–10 mood scale, advanced setting,
+//       #84) reaches the store build alongside the journal form-mode layout
+//       refinements already cached at v177. Version-bump invalidation only; no
+//       new precached assets beyond v177.
+const CACHE_NAME = 'bipolarbear-v178';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
