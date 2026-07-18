@@ -8677,7 +8677,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
         setDraw(orange); doc.setLineWidth(0.4);
         doc.line(margin + 4, ly2 + 1, margin + colW - 4, ly2 + 1);
         ly2 += 7;
-        ly2 = moodDistBar(allMoodCounts, entries.length, margin + 4, ly2);
+        ly2 = moodDistBar(allMoodCounts, allEntries.length, margin + 4, ly2);
 
         setDraw([220,220,220]); setFill([255,255,255]);
         doc.roundedRect(col2, y, colW, 50, 2, 2, 'FD');
@@ -8734,19 +8734,21 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
               setColor(grey); doc.setFont(undefined, 'italic'); doc.text(BB.t('journal.pdf.noDataRecorded'), margin + 4, ay);
             } else {
               allTracked.forEach(f => {
-                const tracked = allEntries.filter(e => e[f.key]);
-                const pct = Math.round(tracked.filter(e => e[f.key] === 'yes').length / tracked.length * 100);
+                const yesN = allEntries.filter(e => e[f.key] === 'yes').length;
+                const noN  = allEntries.filter(e => e[f.key] === 'no').length;
+                const untN = allEntries.length - yesN - noN;
                 setColor(grey); doc.setFont(undefined, 'normal'); doc.text(f.label, margin + 4, ay);
                 setColor(dark); doc.setFont(undefined, 'bold');
-                doc.text(`${tracked.length}d · ${pct}% ${f.yesLabel}`, margin + colW - 4, ay, { align: 'right' });
+                doc.text(`${yesN} yes · ${noN} no · ${untN} untracked`, margin + colW - 4, ay, { align: 'right' });
                 ay += 5;
               });
               allCustomTracked.forEach(f => {
-                const tracked = allEntries.filter(e => e.customFields?.[f.id]);
-                const pct = Math.round(tracked.filter(e => e.customFields[f.id] === 'yes').length / tracked.length * 100);
+                const yesN = allEntries.filter(e => e.customFields?.[f.id] === 'yes').length;
+                const noN  = allEntries.filter(e => e.customFields?.[f.id] === 'no').length;
+                const untN = allEntries.length - yesN - noN;
                 setColor(grey); doc.setFont(undefined, 'normal'); doc.text(f.label, margin + 4, ay);
                 setColor(dark); doc.setFont(undefined, 'bold');
-                doc.text(`${tracked.length}d · ${pct}% yes`, margin + colW - 4, ay, { align: 'right' });
+                doc.text(`${yesN} yes · ${noN} no · ${untN} untracked`, margin + colW - 4, ay, { align: 'right' });
                 ay += 5;
               });
             }
@@ -8763,19 +8765,21 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
               setColor(grey); doc.setFont(undefined, 'italic'); doc.text(BB.t('journal.pdf.noDataForPeriod'), col2 + 4, ry);
             } else {
               recentTracked.forEach(f => {
-                const tracked = recent.filter(e => e[f.key]);
-                const pct = Math.round(tracked.filter(e => e[f.key] === 'yes').length / tracked.length * 100);
+                const yesN = recent.filter(e => e[f.key] === 'yes').length;
+                const noN  = recent.filter(e => e[f.key] === 'no').length;
+                const untN = recent.length - yesN - noN;
                 setColor(grey); doc.setFont(undefined, 'normal'); doc.text(f.label, col2 + 4, ry);
                 setColor(dark); doc.setFont(undefined, 'bold');
-                doc.text(`${tracked.length}d · ${pct}% ${f.yesLabel}`, col2 + colW - 4, ry, { align: 'right' });
+                doc.text(`${yesN} yes · ${noN} no · ${untN} untracked`, col2 + colW - 4, ry, { align: 'right' });
                 ry += 5;
               });
               recentCustomTracked.forEach(f => {
-                const tracked = recent.filter(e => e.customFields?.[f.id]);
-                const pct = Math.round(tracked.filter(e => e.customFields[f.id] === 'yes').length / tracked.length * 100);
+                const yesN = recent.filter(e => e.customFields?.[f.id] === 'yes').length;
+                const noN  = recent.filter(e => e.customFields?.[f.id] === 'no').length;
+                const untN = recent.length - yesN - noN;
                 setColor(grey); doc.setFont(undefined, 'normal'); doc.text(f.label, col2 + 4, ry);
                 setColor(dark); doc.setFont(undefined, 'bold');
-                doc.text(`${tracked.length}d · ${pct}% yes`, col2 + colW - 4, ry, { align: 'right' });
+                doc.text(`${yesN} yes · ${noN} no · ${untN} untracked`, col2 + colW - 4, ry, { align: 'right' });
                 ry += 5;
               });
             }
