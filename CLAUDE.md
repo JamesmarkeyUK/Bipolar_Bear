@@ -225,10 +225,10 @@ Cloud Functions region: `europe-west1`.
 
 Settings that live in BOTH localStorage AND `userSettings/{uid}`:
 
-`moodLinkingEnabled, showMoodSuggestion, healthSyncEnabled,
-focusedModeEnabled, incognitoMode, achievementToastsEnabled, reminderEnabled,
-reminderTime, weeklySummaryEnabled, customiseFormEnabled, disabledSteps,
-currentStreak, stableStreak, fabState`
+`moodLinkingEnabled, moodSpectrumEnabled, wheelModeEnabled, showMoodSuggestion,
+healthSyncEnabled, focusedModeEnabled, incognitoMode, achievementToastsEnabled,
+reminderEnabled, reminderTime, weeklySummaryEnabled, customiseFormEnabled,
+disabledSteps, currentStreak, stableStreak, fabState`
 
 ## When adding a new feature
 

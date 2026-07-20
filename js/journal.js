@@ -461,6 +461,9 @@ window.addEventListener('pageshow', () => {
                 localStorage.setItem('moodSpectrumEnabled', d.moodSpectrumEnabled ? '1' : '0');
                 if (typeof _applyMoodSpectrumMode === 'function') _applyMoodSpectrumMode();
               }
+              if (d.wheelModeEnabled !== undefined) {
+                localStorage.setItem('wheelModeEnabled', d.wheelModeEnabled ? '1' : '0');
+              }
               if (d.healthSyncEnabled !== undefined) {
                 BB.storage.set('HealthSyncEnabled', d.healthSyncEnabled ? '1' : '0');
               }
@@ -558,7 +561,7 @@ window.addEventListener('pageshow', () => {
               ['PinEnabled','PinCode','FavAnniShown',
                'PrivateHintSeen','FavouriteHintSeen','_moodTipShown','_fmMoodTipShown','_draft']
                 .forEach(k => BB.storage.remove(k));
-              ['moreDataOpenByDefault','showMoodSuggestion','moodLinkingEnabled','moodSpectrumEnabled']
+              ['moreDataOpenByDefault','showMoodSuggestion','moodLinkingEnabled','moodSpectrumEnabled','wheelModeEnabled']
                 .forEach(k => localStorage.removeItem(k));
               BB.storage.remove('OnboardingStep'); // new user starts at step 0
               localStorage.setItem('focusedModeEnabled', '1');
@@ -1607,6 +1610,9 @@ window.addEventListener('pageshow', () => {
       10: 'Manic',
     };
     function _spectrumEnabled() { return localStorage.getItem('moodSpectrumEnabled') === '1'; }
+    // Focus mode's spinner-wheel experience is opt-in (BETA). Off by default →
+    // focus mode renders each step as a plain tappable list (see _fmRenderContent).
+    function _wheelMode() { return localStorage.getItem('wheelModeEnabled') === '1'; }
     // True only for a raw spectrum number (0–10); legacy category strings return false.
     function _isNumericMood(m) {
       return typeof m === 'number'
@@ -3973,6 +3979,20 @@ window.addEventListener('pageshow', () => {
     }
     window._toggleMoodSpectrum = _toggleMoodSpectrum;
 
+    // BETA: switch focus mode between the plain step-by-step list (off, default)
+    // and the full spinner-wheel experience (on).
+    function _toggleWheelMode() {
+      const chk = document.getElementById('wheelModeToggle');
+      const on = !!(chk && chk.checked);
+      localStorage.setItem('wheelModeEnabled', on ? '1' : '0');
+      // Live-swap the current step if focus mode is open.
+      if (typeof _fmActive !== 'undefined' && _fmActive) _renderFocusedStep();
+      if (window.db && window.currentUser) {
+        window.db.collection('userSettings').doc(window.currentUser.uid).set({ wheelModeEnabled: on }, { merge: true }).catch(() => {});
+      }
+    }
+    window._toggleWheelMode = _toggleWheelMode;
+
     // Show/hide the spectrum slider vs the five-button selector in the standard form.
     function _applyMoodSpectrumMode() {
       const on = _spectrumEnabled();
@@ -5139,6 +5159,32 @@ window.addEventListener('pageshow', () => {
           } else if (selectedMood && localStorage.getItem('moodLinkingEnabled') === '1') {
             _linkedChip = `<p style="text-align:center;font-size:0.72em;color:#adb5bd;margin-top:8px;margin-bottom:0;">${BB.t('journal.ui.holdToLink')}</p>`;
           }
+          // ── Plain mode (wheel BETA off) — mood as a simple tappable list ──
+          if (!_wheelMode()) {
+            const _chooseHint = _showChooseMoodHint ? `<div id="_fmChooseMoodHintEl" style="display:flex;flex-direction:column;align-items:center;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-top:10px;">
+              <svg width="24" height="22" viewBox="0 0 24 22" fill="none"><path d="M 12,20 Q 8,10 12,2" stroke="rgba(255,149,0,0.7)" stroke-width="2" stroke-linecap="round" fill="none"/><polyline points="7,6 12,1 17,6" stroke="rgba(255,149,0,0.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+              <span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,149,0,0.9);white-space:nowrap;font-family:'Georgia',serif;letter-spacing:0.01em;">${BB.t('journal.hint.chooseMood')}</span></div>` : '';
+            let _moodList;
+            if (_spectrumEnabled()) {
+              // Best mood (10) at the top, most depressed (0) at the bottom.
+              _moodList = [10,9,8,7,6,5,4,3,2,1,0].map((n,i) => `<button class="fm-opt ${(selectedMood!=null&&selectedMood!==''&&Number(selectedMood)===n)?'sel':''}"
+                onclick="_fmSpectrumTap(${n})" style="border-left:4px solid ${_FM_MOOD_COLORS[_moodCat(n)]};${i>0?'margin-top:8px;':''}">
+                <img src="${_moodImg(n)}" alt="" style="width:26px;height:26px;object-fit:contain;flex-shrink:0;">
+                <span style="flex:1;">${SPECTRUM_LABELS[n]}</span>
+                <span style="font-weight:700;color:#adb5bd;">${n}</span></button>`).join('');
+            } else {
+              _moodList = ['manic','elevated','stable','low','depressed'].map((m,i) => `<button class="fm-opt ${selectedMood===m?'sel':''}${(selectedLinkedMood===m || (_fmLinkMoodPickerOpen && m!==selectedMood)) ? ' linked' : ''}"
+                onclick="_fmMoodTap('${m}')"
+                ontouchstart="_fmLongPressStart('${m}',event)" ontouchend="_fmLongPressCancel()" ontouchmove="_fmLongPressCancel()" onmousedown="_fmLongPressStart('${m}',event)" onmouseup="_fmLongPressCancel()" onmouseleave="_fmLongPressCancel()"
+                style="border-left:4px solid ${_FM_MOOD_COLORS[m]};${i>0?'margin-top:8px;':''}">
+                <img src="images/moods/${m}.png" alt="" style="width:26px;height:26px;object-fit:contain;flex-shrink:0;">
+                <span>${BB.t('mood.' + m)}</span></button>`).join('');
+            }
+            return `${_quickNotesHtml}${_prevIntentionHtml}${_moodList}
+            ${_linkedChip}
+            ${selectedLinkedMood ? `<button onclick="_fmAdvance()" style="width:100%;margin-top:14px;padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:14px;font-size:0.95em;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">${BB.t('common.continue')} →</button>` : ''}
+            ${_chooseHint}`;
+          }
           // Full mood spectrum — render an 11-point (0–10) wheel instead of the
           // five fixed moods. Each stop maps to a legacy category for its image/colour.
           if (_spectrumEnabled()) {
@@ -5197,6 +5243,16 @@ window.addEventListener('pageshow', () => {
 
         case 'energy': {
           const _committedEnergy = _fmEnergyClear ? null : selectedEnergy;
+          // Plain mode (wheel BETA off) — energy as a simple tappable list.
+          if (!_wheelMode()) {
+            return _FM_ENERGY_LEVELS.map((l,i) => {
+              const [emoji, ...rest] = l.label.split(' ');
+              return `<button class="fm-opt ${_committedEnergy===l.val?'sel':''}"
+                onclick="selectedEnergy=${l.val}; _fmEnergyClear=false; _fmAdvance();"
+                style="border-left:4px solid ${l.color};${i>0?'margin-top:8px;':''}">
+                <span style="font-size:1.2em;flex-shrink:0;">${emoji}</span><span>${rest.join(' ')}</span></button>`;
+            }).join('');
+          }
           const _initEnergy = _committedEnergy !== null ? _committedEnergy
             : (_fmEnergySuggestion !== null ? _fmEnergySuggestion : 5);
           const _energyWheel = _fmWheelHtml(_FM_ENERGY_LEVELS.map(l => {
@@ -5227,6 +5283,23 @@ window.addEventListener('pageshow', () => {
               </div>`;
           }
           const _committedBucket = (_fmSleepClear || selectedSleep == null) ? null : _fmSleepBucketOf(selectedSleep);
+          // Plain mode (wheel BETA off) — sleep as a simple tappable list. No
+          // long-press, so the (opt-in, hidden) sleep-quality step is skipped —
+          // matching focus mode before the wheel work introduced it.
+          if (!_wheelMode()) {
+            const _sleepRetry = (BB.storage.get('HealthSyncEnabled') === '1' && _fmSleepError)
+              ? `<p style="text-align:center;margin:0 0 10px;"><button onclick="importSleepFromHealth()" style="background:none;border:none;color:var(--brand-primary);font-size:0.82em;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px;-webkit-tap-highlight-color:transparent;">${_fmSleepError === 'nodata' ? '🤷 No sleep data found — try again' : '❌ Sync failed — try again'}</button></p>` : '';
+            const _sleepList = _FM_SLEEP_RANGES.map((r,i) => {
+              const isSel = _committedBucket === r.val;
+              const [emoji, ...rest] = r.label.split(' ');
+              const _slOnclick = (_sleepHealthSynced && isSel)
+                ? `_fmSleepClear=false;_fmAdvance();`
+                : `selectedSleep=${r.val};_sleepHealthSynced=false;_fmSleepClear=false;_fmAdvance();`;
+              return `<button class="fm-opt ${isSel?'sel':''}" onclick="${_slOnclick}" style="border-left:4px solid ${r.color};${i>0?'margin-top:8px;':''}">
+                <span style="font-size:1.2em;flex-shrink:0;">${emoji}</span><span>${rest.join(' ')}</span>${(isSel && _sleepHealthSynced) ? `<span style="margin-left:auto;font-size:0.82em;color:#6c757d;font-weight:600;">${selectedSleep}h</span>` : ''}</button>`;
+            }).join('');
+            return _sleepRetry + _sleepList;
+          }
           const _initBucket = _committedBucket !== null ? _committedBucket
             : (_fmSleepSuggestion !== null ? _fmSleepSuggestion : 8);
           const _sqHint = `<p class="fm-wheel-hint">${BB.t('journal.sleepQualityHint')}</p>`;
@@ -5263,14 +5336,22 @@ window.addEventListener('pageshow', () => {
           // surface, but painted as invisible runway (see .fm-wheel-runway) so
           // the user only sees the three distinct answers. Landing on a runway
           // slot still commits its (edge) value, and OK is the neutral centre.
+          const _sqBad = { val:'bad',    emoji:'😴', label:BB.t('journal.value.bad'),  color:'#dc3545' };
+          const _sqOk  = { val:'unsure', emoji:'😐', label:BB.t('journal.value.ok'),   color:'#adb5bd' };
+          const _sqGd  = { val:'good',   emoji:'😊', label:BB.t('journal.value.good'), color:'#51cf66' };
+          // Plain mode — three tappable answers (reached only when editing an
+          // entry that already carries a sleep-quality value).
+          if (!_wheelMode()) {
+            return [_sqBad, _sqOk, _sqGd].map((o,i) => `<button class="fm-opt ${selectedSleepQuality===o.val?'sel':''}"
+              onclick="selectedSleepQuality='${o.val}'; _fmAdvance();"
+              style="border-left:4px solid ${o.color};${i>0?'margin-top:8px;':''}">
+              <span style="font-size:1.2em;flex-shrink:0;">${o.emoji}</span><span>${o.label}</span></button>`).join('');
+          }
           const _sqP = (o, extra) => Object.assign({
             val: o.val, emoji: o.emoji, label: o.label, color: o.color,
             cls: selectedSleepQuality === o.val ? 'sel' : '',
             onclick: `selectedSleepQuality='${o.val}'; _fmAdvance();`,
           }, extra || {});
-          const _sqBad = { val:'bad',    emoji:'😴', label:BB.t('journal.value.bad'),  color:'#dc3545' };
-          const _sqOk  = { val:'unsure', emoji:'😐', label:BB.t('journal.value.ok'),   color:'#adb5bd' };
-          const _sqGd  = { val:'good',   emoji:'😊', label:BB.t('journal.value.good'), color:'#51cf66' };
           const _sqWheel = _fmWheelHtml([
             _sqP(_sqBad, { spacer: true }),
             _sqP(_sqBad),
@@ -5291,6 +5372,22 @@ window.addEventListener('pageshow', () => {
             }
           } catch(e) {}
           const _medHintDone = BB.storage.get('MedHintDone') === '1';
+          // Plain mode (wheel BETA off) — medication as a simple tappable list,
+          // Taken / Unsure / Not taken, over a plain "Manage medications" link.
+          if (!_wheelMode()) {
+            const _mdList = [
+              { val:'taken',     label:BB.t('journal.med.taken'),    color:'#51cf66' },
+              { val:'unsure',    label:BB.t('journal.med.unsure'),   color:'#adb5bd' },
+              { val:'not-taken', label:BB.t('journal.med.notTaken'), color:'var(--brand-primary)' },
+            ].map((o,i) => { const p = String(o.label).split(' '); const emoji = p[0] || ''; const txt = p.slice(1).join(' ') || String(o.label);
+              return `<button class="fm-opt ${selectedMedication===o.val?'sel':''}"
+                onclick="selectedMedication='${o.val}'; _fmAdvance();"
+                style="border-left:4px solid ${o.color};${i>0?'margin-top:8px;':''}">
+                <span style="font-size:1.2em;flex-shrink:0;">${emoji}</span><span>${txt}</span></button>`;
+            }).join('');
+            const _mdManage = `<div style="text-align:center;margin-top:14px;">${medListHtml}<button onclick="showMedicationList()" style="background:none;border:none;color:var(--brand-primary);font-size:0.85em;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px;-webkit-tap-highlight-color:transparent;">${BB.t('journal.ui.manageMeds')}</button></div>`;
+            return _mdList + _mdManage;
+          }
           // Sits below the wheel at the very bottom of the page, with the
           // user's med list directly above the "Manage medications" link.
           const _manageRow = `<div class="fm-meds-manage">
@@ -9284,7 +9381,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
               ['focusedModeEnabled','fmConfirmStep','fmAutoAdvance','fmAutoAdvanceMoreData',
                'elaborateResponsesEnabled','intentionEnabled','incognitoMode','pdfHideByDefault',
                'showMoodSuggestion','moreDataOpenByDefault','achievementToastsEnabled',
-               'weeklySummaryEnabled','customiseFormEnabled','moodLinkingEnabled','moodSpectrumEnabled'].forEach(k => {
+               'weeklySummaryEnabled','customiseFormEnabled','moodLinkingEnabled','moodSpectrumEnabled','wheelModeEnabled'].forEach(k => {
                 if (settings[k] !== undefined) fsSettings[k] = _boolKey(settings[k]);
               });
               if (settings.statsStartDate) fsSettings.statsStartDate = settings.statsStartDate;
@@ -9554,7 +9651,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
         'incognitoMode', 'pdfHideByDefault',
         'showMoodSuggestion', 'moreDataOpenByDefault',
         'achievementToastsEnabled', 'statsStartDate', 'weeklySummaryEnabled',
-        'customiseFormEnabled', 'disabledSteps', 'moodLinkingEnabled', 'moodSpectrumEnabled',
+        'customiseFormEnabled', 'disabledSteps', 'moodLinkingEnabled', 'moodSpectrumEnabled', 'wheelModeEnabled',
         'customTrackingFields', 'deletedDefaultCustomFields', 'deletedBuiltinFields',
       ];
       _keys.forEach(k => localStorage.removeItem(k));
@@ -9742,7 +9839,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
           'incognitoMode', 'pdfHideByDefault',
           'showMoodSuggestion', 'moreDataOpenByDefault',
           'achievementToastsEnabled', 'statsStartDate', 'weeklySummaryEnabled',
-          'customiseFormEnabled', 'disabledSteps', 'moodLinkingEnabled', 'moodSpectrumEnabled',
+          'customiseFormEnabled', 'disabledSteps', 'moodLinkingEnabled', 'moodSpectrumEnabled', 'wheelModeEnabled',
           'customTrackingFields', 'deletedDefaultCustomFields', 'deletedBuiltinFields',
           'bbPinEnabled', 'bbPinCode', 'bbNativePinEnabled',
           'bbHealthSyncEnabled', 'reminderEnabled', 'reminderTime',
@@ -11151,6 +11248,8 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
       document.getElementById('moodLinkingToggle').checked = localStorage.getItem('moodLinkingEnabled') === '1';
       const _msToggle = document.getElementById('moodSpectrumToggle');
       if (_msToggle) _msToggle.checked = _spectrumEnabled();
+      const _wmToggle = document.getElementById('wheelModeToggle');
+      if (_wmToggle) _wmToggle.checked = _wheelMode();
       document.getElementById('moodSuggestionToggle').checked = localStorage.getItem('showMoodSuggestion') === '1';
       document.getElementById('focusModeToggle').checked = _fmEnabled;
       document.getElementById('focusModeSubOptions').style.display = _fmEnabled ? '' : 'none';
