@@ -75,6 +75,14 @@ on the catch.
 > at `~/bipolarbear-native` and `~/bipolaranonymous-native`; those paths
 > are dead — the old home-dir `~/bipolaranonymous-native` is now just an
 > empty `www/` shell, safe to ignore or delete.)
+>
+> **On Windows** the whole Github tree lives on the `D:` drive (not the
+> home dir), so the real paths are
+> `D:\Github\James\Bipolar_Bear_Mobile\bipolarbear-native\` and
+> `…\bipolaranonymous-native\` — siblings of the web repo
+> `D:\Github\James\Bipolar_Bear`. Translate the `~/Github/James/…` paths
+> below accordingly. `scripts/bump-version.sh` auto-detects this sibling
+> layout; for other commands pass the `D:` path (or `NATIVE_REPO=…`).
 
 ### BipolarBear app (`com.bipolarbear.app`)
 

@@ -24,7 +24,20 @@ BUILD="${1:?Usage: bump-version.sh <buildNumber>   (e.g. 13 -> v1.13 build 13)}"
 VER="1.$BUILD"
 
 WEB="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-NATIVE="${NATIVE_REPO:-$HOME/Github/James/Bipolar_Bear_Mobile/bipolarbear-native}"
+
+# Locate the native repo. Order: explicit NATIVE_REPO override, then the sibling
+# layout next to the web repo (works on Windows/D: where $HOME is on C:), then the
+# documented home-dir path (macOS). First existing candidate wins.
+_default_native() {
+  local c
+  for c in \
+    "$WEB/../Bipolar_Bear_Mobile/bipolarbear-native" \
+    "$HOME/Github/James/Bipolar_Bear_Mobile/bipolarbear-native" ; do
+    [[ -d "$c" ]] && { (cd "$c" && pwd); return; }
+  done
+  echo "$HOME/Github/James/Bipolar_Bear_Mobile/bipolarbear-native"  # for the error below
+}
+NATIVE="${NATIVE_REPO:-$(_default_native)}"
 [[ -d "$NATIVE" ]] || { echo "error: native repo not found at '$NATIVE' (set NATIVE_REPO=...)"; exit 1; }
 
 PBX="$NATIVE/ios/App/BipolarBear.xcodeproj/project.pbxproj"   # main app + widget, Debug+Release
@@ -35,12 +48,17 @@ for f in "$PBX" "$GRADLE" "$BRAND" "$SW"; do
   [[ -f "$f" ]] || { echo "error: expected file missing: $f"; exit 1; }
 done
 
-# Edit in place (BSD/macOS sed); abort if the pattern matched nothing, so a
-# renamed/moved field surfaces loudly instead of silently no-op'ing.
+# Edit in place; abort if the pattern matched nothing, so a renamed/moved field
+# surfaces loudly instead of silently no-op'ing. Uses a temp file + copy-back
+# instead of `sed -i` so it's portable across GNU sed (Linux/Git-Bash on Windows)
+# and BSD sed (macOS), which disagree on `-i`'s argument. Copy-back (not mv)
+# preserves the original file's permissions/line endings.
 bump() { # <file> <grep-ere-to-confirm-present> <sed-ere>
-  local f="$1" check="$2" expr="$3"
+  local f="$1" check="$2" expr="$3" tmp
   grep -Eq "$check" "$f" || { echo "error: pattern not found in $f -> /$check/"; exit 1; }
-  sed -i '' -E "$expr" "$f"
+  tmp="$(mktemp)"
+  sed -E "$expr" "$f" > "$tmp" && cat "$tmp" > "$f"
+  rm -f "$tmp"
 }
 
 # ── iOS (4 entries each: main app + widget extension, Debug + Release) ──
