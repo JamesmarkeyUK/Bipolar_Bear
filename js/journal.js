@@ -4063,6 +4063,34 @@ window.addEventListener('pageshow', () => {
     }
     window._onEditSpectrumInput = _onEditSpectrumInput;
 
+    // Focus-mode 0–10 slider: live-preview the readout, accent and card wash as
+    // the user drags (distinct element IDs from the classic form's hidden
+    // #moodSpectrumControl). The step's Continue button commits via
+    // _fmSpectrumTap (which also fires the severe-low support modal for 0–1).
+    function _fmOnSpectrumSlide(v) {
+      const n = Number(v);
+      selectedMood = n;
+      selectedLinkedMood = null;
+      _fmPrevMood = null;
+      const cat = _moodCat(n);
+      const color = moodColors[cat] || 'var(--brand-primary)';
+      const img = document.getElementById('fmMscImg');
+      const valEl = document.getElementById('fmMscValue');
+      const labelEl = document.getElementById('fmMscLabel');
+      const slider = document.getElementById('fmMscSlider');
+      const ctrl = document.getElementById('fmSpectrumControl');
+      const btn = document.getElementById('fmSpectrumContinue');
+      if (img) img.src = _moodImg(n);
+      if (valEl) { valEl.textContent = _fmtMoodNum(n); valEl.style.color = color; }
+      if (labelEl) labelEl.textContent = _moodLabelOf(n);
+      if (slider) slider.style.setProperty('--msc-accent', color);
+      if (ctrl) ctrl.style.setProperty('--msc-accent', color);
+      if (btn) btn.style.background = color;
+      if (typeof _fmApplyMoodTheme === 'function') _fmApplyMoodTheme(cat);
+      if (typeof scheduleDraftSave === 'function') scheduleDraftSave();
+    }
+    window._fmOnSpectrumSlide = _fmOnSpectrumSlide;
+
     // Preselect the slider to a given numeric mood (used by draft restore / edit load).
     function _setSpectrumValue(n) {
       const slider = document.getElementById('mscSlider');
@@ -5171,12 +5199,24 @@ window.addEventListener('pageshow', () => {
               ${_hintSvg}<span style="font-size:0.78em;font-weight:700;font-style:italic;color:rgba(255,149,0,0.9);white-space:nowrap;font-family:'Georgia',serif;letter-spacing:0.01em;">${BB.t('journal.hint.tapHold').replace(/&/g, '&amp;')}</span></div>` : '';
             let _moodControl;
             if (_spectrumEnabled()) {
-              // Best mood (10) at the top, most depressed (0) at the bottom.
-              _moodControl = [10,9,8,7,6,5,4,3,2,1,0].map((n,i) => `<button class="fm-opt ${(selectedMood!=null&&selectedMood!==''&&Number(selectedMood)===n)?'sel':''}"
-                onclick="_fmSpectrumTap(${n})" style="border-left:4px solid ${_FM_MOOD_COLORS[_moodCat(n)]};${i>0?'margin-top:8px;':''}">
-                <img src="${_moodImg(n)}" alt="" style="width:26px;height:26px;object-fit:contain;flex-shrink:0;">
-                <span style="flex:1;">${SPECTRUM_LABELS[n]}</span>
-                <span style="font-weight:700;color:#adb5bd;">${n}</span></button>`).join('');
+              // 0–10 spectrum uses the same slider as the classic form (it postdates
+              // the wheel, so there's no five-slot horizontal equivalent). Slide to
+              // preview; the Continue button commits via _fmSpectrumTap.
+              const _initN = (selectedMood != null && selectedMood !== '') ? Math.max(0, Math.min(10, Math.round(Number(selectedMood)))) : 5;
+              const _sCat = _moodCat(_initN);
+              const _sCol = moodColors[_sCat] || 'var(--brand-primary)';
+              _moodControl = `<div class="mood-spectrum-control committed" id="fmSpectrumControl" style="--msc-accent:${_sCol};">
+                <div class="msc-readout">
+                  <img id="fmMscImg" class="msc-img" src="${_moodImg(_initN)}" alt="">
+                  <div class="msc-text">
+                    <div id="fmMscValue" class="msc-value" style="color:${_sCol};">${_fmtMoodNum(_initN)}</div>
+                    <div id="fmMscLabel" class="msc-label">${_moodLabelOf(_initN)}</div>
+                  </div>
+                </div>
+                <input type="range" id="fmMscSlider" class="msc-slider" min="0" max="10" step="1" value="${_initN}" oninput="_fmOnSpectrumSlide(this.value)" aria-label="Mood on a 0 to 10 spectrum">
+                <div class="msc-scale"><span>0 · ${BB.t('mood.depressed')}</span><span>5 · ${BB.t('mood.stable')}</span><span>10 · ${BB.t('mood.manic')}</span></div>
+              </div>
+              <button id="fmSpectrumContinue" onclick="_fmSpectrumTap(document.getElementById('fmMscSlider').value)" style="width:100%;margin-top:2px;padding:12px;background:${_sCol};color:white;border:none;border-radius:14px;font-size:0.95em;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">${BB.t('common.continue')} →</button>`;
             } else {
               _moodControl = `<div class="mood-selector" style="margin-bottom:0;">${['manic','elevated','stable','low','depressed'].map(m =>
                 `<button class="mood-btn mood-${m} ${selectedMood===m?'selected':''} ${(selectedLinkedMood===m || (_fmLinkMoodPickerOpen && m!==selectedMood)) ? 'linked':''}"

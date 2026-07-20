@@ -811,7 +811,7 @@
 //       no longer reads "3% stable / 0% low". Additional Data rows now show an
 //       explicit "N yes · N no · N untracked" breakdown per field instead of a
 //       single ambiguous "Nd · N% <verb>" figure.
-const CACHE_NAME = 'bipolarbear-v181';
+const CACHE_NAME = 'bipolarbear-v182';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
