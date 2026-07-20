@@ -214,6 +214,18 @@
        spacer like the fresh-first step so the heading rides up under the chips. */
     body.bb-fm-full #focusedModeCard.fm-flat-top #fmHeaderSpacer { flex: 0 0 auto; min-height: 10px; }
 
+    /* Plain (non-wheel) steps — mood cards, energy/sleep grids, tappable lists.
+       No hero fills the content box, so instead of leaving a big empty band
+       below the cards, size the content to its own height and let the header +
+       footer spacers grow equally, centring the question + cards as a group.
+       Placed after the fresh-first / flat-top rules so it wins when a plain step
+       also carries those classes (e.g. the first-time mood step). Long lists
+       still fit: the flex:0-basis spacers collapse when there's no free space. */
+    #fmFooterSpacer { display: none; }
+    body.bb-fm-full #focusedModeCard.fm-plain-center #fmHeaderSpacer { flex: 1 1 0; min-height: 10px; }
+    body.bb-fm-full #focusedModeCard.fm-plain-center #fmContent { flex: 0 0 auto; }
+    body.bb-fm-full #focusedModeCard.fm-plain-center #fmFooterSpacer { display: block; flex: 1 1 0; min-height: 10px; }
+
     /* ── Focused mode: hero readout (big emoji + value + synced badge) ── */
     #fmContent.fm-content-hero { display: flex; flex-direction: column; }
     .fm-hero {

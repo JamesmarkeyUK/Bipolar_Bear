@@ -452,6 +452,11 @@
       <!-- Step content area -->
       <div id="fmContent"></div>
 
+      <!-- Footer spacer: on plain (non-wheel) steps it grows to match
+           #fmHeaderSpacer so the question + answer cards centre as a group
+           (see .fm-plain-center CSS). Inert on wheel/notes/done steps. -->
+      <div id="fmFooterSpacer"></div>
+
       <!-- Next/Save button row (shown only for non-auto steps) -->
       <div id="fmNextRow" style="display:none;margin-top:16px;gap:10px;align-items:center;position:sticky;bottom:0;background:var(--brand-tint);padding-bottom:4px;">
         <button id="fmDeleteBtn" onclick="_fmDoneDelete()" style="display:none;min-width:52px;height:52px;background:white;color:#ff6b6b;border:2px solid #ff6b6b;border-radius:14px;font-size:1.3em;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;">🗑️</button>

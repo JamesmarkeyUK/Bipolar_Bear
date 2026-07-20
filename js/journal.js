@@ -4797,6 +4797,10 @@ window.addEventListener('pageshow', () => {
       // leaves a dead gap above the question. Collapse it (see .fm-flat-top CSS)
       // so the heading rides up under the summary chips, like the fresh-first step.
       document.getElementById('focusedModeCard').classList.toggle('fm-flat-top', step.id === 'more_data');
+      // Plain (non-wheel) steps have no big hero to fill the content box, so
+      // centre the question + answer cards vertically as a group (via the
+      // header + footer spacers) instead of leaving a large gap below them.
+      document.getElementById('focusedModeCard').classList.toggle('fm-plain-center', !_isHeroStep);
       // setTimeout(0), not rAF: rAF can starve in a backgrounded/hidden WebView
       // and the wheel would never get its initial centring + hero paint.
       if (_hasWheel) setTimeout(_fmInitWheel, 0);
