@@ -5159,31 +5159,37 @@ window.addEventListener('pageshow', () => {
           } else if (selectedMood && localStorage.getItem('moodLinkingEnabled') === '1') {
             _linkedChip = `<p style="text-align:center;font-size:0.72em;color:#adb5bd;margin-top:8px;margin-bottom:0;">${BB.t('journal.ui.holdToLink')}</p>`;
           }
-          // ── Plain mode (wheel BETA off) — mood as a simple tappable list ──
+          // ── Plain mode (wheel BETA off) — the original pre-wheel focus form:
+          // the same horizontal mood buttons (bear image + label) as the classic
+          // form. Spectrum (0–10) falls back to a vertical list (it predates the
+          // wheel and has no five-slot equivalent).
           if (!_wheelMode()) {
+            const _hintSvg = `<svg width="24" height="22" viewBox="0 0 24 22" fill="none"><path d="M 12,20 Q 8,10 12,2" stroke="rgba(255,149,0,0.7)" stroke-width="2" stroke-linecap="round" fill="none"/><polyline points="7,6 12,1 17,6" stroke="rgba(255,149,0,0.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
             const _chooseHint = _showChooseMoodHint ? `<div id="_fmChooseMoodHintEl" style="display:flex;flex-direction:column;align-items:center;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-top:10px;">
-              <svg width="24" height="22" viewBox="0 0 24 22" fill="none"><path d="M 12,20 Q 8,10 12,2" stroke="rgba(255,149,0,0.7)" stroke-width="2" stroke-linecap="round" fill="none"/><polyline points="7,6 12,1 17,6" stroke="rgba(255,149,0,0.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-              <span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,149,0,0.9);white-space:nowrap;font-family:'Georgia',serif;letter-spacing:0.01em;">${BB.t('journal.hint.chooseMood')}</span></div>` : '';
-            let _moodList;
+              ${_hintSvg}<span style="font-size:0.72em;font-weight:700;font-style:italic;color:rgba(255,149,0,0.9);white-space:nowrap;font-family:'Georgia',serif;letter-spacing:0.01em;">${BB.t('journal.hint.chooseMood')}</span></div>` : '';
+            const _tapHoldHint = _showFmTip ? `<div id="_fmTapHoldHintEl" style="display:flex;flex-direction:column;align-items:center;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-top:12px;">
+              ${_hintSvg}<span style="font-size:0.78em;font-weight:700;font-style:italic;color:rgba(255,149,0,0.9);white-space:nowrap;font-family:'Georgia',serif;letter-spacing:0.01em;">${BB.t('journal.hint.tapHold').replace(/&/g, '&amp;')}</span></div>` : '';
+            let _moodControl;
             if (_spectrumEnabled()) {
               // Best mood (10) at the top, most depressed (0) at the bottom.
-              _moodList = [10,9,8,7,6,5,4,3,2,1,0].map((n,i) => `<button class="fm-opt ${(selectedMood!=null&&selectedMood!==''&&Number(selectedMood)===n)?'sel':''}"
+              _moodControl = [10,9,8,7,6,5,4,3,2,1,0].map((n,i) => `<button class="fm-opt ${(selectedMood!=null&&selectedMood!==''&&Number(selectedMood)===n)?'sel':''}"
                 onclick="_fmSpectrumTap(${n})" style="border-left:4px solid ${_FM_MOOD_COLORS[_moodCat(n)]};${i>0?'margin-top:8px;':''}">
                 <img src="${_moodImg(n)}" alt="" style="width:26px;height:26px;object-fit:contain;flex-shrink:0;">
                 <span style="flex:1;">${SPECTRUM_LABELS[n]}</span>
                 <span style="font-weight:700;color:#adb5bd;">${n}</span></button>`).join('');
             } else {
-              _moodList = ['manic','elevated','stable','low','depressed'].map((m,i) => `<button class="fm-opt ${selectedMood===m?'sel':''}${(selectedLinkedMood===m || (_fmLinkMoodPickerOpen && m!==selectedMood)) ? ' linked' : ''}"
-                onclick="_fmMoodTap('${m}')"
-                ontouchstart="_fmLongPressStart('${m}',event)" ontouchend="_fmLongPressCancel()" ontouchmove="_fmLongPressCancel()" onmousedown="_fmLongPressStart('${m}',event)" onmouseup="_fmLongPressCancel()" onmouseleave="_fmLongPressCancel()"
-                style="border-left:4px solid ${_FM_MOOD_COLORS[m]};${i>0?'margin-top:8px;':''}">
-                <img src="images/moods/${m}.png" alt="" style="width:26px;height:26px;object-fit:contain;flex-shrink:0;">
-                <span>${BB.t('mood.' + m)}</span></button>`).join('');
+              _moodControl = `<div class="mood-selector" style="margin-bottom:0;">${['manic','elevated','stable','low','depressed'].map(m =>
+                `<button class="mood-btn mood-${m} ${selectedMood===m?'selected':''} ${(selectedLinkedMood===m || (_fmLinkMoodPickerOpen && m!==selectedMood)) ? 'linked':''}"
+                  onclick="_fmMoodTap('${m}')"
+                  ontouchstart="_fmLongPressStart('${m}',event)" ontouchend="_fmLongPressCancel()" ontouchmove="_fmLongPressCancel()" onmousedown="_fmLongPressStart('${m}',event)" onmouseup="_fmLongPressCancel()" onmouseleave="_fmLongPressCancel()">
+                  <img class="emoji" src="images/moods/${m}.png" alt="${m}">
+                  <span class="label">${BB.t('mood.' + m)}</span>
+                </button>`).join('')}</div>`;
             }
-            return `${_quickNotesHtml}${_prevIntentionHtml}${_moodList}
+            return `${_quickNotesHtml}${_prevIntentionHtml}${_moodControl}
             ${_linkedChip}
             ${selectedLinkedMood ? `<button onclick="_fmAdvance()" style="width:100%;margin-top:14px;padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:14px;font-size:0.95em;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">${BB.t('common.continue')} →</button>` : ''}
-            ${_chooseHint}`;
+            ${_chooseHint}${_tapHoldHint}`;
           }
           // Full mood spectrum — render an 11-point (0–10) wheel instead of the
           // five fixed moods. Each stop maps to a legacy category for its image/colour.
@@ -5243,15 +5249,23 @@ window.addEventListener('pageshow', () => {
 
         case 'energy': {
           const _committedEnergy = _fmEnergyClear ? null : selectedEnergy;
-          // Plain mode (wheel BETA off) — energy as a simple tappable list.
+          // Plain mode (wheel BETA off) — the original pre-wheel horizontal card
+          // grid (emoji + label per card).
           if (!_wheelMode()) {
-            return _FM_ENERGY_LEVELS.map((l,i) => {
+            const _stepsSyncBtn = (BB.storage.get('HealthSyncEnabled') === '1' && _fmStepsResult) ? `<button onclick="importStepsFromHealth()" style="width:100%;padding:11px 16px;margin-bottom:14px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:12px;color:var(--brand-primary);font-weight:600;font-size:0.88em;cursor:pointer;-webkit-tap-highlight-color:transparent;">📱 ${BB.t('journal.sync.steps', { n: _fmStepsResult })} — ${BB.t('common.change')}</button>` : '';
+            const _energyCards = `<div class="fm-card-grid">${_FM_ENERGY_LEVELS.map(l => {
+              const isSel = _committedEnergy === l.val;
+              const isSugg = _fmEnergySuggestion === l.val;
               const [emoji, ...rest] = l.label.split(' ');
-              return `<button class="fm-opt ${_committedEnergy===l.val?'sel':''}"
-                onclick="selectedEnergy=${l.val}; _fmEnergyClear=false; _fmAdvance();"
-                style="border-left:4px solid ${l.color};${i>0?'margin-top:8px;':''}">
-                <span style="font-size:1.2em;flex-shrink:0;">${emoji}</span><span>${rest.join(' ')}</span></button>`;
-            }).join('');
+              return `<button class="fm-card-btn ${isSel?'sel':''}" onclick="selectedEnergy=${l.val}; _fmEnergyClear=false; _fmAdvance();"
+                onmouseenter="if(window.matchMedia('(pointer:fine)').matches && !this.classList.contains('sel')){this.style.borderColor='${l.color}';this.style.background='${l.color}18';this.style.color='${l.color}';}"
+                onmouseleave="if(window.matchMedia('(pointer:fine)').matches && !this.classList.contains('sel')){this.style.borderColor='';this.style.background='';this.style.color='';}"
+                style="${isSel ? `border-color:${l.color};background:${l.color}22;color:${l.color};` : ''}">
+                <span class="fm-card-emoji">${emoji}</span>
+                <span class="fm-card-label">${rest.join(' ')}${isSugg && !isSel ? '<br><span style="font-size:0.72em;opacity:0.65;">✓</span>' : ''}</span>
+              </button>`;
+            }).join('')}</div>`;
+            return _stepsSyncBtn + _energyCards;
           }
           const _initEnergy = _committedEnergy !== null ? _committedEnergy
             : (_fmEnergySuggestion !== null ? _fmEnergySuggestion : 5);
@@ -5283,22 +5297,44 @@ window.addEventListener('pageshow', () => {
               </div>`;
           }
           const _committedBucket = (_fmSleepClear || selectedSleep == null) ? null : _fmSleepBucketOf(selectedSleep);
-          // Plain mode (wheel BETA off) — sleep as a simple tappable list. No
-          // long-press, so the (opt-in, hidden) sleep-quality step is skipped —
-          // matching focus mode before the wheel work introduced it.
+          // Plain mode (wheel BETA off) — the original pre-wheel horizontal card
+          // grid. Long-pressing a card still opens the sleep-quality step (the
+          // original behaviour), so nothing is lost vs the wheel.
           if (!_wheelMode()) {
-            const _sleepRetry = (BB.storage.get('HealthSyncEnabled') === '1' && _fmSleepError)
-              ? `<p style="text-align:center;margin:0 0 10px;"><button onclick="importSleepFromHealth()" style="background:none;border:none;color:var(--brand-primary);font-size:0.82em;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px;-webkit-tap-highlight-color:transparent;">${_fmSleepError === 'nodata' ? '🤷 No sleep data found — try again' : '❌ Sync failed — try again'}</button></p>` : '';
-            const _sleepList = _FM_SLEEP_RANGES.map((r,i) => {
+            const _autoSyncSleep = BB.storage.get('HealthSyncEnabled') === '1';
+            const _showSleepSyncBtn = _autoSyncSleep && (_fmSleepError || (_fmSleepAutoSyncDone && !_fmSleepImported && !_sleepHealthSynced));
+            const _syncText = _fmSleepError === 'fail' ? '❌ Sync failed — try again'
+              : _fmSleepError === 'nodata' ? '🤷 No sleep data found — try again'
+              : '📱 ' + _syncSourceLabel();
+            const _syncBtn = _showSleepSyncBtn ? `<button onclick="importSleepFromHealth()" style="width:100%;padding:11px 16px;margin-bottom:14px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:12px;color:var(--brand-primary);font-weight:600;font-size:0.88em;cursor:pointer;-webkit-tap-highlight-color:transparent;">${_syncText}</button>` : '';
+            const _syncedRange = (_sleepHealthSynced && !_fmSleepClear) ? _FM_SLEEP_RANGES.find(r => r.val === _committedBucket) : null;
+            const _bannerCol = _syncedRange ? _syncedRange.color : '#51cf66';
+            const _syncedBanner = (_sleepHealthSynced && !_fmSleepClear)
+              ? `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;margin-bottom:10px;background:${_bannerCol}18;border:1.5px solid ${_bannerCol}55;border-radius:10px;">
+                  <span style="font-size:0.9em;font-weight:600;color:${_bannerCol};">😴 ${selectedSleep}h — ${_syncSourceLabel()}</span>
+                  <div style="display:flex;align-items:center;gap:4px;">
+                    ${_autoSyncSleep ? `<button onclick="importSleepFromHealth()" style="background:none;border:1px solid #adb5bd;color:#adb5bd;font-size:0.75em;cursor:pointer;padding:2px 8px;border-radius:6px;-webkit-tap-highlight-color:transparent;">${BB.t('common.change')}</button>` : ''}
+                    <button onclick="_fmUndoSleepSync()" style="background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:2px 6px;">✕</button>
+                  </div>
+                 </div>` : '';
+            const _sleepCards = `<div class="fm-card-grid">${_FM_SLEEP_RANGES.map(r => {
               const isSel = _committedBucket === r.val;
               const [emoji, ...rest] = r.label.split(' ');
+              const text = (isSel && _sleepHealthSynced && !_fmSleepClear) ? `${selectedSleep}h` : rest.join(' ');
               const _slOnclick = (_sleepHealthSynced && isSel)
-                ? `_fmSleepClear=false;_fmAdvance();`
-                : `selectedSleep=${r.val};_sleepHealthSynced=false;_fmSleepClear=false;_fmAdvance();`;
-              return `<button class="fm-opt ${isSel?'sel':''}" onclick="${_slOnclick}" style="border-left:4px solid ${r.color};${i>0?'margin-top:8px;':''}">
-                <span style="font-size:1.2em;flex-shrink:0;">${emoji}</span><span>${rest.join(' ')}</span>${(isSel && _sleepHealthSynced) ? `<span style="margin-left:auto;font-size:0.82em;color:#6c757d;font-weight:600;">${selectedSleep}h</span>` : ''}</button>`;
-            }).join('');
-            return _sleepRetry + _sleepList;
+                ? `if(!_fmSlLpFired){_fmSleepClear=false;_fmAdvance();}`
+                : `if(!_fmSlLpFired){selectedSleep=${r.val};_sleepHealthSynced=false;_fmSleepClear=false;_fmAdvance();}`;
+              return `<button class="fm-card-btn ${isSel?'sel':''}" onclick="${_slOnclick}"
+                onpointerdown="_fmSleepPtrDown(${r.val}, this)" onpointerup="_fmSleepPtrUp()" onpointercancel="_fmSleepPtrCancel()"
+                onmouseenter="if(window.matchMedia('(pointer:fine)').matches && !this.classList.contains('sel')){this.style.borderColor='${r.color}';this.style.background='${r.color}18';this.style.color='${r.color}';}"
+                onmouseleave="if(window.matchMedia('(pointer:fine)').matches && !this.classList.contains('sel')){this.style.borderColor='';this.style.background='';this.style.color='';}"
+                style="${isSel ? `border-color:${r.color};background:${r.color};color:white;font-weight:700;` : ''}">
+                <span class="fm-card-emoji">${emoji}</span>
+                <span class="fm-card-label">${text}</span>
+              </button>`;
+            }).join('')}</div>`;
+            const _sqHint = `<p style="text-align:center;font-size:0.78em;color:#adb5bd;margin-top:8px;margin-bottom:0;">${BB.t('journal.sleepQualityHint')}</p>`;
+            return _syncBtn + _syncedBanner + _sleepCards + _sqHint;
           }
           const _initBucket = _committedBucket !== null ? _committedBucket
             : (_fmSleepSuggestion !== null ? _fmSleepSuggestion : 8);
@@ -5339,13 +5375,18 @@ window.addEventListener('pageshow', () => {
           const _sqBad = { val:'bad',    emoji:'😴', label:BB.t('journal.value.bad'),  color:'#dc3545' };
           const _sqOk  = { val:'unsure', emoji:'😐', label:BB.t('journal.value.ok'),   color:'#adb5bd' };
           const _sqGd  = { val:'good',   emoji:'😊', label:BB.t('journal.value.good'), color:'#51cf66' };
-          // Plain mode — three tappable answers (reached only when editing an
-          // entry that already carries a sleep-quality value).
+          // Plain mode (wheel BETA off) — the original pre-wheel 3-up card grid.
           if (!_wheelMode()) {
-            return [_sqBad, _sqOk, _sqGd].map((o,i) => `<button class="fm-opt ${selectedSleepQuality===o.val?'sel':''}"
-              onclick="selectedSleepQuality='${o.val}'; _fmAdvance();"
-              style="border-left:4px solid ${o.color};${i>0?'margin-top:8px;':''}">
-              <span style="font-size:1.2em;flex-shrink:0;">${o.emoji}</span><span>${o.label}</span></button>`).join('');
+            const _sqCls = { bad:'sq-bad', unsure:'sq-ok', good:'sq-good' };
+            const _sqSelStyle = { bad:'border-color:#dc3545;background:#dc354522;color:#dc3545;', unsure:'border-color:#adb5bd;background:#adb5bd22;color:#adb5bd;', good:'border-color:#51cf66;background:#51cf6622;color:#51cf66;' };
+            return `<div class="fm-card-grid" style="grid-template-columns:repeat(3,1fr);">${[_sqBad, _sqOk, _sqGd].map(o => {
+              const isSel = selectedSleepQuality === o.val;
+              return `<button class="fm-card-btn ${_sqCls[o.val]} ${isSel?'sel':''}" onclick="selectedSleepQuality='${o.val}'; _fmAdvance();"
+                style="${isSel ? _sqSelStyle[o.val] : ''}">
+                <span class="fm-card-emoji">${o.emoji}</span>
+                <span class="fm-card-label">${o.label}</span>
+              </button>`;
+            }).join('')}</div>`;
           }
           const _sqP = (o, extra) => Object.assign({
             val: o.val, emoji: o.emoji, label: o.label, color: o.color,
@@ -5372,21 +5413,24 @@ window.addEventListener('pageshow', () => {
             }
           } catch(e) {}
           const _medHintDone = BB.storage.get('MedHintDone') === '1';
-          // Plain mode (wheel BETA off) — medication as a simple tappable list,
-          // Taken / Unsure / Not taken, over a plain "Manage medications" link.
+          // Plain mode (wheel BETA off) — the original pre-wheel layout: the
+          // user's med list + a "Manage medications" link above the answer
+          // buttons (a vertical fm-opt list, as it always was — no card grid).
           if (!_wheelMode()) {
-            const _mdList = [
-              { val:'taken',     label:BB.t('journal.med.taken'),    color:'#51cf66' },
-              { val:'unsure',    label:BB.t('journal.med.unsure'),   color:'#adb5bd' },
-              { val:'not-taken', label:BB.t('journal.med.notTaken'), color:'var(--brand-primary)' },
-            ].map((o,i) => { const p = String(o.label).split(' '); const emoji = p[0] || ''; const txt = p.slice(1).join(' ') || String(o.label);
-              return `<button class="fm-opt ${selectedMedication===o.val?'sel':''}"
-                onclick="selectedMedication='${o.val}'; _fmAdvance();"
-                style="border-left:4px solid ${o.color};${i>0?'margin-top:8px;':''}">
-                <span style="font-size:1.2em;flex-shrink:0;">${emoji}</span><span>${txt}</span></button>`;
-            }).join('');
-            const _mdManage = `<div style="text-align:center;margin-top:14px;">${medListHtml}<button onclick="showMedicationList()" style="background:none;border:none;color:var(--brand-primary);font-size:0.85em;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px;-webkit-tap-highlight-color:transparent;">${BB.t('journal.ui.manageMeds')}</button></div>`;
-            return _mdList + _mdManage;
+            const _mdManage = `${medListHtml}
+              <div style="text-align:center;margin-bottom:${_medHintDone ? '14' : '4'}px;">
+                <button id="manageMedsBtn" onclick="_dismissMedHint();showMedicationList()" style="background:none;border:none;color:var(--brand-primary);font-size:0.8em;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;text-decoration:underline;text-underline-offset:2px;">${BB.t('journal.ui.manageMeds')}</button>
+                ${_medHintDone ? '' : `<div id="medHintEl" style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:4px;margin-bottom:10px;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="8" y1="13" x2="8" y2="2" stroke="var(--brand-primary)" stroke-width="2" stroke-linecap="round"/><polyline points="3,7 8,2 13,7" stroke="var(--brand-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><span style="font-size:0.72em;font-weight:700;font-style:italic;color:var(--brand-primary);font-family:'Georgia',serif;letter-spacing:0.01em;">${BB.t('journal.hint.logMed')}</span></div>`}
+              </div>`;
+            const _mdOpts = [
+              { val:'not-taken', label:BB.t('journal.med.notTaken'), hover:'fm-hover-orange', color:'var(--brand-primary)' },
+              { val:'unsure',    label:BB.t('journal.med.unsure'),   hover:'fm-hover-grey',   color:'#adb5bd' },
+              { val:'taken',     label:BB.t('journal.med.taken'),    hover:'fm-hover-green',  color:'#51cf66' },
+            ].map((o,i) => `<button class="fm-opt ${o.hover} ${selectedMedication===o.val?'sel':''}"
+              onclick="selectedMedication='${o.val}'; _fmAdvance();"
+              style="border-left:4px solid ${o.color};${i>0?'margin-top:8px;':''}">
+              <span>${o.label}</span></button>`).join('');
+            return _mdManage + _mdOpts;
           }
           // Sits below the wheel at the very bottom of the page, with the
           // user's med list directly above the "Manage medications" link.
