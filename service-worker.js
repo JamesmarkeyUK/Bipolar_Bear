@@ -811,7 +811,11 @@
 //       no longer reads "3% stable / 0% low". Additional Data rows now show an
 //       explicit "N yes · N no · N untracked" breakdown per field instead of a
 //       single ambiguous "Nd · N% <verb>" figure.
-const CACHE_NAME = 'bipolarbear-v184';
+// v185: weekly summary notification no longer mirrors the week's average mood
+//       back at the user — the emoji is now always positive (🎉 for a full 7/7,
+//       🙂 otherwise) instead of the old 😄/🙂/😐/😔/😞 scale, so a low-mood week
+//       can't arrive on the lock screen as a sad face. Touches js/journal.js.
+const CACHE_NAME = 'bipolarbear-v185';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

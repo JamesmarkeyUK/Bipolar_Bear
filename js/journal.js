@@ -12787,13 +12787,13 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
 
         const entryCount = last7.length;
         const medsTaken = last7.filter(e => !e.medication || e.medication === 'taken').length;
-        const moodScore = entryCount > 0
-          ? last7.reduce((s, e) => s + _moodScore(e.mood), 0) / entryCount : 0;
-        const moodEmoji = moodScore >= 5 ? '😄' : moodScore >= 4 ? '🙂' : moodScore >= 3 ? '😐' : moodScore >= 2 ? '😔' : '😞';
+        // Always a positive emoji — a weekly nudge should never read as a
+        // telling-off. Party only for a full 7/7, a plain smile otherwise.
+        const summaryEmoji = entryCount >= 7 ? '🎉' : '🙂';
 
         const body = entryCount === 0
           ? "No entries this week — open the app to start tracking your mood!"
-          : `${entryCount}/7 days logged ${moodEmoji} · Meds taken ${medsTaken}/${entryCount} days`;
+          : `${entryCount}/7 days logged ${summaryEmoji} · Meds taken ${medsTaken}/${entryCount} days`;
 
         await LocalNotifications.schedule({
           notifications: [{
