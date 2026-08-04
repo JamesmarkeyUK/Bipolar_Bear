@@ -815,7 +815,11 @@
 //       back at the user — the emoji is now always positive (🎉 for a full 7/7,
 //       🙂 otherwise) instead of the old 😄/🙂/😐/😔/😞 scale, so a low-mood week
 //       can't arrive on the lock screen as a sad face. Touches js/journal.js.
-const CACHE_NAME = 'bipolarbear-v185';
+// v186: release 1.28 (build 28). Version-only invalidation so returning web
+//       clients pick up the new _APP_VERSION — the only content change since
+//       v185 is the rebuilt social share cards (images/og-card*.png), which
+//       are not precached runtime assets.
+const CACHE_NAME = 'bipolarbear-v186';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
