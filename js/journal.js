@@ -177,7 +177,13 @@ window.addEventListener('pageshow', () => {
       // Med hint: active when medHintEl is in the DOM (medication step rendered)
       const _medHintEl = document.getElementById('medHintEl');
       const _showMedHint = !!_medHintEl && BB.storage.get('MedHintDone') !== '1';
-      const _isBlocking = _blockingSteps.has(step) || _showSettings || _showMedHint;
+      // The one-shot Settings-FAB hint owns the same #bbHintOverlay. It can be
+      // raised while focused mode is opening, and _renderFocusedStep() calls
+      // back into here on every step — without this the very next render would
+      // switch the dimmer off underneath it, leaving the hint stranded on a
+      // fully interactive page with nothing pointing anywhere.
+      const _showFabHint = document.body.classList.contains('bb-settings-fab-hint');
+      const _isBlocking = _blockingSteps.has(step) || _showSettings || _showMedHint || _showFabHint;
       const _overlay = document.getElementById('bbHintOverlay');
       if (_overlay) _overlay.style.display = _isBlocking ? '' : 'none';
 
@@ -658,15 +664,24 @@ window.addEventListener('pageshow', () => {
 
     var fab = document.getElementById('bbAuthFab');
     var overlay = document.getElementById('bbHintOverlay');
+    // Focused mode hides the whole FAB dock (body.bb-fm-full). This hint fires
+    // ~600ms after auth resolves, which is usually BEFORE the entries finish
+    // loading and focused mode opens — so without this class the dock would
+    // vanish out from under an already-visible hint and its arrow would point
+    // at empty background. The class re-exposes just the Settings button over
+    // the focused card (see css/journal.css) and is dropped again in _cleanup.
+    document.body.classList.add('bb-settings-fab-hint');
     // fab.js injects the dock after this script + the Firebase SDKs, so on a
     // cold load the FAB may not exist yet. Retry for ~4s before giving up.
     var notReady = !fab || !overlay || getComputedStyle(fab).display === 'none';
     if (notReady) {
+      document.body.classList.remove('bb-settings-fab-hint');
       if ((_attempt || 0) < 16) setTimeout(function () { _showSettingsFabHint((_attempt || 0) + 1); }, 250);
       return;
     }
     // Don't fight a modal that's already open — wait for it to close.
     if (document.querySelector('.confirm-modal.active, .overlay-modal.active, .bb-auth-overlay.active')) {
+      document.body.classList.remove('bb-settings-fab-hint');
       if ((_attempt || 0) < 40) setTimeout(function () { _showSettingsFabHint((_attempt || 0) + 1); }, 300);
       return;
     }
@@ -702,6 +717,7 @@ window.addEventListener('pageshow', () => {
 
     function _cleanup() {
       if (_pulse) { try { _pulse.cancel(); } catch (_) {} }
+      document.body.classList.remove('bb-settings-fab-hint');
       overlay.style.display = 'none';
       overlay.style.pointerEvents = 'none';
       overlay.onclick = null;
@@ -4798,9 +4814,9 @@ window.addEventListener('pageshow', () => {
       // so the heading rides up under the summary chips, like the fresh-first step.
       document.getElementById('focusedModeCard').classList.toggle('fm-flat-top', step.id === 'more_data');
       // Plain (non-wheel) steps have no big hero to fill the content box, so
-      // centre the question + answer cards vertically as a group (via the
-      // header + footer spacers) instead of leaving a large gap below them.
-      document.getElementById('focusedModeCard').classList.toggle('fm-plain-center', !_isHeroStep);
+      // let the card hug its own content instead of stretching to the full
+      // viewport and leaving a large dead band below the answer cards.
+      document.getElementById('focusedModeCard').classList.toggle('fm-plain-fit', !_isHeroStep);
       // setTimeout(0), not rAF: rAF can starve in a backgrounded/hidden WebView
       // and the wheel would never get its initial centring + hero paint.
       if (_hasWheel) setTimeout(_fmInitWheel, 0);

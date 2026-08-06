@@ -167,6 +167,13 @@
     body.bb-fm-full .bb-extra-fab,
     body.bb-fm-full .fab-dot-placeholder,
     body.bb-fm-full .bb-auth-fab { display: none !important; }
+    /* …except while the one-shot "Tap Settings to customise your journal" hint
+       is up (see _showSettingsFabHint in js/journal.js). That hint can fire
+       before the entries finish loading, i.e. before focused mode opens — with
+       the dock hidden its downward arrow would point at empty background. Lift
+       the Settings button back over the card for as long as the hint is
+       showing; the rest of the dock stays hidden. */
+    body.bb-fm-full.bb-settings-fab-hint .bb-auth-fab { display: flex !important; z-index: 601; }
     body.bb-fm-full #focusedModeCard {
       box-sizing: border-box;
       margin-bottom: 0;
@@ -214,17 +221,27 @@
        spacer like the fresh-first step so the heading rides up under the chips. */
     body.bb-fm-full #focusedModeCard.fm-flat-top #fmHeaderSpacer { flex: 0 0 auto; min-height: 10px; }
 
-    /* Plain (non-wheel) steps — mood cards, energy/sleep grids, tappable lists.
-       No hero fills the content box, so instead of leaving a big empty band
-       below the cards, size the content to its own height and let the header +
-       footer spacers grow equally, centring the question + cards as a group.
+    /* Plain (non-wheel) steps — mood slider/cards, energy/sleep grids, tappable
+       lists. No hero fills the content box, so a full-viewport card left a big
+       dead band under the Next/Continue button (and made the page scrollable,
+       which let the top bar slide out of view). Drop the min-height so the card
+       hugs its own content instead — the spacers hold a small fixed gap rather
+       than growing to fill space that no longer exists. Hero steps (wheel,
+       notes, done) keep the full-height card; their hero needs the room.
        Placed after the fresh-first / flat-top rules so it wins when a plain step
-       also carries those classes (e.g. the first-time mood step). Long lists
-       still fit: the flex:0-basis spacers collapse when there's no free space. */
+       also carries those classes (e.g. the first-time mood step), and after the
+       ≥920px frame overrides so the desktop mockup shrinks to fit too. */
     #fmFooterSpacer { display: none; }
-    body.bb-fm-full #focusedModeCard.fm-plain-center #fmHeaderSpacer { flex: 1 1 0; min-height: 10px; }
-    body.bb-fm-full #focusedModeCard.fm-plain-center #fmContent { flex: 0 0 auto; }
-    body.bb-fm-full #focusedModeCard.fm-plain-center #fmFooterSpacer { display: block; flex: 1 1 0; min-height: 10px; }
+    body.bb-fm-full #focusedModeCard.fm-plain-fit { min-height: 0; }
+    body.bb-fm-full #focusedModeCard.fm-plain-fit #fmHeaderSpacer { flex: 0 0 auto; min-height: 10px; }
+    body.bb-fm-full #focusedModeCard.fm-plain-fit #fmContent { flex: 0 0 auto; }
+    body.bb-fm-full #focusedModeCard.fm-plain-fit #fmFooterSpacer { display: block; flex: 0 0 auto; min-height: 10px; }
+    @media (min-width: 920px) {
+      /* Out-specify the frame-height rules above (they carry an html-level
+         qualifier) so the desktop/iPad mockup shrinks to content as well. */
+      html:not(.is-native) body.bb-fm-full #focusedModeCard.fm-plain-fit,
+      html.is-native body.bb-fm-full #focusedModeCard.fm-plain-fit { min-height: 0; }
+    }
 
     /* ── Focused mode: hero readout (big emoji + value + synced badge) ── */
     #fmContent.fm-content-hero { display: flex; flex-direction: column; }

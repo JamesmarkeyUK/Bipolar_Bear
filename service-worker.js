@@ -819,7 +819,13 @@
 //       clients pick up the new _APP_VERSION — the only content change since
 //       v185 is the rebuilt social share cards (images/og-card*.png), which
 //       are not precached runtime assets.
-const CACHE_NAME = 'bipolarbear-v186';
+// v187: focus mode (plain/non-wheel) — the card now hugs its own content
+//       instead of stretching to the full viewport, so there's no dead band
+//       under Continue and the page no longer scrolls the top bar out of view.
+//       Also fixes the one-shot "Tap Settings" hint being stranded: it can fire
+//       before focused mode opens, and body.bb-fm-full then hid the very FAB its
+//       arrow pointed at. Touches css/journal.css, js/journal.js, journal.html.
+const CACHE_NAME = 'bipolarbear-v187';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
