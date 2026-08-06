@@ -842,7 +842,12 @@
 //       set of stops in wheel mode. Wheel mode moved into the focus-mode
 //       sub-options (it only affects focus mode) and now switches off with it.
 //       Touches css/journal.css, journal.html, js/journal.js, js/shared/i18n.js.
-const CACHE_NAME = 'bipolarbear-v189';
+// v190: Your Journey — the 60d / 90d (and 60+ custom) timeframes now show a
+//       per-month completeness box under the calendar: green when every
+//       in-window day of that month has an entry, amber when any are missing,
+//       future days excluded. Tapping one opens that month in the calendar.
+//       Touches js/journal.js.
+const CACHE_NAME = 'bipolarbear-v190';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

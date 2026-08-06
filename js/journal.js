@@ -7861,6 +7861,93 @@ window.addEventListener('pageshow', () => {
       return { month: d.getMonth(), day: d.getDate() };
     }
 
+    /**
+     * The calendar months a multi-month timeframe window covers, each clipped to
+     * the part that's actually in the window and already happened.
+     *
+     * The window is counted back from TODAY (not from the most recent entry, as
+     * the stats card's "since" label does) — these boxes are about which days are
+     * missing, so "excluding future days" only makes sense relative to today.
+     *
+     * @param {Date} today midnight today
+     * @returns {Array<{year:number, month:number, from:Date, to:Date}>} empty for
+     *   'all' and for windows under 60 days, which sit inside one or two months
+     *   and are already fully visible in the calendar below.
+     */
+    function _timeframeMonthSpans(today) {
+      if (typeof statsTimeframe !== 'number' || statsTimeframe < 60) return [];
+      const start = new Date(today);
+      start.setDate(start.getDate() - (statsTimeframe - 1));
+      const endMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+      const spans = [];
+      let cur = new Date(start.getFullYear(), start.getMonth(), 1);
+      // Ceiling so a large custom window (say 800 days) can't emit an unreadable
+      // wall of boxes. Trimmed from the oldest end below, keeping recent months.
+      while (cur <= endMonth && spans.length < 400) {
+        const mStart = new Date(cur.getFullYear(), cur.getMonth(), 1);
+        const mEnd   = new Date(cur.getFullYear(), cur.getMonth() + 1, 0);
+        const from = mStart < start ? start : mStart;
+        const to   = mEnd > today ? today : mEnd;
+        if (from <= to) spans.push({ year: cur.getFullYear(), month: cur.getMonth(), from, to });
+        cur = new Date(cur.getFullYear(), cur.getMonth() + 1, 1);
+      }
+      return spans.length > 12 ? spans.slice(spans.length - 12) : spans;
+    }
+
+    /**
+     * Row of per-month completeness boxes shown above the calendar on the 60d /
+     * 90d (and 60+ custom) timeframes. Green when every in-window day of that
+     * month has an entry, amber when any are missing. Tapping one opens that
+     * month in the calendar below.
+     *
+     * @param {Object<string, object>} moodByDate date-key → entry, as built by
+     *   displayMonthCalendar
+     * @param {Date} today midnight today
+     * @param {number} openYear  year currently shown in the calendar
+     * @param {number} openMonth month currently shown in the calendar
+     */
+    function _monthCompletenessHtml(moodByDate, today, openYear, openMonth) {
+      const spans = _timeframeMonthSpans(today);
+      if (spans.length < 2) return '';
+      const boxes = spans.map(sp => {
+        let logged = 0, total = 0;
+        const d = new Date(sp.from);
+        while (d <= sp.to) {
+          total++;
+          const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+          if (moodByDate[key]) logged++;
+          d.setDate(d.getDate() + 1);
+        }
+        const complete = total > 0 && logged === total;
+        const color = complete ? '#2ECC40' : '#FF851B';
+        const name = new Date(sp.year, sp.month, 1).toLocaleString('en-GB', { month: 'long' });
+        const isOpen = sp.year === openYear && sp.month === openMonth;
+        // The month is only PART of the window at the oldest end, so say how many
+        // days were actually judged — otherwise "12/23" for a 31-day month reads
+        // like a bug rather than the window starting mid-month.
+        const partial = sp.from.getDate() !== 1 || (sp.to.getDate() !== new Date(sp.year, sp.month + 1, 0).getDate());
+        const title = `${name} ${sp.year}: ${logged} of ${total} day${total === 1 ? '' : 's'} logged${partial ? ' (within the selected window, excluding future days)' : ''}`;
+        return `<button type="button" onclick="_openMonthFromBox(${sp.year},${sp.month})" title="${title}"
+            style="flex:1 1 0;min-width:74px;background:${color}1a;border:${isOpen ? `2.5px solid ${color}` : `1.5px solid ${color}66`};border-radius:12px;padding:8px 6px;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;flex-direction:column;align-items:center;gap:2px;">
+            <span style="font-size:0.8em;font-weight:700;color:${color};">${name}</span>
+            <span style="font-size:0.72em;font-weight:600;color:#6c757d;">${complete ? '✓' : `${logged}/${total}`}</span>
+          </button>`;
+      }).join('');
+      return `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;">${boxes}</div>`;
+    }
+
+    /** Open a month from a completeness box in the calendar below. */
+    function _openMonthFromBox(year, month) {
+      const now = new Date();
+      // Exact month arithmetic — applyCalMonthPicker's 30.44-day division is only
+      // approximate and drifts across long spans.
+      _monthCalOffset = Math.min(0, (year - now.getFullYear()) * 12 + (month - now.getMonth()));
+      displayMonthCalendar(_monthCalEntries, document.getElementById('monthCalendar'));
+      const cal = document.getElementById('monthCalendar');
+      if (cal) { try { cal.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (_) {} }
+    }
+    window._openMonthFromBox = _openMonthFromBox;
+
     function displayMonthCalendar(entries, container) {
       if (!container) return;
       _monthCalEntries = entries;
@@ -7955,6 +8042,7 @@ window.addEventListener('pageshow', () => {
           <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px;">${dayHeaders}</div>
           <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;">${cells}</div>
           <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px;">${legend}</div>
+          ${_monthCompletenessHtml(moodByDate, today, year, month)}
         </div>`;
     }
 
