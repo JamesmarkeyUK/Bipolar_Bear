@@ -890,6 +890,22 @@
       text-align: center; font-size: 0.78em; color: var(--brand-primary);
       font-weight: 600; margin-top: 10px;
     }
+    /* Full spectrum reuses this control for sleep + energy, where the readout is
+       an emoji rather than a bear image, and the track needs its own ramp — the
+       mood gradient runs low→high, but sleep and energy are both "bad at either
+       end, good in the middle". */
+    .msc-emoji {
+      width: 46px; height: 46px; font-size: 34px; line-height: 46px;
+      text-align: center; flex-shrink: 0;
+    }
+    /* ≤4h red → 6h orange → 7–9h green → 10h blue → ≥12h purple */
+    .msc-slider.msc-sleep {
+      background: linear-gradient(90deg, #FF4136 0%, #FF851B 22%, #2ECC40 44%, #2ECC40 62%, #0074D9 78%, #7B68EE 100%);
+    }
+    /* 0 grey → less-than-usual orange → 5 normal green → more-than-usual orange → 10 red */
+    .msc-slider.msc-energy {
+      background: linear-gradient(90deg, #6c757d 0%, #FF851B 22%, #2ECC40 50%, #FF851B 78%, #FF4136 100%);
+    }
 
     .form-group {
       margin-bottom: 12px;

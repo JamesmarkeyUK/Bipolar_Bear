@@ -3835,6 +3835,87 @@ window.addEventListener('pageshow', () => {
       { val:9.5, label:'😴 9–10h', color:'#0074D9' },
       { val:11,  label:'💤 10+h',  color:'#7B68EE' },
     ];
+
+    // ── Full spectrum scales ──────────────────────────────────────────────────
+    // With the "Full spectrum" setting on, sleep and energy get the same
+    // fine-grained treatment as mood: an hour-by-hour sleep scale and a 0–10
+    // energy scale, rendered as an msc slider in plain mode and as the full set
+    // of wheel stops in wheel mode. Off, both keep the five coarse buckets above.
+    //
+    // Sleep runs ≤4h … ≥12h. The endpoints are clamps, not literal values — 4
+    // means "4 or fewer", 12 means "12 or more" — which is why they carry their
+    // own labels. The interior values are exact hours, so a saved entry reads
+    // "7h" rather than being rounded into a 7–9h bucket.
+    const _FM_SLEEP_FULL_MIN = 4;
+    const _FM_SLEEP_FULL_MAX = 12;
+    const _FM_ENERGY_FULL_MIN = 0;
+    const _FM_ENERGY_FULL_MAX = 10;
+
+    /**
+     * Emoji / label / colour for any sleep value in hours. Shared by the full
+     * spectrum slider, the full spectrum wheel, the summary chips and the done
+     * step, so a value picked in one place reads identically everywhere.
+     * Bands mirror _FM_SLEEP_RANGES so colours stay consistent with the coarse UI.
+     */
+    function _fmSleepMeta(h) {
+      const n = Number(h);
+      if (!isFinite(n)) return { emoji:'🛌', label:'—', band:'', color:'#adb5bd' };
+      const label = n <= _FM_SLEEP_FULL_MIN ? `≤${_FM_SLEEP_FULL_MIN}h`
+        : n >= _FM_SLEEP_FULL_MAX ? `≥${_FM_SLEEP_FULL_MAX}h`
+        : `${_fmtHours(n)}h`;
+      const _b = k => BB.t('journal.sleepBand.' + k);
+      if (n <= 5)  return { emoji:'😫', label, band:_b('veryShort'), color:'#FF4136' };
+      if (n < 7)   return { emoji:'😕', label, band:_b('short'),     color:'#FF851B' };
+      if (n <= 9)  return { emoji:'😊', label, band:_b('healthy'),   color:'#2ECC40' };
+      if (n <= 10) return { emoji:'😴', label, band:_b('long'),      color:'#0074D9' };
+      return { emoji:'💤', label, band:_b('veryLong'), color:'#7B68EE' };
+    }
+
+    /** Trim a trailing .0 so 6.5 stays "6.5" but 7 reads "7", not "7.0". */
+    function _fmtHours(n) {
+      return Number.isInteger(Number(n)) ? String(Number(n)) : String(Number(n));
+    }
+
+    /**
+     * Mood-estimator weight for an energy value. The five coarse levels used to
+     * be a plain lookup ({0:-50, 3:-8, 5:0, 7:8, 10:50}) with everything else
+     * falling back to 0 — which, once full spectrum let the user pick 4 or 8,
+     * silently threw that field's signal away. Linear interpolation between the
+     * same five anchors keeps the legacy values scoring exactly as before while
+     * giving the in-between ones a proportional weight.
+     */
+    function _energyScore(v) {
+      const n = Number(v);
+      if (!isFinite(n)) return 0;
+      const pts = [[0, -50], [3, -8], [5, 0], [7, 8], [10, 50]];
+      if (n <= pts[0][0]) return pts[0][1];
+      if (n >= pts[pts.length - 1][0]) return pts[pts.length - 1][1];
+      for (let i = 1; i < pts.length; i++) {
+        const [x0, y0] = pts[i - 1], [x1, y1] = pts[i];
+        if (n <= x1) return y0 + (y1 - y0) * (n - x0) / (x1 - x0);
+      }
+      return 0;
+    }
+
+    /**
+     * Emoji / label / colour for any energy value 0–10, with 5 = normal.
+     * Bands match the five coarse _FM_ENERGY_LEVELS so the two UIs agree:
+     * 0 not enough · 1–4 less than usual · 5 normal · 6–9 more · 10 too much.
+     */
+    function _fmEnergyMeta(v) {
+      const n = Number(v);
+      if (!isFinite(n)) return { emoji:'⚡', label:'—', color:'#adb5bd' };
+      const _pick = key => {
+        const full = BB.t(key);
+        const parts = full.split(' ');
+        return { emoji: parts[0] || '⚡', label: parts.slice(1).join(' ') || full };
+      };
+      if (n <= 0) return { ..._pick('journal.energy.notEnough'), color:'#6c757d' };
+      if (n <= 4) return { ..._pick('journal.energy.less'),      color:'#FF851B' };
+      if (n === 5) return { ..._pick('journal.energy.normal'),   color:'#2ECC40' };
+      if (n <= 9) return { ..._pick('journal.energy.more'),      color:'#FF851B' };
+      return { ..._pick('journal.energy.tooMuch'),               color:'#FF4136' };
+    }
     const _FM_EYEBROWS = {
       mood:       () => BB.t('journal.fm.eyebrowMood'),
       energy:     () => BB.t('journal.fm.eyebrowEnergy'),
@@ -3957,7 +4038,9 @@ window.addEventListener('pageshow', () => {
           title: _slNotYet ? _t('journal.fm.sleepNotYetTitle')
             : _dh.isYest ? _t('journal.fm.sleepTitleYest')
             : _t('journal.fm.sleepTitleOther', { phrase: _dh.nightPhrase }),
-          subtitle: _slNotYet ? '' : _t('journal.fm.sleepSub'),
+          // Full spectrum replaces the tappable ranges with a slider, so "Tap a
+          // range" would be describing a control that isn't there.
+          subtitle: _slNotYet ? '' : _t(_spectrumEnabled() && !_wheelMode() ? 'journal.fm.sleepSubSlider' : 'journal.fm.sleepSub'),
           auto:true
         });
       }
@@ -4117,6 +4200,91 @@ window.addEventListener('pageshow', () => {
     }
     window._fmOnSpectrumSlide = _fmOnSpectrumSlide;
 
+    // ── Full spectrum sleep / energy sliders (focus mode, plain) ──────────────
+    // Same shape as the mood spectrum slider above: drag to preview, Continue to
+    // commit and advance. Kept separate from the mood handlers because the
+    // readout is an emoji + hours/level rather than a bear image + mood name.
+
+    /** Clamp to the sleep scale's ends — ≤4h and ≥12h are buckets, not values. */
+    function _fmClampSleep(h) {
+      return Math.max(_FM_SLEEP_FULL_MIN, Math.min(_FM_SLEEP_FULL_MAX, Number(h)));
+    }
+    /** Clamp to the 0–10 energy scale. */
+    function _fmClampEnergy(v) {
+      return Math.max(_FM_ENERGY_FULL_MIN, Math.min(_FM_ENERGY_FULL_MAX, Number(v)));
+    }
+
+    function _fmOnSleepSlide(v) {
+      const h = _fmClampSleep(v);
+      selectedSleep = h;
+      _sleepHealthSynced = false; // dragging is a manual pick — it overrides the import
+      _fmSleepClear = false;
+      const m = _fmSleepMeta(h);
+      const emojiEl = document.getElementById('fmSlscEmoji');
+      const valEl   = document.getElementById('fmSlscValue');
+      const labelEl = document.getElementById('fmSlscLabel');
+      const slider  = document.getElementById('fmSlscSlider');
+      const ctrl    = document.getElementById('fmSleepSpectrumControl');
+      const btn     = document.getElementById('fmSleepSpectrumContinue');
+      if (emojiEl) emojiEl.textContent = m.emoji;
+      if (valEl) { valEl.textContent = m.label; valEl.style.color = m.color; }
+      if (labelEl) labelEl.textContent = m.band;
+      if (slider) slider.style.setProperty('--msc-accent', m.color);
+      if (ctrl) { ctrl.style.setProperty('--msc-accent', m.color); ctrl.classList.add('committed'); }
+      if (btn) btn.style.background = m.color;
+      if (typeof scheduleDraftSave === 'function') scheduleDraftSave();
+    }
+    window._fmOnSleepSlide = _fmOnSleepSlide;
+
+    function _fmSleepSliderTap(v) {
+      selectedSleep = _fmClampSleep(v);
+      _sleepHealthSynced = false;
+      _fmSleepClear = false;
+      _fmAdvance();
+    }
+    window._fmSleepSliderTap = _fmSleepSliderTap;
+
+    /** Commit the slider value and go on to the sleep-quality step (the slider's
+     *  stand-in for the long-press available on the card / wheel UIs). */
+    function _fmSleepSliderQuality(v) {
+      selectedSleep = _fmClampSleep(v);
+      _sleepHealthSynced = false;
+      _fmSleepClear = false;
+      _fmWantsSleepQuality = true;
+      const _sqIdx = _fmSteps.findIndex(s => s.id === 'sleepQuality');
+      if (_sqIdx > _fmStepIndex) setTimeout(() => _fmGoTo(_sqIdx), 120);
+      else _fmAdvance();
+    }
+    window._fmSleepSliderQuality = _fmSleepSliderQuality;
+
+    function _fmOnEnergySlide(v) {
+      const n = Math.round(_fmClampEnergy(v));
+      selectedEnergy = n;
+      _fmEnergyClear = false;
+      const m = _fmEnergyMeta(n);
+      const emojiEl = document.getElementById('fmEnscEmoji');
+      const valEl   = document.getElementById('fmEnscValue');
+      const labelEl = document.getElementById('fmEnscLabel');
+      const slider  = document.getElementById('fmEnscSlider');
+      const ctrl    = document.getElementById('fmEnergySpectrumControl');
+      const btn     = document.getElementById('fmEnergySpectrumContinue');
+      if (emojiEl) emojiEl.textContent = m.emoji;
+      if (valEl) { valEl.textContent = String(n); valEl.style.color = m.color; }
+      if (labelEl) labelEl.textContent = m.label;
+      if (slider) slider.style.setProperty('--msc-accent', m.color);
+      if (ctrl) { ctrl.style.setProperty('--msc-accent', m.color); ctrl.classList.add('committed'); }
+      if (btn) btn.style.background = m.color;
+      if (typeof scheduleDraftSave === 'function') scheduleDraftSave();
+    }
+    window._fmOnEnergySlide = _fmOnEnergySlide;
+
+    function _fmEnergySliderTap(v) {
+      selectedEnergy = Math.round(_fmClampEnergy(v));
+      _fmEnergyClear = false;
+      _fmAdvance();
+    }
+    window._fmEnergySliderTap = _fmEnergySliderTap;
+
     // Preselect the slider to a given numeric mood (used by draft restore / edit load).
     function _setSpectrumValue(n) {
       const slider = document.getElementById('mscSlider');
@@ -4274,6 +4442,16 @@ window.addEventListener('pageshow', () => {
         localStorage.setItem('intentionEnabled', 'false');
         const _erChk = document.getElementById('elaborateResponsesToggle');
         if (_erChk) _erChk.checked = false;
+        // Wheel mode is a focus-mode sub-option too — it has no meaning in the
+        // full form, so it goes off with the rest rather than lying dormant and
+        // surprising the user the next time focus mode is switched back on.
+        localStorage.setItem('wheelModeEnabled', '0');
+        const _wmChk = document.getElementById('wheelModeToggle');
+        if (_wmChk) _wmChk.checked = false;
+        if (window.db && window.currentUser) {
+          window.db.collection('userSettings').doc(window.currentUser.uid)
+            .set({ wheelModeEnabled: false }, { merge: true }).catch(() => {});
+        }
         if (_fmSub) _fmSub.style.display = 'none';
         _exitFocusedMode();
       } else {
@@ -4975,7 +5153,10 @@ window.addEventListener('pageshow', () => {
     /** The wheel value the user has actually committed on this step (null = none). */
     function _fmWheelCommittedVal(stepId) {
       if (stepId === 'energy')     return _fmEnergyClear ? null : String(selectedEnergy);
-      if (stepId === 'sleep')      return (_fmSleepClear || selectedSleep == null) ? null : String(_fmSleepBucketOf(selectedSleep));
+      // Full spectrum stops are exact hours, so they must compare against the raw
+      // value — bucketing 7h to 8 would light up the wrong pill.
+      if (stepId === 'sleep')      return (_fmSleepClear || selectedSleep == null) ? null
+        : String(_spectrumEnabled() ? _fmClampSleep(selectedSleep) : _fmSleepBucketOf(selectedSleep));
       if (stepId === 'mood')         return (selectedMood != null && selectedMood !== '') ? String(selectedMood) : null;
       if (stepId === 'medication')   return selectedMedication || null;
       if (stepId === 'sleepQuality') return selectedSleepQuality || null;
@@ -5343,6 +5524,25 @@ window.addEventListener('pageshow', () => {
           // grid (emoji + label per card).
           if (!_wheelMode()) {
             const _stepsSyncBtn = (BB.storage.get('HealthSyncEnabled') === '1' && _fmStepsResult) ? `<button onclick="importStepsFromHealth()" style="width:100%;padding:11px 16px;margin-bottom:14px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:12px;color:var(--brand-primary);font-weight:600;font-size:0.88em;cursor:pointer;-webkit-tap-highlight-color:transparent;">📱 ${BB.t('journal.sync.steps', { n: _fmStepsResult })} — ${BB.t('common.change')}</button>` : '';
+            // Full spectrum: 0–10 on one slider (5 = normal) instead of five cards.
+            if (_spectrumEnabled()) {
+              const _initE = _committedEnergy !== null ? _fmClampEnergy(_committedEnergy)
+                : (_fmEnergySuggestion !== null ? _fmClampEnergy(_fmEnergySuggestion) : 5);
+              const _m = _fmEnergyMeta(_initE);
+              return _stepsSyncBtn + `<div class="mood-spectrum-control${_committedEnergy !== null ? ' committed' : ''}" id="fmEnergySpectrumControl" style="--msc-accent:${_m.color};">
+                  <div class="msc-readout">
+                    <div id="fmEnscEmoji" class="msc-emoji">${_m.emoji}</div>
+                    <div class="msc-text">
+                      <div id="fmEnscValue" class="msc-value" style="color:${_m.color};">${_initE}</div>
+                      <div id="fmEnscLabel" class="msc-label">${_m.label}</div>
+                    </div>
+                  </div>
+                  <input type="range" id="fmEnscSlider" class="msc-slider msc-energy" min="${_FM_ENERGY_FULL_MIN}" max="${_FM_ENERGY_FULL_MAX}" step="1" value="${_initE}"
+                    oninput="_fmOnEnergySlide(this.value)" aria-label="Energy on a 0 to 10 scale where 5 is normal">
+                  <div class="msc-scale"><span>0 · ${_fmEnergyMeta(0).label}</span><span>5 · ${_fmEnergyMeta(5).label}</span><span>10 · ${_fmEnergyMeta(10).label}</span></div>
+                </div>
+                <button id="fmEnergySpectrumContinue" onclick="_fmEnergySliderTap(document.getElementById('fmEnscSlider').value)" style="width:100%;margin-top:2px;padding:12px;background:${_m.color};color:white;border:none;border-radius:14px;font-size:0.95em;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">${BB.t('common.continue')} →</button>`;
+            }
             const _energyCards = `<div class="fm-card-grid">${_FM_ENERGY_LEVELS.map(l => {
               const isSel = _committedEnergy === l.val;
               const isSugg = _fmEnergySuggestion === l.val;
@@ -5359,6 +5559,24 @@ window.addEventListener('pageshow', () => {
           }
           const _initEnergy = _committedEnergy !== null ? _committedEnergy
             : (_fmEnergySuggestion !== null ? _fmEnergySuggestion : 5);
+          // Full spectrum + wheel: all eleven 0–10 stops rather than five levels.
+          if (_spectrumEnabled()) {
+            const _stops = [];
+            for (let v = _FM_ENERGY_FULL_MIN; v <= _FM_ENERGY_FULL_MAX; v++) _stops.push(v);
+            const _fullEnergyWheel = _fmWheelHtml(_stops.map(v => {
+              const m = _fmEnergyMeta(v);
+              return {
+                val: v, emoji: m.emoji, label: m.label, color: m.color,
+                // The number distinguishes adjacent stops that share a band name
+                // (1–4 are all "less than usual", 6–9 all "more than usual").
+                sub: String(v),
+                cls: _committedEnergy === v ? 'sel' : '',
+                init: v === Math.round(_fmClampEnergy(_initEnergy)),
+                onclick: `selectedEnergy=${v}; _fmEnergyClear=false; _fmAdvance();`,
+              };
+            }));
+            return _fmHeroHtml() + _fullEnergyWheel;
+          }
           const _energyWheel = _fmWheelHtml(_FM_ENERGY_LEVELS.map(l => {
             const [emoji, ...rest] = l.label.split(' ');
             return {
@@ -5407,6 +5625,33 @@ window.addEventListener('pageshow', () => {
                     <button onclick="_fmUndoSleepSync()" style="background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:2px 6px;">✕</button>
                   </div>
                  </div>` : '';
+            // Full spectrum: one slider across ≤4h … ≥12h instead of five buckets.
+            // Slide to preview, Continue to commit — the same shape as the mood
+            // spectrum control, so the two steps feel like one mechanism.
+            if (_spectrumEnabled()) {
+              const _initH = (!_fmSleepClear && selectedSleep != null)
+                ? _fmClampSleep(selectedSleep)
+                : (_fmSleepSuggestion != null ? _fmClampSleep(_fmSleepSuggestion) : 8);
+              const _m = _fmSleepMeta(_initH);
+              const _committed = (!_fmSleepClear && selectedSleep != null);
+              return _syncBtn + _syncedBanner + `<div class="mood-spectrum-control${_committed ? ' committed' : ''}" id="fmSleepSpectrumControl" style="--msc-accent:${_m.color};">
+                  <div class="msc-readout">
+                    <div id="fmSlscEmoji" class="msc-emoji">${_m.emoji}</div>
+                    <div class="msc-text">
+                      <div id="fmSlscValue" class="msc-value" style="color:${_m.color};">${_m.label}</div>
+                      <div id="fmSlscLabel" class="msc-label">${_m.band}</div>
+                    </div>
+                  </div>
+                  <input type="range" id="fmSlscSlider" class="msc-slider msc-sleep" min="${_FM_SLEEP_FULL_MIN}" max="${_FM_SLEEP_FULL_MAX}" step="1" value="${Math.round(_initH)}"
+                    oninput="_fmOnSleepSlide(this.value)" aria-label="Hours of sleep from ${_FM_SLEEP_FULL_MIN} or fewer to ${_FM_SLEEP_FULL_MAX} or more">
+                  <div class="msc-scale"><span>≤${_FM_SLEEP_FULL_MIN}h</span><span>8h</span><span>≥${_FM_SLEEP_FULL_MAX}h</span></div>
+                </div>
+                <button id="fmSleepSpectrumContinue" onclick="_fmSleepSliderTap(document.getElementById('fmSlscSlider').value)" style="width:100%;margin-top:2px;padding:12px;background:${_m.color};color:white;border:none;border-radius:14px;font-size:0.95em;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">${BB.t('common.continue')} →</button>`
+                // A slider has nothing to long-press, so sleep quality — reachable
+                // by holding a card/pill everywhere else — gets an explicit link
+                // here. Without it the step would be unreachable in this mode.
+                + `<p style="text-align:center;margin:10px 0 0;"><button onclick="_fmSleepSliderQuality(document.getElementById('fmSlscSlider').value)" style="background:none;border:none;color:var(--brand-primary);font-size:0.8em;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px;-webkit-tap-highlight-color:transparent;">${BB.t('journal.sleepQualityAdd')}</button></p>`;
+            }
             const _sleepCards = `<div class="fm-card-grid">${_FM_SLEEP_RANGES.map(r => {
               const isSel = _committedBucket === r.val;
               const [emoji, ...rest] = r.label.split(' ');
@@ -5429,6 +5674,34 @@ window.addEventListener('pageshow', () => {
           const _initBucket = _committedBucket !== null ? _committedBucket
             : (_fmSleepSuggestion !== null ? _fmSleepSuggestion : 8);
           const _sqHint = `<p class="fm-wheel-hint">${BB.t('journal.sleepQualityHint')}</p>`;
+          // Full spectrum + wheel: every hour from ≤4h to ≥12h becomes a stop,
+          // rather than the five buckets.
+          if (_spectrumEnabled()) {
+            const _committedH = (!_fmSleepClear && selectedSleep != null) ? _fmClampSleep(selectedSleep) : null;
+            const _initH = _committedH != null ? Math.round(_committedH)
+              : (_fmSleepSuggestion != null ? Math.round(_fmClampSleep(_fmSleepSuggestion)) : 8);
+            const _stops = [];
+            for (let h = _FM_SLEEP_FULL_MIN; h <= _FM_SLEEP_FULL_MAX; h++) _stops.push(h);
+            const _fullSleepWheel = _fmWheelHtml(_stops.map(h => {
+              const m = _fmSleepMeta(h);
+              // Exact-hour match, so a 7.5h Health import highlights neither 7 nor
+              // 8 — the synced banner above already states the precise figure.
+              const isSel = _committedH === h;
+              return {
+                val: h, emoji: m.emoji, label: m.label, color: m.color,
+                sub: (isSel && _sleepHealthSynced) ? `${selectedSleep}h` : '',
+                cls: isSel ? 'sel' : '',
+                init: h === _initH,
+                onclick: (_sleepHealthSynced && isSel)
+                  ? `if(!_fmSlLpFired){_fmSleepClear=false;_fmAdvance();}`
+                  : `if(!_fmSlLpFired){selectedSleep=${h};_sleepHealthSynced=false;_fmSleepClear=false;_fmAdvance();}`,
+                extra: `onpointerdown="_fmSleepPtrDown(${h}, this)" onpointerup="_fmSleepPtrUp()" onpointercancel="_fmSleepPtrCancel()"`,
+              };
+            }), _sqHint);
+            const _retryLinkFull = (BB.storage.get('HealthSyncEnabled') === '1' && _fmSleepError)
+              ? `<p style="text-align:center;margin:0;"><button onclick="importSleepFromHealth()" style="background:none;border:none;color:var(--brand-primary);font-size:0.82em;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px;-webkit-tap-highlight-color:transparent;">${_fmSleepError === 'nodata' ? '🤷 No sleep data found — try again' : '❌ Sync failed — try again'}</button></p>` : '';
+            return _fmHeroHtml() + _retryLinkFull + _fullSleepWheel;
+          }
           const _sleepWheel = _fmWheelHtml(_FM_SLEEP_RANGES.map(r => {
             const isSel = _committedBucket === r.val;
             const [emoji, ...rest] = r.label.split(' ');
@@ -5815,8 +6088,13 @@ window.addEventListener('pageshow', () => {
         case 'done': {
           if (!_hasMood()) return `<p style="text-align:center;color:#dc3545;font-size:0.9em;">${BB.t('journal.selectMoodFirst')}</p>`;
           const mc = _FM_MOOD_COLORS[_moodCat(selectedMood)]||'var(--brand-primary)';
-          const eLabel = {0:BB.t('journal.energy.notEnough'),3:BB.t('journal.energy.less'),5:BB.t('journal.energy.normal'),7:BB.t('journal.energy.more'),10:BB.t('journal.energy.tooMuch')}[selectedEnergy]||selectedEnergy;
-          const sLabel = {5:'≤5h',6.5:'6–7h',8:'7–9h',9.5:'9–10h',11:'10+h'}[selectedSleep]||selectedSleep+'h';
+          // The lookups cover the five coarse buckets; full spectrum values (e.g.
+          // energy 4, sleep 7h) fall through to the banded meta so the review row
+          // still reads "🪫 Less than usual" / "7h" rather than a bare number.
+          const eLabel = {0:BB.t('journal.energy.notEnough'),3:BB.t('journal.energy.less'),5:BB.t('journal.energy.normal'),7:BB.t('journal.energy.more'),10:BB.t('journal.energy.tooMuch')}[selectedEnergy]
+            || (selectedEnergy != null ? `${_fmEnergyMeta(selectedEnergy).emoji} ${_fmEnergyMeta(selectedEnergy).label}` : selectedEnergy);
+          const sLabel = {5:'≤5h',6.5:'6–7h',8:'7–9h',9.5:'9–10h',11:'10+h'}[selectedSleep]
+            || (selectedSleep != null ? _fmSleepMeta(selectedSleep).label : selectedSleep + 'h');
           const notesVal = (document.getElementById('fmNotesInput')||document.getElementById('notes')||{}).value||'';
           const intentionVal = (document.getElementById('fmIntentionInput')||{}).value ?? selectedIntention;
           const _elabOn = localStorage.getItem('elaborateResponsesEnabled') === 'true';
@@ -5974,12 +6252,16 @@ window.addEventListener('pageshow', () => {
           html = `<img src="${_moodImg(selectedMood)}" style="width:16px;height:16px;vertical-align:middle;margin-right:3px;">${lbl}`;
           borderColor = col;
         } else if (s.id === 'energy' && !_fmEnergyClear) {
+          // Fall back to the banded meta for any value outside the five coarse
+          // levels — full spectrum can pick e.g. 4, which has no _FM_ENERGY_LEVELS row.
           const lvl = _FM_ENERGY_LEVELS.find(l => l.val === selectedEnergy);
           if (lvl) { html = lvl.label.split(' ')[0]; borderColor = lvl.color; }
+          else if (selectedEnergy != null) { const m = _fmEnergyMeta(selectedEnergy); html = m.emoji; borderColor = m.color; }
         } else if (s.id === 'sleep' && !_fmSleepClear) {
           const rng = _FM_SLEEP_RANGES.find(r => r.val === selectedSleep);
-          const hrsText = (_sleepHealthSynced && selectedSleep != null) ? `${selectedSleep}h` : (rng ? rng.label.replace(/^\S+\s*/, '') : (selectedSleep != null ? `${selectedSleep}h` : null));
-          const rngColor = rng ? rng.color : '#667eea';
+          const _sm = selectedSleep != null ? _fmSleepMeta(selectedSleep) : null;
+          const hrsText = (_sleepHealthSynced && selectedSleep != null) ? `${selectedSleep}h` : (rng ? rng.label.replace(/^\S+\s*/, '') : (_sm ? _sm.label : null));
+          const rngColor = rng ? rng.color : (_sm ? _sm.color : '#667eea');
           if (hrsText) {
             html = `<span style="display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1.2;">🛌<span style="font-size:0.85em;">${hrsText}</span></span>`;
             borderColor = selectedSleepQuality === 'good' ? '#2ECC40' : selectedSleepQuality === 'bad' ? '#dc3545' : selectedSleepQuality === 'unsure' ? '#adb5bd' : rngColor;
@@ -6336,8 +6618,7 @@ window.addEventListener('pageshow', () => {
       function _f(score, min, max) { fields.push({ score, min, max }); }
       // Energy: extremes (0/10) are strong signals; middle values (3/7) are mild.
       // This prevents lethargic energy from dominating when few other fields are answered.
-      const eMap = { 0: -50, 3: -8, 5: 0, 7: 8, 10: 50 };
-      _f(eMap[e.energy] ?? 0, -50, 50);
+      _f(_energyScore(e.energy), -50, 50);
       if (e.sleep != null) {
         const s = e.sleep;
         _f(s <= 5 ? 20 : s < 7 ? 5 : s <= 9 ? 0 : s <= 10 ? -8 : -15, -15, 20);
@@ -6381,8 +6662,7 @@ window.addEventListener('pageshow', () => {
 
       // Energy: extremes (0/10) are strong signals; middle values (3/7) are mild.
       // This prevents lethargic energy from dominating when few other fields are answered.
-      const eMap = { 0: -50, 3: -8, 5: 0, 7: 8, 10: 50 };
-      _field(eMap[selectedEnergy] ?? 0, -50, 50);
+      _field(_energyScore(selectedEnergy), -50, 50);
 
       // Sleep: −15 (depressed) → +20 (manic, sleep-deprived)
       if (selectedSleep != null) {

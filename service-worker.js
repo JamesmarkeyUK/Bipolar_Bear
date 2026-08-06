@@ -836,7 +836,13 @@
 //       second, dead copy of the Clear/Save row, and 7–9h of Health sleep now
 //       suggests "stable". Touches js/journal.js, js/index.js,
 //       js/survival-kit.js, js/shared/i18n.js.
-const CACHE_NAME = 'bipolarbear-v188';
+// v189: "Full Mood Spectrum" is now "Full spectrum" and covers sleep + energy
+//       too — an hour-by-hour ≤4h…≥12h sleep scale and a 0–10 energy scale
+//       (5 = normal), shown as msc sliders in plain focus mode and as the full
+//       set of stops in wheel mode. Wheel mode moved into the focus-mode
+//       sub-options (it only affects focus mode) and now switches off with it.
+//       Touches css/journal.css, journal.html, js/journal.js, js/shared/i18n.js.
+const CACHE_NAME = 'bipolarbear-v189';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

@@ -839,6 +839,7 @@
           sleepTitleYest: "How was last night's sleep?",
           sleepTitleOther: 'How did you sleep {phrase}?',
           sleepSub: 'Tap a range or sync from Health',
+          sleepSubSlider: 'Slide to set the hours, or sync from Health',
           sleepNotYetTitle: 'Sleep',
           sleepNotYet: "You haven't slept yet",
           sleepNotYetSub: 'Come back tomorrow to log last night.',
@@ -948,6 +949,14 @@
           tooMuch: '🚀 Too much',
         },
         sleepQualityHint: 'Hold the selected response to log sleep quality',
+        sleepQualityAdd: '+ Add sleep quality',
+        sleepBand: {
+          veryShort: 'Very short',
+          short: 'Short',
+          healthy: 'Healthy range',
+          long: 'Long',
+          veryLong: 'Very long',
+        },
         q: {
           goalProgress: '🏅 Goal progress?',
           keptBudget: '💰 Kept budget?',
