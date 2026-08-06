@@ -825,7 +825,18 @@
 //       Also fixes the one-shot "Tap Settings" hint being stranded: it can fire
 //       before focused mode opens, and body.bb-fm-full then hid the very FAB its
 //       arrow pointed at. Touches css/journal.css, js/journal.js, journal.html.
-const CACHE_NAME = 'bipolarbear-v187';
+// v188: new-device sign-in fixes. Notification/Health settings sync across
+//       devices but their OS grants don't, so a fresh phone showed the toggles
+//       ON with nothing scheduled — now reconciled (and switched off locally)
+//       against the real grants. Home mirrors all 8 survival-kit keys and
+//       recounts, instead of freezing at "7 / 12" until survival-kit.html was
+//       visited; survival-kit re-renders its section ticks after the cloud copy
+//       lands. The Anonymous badge no longer counts the auto-generated daily
+//       topic as a new message. Also: the save-confirm modal no longer shows a
+//       second, dead copy of the Clear/Save row, and 7–9h of Health sleep now
+//       suggests "stable". Touches js/journal.js, js/index.js,
+//       js/survival-kit.js, js/shared/i18n.js.
+const CACHE_NAME = 'bipolarbear-v188';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

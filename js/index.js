@@ -147,6 +147,59 @@ setTimeout(function () {
       // and the journal toggle handlers — gate on window.db / window.currentUser.
       window.auth = auth;
       window.db = db;
+
+      /**
+       * Paint the Bipolar Anonymous "new messages" badge from posts newer than
+       * this device's last board visit.
+       *
+       * Excluded from the count:
+       *   - the user's own posts (matched on monika)
+       *   - the daily discussion topic (`isTopic`) and system posts. The topic is
+       *     an auto-generated conversation-starter written by the app itself, and
+       *     it's created the moment the board is opened for the day — so simply
+       *     visiting the board, replying to the topic and coming home reported
+       *     "1 new message" that was really the app's own prompt, with nothing in
+       *     the thread but the user's own reply.
+       *   - deleted posts
+       *
+       * If the monika isn't known yet (fresh device, before the Firestore profile
+       * lands) the badge is left as-is rather than counted, because without it
+       * every one of the user's own posts would read as somebody else's.
+       */
+      function _refreshAnonMessagesBadge() {
+        const _badge = document.getElementById('anonMessagesBadge');
+        if (!_badge) return;
+        const _lastVisit = parseInt(BB.storage.get('AnonLastVisit') || '0', 10);
+        if (!_lastVisit) {
+          _badge.textContent = _tr('home.anonTapJoin', '💬 Tap to join the community');
+          _revealBadge(_badge, 'block');
+          return;
+        }
+        if (!navigator.onLine) {
+          // Offline — skip the live count, hide the row after the skeleton
+          // min-time; we'll re-check next time we're online.
+          _revealBadge(_badge, 'none');
+          return;
+        }
+        const _myMonika = BB.storage.get('Anon_monika') || '';
+        if (!_myMonika) return; // profile not hydrated yet — a later pass repaints
+        db.collection(BB_BRAND.collections.posts)
+          .where('timestamp', '>', firebase.firestore.Timestamp.fromMillis(_lastVisit))
+          .limit(5)
+          .get()
+          .then(snap => {
+            const _newCount = snap.docs.filter(d => {
+              const p = d.data();
+              return !p.deleted && !p.isTopic && !p.isSystem && p.name !== _myMonika;
+            }).length;
+            _badge.textContent = _newCount > 0
+              ? _tr('home.anonNewMessages', '💬 ' + _newCount + ' new messages', { n: _newCount })
+              : _tr('home.anonNoMessages', '✓ No new messages');
+            _revealBadge(_badge, 'block');
+          })
+          .catch(() => {});
+      }
+
       auth.onAuthStateChanged(user => {
         currentUser = user && !user.isAnonymous ? user : null;
         window.currentUser = currentUser;
@@ -181,34 +234,7 @@ setTimeout(function () {
             anonBtn.classList.remove('locked');
             if (anonNote) anonNote.style.display = 'none';
             // New messages badge — only if they've verified for Anonymous
-            if (BB.storage.get('Anon_verified') === 'true') {
-              const _badge     = document.getElementById('anonMessagesBadge');
-              const _lastVisit = parseInt(BB.storage.get('AnonLastVisit') || '0', 10);
-              if (_badge) {
-                if (!_lastVisit) {
-                  _badge.textContent  = _tr('home.anonTapJoin', '💬 Tap to join the community');
-                  _revealBadge(_badge, 'block');
-                } else if (!navigator.onLine) {
-                  // Offline — skip the live count, hide the row after the
-                  // skeleton min-time; we'll re-check next time we're online.
-                  _revealBadge(_badge, 'none');
-                } else {
-                  db.collection(BB_BRAND.collections.posts)
-                    .where('timestamp', '>', firebase.firestore.Timestamp.fromMillis(_lastVisit))
-                    .limit(5)
-                    .get()
-                    .then(snap => {
-                      const _myMonika  = BB.storage.get('Anon_monika') || '';
-                  const _newCount = snap.docs.filter(d => !d.data().deleted && (_myMonika ? d.data().name !== _myMonika : true)).length;
-                      _badge.textContent   = _newCount > 0
-                        ? _tr('home.anonNewMessages', '💬 ' + _newCount + ' new messages', { n: _newCount })
-                        : _tr('home.anonNoMessages', '✓ No new messages');
-                      _revealBadge(_badge, 'block');
-                    })
-                    .catch(() => {});
-                }
-              }
-            }
+            if (BB.storage.get('Anon_verified') === 'true') _refreshAnonMessagesBadge();
           } else {
             anonBtn.classList.add('locked');
             if (anonNote) anonNote.style.display = 'block';
@@ -281,6 +307,16 @@ setTimeout(function () {
             if (d.copingStrategies !== undefined) localStorage.setItem('copingStrategies', JSON.stringify(d.copingStrategies));
             if (d.currentMedList  !== undefined) localStorage.setItem('currentMedList',  JSON.stringify(d.currentMedList));
             if (d.dailyGoals      !== undefined) localStorage.setItem('dailyGoals',      JSON.stringify(d.dailyGoals));
+            // The remaining five survival-kit keys. Without them the home
+            // progress counter could never see those sections as done on a
+            // freshly signed-in device — it counted 7 / 12 (the 4 info-only
+            // sections + the 3 keys mirrored above) until the user opened
+            // survival-kit.html, which hydrates the full set, and came back.
+            if (d.survivalGratitude !== undefined) localStorage.setItem('survivalGratitude', JSON.stringify(d.survivalGratitude));
+            if (d.moodMemories     !== undefined) localStorage.setItem('moodMemories',     JSON.stringify(d.moodMemories));
+            if (d.myCommitments    !== undefined) localStorage.setItem('myCommitments',    JSON.stringify(d.myCommitments));
+            if (d.customReminders  !== undefined) localStorage.setItem('customReminders',  JSON.stringify(d.customReminders));
+            if (d.rememberThis     !== undefined) localStorage.setItem('rememberThis',     d.rememberThis);
             if (d.stableStreak    !== undefined) {
               BB.storage.set('StableStreak', String(d.stableStreak || 0));
             }
@@ -324,25 +360,7 @@ setTimeout(function () {
             // (Firestore field only updates when journal.html opens). Best-effort.
             _recomputeStreakFromEntries(user);
             // Refresh anonymous "new messages" badge now that monika/verified are in place
-            if (currentUser && BB.storage.get('Anon_verified') === 'true') {
-              const _badge2 = document.getElementById('anonMessagesBadge');
-              const _lastVisit2 = parseInt(BB.storage.get('AnonLastVisit') || '0', 10);
-              if (_badge2 && _lastVisit2) {
-                db.collection(BB_BRAND.collections.posts)
-                  .where('timestamp', '>', firebase.firestore.Timestamp.fromMillis(_lastVisit2))
-                  .limit(5).get().then(snap => {
-                    const _myMonika = BB.storage.get('Anon_monika') || '';
-                    const _newCount = snap.docs.filter(dd => !dd.data().deleted && (_myMonika ? dd.data().name !== _myMonika : true)).length;
-                    _badge2.textContent = _newCount > 0
-                      ? _tr('home.anonNewMessages', '💬 ' + _newCount + ' new messages', { n: _newCount })
-                      : _tr('home.anonNoMessages', '✓ No new messages');
-                    _revealBadge(_badge2, 'block');
-                  }).catch(() => {});
-              } else if (_badge2 && !_lastVisit2) {
-                _badge2.textContent = _tr('home.anonTapJoin', '💬 Tap to join the community');
-                _revealBadge(_badge2, 'block');
-              }
-            }
+            if (currentUser && BB.storage.get('Anon_verified') === 'true') _refreshAnonMessagesBadge();
             // Refresh the "posted today" tick next to Bipolar Anonymous.
             // Query only the user's own posts by monika (single-field, so no
             // composite index needed) and check whether any landed today. The
@@ -383,6 +401,9 @@ setTimeout(function () {
                 sTick.setAttribute('data-done', done ? 'true' : 'false');
               } catch(e) {}
             }
+            // …and the "N / 12 sections complete" counter, which ran during the
+            // synchronous page render, before any of the keys above existed.
+            if (typeof window._updateSurvivalProgress === 'function') window._updateSurvivalProgress();
             _applyOnboardingGating();
           }).catch(() => {});
           // Check Firestore for the current entry if the local cache is missing or stale.
@@ -1829,9 +1850,14 @@ setTimeout(function () {
 
       tick.setAttribute('data-done', check() ? 'true' : 'false');
 
-      // Survival kit progress counter
-      const _prog = document.getElementById('survivalProgress');
-      if (_prog) {
+      // Survival kit progress counter. Exposed (not just run inline) because the
+      // survival-kit keys arrive asynchronously from Firestore on a freshly
+      // signed-in device — the auth listener re-runs this once they've landed so
+      // the count doesn't sit at 7 / 12 until the user visits survival-kit.html
+      // and comes back.
+      window._updateSurvivalProgress = function () {
+        const _prog = document.getElementById('survivalProgress');
+        if (!_prog) return;
         const _arr = k => { try { const v = JSON.parse(localStorage.getItem(k)||'[]'); return Array.isArray(v) && v.length > 0; } catch(e){ return false; } };
         const _obj = k => { try { const v = JSON.parse(localStorage.getItem(k)||'{}'); return Object.values(v).some(a => Array.isArray(a) && a.length > 0); } catch(e){ return false; } };
         let _c = 4; // mood-scale, books, media, spiritual — always complete
@@ -1847,7 +1873,8 @@ setTimeout(function () {
           ? _tr('home.survivalAllDone', '✓ All sections completed')
           : _tr('home.survivalProgress', _c + ' / 12 sections complete', { c: _c });
         _revealBadge(_prog, 'block');
-      }
+      };
+      window._updateSurvivalProgress();
     })();
 
 // ── BLOCK 5: celebration confetti + toast ──

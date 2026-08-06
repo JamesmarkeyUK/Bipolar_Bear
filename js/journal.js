@@ -477,6 +477,16 @@ window.addEventListener('pageshow', () => {
               if (d.reminderEnabled !== undefined) localStorage.setItem('reminderEnabled', d.reminderEnabled ? 'true' : 'false');
               if (d.reminderTime !== undefined && d.reminderTime) localStorage.setItem('reminderTime', d.reminderTime);
               if (d.weeklySummaryEnabled !== undefined) localStorage.setItem('weeklySummaryEnabled', d.weeklySummaryEnabled ? 'true' : 'false');
+              // The three settings above are account-level, but the OS grants they
+              // depend on are per-install. Signing in on a new device restored
+              // "reminders on" / "Health sync on" onto a phone that had never been
+              // asked, leaving the toggles reading ON while nothing was scheduled
+              // and no health data was imported. Reconcile against the real grants
+              // FIRST, so the reschedule below runs on settings this device can
+              // actually honour.
+              if (isNative()) {
+                await _reconcileNativePermissionSettings().catch(() => {});
+              }
               // Reschedule local notifications on this device using the synced settings.
               // scheduleReminder() gates on reminderEnabled internally; weekly summary
               // is rescheduled by the entries-load flow (loadEntries → scheduleWeeklySummary).
@@ -3084,7 +3094,7 @@ window.addEventListener('pageshow', () => {
     function showSaveConfirmModal() {
       if (editingEntry && !_hasEditChanges()) { cancelEdit(); return; }
       const summary = document.getElementById('saveConfirmSummary');
-      if (summary) summary.innerHTML = _fmRenderContent({ id: 'done' });
+      if (summary) summary.innerHTML = _fmRenderContent({ id: 'done' }, { noActions: true });
       const _isEditing = !!editingEntry;
       const titleEl = document.getElementById('saveConfirmTitle');
       const _t = (k) => (window.BB && BB.t) ? BB.t(k) : k;
@@ -5107,12 +5117,19 @@ window.addEventListener('pageshow', () => {
      * of sleep → low; lots of steps + little sleep → elevated; middling both
      * → stable. Preview only — it becomes the mood wheel's initial centre with
      * a "best guess" badge; the user still taps to commit.
+     *
+     * Sleep in the healthy 7–9h band short-circuits to stable on its own.
+     * Sleep is the strongest single indicator of a bipolar episode, so when
+     * Health reports a normal night it outranks the step count: a quiet 3k-step
+     * day on top of 7.7h sleep is a rest day, not a low mood, and defaulting it
+     * to "low" put the wrong answer in front of the user before they'd chosen.
      */
     function _fmMaybeSuggestMood() {
       if (selectedMood || editingEntry) return;
       const steps  = _fmStepsRaw;
       const sleepH = _fmSleepImported;
       if (steps == null && sleepH == null) return;
+      if (sleepH != null && sleepH >= 7 && sleepH <= 9) { _fmMoodSuggestion = 'stable'; return; }
       let score = 0; // negative → low, positive → elevated
       if (steps != null)  { if (steps < 3000)  score--; else if (steps > 15000) score++; }
       if (sleepH != null) { if (sleepH >= 9.5) score--; else if (sleepH <= 5.5) score++; }
@@ -5152,7 +5169,20 @@ window.addEventListener('pageshow', () => {
       hero.style.display = _sleepHealthSynced ? '' : 'none';
     }
 
-    function _fmRenderContent(step) {
+    /**
+     * Renders the body of a focused-mode step.
+     *
+     * @param {object} step  step descriptor ({ id, … })
+     * @param {object} [opts]
+     * @param {boolean} [opts.noActions]  omit the done step's own Clear/Save
+     *   pill row. The full (non-focused) form reuses this renderer to build the
+     *   save-confirmation modal's summary, and that modal already carries its
+     *   own ← Edit / Save ✨ footer — so without this the user got two rows of
+     *   the same buttons, the top one wired to _fmNext(), which does nothing
+     *   outside focused mode (_fmStepIndex isn't on the done step there).
+     */
+    function _fmRenderContent(step, opts) {
+      const _noActions = !!(opts && opts.noActions);
       const cap = s => s ? s.charAt(0).toUpperCase()+s.slice(1) : '';
       switch (step.id) {
         case 'mood': {
@@ -5891,7 +5921,7 @@ window.addEventListener('pageshow', () => {
           const _delLabel = editingEntry ? BB.t('journal.fm.doneDelete') : BB.t('journal.fm.doneClear');
           const _saveLabel = _noChanges ? BB.t('journal.fm.doneClose') : (editingEntry ? BB.t('journal.fm.doneUpdate') : BB.t('journal.fm.doneSave'));
           const _saveEmoji = _noChanges ? '✓' : '💾';
-          const _actions = `<div class="fm-done-actions">
+          const _actions = _noActions ? '' : `<div class="fm-done-actions">
               <button type="button" class="fm-wheel-btn fm-done-del" onclick="_fmDoneDelete()">
                 <span class="fm-wheel-emoji">🗑️</span><span class="fm-wheel-label">${_delLabel}</span>
               </button>
@@ -12321,6 +12351,121 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
       } catch (e) {
         return true; // best-effort: don't block on plugin errors
       }
+    }
+
+    /**
+     * Reconcile the OS-permission-backed settings against what this device can
+     * actually do, after they've been restored from Firestore.
+     *
+     * `reminderEnabled`, `weeklySummaryEnabled` and `healthSyncEnabled` sync
+     * across devices, but the OS grants they depend on do not — they're granted
+     * per install. Signing in on a new phone therefore restored "reminders on"
+     * and "Health sync on" onto a device that had never been asked for either,
+     * so the toggles read ON in Settings while nothing was ever scheduled and no
+     * health data was ever imported.
+     *
+     * We deactivate rather than prompt. Raising the OS permission sheet on login
+     * isn't a deliberate user action (and initNotifications' contract is that
+     * startup NEVER prompts) — flipping the toggle back on is, and that path
+     * already requests permission properly via _ensureNotifPermission /
+     * _requestHealthAccessInteractive.
+     *
+     * Local-only: the Firestore values are left untouched, because the grant is
+     * a property of this device, not of the account. The phone that does have
+     * permission keeps its settings.
+     *
+     * @returns {Promise<{notifications: boolean, health: boolean}>} which
+     *   settings were switched off on this device.
+     */
+    async function _reconcileNativePermissionSettings() {
+      const _off = { notifications: false, health: false };
+      if (!isNative()) return _off;
+
+      // ── Notifications (daily reminder + weekly summary) ──
+      try {
+        const _wantsNotifs = localStorage.getItem('reminderEnabled') === 'true'
+          || localStorage.getItem('weeklySummaryEnabled') === 'true';
+        const LocalNotifications = getPlugin('LocalNotifications');
+        if (_wantsNotifs && LocalNotifications) {
+          const { display } = await LocalNotifications.checkPermissions();
+          if (display !== 'granted') {
+            localStorage.setItem('reminderEnabled', 'false');
+            localStorage.setItem('weeklySummaryEnabled', 'false');
+            // Drop anything a previous session managed to queue (ids 1 + 2).
+            await LocalNotifications.cancel({ notifications: [{ id: 1 }, { id: 2 }] }).catch(() => {});
+            const _rEl = document.getElementById('reminderEnabled');
+            if (_rEl) _rEl.checked = false;
+            const _wEl = document.getElementById('weeklySummaryEnabled');
+            if (_wEl) _wEl.checked = false;
+            _off.notifications = true;
+          }
+        }
+      } catch (e) { console.warn('Notification permission reconcile failed:', e); }
+
+      // ── Apple Health / Health Connect ──
+      try {
+        if (BB.storage.get('HealthSyncEnabled') === '1') {
+          const Health = getPlugin('HealthPlugin');
+          if (Health) {
+            const { available } = await Health.isHealthAvailable();
+            let _neverAsked = false;
+            if (available) {
+              const r = await Health.checkHealthPermissions({ permissions: ['READ_SLEEP', 'READ_STEPS'] });
+              // Only "never asked" is a safe signal to act on. iOS deliberately
+              // reports the SAME status for granted and denied read types (see
+              // _refreshHealthAuthDisplay), so both flags being false is the one
+              // state that unambiguously means this device was never asked.
+              _neverAsked = !(r?.permissions?.READ_SLEEP || r?.permissions?.READ_STEPS);
+            }
+            if (!available || _neverAsked) {
+              BB.storage.set('HealthSyncEnabled', '0');
+              const _hEl = document.getElementById('healthSyncToggle');
+              if (_hEl) _hEl.checked = false;
+              _off.health = true;
+            }
+          }
+        }
+      } catch (e) { console.warn('Health permission reconcile failed:', e); }
+
+      if (_off.notifications || _off.health) _showPermissionResetToast(_off);
+      return _off;
+    }
+    window._reconcileNativePermissionSettings = _reconcileNativePermissionSettings;
+
+    /**
+     * One-off, non-blocking notice that a synced setting was switched off here
+     * because this device hasn't granted the underlying OS permission. Silently
+     * disabling a feature the user believes is on is worse than the original
+     * bug, so tell them — and point at the toggle that will ask properly.
+     */
+    function _showPermissionResetToast(off) {
+      const _what = off.notifications && off.health
+        ? BB.t('journal.perm.resetBoth')
+        : off.notifications ? BB.t('journal.perm.resetNotifs') : BB.t('journal.perm.resetHealth');
+      const existing = document.getElementById('permResetToast');
+      if (existing) existing.remove();
+      const toast = document.createElement('div');
+      toast.id = 'permResetToast';
+      // _what is a translation-table string, not user data — safe for innerHTML.
+      toast.innerHTML = `<div style="font-weight:700;font-size:0.9em;margin-bottom:3px;">${BB.t('journal.perm.resetTitle')}</div>`
+        + `<div style="font-size:0.8em;line-height:1.4;color:rgba(255,255,255,0.9);">${_what}</div>`;
+      Object.assign(toast.style, {
+        position: 'fixed', bottom: '90px', left: '50%', transform: 'translateX(-50%) translateY(10px)',
+        background: 'linear-gradient(135deg,var(--brand-primary-mid),var(--brand-primary-light))', color: 'white',
+        borderRadius: '16px', padding: '14px 20px', boxShadow: '0 8px 32px rgba(255,107,0,0.45)',
+        textAlign: 'center', zIndex: '9999', minWidth: '240px', maxWidth: '300px',
+        opacity: '0', transition: 'opacity 0.4s ease, transform 0.4s ease', cursor: 'pointer',
+      });
+      toast.addEventListener('click', () => {
+        toast.remove();
+        if (typeof showSettingsModal === 'function') showSettingsModal();
+      });
+      document.body.appendChild(toast);
+      requestAnimationFrame(() => { toast.style.opacity = '1'; toast.style.transform = 'translateX(-50%) translateY(0)'; });
+      setTimeout(() => {
+        toast.style.opacity = '0'; toast.style.transform = 'translateX(-50%) translateY(10px)';
+        setTimeout(() => toast.remove(), 400);
+      }, 6000);
     }
 
     async function _onReminderToggleChange() {

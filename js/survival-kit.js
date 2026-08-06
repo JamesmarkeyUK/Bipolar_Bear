@@ -2140,6 +2140,12 @@ function _sktMood(moodKey) {
               renderGratitude();
             }
             } // end !_skSkipOverwrite
+            // The section ticks were computed at page load, when localStorage was
+            // still empty on a freshly signed-in device — so every section read as
+            // incomplete even though the data was in the account. Recompute now
+            // that the cloud copy has landed. (Editing an entry used to be the only
+            // way to refresh them, via the save → render path.)
+            if (typeof _skUpdateTicks === 'function') _skUpdateTicks();
             // Sync vote state from Firestore
             const voted = !!d.helpedVoted;
             if (voted) localStorage.setItem('bipolarHelpedVoted', '1');

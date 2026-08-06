@@ -799,6 +799,12 @@
           healthRecoverAndroid: "Health access couldn't be requested automatically.\n\nOpen Health Connect to grant Sleep and Steps access, then try again?",
           healthRecoverIos: "iOS didn't show the Health permission sheet — this usually means access was set before (for example, before reinstalling the app).\n\nOpen Apple Health → Profile → Apps → BipolarBear and turn on Sleep and Steps. Open Health settings now?",
         },
+        perm: {
+          resetTitle: '⚠️ Turned off on this device',
+          resetNotifs: "Reminders are on for your account, but this device hasn't allowed notifications. Tap to turn them back on.",
+          resetHealth: "Health sync is on for your account, but this device hasn't allowed Health access. Tap to turn it back on.",
+          resetBoth: "Reminders and Health sync are on for your account, but this device hasn't granted those permissions yet. Tap to turn them back on.",
+        },
         hint: {
           goBack: '🐻 Go back here',
           openEntries: '🐻 Click to open your past entries and statistics',
