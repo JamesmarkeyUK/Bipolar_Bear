@@ -1718,8 +1718,10 @@
     <div id="settingsHint" style="display:none;"></div>
     <button id="settingsBtn" type="button" style="display:none;">⚙️ Settings<span id="settingsAdvancedBadge" style="display:none;"></span></button>
   </div>
-  <!-- Spacer so fixed footer doesn't obscure last content -->
-  <div style="height:88px;"></div>
+  <!-- Spacer so fixed footer doesn't obscure last content. Collapsed in focus
+       mode (see .bb-dock-spacer in css/journal.css) — the dock is hidden there,
+       so it's 88px of empty scroll below an otherwise screen-sized card. -->
+  <div class="bb-dock-spacer" style="height:88px;"></div>
 
 
   

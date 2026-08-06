@@ -158,7 +158,55 @@
        MutationObserver in js/journal.js, so every open/close path (save,
        cancel, edit, switch-to-full-form) restores the page automatically. */
     body.bb-fm-full .container > *:not(#focusedModeCard) { display: none !important; }
-    body.bb-fm-full #appContent { margin-top: 0 !important; padding-bottom: 0; }
+    /* .container is the only visible child of #appContent in focus mode, and the
+       card lives inside it — so it has to carry the height down for the card's
+       auto margins to have any free space to work with. */
+    body.bb-fm-full #appContent > .container {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      /* .container carries `margin: 0 auto` for its 800px desktop centring, and
+         auto cross-axis margins on a flex item defeat the default stretch — it
+         would shrink-to-fit its content and the card would go narrow. An
+         explicit width restores full bleed while leaving the max-width
+         centring intact on wide screens. */
+      width: 100%;
+    }
+    /* Flex column filling the viewport, so a card shorter than the screen can
+       centre itself with `margin: auto` (see .fm-plain-fit below) instead of
+       clinging to the top with a bare band of page background underneath.
+       `margin: auto` rather than `justify-content: center` on purpose: when the
+       content IS taller than the container, auto margins collapse to zero and
+       the card simply overflows downward, whereas centring would push its top
+       off-screen and out of reach.
+       Body reserves 80px at the bottom for the FAB dock, which focus mode hides
+       — so that space is dead here. Reclaiming it both centres the card against
+       the real viewport and stops the full-height card from overflowing into a
+       scrollable page (which is how the top bar used to scroll out of view).
+       What's left to subtract is body's top padding: 10px, or 5px on phones. */
+    body.bb-fm-full { padding-bottom: 0; }
+    /* Same reasoning: the fixed-footer spacer has nothing to clear here. */
+    body.bb-fm-full .bb-dock-spacer { display: none; }
+    body.bb-fm-full #appContent {
+      margin-top: 0 !important;
+      padding-bottom: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: calc(100vh - 10px);
+      min-height: calc(100dvh - 10px);
+    }
+    @media (max-width: 600px) {
+      body.bb-fm-full #appContent {
+        min-height: calc(100vh - 5px);
+        min-height: calc(100dvh - 5px);
+      }
+    }
+    @media (min-width: 920px) {
+      /* Mirror the card's own frame-height rules below, so the centring box
+         matches the device-frame mockup's inner height rather than the window. */
+      html:not(.is-native) body.bb-fm-full #appContent { min-height: calc(min(1024px, 96dvh) - 176px); }
+      html.is-native body.bb-fm-full #appContent { min-height: calc(100dvh - 120px); }
+    }
     body.bb-fm-full .fab-footer,
     body.bb-fm-full .whatsapp-fab,
     body.bb-fm-full .placeholder-fab,
@@ -232,7 +280,13 @@
        also carries those classes (e.g. the first-time mood step), and after the
        ≥920px frame overrides so the desktop mockup shrinks to fit too. */
     #fmFooterSpacer { display: none; }
-    body.bb-fm-full #focusedModeCard.fm-plain-fit { min-height: 0; }
+    body.bb-fm-full #focusedModeCard.fm-plain-fit {
+      min-height: 0;
+      /* Float the fitted card in the middle of the screen rather than leaving
+         all the leftover space in one slab underneath it. */
+      margin-top: auto;
+      margin-bottom: auto;
+    }
     body.bb-fm-full #focusedModeCard.fm-plain-fit #fmHeaderSpacer { flex: 0 0 auto; min-height: 10px; }
     body.bb-fm-full #focusedModeCard.fm-plain-fit #fmContent { flex: 0 0 auto; }
     body.bb-fm-full #focusedModeCard.fm-plain-fit #fmFooterSpacer { display: block; flex: 0 0 auto; min-height: 10px; }
