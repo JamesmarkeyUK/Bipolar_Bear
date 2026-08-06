@@ -847,7 +847,12 @@
 //       in-window day of that month has an entry, amber when any are missing,
 //       future days excluded. Tapping one opens that month in the calendar.
 //       Touches js/journal.js.
-const CACHE_NAME = 'bipolarbear-v190';
+// v191: Journey month boxes score up to yesterday, not today. Today is still
+//       in progress, so counting it left the current month permanently amber
+//       until the moment the day was logged. On the 1st the current month now
+//       has no finished days and its box drops out rather than reading 0/0.
+//       Touches js/journal.js.
+const CACHE_NAME = 'bipolarbear-v191';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

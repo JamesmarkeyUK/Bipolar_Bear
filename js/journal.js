@@ -7863,11 +7863,15 @@ window.addEventListener('pageshow', () => {
 
     /**
      * The calendar months a multi-month timeframe window covers, each clipped to
-     * the part that's actually in the window and already happened.
+     * the part that's inside the window and already finished.
      *
-     * The window is counted back from TODAY (not from the most recent entry, as
+     * Scoring stops at YESTERDAY. Today is still in progress — the entry for it
+     * may not have been written yet — so counting it would leave the current
+     * month permanently amber until the moment the day is logged.
+     *
+     * The window is counted back from today (not from the most recent entry, as
      * the stats card's "since" label does) — these boxes are about which days are
-     * missing, so "excluding future days" only makes sense relative to today.
+     * missing, so anchoring anywhere else makes "already finished" incoherent.
      *
      * @param {Date} today midnight today
      * @returns {Array<{year:number, month:number, from:Date, to:Date}>} empty for
@@ -7878,7 +7882,12 @@ window.addEventListener('pageshow', () => {
       if (typeof statsTimeframe !== 'number' || statsTimeframe < 60) return [];
       const start = new Date(today);
       start.setDate(start.getDate() - (statsTimeframe - 1));
-      const endMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+      // Last scoreable day. On the 1st of a month this lands in the previous
+      // month, so the current month contributes no span and its box drops out
+      // (the `from <= to` guard below) rather than showing a meaningless 0/0.
+      const lastDay = new Date(today);
+      lastDay.setDate(lastDay.getDate() - 1);
+      const endMonth = new Date(lastDay.getFullYear(), lastDay.getMonth(), 1);
       const spans = [];
       let cur = new Date(start.getFullYear(), start.getMonth(), 1);
       // Ceiling so a large custom window (say 800 days) can't emit an unreadable
@@ -7887,7 +7896,7 @@ window.addEventListener('pageshow', () => {
         const mStart = new Date(cur.getFullYear(), cur.getMonth(), 1);
         const mEnd   = new Date(cur.getFullYear(), cur.getMonth() + 1, 0);
         const from = mStart < start ? start : mStart;
-        const to   = mEnd > today ? today : mEnd;
+        const to   = mEnd > lastDay ? lastDay : mEnd;
         if (from <= to) spans.push({ year: cur.getFullYear(), month: cur.getMonth(), from, to });
         cur = new Date(cur.getFullYear(), cur.getMonth() + 1, 1);
       }
@@ -7926,7 +7935,7 @@ window.addEventListener('pageshow', () => {
         // days were actually judged — otherwise "12/23" for a 31-day month reads
         // like a bug rather than the window starting mid-month.
         const partial = sp.from.getDate() !== 1 || (sp.to.getDate() !== new Date(sp.year, sp.month + 1, 0).getDate());
-        const title = `${name} ${sp.year}: ${logged} of ${total} day${total === 1 ? '' : 's'} logged${partial ? ' (within the selected window, excluding future days)' : ''}`;
+        const title = `${name} ${sp.year}: ${logged} of ${total} day${total === 1 ? '' : 's'} logged${partial ? ' (within the selected window, up to yesterday)' : ''}`;
         return `<button type="button" onclick="_openMonthFromBox(${sp.year},${sp.month})" title="${title}"
             style="flex:1 1 0;min-width:74px;background:${color}1a;border:${isOpen ? `2.5px solid ${color}` : `1.5px solid ${color}66`};border-radius:12px;padding:8px 6px;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;flex-direction:column;align-items:center;gap:2px;">
             <span style="font-size:0.8em;font-weight:700;color:${color};">${name}</span>
