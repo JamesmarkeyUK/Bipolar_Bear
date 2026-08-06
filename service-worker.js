@@ -855,7 +855,15 @@
 // v192: release 1.29 (build 29). Version-only invalidation so returning web
 //       clients pick up the new _APP_VERSION — the runtime assets themselves
 //       are unchanged since v191.
-const CACHE_NAME = 'bipolarbear-v192';
+// v193: full spectrum reaches the classic form (sleep + energy sliders there
+//       too, driven off the existing hidden buttons via a MutationObserver);
+//       the fitted focus card centres instead of leaving a slab of background
+//       underneath, and focus mode reclaims the hidden dock's 168px of chrome
+//       so the page no longer scrolls at all; the Anonymous badge pluralises
+//       ("1 new message") across all ten locales; changelog entries for
+//       v1.26-v1.28. Touches css/journal.css, journal.html, js/journal.js,
+//       js/index.js, js/shared/i18n.js.
+const CACHE_NAME = 'bipolarbear-v193';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
