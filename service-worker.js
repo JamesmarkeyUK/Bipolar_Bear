@@ -852,7 +852,10 @@
 //       until the moment the day was logged. On the 1st the current month now
 //       has no finished days and its box drops out rather than reading 0/0.
 //       Touches js/journal.js.
-const CACHE_NAME = 'bipolarbear-v191';
+// v192: release 1.29 (build 29). Version-only invalidation so returning web
+//       clients pick up the new _APP_VERSION — the runtime assets themselves
+//       are unchanged since v191.
+const CACHE_NAME = 'bipolarbear-v192';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
