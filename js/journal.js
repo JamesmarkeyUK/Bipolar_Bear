@@ -4112,8 +4112,137 @@ window.addEventListener('pageshow', () => {
       // Reset the standard-form selection UI so no stale highlight/value lingers.
       document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected', 'cycle-hover', 'linked'));
       if (on) _resetSpectrumControl();
+      _applySleepEnergySpectrumMode(on);
     }
     window._applyMoodSpectrumMode = _applyMoodSpectrumMode;
+
+    /**
+     * Swap the classic form's five sleep / energy buttons for the full spectrum
+     * sliders, mirroring what _applyMoodSpectrumMode does for mood.
+     *
+     * The button rows are HIDDEN, never removed. Around a dozen call sites —
+     * draft restore, edit restore, resetForm, the health-sync handlers — set
+     * selectedSleep / selectedEnergy and then repaint those buttons. Leaving them
+     * in the DOM means every one of those paths keeps working untouched; the
+     * MutationObserver below notices the repaint and mirrors the (already
+     * updated) variable onto the slider. Nothing reads the buttons back —
+     * selectedSleep / selectedEnergy are the sole source of truth for saving —
+     * so a hidden repaint is harmless.
+     */
+    function _applySleepEnergySpectrumMode(on) {
+      const _pairs = [
+        ['sleepSelector', 'sleepSpectrumControl'],
+        ['energySelector', 'energySpectrumControl'],
+      ];
+      _pairs.forEach(([btnsId, ctrlId]) => {
+        const b = document.getElementById(btnsId);
+        const c = document.getElementById(ctrlId);
+        if (b) b.style.display = on ? 'none' : '';
+        if (c) c.style.display = on ? '' : 'none';
+      });
+      if (!on) return;
+      // The slider steps in whole hours, but the form's default is 7.5 (a legacy
+      // mid-bucket value) — which would render "7.5h" under a thumb sitting at 8.
+      // Round it once on switch-on. A health-synced value is left alone: 7.7h
+      // from Apple Health is a real measurement, and showing the exact figure
+      // under a nearest-stop thumb is the intended behaviour there.
+      if (selectedSleep != null && !_sleepHealthSynced && !Number.isInteger(selectedSleep)) {
+        selectedSleep = Math.round(_fmClampSleep(selectedSleep));
+      }
+      _syncSpectrumSliders();
+    }
+
+    /** Paint both classic-form sliders from the current selection. */
+    function _syncSpectrumSliders() {
+      if (!_spectrumEnabled()) return;
+      // moveSlider TRUE: this reflects state the user set somewhere else (draft
+      // restore, health sync, edit), so the thumb has to follow it.
+      if (selectedSleep != null) _paintSleepSpectrum(_fmClampSleep(selectedSleep), true);
+      if (selectedEnergy != null) _paintEnergySpectrum(Math.round(_fmClampEnergy(selectedEnergy)), true);
+    }
+    window._syncSpectrumSliders = _syncSpectrumSliders;
+
+    /**
+     * Mirror hidden-button repaints onto the sliders. Watching the DOM rather
+     * than patching each call site keeps the two representations from drifting:
+     * any future code path that highlights a sleep/energy button is picked up
+     * automatically. `moveSlider` is false here because the repaint is a
+     * reflection of state the user didn't set via the slider.
+     */
+    (function _spectrumSliderSync() {
+      if (typeof MutationObserver === 'undefined') return;
+      const obs = new MutationObserver(() => {
+        // The call sites assign the variable BEFORE repainting, so by the time
+        // this fires the value is already current.
+        _syncSpectrumSliders();
+      });
+      const attach = () => {
+        ['sleepSelector', 'energySelector'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) obs.observe(el, { attributes: true, attributeFilter: ['class', 'style'], subtree: true });
+        });
+      };
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', attach);
+      else attach();
+    })();
+
+    function _paintSleepSpectrum(h, moveSlider) {
+      const m = _fmSleepMeta(h);
+      const slider = document.getElementById('slscSlider');
+      const ctrl   = document.getElementById('sleepSpectrumControl');
+      const emoji  = document.getElementById('slscEmoji');
+      const val    = document.getElementById('slscValue');
+      const label  = document.getElementById('slscLabel');
+      if (slider && moveSlider !== false) slider.value = String(Math.round(h));
+      if (slider) slider.style.setProperty('--msc-accent', m.color);
+      if (ctrl) { ctrl.style.setProperty('--msc-accent', m.color); ctrl.classList.add('committed'); }
+      if (emoji) emoji.textContent = m.emoji;
+      if (val) { val.textContent = m.label; val.style.color = m.color; }
+      if (label) label.textContent = m.band;
+    }
+
+    function _paintEnergySpectrum(v, moveSlider) {
+      const m = _fmEnergyMeta(v);
+      const slider = document.getElementById('enscSlider');
+      const ctrl   = document.getElementById('energySpectrumControl');
+      const emoji  = document.getElementById('enscEmoji');
+      const val    = document.getElementById('enscValue');
+      const label  = document.getElementById('enscLabel');
+      if (slider && moveSlider !== false) slider.value = String(v);
+      if (slider) slider.style.setProperty('--msc-accent', m.color);
+      if (ctrl) { ctrl.style.setProperty('--msc-accent', m.color); ctrl.classList.add('committed'); }
+      if (emoji) emoji.textContent = m.emoji;
+      if (val) { val.textContent = String(v); val.style.color = m.color; }
+      if (label) label.textContent = m.label;
+    }
+
+    /** Classic-form sleep slider drag → commit the hours. */
+    function _onSleepSpectrumChange(v) {
+      selectedSleep = _fmClampSleep(v);
+      _sleepHealthSynced = false; // a manual pick overrides any health import
+      // moveSlider FALSE: the user is dragging it — writing .value back mid-drag
+      // fights the thumb on some browsers.
+      _paintSleepSpectrum(selectedSleep, false);
+      if (typeof _updateSleepHero === 'function') _updateSleepHero();
+      scheduleDraftSave();
+    }
+    window._onSleepSpectrumChange = _onSleepSpectrumChange;
+
+    /** Classic-form energy slider drag → commit the level. */
+    function _onEnergySpectrumChange(v) {
+      selectedEnergy = Math.round(_fmClampEnergy(v));
+      _paintEnergySpectrum(selectedEnergy, false);
+      if (typeof _updateEnergyHero === 'function') _updateEnergyHero();
+      scheduleDraftSave();
+    }
+    window._onEnergySpectrumChange = _onEnergySpectrumChange;
+
+    /** The slider's stand-in for long-pressing a sleep button. */
+    function _revealSleepQuality() {
+      const sq = document.getElementById('sleepQualitySubSection');
+      if (sq) { sq.style.display = ''; try { sq.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (_) {} }
+    }
+    window._revealSleepQuality = _revealSleepQuality;
 
     // Reset the standard-form spectrum slider to its neutral, not-yet-chosen state.
     function _resetSpectrumControl() {
@@ -11508,11 +11637,18 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
       const selector = document.getElementById('sleepSelector');
       const btnRow   = document.getElementById('sleepBtnRow');
       const sq       = document.getElementById('sleepQualitySubSection');
+      // Full spectrum swaps the range buttons for a slider, so the lock has to
+      // know about both — and the unlock branch below must restore whichever one
+      // is actually in use rather than always un-hiding the buttons (which is
+      // what undid _applyMoodSpectrumMode's hide).
+      const spectrumCtrl = document.getElementById('sleepSpectrumControl');
+      const _fs = _spectrumEnabled();
       let msg = document.getElementById('sleepNotYetMsg');
       if (_sleepNotYet()) {
         selectedSleep = null;
         selectedSleepQuality = null;
         if (selector) selector.style.display = 'none';
+        if (spectrumCtrl) spectrumCtrl.style.display = 'none';
         if (btnRow)   btnRow.style.display = 'none';
         if (sq)       sq.style.display = 'none';
         if (!msg) {
@@ -11524,10 +11660,16 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
         msg.textContent = '🌙 ' + ((window.BB && BB.t) ? BB.t('journal.fm.sleepNotYet') : "You haven't slept yet");
         msg.style.display = '';
       } else {
-        if (selector) selector.style.display = '';
+        if (selector) selector.style.display = _fs ? 'none' : '';
+        if (spectrumCtrl) spectrumCtrl.style.display = _fs ? '' : 'none';
         if (btnRow)   btnRow.style.display = '';
         if (msg)      msg.style.display = 'none';
-        if (selectedSleep == null) selectedSleep = 7.5;
+        // 7.5 predates the slider and sits between two of its integer stops, so
+        // the thumb and the readout would disagree ("7.5h" under a thumb at 8).
+        // Full spectrum defaults to a whole 8h instead; the button UI is
+        // unaffected, since its 7-9h bucket covers both.
+        if (selectedSleep == null) selectedSleep = _fs ? 8 : 7.5;
+        if (_fs) _syncSpectrumSliders();
       }
     }
     window._applySleepLock = _applySleepLock;

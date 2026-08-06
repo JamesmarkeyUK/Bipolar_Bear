@@ -275,6 +275,23 @@
           <div class="step-hero-badge" id="sleepHeroBadge" style="display:none;"></div>
         </div>
         <div class="sleep-selector" id="sleepSelector"></div>
+        <!-- Full spectrum sleep slider — shown instead of the five range buttons
+             when the "Full spectrum" advanced setting is on. The buttons stay in
+             the DOM (just hidden) so every existing repaint path keeps working;
+             _syncSpectrumSliders mirrors selectedSleep onto this control. -->
+        <div id="sleepSpectrumControl" class="mood-spectrum-control" style="display:none;">
+          <div class="msc-readout">
+            <div id="slscEmoji" class="msc-emoji">😊</div>
+            <div class="msc-text">
+              <div id="slscValue" class="msc-value">8h</div>
+              <div id="slscLabel" class="msc-label">Healthy range</div>
+            </div>
+          </div>
+          <input type="range" id="slscSlider" class="msc-slider msc-sleep" min="4" max="12" step="1" value="8"
+                 oninput="_onSleepSpectrumChange(this.value)" aria-label="Hours of sleep from 4 or fewer to 12 or more">
+          <div class="msc-scale"><span>≤4h</span><span>8h</span><span>≥12h</span></div>
+          <p style="text-align:center;margin:10px 0 0;"><button type="button" onclick="_revealSleepQuality()" style="background:none;border:none;color:var(--brand-primary);font-size:0.8em;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px;-webkit-tap-highlight-color:transparent;" data-i18n="journal.sleepQualityAdd">+ Add sleep quality</button></p>
+        </div>
         <div id="sleepQualitySubSection" style="display:none;">
           <label style="display:block;margin-top:10px;margin-bottom:6px;font-size:0.85em;color:#6c757d;" data-i18n="journal.label.sleepQuality">Sleep Quality</label>
           <div style="display:flex;gap:8px;">
@@ -293,6 +310,19 @@
           <div class="step-hero-badge" id="energyHeroBadge" style="display:none;"></div>
         </div>
         <div class="energy-selector" id="energySelector"></div>
+        <!-- Full spectrum energy slider — see the sleep control above. -->
+        <div id="energySpectrumControl" class="mood-spectrum-control" style="display:none;">
+          <div class="msc-readout">
+            <div id="enscEmoji" class="msc-emoji">⚡️</div>
+            <div class="msc-text">
+              <div id="enscValue" class="msc-value">5</div>
+              <div id="enscLabel" class="msc-label">Normal</div>
+            </div>
+          </div>
+          <input type="range" id="enscSlider" class="msc-slider msc-energy" min="0" max="10" step="1" value="5"
+                 oninput="_onEnergySpectrumChange(this.value)" aria-label="Energy on a 0 to 10 scale where 5 is normal">
+          <div class="msc-scale"><span>0</span><span>5</span><span>10</span></div>
+        </div>
       </div>
 
       <div class="form-group hidden-until-mood" id="medicationSection">
