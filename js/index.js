@@ -192,8 +192,11 @@ setTimeout(function () {
               const p = d.data();
               return !p.deleted && !p.isTopic && !p.isSystem && p.name !== _myMonika;
             }).length;
+            // `count` drives Intl.PluralRules inside BB.t; `n` fills the
+            // placeholder. Without count it always rendered the plural form,
+            // so a single post read "1 new messages".
             _badge.textContent = _newCount > 0
-              ? _tr('home.anonNewMessages', '💬 ' + _newCount + ' new messages', { n: _newCount })
+              ? _tr('home.anonNewMessages', '💬 ' + _newCount + ' new message' + (_newCount === 1 ? '' : 's'), { n: _newCount, count: _newCount })
               : _tr('home.anonNoMessages', '✓ No new messages');
             _revealBadge(_badge, 'block');
           })
