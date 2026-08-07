@@ -863,7 +863,9 @@
 //       ("1 new message") across all ten locales; changelog entries for
 //       v1.26-v1.28. Touches css/journal.css, journal.html, js/journal.js,
 //       js/index.js, js/shared/i18n.js.
-const CACHE_NAME = 'bipolarbear-v193';
+// v194: release 1.30 (build 30). Version-only invalidation on top of v193 so
+//       returning web clients pick up the new _APP_VERSION.
+const CACHE_NAME = 'bipolarbear-v194';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
