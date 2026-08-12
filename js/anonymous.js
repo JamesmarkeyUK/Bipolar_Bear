@@ -1331,6 +1331,11 @@ function _updateAnonStreak() {
 
 function initBoard() {
   BB.storage.set('AnonLastVisit', Date.now());
+  // Opening the board reads everything up to now — record it so the home
+  // screen's Bipolar Anonymous tick is already active on the way back, before
+  // its own Firestore unread count resolves. (Home re-derives this key from the
+  // live count on load; this just avoids the stale-tick flash in between.)
+  BB.storage.set('Anon_allRead', '1');
   _updateAnonStreak();
   _resolveJoinedAt();
   renderUserPill();

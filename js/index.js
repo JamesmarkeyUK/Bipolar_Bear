@@ -171,6 +171,10 @@ setTimeout(function () {
         if (!_badge) return;
         const _lastVisit = parseInt(BB.storage.get('AnonLastVisit') || '0', 10);
         if (!_lastVisit) {
+          // Never opened the board — nothing has been read, so the tick stays
+          // inactive (unless they've posted today; _refreshAnonTick decides).
+          BB.storage.set('Anon_allRead', '0');
+          if (window._refreshAnonTick) window._refreshAnonTick();
           _badge.textContent = _tr('home.anonTapJoin', '💬 Tap to join the community');
           _revealBadge(_badge, 'block');
           return;
@@ -198,6 +202,11 @@ setTimeout(function () {
             _badge.textContent = _newCount > 0
               ? _tr('home.anonNewMessages', '💬 ' + _newCount + ' new message' + (_newCount === 1 ? '' : 's'), { n: _newCount, count: _newCount })
               : _tr('home.anonNoMessages', '✓ No new messages');
+            // Caught up on the board counts as "done" for the day, same as the
+            // journal tick — cache the verdict so the tick paints from
+            // localStorage on the next load instead of waiting for this query.
+            BB.storage.set('Anon_allRead', _newCount > 0 ? '0' : '1');
+            if (window._refreshAnonTick) window._refreshAnonTick();
             _revealBadge(_badge, 'block');
           })
           .catch(() => {});
@@ -382,10 +391,13 @@ setTimeout(function () {
                   .where('name', '==', _monika)
                   .get().then(snap => {
                     const done = snap.docs.some(dd => { const x = dd.data(); return !x.deleted && _isToday(x.timestamp); });
-                    const _aTick = document.getElementById('anonEntryTick');
-                    if (_aTick) _aTick.setAttribute('data-done', done ? 'true' : 'false');
                     if (done) BB.storage.set('Anon_lastPostDate', _todayKey);
                     else if (BB.storage.get('Anon_lastPostDate') === _todayKey) BB.storage.remove('Anon_lastPostDate');
+                    // Repaint through the shared helper rather than setting
+                    // data-done directly — "posted today" is only one half of
+                    // the tick, and writing false here would wipe the tick off
+                    // a user who is simply all caught up on the board.
+                    if (window._refreshAnonTick) window._refreshAnonTick();
                   }).catch(() => {});
               }
             }
@@ -1060,6 +1072,7 @@ setTimeout(function () {
         'CurrentStreak', 'StableStreak',
         // Anonymous board state
         'Anon_streak', 'Anon_monika', 'Anon_verified', 'AnonLastVisit', 'Anon_lastPostDate',
+        'Anon_allRead',
         // Mood step tutorial hints
         '_moodTipShown', '_fmMoodTipShown',
         '_fmChooseMoodHintDone', '_fmMoodInfoCloseHintDone',
@@ -1619,6 +1632,7 @@ setTimeout(function () {
          'Anon_streak','Anon_med','Anon_medList','Anon_showMeds',
          'Anon_showStable','Anon_stableSince','Anon_stableStreak',
          'Anon_colorKey','Anon_initials','Anon_liked','Anon_hasPosted',
+         'Anon_lastPostDate','Anon_allRead',
          'AnonLastVisit','AnonVisitDate'].forEach(k => BB.storage.remove(k));
         if (typeof applyLogoVariant === 'function') applyLogoVariant(0);
 
@@ -1816,13 +1830,27 @@ setTimeout(function () {
       }
     })();
 
-// ── BLOCK 3b: Bipolar Anonymous "posted today" tick ──
+// ── BLOCK 3b: Bipolar Anonymous tick — posted today OR board all read ──
     (function() {
-      const tick = document.getElementById('anonEntryTick');
-      if (!tick) return;
-      const d = new Date();
-      const todayKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-      tick.setAttribute('data-done', BB.storage.get('Anon_lastPostDate') === todayKey ? 'true' : 'false');
+      // The tick means "nothing outstanding on the board". Two ways to earn it:
+      //   - posted today (bbAnon_lastPostDate)
+      //   - all caught up: no unread posts since the last board visit
+      //     (bbAnon_allRead, cached by _refreshAnonMessagesBadge in BLOCK 2)
+      // Reading everything is the common case — the badge says "✓ No new
+      // messages" — so gating the tick on posting alone left it permanently
+      // dashed for anyone who reads the board without posting.
+      // Exposed on window so BLOCK 2's async Firestore callbacks can repaint it
+      // once the live counts land.
+      window._refreshAnonTick = function () {
+        const tick = document.getElementById('anonEntryTick');
+        if (!tick) return;
+        const d = new Date();
+        const todayKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        const postedToday = BB.storage.get('Anon_lastPostDate') === todayKey;
+        const allRead     = BB.storage.get('Anon_allRead') === '1';
+        tick.setAttribute('data-done', (postedToday || allRead) ? 'true' : 'false');
+      };
+      window._refreshAnonTick();
     })();
 
 // ── BLOCK 4: survival-kit completion tick ──

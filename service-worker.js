@@ -865,7 +865,12 @@
 //       js/index.js, js/shared/i18n.js.
 // v194: release 1.30 (build 30). Version-only invalidation on top of v193 so
 //       returning web clients pick up the new _APP_VERSION.
-const CACHE_NAME = 'bipolarbear-v194';
+// v195: the home Bipolar Anonymous tick now activates when the board is all
+//       read, not only when the user posted that day — reading everything is
+//       the common case ("✓ No new messages"), so the tick sat dashed for
+//       anyone who kept up without posting. Cached in bbAnon_allRead so it
+//       paints on load. Touches js/index.js, js/anonymous.js, js/journal.js.
+const CACHE_NAME = 'bipolarbear-v195';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
