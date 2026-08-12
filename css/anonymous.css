@@ -439,6 +439,7 @@
     .topic-card .topic-head  { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
     .topic-card .topic-emoji { font-size: 15px; }
     .topic-card .topic-label { font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--yellow-dark); }
+    .topic-card .topic-by    { font-size: 11px; font-weight: 700; color: var(--muted, #888); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .topic-card .topic-text  { font-size: 15px; font-weight: 700; color: var(--dark); line-height: 1.35; }
     .topic-card .topic-cta   { font-size: 12px; color: var(--muted, #888); margin-top: 8px; }
 

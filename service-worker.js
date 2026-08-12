@@ -890,7 +890,15 @@
 //       and replies are marked read as they are sent, and the tab badge skips
 //       your own posts the way the home-screen count already did. Touches
 //       js/anonymous.js, css/anonymous.css, js/shared/i18n.js, anonymous.html.
-const CACHE_NAME = 'bipolarbear-v198';
+// v199: the Anonymous daily topic is no longer signed by the BipolarBear admin
+//       account — it posts under a member-style name (Sarah, adam76, Emma_27,
+//       ChloeR …) with an avatar gradient and a streak, derived from the
+//       topic's UTC day so every device shows the same author. The name is
+//       written onto the topic doc and carried over when the topic retires
+//       into an ordinary post; topics archived under the old admin identity
+//       are re-attributed at render time. Touches js/anonymous.js,
+//       css/anonymous.css.
+const CACHE_NAME = 'bipolarbear-v199';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

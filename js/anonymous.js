@@ -555,7 +555,10 @@ function _birthdayDateLabel(iso) {
 }
 
 function getLatestRealPost(tab) {
-  const real = localPosts.filter(p => p.tab === tab && !p.deleted);
+  // Daily topics are excluded: they're app-authored, and since they now post
+  // under a generated member name that name could collide with the user's
+  // monika and wrongly trip the "wait for a reaction" gate.
+  const real = localPosts.filter(p => p.tab === tab && !p.deleted && !p.isTopic && !p.wasTopic);
   if (!real.length) return null;
   return real.reduce((a, b) => {
     const ta = a.timestamp?.toMillis?.() ?? 0;
@@ -2748,7 +2751,7 @@ function dedupeTopics(posts) {
 // current topic has received at least one reply. A topic that sparked no
 // responses stays up until it does, so it always gets its chance to land.
 // When it does rotate, the outgoing topic is NOT deleted — it is demoted to an
-// ordinary BipolarBear post so its reply thread lives on in the feed (an empty
+// ordinary member post so its reply thread lives on in the feed (an empty
 // topic with no replies is simply removed instead, as there's nothing to keep).
 // ─────────────────────────────────────────────────────────────────
 let _dailyTopics        = null; // string[] once loaded
@@ -2822,9 +2825,87 @@ async function fetchTopicDocs() {
   }
 }
 
+// ── Topic author identity ────────────────────────────────────────
+// The daily topic used to be signed by the BipolarBear admin account, which
+// made an ordinary conversation-starter read like a broadcast from the app.
+// It now carries a plain member-style identity — a first name, sometimes with
+// a number or trailing initial, plus one of the standard avatar gradients and
+// a streak — so it sits in the feed like anyone else's post.
+//
+// The identity is DERIVED, not random: a hash of the topic's UTC day string
+// picks every field, so all clients (and topic docs written before these
+// fields existed) resolve the same author for a given day without needing to
+// coordinate. The author fields are still written onto the doc at creation so
+// the archived post keeps its identity even if the pools below change later.
+const TOPIC_NAME_POOL = [
+  'Sarah', 'Adam', 'Emma', 'Josh', 'Chloe', 'Daniel', 'Megan', 'Ryan',
+  'Hannah', 'Liam', 'Olivia', 'Nathan', 'Jess', 'Callum', 'Amelia', 'Owen',
+  'Leah', 'Marcus', 'Grace', 'Toby', 'Nadia', 'Elliot', 'Priya', 'Sam',
+  'Rachel', 'Jamie', 'Sofia', 'Ben', 'Katie', 'Theo', 'Maya', 'Connor',
+];
+const TOPIC_INITIAL_POOL = 'BCDGHJKLMNPRSTW'.split('');
+
+// FNV-1a — small, stable, and dependency-free. Same string always yields the
+// same 32-bit unsigned hash on every device.
+function _topicSeedHash(str) {
+  let h = 2166136261;
+  const s = String(str || '');
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+// Build the member-style author for a topic from its day string (or, as a
+// fallback, its doc id). Returns the exact field set an ordinary post carries.
+function topicAuthor(seed) {
+  const h    = _topicSeedHash(seed);
+  const at   = shift => (h >>> shift) >>> 0;
+  const first = TOPIC_NAME_POOL[at(0) % TOPIC_NAME_POOL.length];
+  const digits = 10 + (at(7) % 89);           // 10–98, reads like a birth year / handle suffix
+  const letter = TOPIC_INITIAL_POOL[at(13) % TOPIC_INITIAL_POOL.length];
+  let name;
+  switch (at(17) % 6) {
+    case 0:  name = first; break;                              // Sarah
+    case 1:  name = first + digits; break;                     // Adam94
+    case 2:  name = first + '_' + digits; break;               // Emma_27
+    case 3:  name = first.toLowerCase() + digits; break;       // josh81
+    case 4:  name = first + letter; break;                     // ChloeR
+    default: name = first.toLowerCase() + '_' + letter.toLowerCase(); break; // daniel_k
+  }
+  const preset = COLOR_PRESETS[at(23) % COLOR_PRESETS.length];
+  return {
+    name,
+    isAdmin:  false,
+    initials: initials(name),
+    grad1:    preset.g1,
+    grad2:    preset.g2,
+    streak:   4 + (at(3) % 115),  // 4–118 days, in the range real members show
+  };
+}
+
+// Resolve the author to render for a topic / archived topic post: the fields
+// stored on the doc when present, otherwise derived from the doc's day. The
+// derived path covers docs written before the author fields existed — topics
+// with no author at all, and ones already archived under the BipolarBear admin
+// identity — so no daily topic anywhere in the feed still reads as admin.
+function topicAuthorOf(p) {
+  const fallback = topicAuthor(p.dayStr || p.id || '');
+  const legacy   = !p.name || p.isAdmin || p.name === 'BipolarBear';
+  if (legacy) return fallback;
+  return {
+    name:     p.name,
+    initials: p.initials || fallback.initials,
+    grad1:    safeColor(p.grad1, fallback.grad1),
+    grad2:    safeColor(p.grad2, fallback.grad2),
+    streak:   num(p.streak, fallback.streak),
+  };
+}
+
 // Retire a topic doc that is no longer the live one. If it sparked a
 // conversation (has at least one reply) it is demoted in place to an ordinary
-// BipolarBear post — same doc id, so the `comments` subcollection and its reply
+// member post — same doc id, so the `comments` subcollection and its reply
 // thread carry over untouched — so the discussion lives on in the feed. If it
 // never got a reply there is nothing to preserve, so it is deleted. `topicDoc`
 // carries the doc data (needs commentCount); pass a synthesized doc when only
@@ -2835,14 +2916,19 @@ function retireTopic(topicDoc) {
   const ref = db.collection(BB_BRAND.collections.posts).doc(topicDoc.id);
   const hasReplies = (Number(topicDoc.commentCount) || 0) > 0;
   if (hasReplies) {
+    // Keep whatever author the topic was posted under; older topic docs (and
+    // ones the admin account wrote) get one derived from their day so the
+    // archived post never reads as BipolarBear.
+    const author = topicAuthorOf(topicDoc);
     ref.update({
       isTopic:  false,   // stop it counting as the live topic / being deduped away
-      wasTopic: true,    // render as a BipolarBear "past daily topic" post
-      name:     'BipolarBear',
-      isAdmin:  true,
-      initials: '🐻',
-      grad1:    YELLOW_LT,
-      grad2:    YELLOW_DARK,
+      wasTopic: true,    // render as a "past daily topic" member post
+      isAdmin:  false,
+      name:     author.name,
+      initials: author.initials,
+      grad1:    author.grad1,
+      grad2:    author.grad2,
+      streak:   author.streak,
     }).catch(() => {});
   } else {
     ref.delete().catch(() => {});
@@ -2893,6 +2979,9 @@ async function maybePostDailyTopic() {
     const existing = await ref.get();
 
     if (!existing.exists) {
+      // Posted under a member-style identity rather than the admin account —
+      // derived from the day string, so it is the same author on every device.
+      const author = topicAuthor(decision.dayStr);
       await ref.set({
         isTopic:    true,
         topicIndex: decision.index,
@@ -2902,6 +2991,12 @@ async function maybePostDailyTopic() {
         likes:      0,
         isSystem:   false,
         pinned:     false,
+        name:       author.name,
+        isAdmin:    author.isAdmin,
+        initials:   author.initials,
+        grad1:      author.grad1,
+        grad2:      author.grad2,
+        streak:     author.streak,
         timestamp:  firebase.firestore.FieldValue.serverTimestamp(),
       });
     }
@@ -3142,26 +3237,19 @@ function authorLabel(item) {
 }
 
 function renderThreadHeader(p) {
-  if (p.isTopic) {
+  // Live and retired daily topics both render under their member-style author
+  // (see topicAuthor) with the topic label demoted to a sub-line, so opening a
+  // topic thread looks like opening any other member's thread.
+  if (p.isTopic || p.wasTopic) {
+    const a = topicAuthorOf(p);
+    const label = p.isTopic ? _wt('anon.feed.todayTopic') : _wt('anon.feed.pastTopic');
     return `<div class="thread-orig-post">
       <div class="post-header">
         <div class="post-avatar">
-          <div class="post-av-circle" style="background:linear-gradient(135deg,${YELLOW_LT},${YELLOW_DARK});">💬</div>
-          <div><div class="post-name">${esc(_wt('anon.feed.todayTopic'))}</div></div>
-        </div>
-        <span class="post-time">${p.timestamp ? timeAgo(p.timestamp) : _wt('anon.time.now')}</span>
-      </div>
-      <div class="post-text">${esc(p.text)}</div>
-    </div>`;
-  }
-  if (p.wasTopic) {
-    return `<div class="thread-orig-post">
-      <div class="post-header">
-        <div class="post-avatar">
-          <div class="post-av-circle" style="background:linear-gradient(135deg,${YELLOW_LT},${YELLOW_DARK});">🐻</div>
+          <div class="post-av-circle" style="background:linear-gradient(135deg,${a.grad1},${a.grad2});">${esc(a.initials)}</div>
           <div>
-            <div class="post-name">[BipolarBear]<span class="admin-badge">ADMIN</span></div>
-            <div class="post-med" style="color:var(--muted);">💬 Past daily topic</div>
+            <div class="post-name">[${esc(a.name)}] 🔥 ${a.streak}d</div>
+            <div class="post-med" style="color:var(--muted);">💬 ${esc(label)}</div>
           </div>
         </div>
         <span class="post-time">${p.timestamp ? timeAgo(p.timestamp) : _wt('anon.time.now')}</span>
@@ -3412,8 +3500,11 @@ function renderPosts(posts) {
   const list = document.getElementById('post-list');
   // Drop posts from users muted on this device, and from users an admin has
   // banned (hidden for everyone). System/announcement cards have no name and
-  // always pass.
-  posts = posts.filter(p => !p.name || (!mutedUsers.has(p.name) && !isBanned(p.name)));
+  // always pass — and so do daily topics, which now carry a generated member
+  // name (see topicAuthor) that could otherwise collide with a muted/banned
+  // monika and silently hide the topic on that device.
+  posts = posts.filter(p => p.isTopic || p.wasTopic || !p.name ||
+    (!mutedUsers.has(p.name) && !isBanned(p.name)));
   // Final safety net: never surface more than one "Today's topic" card, no matter
   // which caller assembled `posts`. assembleGeneralPosts already dedupes, but the
   // optimistic-compose path (and any future render path) can hand us the raw
@@ -3537,31 +3628,37 @@ function renderSystem(p) {
 
 function renderTopic(p) {
   const replies = num(p.commentCount, 0);
+  const a = topicAuthorOf(p);
   const cta = replies
     ? _wt('anon.feed.topicCtaReplies', { count: replies, word: replies === 1 ? _wt('anon.feed.replyOne') : _wt('anon.feed.replyMany') })
     : _wt('anon.feed.topicCtaNone');
+  // The author sits on the label line ("· Sarah_88") — no new copy to
+  // translate, and it matches the name the thread header shows.
   return `<div class="topic-card${threadHasUnread(p) ? ' has-unread' : ''}" data-comment="${esc(p.id)}">
-    <div class="topic-head"><span class="topic-emoji">💬</span><span class="topic-label">${esc(_wt('anon.feed.todayTopic'))}</span></div>
+    <div class="topic-head"><span class="topic-emoji">💬</span><span class="topic-label">${esc(_wt('anon.feed.todayTopic'))}</span><span class="topic-by">· ${esc(a.name)}</span></div>
     <div class="topic-text">${esc(p.text)}</div>
     <div class="topic-cta">${cta}</div>
   </div>`;
 }
 
-// A retired daily topic, rendered as an ordinary BipolarBear post so its reply
-// thread stays open and scrolls with the feed. Styled with the brand avatar and
-// no report/mute/ban affordances — you can't report or mute BipolarBear.
+// A retired daily topic, rendered as an ordinary member post so its reply
+// thread stays open and scrolls with the feed. It carries the same member-style
+// author the topic was posted under (see topicAuthor) and keeps the "past daily
+// topic" sub-label so the thread's origin is still clear. No report/mute/ban
+// affordances — the author isn't a real member to act on.
 function renderArchivedTopic(p) {
   const liked        = likedPosts.has(p.id);
   const likes        = num(p.likes, 0);
   const commentCount = num(p.commentCount, 0);
+  const a            = topicAuthorOf(p);
   const deleteBtn    = profile.isAdmin
     ? `<button class="icon-btn" data-delete="${esc(p.id)}" title="${esc(_wt('anon.modbtn.deletePost'))}">🗑️</button>` : '';
   return `<div class="post-card">
     <div class="post-header">
       <div class="post-avatar">
-        <div class="post-av-circle" style="background:linear-gradient(135deg,${YELLOW_LT},${YELLOW_DARK});">🐻</div>
+        <div class="post-av-circle" style="background:linear-gradient(135deg,${a.grad1},${a.grad2});">${esc(a.initials)}</div>
         <div>
-          <div class="post-name">[BipolarBear]<span class="admin-badge">ADMIN</span></div>
+          <div class="post-name">[${esc(a.name)}] 🔥 ${a.streak}d</div>
           <div class="post-med" style="color:var(--muted);">💬 ${esc(_wt('anon.feed.pastTopic'))}</div>
         </div>
       </div>
@@ -3569,7 +3666,7 @@ function renderArchivedTopic(p) {
     </div>
     <div class="post-text">${esc(p.text)}</div>
     <div class="post-actions">
-      <button class="like-btn ${liked ? 'liked' : ''}" data-id="${esc(p.id)}" data-likes="${likes}" data-author="BipolarBear">
+      <button class="like-btn ${liked ? 'liked' : ''}" data-id="${esc(p.id)}" data-likes="${likes}" data-author="${esc(a.name)}">
         💛 <span>${likes}</span>
       </button>
       ${commentBtnHtml(p, commentCount)}
