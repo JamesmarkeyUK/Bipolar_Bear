@@ -878,7 +878,10 @@
 //       natural slot is taken instead of stacking two FABs on the same
 //       coordinates, and the picker offers any default that could not be
 //       placed. Touches fab.js, js/index.js, js/journal.js, js/shared/i18n.js.
-const CACHE_NAME = 'bipolarbear-v196';
+// v197: release 1.31 (build 31). Packages v195 (Anonymous tick on all-read) and
+//       v196 (Leave a Review dock button) for release, plus the matching
+//       user-facing changelog entry. Touches journal.html.
+const CACHE_NAME = 'bipolarbear-v197';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
