@@ -824,7 +824,7 @@ window.addEventListener('pageshow', () => {
         // Advanced settings badge + tap-hold hint pending
         'bbAdvancedBadgePending', 'bbAdvancedBadgeVisible',
         'bb_fmTapHoldHintPending', 'bb_fmTapHoldHintReady',
-        'bbHasEntries', 'bbFeedbackFabHidden', 'bbWaFabHidden', 'bbFooterHidden',
+        'bbHasEntries', 'bbFeedbackFabHidden', 'bbWaFabHidden', 'bbReviewFabHidden', 'bbFooterHidden',
         'bbPinEnabled', 'bbPinCode',
         'bbWelcomeShown',
         'focusedModeEnabled', 'moreDataOpenByDefault', 'showMoodSuggestion',
@@ -10442,9 +10442,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
          // Streaks — must clear so the home page doesn't render a stale badge
          // for the just-deleted account on the post-redirect render.
          'bbCurrentStreak','bbStableStreak',
-         'bbFeedbackFabHidden','bbWaFabHidden','bbFooterHidden',
+         'bbFeedbackFabHidden','bbWaFabHidden','bbReviewFabHidden','bbFooterHidden',
          // FAB customisation: clear slot assignments and the first-run flag
-         // so the new install gets the empty slot-1 placeholder again.
+         // so the new install gets the first-run dock layout again.
          'bbFabSlot_1','bbFabSlot_2','bbFabSlot_3','bbFabSlot_4',
          'bbFabsUnlocked','bbFabFirstRunDone',
          'bbLogoEasterEggFound','bbCustomFieldHintDone',

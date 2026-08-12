@@ -5,7 +5,7 @@
  * anonymous.html (that page uses its own yellow-themed FAB layout).
  *
  * Self-contained IIFE that on load:
- *   1. Applies first-run defaults (empty slot 1 for brand-new installs).
+ *   1. Applies first-run defaults (Crisis Support hidden on brand-new installs).
  *   2. Injects all FAB markup, CSS and modals into the document.
  *   3. Wires global handlers exposed on `window.*` for inline `onclick=` use.
  *
@@ -32,6 +32,7 @@
  *   bbQuickNoteFabHidden      — security (Data Security) hidden
  *   bbCoffeeFabHidden         — coffee FAB hidden
  *   bbFeedbackFabHidden       — feedback FAB hidden
+ *   bbReviewFabHidden         — review (app-store rating) FAB hidden
  *   bbFooterHidden            — entire footer hidden
  *   bbFabsUnlocked            — '1' once the onboarding tutorial has unlocked the dock
  *   bbFabFirstRunDone         — '1' after first-run defaults applied (one-shot)
@@ -95,7 +96,7 @@
       const v = BB.storage.get('FabSlot_' + s);
       if (v) fabState['slot' + s] = v;
     }
-    ['bbWaFabHidden','bbQuickNoteFabHidden','bbCoffeeFabHidden','bbFeedbackFabHidden','bbFooterHidden'].forEach(k => {
+    ['bbWaFabHidden','bbQuickNoteFabHidden','bbCoffeeFabHidden','bbFeedbackFabHidden','bbReviewFabHidden','bbFooterHidden'].forEach(k => {
       if (localStorage.getItem(k) === '1') fabState[k] = '1';
     });
     window.db.collection('userSettings').doc(window.currentUser.uid)
@@ -107,10 +108,11 @@
 
   /**
    * One-shot migration that hides the Crisis Support FAB on brand-new
-   * installs so the dock starts with a dotted placeholder in slot 1. Tapping
-   * the placeholder opens the picker, and because the chat FAB is "hidden"
-   * it appears there as a re-addable option — subtly teaching the user that
-   * the dock is customisable.
+   * installs, freeing slot 1. Because the chat FAB is "hidden" it shows up in
+   * the picker as a re-addable option — subtly teaching the user that the
+   * dock is customisable. (Slot 1 itself is then taken by the review FAB,
+   * which is the default with no slot of its own; hiding review hands the
+   * slot back to the dotted `+` placeholder.)
    *
    * Returning users are detected by any of: existing FAB state, journal
    * entries, or onboarding progress. They are left untouched.
@@ -123,7 +125,7 @@
     const _existingFabKeys = [
       'bbFabSlot_1', 'bbFabSlot_2', 'bbFabSlot_3', 'bbFabSlot_4',
       'bbWaFabHidden', 'bbQuickNoteFabHidden', 'bbCoffeeFabHidden',
-      'bbFeedbackFabHidden', 'bbFooterHidden',
+      'bbFeedbackFabHidden', 'bbReviewFabHidden', 'bbFooterHidden',
     ];
     const _isReturningUser =
       BB.storage.get('HasEntries') === '1' ||
@@ -147,6 +149,16 @@
   const _COFFEE_BLOCKED = !!(window.BB && BB.platform && BB.platform.isIOS());
 
   /**
+   * Store listings for the review FAB. The `?action=write-review` query param
+   * makes the App Store open straight on the review composer; Play has no
+   * equivalent parameter, so the listing page is the best we can do there.
+   */
+  const _STORE_URLS = {
+    ios:     'https://apps.apple.com/gb/app/bipolar-bear/id6766637453?action=write-review',
+    android: 'https://play.google.com/store/apps/details?id=com.bipolarbear.app',
+  };
+
+  /**
    * Default FABs, one per slot. `hiddenKey` is the localStorage flag that
    * removes the FAB from the dock when set to '1'. Reordering this array
    * does not move existing users' FABs — slot persistence is keyed on `id`
@@ -157,6 +169,12 @@
     { id: 'e2ee',     icon: '🔐', label: 'Data Security',   desc: 'How your data is kept safe',  hiddenKey: 'bbQuickNoteFabHidden',  slotNum: 2 },
     { id: 'coffee',   icon: '☕', label: 'Buy Us a Coffee', desc: 'Support Bipolar Bear',         hiddenKey: 'bbCoffeeFabHidden',     slotNum: 3 },
     { id: 'feedback', icon: '📣', label: 'Send Feedback',   desc: 'Help us make it better',      hiddenKey: 'bbFeedbackFabHidden',   slotNum: 4 },
+    // The dock only has four slots, so `review` is the one default without a
+    // slot of its own — it claims the first free slot (slot 1 on a brand-new
+    // install, where the first-run migration hides Crisis Support; slot 3 on
+    // iOS, where the coffee FAB is suppressed). When every slot is taken it
+    // stays out of the dock and is offered in the picker instead.
+    { id: 'review',   icon: '⭐', label: 'Leave a Review',  desc: 'Rate Bipolar Bear on the app store', hiddenKey: 'bbReviewFabHidden', slotNum: 1 },
   ];
   /**
    * Extra FABs available via the picker — never auto-assigned, only added
@@ -212,7 +230,7 @@
       border-radius: 28px 28px 0 0; z-index: 45;
       box-shadow: 0 -4px 20px rgba(0,0,0,0.10); pointer-events: none;
     }
-    .whatsapp-fab, .placeholder-fab, .coffee-fab, .feedback-fab, .bb-extra-fab {
+    .whatsapp-fab, .placeholder-fab, .coffee-fab, .feedback-fab, .review-fab, .bb-extra-fab {
       position: fixed; bottom: 24px;
       width: 44px; height: 44px; border-radius: 50%;
       background: rgba(255,149,0,0.13); border: none; color: var(--brand-primary); font-size: 1.2em;
@@ -223,7 +241,7 @@
     }
     @media (hover: hover) and (pointer: fine) {
       .whatsapp-fab:hover, .placeholder-fab:hover, .coffee-fab:hover,
-      .feedback-fab:hover, .bb-extra-fab:hover { background: rgba(255,149,0,0.22); transform: scale(1.08); }
+      .feedback-fab:hover, .review-fab:hover, .bb-extra-fab:hover { background: rgba(255,149,0,0.22); transform: scale(1.08); }
     }
     .fab-dot-placeholder {
       position: fixed; bottom: 24px;
@@ -437,6 +455,30 @@
         </div>
       </div>
 
+      <button class="review-fab" id="reviewFab" onclick="openReviewModal()" title="Leave a review" data-i18n-title="fab.review.tooltip">⭐</button>
+      <div id="bbReviewModal" class="bb-fab-modal" onclick="if(event.target===this)closeReviewModal()">
+        <div style="background:white;border-radius:20px;padding:24px 24px 20px;text-align:center;max-width:300px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.22);">
+          <div style="font-size:2em;margin-bottom:8px;">⭐⭐⭐</div>
+          <div style="font-weight:700;font-size:1.05em;color:#212529;margin-bottom:8px;" data-i18n="fab.review.title">Enjoying Bipolar Bear?</div>
+          <p style="font-size:0.88em;color:#6c757d;line-height:1.55;margin-bottom:16px;" data-i18n="fab.review.body">A review helps other people going through the same thing find the app. It only takes a moment.</p>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <a id="bbReviewIosLink" href="#" target="_blank" rel="noopener noreferrer" onclick="closeReviewModal()"
+              style="display:none;padding:13px;background:#000;color:white;border-radius:12px;text-decoration:none;font-weight:700;font-size:0.95em;text-align:center;">
+              <span data-i18n="fab.review.appStore">🍎 Review on the App Store</span>
+            </a>
+            <a id="bbReviewAndroidLink" href="#" target="_blank" rel="noopener noreferrer" onclick="closeReviewModal()"
+              style="display:none;padding:13px;background:#01875f;color:white;border-radius:12px;text-decoration:none;font-weight:700;font-size:0.95em;text-align:center;">
+              <span data-i18n="fab.review.googlePlay">▶️ Review on Google Play</span>
+            </a>
+            <button onclick="closeReviewModal()" style="padding:10px;background:#f8f9fa;color:#6c757d;border:none;border-radius:12px;font-size:0.9em;cursor:pointer;" data-i18n="fab.review.later">Maybe later</button>
+            <button onclick="window._showHidePermanently('review')"
+              style="padding:8px;background:none;border:none;color:#adb5bd;font-size:0.8em;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-i18n="common.hideButton">
+              🙈 Hide this button
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Center auth FAB (always at 50%, not part of slot system) -->
       <button id="bbAuthFab" class="bb-auth-fab" onclick="(window._fabOpenAuth||function(){})()" title="Profile / Sign in">👤</button>
 
@@ -628,6 +670,15 @@
    *
    * @returns {void}
    */
+  /**
+   * Ids of the default FABs that got a slot on the last `_applyFabDock()`
+   * run. The picker uses it to offer any visible-but-unplaced default (there
+   * are five defaults for four slots), so a FAB squeezed out of the dock is
+   * still reachable.
+   * @type {Set<string>}
+   */
+  let _placedDefaults = new Set();
+
   function _applyFabDock() {
     const _fabsUnlocked = BB.storage.get('FabsUnlocked') === '1';
     const _footer = document.querySelector('.fab-footer');
@@ -643,7 +694,8 @@
     if (!_fabsUnlocked) {
       if (_footer) _footer.style.display = 'none';
       [document.getElementById('chatFab'), document.getElementById('quickNoteFab'),
-       document.getElementById('coffeeFab'), document.querySelector('.feedback-fab')].forEach(el => { if (el) el.style.display = 'none'; });
+       document.getElementById('coffeeFab'), document.querySelector('.feedback-fab'),
+       document.getElementById('reviewFab')].forEach(el => { if (el) el.style.display = 'none'; });
       Object.values(_extraMap).forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
       for (let s = 1; s <= 4; s++) { const ph = document.getElementById('fabPh' + s); if (ph) ph.style.display = 'none'; }
       return;
@@ -675,33 +727,71 @@
       e2ee:     BB.storage.get('QuickNoteFabHidden') !== '1',
       coffee:   !_COFFEE_BLOCKED && BB.storage.get('CoffeeFabHidden') !== '1',
       feedback: BB.storage.get('FeedbackFabHidden')  !== '1',
+      review:   BB.storage.get('ReviewFabHidden')    !== '1',
     };
     const _defEl = {
       chat:     document.getElementById('chatFab'),
       e2ee:     document.getElementById('quickNoteFab'),
       coffee:   document.getElementById('coffeeFab'),
       feedback: document.querySelector('.feedback-fab'),
+      review:   document.getElementById('reviewFab'),
     };
 
-    // Resolve which slot each default FAB lives in (can be reassigned via picker)
+    // Resolve which slot each visible default FAB lives in, in three passes:
+    //   1. an explicit picker assignment (bbFabSlot_N === id) always wins;
+    //   2. otherwise the FAB's natural `slotNum`, if still free;
+    //   3. otherwise the lowest free slot.
+    // There are five defaults and only four slots, so a FAB can end up with no
+    // slot at all — it is then left out of the dock and offered in the picker
+    // (see `_placedDefaults`). Hidden defaults never reserve a slot, which is
+    // what frees slot 1 on a brand-new install and slot 3 on iOS.
     const _defaultSlotMap = {};
-    _FAB_DEFAULTS.forEach(_def => {
+    const _slotOccupied = {};
+    const _visibleDefaults = _FAB_DEFAULTS.filter(_def => _defVis[_def.id]);
+    const _unassigned = [];
+    _visibleDefaults.forEach(_def => {
       let _found = null;
       for (let s = 1; s <= 4; s++) {
         if (BB.storage.get('FabSlot_' + s) === _def.id) { _found = s; break; }
       }
-      _defaultSlotMap[_def.id] = _found !== null ? _found : _def.slotNum;
+      if (_found !== null) {
+        _defaultSlotMap[_def.id] = _found;
+        _slotOccupied[_found] = true;
+      } else {
+        _unassigned.push(_def);
+      }
     });
+    _unassigned.forEach(_def => {
+      if (!_slotOccupied[_def.slotNum]) {
+        _defaultSlotMap[_def.id] = _def.slotNum;
+        _slotOccupied[_def.slotNum] = true;
+      }
+    });
+    // Slots the user has explicitly given to an extra FAB are off-limits to
+    // pass 3, so adding `review` never evicts a button the user chose to dock.
+    const _extraClaimed = {};
+    for (let s = 1; s <= 4; s++) {
+      const _a = BB.storage.get('FabSlot_' + s);
+      if (_a && _extraMap[_a]) _extraClaimed[s] = true;
+    }
+    _unassigned.forEach(_def => {
+      if (_defaultSlotMap[_def.id]) return;
+      for (let s = 1; s <= 4; s++) {
+        if (!_slotOccupied[s] && !_extraClaimed[s]) {
+          _defaultSlotMap[_def.id] = s; _slotOccupied[s] = true; return;
+        }
+      }
+    });
+
+    _placedDefaults = new Set(Object.keys(_defaultSlotMap));
 
     _FAB_DEFAULTS.forEach(_def => {
       const _el = _defEl[_def.id];
       if (!_el) return;
-      _el.style.display = _defVis[_def.id] ? (_def.id === 'feedback' ? '' : 'flex') : 'none';
-      _el.style.left = _slotPos[_defaultSlotMap[_def.id]];
+      const _slot = _defaultSlotMap[_def.id];
+      _el.style.display = _slot ? (_def.id === 'feedback' ? '' : 'flex') : 'none';
+      if (_slot) _el.style.left = _slotPos[_slot];
     });
-
-    const _slotOccupied = {};
-    _FAB_DEFAULTS.forEach(_def => { if (_defVis[_def.id]) _slotOccupied[_defaultSlotMap[_def.id]] = true; });
 
     // Hide all extras first, then show the assigned ones
     Object.values(_extraMap).forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
@@ -749,7 +839,9 @@
     _opts.innerHTML = '';
     _FAB_DEFAULTS.forEach(_def => {
       if (_def.id === 'coffee' && _COFFEE_BLOCKED) return;
-      if (localStorage.getItem(_def.hiddenKey) === '1') {
+      // Offer a default when the user hid it, and also when it is visible but
+      // could not be placed (more defaults than slots — see _placedDefaults).
+      if (localStorage.getItem(_def.hiddenKey) === '1' || !_placedDefaults.has(_def.id)) {
         const _btn = document.createElement('button');
         _btn.style.cssText = 'display:flex;align-items:center;gap:14px;width:100%;padding:13px 14px;background:#f8f9fa;border:1.5px solid #e9ecef;border-radius:14px;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;';
         _btn.innerHTML = `<span style="font-size:1.6em;line-height:1;">${_def.icon}</span><div><div style="font-weight:700;font-size:0.95em;color:#212529;">${_bbT('fab.picker.' + _def.id + 'Label', _def.label)}</div><div style="font-size:0.8em;color:#adb5bd;margin-top:2px;">${_bbT('fab.picker.' + _def.id + 'Desc', _def.desc)}</div></div>`;
@@ -824,6 +916,36 @@
   window.openSecurityModal = function () { document.getElementById('securityModal').classList.add('open'); };
   /** @returns {void} */
   window.closeSecurityModal = function () { document.getElementById('securityModal').classList.remove('open'); };
+
+  /**
+   * Open the "Leave a review" modal. In the native shells only the store the
+   * app was actually installed from is offered (linking an iOS user at Google
+   * Play is dead weight, and App Store guideline 3.1.1 dislikes pointing at
+   * other storefronts); on the web both listings are shown so the visitor can
+   * pick whichever platform they're on.
+   *
+   * @returns {void}
+   */
+  window.openReviewModal = function () {
+    const _ios     = !!(window.BB && BB.platform && BB.platform.isIOS());
+    const _android = !!(window.BB && BB.platform && BB.platform.isAndroid());
+    const _native  = !!(window.BB && BB.platform && BB.platform.isNative());
+    const _showIos     = !_native || _ios;
+    const _showAndroid = !_native || _android;
+    const _iosLink = document.getElementById('bbReviewIosLink');
+    if (_iosLink) {
+      _iosLink.href = _STORE_URLS.ios;
+      _iosLink.style.display = _showIos ? 'block' : 'none';
+    }
+    const _androidLink = document.getElementById('bbReviewAndroidLink');
+    if (_androidLink) {
+      _androidLink.href = _STORE_URLS.android;
+      _androidLink.style.display = _showAndroid ? 'block' : 'none';
+    }
+    document.getElementById('bbReviewModal').classList.add('open');
+  };
+  /** @returns {void} */
+  window.closeReviewModal = function () { document.getElementById('bbReviewModal').classList.remove('open'); };
 
   /**
    * Open the "Buy us a coffee" modal and best-effort fetch the current
@@ -1419,7 +1541,7 @@
    * Firestore. The hidden FAB then appears in the picker as a re-addable
    * option.
    *
-   * @param {'chat'|'wa'|'quicknote'|'feedback'|'coffee'} type
+   * @param {'chat'|'wa'|'quicknote'|'feedback'|'coffee'|'review'} type
    */
   window._showHidePermanently = function (type) {
     if (type === 'chat' || type === 'wa') {
@@ -1434,6 +1556,9 @@
     } else if (type === 'coffee') {
       window.closeCoffeeModal();
       BB.storage.set('CoffeeFabHidden', '1');
+    } else if (type === 'review') {
+      window.closeReviewModal();
+      BB.storage.set('ReviewFabHidden', '1');
     }
     _applyFabDock();
     _syncFabsToFirestore();

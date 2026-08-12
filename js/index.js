@@ -345,7 +345,7 @@ setTimeout(function () {
               for (let s = 1; s <= 4; s++) {
                 if (_fs['slot' + s]) BB.storage.set('FabSlot_' + s, _fs['slot' + s]);
               }
-              ['bbWaFabHidden','bbQuickNoteFabHidden','bbCoffeeFabHidden','bbFeedbackFabHidden','bbFooterHidden'].forEach(k => {
+              ['bbWaFabHidden','bbQuickNoteFabHidden','bbCoffeeFabHidden','bbFeedbackFabHidden','bbReviewFabHidden','bbFooterHidden'].forEach(k => {
                 if (_fs[k] === '1') localStorage.setItem(k, '1');
               });
               if (typeof window._applyFabDock === 'function') window._applyFabDock();
@@ -1086,7 +1086,7 @@ setTimeout(function () {
         // Misc hints
         'PersonalHintDone',
         'FavouriteHintSeen', 'PrivateHintSeen', 'FavAnniShown',
-        'FeedbackFabHidden', 'WaFabHidden', 'CoffeeFabHidden', 'QuickNoteFabHidden', 'FooterHidden', 'FabsUnlocked',
+        'FeedbackFabHidden', 'WaFabHidden', 'CoffeeFabHidden', 'QuickNoteFabHidden', 'ReviewFabHidden', 'FooterHidden', 'FabsUnlocked',
         'FabSlot_1', 'FabSlot_2', 'FabSlot_3', 'FabSlot_4',
         'LogoEasterEggFound',
         'PinEnabled', 'PinCode',
@@ -1542,7 +1542,7 @@ setTimeout(function () {
          'bb_fmTapHoldHintPending','bb_fmTapHoldHintReady',
          'bbHasEntries','bbOnboardingStep',
          'bbCurrentStreak','bbStableStreak',
-         'bbFeedbackFabHidden','bbWaFabHidden','bbFooterHidden',
+         'bbFeedbackFabHidden','bbWaFabHidden','bbReviewFabHidden','bbFooterHidden',
          'bbFabSlot_1','bbFabSlot_2','bbFabSlot_3','bbFabSlot_4',
          'bbFabsUnlocked','bbFabFirstRunDone',
          'bbLogoEasterEggFound','bbCustomFieldHintDone',
@@ -1759,7 +1759,7 @@ setTimeout(function () {
             document.getElementById('_dockCancelBtn').addEventListener('click', () => _confirmOverlay.remove());
             document.getElementById('_dockConfirmBtn').addEventListener('click', () => {
               _confirmOverlay.remove();
-              ['WaFabHidden','QuickNoteFabHidden','CoffeeFabHidden','FeedbackFabHidden','FabSlot_1','FabSlot_2','FabSlot_3','FabSlot_4'].forEach(k => BB.storage.remove(k));
+              ['WaFabHidden','QuickNoteFabHidden','CoffeeFabHidden','FeedbackFabHidden','ReviewFabHidden','FabSlot_1','FabSlot_2','FabSlot_3','FabSlot_4'].forEach(k => BB.storage.remove(k));
               _applyOnboardingGating();
               const _t = document.createElement('div');
               Object.assign(_t.style, { position:'fixed', top:'calc(env(safe-area-inset-top,0px) + 12px)', left:'50%', transform:'translateX(-50%)', background:'var(--brand-primary)', color:'white', padding:'10px 20px', borderRadius:'20px', fontWeight:'700', fontSize:'0.9em', zIndex:'9999', whiteSpace:'nowrap', boxShadow:'0 4px 16px rgba(0,0,0,0.2)', pointerEvents:'none' });

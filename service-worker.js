@@ -870,7 +870,15 @@
 //       the common case ("✓ No new messages"), so the tick sat dashed for
 //       anyone who kept up without posting. Cached in bbAnon_allRead so it
 //       paints on load. Touches js/index.js, js/anonymous.js, js/journal.js.
-const CACHE_NAME = 'bipolarbear-v195';
+// v196: new "Leave a Review" dock button (⭐) — a fifth default FAB that takes
+//       the first free slot (slot 1 on a new install, slot 3 on iOS where the
+//       coffee FAB is suppressed) and opens a modal linking to the App Store
+//       and Google Play. Native builds show only their own store; the web
+//       shows both. The dock's slot resolution now relocates a default whose
+//       natural slot is taken instead of stacking two FABs on the same
+//       coordinates, and the picker offers any default that could not be
+//       placed. Touches fab.js, js/index.js, js/journal.js, js/shared/i18n.js.
+const CACHE_NAME = 'bipolarbear-v196';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
