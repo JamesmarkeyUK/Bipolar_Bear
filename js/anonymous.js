@@ -1472,11 +1472,27 @@ function saveLastSeen(tab) {
 
 function tabHasUnseen(tab) {
   const seen = lastSeenMs[tab];
+  const mine = profile.monika;
   return postsByTab[tab].some(p => {
     if (p.isSystem || p.isSeed || p.isAnnouncement || p.deleted || p.isTopic) return false;
-    const la = p.lastActivity?.toMillis?.() ?? 0;
-    const ts = p.timestamp?.toMillis?.()    ?? 0;
-    return Math.max(la, ts) > seen;
+    // Unread replies count on any post, your own included — that's how you
+    // hear that somebody answered you.
+    if (threadSeen[p.id]) {
+      if (threadHasUnread(p)) return true;
+    } else {
+      // No read state for this thread (it has never rendered on this device),
+      // so fall back to its activity stamp. Commenting is only possible from
+      // the thread overlay, which records read state, so a bump reaching this
+      // branch is never the user's own reply.
+      const la = p.lastActivity?.toMillis?.() ?? 0;
+      if (la > seen) return true;
+    }
+    // A post you wrote is not news to you — you saw it when you posted it.
+    // (_refreshAnonMessagesBadge in js/index.js applies the same rule to the
+    // home-screen count.)
+    if (mine && p.name === mine) return false;
+    const ts = p.timestamp?.toMillis?.() ?? 0;
+    return ts > seen;
   });
 }
 
@@ -1530,9 +1546,12 @@ function _saveThreadSeen() {
 }
 
 // Only real, live post docs carry a thread. Seeds, the system card, the feed
-// footer and tombstones have no comments to be unread.
+// footer and tombstones have no comments to be unread — nor does the `local-`
+// placeholder an optimistic compose renders before its doc id comes back
+// (marked read against the real id once the write lands).
 function _isThreadable(p) {
-  return !!(p && p.id && !p.isSeed && !p.isSystem && !p.isAnnouncement && !p.isFooter && !p.deleted);
+  return !!(p && p.id && !String(p.id).startsWith('local-')
+    && !p.isSeed && !p.isSystem && !p.isAnnouncement && !p.isFooter && !p.deleted);
 }
 
 function threadHasUnread(p) {
@@ -3306,6 +3325,11 @@ function setupThread() {
         const postRef = db.collection(BB_BRAND.collections.posts).doc(commentTargetId);
         await postRef.collection('comments').add(comment);
         sent = true;
+        // Your own reply is read the instant you send it. The thread listener
+        // lands on the same number a moment later, but recording it here means
+        // a dead listener — or closing the sheet mid-flight — can't leave your
+        // own comment pulsing back at you from the feed.
+        markThreadSeen(commentTargetId, num(threadSeen[commentTargetId]?.c, 0) + 1);
         _anonMarkPostedToday();
         // Bump the parent post to the top of the board and update count.
         // Separate try — a failed bump shouldn't read as a failed comment.
@@ -3776,6 +3800,10 @@ function setupCompose() {
           timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         });
         docId = ref.id;
+        // A post you just wrote starts read, with no replies outstanding — the
+        // first-render baseline would land on the same value, but only if the
+        // post renders before anyone answers it.
+        markThreadSeen(docId, 0);
         _anonMarkPostedToday();
         // Replace optimistic entry with the real one from the snapshot (happens automatically)
       } catch (e) { console.error('[Anonymous] post failed', e); }

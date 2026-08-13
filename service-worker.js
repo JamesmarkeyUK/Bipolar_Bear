@@ -886,8 +886,10 @@
 //       button (and the daily-topic card its 💬 head icon) until the thread is
 //       opened. Read state is a per-post count in bbAnon_threadSeen; threads
 //       are baselined on first render so a first load doesn't light up
-//       wholesale. Touches js/anonymous.js, css/anonymous.css,
-//       js/shared/i18n.js, anonymous.html.
+//       wholesale. Content you wrote yourself is never unread to you: posts
+//       and replies are marked read as they are sent, and the tab badge skips
+//       your own posts the way the home-screen count already did. Touches
+//       js/anonymous.js, css/anonymous.css, js/shared/i18n.js, anonymous.html.
 const CACHE_NAME = 'bipolarbear-v198';
 
 /**
