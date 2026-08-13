@@ -881,7 +881,14 @@
 // v197: release 1.31 (build 31). Packages v195 (Anonymous tick on all-read) and
 //       v196 (Leave a Review dock button) for release, plus the matching
 //       user-facing changelog entry. Touches journal.html.
-const CACHE_NAME = 'bipolarbear-v197';
+// v198: Anonymous board: per-thread unread replies. A post whose commentCount
+//       runs ahead of the comment count last seen in its thread pulses its 💬
+//       button (and the daily-topic card its 💬 head icon) until the thread is
+//       opened. Read state is a per-post count in bbAnon_threadSeen; threads
+//       are baselined on first render so a first load doesn't light up
+//       wholesale. Touches js/anonymous.js, css/anonymous.css,
+//       js/shared/i18n.js, anonymous.html.
+const CACHE_NAME = 'bipolarbear-v198';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

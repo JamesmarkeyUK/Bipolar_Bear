@@ -68,6 +68,11 @@ const lastSeenMs = {
   announcements: parseInt(BB.storage.get('Anon_lastSeen_announcements') || '0', 10),
   general:       parseInt(BB.storage.get('Anon_lastSeen_general')       || '0', 10),
 };
+// Per-thread read state: postId → { c: comments seen, t: when it was stored }.
+// A post whose live commentCount runs ahead of its stored `c` has replies the
+// user hasn't read, and its 💬 button pulses. See the unread-reply helpers.
+const THREAD_SEEN_KEY = 'Anon_threadSeen';
+let threadSeen = _loadThreadSeen();
 let localPosts      = [];
 let sosTargetName   = '';
 let reportTargetId  = '';
@@ -1480,6 +1485,110 @@ function renderTabBadges() {
     const btn = document.querySelector(`.board-tab[data-tab="${tab}"]`);
     if (btn) btn.classList.toggle('has-badge', tab !== currentTab && tabHasUnseen(tab));
   });
+}
+// ──────────────────────────────────────────────────────────────────
+
+// ── Unread replies, per thread ─────────────────────────────────────
+// The tab badge above answers "is there anything new on this tab?". These
+// helpers answer the finer question "which of these threads has replies I
+// haven't read?", and pulse that post's 💬 button until the thread is opened.
+//
+// Read state is a count, not a timestamp: a thread is unread when the post
+// doc's commentCount runs ahead of the number of comments we saw the last time
+// its thread was open. Counts survive a clock skew and, unlike lastActivity,
+// don't flag your own reply as unread.
+//
+// Threads are baselined the first time they render (see baselineThreadSeen),
+// so a first-ever board load doesn't light up every post that already had
+// replies — only activity from that point on counts as unread.
+
+function _loadThreadSeen() {
+  try {
+    const raw = JSON.parse(BB.storage.get(THREAD_SEEN_KEY) || '{}');
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return {};
+    // Posts are swept after POST_RETENTION_DAYS, so entries older than twice
+    // that can't refer to a live thread — drop them and keep the map small.
+    const cutoff = Date.now() - (POST_RETENTION_DAYS * 2 * DAY_MS);
+    const out = {};
+    Object.keys(raw).forEach(id => {
+      const e = raw[id];
+      const t = e && num(e.t, 0);
+      if (t > cutoff) out[id] = { c: Math.max(0, num(e.c, 0)), t };
+    });
+    return out;
+  } catch (e) { return {}; }
+}
+
+// Coalesce the writes — a burst of snapshots (or a feed full of first-sight
+// posts being baselined) would otherwise re-serialise the whole map each time.
+let _threadSeenSaveT = null;
+function _saveThreadSeen() {
+  clearTimeout(_threadSeenSaveT);
+  _threadSeenSaveT = setTimeout(() => {
+    try { BB.storage.set(THREAD_SEEN_KEY, JSON.stringify(threadSeen)); } catch (e) {}
+  }, 400);
+}
+
+// Only real, live post docs carry a thread. Seeds, the system card, the feed
+// footer and tombstones have no comments to be unread.
+function _isThreadable(p) {
+  return !!(p && p.id && !p.isSeed && !p.isSystem && !p.isAnnouncement && !p.isFooter && !p.deleted);
+}
+
+function threadHasUnread(p) {
+  if (!_isThreadable(p)) return false;
+  const seen = threadSeen[p.id];
+  if (!seen) return false; // never seen before → baselined on this render, not flagged
+  return num(p.commentCount, 0) > seen.c;
+}
+
+// Record how many comments the user has now seen in a thread. Called from the
+// open thread's snapshot, so a reply that arrives while you're reading counts
+// as read — including your own.
+function markThreadSeen(postId, count) {
+  if (!postId) return;
+  const c = Math.max(0, num(count, 0));
+  const prev = threadSeen[postId];
+  if (prev && prev.c === c) return; // already current; no write needed
+  threadSeen[postId] = { c, t: Date.now() };
+  _saveThreadSeen();
+}
+
+// First sight of a thread sets its baseline instead of flagging it. Runs after
+// the feed markup is built so this render still reads the previous state.
+function baselineThreadSeen(posts) {
+  let added = false;
+  posts.forEach(p => {
+    if (!_isThreadable(p) || threadSeen[p.id]) return;
+    threadSeen[p.id] = { c: Math.max(0, num(p.commentCount, 0)), t: Date.now() };
+    added = true;
+  });
+  if (added) _saveThreadSeen();
+}
+
+// Repaint the unread affordance on the already-rendered feed. Used when the
+// thread overlay closes: the feed underneath is untouched by that, and a full
+// re-render would throw away the user's scroll position.
+function syncUnreadFlags() {
+  const list = document.getElementById('post-list');
+  if (!list) return;
+  list.querySelectorAll('[data-comment]').forEach(el => {
+    const post   = localPosts.find(p => p.id === el.dataset.comment);
+    const unread = threadHasUnread(post);
+    el.classList.toggle('has-unread', unread);
+    if (el.classList.contains('comment-btn')) {
+      el.title = _wt(unread ? 'anon.modbtn.newReplies' : 'anon.modbtn.viewComments');
+    }
+  });
+}
+
+// Shared by renderPost and renderArchivedTopic — the 💬 pulses and gains a dot
+// while the thread holds replies the user hasn't opened.
+function commentBtnHtml(p, commentCount) {
+  const unread = threadHasUnread(p);
+  const title  = _wt(unread ? 'anon.modbtn.newReplies' : 'anon.modbtn.viewComments');
+  return `<button class="comment-btn${unread ? ' has-unread' : ''}" data-comment="${esc(p.id)}" title="${esc(title)}">`
+       + `<span class="cb-icon">💬</span>${commentCount > 0 ? ` <span>${commentCount}</span>` : ''}</button>`;
 }
 // ──────────────────────────────────────────────────────────────────
 
@@ -2930,6 +3039,10 @@ async function openThread(postId) {
       // else commented" and lifts your own gate.
       const lastDoc = snap.docs[snap.docs.length - 1];
       lastCommentAuthor = lastDoc ? (lastDoc.data().name || '') : '';
+      // Everything in this thread is now read. Take the higher of the real
+      // comment count and the parent's counter so a drifted commentCount (a
+      // decrement that never landed) can't leave the post pulsing forever.
+      markThreadSeen(postId, Math.max(snap.docs.length, num(post.commentCount, 0)));
       const comments = snap.docs.map(d => ({ id: d.id, ...d.data() }))
         .filter(c => !c.name || (!mutedUsers.has(c.name) && !isBanned(c.name)));
       const el = document.getElementById('thread-comments-list');
@@ -2950,6 +3063,7 @@ function closeThread() {
   closeOv('ov-thread');
   commentTargetId = '';
   lastCommentAuthor = '';
+  syncUnreadFlags(); // drop the pulse on the thread just read, in place
 }
 
 // Hard-delete a comment from a thread (self-remove or admin-remove) and keep
@@ -3318,6 +3432,9 @@ function renderPosts(posts) {
     if (p.isFooter)       return renderFeedFooter();
     return renderPost(p);
   }).join('');
+  // After the markup, never before — a thread first seen on this render is
+  // baselined, so it isn't flagged as unread the moment it appears.
+  baselineThreadSeen(posts);
 
   // Like buttons
   list.querySelectorAll('.like-btn').forEach(btn => {
@@ -3399,7 +3516,7 @@ function renderTopic(p) {
   const cta = replies
     ? _wt('anon.feed.topicCtaReplies', { count: replies, word: replies === 1 ? _wt('anon.feed.replyOne') : _wt('anon.feed.replyMany') })
     : _wt('anon.feed.topicCtaNone');
-  return `<div class="topic-card" data-comment="${esc(p.id)}">
+  return `<div class="topic-card${threadHasUnread(p) ? ' has-unread' : ''}" data-comment="${esc(p.id)}">
     <div class="topic-head"><span class="topic-emoji">💬</span><span class="topic-label">${esc(_wt('anon.feed.todayTopic'))}</span></div>
     <div class="topic-text">${esc(p.text)}</div>
     <div class="topic-cta">${cta}</div>
@@ -3431,7 +3548,7 @@ function renderArchivedTopic(p) {
       <button class="like-btn ${liked ? 'liked' : ''}" data-id="${esc(p.id)}" data-likes="${likes}" data-author="BipolarBear">
         💛 <span>${likes}</span>
       </button>
-      <button class="comment-btn" data-comment="${esc(p.id)}" title="${esc(_wt('anon.modbtn.viewComments'))}">💬${commentCount > 0 ? ` <span>${commentCount}</span>` : ''}</button>
+      ${commentBtnHtml(p, commentCount)}
       <div style="flex:1"></div>
       ${deleteBtn}
     </div>
@@ -3479,8 +3596,7 @@ function renderPost(p) {
     ? `<button class="icon-btn${p.pinned ? ' pin-active' : ''}" data-pin="${esc(p.id)}" data-tab="${esc(p.tab || currentTab)}" title="${esc(p.pinned ? _wt('anon.modbtn.unpinPost') : _wt('anon.modbtn.pinPost'))}">📌</button>` : '';
   const selfDeleteBtn = !p.isSeed && !profile.isAdmin && p.name === profile.monika && isSelfDeleteEligible(p)
     ? `<button class="icon-btn" data-selfdelete="${esc(p.id)}" title="${esc(_wt('anon.modbtn.selfDeletePost'))}" style="opacity:0.4;">🗑️</button>` : '';
-  const commentBtn   = !p.isSeed
-    ? `<button class="comment-btn" data-comment="${esc(p.id)}" title="${esc(_wt('anon.modbtn.viewComments'))}">💬${commentCount > 0 ? ` <span>${commentCount}</span>` : ''}</button>` : '';
+  const commentBtn   = !p.isSeed ? commentBtnHtml(p, commentCount) : '';
   const pinnedBadge  = p.pinned ? `<div class="pinned-badge">📌 ${esc(_wt('anon.modbtn.pinnedBadge'))}</div>` : '';
   const postBday     = _birthdayCompact(p.joinedAt || '');
   return `<div class="post-card${p.pinned ? ' post-pinned' : ''}">

@@ -502,6 +502,39 @@
       font-family: inherit; transition: all 0.15s;
     }
     .comment-btn:active { background: var(--yellow-bg); }
+    .comment-btn .cb-icon { display: inline-block; transform-origin: 50% 80%; }
+
+    /* Unread replies — the 💬 wobbles and a red dot trails the count until the
+       thread is opened. Applied by renderPost / syncUnreadFlags in
+       js/anonymous.js from the per-thread seen map. */
+    .comment-btn.has-unread {
+      background: var(--yellow-bg); border-color: var(--yellow);
+      color: var(--dark); font-weight: 700;
+    }
+    .comment-btn.has-unread .cb-icon { animation: unread-bubble 2.2s ease-in-out infinite; }
+    .comment-btn.has-unread::after {
+      content: ''; width: 7px; height: 7px; margin-left: 1px;
+      background: #e53935; border-radius: 50%; flex-shrink: 0;
+      animation: badge-pulse 1.4s ease-in-out infinite;
+    }
+    /* Same signal on the daily-topic card, whose 💬 is its head icon */
+    .topic-card.has-unread { background: rgba(245,200,0,0.18); border-color: rgba(245,200,0,0.85); }
+    .topic-card.has-unread .topic-emoji { display: inline-block; transform-origin: 50% 80%; animation: unread-bubble 2.2s ease-in-out infinite; }
+
+    /* Two quick wobbles, then a long rest — a continuous shake next to a wall
+       of text is exhausting to read past. */
+    @keyframes unread-bubble {
+      0%, 32%, 100% { transform: scale(1)    rotate(0);    }
+      6%            { transform: scale(1.22) rotate(-11deg); }
+      13%           { transform: scale(1.22) rotate(9deg);  }
+      20%           { transform: scale(1.18) rotate(-7deg); }
+      26%           { transform: scale(1.1)  rotate(0);    }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .comment-btn.has-unread .cb-icon,
+      .comment-btn.has-unread::after,
+      .topic-card.has-unread .topic-emoji { animation: none; }
+    }
 
     /* ── Thread overlay ── */
     .thread-sheet {
