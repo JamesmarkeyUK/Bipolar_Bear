@@ -1,5 +1,13 @@
 # BipolarBear Changelog
 
+> Note: releases 1.26 – 1.31 shipped without an entry here. The service-worker
+> `CACHE_NAME` notes in `service-worker.js` (v179 – v199) are the record for
+> that stretch.
+
+## v1.32
+- 👥 **User counts across both apps** — the home screen now shows how many people are using Bipolar Bear (just above the footer credit), and the Bipolar Anonymous board header shows how many members the community has. Both read live Firestore counters (`counters/userCount`, `counters/anonUserCount`) maintained by a new shared module. Each account counts itself exactly once — the increment and the account's one-time `counted` flag are written in the same transaction — so accounts that predate this are picked up on their next visit, no device double-counts, and deleting an account gives the count back. Anonymous members are keyed on `anonProfiles/{sha256(email)}`, the one document shared by the BipolarBear-account and standalone email-code paths, so the same person is never counted twice. Both lines paint from a localStorage cache first (so they survive an offline load or a failed Firebase init) and stay hidden until a real, non-zero number resolves. Translated across all ten languages with plural forms. Touches `index.html`, `journal.html`, `anonymous.html`, `js/shared/user-count.js` (new), `js/index.js`, `js/anonymous.js`, `js/journal.js`, `js/survival-kit.js`, `js/shared/i18n.js`, `css/index.css`, `css/anonymous.css`, `scripts/build-anonymous.js`, `service-worker.js` (`CACHE_NAME` v200)
+- Version bump: `_APP_VERSION` 1.32, `version.json` web channel 1.32 (it had drifted back at 1.25), iOS (app+widget) + Android build 32, `service-worker.js` `CACHE_NAME` v201
+
 ## v1.25
 - 🎚️ New advanced setting: **Full Mood Spectrum** — track your mood on a 0–10 scale (e.g. 4 = sad but stable) by spinning a wheel or sliding, instead of the five fixed moods. Turn it on under Advanced → Journal Options (#84). Touches `js/journal.js`, `css/journal.css`, `journal.html`
 - 🎨 Journal (classic form): cleaner energy / sleep / medication rows — dropped the big floating emoji + value readout from the energy and sleep steps (the step count and sleep time already sit in the section headers, leaving only the compact "✓ Synced from …" badge when health data is present); energy buttons now show the emoji plus a short symbol (`- -`, `-`, Normal, `+`, `++`) so each fits one line; the three medication responses (No / Forgot, Unsure, Taken) are a 3-across single-line row. Touches `js/journal.js`, `css/journal.css`, `service-worker.js` (`CACHE_NAME` v177)

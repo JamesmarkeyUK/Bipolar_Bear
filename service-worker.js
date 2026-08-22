@@ -908,7 +908,12 @@
 //       index.html, journal.html, anonymous.html, js/index.js, js/anonymous.js,
 //       js/journal.js, js/survival-kit.js, js/shared/{user-count,i18n}.js,
 //       css/index.css, css/anonymous.css, scripts/build-anonymous.js.
-const CACHE_NAME = 'bipolarbear-v200';
+// v201: release 1.32 (build 32). Packages v200 (community user counts) and the
+//       version bump itself — _APP_VERSION, the version.json web channel (which
+//       had drifted back at 1.25), the What's New headline and the in-app
+//       changelog. Touches js/shared/brand-config.js, version.json, js/index.js,
+//       journal.html, CHANGELOG.md.
+const CACHE_NAME = 'bipolarbear-v201';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
