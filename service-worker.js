@@ -898,7 +898,17 @@
 //       into an ordinary post; topics archived under the old admin identity
 //       are re-attributed at render time. Touches js/anonymous.js,
 //       css/anonymous.css.
-const CACHE_NAME = 'bipolarbear-v199';
+// v200: community user counts. New shared module js/shared/user-count.js reads
+//       and maintains two Firestore counters — counters/userCount (Bipolar Bear
+//       accounts, shown above the home footer) and counters/anonUserCount
+//       (Bipolar Anonymous members, shown in the board header). Each account
+//       counts itself exactly once by writing a one-time flag into its own
+//       profile document in the same transaction, so pre-existing accounts are
+//       picked up on their next visit and nobody is counted twice. Touches
+//       index.html, journal.html, anonymous.html, js/index.js, js/anonymous.js,
+//       js/journal.js, js/survival-kit.js, js/shared/{user-count,i18n}.js,
+//       css/index.css, css/anonymous.css, scripts/build-anonymous.js.
+const CACHE_NAME = 'bipolarbear-v200';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
@@ -932,6 +942,7 @@ const STATIC_ASSETS = [
   './js/shared/version-check.js',
   './js/shared/i18n.js',
   './js/shared/guest-data.js',
+  './js/shared/user-count.js',
 
   // NOTE: /version.json is deliberately NOT precached. It must always be
   // fetched fresh so a new release reaches stale clients on next page load

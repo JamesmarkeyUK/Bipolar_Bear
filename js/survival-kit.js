@@ -2188,6 +2188,9 @@ function _sktMood(moodKey) {
         'currentMedList', 'copingStrategies', 'moodDefinitions',
         'survivalGratitude',
         'bbFirstName', 'bipolarHelpedVoted', 'skAchievementUnlocked',
+        // "Already counted in counters/{userCount,anonUserCount}" mirrors —
+        // account-specific, so the next account on this device still counts.
+        'bbUserCounted', 'bbAnon_counted',
       ].forEach(k => localStorage.removeItem(k));
       if (auth) auth.signOut();
     }

@@ -829,6 +829,10 @@ window.addEventListener('pageshow', () => {
         'bbWelcomeShown',
         'focusedModeEnabled', 'moreDataOpenByDefault', 'showMoodSuggestion',
         'moodLinkingEnabled', 'bb_draft',
+        // "Already counted in counters/{userCount,anonUserCount}" mirrors.
+        // Account-specific: leaving them behind would make the next account to
+        // sign in on this device skip counting itself.
+        'bbUserCounted', 'bbAnon_counted',
       ].forEach(k => localStorage.removeItem(k));
       sessionStorage.removeItem('bbPinUnlocked');
       sessionStorage.removeItem('bb_user_key');
@@ -10521,6 +10525,14 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
         //   reset only    → reset userSettings fields, drop personalDetails
         if (currentUser && db) {
           if (deleteAccount) {
+            // Hand the community counts back BEFORE the documents that hold
+            // the one-time "counted" flags are destroyed. Both are best-effort
+            // and no-op unless this device knows the account was counted.
+            if (BB.userCount) {
+              await BB.userCount.uncount(db, 'app');
+              await BB.userCount.uncount(db, 'anon');
+            }
+
             // Drop the entire userSettings doc (includes nested anonProfile).
             await db.collection('userSettings').doc(currentUser.uid).delete().catch(() => {});
             await db.collection('personalDetails').doc(currentUser.uid).delete().catch(() => {});

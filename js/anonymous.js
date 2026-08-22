@@ -1337,6 +1337,48 @@ function _updateAnonStreak() {
   BB.storage.set('AnonVisitDate', today);
 }
 
+/**
+ * Paint the "N members" line in the board header.
+ *
+ * Cached value first (instant, and still right offline), then a refresh from
+ * `counters/anonUserCount`. Stays hidden until there's a real number — an
+ * empty-looking community is worse than no line at all.
+ */
+function _refreshMemberCount() {
+  const el = document.getElementById('member-count');
+  if (!el || !window.BB || !BB.userCount) return;
+  const paint = n => {
+    if (typeof n !== 'number' || n <= 0) return;
+    el.textContent = _wt('anon.board.memberCount', { n: BB.userCount.format(n), count: n });
+    el.style.display = 'block';
+  };
+  paint(BB.userCount.cached('anon'));
+  BB.userCount.load(db, 'anon').then(paint);
+}
+
+/**
+ * Count this member towards `counters/anonUserCount`, exactly once ever.
+ *
+ * The flag lives on `anonProfiles/{sha256(email)}` — the one document that
+ * identifies a member across both entry paths (BipolarBear account and the
+ * standalone email-code flow) and across devices, so the same person can't be
+ * counted twice. Members who joined before this shipped get counted the first
+ * time they open the board.
+ */
+async function _countAnonMember() {
+  if (!db || !window.BB || !BB.userCount) return;
+  if (!profile.monika) return; // still mid-onboarding — not a member yet
+  const email = (_bbUser && _bbUser.email) || BB.storage.get('Anon_email');
+  if (!email) return;
+  try {
+    const hash    = await _anonEmailHash(email);
+    const counted = await BB.userCount.countOnce(
+      db, 'anon', db.collection('anonProfiles').doc(hash), 'counted'
+    );
+    if (counted) _refreshMemberCount();
+  } catch (e) { /* best-effort — the board doesn't depend on this */ }
+}
+
 function initBoard() {
   BB.storage.set('AnonLastVisit', Date.now());
   // Opening the board reads everything up to now — record it so the home
@@ -1359,7 +1401,10 @@ function initBoard() {
     setupOverlayActions();
     _boardSetupDone = true;
   }
-  _ensureAuthSession(); // fire-and-forget; openThread/send await the promise
+  // Fire-and-forget; openThread/send await the same memoised promise. The
+  // community-size read and the one-time self-count both need the auth session
+  // Firestore rules expect, so they chain off it rather than racing it.
+  _ensureAuthSession().then(() => { _refreshMemberCount(); _countAnonMember(); });
   setTab('general');
   listenPosts(); // starts both tab listeners; setTab no longer does this
   listenBanned(); // live ban list — hides banned users + gates compose
@@ -4275,6 +4320,11 @@ async function deleteAnonAccount() {
     await _ensureAuthSession();
 
     if (db) {
+      // 0. Hand the member count back before the anonProfile document that
+      //    holds the one-time "counted" flag is deleted below. No-op unless
+      //    this device knows the member was counted.
+      if (window.BB && BB.userCount) await BB.userCount.uncount(db, 'anon');
+
       // 1. Delete every post authored under this monika.
       if (monika) {
         try {

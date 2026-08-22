@@ -106,6 +106,7 @@ const SHARED_MODULES = [
   'js/shared/i18n.js',
   'js/shared/medications.js',
   'js/shared/version-check.js',
+  'js/shared/user-count.js',
 ];
 for (const f of SHARED_MODULES) copy(f);
 

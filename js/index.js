@@ -131,6 +131,36 @@ setTimeout(function () {
   } catch (_) {}
 }, 5000);
 
+/**
+ * Paint the "N people are using Bipolar Bear" line above the footer.
+ *
+ * Renders the cached value first — instant, and still right on an offline load
+ * or when the Firebase SDKs fail to download — then refreshes it from
+ * `counters/userCount` if Firestore is up. Deliberately defined outside the
+ * Firebase init block so the cached paint survives an init failure.
+ *
+ * The line stays hidden until there is a real number to show: a counter we've
+ * never managed to read is nothing to advertise, and "0 people" would be worse
+ * than no line at all.
+ * @returns {void}
+ */
+function _refreshUserCount() {
+  const el = document.getElementById('userCountLine');
+  if (!el || !window.BB || !BB.userCount) return;
+  const paint = n => {
+    if (typeof n !== 'number' || n <= 0) return;
+    el.textContent = _tr(
+      'home.userCount',
+      '🐻 ' + BB.userCount.format(n) + ' ' + (n === 1 ? 'person is' : 'people are') + ' using Bipolar Bear',
+      { n: BB.userCount.format(n), count: n }
+    );
+    el.style.display = 'block';
+  };
+  paint(BB.userCount.cached('app'));
+  BB.userCount.load(window.db || null, 'app').then(paint);
+}
+_refreshUserCount();
+
 // ── BLOCK 2: Firebase init + auth listener + onboarding helpers ──
     // ── Firebase init ──
     // Config lives in js/shared/firebase-config.js so every page reads the
@@ -215,6 +245,18 @@ setTimeout(function () {
       auth.onAuthStateChanged(user => {
         currentUser = user && !user.isAnonymous ? user : null;
         window.currentUser = currentUser;
+
+        // Community size (footer). Runs on every auth state so the Firestore
+        // read happens once auth has settled, not before it.
+        _refreshUserCount();
+        // Count this account towards the total, exactly once ever. Existing
+        // accounts are picked up here too — the flag lives in their own
+        // userSettings document, so nobody is counted twice.
+        if (currentUser && window.BB && BB.userCount) {
+          BB.userCount.countOnce(
+            db, 'app', db.collection('userSettings').doc(currentUser.uid), 'userCounted'
+          ).then(counted => { if (counted) _refreshUserCount(); });
+        }
 
         // survival-kit.html has no delete flow of its own, so fab.js sends the
         // user here with ?deleteAccount=1 (App Store 5.1.1(v)). Fire it from
@@ -1091,6 +1133,9 @@ setTimeout(function () {
         'LogoEasterEggFound',
         'PinEnabled', 'PinCode',
         'WelcomeShown',
+        // "Already counted in counters/userCount" mirror — account-specific,
+        // so the next account signing in on this device still counts itself.
+        'UserCounted', 'Anon_counted',
       ];
       bbKeysToRemove.forEach(k => BB.storage.remove(k));
 

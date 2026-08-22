@@ -382,6 +382,20 @@
     #board-user-pill .pill-name { display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     #board-user-pill .pill-badge { flex-shrink: 0; white-space: nowrap; }
 
+    /* Community size, between the header identity row and the tabs. Sits on
+       the yellow header, so it uses --dark at a low weight to stay quiet. */
+    .member-count {
+      text-align: center;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      color: var(--dark);
+      opacity: 0.6;
+      /* Header-top already carries a 14px bottom margin — pull most of it back
+         so this line tucks under the logo rather than floating between rows. */
+      margin: -9px 0 8px;
+    }
+
     .board-tabs { display: flex; gap: 4px; }
     .board-tab {
       flex: 1; padding: 10px 0; border-radius: 12px 12px 0 0; border: none;

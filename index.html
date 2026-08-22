@@ -17,6 +17,7 @@
   <script src="js/shared/i18n.js"></script>
   <script src="js/shared/version-check.js"></script>
   <script src="js/shared/guest-data.js"></script>
+  <script src="js/shared/user-count.js"></script>
   <meta name="description" content="Checkin with the Bear. Free mood journal and survival kit for people living with bipolar disorder. Track mood, energy, sleep and medication daily.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://www.bipolarbear.app/index.html">
@@ -316,6 +317,9 @@
 
 
     <div style="text-align:center; margin-top: 14px; padding-bottom: 20px;">
+      <!-- Community size. Hidden until js/index.js resolves counters/userCount
+           (or the cached value from a previous load) — never shows a zero. -->
+      <div id="userCountLine" class="user-count" style="display:none;"></div>
       <a href="https://www.jamesmarkey.co.uk/" target="_blank" rel="noopener noreferrer" class="footer-link" data-i18n="home.madeBy">
         Being built by James Markey MBE
       </a>

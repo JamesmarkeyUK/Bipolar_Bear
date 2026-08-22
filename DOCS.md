@@ -212,7 +212,36 @@ anonVerify/
 counters/
   peopleHelped
     count   number   — global increment counter
+  userCount
+    count   number   — Bipolar Bear accounts. Incremented once per account by
+                       js/shared/user-count.js, in the same transaction that
+                       sets userSettings/{uid}.userCounted = true.
+  anonUserCount
+    count   number   — Bipolar Anonymous members. Incremented once per member,
+                       paired with anonProfiles/{sha256email}.counted = true.
 ```
+
+#### User counts
+
+`js/shared/user-count.js` owns both counter documents above. It exists because
+neither `userSettings` nor `anonProfiles` can be counted with an aggregate
+query from the client — a user may only read their own document — so the total
+is maintained incrementally instead:
+
+- **Counting is idempotent per account.** The increment and the account's
+  one-time `counted` flag are written in the same Firestore transaction, so two
+  devices racing on the same account can only produce one increment.
+- **No backfill migration.** Accounts that predate the feature carry no flag,
+  so they count themselves the first time they open the app / board.
+- **Anonymous members are keyed on `anonProfiles/{sha256(email)}`** — the one
+  document shared by both entry paths (BipolarBear account and standalone
+  email-code), so the same person can't be counted twice.
+- **Deleting an account decrements** (`js/journal.js` delete-account flow,
+  `deleteAnonAccount()` on the board), guarded by a localStorage mirror of the
+  flag — the document holding the real flag is being deleted in the same pass.
+- Displayed values are cached in `localStorage` (`bbUserCountCache`,
+  `bbAnonUserCountCache`) and both lines stay hidden until a real, non-zero
+  number resolves.
 
 #### localStorage Keys
 

@@ -42,6 +42,7 @@
   <script src="js/shared/i18n.js"></script>
   <script src="js/shared/medications.js"></script>
   <script src="js/shared/version-check.js"></script>
+  <script src="js/shared/user-count.js"></script>
   <link rel="preload" href="fonts/nunito-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/fonts.css">
   <link rel="stylesheet" href="css/theme.css">
@@ -228,6 +229,9 @@
       </button>
       <button id="board-user-pill" onclick="openMonikaSettings()" title="Your moniker settings" data-i18n-title="anon.tips.moniker" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:20px;transition:background 0.15s;" onmouseenter="this.style.background='rgba(255,255,255,0.15)'" onmouseleave="this.style.background='none'"></button>
     </div>
+    <!-- Community size. Hidden until js/anonymous.js resolves
+         counters/anonUserCount (or its cached value) — never shows a zero. -->
+    <div id="member-count" class="member-count" style="display:none;"></div>
     <div class="board-tabs">
       <button class="board-tab" id="tab-ann" data-tab="announcements" data-i18n="anon.board.announcements">📢 Announcements</button>
       <button class="board-tab active" id="tab-gen" data-tab="general" data-i18n="anon.board.general">💬 General</button>
