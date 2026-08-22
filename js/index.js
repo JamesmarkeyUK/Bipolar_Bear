@@ -162,7 +162,7 @@ function _paintUserCount() {
   const n = BB.userCount.format(_ucTotal);
   let text = _tr(
     'home.userCount',
-    '🐻 ' + n + ' ' + (_ucTotal === 1 ? 'person has' : 'people have') + ' used Bipolar Bear',
+    '🐻 ' + n + ' ' + (_ucTotal === 1 ? 'person uses' : 'people use') + ' Bipolar Bear',
     { n: n, count: _ucTotal }
   );
   if (typeof _ucLive === 'number' && _ucLive > 0) {

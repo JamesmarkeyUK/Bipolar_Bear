@@ -933,7 +933,10 @@
 //       live person. survival-kit.html picks up js/shared/user-count.js.
 //       Touches js/shared/user-count.js, js/journal.js, js/survival-kit.js,
 //       survival-kit.html.
-const CACHE_NAME = 'bipolarbear-v204';
+// v205: home counter copy — "12 people use Bipolar Bear (2 live)" rather than
+//       "have used". Present tense across all ten locales. js/shared/i18n.js,
+//       js/index.js.
+const CACHE_NAME = 'bipolarbear-v205';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
