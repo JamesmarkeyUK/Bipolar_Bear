@@ -242,7 +242,10 @@
      *
      * @param {object} db  Firestore instance
      * @param {'app'|'anon'} kind
-     * @param {function(number)} onCount  called with the live session count
+     * @param {function(number)} [onCount]  called with the live session count.
+     *   Omit it on pages that don't display a figure (journal, survival kit):
+     *   they then only heartbeat, skipping the count query and the sweep, so
+     *   being present costs one write per 45s and nothing else.
      * @returns {function()} stop function (clears the timer, drops the doc)
      */
     startPresence: function (db, kind, onCount) {
@@ -300,7 +303,11 @@
 
       function tick() {
         if (stopped || hidden()) return;
-        beat().then(count).then(sweep);
+        var beating = beat();
+        // Pages that don't show a figure only report themselves — no count
+        // query, no sweep. Every open page adding reads would make the live
+        // number cost more the more people are using the app.
+        if (typeof onCount === 'function') beating.then(count).then(sweep);
       }
 
       tick();

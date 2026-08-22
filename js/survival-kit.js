@@ -2063,6 +2063,7 @@ function _sktMood(moodKey) {
       };
 
       let _helpedCountLoaded = false;
+      let _presenceStarted   = false;  // live-now heartbeat wired (see below)
       auth.onAuthStateChanged(user => {
         currentUser = user && !user.isAnonymous ? user : null;
         const signinBtn = document.getElementById('signinBtn');
@@ -2070,6 +2071,14 @@ function _sktMood(moodKey) {
         const userEmail = document.getElementById('userEmail');
         // Load counter once per page, now that auth state is known (avoids premature signInAnonymously)
         if (!_helpedCountLoaded) { _helpedCountLoaded = true; loadHelpedCount(); }
+        // Report this session to the home screen's "(N live)" figure — reading
+        // your survival kit is using the app. No callback: nothing here shows a
+        // count, so this only heartbeats. Once per page, for the same reason
+        // loadHelpedCount is.
+        if (!_presenceStarted && window.BB && BB.userCount) {
+          _presenceStarted = true;
+          BB.userCount.startPresence(db, 'app');
+        }
         if (user && !user.isAnonymous) {
           if (signinBtn) signinBtn.style.display = 'none';
           if (userInfo) { userInfo.style.display = 'flex'; }

@@ -263,8 +263,13 @@ bbPresence/{sessionId}
   regardless of how many are live) and falls back to a capped document read.
 - Documents idle for 30 min are swept opportunistically, ten at a time, on
   every tenth tick.
-- Presence runs only on the pages that display a count — the home page and the
-  board. Someone deep in the journal isn't counted as live.
+- **Which pages beat:** home, journal and survival kit (all `bbPresence`) plus
+  the board (`bbAnonPresence`) — time in the journal is time using the app, so
+  it counts. Only the pages that display a figure pass a callback; the rest run
+  in beat-only mode, skipping the count query and the sweep, so an extra open
+  page costs one write per 45s and no reads.
+- The session id lives in `sessionStorage`, so moving home → journal → survival
+  kit in one tab reuses one presence document and reads as one live person.
 
 #### localStorage Keys
 

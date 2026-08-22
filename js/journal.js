@@ -340,6 +340,8 @@ window.addEventListener('pageshow', () => {
           }
         });
 
+      let _presenceStarted = false;  // live-now heartbeat wired (see below)
+
       // Safety net: if onAuthStateChanged never fires (e.g. Firebase Auth IndexedDB hangs
       // after site data is cleared), fall back to guest mode after 4 seconds so the spinner
       // doesn't get stuck forever.
@@ -358,6 +360,15 @@ window.addEventListener('pageshow', () => {
       // If persistence isn't ready when loadEntries() fires, the 10s timeout is the safety net.
       auth.onAuthStateChanged((user) => {
         _authResolved = true;
+        // Report this session to the home screen's "(N live)" figure. Journal
+        // time is very much time spent using the app. No callback: nothing here
+        // displays a count, so this only heartbeats. Once per page — the auth
+        // listener can fire more than once and two loops would double-count
+        // this session.
+        if (!_presenceStarted && window.BB && BB.userCount) {
+          _presenceStarted = true;
+          BB.userCount.startPresence(db, 'app');
+        }
         if (user && !user.isAnonymous) {
           currentUser = user;
           window.currentUser = user;

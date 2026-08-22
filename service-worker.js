@@ -926,7 +926,14 @@
 //       closed tab ages out on its own. Both totals reworded to the past tense
 //       ("have used") so the pair reads correctly. Touches
 //       js/shared/{user-count,i18n}.js, js/index.js, js/anonymous.js.
-const CACHE_NAME = 'bipolarbear-v203';
+// v204: the live-now figure now counts journal and survival-kit sessions too,
+//       not just people sitting on the home screen. Those pages heartbeat in
+//       beat-only mode (no callback -> no count query, no sweep), and the
+//       per-tab session id means home -> journal -> kit in one tab stays one
+//       live person. survival-kit.html picks up js/shared/user-count.js.
+//       Touches js/shared/user-count.js, js/journal.js, js/survival-kit.js,
+//       survival-kit.html.
+const CACHE_NAME = 'bipolarbear-v204';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
