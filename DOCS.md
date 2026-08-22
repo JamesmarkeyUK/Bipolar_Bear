@@ -243,6 +243,29 @@ is maintained incrementally instead:
   `bbAnonUserCountCache`) and both lines stay hidden until a real, non-zero
   number resolves.
 
+#### Live counts ("(N live)")
+
+`BB.userCount.startPresence(db, kind, cb)` maintains one document per open
+page in `bbPresence/` (home) or `bbAnonPresence/` (board):
+
+```
+bbPresence/{sessionId}
+  lastSeen   Timestamp   — server timestamp, re-written every 45s
+```
+
+- **Doc id is a random per-tab id** held in `sessionStorage.bbPresenceId`. The
+  document carries no uid, email or monika — a live count must not become a
+  record of who was reading a mental-health app and when.
+- **"Live" = beat within the last 2 minutes**, so a closed tab drops out on its
+  own even when its delete never lands (unload deletes are best-effort).
+- **Hidden tabs stop beating**, so a backgrounded tab ages out of the window.
+- The count uses the `count()` aggregate where the SDK exposes it (one read
+  regardless of how many are live) and falls back to a capped document read.
+- Documents idle for 30 min are swept opportunistically, ten at a time, on
+  every tenth tick.
+- Presence runs only on the pages that display a count — the home page and the
+  board. Someone deep in the journal isn't counted as live.
+
 #### localStorage Keys
 
 ```

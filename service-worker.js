@@ -918,7 +918,15 @@
 //       warns with the Firestore error code when a read, a count or a decrement
 //       is rejected — so a rules denial is distinguishable from "nobody counted
 //       yet" without guessing.
-const CACHE_NAME = 'bipolarbear-v202';
+// v203: the community counters gain a live-now figure — "12 people have used
+//       Bipolar Bear (2 live)" on the home screen, "842 members (3 live)" on
+//       the board. Each open page heartbeats a presence document (random
+//       per-tab id, lastSeen only, no identity) into bbPresence /
+//       bbAnonPresence every 45s while visible; live = beat within 2 min, so a
+//       closed tab ages out on its own. Both totals reworded to the past tense
+//       ("have used") so the pair reads correctly. Touches
+//       js/shared/{user-count,i18n}.js, js/index.js, js/anonymous.js.
+const CACHE_NAME = 'bipolarbear-v203';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

@@ -1344,16 +1344,41 @@ function _updateAnonStreak() {
  * `counters/anonUserCount`. Stays hidden until there's a real number — an
  * empty-looking community is worse than no line at all.
  */
-function _refreshMemberCount() {
+let _mcTotal = null;   // members who have ever joined the board
+let _mcLive  = null;   // sessions on the board right now, or null while unknown
+let _mcPresenceStarted = false;
+
+/**
+ * Paint the header line from whatever we currently know. The member total is
+ * the headline; "(N live)" is appended only once presence resolves to at least
+ * one session, so the line never reads "(0 live)" while it settles.
+ */
+function _paintMemberCount() {
   const el = document.getElementById('member-count');
   if (!el || !window.BB || !BB.userCount) return;
-  const paint = n => {
-    if (typeof n !== 'number' || n <= 0) return;
-    el.textContent = _wt('anon.board.memberCount', { n: BB.userCount.format(n), count: n });
-    el.style.display = 'block';
-  };
-  paint(BB.userCount.cached('anon'));
-  BB.userCount.load(db, 'anon').then(paint);
+  if (typeof _mcTotal !== 'number' || _mcTotal <= 0) return;
+  let text = _wt('anon.board.memberCount', { n: BB.userCount.format(_mcTotal), count: _mcTotal });
+  if (typeof _mcLive === 'number' && _mcLive > 0) {
+    text += ' ' + _wt('common.live', { n: _mcLive });
+  }
+  el.textContent = text;
+  el.style.display = 'block';
+}
+
+/**
+ * Refresh the member total in the board header.
+ *
+ * Cached value first (instant, and still right offline), then a refresh from
+ * `counters/anonUserCount`. Stays hidden until there's a real number — an
+ * empty-looking community is worse than no line at all.
+ */
+function _refreshMemberCount() {
+  if (!window.BB || !BB.userCount) return;
+  const cached = BB.userCount.cached('anon');
+  if (typeof cached === 'number') { _mcTotal = cached; _paintMemberCount(); }
+  BB.userCount.load(db, 'anon').then(n => {
+    if (typeof n === 'number') { _mcTotal = n; _paintMemberCount(); }
+  });
 }
 
 /**
@@ -1404,7 +1429,17 @@ function initBoard() {
   // Fire-and-forget; openThread/send await the same memoised promise. The
   // community-size read and the one-time self-count both need the auth session
   // Firestore rules expect, so they chain off it rather than racing it.
-  _ensureAuthSession().then(() => { _refreshMemberCount(); _countAnonMember(); });
+  _ensureAuthSession().then(() => {
+    _refreshMemberCount();
+    _countAnonMember();
+    // "(N live)" — report this session as live and count the others. Once per
+    // page: initBoard() is reachable from several paths (boot, verify success,
+    // meds yes/no) and a second heartbeat loop would double-count this session.
+    if (!_mcPresenceStarted && window.BB && BB.userCount) {
+      _mcPresenceStarted = true;
+      BB.userCount.startPresence(db, 'anon', live => { _mcLive = live; _paintMemberCount(); });
+    }
+  });
   setTab('general');
   listenPosts(); // starts both tab listeners; setTab no longer does this
   listenBanned(); // live ban list — hides banned users + gates compose

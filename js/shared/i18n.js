@@ -28,6 +28,7 @@
 
     en: {
       common: {
+        live: '({n} live)',
         save: 'Save', cancel: 'Cancel', close: 'Close', edit: 'Edit',
         delete: 'Delete', add: 'Add', back: 'Back', next: 'Next',
         previous: 'Previous', loading: 'Loading…', gotIt: 'Got it',
@@ -119,7 +120,7 @@
         signinHintStored: 'Stored securely in Firebase',
         accountHint: '🐻 Sign in to back up your data (optional)',
         madeBy: 'Being built by James Markey MBE',
-        userCount: { one: '🐻 {n} person is using Bipolar Bear', other: '🐻 {n} people are using Bipolar Bear' },
+        userCount: { one: '🐻 {n} person has used Bipolar Bear', other: '🐻 {n} people have used Bipolar Bear' },
         profileTitle: '👤 Profile',
         homeButtons: '🏠 Home buttons',
         homeButtonsHint: 'Tap to add a feature to your home screen.',
@@ -1708,6 +1709,7 @@
 
     es: {
       common: {
+        live: '({n} en línea)',
         save: 'Guardar', cancel: 'Cancelar', close: 'Cerrar', edit: 'Editar',
         delete: 'Eliminar', add: 'Agregar', back: 'Atrás', next: 'Siguiente',
         previous: 'Anterior', loading: 'Cargando…', gotIt: 'Entendido',
@@ -1796,7 +1798,7 @@
         signinHintLabel: '🐻 Guarda tu progreso aquí',
         signinHintStored: 'Almacenado de forma segura en Firebase',
         madeBy: 'Creado por James Markey MBE',
-        userCount: { one: '🐻 {n} persona usa Bipolar Bear', other: '🐻 {n} personas usan Bipolar Bear' },
+        userCount: { one: '🐻 {n} persona ha usado Bipolar Bear', other: '🐻 {n} personas han usado Bipolar Bear' },
         profileTitle: '👤 Perfil',
         homeButtons: '🏠 Botones de inicio',
         homeButtonsHint: 'Toca para añadir una función a tu pantalla de inicio.',
@@ -2636,6 +2638,7 @@
 
     fr: {
       common: {
+        live: '({n} en ligne)',
         save: 'Enregistrer', cancel: 'Annuler', close: 'Fermer', edit: 'Modifier',
         delete: 'Supprimer', add: 'Ajouter', back: 'Retour', next: 'Suivant',
         previous: 'Précédent', loading: 'Chargement…', gotIt: 'Compris',
@@ -2723,7 +2726,7 @@
         signinHintStored: 'Stocké en toute sécurité sur Firebase',
         accountHint: '🐻 Connectez-vous pour sauvegarder vos données (facultatif)',
         madeBy: 'Développé par James Markey MBE',
-        userCount: { one: '🐻 {n} personne utilise Bipolar Bear', other: '🐻 {n} personnes utilisent Bipolar Bear' },
+        userCount: { one: '🐻 {n} personne a utilisé Bipolar Bear', other: '🐻 {n} personnes ont utilisé Bipolar Bear' },
         profileTitle: '👤 Profil',
         homeButtons: "🏠 Boutons d'accueil",
         homeButtonsHint: "Appuyez pour ajouter une fonction à votre écran d'accueil.",
@@ -4210,6 +4213,7 @@
 
     de: {
       common: {
+        live: '({n} online)',
         save: 'Speichern', cancel: 'Abbrechen', close: 'Schließen', edit: 'Bearbeiten',
         delete: 'Löschen', add: 'Hinzufügen', back: 'Zurück', next: 'Weiter',
         previous: 'Zurück', loading: 'Laden…', gotIt: 'Verstanden',
@@ -4294,7 +4298,7 @@
         signinHintLabel: '🐻 Speichern Sie Ihren Fortschritt hier',
         signinHintStored: 'Sicher in Firebase gespeichert',
         madeBy: 'Entwickelt von James Markey MBE',
-        userCount: { one: '🐻 {n} Person nutzt Bipolar Bear', other: '🐻 {n} Personen nutzen Bipolar Bear' },
+        userCount: { one: '🐻 {n} Person hat Bipolar Bear genutzt', other: '🐻 {n} Personen haben Bipolar Bear genutzt' },
         profileTitle: '👤 Profil',
         homeButtons: '🏠 Startschaltflächen',
         homeButtonsHint: 'Tippen Sie, um eine Funktion zu Ihrem Startbildschirm hinzuzufügen.',
@@ -5080,6 +5084,7 @@
 
     it: {
       common: {
+        live: '({n} online)',
         save: 'Salva', cancel: 'Annulla', close: 'Chiudi', edit: 'Modifica',
         delete: 'Elimina', add: 'Aggiungi', back: 'Indietro', next: 'Avanti',
         previous: 'Precedente', loading: 'Caricamento…', gotIt: 'Capito',
@@ -5164,7 +5169,7 @@
         signinHintLabel: '🐻 Salva i tuoi progressi qui',
         signinHintStored: 'Archiviato in modo sicuro su Firebase',
         madeBy: 'Sviluppato da James Markey MBE',
-        userCount: { one: '🐻 {n} persona usa Bipolar Bear', other: '🐻 {n} persone usano Bipolar Bear' },
+        userCount: { one: '🐻 {n} persona ha usato Bipolar Bear', other: '🐻 {n} persone hanno usato Bipolar Bear' },
         profileTitle: '👤 Profilo',
         homeButtons: '🏠 Pulsanti home',
         homeButtonsHint: 'Tocca per aggiungere una funzione alla tua schermata home.',
@@ -5950,6 +5955,7 @@
 
     pt: {
       common: {
+        live: '({n} online)',
         save: 'Salvar', cancel: 'Cancelar', close: 'Fechar', edit: 'Editar',
         delete: 'Excluir', add: 'Adicionar', back: 'Voltar', next: 'Próximo',
         previous: 'Anterior', loading: 'Carregando…', gotIt: 'Entendi',
@@ -6034,7 +6040,7 @@
         signinHintLabel: '🐻 Salve seu progresso aqui',
         signinHintStored: 'Armazenado com segurança no Firebase',
         madeBy: 'Desenvolvido por James Markey MBE',
-        userCount: { one: '🐻 {n} pessoa usa o Bipolar Bear', other: '🐻 {n} pessoas usam o Bipolar Bear' },
+        userCount: { one: '🐻 {n} pessoa já usou o Bipolar Bear', other: '🐻 {n} pessoas já usaram o Bipolar Bear' },
         profileTitle: '👤 Perfil',
         homeButtons: '🏠 Botões de início',
         homeButtonsHint: 'Toque para adicionar uma função ao seu ecrã inicial.',
@@ -6820,6 +6826,7 @@
 
     nl: {
       common: {
+        live: '({n} online)',
         save: 'Opslaan', cancel: 'Annuleren', close: 'Sluiten', edit: 'Bewerken',
         delete: 'Verwijderen', add: 'Toevoegen', back: 'Terug', next: 'Volgende',
         previous: 'Vorige', loading: 'Laden…', gotIt: 'Begrepen',
@@ -6904,7 +6911,7 @@
         signinHintLabel: '🐻 Sla uw voortgang hier op',
         signinHintStored: 'Veilig opgeslagen in Firebase',
         madeBy: 'Ontwikkeld door James Markey MBE',
-        userCount: { one: '🐻 {n} persoon gebruikt Bipolar Bear', other: '🐻 {n} mensen gebruiken Bipolar Bear' },
+        userCount: { one: '🐻 {n} persoon heeft Bipolar Bear gebruikt', other: '🐻 {n} mensen hebben Bipolar Bear gebruikt' },
         profileTitle: '👤 Profiel',
         homeButtons: '🏠 Startknoppen',
         homeButtonsHint: 'Tik om een functie aan uw startscherm toe te voegen.',
@@ -7690,6 +7697,7 @@
 
     pl: {
       common: {
+        live: '({n} online)',
         save: 'Zapisz', cancel: 'Anuluj', close: 'Zamknij', edit: 'Edytuj',
         delete: 'Usuń', add: 'Dodaj', back: 'Wróć', next: 'Dalej',
         previous: 'Poprzedni', loading: 'Ładowanie…', gotIt: 'Rozumiem',
@@ -7774,7 +7782,7 @@
         signinHintLabel: '🐻 Zapisz swój postęp tutaj',
         signinHintStored: 'Bezpiecznie przechowywane w Firebase',
         madeBy: 'Tworzone przez James Markey MBE',
-        userCount: { one: '🐻 {n} osoba używa Bipolar Bear', few: '🐻 {n} osoby używają Bipolar Bear', many: '🐻 {n} osób używa Bipolar Bear', other: '🐻 {n} osób używa Bipolar Bear' },
+        userCount: { one: '🐻 {n} osoba korzystała z Bipolar Bear', few: '🐻 {n} osoby korzystały z Bipolar Bear', many: '🐻 {n} osób korzystało z Bipolar Bear', other: '🐻 {n} osób korzystało z Bipolar Bear' },
         profileTitle: '👤 Profil',
         homeButtons: '🏠 Przyciski ekranu głównego',
         homeButtonsHint: 'Dotknij, aby dodać funkcję do ekranu głównego.',
@@ -8564,6 +8572,7 @@
 
     sv: {
       common: {
+        live: '({n} online)',
         save: 'Spara', cancel: 'Avbryt', close: 'Stäng', edit: 'Redigera',
         delete: 'Ta bort', add: 'Lägg till', back: 'Tillbaka', next: 'Nästa',
         previous: 'Föregående', loading: 'Laddar…', gotIt: 'Förstått',
@@ -8648,7 +8657,7 @@
         signinHintLabel: '🐻 Spara dina framsteg här',
         signinHintStored: 'Lagrat säkert i Firebase',
         madeBy: 'Skapas av James Markey MBE',
-        userCount: { one: '🐻 {n} person använder Bipolar Bear', other: '🐻 {n} personer använder Bipolar Bear' },
+        userCount: { one: '🐻 {n} person har använt Bipolar Bear', other: '🐻 {n} personer har använt Bipolar Bear' },
         profileTitle: '👤 Profil',
         homeButtons: '🏠 Hemknappar',
         homeButtonsHint: 'Tryck för att lägga till en funktion på din hemskärm.',
@@ -9434,6 +9443,7 @@
 
     zh: {
       common: {
+        live: '（{n} 人在线）',
         save: '保存', cancel: '取消', close: '关闭', edit: '编辑',
         delete: '删除', add: '添加', back: '返回', next: '下一步',
         previous: '上一步', loading: '加载中…', gotIt: '明白了',
@@ -9518,7 +9528,7 @@
         signinHintLabel: '🐻 在这里保存你的进度',
         signinHintStored: '安全存储在Firebase中',
         madeBy: '由James Markey MBE开发',
-        userCount: '🐻 {n} 人正在使用 Bipolar Bear',
+        userCount: '🐻 {n} 人使用过 Bipolar Bear',
         profileTitle: '👤 个人资料',
         homeButtons: '🏠 主屏按钮',
         homeButtonsHint: '点击以将功能添加到您的主屏幕。',

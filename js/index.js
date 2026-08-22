@@ -144,20 +144,54 @@ setTimeout(function () {
  * than no line at all.
  * @returns {void}
  */
-function _refreshUserCount() {
+let _ucTotal = null;   // people who have ever used the app (accounts)
+let _ucLive  = null;   // sessions live right now, or null while unknown
+let _ucPresenceStarted = false;
+
+/**
+ * Paint the footer line from whatever we currently know. The total is the
+ * headline; the live count is appended in parentheses only once it resolves
+ * to at least one session, so the line never reads "(0 live)" while presence
+ * is still settling.
+ * @returns {void}
+ */
+function _paintUserCount() {
   const el = document.getElementById('userCountLine');
   if (!el || !window.BB || !BB.userCount) return;
-  const paint = n => {
-    if (typeof n !== 'number' || n <= 0) return;
-    el.textContent = _tr(
-      'home.userCount',
-      '🐻 ' + BB.userCount.format(n) + ' ' + (n === 1 ? 'person is' : 'people are') + ' using Bipolar Bear',
-      { n: BB.userCount.format(n), count: n }
-    );
-    el.style.display = 'block';
-  };
-  paint(BB.userCount.cached('app'));
-  BB.userCount.load(window.db || null, 'app').then(paint);
+  if (typeof _ucTotal !== 'number' || _ucTotal <= 0) return;  // nothing honest to show yet
+  const n = BB.userCount.format(_ucTotal);
+  let text = _tr(
+    'home.userCount',
+    '🐻 ' + n + ' ' + (_ucTotal === 1 ? 'person has' : 'people have') + ' used Bipolar Bear',
+    { n: n, count: _ucTotal }
+  );
+  if (typeof _ucLive === 'number' && _ucLive > 0) {
+    text += ' ' + _tr('common.live', '(' + _ucLive + ' live)', { n: _ucLive });
+  }
+  el.textContent = text;
+  el.style.display = 'block';
+}
+
+/**
+ * Refresh the community total above the footer.
+ *
+ * Renders the cached value first — instant, and still right on an offline load
+ * or when the Firebase SDKs fail to download — then refreshes it from
+ * `counters/userCount` if Firestore is up. Deliberately defined outside the
+ * Firebase init block so the cached paint survives an init failure.
+ *
+ * The line stays hidden until there is a real number to show: a counter we've
+ * never managed to read is nothing to advertise, and "0 people" would be worse
+ * than no line at all.
+ * @returns {void}
+ */
+function _refreshUserCount() {
+  if (!window.BB || !BB.userCount) return;
+  const cached = BB.userCount.cached('app');
+  if (typeof cached === 'number') { _ucTotal = cached; _paintUserCount(); }
+  BB.userCount.load(window.db || null, 'app').then(n => {
+    if (typeof n === 'number') { _ucTotal = n; _paintUserCount(); }
+  });
 }
 _refreshUserCount();
 
@@ -249,6 +283,13 @@ _refreshUserCount();
         // Community size (footer). Runs on every auth state so the Firestore
         // read happens once auth has settled, not before it.
         _refreshUserCount();
+        // "(N live)" — report this session as live and count the others. Once
+        // per page: the auth listener can fire more than once, and a second
+        // heartbeat loop would double-count this very session.
+        if (!_ucPresenceStarted && window.BB && BB.userCount) {
+          _ucPresenceStarted = true;
+          BB.userCount.startPresence(db, 'app', live => { _ucLive = live; _paintUserCount(); });
+        }
         // Count this account towards the total, exactly once ever. Existing
         // accounts are picked up here too — the flag lives in their own
         // userSettings document, so nobody is counted twice.

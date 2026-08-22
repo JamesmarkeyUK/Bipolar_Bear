@@ -215,6 +215,8 @@ counters/{...}              appCosts, peopleHelped, peopleHelpedApp, helpedCount
 bbAnonPosts/{auto}          Community posts (plaintext)
 bbAnonMonikas/{lowercase}   Monika reservation (uniqueness)
 anonProfiles/{sha256email}  Cross-device anon profile lookup (standalone path)
+bbPresence/{sessionId}      Live-now heartbeat, main app (lastSeen only)
+bbAnonPresence/{sessionId}  Live-now heartbeat, anonymous board
 betaSignups/{auto}          Beta access requests
 feedback/{auto}             In-app feedback submissions
 ```

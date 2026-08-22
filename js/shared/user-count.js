@@ -35,6 +35,22 @@
   /** localStorage key mirroring "this account has already been counted". */
   var FLAG_KEY = { app: 'UserCounted', anon: 'Anon_counted' };
 
+  /**
+   * Presence ("live right now") collections. One document per open session,
+   * doc id = a random per-tab id, contents = a single `lastSeen` timestamp.
+   * Deliberately carries NO uid, email or monika: a live count should never
+   * become a record of who was reading a mental-health app and when.
+   */
+  var PRESENCE = { app: 'bbPresence', anon: 'bbAnonPresence' };
+  /** A session counts as live for this long after its last heartbeat. */
+  var LIVE_WINDOW_MS = 120000;   // 2 min
+  /** How often an open, visible page re-beats and re-counts. */
+  var BEAT_MS = 45000;           // 45 s
+  /** Presence docs older than this are swept opportunistically. */
+  var STALE_MS = 1800000;        // 30 min
+  /** Safety cap on a live-count query that can't use the count() aggregate. */
+  var LIVE_CAP = 500;
+
   /** BB.log / BB.warn if debug.js loaded, plain console otherwise. */
   function _log(msg, extra) {
     var f = (window.BB && window.BB.log) || (window.console && console.log);
@@ -43,6 +59,22 @@
   function _warn(msg, extra) {
     var f = (window.BB && window.BB.warn) || (window.console && console.warn);
     if (f) extra === undefined ? f(msg) : f(msg, extra);
+  }
+
+  /**
+   * Random per-tab session id for the presence document, kept in
+   * sessionStorage so a reload reuses it (and a new tab gets its own).
+   * @returns {string}
+   */
+  function _sessionId() {
+    var KEY = 'bbPresenceId';
+    try {
+      var existing = sessionStorage.getItem(KEY);
+      if (existing) return existing;
+    } catch (_) { /* private mode — fall through to a per-load id */ }
+    var id = 's' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+    try { sessionStorage.setItem(KEY, id); } catch (_) {}
+    return id;
   }
 
   function _counterRef(db, kind) {
@@ -192,6 +224,102 @@
           _warn('[userCount] decrement of counters/' + DOC_ID[kind] + ' failed:', e && (e.code || e.message || e));
           return false;
         });
+    },
+
+    /**
+     * Start reporting this session as live, and report back how many sessions
+     * are live, roughly every 45 seconds.
+     *
+     * Each open page owns one presence document (random id, held in
+     * sessionStorage so a reload keeps the same one) carrying nothing but a
+     * `lastSeen` timestamp. "Live" is then simply "beat within the last two
+     * minutes", so a closed tab drops out on its own even if its delete never
+     * lands. Heartbeats pause while the tab is hidden — a backgrounded tab
+     * isn't someone using the app.
+     *
+     * Everything here is best-effort: if the writes or the query are refused,
+     * it warns once per failure and the caller simply never gets a live number.
+     *
+     * @param {object} db  Firestore instance
+     * @param {'app'|'anon'} kind
+     * @param {function(number)} onCount  called with the live session count
+     * @returns {function()} stop function (clears the timer, drops the doc)
+     */
+    startPresence: function (db, kind, onCount) {
+      var noop = function () {};
+      if (!db || !window.firebase || !window.firebase.firestore) return noop;
+
+      var coll = db.collection(PRESENCE[kind] || PRESENCE.app);
+      var ref  = coll.doc(_sessionId());
+      var timer = null;
+      var stopped = false;
+      var sweeps = 0;
+
+      function hidden() {
+        try { return document.visibilityState === 'hidden'; } catch (_) { return false; }
+      }
+
+      function beat() {
+        return ref.set(
+          { lastSeen: window.firebase.firestore.FieldValue.serverTimestamp() },
+          { merge: true }
+        ).catch(function (e) {
+          _warn('[userCount] presence beat on ' + (PRESENCE[kind] || PRESENCE.app) + ' failed:',
+            e && (e.code || e.message || e));
+        });
+      }
+
+      function count() {
+        var cutoff = window.firebase.firestore.Timestamp.fromMillis(Date.now() - LIVE_WINDOW_MS);
+        var q = coll.where('lastSeen', '>', cutoff);
+        // Prefer the count() aggregate (one read regardless of how many are
+        // live); fall back to a capped document read on SDKs without it.
+        var p = (typeof q.count === 'function')
+          ? q.count().get().then(function (agg) { return agg.data().count; })
+          : q.limit(LIVE_CAP).get().then(function (snap) { return snap.size; });
+        return p.then(function (n) {
+          _log('[userCount] ' + (PRESENCE[kind] || PRESENCE.app) + ': ' + n + ' live');
+          if (!stopped && typeof onCount === 'function') onCount(n);
+          return n;
+        }).catch(function (e) {
+          _warn('[userCount] live count on ' + (PRESENCE[kind] || PRESENCE.app) + ' failed:',
+            e && (e.code || e.message || e));
+        });
+      }
+
+      // Sweep abandoned documents now and then so the collection doesn't grow
+      // without bound. Every 10th tick, a handful at a time, failures ignored —
+      // it's tidying, not correctness (the lastSeen window already excludes them).
+      function sweep() {
+        if (sweeps++ % 10 !== 0) return;
+        var old = window.firebase.firestore.Timestamp.fromMillis(Date.now() - STALE_MS);
+        coll.where('lastSeen', '<', old).limit(10).get()
+          .then(function (snap) { snap.forEach(function (d) { d.ref.delete().catch(function () {}); }); })
+          .catch(function () {});
+      }
+
+      function tick() {
+        if (stopped || hidden()) return;
+        beat().then(count).then(sweep);
+      }
+
+      tick();
+      timer = setInterval(tick, BEAT_MS);
+      // Coming back to a backgrounded tab should refresh immediately rather
+      // than waiting out the rest of the interval.
+      try {
+        document.addEventListener('visibilitychange', function () { if (!hidden()) tick(); });
+      } catch (_) {}
+      // Best-effort tidy-up; the 2-minute window covers us when it doesn't land.
+      try {
+        window.addEventListener('pagehide', function () { ref.delete().catch(function () {}); });
+      } catch (_) {}
+
+      return function stop() {
+        stopped = true;
+        if (timer) clearInterval(timer);
+        ref.delete().catch(function () {});
+      };
     },
 
     /**
