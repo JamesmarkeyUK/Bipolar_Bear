@@ -35,6 +35,16 @@
   /** localStorage key mirroring "this account has already been counted". */
   var FLAG_KEY = { app: 'UserCounted', anon: 'Anon_counted' };
 
+  /** BB.log / BB.warn if debug.js loaded, plain console otherwise. */
+  function _log(msg, extra) {
+    var f = (window.BB && window.BB.log) || (window.console && console.log);
+    if (f) extra === undefined ? f(msg) : f(msg, extra);
+  }
+  function _warn(msg, extra) {
+    var f = (window.BB && window.BB.warn) || (window.console && console.warn);
+    if (f) extra === undefined ? f(msg) : f(msg, extra);
+  }
+
   function _counterRef(db, kind) {
     return db.collection('counters').doc(DOC_ID[kind] || DOC_ID.app);
   }
@@ -87,11 +97,23 @@
       return _counterRef(db, kind).get()
         .then(function (snap) {
           var n = snap.exists ? snap.data().count : null;
-          if (typeof n !== 'number' || !isFinite(n) || n < 0) return self.cached(kind);
+          if (typeof n !== 'number' || !isFinite(n) || n < 0) {
+            // Missing doc (nobody has been counted yet) or a junk value — the
+            // caller hides its line rather than showing a zero.
+            _log('[userCount] no value for ' + DOC_ID[kind] +
+              (snap.exists ? ' (doc exists, count=' + JSON.stringify(n) + ')' : ' (doc does not exist yet)'));
+            return self.cached(kind);
+          }
           window.BB.storage.set(CACHE_KEY[kind], String(n));
+          _log('[userCount] ' + DOC_ID[kind] + ' = ' + n);
           return n;
         })
-        .catch(function () { return self.cached(kind); });
+        .catch(function (e) {
+          // Never fatal, but never silent either — a permission-denied here is
+          // the difference between "no users yet" and "rules block the read".
+          _warn('[userCount] read of counters/' + DOC_ID[kind] + ' failed:', e && (e.code || e.message || e));
+          return self.cached(kind);
+        });
     },
 
     /**
@@ -128,12 +150,18 @@
         });
       }).then(function (counted) {
         window.BB.storage.set(FLAG_KEY[kind], '1');
+        _log('[userCount] ' + DOC_ID[kind] + ': this account ' +
+          (counted ? 'counted (+1)' : 'was already counted'));
         if (counted) {
           var c = self.cached(kind);
           if (c !== null) window.BB.storage.set(CACHE_KEY[kind], String(c + 1));
         }
         return counted;
-      }).catch(function () { return false; });
+      }).catch(function (e) {
+        _warn('[userCount] counting this account into counters/' + DOC_ID[kind] + ' failed:',
+          e && (e.code || e.message || e));
+        return false;
+      });
     },
 
     /**
@@ -160,7 +188,10 @@
           if (c !== null) window.BB.storage.set(CACHE_KEY[kind], String(Math.max(0, c - 1)));
           return true;
         })
-        .catch(function () { return false; });
+        .catch(function (e) {
+          _warn('[userCount] decrement of counters/' + DOC_ID[kind] + ' failed:', e && (e.code || e.message || e));
+          return false;
+        });
     },
 
     /**

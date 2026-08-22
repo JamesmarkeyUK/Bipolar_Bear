@@ -913,7 +913,12 @@
 //       had drifted back at 1.25), the What's New headline and the in-app
 //       changelog. Touches js/shared/brand-config.js, version.json, js/index.js,
 //       journal.html, CHANGELOG.md.
-const CACHE_NAME = 'bipolarbear-v201';
+// v202: user counts are no longer silent when they fail. js/shared/user-count.js
+//       now logs what the counter read resolved to (value / missing doc) and
+//       warns with the Firestore error code when a read, a count or a decrement
+//       is rejected — so a rules denial is distinguishable from "nobody counted
+//       yet" without guessing.
+const CACHE_NAME = 'bipolarbear-v202';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
