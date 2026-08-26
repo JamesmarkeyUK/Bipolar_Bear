@@ -936,7 +936,12 @@
 // v205: home counter copy — "12 people use Bipolar Bear (2 live)" rather than
 //       "have used". Present tense across all ten locales. js/shared/i18n.js,
 //       js/index.js.
-const CACHE_NAME = 'bipolarbear-v205';
+// v206: release 1.33 (build 33). Packages v202-v205 — the live-now figure on
+//       both counters, presence heartbeats from the journal and survival kit,
+//       the diagnostics behind a missing count, and the present-tense copy.
+//       Touches js/shared/brand-config.js, version.json, js/index.js,
+//       journal.html, CHANGELOG.md.
+const CACHE_NAME = 'bipolarbear-v206';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

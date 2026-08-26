@@ -2236,6 +2236,7 @@ function _handleIndexJournalNav() {
     // (and fab.js) reads the same value without depending on this script.
     const _APP_VERSION = window._APP_VERSION;
     const _WHATS_NEW_HEADLINES = {
+      '1.33': 'The home screen now shows how many people use Bipolar Bear and how many are using it right now, and the Bipolar Anonymous board does the same for its members. The live figure is an anonymous heartbeat that expires after two minutes — it stores nothing about who you are.',
       '1.32': 'Bipolar Bear now shows how many people are using it, just above the credit on the home screen — and the Bipolar Anonymous board shows how many members the community has, at the top of the board.',
       '1.25': 'New Full Mood Spectrum option: track your mood on a 0–10 scale by spinning a wheel or sliding, instead of the five fixed moods (turn it on under Advanced → Journal Options). Plus a cleaner classic journal form — tidier energy, sleep and medication rows.',
       '1.24': 'A round of polish: the medication step now starts on "Taken", the home screen shows a tick when you’ve posted on Bipolar Anonymous today, and the community board is clearer — admins post as "Bipolar Bear Admin" and a new About-screen guide explains every post-action button',
