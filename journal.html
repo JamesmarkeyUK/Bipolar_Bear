@@ -1282,13 +1282,40 @@
     <div class="confirm-content" style="max-width: 600px; max-height: 80vh; overflow-y: auto;">
       <h3 data-i18n="journal.missingTitle">Missing Entries</h3>
       <p style="color: #6c757d; margin-bottom: 20px;" data-i18n="journal.missingSub">Click on a date to fill in that entry (showing up to 30 days):</p>
-      
+
+      <!-- Auto-complete promo — shown by showMissingDates() only when 2+ days are missing -->
+      <div id="autoFillPromo" style="display:none; text-align:left; background:var(--brand-tint,#fff6ec); border:1.5px solid rgba(255,149,0,0.35); border-radius:12px; padding:14px; margin-bottom:20px;">
+        <div style="font-weight:700; color:#333; margin-bottom:6px;">
+          <span data-i18n="journal.autofill.promoTitle">✨ Auto-complete these days</span>
+        </div>
+        <p style="color:#6c757d; font-size:0.86em; margin:0 0 12px; line-height:1.5;" data-i18n="journal.autofill.promoDesc">Fill the gaps in one go from the data you already have — sleep and steps from your phone's health app, with a mood and energy level suggested from them. You review every day before anything is saved.</p>
+        <button id="autoFillPromoBtn" onclick="showAutoFillModal()" style="width:100%; padding:11px 16px; background:var(--brand-primary); color:white; border:none; border-radius:10px; font-weight:700; font-size:0.92em; cursor:pointer; -webkit-tap-highlight-color:transparent;" data-i18n="journal.autofill.promoBtn">✨ Auto-complete</button>
+      </div>
+
       <div id="missingDatesList" style="margin-bottom: 20px;">
         <!-- Missing dates will be listed here -->
       </div>
       
       <div class="confirm-buttons">
         <button class="confirm-btn confirm-btn-no" onclick="closeMissingDatesModal()" data-i18n="common.close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auto-complete missing entries -->
+  <div class="confirm-modal" id="autoFillModal">
+    <div class="confirm-content" style="max-width: 520px; text-align: left;">
+      <h3 style="text-align:center;" data-i18n="journal.autofill.title">✨ Auto-complete missing days</h3>
+      <p id="autoFillIntro" style="font-size:0.88em; line-height:1.55; margin-bottom:16px;" data-i18n="journal.autofill.intro">Bipolar Bear will add an entry for each day below. Sleep and steps come from your phone's health app where it has them, and from your recent typical day where it doesn't. Mood and energy are suggested from that data — nothing else is filled in.</p>
+      <div id="autoFillStatus" style="text-align:center; color:#6c757d; font-size:0.9em; padding:18px 0;"></div>
+      <div id="autoFillPreview" style="display:none; max-height:38vh; overflow-y:auto; margin-bottom:14px;"></div>
+      <p id="autoFillFoot" style="display:none; font-size:0.8em; color:#adb5bd; line-height:1.5; margin-bottom:18px;" data-i18n="journal.autofill.foot">These are estimates, not a record of how you actually felt. Every day added is marked AUTO in your journal — tap ✏️ to edit it or × to delete it.</p>
+      <div class="confirm-buttons" id="autoFillActions" style="display:none;">
+        <button class="confirm-btn confirm-btn-no" onclick="closeAutoFillModal()" data-i18n="common.cancel">Cancel</button>
+        <button class="confirm-btn" id="autoFillConfirmBtn" onclick="runAutoFill()" style="background:var(--brand-primary); color:white; border:2px solid var(--brand-primary);">Fill these in</button>
+      </div>
+      <div class="confirm-buttons" id="autoFillDoneActions" style="display:none;">
+        <button class="confirm-btn confirm-btn-no" onclick="finishAutoFill()" data-i18n="common.close">Close</button>
       </div>
     </div>
   </div>

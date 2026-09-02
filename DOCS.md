@@ -153,6 +153,10 @@ entries/
     alcohol       string?  — "yes" | "no"
     notes         string?  — free text journal entry
     steps         number?  — step count from HealthKit
+    autoFilled    bool?    — true when the day was created by auto-complete (§2.13)
+                             rather than logged by the user; cleared when the
+                             user edits and saves the entry
+    autoFilledSource string? — "health" | "typical" — where the estimate came from
     pdfHidden     bool     — exclude from PDF export
     favourite     bool     — starred entry
     customFields  object   — user-defined extra fields { [id]: "yes"|"no" }
@@ -570,6 +574,53 @@ Three sub-labels appear under the navigation buttons:
 | Bipolar Anonymous | `#anonMessagesBadge` | `💬 N new messages` or `✓ No new messages` (Firestore query since `bbAnonLastVisit`) |
 
 All three use the shared CSS class `.btn-subnote` (bold, white, `font-size: 0.78em`). The Anonymous sign-in fallback note uses `.btn-subnote-muted` (same size but dimmed + italic).
+
+### 2.13 Auto-complete Missing Entries
+
+The "Missing Entries" modal (`showMissingDates()`) offers an **Auto-complete**
+panel whenever 2+ days are missing. It creates one entry per gap day from data
+the app already has, instead of making the user open the form N times.
+
+```
+Entry point:  #autoFillPromoBtn → showAutoFillModal()   (journal.js)
+Input:        _missingDatesCache — the exact list the modal just rendered
+
+Sources, per day, in priority order:
+  1. Health (native only, and only when the health-sync toggle is on)
+     _autoFillHealthData() runs TWO aggregated queries across the whole gap:
+       queryAggregated({dataType:'steps', bucket:'day'})  → count
+       queryAggregated({dataType:'sleep', bucket:'day'})  → SECONDS
+     (queryLatestSample returns sleep in MINUTES — different unit, same plugin.)
+     Aggregated sleep buckets a session under the day it STARTED, which matches
+     the journal's model: an entry for day D covers the night at the end of D
+     (see _sleepNotYet()). Totals outside 1–16h are discarded as unusable.
+     Permissions are requested here, not just checked — the tap is deliberate.
+  2. _autoFillTypicals() — median energy, median sleep and most frequent mood
+     over the 30 most recent entries. Used for every day Health knows nothing
+     about, which on the web build is all of them.
+
+Derived, never read directly from Health:
+  mood    ← _suggestMoodFromHealth(steps, sleepH)   (same rule as focused
+            mode's "best guess": 7–9h sleep short-circuits to stable)
+  energy  ← _energyFromSteps(steps)                 (same mapping as the
+            single-day steps import)
+
+UI:       preview lists every day with its values and its source, each with a
+          checkbox (all ticked by default) so the user can drop any day before
+          anything is written. Confirm → _autoFillPersist().
+
+Writes:   signed in → one encrypted Firestore batch (max 30 days, well under
+                      the 500-write limit)
+          guest     → encrypted localStorage, behind the same first-save PIN
+                      gate as saveAndOpenJournal()
+          No other field is filled: medication, notes, goals etc. stay empty.
+
+Marking:  every entry carries autoFilled:true → an AUTO badge in the entry list,
+          "Auto-filled estimate" in the PDF export and an Auto-filled column in
+          the CSV. Editing and saving the entry clears the flag (saveEntry).
+          A guess must never read as something the user reported — least of all
+          in the PDF a clinician sees.
+```
 
 ---
 

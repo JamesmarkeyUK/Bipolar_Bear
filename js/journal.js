@@ -98,6 +98,7 @@ window.addEventListener('pageshow', () => {
     }
 
     let _allEntries = []; // full sorted entry list for personalised feedback
+    let _missingDatesCache = []; // dates listed by the last showMissingDates() — input to auto-complete
 
     // _resolvePointerPosition is provided by js/shared/onboarding.js.
     // Local alias kept so existing call sites in this script work unchanged.
@@ -2100,6 +2101,13 @@ window.addEventListener('pageshow', () => {
         recordedTz: Intl.DateTimeFormat().resolvedOptions().timeZone
       };
 
+      // An auto-filled day the user has now opened and saved is no longer a
+      // guess — drop the flag so the AUTO badge and PDF note disappear.
+      if (editingEntry && editingEntry.autoFilled) {
+        entry.autoFilled = false;
+        entry.autoFilledSource = null;
+      }
+
       // Attach steps from health sync for new entries (backfill only updates existing entries)
       if (!editingEntry && window._healthStepsByDate) {
         const dKey = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth()+1).padStart(2,'0')}-${String(selectedDate.getDate()).padStart(2,'0')}`;
@@ -2545,6 +2553,7 @@ window.addEventListener('pageshow', () => {
                   <img src="${_moodImg(entry.mood)}" alt="${_moodLabelOf(entry.mood)}" class="entry-mood" style="width:32px;height:32px;object-fit:contain;">
                   ${entry.linkedMood ? `<img src="${_moodImg(entry.linkedMood)}" alt="${_moodLabelOf(entry.linkedMood)}" style="width:22px;height:22px;object-fit:contain;opacity:0.75;margin-left:-4px;" title="Also: ${_moodLabelOf(entry.linkedMood)}">` : ''}
                   ${entry.pdfHide ? `<span style="font-size:1em;line-height:1;opacity:0.7;" title="${BB.t('journal.ui.privateTitle')}">🕵️</span>` : ''}
+                  ${entry.autoFilled ? `<span style="font-size:0.6em;font-weight:700;letter-spacing:0.05em;color:var(--brand-primary);border:1.5px solid rgba(255,149,0,0.45);border-radius:6px;padding:2px 4px;line-height:1;" title="${BB.t('journal.autofill.badgeTitle')}">${BB.t('journal.autofill.badge')}</span>` : ''}
                   ${entry.favourite ? `<span style="font-size:1em;color:var(--brand-primary);line-height:1;" title="${BB.t('journal.ui.favouriteTitle')}">★</span>` : ''}
                   <button class="edit-btn" id="edit-${actualIndex}" title="${BB.t('journal.ui.editEntry')}" style="background:none; border:none; cursor:pointer; font-size:1.1em; padding:4px;">✏️</button>
                   <button class="delete-btn" id="delete-${actualIndex}">×</button>
@@ -5449,16 +5458,24 @@ window.addEventListener('pageshow', () => {
      * day on top of 7.7h sleep is a rest day, not a low mood, and defaulting it
      * to "low" put the wrong answer in front of the user before they'd chosen.
      */
-    function _fmMaybeSuggestMood() {
-      if (selectedMood || editingEntry) return;
-      const steps  = _fmStepsRaw;
-      const sleepH = _fmSleepImported;
-      if (steps == null && sleepH == null) return;
-      if (sleepH != null && sleepH >= 7 && sleepH <= 9) { _fmMoodSuggestion = 'stable'; return; }
+    function _suggestMoodFromHealth(steps, sleepH) {
+      if (steps == null && sleepH == null) return null;
+      if (sleepH != null && sleepH >= 7 && sleepH <= 9) return 'stable';
       let score = 0; // negative → low, positive → elevated
       if (steps != null)  { if (steps < 3000)  score--; else if (steps > 15000) score++; }
       if (sleepH != null) { if (sleepH >= 9.5) score--; else if (sleepH <= 5.5) score++; }
-      _fmMoodSuggestion = score < 0 ? 'low' : score > 0 ? 'elevated' : 'stable';
+      return score < 0 ? 'low' : score > 0 ? 'elevated' : 'stable';
+    }
+
+    /** Steps → an energy value on the form's 0–10 scale. */
+    function _energyFromSteps(s) {
+      return s < 1000 ? 0 : s < 3000 ? 3 : s < 10000 ? 5 : s < 20000 ? 7 : 10;
+    }
+
+    function _fmMaybeSuggestMood() {
+      if (selectedMood || editingEntry) return;
+      const suggestion = _suggestMoodFromHealth(_fmStepsRaw, _fmSleepImported);
+      if (suggestion) _fmMoodSuggestion = suggestion;
     }
 
     // ── Regular (full) form: synced badge on the energy + sleep steps ──
@@ -8886,7 +8903,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
           'Date','Mood','Linked Mood','Energy (1-10)','Sleep (hrs)','Sleep Quality',
           'Medication','Goals','Budget','Anxiety','Stress','Irritability',
           'Exercise','Outside','Alcohol','Smoking','Drugs','Steps',
-          'Notes','Intention','PDF Hidden','Favourite',
+          'Notes','Intention','PDF Hidden','Favourite','Auto-filled',
           ...customFieldIds.map(customLabel),
         ];
         const rows = entries.map(e => [
@@ -8898,6 +8915,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
           _esc(e.smoking || ''), _esc(e.drugs || ''), _esc(e.steps != null ? e.steps : ''),
           _esc(e.notes || ''), _esc(e.intention || ''),
           _esc(e.pdfHidden ? 'yes' : ''), _esc(e.favourite ? 'yes' : ''),
+          _esc(e.autoFilled ? 'yes' : ''),
           ...customFieldIds.map(id => _esc((e.customFields || {})[id] || '')),
         ].join(','));
 
@@ -9840,6 +9858,9 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
             ? `  ·  ${new Date(entry.recordedAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}${entry.recordedTz ? ' ' + entry.recordedTz : ''}`
             : '';
           const stepsStr    = entry.steps    != null ? `  ·  Steps ${Number(entry.steps).toLocaleString()}` : '';
+          // Flag estimated days explicitly — a clinician reading this must not
+          // mistake an auto-filled guess for something the user reported.
+          const autoStr     = entry.autoFilled ? `  ·  ${BB.t('journal.autofill.pdfNote')}` : '';
           const alcoholStr      = entry.alcohol     ? `  ·  Alcohol: ${entry.alcohol === 'yes' ? BB.t('journal.value.yes') : BB.t('journal.value.no')}` : '';
           const smokingStr      = entry.smoking     ? `  ·  Smoked: ${entry.smoking === 'yes' ? BB.t('journal.value.yes') : BB.t('journal.value.no')}` : '';
           const drugsStr        = entry.drugs       ? `  ·  Drugs: ${entry.drugs === 'yes' ? BB.t('journal.value.yes') : BB.t('journal.value.no')}` : '';
@@ -9856,7 +9877,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
               return cf ? `  ·  ${cf.label}: ${val === 'yes' ? BB.t('journal.value.yes') : BB.t('journal.value.no')}` : '';
             }).filter(Boolean).join('');
           const _moodLabel = { manic:BB.t('mood.manic'), elevated:BB.t('mood.elevated'), stable:BB.t('mood.stable'), good:BB.t('mood.stable'), low:BB.t('mood.low'), depressed:BB.t('mood.depressed') };
-          const detail = `${_moodLabelNum(entry.mood)}  ·  Energy ${entry.energy}/10  ·  Sleep ${entry.sleep}h${sleepQualityStr}${stepsStr}  ·  Meds: ${entry.medication === 'not-taken' ? BB.t('journal.pdf.noForgot') : entry.medication === 'unsure' ? BB.t('journal.pdf.unsure') : (entry.medication || 'taken')}${anxietyStr}${irritabilityStr}${stressStr2}${alcoholStr}${smokingStr}${drugsStr}${exerciseStr}${outsideStr}${customStr}${recordedPart}`;
+          const detail = `${_moodLabelNum(entry.mood)}  ·  Energy ${entry.energy}/10  ·  Sleep ${entry.sleep}h${sleepQualityStr}${stepsStr}  ·  Meds: ${entry.medication === 'not-taken' ? BB.t('journal.pdf.noForgot') : entry.medication === 'unsure' ? BB.t('journal.pdf.unsure') : (entry.medication || 'taken')}${anxietyStr}${irritabilityStr}${stressStr2}${alcoholStr}${smokingStr}${drugsStr}${exerciseStr}${outsideStr}${customStr}${autoStr}${recordedPart}`;
           const detailLines = doc.splitTextToSize(detail, pageW - margin - (dotX + 35));
           doc.text(detailLines, dotX + 35, y);
           y += (detailLines.length - 1) * 4;
@@ -11570,6 +11591,13 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
           checkDate.setDate(checkDate.getDate() + 1);
         }
 
+        // Hand the list to the auto-complete flow, and offer it only when
+        // there are several days to fill — for a single day, tapping the date
+        // is just as quick.
+        _missingDatesCache = missingDates;
+        const autoFillPromo = document.getElementById('autoFillPromo');
+        if (autoFillPromo) autoFillPromo.style.display = missingDates.length >= 2 ? '' : 'none';
+
         // Display missing dates in modal
         const listContainer = document.getElementById('missingDatesList');
         
@@ -11600,6 +11628,366 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
     function closeMissingDatesModal() {
       document.getElementById('missingDatesModal').classList.remove('active');
     }
+
+    // ────────────────────────────────────────────
+    // AUTO-COMPLETE MISSING ENTRIES
+    // ────────────────────────────────────────────
+    /*
+     * Fills every gap listed in the missing-entries modal in one pass, instead
+     * of making the user open the form nine times. Two sources, in order:
+     *
+     *   1. Health (native only, and only when the health-sync toggle is on):
+     *      one aggregated steps query and one aggregated sleep query across the
+     *      whole gap. Aggregated sleep buckets a session under the day it
+     *      STARTED, which matches the journal's own model — an entry for day D
+     *      covers the night at the end of D (see _sleepNotYet()).
+     *   2. The user's own recent entries: median energy / sleep and their most
+     *      frequent mood, for the days Health knows nothing about — which on
+     *      the web build is every day, since there is no Health there at all.
+     *
+     * Mood and energy are never read from Health directly; they are derived
+     * from steps + sleep with the same rules behind focused mode's "best guess"
+     * badge (_suggestMoodFromHealth / _energyFromSteps).
+     *
+     * Every entry written here carries autoFilled:true, which shows an AUTO
+     * badge in the list, an "Auto-filled" note in the PDF export and a column
+     * in the CSV. A guess must never be mistaken for something the user
+     * actually reported — least of all in the PDF a clinician reads. Editing
+     * an auto-filled entry and saving it clears the flag (see saveEntry).
+     */
+    let _autoFillPlan = null;    // [{ key, date, mood, energy, sleep, steps, source, include }]
+    let _autoFillBusy = false;
+
+    function _autoFillDateKey(d) {
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    function _autoFillMedian(nums) {
+      const arr = nums.filter(n => typeof n === 'number' && !isNaN(n)).sort((a, b) => a - b);
+      if (!arr.length) return null;
+      const mid = Math.floor(arr.length / 2);
+      return arr.length % 2 ? arr[mid] : (arr[mid - 1] + arr[mid]) / 2;
+    }
+
+    /**
+     * "What a typical day looks like for this user" — median energy and sleep
+     * plus the most frequent mood over their 30 most recent entries. Used for
+     * days Health has nothing for. Falls back to the form's own defaults when
+     * there is nothing to average (shouldn't happen: the missing-dates modal
+     * needs at least one entry to compute a gap at all).
+     */
+    function _autoFillTypicals() {
+      const recent = (_allEntries || []).slice(0, 30);
+      const energy = _autoFillMedian(recent.map(e => Number(e.energy)));
+      const sleep  = _autoFillMedian(recent.map(e => Number(e.sleep)));
+      const counts = {};
+      recent.forEach(e => {
+        const cat = _moodCat(e.mood);
+        if (cat) counts[cat] = (counts[cat] || 0) + 1;
+      });
+      let mood = null, best = 0;
+      Object.entries(counts).forEach(([cat, n]) => { if (n > best) { best = n; mood = cat; } });
+      return {
+        energy: energy == null ? 5   : Math.round(energy),
+        sleep:  sleep  == null ? 7.5 : Math.round(sleep * 10) / 10,
+        mood:   mood || 'stable'
+      };
+    }
+
+    /**
+     * Daily steps + sleep for the whole gap, in two aggregated queries.
+     * Returns empty maps on the web build, when health sync is off, or when
+     * access is refused — the caller then falls back to typical values.
+     *
+     * Units differ per metric and per call: aggregated steps come back as a
+     * count, aggregated sleep as SECONDS. (queryLatestSample returns sleep in
+     * MINUTES — see importSleepFromHealth. Don't mix the two up.)
+     */
+    async function _autoFillHealthData(dates) {
+      const out = { steps: {}, sleep: {} };
+      if (!isNative() || BB.storage.get('HealthSyncEnabled') !== '1') return out;
+
+      const Health = getPlugin('HealthPlugin');
+      if (!Health) return out;
+
+      try {
+        const { available } = await Health.isHealthAvailable();
+        if (!available) return out;
+
+        // Tapping "Auto-complete" is a deliberate action, so raising the OS
+        // permission sheet here is fair game — unlike the silent auto-syncs,
+        // which only ever check.
+        try {
+          const ck = await Health.checkHealthPermissions({ permissions: ['READ_STEPS', 'READ_SLEEP'] });
+          if (!ck?.permissions?.READ_STEPS || !ck?.permissions?.READ_SLEEP) {
+            skipNextResume = true;
+            await Health.requestHealthPermissions({ permissions: ['READ_STEPS', 'READ_SLEEP'] });
+            skipNextResume = false;
+          }
+        } catch (e) { skipNextResume = false; }
+
+        const sorted = [...dates].sort((a, b) => a - b);
+        const startDate = new Date(sorted[0]);
+        startDate.setHours(0, 0, 0, 0);
+        const endDate = new Date(sorted[sorted.length - 1]);
+        endDate.setHours(24, 0, 0, 0); // start of the day after the last gap day
+
+        try {
+          const res = await Health.queryAggregated({
+            dataType: 'steps',
+            startDate: startDate.toISOString(),
+            endDate:   endDate.toISOString(),
+            bucket:    'day'
+          });
+          (res?.aggregatedData || []).forEach(sample => {
+            const count = Math.round(sample.value);
+            if (count > 0) out.steps[_autoFillDateKey(new Date(sample.startDate))] = count;
+          });
+        } catch (e) { BB.log('auto-complete: steps query failed', e); }
+
+        try {
+          const res = await Health.queryAggregated({
+            dataType: 'sleep',
+            startDate: startDate.toISOString(),
+            endDate:   endDate.toISOString(),
+            bucket:    'day'
+          });
+          (res?.aggregatedData || []).forEach(sample => {
+            const hours = sample.value / 3600;
+            // Ignore nonsense totals: a stray 20-minute sample isn't a night's
+            // sleep, and >16h means overlapping sources we can't untangle.
+            if (hours >= 1 && hours <= 16) {
+              out.sleep[_autoFillDateKey(new Date(sample.startDate))] = Math.round(hours * 10) / 10;
+            }
+          });
+        } catch (e) { BB.log('auto-complete: sleep query failed', e); }
+      } catch (e) {
+        BB.log('auto-complete: health unavailable', e);
+      }
+      return out;
+    }
+
+    async function showAutoFillModal() {
+      const dates = (_missingDatesCache || []).slice();
+      const modal = document.getElementById('autoFillModal');
+      if (!modal || !dates.length) return;
+
+      _autoFillPlan = null;
+      _autoFillBusy = false;
+      document.getElementById('autoFillIntro').style.display = '';
+      document.getElementById('autoFillPreview').style.display = 'none';
+      document.getElementById('autoFillFoot').style.display = 'none';
+      document.getElementById('autoFillActions').style.display = 'none';
+      document.getElementById('autoFillDoneActions').style.display = 'none';
+      const statusEl = document.getElementById('autoFillStatus');
+      statusEl.style.display = '';
+      statusEl.textContent = BB.t('journal.autofill.reading');
+      // One modal at a time: the Android back button closes whichever
+      // .confirm-modal it finds first in the DOM, so stacking these two would
+      // close the list underneath and leave this one floating.
+      closeMissingDatesModal();
+      modal.classList.add('active');
+
+      const health  = await _autoFillHealthData(dates);
+      const typical = _autoFillTypicals();
+
+      _autoFillPlan = dates.map(d => {
+        const key    = _autoFillDateKey(d);
+        const steps  = health.steps[key] != null ? health.steps[key] : null;
+        const sleepH = health.sleep[key] != null ? health.sleep[key] : null;
+        return {
+          key,
+          date:   new Date(d),
+          mood:   _suggestMoodFromHealth(steps, sleepH) || typical.mood,
+          energy: steps  != null ? _energyFromSteps(steps) : typical.energy,
+          sleep:  sleepH != null ? sleepH : typical.sleep,
+          steps,
+          source: (steps != null || sleepH != null) ? 'health' : 'typical',
+          include: true
+        };
+      });
+      _renderAutoFillPreview();
+    }
+    window.showAutoFillModal = showAutoFillModal;
+
+    function _renderAutoFillPreview() {
+      const listEl   = document.getElementById('autoFillPreview');
+      const statusEl = document.getElementById('autoFillStatus');
+      if (!listEl || !_autoFillPlan) return;
+
+      statusEl.style.display = 'none';
+      listEl.style.display = '';
+      listEl.innerHTML = _autoFillPlan.map((p, i) => {
+        const dateStr = p.date.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
+        const source  = BB.t(p.source === 'health' ? 'journal.autofill.fromHealth' : 'journal.autofill.fromTypical');
+        const bits = [
+          `${_moodEmoji(p.mood)} ${_moodCatLabel(p.mood)}`,
+          `🛌 ${p.sleep}h`,
+          `⚡ ${p.energy}/10`
+        ];
+        if (p.steps != null) bits.push(`🏃 ${p.steps >= 1000 ? Math.round(p.steps / 1000) + 'k' : p.steps}`);
+        return `
+          <label style="display:flex; align-items:flex-start; gap:10px; padding:10px; margin-bottom:8px; background:#f8f9fa; border-radius:10px; cursor:pointer;">
+            <input type="checkbox" ${p.include ? 'checked' : ''} onchange="toggleAutoFillDay(${i}, this.checked)" style="margin-top:3px; width:18px; height:18px; accent-color:var(--brand-primary); flex-shrink:0;">
+            <span style="flex:1; min-width:0;">
+              <span style="display:block; font-weight:600; color:#333;">${_esc(dateStr)}</span>
+              <span style="display:block; color:#495057; font-size:0.88em;">${_esc(bits.join(' · '))}</span>
+              <span style="display:block; color:#adb5bd; font-size:0.78em;">${_esc(source)}</span>
+            </span>
+          </label>`;
+      }).join('');
+
+      document.getElementById('autoFillFoot').style.display = '';
+      document.getElementById('autoFillActions').style.display = '';
+      _updateAutoFillBtn();
+    }
+
+    function toggleAutoFillDay(i, checked) {
+      if (_autoFillPlan && _autoFillPlan[i]) _autoFillPlan[i].include = !!checked;
+      _updateAutoFillBtn();
+    }
+    window.toggleAutoFillDay = toggleAutoFillDay;
+
+    function _updateAutoFillBtn() {
+      const btn = document.getElementById('autoFillConfirmBtn');
+      if (!btn || !_autoFillPlan) return;
+      const n = _autoFillPlan.filter(p => p.include).length;
+      btn.disabled = n === 0 || _autoFillBusy;
+      btn.style.opacity = btn.disabled ? '0.5' : '';
+      btn.textContent = BB.t('journal.autofill.confirm', { count: n });
+    }
+
+    /** A plan row → a full entry object, shaped exactly like a saved one. */
+    function _buildAutoFilledEntry(plan) {
+      const date = new Date(plan.date);
+      date.setHours(12, 0, 0, 0); // noon, matching saveEntry's date handling
+      const now = new Date();
+      const entry = {
+        date: date.toISOString(),
+        mood: plan.mood,
+        linkedMood: null,
+        energy: plan.energy,
+        sleep: plan.sleep,
+        sleepQuality: null,
+        medication: null,
+        goals: null,
+        alcohol: null,
+        exercise: null,
+        anxiety: null,
+        irritability: null,
+        stress: null,
+        outside: null,
+        smoking: null,
+        drugs: null,
+        notes: '',
+        intention: '',
+        customFields: {},
+        budget: null,
+        pdfHidden: false,
+        favourite: false,
+        timestamp: date.getTime(),
+        recordedAt: now.toISOString(),
+        recordedTz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        autoFilled: true,
+        autoFilledSource: plan.source
+      };
+      if (plan.steps != null) entry.steps = plan.steps;
+      return entry;
+    }
+
+    /**
+     * Writes the entries the same way saveEntry does — encrypted per entry for
+     * signed-in users (one Firestore batch, well inside the 500-write limit for
+     * a 30-day window), encrypted localStorage for guests.
+     */
+    async function _autoFillPersist(entries) {
+      if (currentUser && db) {
+        if (!_userCryptoKey) _userCryptoKey = await _userImportKeyFromSession();
+        const batch = db.batch();
+        for (const entry of entries) {
+          const withUid = { ...entry, userId: currentUser.uid };
+          const ref = db.collection('entries').doc();
+          if (_userCryptoKey) {
+            const enc = await _userEncrypt(_userCryptoKey, withUid);
+            batch.set(ref, { userId: currentUser.uid, timestamp: entry.timestamp, ...enc });
+          } else {
+            batch.set(ref, withUid);
+          }
+        }
+        await batch.commit();
+      } else {
+        for (const entry of entries) {
+          const payload = _guestCryptoKey ? await _guestEncrypt(_guestCryptoKey, entry) : entry;
+          localStorage.setItem(`entry:${entry.timestamp}`, JSON.stringify(payload));
+        }
+      }
+    }
+
+    async function runAutoFill() {
+      if (!_autoFillPlan || _autoFillBusy) return;
+      const chosen = _autoFillPlan.filter(p => p.include);
+      if (!chosen.length) return;
+
+      // Guests must set a PIN before their first save — it derives the key that
+      // encrypts localStorage entries. saveAndOpenJournal() gates on this too;
+      // without it these entries would be written in the clear. The PIN overlay
+      // sits above the modal, and its callback resumes the fill.
+      if (!currentUser && (BB.storage.get('PinEnabled') !== '1' || !BB.storage.get('GuestPinSalt'))) {
+        _showGuestPinSetup(() => { runAutoFill(); });
+        return;
+      }
+
+      _autoFillBusy = true;
+      _updateAutoFillBtn();
+      const statusEl = document.getElementById('autoFillStatus');
+      document.getElementById('autoFillPreview').style.display = 'none';
+      document.getElementById('autoFillFoot').style.display = 'none';
+      document.getElementById('autoFillActions').style.display = 'none';
+      statusEl.style.display = '';
+      statusEl.textContent = BB.t('journal.autofill.saving');
+
+      try {
+        await _autoFillPersist(chosen.map(_buildAutoFilledEntry));
+        nativeHaptic('success');
+        document.getElementById('autoFillIntro').style.display = 'none';
+        statusEl.innerHTML =
+          `<div style="font-size:1.8em; margin-bottom:8px;">✅</div>` +
+          `<div style="font-weight:700; color:#333; margin-bottom:8px;">${_esc(BB.t('journal.autofill.doneTitle', { count: chosen.length }))}</div>` +
+          `<div style="color:#6c757d; font-size:0.9em; line-height:1.5;">${_esc(BB.t('journal.autofill.doneBody'))}</div>`;
+        document.getElementById('autoFillDoneActions').style.display = '';
+        _autoFillPlan = null;
+      } catch (error) {
+        console.error('Auto-complete failed:', error);
+        statusEl.textContent = BB.t('journal.autofill.fail');
+        setTimeout(() => {
+          if (!_autoFillPlan) return;
+          _renderAutoFillPreview();
+        }, 2500);
+      } finally {
+        _autoFillBusy = false;
+        _updateAutoFillBtn();
+      }
+    }
+    window.runAutoFill = runAutoFill;
+
+    /** Cancel: back to the missing-dates list the user came from. */
+    function closeAutoFillModal() {
+      const modal = document.getElementById('autoFillModal');
+      if (modal) modal.classList.remove('active');
+      const list = document.getElementById('missingDatesModal');
+      if (list) list.classList.add('active');
+    }
+    window.closeAutoFillModal = closeAutoFillModal;
+
+    /** Close-out after a successful fill: drop both modals, reload the list. */
+    function finishAutoFill() {
+      const modal = document.getElementById('autoFillModal');
+      if (modal) modal.classList.remove('active');
+      closeMissingDatesModal();
+      currentPage = 1;
+      loadEntries();
+    }
+    window.finishAutoFill = finishAutoFill;
 
     function setDateAndClose(dateValue) {
       // Close the modal
@@ -13761,7 +14149,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
           const stepsLabel = s >= 1000 ? Math.round(s / 1000) + 'k' : String(s);
           _fmStepsResult = stepsLabel;
           if (editingEntry) editingEntry.steps = s;
-          _fmEnergySuggestion = s < 1000 ? 0 : s < 3000 ? 3 : s < 10000 ? 5 : s < 20000 ? 7 : 10;
+          _fmEnergySuggestion = _energyFromSteps(s);
           // Pre-select the suggested energy without auto-advancing
           selectedEnergy = _fmEnergySuggestion;
           _fmEnergyClear = false;
@@ -13769,7 +14157,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
           _renderFocusedStep();
         } else {
           // Non-focused: highlight the suggested energy button
-          const _sugEn = s < 1000 ? 0 : s < 3000 ? 3 : s < 10000 ? 5 : s < 20000 ? 7 : 10;
+          const _sugEn = _energyFromSteps(s);
           document.querySelectorAll('.energy-btn').forEach(b => {
             const isSugg = parseFloat(b.dataset.energy) === _sugEn;
             const isSel  = b.classList.contains('selected');
