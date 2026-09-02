@@ -11671,27 +11671,81 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
 
     /**
      * "What a typical day looks like for this user" — median energy and sleep
-     * plus the most frequent mood over their 30 most recent entries. Used for
-     * days Health has nothing for. Falls back to the form's own defaults when
-     * there is nothing to average (shouldn't happen: the missing-dates modal
-     * needs at least one entry to compute a gap at all).
+     * over their 30 most recent entries, for days Health has nothing for.
+     * Day-independent; mood is worked out per day by _autoFillLikelyMood().
+     * Falls back to the form's own defaults when there is nothing to average
+     * (shouldn't happen: the missing-dates modal needs at least one entry to
+     * compute a gap at all).
      */
     function _autoFillTypicals() {
       const recent = (_allEntries || []).slice(0, 30);
       const energy = _autoFillMedian(recent.map(e => Number(e.energy)));
       const sleep  = _autoFillMedian(recent.map(e => Number(e.sleep)));
-      const counts = {};
-      recent.forEach(e => {
-        const cat = _moodCat(e.mood);
-        if (cat) counts[cat] = (counts[cat] || 0) + 1;
-      });
-      let mood = null, best = 0;
-      Object.entries(counts).forEach(([cat, n]) => { if (n > best) { best = n; mood = cat; } });
       return {
         energy: energy == null ? 5   : Math.round(energy),
-        sleep:  sleep  == null ? 7.5 : Math.round(sleep * 10) / 10,
-        mood:   mood || 'stable'
+        sleep:  sleep  == null ? 7.5 : Math.round(sleep * 10) / 10
       };
+    }
+
+    // How fast a logged mood's pull over a nearby day fades, in days. Mood
+    // persists: the day after a logged "low" is far likelier to be low than
+    // the user's 30-day average is. Half the pull is gone after 3 days, ~80%
+    // after a week.
+    const _AUTOFILL_MOOD_HALF_LIFE_DAYS = 3;
+    // How much the 30-entry baseline counts for against that local pull. Small
+    // on purpose: it should only decide a day once no entry sits near it. At
+    // 0.15 a mood logged the day before a gap day wins outright, the same mood
+    // three days out only wins if the history doesn't strongly say otherwise,
+    // and past about a week the baseline takes over.
+    const _AUTOFILL_MOOD_BASELINE_WEIGHT = 0.15;
+
+    /**
+     * The most likely mood for one gap day.
+     *
+     *   score(mood) = closeness of the NEAREST entry with that mood
+     *               + 0.15 × how often that mood shows up in the last 30
+     *
+     * Closeness is a half-life decay on the distance in days, so the day right
+     * after your last entry inherits that entry's mood almost outright, and a
+     * gap sandwiched between two logged days is pulled from whichever side is
+     * nearer (the distance is absolute).
+     *
+     * Nearest — not the sum of every entry with that mood — because summing
+     * lets a crowd of mid-distance days out-vote the one day that actually
+     * sits next to the gap: seven stable days a week back would drown out the
+     * "low" logged the day before, which is precisely the entry most likely to
+     * still hold. Summing also made one long stable stretch swamp everything
+     * that came after it.
+     *
+     * The baseline term is what stops a single outlier owning a whole gap: an
+     * unusual day next to the gap claims the day beside it, then the user's
+     * normal range takes back over.
+     *
+     * Ties break towards the more recent mood: _allEntries is sorted
+     * newest-first, so the nearer category lands in `scores` first and the
+     * strictly-greater test below leaves it in place.
+     */
+    function _autoFillLikelyMood(date) {
+      const recent = (_allEntries || []).slice(0, 30);
+      const dayMs = 86400000;
+      const nearest = {};  // mood → closeness of its nearest entry (0–1)
+      const counts  = {};  // mood → how many of the recent entries it accounts for
+      let counted = 0;
+      recent.forEach(e => {
+        const cat = _moodCat(e.mood);
+        if (!cat || !e.timestamp) return;
+        const days = Math.abs(date.getTime() - e.timestamp) / dayMs;
+        const closeness = Math.pow(0.5, days / _AUTOFILL_MOOD_HALF_LIFE_DAYS);
+        if (closeness > (nearest[cat] || 0)) nearest[cat] = closeness;
+        counts[cat] = (counts[cat] || 0) + 1;
+        counted++;
+      });
+      let mood = null, best = 0;
+      Object.keys(nearest).forEach(cat => {
+        const score = nearest[cat] + _AUTOFILL_MOOD_BASELINE_WEIGHT * (counts[cat] / counted);
+        if (score > best) { best = score; mood = cat; }
+      });
+      return mood || 'stable';
     }
 
     /**
@@ -11798,7 +11852,7 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
         return {
           key,
           date:   new Date(d),
-          mood:   _suggestMoodFromHealth(steps, sleepH) || typical.mood,
+          mood:   _suggestMoodFromHealth(steps, sleepH) || _autoFillLikelyMood(d),
           energy: steps  != null ? _energyFromSteps(steps) : typical.energy,
           sleep:  sleepH != null ? sleepH : typical.sleep,
           steps,

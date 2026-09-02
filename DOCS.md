@@ -595,9 +595,22 @@ Sources, per day, in priority order:
      the journal's model: an entry for day D covers the night at the end of D
      (see _sleepNotYet()). Totals outside 1–16h are discarded as unusable.
      Permissions are requested here, not just checked — the tap is deliberate.
-  2. _autoFillTypicals() — median energy, median sleep and most frequent mood
-     over the 30 most recent entries. Used for every day Health knows nothing
-     about, which on the web build is all of them.
+  2. The user's own entries, for every day Health knows nothing about — which
+     on the web build is all of them:
+       _autoFillTypicals()    — median energy and median sleep over the 30 most
+                                recent entries (day-independent)
+       _autoFillLikelyMood(d) — per day, scored as
+                                  closeness of the NEAREST entry with that mood
+                                + 0.15 x how often that mood appears in the 30
+                                closeness = 0.5 ^ (days away / 3)
+                                Mood persists, so the day beside your last entry
+                                inherits it; a gap between two logged days is
+                                pulled from whichever side is nearer; and past
+                                about a week the baseline term takes over, so
+                                one outlier day can't own a whole gap. NEAREST
+                                rather than a sum of every matching entry —
+                                summing lets a crowd of mid-distance days
+                                out-vote the one day sitting next to the gap.
 
 Derived, never read directly from Health:
   mood    ← _suggestMoodFromHealth(steps, sleepH)   (same rule as focused
