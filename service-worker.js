@@ -941,7 +941,13 @@
 //       the diagnostics behind a missing count, and the present-tense copy.
 //       Touches js/shared/brand-config.js, version.json, js/index.js,
 //       journal.html, CHANGELOG.md.
-const CACHE_NAME = 'bipolarbear-v206';
+// v207: i18n — every locale now carries every en key. es/de/it/pt/nl/sv/zh/pl
+//       were missing the 646 keys added since the survival kit, landing pages,
+//       focused-mode journal, feedback/quick-note modals and wiki UI were wired
+//       up (users on those languages saw English), fr was missing 42, and the
+//       fr block declared anon.ui twice so its 17 real translations were being
+//       discarded at runtime. Touches js/shared/i18n.js only.
+const CACHE_NAME = 'bipolarbear-v207';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
