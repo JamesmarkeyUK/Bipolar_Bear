@@ -941,14 +941,20 @@
 //       the diagnostics behind a missing count, and the present-tense copy.
 //       Touches js/shared/brand-config.js, version.json, js/index.js,
 //       journal.html, CHANGELOG.md.
-// v207: release 1.34 (build 34). Auto-complete for missing entries — the
+// v207: i18n — every locale now carries every en key. es/de/it/pt/nl/sv/zh/pl
+//       were missing the 646 keys added since the survival kit, landing pages,
+//       focused-mode journal, feedback/quick-note modals and wiki UI were wired
+//       up (users on those languages saw English), fr was missing 42, and the
+//       fr block declared anon.ui twice so its 17 real translations were being
+//       discarded at runtime. Touches js/shared/i18n.js only.
+// v208: release 1.34 (build 34). Auto-complete for missing entries — the
 //       missing-entries modal can now fill every gap day in one pass from
 //       health data (aggregated steps + sleep) or the user's recent typical
 //       day, with a per-day preview first. Filled days carry autoFilled:true
 //       and show an AUTO badge in the list, a note in the PDF and a column in
 //       the CSV. Touches journal.html, js/journal.js, js/shared/i18n.js,
 //       js/shared/brand-config.js, version.json, DOCS.md, CHANGELOG.md.
-const CACHE_NAME = 'bipolarbear-v207';
+const CACHE_NAME = 'bipolarbear-v208';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
