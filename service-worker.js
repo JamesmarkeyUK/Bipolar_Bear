@@ -954,7 +954,10 @@
 //       and show an AUTO badge in the list, a note in the PDF and a column in
 //       the CSV. Touches journal.html, js/journal.js, js/shared/i18n.js,
 //       js/shared/brand-config.js, version.json, DOCS.md, CHANGELOG.md.
-const CACHE_NAME = 'bipolarbear-v208';
+// v209: auto-complete preview dates are formatted 'en-US' rather than with the
+//       device locale, so they read the same way as the missing-dates list the
+//       preview opens on top of. Touches js/journal.js only.
+const CACHE_NAME = 'bipolarbear-v209';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

@@ -11827,7 +11827,10 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
       statusEl.style.display = 'none';
       listEl.style.display = '';
       listEl.innerHTML = _autoFillPlan.map((p, i) => {
-        const dateStr = p.date.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
+        // 'en-US', not the device locale: this list sits directly on top of the
+        // missing-dates list, which formats its dates the same way, and the two
+        // reading differently for the same day is worse than either format is.
+        const dateStr = p.date.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' });
         const source  = BB.t(p.source === 'health' ? 'journal.autofill.fromHealth' : 'journal.autofill.fromTypical');
         const bits = [
           `${_moodEmoji(p.mood)} ${_moodCatLabel(p.mood)}`,
