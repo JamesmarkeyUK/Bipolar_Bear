@@ -687,6 +687,70 @@ Marking:  every entry carries autoFilled:true → an AUTO badge in the entry lis
 
 ---
 
+### 2.14 Bipolar Anonymous Notifications
+
+Three notifications, each behind its own switch in the board's settings sheet
+(🔔 Notifications) and all sent by Cloud Functions over FCM:
+
+| Preference | Fires on | Function |
+|---|---|---|
+| `replies` | a comment on a post you wrote (never your own comment) | `onAnonCommentCreated` |
+| `announcements` | any post created with `tab: 'announcements'` — posted by the admin, or a member's suggestion they approved | `onAnonAnnouncementCreated` |
+| `weekly` | Sunday 18:00 Europe/London; skipped entirely in a week with no posts | `weeklyAnonDigest` |
+
+**No notification carries post or comment text.** A notification is read on a
+lock screen by whoever is nearby; "someone replied to your post" is enough to
+bring a member back, and it can't out them to the person next to them.
+
+#### Client (`js/shared/anon-push.js`)
+
+Asks for OS permission, gets an FCM registration token, and keeps one document
+per token:
+
+```
+bbAnonPush/{fcmToken}
+  prefs: { replies, announcements, weekly }
+  monikaLower   — the reply address: posts carry a monika, not an account
+  emailHash     — sha256(email), the same key anonProfiles uses
+  platform      — 'ios' | 'android' | 'web'
+  bundle        — 'main' | 'anonymous'
+  lang          — one of the ten locales; the sender picks its copy from it
+  updatedAt
+```
+
+Three delivery paths, tried in order: `FirebaseMessaging`
+(`@capacitor-firebase/messaging`) on either native platform;
+`PushNotifications` (`@capacitor/push-notifications`) on Android only — its
+iOS token is an APNs token, which `admin.messaging()` cannot send to, so iOS
+without the first plugin reports unsupported rather than half-working; and web
+push via `firebase-messaging-compat` + `firebase-messaging-sw.js`, gated on
+`window.BB_PUSH_VAPID_KEY`.
+
+Lifecycle:
+
+- **Asked once**, right after a member's first post (`maybeAskNotifications`),
+  with the three switches shown so the offer can be narrowed before accepting.
+  Replies and announcements default on, the weekly digest off. Declining sets
+  `bbAnon_notifAsked` and is never revisited — settings is the way back in.
+- **`refresh()` on every board init** — tokens rotate and permission can be
+  revoked in the OS between visits. A revoked permission clears the local
+  preferences and deletes the token document, so the sheet can't claim to be
+  on while nothing is delivered.
+- **Renaming a monika** rewrites the document (replies are addressed by
+  monika); **signing out**, **deleting the account** and **turning the last
+  switch off** delete it.
+- Preferences are never stored when `isSupported()` is false — a switch that
+  is on while nothing can be sent is a lie, so the sheet shows the reason
+  instead.
+
+Dead tokens are collected on send: FCM's
+`registration-token-not-registered` (and the two invalid-token codes) delete
+the document.
+
+Setup that isn't in the repo — APNs key, `GoogleService-Info.plist` per bundle
+id, plugin install + `cap sync`, and the Web Push VAPID key — is in
+`NOTIFICATIONS.md`, along with the Firestore rules for `bbAnonPush`.
+
 ## 3. Algorithm Flowcharts
 
 ### 3.1 Entry Save Flow

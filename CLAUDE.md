@@ -213,6 +213,8 @@ userSettings/{uid}          Settings + nested anonProfile + currentStreak/stable
 personalDetails/{uid}       PDF-export contact details
 counters/{...}              appCosts, peopleHelped, peopleHelpedApp, helpedCount
 bbAnonPosts/{auto}          Community posts (plaintext)
+bbAnonAnnSuggestions/{auto} Member-suggested announcements awaiting the admin
+bbAnonPush/{fcmToken}       Push registration + notification prefs (never client-readable)
 bbAnonMonikas/{lowercase}   Monika reservation (uniqueness)
 anonProfiles/{sha256email}  Cross-device anon profile lookup (standalone path)
 bbPresence/{sessionId}      Live-now heartbeat, main app (lastSeen only)
@@ -222,6 +224,11 @@ feedback/{auto}             In-app feedback submissions
 ```
 
 Cloud Functions region: `europe-west1`.
+
+Push notifications for the anonymous board (replies / announcements /
+weekly digest) need account + native setup that isn't in the repo — see
+`NOTIFICATIONS.md`. Until it's done the app reports them unavailable
+rather than failing.
 
 ## localStorage key categories
 
