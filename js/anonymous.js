@@ -63,6 +63,8 @@ let db = null;
 let currentTab      = 'general';
 let unsubTabListeners = { announcements: null, general: null };
 let postsByTab        = { announcements: [], general: [] };
+let suggestions       = [];   // announcement suggestions awaiting the admin
+let unsubSuggestions  = null;
 // Millisecond timestamp of when the user last had each tab open
 const lastSeenMs = {
   announcements: parseInt(BB.storage.get('Anon_lastSeen_announcements') || '0', 10),
@@ -1464,6 +1466,7 @@ function initBoard() {
   setTab('general');
   listenPosts(); // starts both tab listeners; setTab no longer does this
   listenBanned(); // live ban list — hides banned users + gates compose
+  listenSuggestions(); // admin review queue / your own suggestions awaiting it
   cleanOldPosts();
   _anonSaveProfile(); _bbSaveProfile(); // persist profile to Firestore
 }
@@ -1538,6 +1541,7 @@ function stopAllListeners() {
     if (unsubTabListeners[tab]) { unsubTabListeners[tab](); unsubTabListeners[tab] = null; }
   });
   if (unsubBanned) { unsubBanned(); unsubBanned = null; }
+  if (unsubSuggestions) { unsubSuggestions(); unsubSuggestions = null; }
 }
 
 // Re-render the current tab from cached posts (used after the ban list or mute
@@ -1612,7 +1616,9 @@ function tabHasUnseen(tab) {
 function renderTabBadges() {
   ['announcements', 'general'].forEach(tab => {
     const btn = document.querySelector(`.board-tab[data-tab="${tab}"]`);
-    if (btn) btn.classList.toggle('has-badge', tab !== currentTab && tabHasUnseen(tab));
+    // The admin's announcements tab also flags suggestions waiting on them.
+    const waiting = tab === 'announcements' && profile.isAdmin && pendingSuggestionCount() > 0;
+    if (btn) btn.classList.toggle('has-badge', tab !== currentTab && (waiting || tabHasUnseen(tab)));
   });
 }
 // ──────────────────────────────────────────────────────────────────
@@ -1750,9 +1756,7 @@ function setTab(tab) {
   saveLastSeen(tab);
   // Render from the already-running listener's cached data (no listener restart)
   localPosts = postsByTab[tab] || [];
-  renderPosts(tab === 'general'
-    ? assembleGeneralPosts(localPosts)
-    : (localPosts.length ? sortPosts(localPosts) : announcementPosts()));
+  renderPosts(tab === 'general' ? assembleGeneralPosts(localPosts) : announcementFeed());
   renderTabBadges();
 }
 
@@ -3143,7 +3147,7 @@ function listenPosts() {
   localPosts = [];
 
   if (!db) {
-    renderPosts(currentTab === 'general' ? assembleGeneralPosts([]) : announcementPosts());
+    renderPosts(currentTab === 'general' ? assembleGeneralPosts([]) : announcementFeed());
     return;
   }
 
@@ -3163,7 +3167,7 @@ function listenPosts() {
           localPosts = postsByTab[tab];
           renderPosts(tab === 'general'
             ? assembleGeneralPosts(localPosts)
-            : sortPosts(localPosts));
+            : announcementFeed());
         }
         renderTabBadges();
       }, err => {
@@ -3171,7 +3175,7 @@ function listenPosts() {
         if (tab === currentTab) {
           renderPosts(currentTab === 'general'
             ? assembleGeneralPosts(localPosts)
-            : (localPosts.length ? sortPosts(localPosts) : announcementPosts()));
+            : announcementFeed());
         }
       });
   });
@@ -3186,6 +3190,170 @@ function announcementPosts() {
 
 function demoData() {
   return currentTab === 'announcements' ? announcementPosts() : assembleGeneralPosts([]);
+}
+
+// The announcements tab, assembled: suggestions awaiting (or refused) review
+// sit above the published announcements. Every announcement render funnels
+// through here so the faded cards can't be dropped by one code path.
+function announcementFeed() {
+  const published = localPosts.length ? sortPosts(localPosts) : announcementPosts();
+  return [...visibleSuggestions(), ...published];
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Announcement suggestions
+//
+// Only the admin publishes announcements. Anyone else composing on the
+// announcements tab writes a *suggestion* instead: it lands in
+// bbAnonAnnSuggestions and renders as a faded card — to its author, who
+// sees it waiting, and to the admin, who publishes or refuses it.
+// Publishing copies it into the posts collection as a real announcement,
+// still credited to the member who suggested it.
+// ─────────────────────────────────────────────────────────────────
+
+// Ids of suggestions written on this device. Suggestions carry a monika, not
+// an account, so there is nothing to query "mine" by — the author's own card
+// is driven off this list instead.
+function mySuggestionIds() {
+  try { return JSON.parse(BB.storage.get('Anon_mySuggestions') || '[]'); }
+  catch (_) { return []; }
+}
+function rememberSuggestion(id) {
+  const ids = mySuggestionIds();
+  if (ids.includes(id)) return;
+  ids.push(id);
+  BB.storage.set('Anon_mySuggestions', JSON.stringify(ids.slice(-20)));
+}
+function forgetSuggestion(id) {
+  BB.storage.set('Anon_mySuggestions',
+    JSON.stringify(mySuggestionIds().filter(x => x !== id)));
+}
+
+// Two kinds of user have anything to see here: the admin (every suggestion
+// waiting) and a member who has suggested something (their own). Everyone
+// else skips the listener rather than paying for reads they can't use.
+function listenSuggestions() {
+  if (unsubSuggestions) { unsubSuggestions(); unsubSuggestions = null; }
+  suggestions = [];
+  if (!db || (!profile.isAdmin && !mySuggestionIds().length)) return;
+  unsubSuggestions = db.collection(BB_BRAND.collections.annSuggestions)
+    .orderBy('timestamp', 'desc')
+    .limit(40)
+    .onSnapshot(snap => {
+      suggestions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      // A suggestion of yours that made it onto the board is now an ordinary
+      // announcement — stop tracking it so the listener can retire.
+      suggestions.forEach(x => { if (x.status === 'approved') forgetSuggestion(x.id); });
+      if (currentTab === 'announcements') renderPosts(announcementFeed());
+      renderTabBadges();
+    }, err => console.warn('[Anonymous] suggestions listener error', err));
+}
+
+// Suggestions this viewer should see, newest first, as feed-shaped cards.
+function visibleSuggestions() {
+  const mine = mySuggestionIds();
+  return suggestions
+    .filter(x => {
+      const isMine = mine.includes(x.id);
+      if (x.status === 'rejected') return isMine;  // the author gets one "not published" card
+      if (x.status === 'pending')  return profile.isAdmin || isMine;
+      return false;                                // approved ones are in the feed proper
+    })
+    .map(x => ({ ...x, isSuggestion: true, mine: mine.includes(x.id) }));
+}
+
+function pendingSuggestionCount() {
+  return suggestions.filter(x => x.status === 'pending').length;
+}
+
+function renderSuggestion(x) {
+  const rejected = x.status === 'rejected';
+  const g1 = safeColor(x.grad1, YELLOW_LT);
+  const g2 = safeColor(x.grad2, YELLOW_DARK);
+  const av = x.initials || initials(x.name || '');
+  const label = rejected ? _wt('anon.sugg.rejected')
+    : (profile.isAdmin ? _wt('anon.sugg.forReview') : _wt('anon.sugg.waiting'));
+  const actions = profile.isAdmin && !rejected
+    ? `<button class="sugg-btn sugg-yes" data-sugg-approve="${esc(x.id)}">${esc(_wt('anon.sugg.publish'))}</button>`
+    + `<button class="sugg-btn sugg-no" data-sugg-reject="${esc(x.id)}">${esc(_wt('anon.sugg.reject'))}</button>`
+    : (x.mine && rejected
+        ? `<button class="sugg-btn" data-sugg-dismiss="${esc(x.id)}">${esc(_wt('anon.sugg.dismiss'))}</button>`
+        : '');
+  return `<div class="sugg-card${rejected ? ' sugg-rejected' : ''}">
+    <div class="sugg-flag">${esc(label)}</div>
+    <div class="post-header">
+      <div class="post-avatar">
+        <div class="post-av-circle" style="background:linear-gradient(135deg,${g1},${g2});">${esc(av)}</div>
+        <div><div class="post-name">[${esc(x.name || '')}]</div></div>
+      </div>
+      <span class="post-time">${x.timestamp ? timeAgo(x.timestamp) : _wt('anon.time.now')}</span>
+    </div>
+    <div class="post-text">${esc(x.text || '')}</div>
+    ${actions ? `<div class="sugg-actions">${actions}</div>` : ''}
+  </div>`;
+}
+
+// Publish a suggestion as a real announcement. Authorship stays with the
+// member who wrote it — the admin decides what goes up, not who said it.
+async function approveSuggestion(id) {
+  const x = suggestions.find(s => s.id === id);
+  if (!x || !db || !profile.isAdmin) return;
+  try {
+    await _ensureAuthSession();
+    await db.collection(BB_BRAND.collections.posts).add({
+      name:        x.name,
+      streak:      num(x.streak, 1),
+      initials:    x.initials || initials(x.name || ''),
+      grad1:       x.grad1 || YELLOW_LT,
+      grad2:       x.grad2 || YELLOW_DARK,
+      isAdmin:     false,
+      text:        x.text,
+      med:         '',
+      stable:      0,
+      joinedAt:    x.joinedAt || null,
+      tab:         'announcements',
+      likes:       0,
+      isSystem:    false,
+      suggestedBy: x.name,
+      timestamp:   firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    await db.collection(BB_BRAND.collections.annSuggestions).doc(id).update({
+      status:     'approved',
+      reviewedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    showHint(_wt('anon.toast.suggPublished'));
+  } catch (e) {
+    console.error('[Anonymous] approve suggestion failed', e);
+    showHint(_wt('anon.toast.suggFailed'));
+  }
+}
+
+async function rejectSuggestion(id) {
+  if (!db || !profile.isAdmin) return;
+  try {
+    await _ensureAuthSession();
+    await db.collection(BB_BRAND.collections.annSuggestions).doc(id).update({
+      status:     'rejected',
+      reviewedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    showHint(_wt('anon.toast.suggRejected'));
+  } catch (e) {
+    console.error('[Anonymous] reject suggestion failed', e);
+    showHint(_wt('anon.toast.suggFailed'));
+  }
+}
+
+// Author clearing their own refused suggestion off the board.
+async function dismissSuggestion(id) {
+  forgetSuggestion(id);
+  suggestions = suggestions.filter(x => x.id !== id);
+  if (currentTab === 'announcements') renderPosts(announcementFeed());
+  if (!db) return;
+  try {
+    await _ensureAuthSession();
+    await db.collection(BB_BRAND.collections.annSuggestions).doc(id).delete();
+  } catch (e) { console.warn('[Anonymous] dismiss suggestion failed', e); }
+  if (!mySuggestionIds().length && !profile.isAdmin) listenSuggestions(); // drops the listener
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -3613,7 +3781,7 @@ function renderPosts(posts) {
   // always pass — and so do daily topics, which now carry a generated member
   // name (see topicAuthor) that could otherwise collide with a muted/banned
   // monika and silently hide the topic on that device.
-  posts = posts.filter(p => p.isTopic || p.wasTopic || !p.name ||
+  posts = posts.filter(p => p.isTopic || p.wasTopic || p.isSuggestion || !p.name ||
     (!mutedUsers.has(p.name) && !isBanned(p.name)));
   // Final safety net: never surface more than one "Today's topic" card, no matter
   // which caller assembled `posts`. assembleGeneralPosts already dedupes, but the
@@ -3650,6 +3818,7 @@ function renderPosts(posts) {
   // would linger past the hour. Schedule a re-render for when it expires.
   scheduleTombstoneSweep(_nextTombstoneExpiry, _now);
   list.innerHTML = posts.map(p => {
+    if (p.isSuggestion)   return renderSuggestion(p);
     if (p.isTopic)        return renderTopic(p);
     if (p.wasTopic)       return renderArchivedTopic(p);
     if (p.isSystem)       return renderSystem(p);
@@ -3725,6 +3894,16 @@ function renderPosts(posts) {
   // Admin pin buttons
   list.querySelectorAll('[data-pin]').forEach(btn => {
     btn.addEventListener('click', () => handlePin(btn.dataset.pin, btn.dataset.tab));
+  });
+  // Announcement suggestions — publish / refuse (admin) and dismiss (author)
+  list.querySelectorAll('[data-sugg-approve]').forEach(btn => {
+    btn.addEventListener('click', () => approveSuggestion(btn.dataset.suggApprove));
+  });
+  list.querySelectorAll('[data-sugg-reject]').forEach(btn => {
+    btn.addEventListener('click', () => rejectSuggestion(btn.dataset.suggReject));
+  });
+  list.querySelectorAll('[data-sugg-dismiss]').forEach(btn => {
+    btn.addEventListener('click', () => dismissSuggestion(btn.dataset.suggDismiss));
   });
 }
 
@@ -3922,11 +4101,15 @@ function setupFAB() {
       showHint(_wt('anon.toast.accessRevoked'));
       return;
     }
+    // The "wait for a reaction before posting again" gate is about the feed,
+    // not the review queue — a suggestion isn't on the board yet.
     const latest = getLatestRealPost(currentTab);
-    if (!profile.isAdmin && latest && latest.name === profile.monika && (latest.likes || 0) === 0) {
+    if (composeMode() === 'post' && !profile.isAdmin
+        && latest && latest.name === profile.monika && (latest.likes || 0) === 0) {
       showHint(_wt('anon.toast.reactWait'));
       return;
     }
+    setComposeMode();
     document.getElementById('compose-ta').value = '';
     document.getElementById('compose-post').disabled = true;
     openOv('ov-compose');
@@ -3943,6 +4126,23 @@ function setupFAB() {
 // ─────────────────────────────────────────────────────────────────
 // Compose
 // ─────────────────────────────────────────────────────────────────
+// 'suggest' when a member composes on the announcements tab — only the admin
+// publishes announcements. Everything else is an ordinary post.
+function composeMode() {
+  return (currentTab === 'announcements' && !profile.isAdmin) ? 'suggest' : 'post';
+}
+
+// Dress the compose sheet for the mode it's about to open in.
+function setComposeMode() {
+  const suggest = composeMode() === 'suggest';
+  const head    = document.getElementById('compose-head');
+  const ta      = document.getElementById('compose-ta');
+  const post    = document.getElementById('compose-post');
+  if (head) head.style.display = suggest ? '' : 'none';
+  if (ta)   ta.placeholder = _wt(suggest ? 'anon.sugg.placeholder' : 'anon.compose.placeholder');
+  if (post) post.textContent = _wt(suggest ? 'anon.sugg.send' : 'anon.compose.post');
+}
+
 function setupCompose() {
   const ta   = document.getElementById('compose-ta');
   const post = document.getElementById('compose-post');
@@ -3970,6 +4170,14 @@ function setupCompose() {
     _posting = true;
     post.disabled = true;
     closeOv('ov-compose');
+
+    // Announcements are the admin's to publish — a member's goes to them for
+    // review instead of onto the board.
+    if (composeMode() === 'suggest') {
+      await submitSuggestion(text);
+      _posting = false;
+      return;
+    }
 
     const now = new Date();
     const optimisticId = 'local-' + now.getTime();
@@ -4023,6 +4231,33 @@ function setupCompose() {
     }
     _posting = false;
   });
+}
+
+// Write a suggested announcement to the review queue. The author's own copy
+// shows on the announcements tab straight away (faded, "waiting for approval")
+// because listenSuggestions picks it up once the id is remembered.
+async function submitSuggestion(text) {
+  if (!db) { showHint(_wt('anon.toast.suggFailed')); return; }
+  try {
+    await _ensureAuthSession();
+    const ref = await db.collection(BB_BRAND.collections.annSuggestions).add({
+      name:      profile.monika,
+      initials:  profile.avatarInitials(),
+      grad1:     profile.grad1,
+      grad2:     profile.grad2,
+      streak:    profile.streak,
+      joinedAt:  profile.joinedAt || null,
+      text,
+      status:    'pending',
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    rememberSuggestion(ref.id);
+    listenSuggestions(); // first suggestion on this device — start watching it
+    showHint(_wt('anon.toast.suggSent'));
+  } catch (e) {
+    console.error('[Anonymous] suggestion failed', e);
+    showHint(_wt('anon.toast.suggFailed'));
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────

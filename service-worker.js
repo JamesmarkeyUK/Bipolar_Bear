@@ -964,7 +964,14 @@
 //       Bipolar Anonymous app are unchanged. Touches anonymous.html,
 //       css/anonymous.css, js/anonymous.js, js/shared/i18n.js (new
 //       anon.ui.goBack across all ten locales).
-const CACHE_NAME = 'bipolarbear-v210';
+// v211: anonymous board — only the admin can publish an announcement. Anyone
+//       else composing on the Announcements tab now writes a suggestion to
+//       bbAnonAnnSuggestions, which renders as a faded card to its author
+//       ("waiting for approval") and to the admin, who publishes or refuses
+//       it. Touches anonymous.html, css/anonymous.css, js/anonymous.js,
+//       js/shared/brand-config.js, js/shared/i18n.js (anon.sugg.* + four
+//       toasts across all ten locales), DOCS.md.
+const CACHE_NAME = 'bipolarbear-v211';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

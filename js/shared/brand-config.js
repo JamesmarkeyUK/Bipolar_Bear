@@ -63,6 +63,10 @@ window.BB_BRAND = {
     // Admin-maintained ban list (Apple UGC guideline 1.2 — "eject the user").
     // Doc id = lowercased monika; presence = banned everywhere.
     banned: 'bbAnonBanned',
+    // Announcements suggested by members, awaiting the admin's decision.
+    // Only the admin publishes an announcement; this is the queue they
+    // publish or refuse from (see visibleSuggestions in js/anonymous.js).
+    annSuggestions: 'bbAnonAnnSuggestions',
   },
 
   // Marketing/manifest copy.

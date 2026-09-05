@@ -467,6 +467,27 @@
 
     /* Announcement card */
     .ann-card { background: rgba(245,200,0,0.08); border: 1px solid rgba(245,200,0,0.2); border-radius: 16px; padding: 14px 16px; margin-bottom: 10px; }
+    /* Suggested announcement awaiting the admin. Deliberately faded and
+       dashed — it is not on the board yet, and must never read as one that is.
+       Seen only by its author and by the admin (see visibleSuggestions). */
+    .sugg-card {
+      background: #fff; border: 1.5px dashed rgba(245,200,0,0.55); border-radius: 16px;
+      padding: 12px 16px 14px; margin-bottom: 10px; opacity: 0.62;
+    }
+    .sugg-card.sugg-rejected { border-color: rgba(220,53,69,0.35); opacity: 0.5; }
+    .sugg-card .sugg-flag {
+      font-size: 10px; font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 8px;
+    }
+    .sugg-card.sugg-rejected .sugg-flag { color: #b71c1c; }
+    .sugg-actions { display: flex; gap: 8px; margin-top: 10px; }
+    .sugg-btn {
+      flex: 1; padding: 8px 10px; border-radius: 10px; border: 1.5px solid rgba(0,0,0,0.12);
+      background: #fff; color: var(--dark); font-size: 12px; font-weight: 700;
+      font-family: inherit; cursor: pointer;
+    }
+    .sugg-btn.sugg-yes { background: var(--yellow); border-color: var(--yellow-dark); }
+    .sugg-btn.sugg-no  { color: #b71c1c; border-color: rgba(183,28,28,0.3); }
 
     /* ── FAB Footer ── */
     .fab-footer {

@@ -582,6 +582,20 @@
         ban: { title: 'Ban this user?', body: "Their existing posts will be removed and they won't be able to post or comment again.", bodyNamed: "Ban {name}? Their existing posts will be removed and they won't be able to post or comment again.", confirm: 'Ban 🚫' },
         thread: { title: 'Comments', placeholder: 'Add a comment…', send: 'Send 💛' },
         tips: { moniker: 'Your moniker settings', about: 'About Bipolar Anonymous', announcements: 'Announcements', compose: 'Write a post', search: 'Search the wiki', general: 'General Chat', privacy: 'Privacy info' },
+        // Member-suggested announcements awaiting the admin (see
+        // visibleSuggestions in js/anonymous.js).
+        sugg: {
+          composeTitle: "Suggest an announcement",
+          composeSub: "Announcements are posted by the Bipolar Bear admin. Write yours here and it goes to them for approval — you'll see it waiting on this tab.",
+          placeholder: "What should everyone know?",
+          send: "Send for approval",
+          publish: "✅ Publish",
+          reject: "✖️ Refuse",
+          dismiss: "Dismiss",
+          waiting: "Waiting for approval",
+          forReview: "Suggested — your call",
+          rejected: "Not published",
+        },
         toast: {
           medUpdated: 'Medication updated ✓',
           accessRevoked: 'Your access to the community has been revoked.',
@@ -605,7 +619,7 @@
           accountDeleted: 'Your account has been deleted',
           monikaTooShort: 'Moniker must be at least 2 characters',
           nameTaken: 'That name is already taken',
-          monikaUpdated: 'Moniker updated ✓',
+          monikaUpdated: 'Moniker updated ✓', suggSent: "Sent to the admin for approval 🙏", suggPublished: "Announcement published 📢", suggRejected: "Suggestion refused", suggFailed: "That didn't send — please try again.",
         },
         verifyMsg: {
           demoCode: 'Enter your demo access code to continue.',
@@ -2287,7 +2301,21 @@
         ban: { title: '¿Vetar a este usuario?', body: 'Sus publicaciones existentes se eliminarán y no podrá volver a publicar ni comentar.', bodyNamed: '¿Vetar a {name}? Sus publicaciones existentes se eliminarán y no podrá volver a publicar ni comentar.', confirm: 'Vetar 🚫' },
         thread: { title: 'Comentarios', placeholder: 'Añade un comentario…', send: 'Enviar 💛' },
         tips: { moniker: 'Ajustes de tu moniker', about: 'Acerca de Bipolar Anonymous', announcements: 'Anuncios', compose: 'Escribir una publicación', search: 'Buscar en la wiki', general: 'Chat general', privacy: 'Información de privacidad' },
-        toast: { medUpdated: 'Medicación actualizada ✓', accessRevoked: 'Se ha revocado tu acceso a la comunidad.', commentObjectionable: 'Ese comentario puede contener lenguaje objetable. Por favor, edítalo. 💛', commentWait: 'Espera a que otra persona responda antes de comentar de nuevo.', commentFailed: 'No se pudo enviar el comentario — inténtalo de nuevo.', postPinned: 'Publicación fijada 📌', postUnpinned: 'Publicación desfijada', pinFailed: 'No se pudo actualizar la fijación', cantLikeOwn: 'No puedes dar me gusta a tu propia publicación 😊', annOpen: 'Los anuncios ya están abiertos', genOpen: 'El chat general ya está abierto', reactWait: 'Espera a que otra persona reaccione a tu mensaje o publique otro.', postObjectionable: 'Esa publicación puede contener lenguaje objetable. Por favor, edítala para mantener segura a la comunidad. 💛', sosSent: 'SOS enviado a los moderadores 🆘', reportSubmitted: 'Denuncia enviada — gracias 🙏', mutedNamed: '{name} silenciado — deja de silenciarlo desde la pantalla Acerca de 🙈', postRemoved: 'Publicación retirada ✓', postDeleted: 'Publicación eliminada 🛡️', bannedNamed: '{name} vetado y eliminado 🚫', accountDeleted: 'Tu cuenta ha sido eliminada', monikaTooShort: 'El Moniker debe tener al menos 2 caracteres', nameTaken: 'Ese nombre ya está en uso', monikaUpdated: 'Moniker actualizado ✓' },
+        // Member-suggested announcements awaiting the admin (see
+        // visibleSuggestions in js/anonymous.js).
+        sugg: {
+          composeTitle: "Sugerir un anuncio",
+          composeSub: "Los anuncios los publica el administrador de Bipolar Bear. Escribe el tuyo aquí y se le enviará para su aprobación — lo verás esperando en esta pestaña.",
+          placeholder: "¿Qué debería saber todo el mundo?",
+          send: "Enviar para aprobación",
+          publish: "✅ Publicar",
+          reject: "✖️ Rechazar",
+          dismiss: "Descartar",
+          waiting: "Esperando aprobación",
+          forReview: "Sugerencia — tú decides",
+          rejected: "No publicado",
+        },
+        toast: { medUpdated: 'Medicación actualizada ✓', accessRevoked: 'Se ha revocado tu acceso a la comunidad.', commentObjectionable: 'Ese comentario puede contener lenguaje objetable. Por favor, edítalo. 💛', commentWait: 'Espera a que otra persona responda antes de comentar de nuevo.', commentFailed: 'No se pudo enviar el comentario — inténtalo de nuevo.', postPinned: 'Publicación fijada 📌', postUnpinned: 'Publicación desfijada', pinFailed: 'No se pudo actualizar la fijación', cantLikeOwn: 'No puedes dar me gusta a tu propia publicación 😊', annOpen: 'Los anuncios ya están abiertos', genOpen: 'El chat general ya está abierto', reactWait: 'Espera a que otra persona reaccione a tu mensaje o publique otro.', postObjectionable: 'Esa publicación puede contener lenguaje objetable. Por favor, edítala para mantener segura a la comunidad. 💛', sosSent: 'SOS enviado a los moderadores 🆘', reportSubmitted: 'Denuncia enviada — gracias 🙏', mutedNamed: '{name} silenciado — deja de silenciarlo desde la pantalla Acerca de 🙈', postRemoved: 'Publicación retirada ✓', postDeleted: 'Publicación eliminada 🛡️', bannedNamed: '{name} vetado y eliminado 🚫', accountDeleted: 'Tu cuenta ha sido eliminada', monikaTooShort: 'El Moniker debe tener al menos 2 caracteres', nameTaken: 'Ese nombre ya está en uso', monikaUpdated: 'Moniker actualizado ✓', suggSent: "Enviado al administrador para su aprobación 🙏", suggPublished: "Anuncio publicado 📢", suggRejected: "Sugerencia rechazada", suggFailed: "No se pudo enviar — inténtalo de nuevo." },
         verifyMsg: { demoCode: 'Introduce tu código de acceso de demostración para continuar.', serviceUnavailable: 'Servicio de verificación no disponible — inténtalo de nuevo en un momento.', codeSent: 'Código enviado a {email}. Revisa tu bandeja de entrada (y la carpeta de spam).', tooManyRequests: 'Demasiadas solicitudes de código. Espera 10 minutos e inténtalo de nuevo.', invalidEmail: 'Introduce una dirección de correo válida.', couldNotSend: 'No se pudo enviar el código de verificación. Inténtalo de nuevo.', incorrectDemo: 'Código de demostración incorrecto. Inténtalo de nuevo.', incorrectCode: 'Código incorrecto. Inténtalo de nuevo.', codeExpired: 'Este código ha caducado. Enviando uno nuevo…', tooManyAttempts: 'Demasiados intentos incorrectos. Solicita un código nuevo.', sessionNotFound: 'No se encontró la sesión de verificación. Empieza de nuevo.', verifyFailed: 'La verificación falló. Inténtalo de nuevo.' },
         deleteAccount: {
           title: '¿Eliminar tu cuenta?',
@@ -3971,7 +3999,21 @@
         ban: { title: 'Bannir cet utilisateur ?', body: 'Ses posts existants seront supprimés et il ne pourra plus publier ni commenter.', bodyNamed: 'Bannir {name} ? Ses posts existants seront supprimés et il ne pourra plus publier ni commenter.', confirm: 'Bannir 🚫' },
         thread: { title: 'Commentaires', placeholder: 'Ajouter un commentaire…', send: 'Envoyer 💛' },
         tips: { moniker: 'Réglages de votre moniker', about: 'À propos de Bipolar Anonymous', announcements: 'Annonces', compose: 'Écrire un post', search: 'Rechercher dans le wiki', general: 'Chat général', privacy: 'Infos de confidentialité' },
-        toast: { medUpdated: 'Médicaments mis à jour ✓', accessRevoked: 'Votre accès à la communauté a été révoqué.', commentObjectionable: 'Ce commentaire peut contenir un langage répréhensible. Veuillez le modifier. 💛', commentWait: "Veuillez attendre qu'une autre personne réponde avant de commenter à nouveau.", commentFailed: "L'envoi du commentaire a échoué — veuillez réessayer.", postPinned: 'Post épinglé 📌', postUnpinned: 'Post désépinglé', pinFailed: "Échec de la mise à jour de l'épingle", cantLikeOwn: 'Vous ne pouvez pas aimer votre propre post 😊', annOpen: 'Les annonces sont déjà ouvertes', genOpen: 'Le chat général est déjà ouvert', reactWait: "Veuillez attendre qu'une autre personne réagisse à votre message ou en publie un autre.", postObjectionable: 'Ce post peut contenir un langage répréhensible. Veuillez le modifier pour garder la communauté sûre. 💛', sosSent: 'SOS envoyé aux modérateurs 🆘', reportSubmitted: 'Signalement envoyé — merci 🙏', mutedNamed: "{name} masqué — annulez le masquage depuis l'écran À propos 🙈", postRemoved: 'Post retiré ✓', postDeleted: 'Post supprimé 🛡️', bannedNamed: '{name} banni et supprimé 🚫', accountDeleted: 'Votre compte a été supprimé', monikaTooShort: 'Le Moniker doit comporter au moins 2 caractères', nameTaken: 'Ce nom est déjà pris', monikaUpdated: 'Moniker mis à jour ✓' },
+        // Member-suggested announcements awaiting the admin (see
+        // visibleSuggestions in js/anonymous.js).
+        sugg: {
+          composeTitle: "Suggérer une annonce",
+          composeSub: "Les annonces sont publiées par l'administrateur de Bipolar Bear. Écrivez la vôtre ici : elle lui sera envoyée pour approbation — vous la verrez en attente dans cet onglet.",
+          placeholder: "Que doit savoir la communauté ?",
+          send: "Envoyer pour approbation",
+          publish: "✅ Publier",
+          reject: "✖️ Refuser",
+          dismiss: "Ignorer",
+          waiting: "En attente d'approbation",
+          forReview: "Suggestion — à vous de décider",
+          rejected: "Non publiée",
+        },
+        toast: { medUpdated: 'Médicaments mis à jour ✓', accessRevoked: 'Votre accès à la communauté a été révoqué.', commentObjectionable: 'Ce commentaire peut contenir un langage répréhensible. Veuillez le modifier. 💛', commentWait: "Veuillez attendre qu'une autre personne réponde avant de commenter à nouveau.", commentFailed: "L'envoi du commentaire a échoué — veuillez réessayer.", postPinned: 'Post épinglé 📌', postUnpinned: 'Post désépinglé', pinFailed: "Échec de la mise à jour de l'épingle", cantLikeOwn: 'Vous ne pouvez pas aimer votre propre post 😊', annOpen: 'Les annonces sont déjà ouvertes', genOpen: 'Le chat général est déjà ouvert', reactWait: "Veuillez attendre qu'une autre personne réagisse à votre message ou en publie un autre.", postObjectionable: 'Ce post peut contenir un langage répréhensible. Veuillez le modifier pour garder la communauté sûre. 💛', sosSent: 'SOS envoyé aux modérateurs 🆘', reportSubmitted: 'Signalement envoyé — merci 🙏', mutedNamed: "{name} masqué — annulez le masquage depuis l'écran À propos 🙈", postRemoved: 'Post retiré ✓', postDeleted: 'Post supprimé 🛡️', bannedNamed: '{name} banni et supprimé 🚫', accountDeleted: 'Votre compte a été supprimé', monikaTooShort: 'Le Moniker doit comporter au moins 2 caractères', nameTaken: 'Ce nom est déjà pris', monikaUpdated: 'Moniker mis à jour ✓', suggSent: "Envoyé à l'administrateur pour approbation 🙏", suggPublished: "Annonce publiée 📢", suggRejected: "Suggestion refusée", suggFailed: "L'envoi a échoué — veuillez réessayer." },
         verifyMsg: { demoCode: "Saisissez votre code d'accès de démonstration pour continuer.", serviceUnavailable: 'Service de vérification indisponible — veuillez réessayer dans un instant.', codeSent: 'Code envoyé à {email}. Vérifiez votre boîte de réception (et le dossier spam).', tooManyRequests: 'Trop de demandes de code. Veuillez patienter 10 minutes et réessayer.', invalidEmail: 'Veuillez saisir une adresse e-mail valide.', couldNotSend: "Impossible d'envoyer le code de vérification. Veuillez réessayer.", incorrectDemo: 'Code de démonstration incorrect. Veuillez réessayer.', incorrectCode: 'Code incorrect. Veuillez réessayer.', codeExpired: "Ce code a expiré. Envoi d'un nouveau code…", tooManyAttempts: 'Trop de tentatives incorrectes. Veuillez demander un nouveau code.', sessionNotFound: 'Session de vérification introuvable. Veuillez recommencer.', verifyFailed: 'La vérification a échoué. Veuillez réessayer.' },
         deleteAccount: {
           title: 'Supprimer votre compte ?',
@@ -5571,7 +5613,21 @@
         ban: { title: 'Diesen Benutzer sperren?', body: 'Seine vorhandenen Beiträge werden entfernt und er kann nicht mehr posten oder kommentieren.', bodyNamed: '{name} sperren? Seine vorhandenen Beiträge werden entfernt und er kann nicht mehr posten oder kommentieren.', confirm: 'Sperren 🚫' },
         thread: { title: 'Kommentare', placeholder: 'Kommentar hinzufügen…', send: 'Senden 💛' },
         tips: { moniker: 'Ihre Moniker-Einstellungen', about: 'Über Bipolar Anonymous', announcements: 'Ankündigungen', compose: 'Beitrag schreiben', search: 'Wiki durchsuchen', general: 'Allgemeiner Chat', privacy: 'Datenschutzinfos' },
-        toast: { medUpdated: 'Medikamente aktualisiert ✓', accessRevoked: 'Ihr Zugang zur Community wurde widerrufen.', commentObjectionable: 'Dieser Kommentar enthält möglicherweise anstößige Sprache. Bitte bearbeiten Sie ihn. 💛', commentWait: 'Bitte warten Sie, bis jemand anderes antwortet, bevor Sie erneut kommentieren.', commentFailed: 'Kommentar konnte nicht gesendet werden — bitte versuchen Sie es erneut.', postPinned: 'Beitrag angepinnt 📌', postUnpinned: 'Beitrag abgepinnt', pinFailed: 'Anpinnen fehlgeschlagen', cantLikeOwn: 'Sie können Ihren eigenen Beitrag nicht liken 😊', annOpen: 'Ankündigungen sind bereits geöffnet', genOpen: 'Allgemeiner Chat ist bereits geöffnet', reactWait: 'Bitte warten Sie, bis jemand anderes auf Ihre Nachricht reagiert oder eine weitere postet.', postObjectionable: 'Dieser Beitrag enthält möglicherweise anstößige Sprache. Bitte bearbeiten Sie ihn, um die Community sicher zu halten. 💛', sosSent: 'SOS an die Moderatoren gesendet 🆘', reportSubmitted: 'Meldung gesendet — danke 🙏', mutedNamed: '{name} stummgeschaltet — Stummschaltung über den Info-Bildschirm aufheben 🙈', postRemoved: 'Beitrag entfernt ✓', postDeleted: 'Beitrag gelöscht 🛡️', bannedNamed: '{name} gesperrt und entfernt 🚫', accountDeleted: 'Ihr Konto wurde gelöscht', monikaTooShort: 'Der Moniker muss mindestens 2 Zeichen lang sein', nameTaken: 'Dieser Name ist bereits vergeben', monikaUpdated: 'Moniker aktualisiert ✓' },
+        // Member-suggested announcements awaiting the admin (see
+        // visibleSuggestions in js/anonymous.js).
+        sugg: {
+          composeTitle: "Ankündigung vorschlagen",
+          composeSub: "Ankündigungen werden vom Bipolar-Bear-Admin veröffentlicht. Schreiben Sie Ihre hier — sie geht zur Freigabe an ihn und wartet sichtbar in diesem Tab.",
+          placeholder: "Was sollten alle wissen?",
+          send: "Zur Freigabe senden",
+          publish: "✅ Veröffentlichen",
+          reject: "✖️ Ablehnen",
+          dismiss: "Ausblenden",
+          waiting: "Wartet auf Freigabe",
+          forReview: "Vorschlag — Ihre Entscheidung",
+          rejected: "Nicht veröffentlicht",
+        },
+        toast: { medUpdated: 'Medikamente aktualisiert ✓', accessRevoked: 'Ihr Zugang zur Community wurde widerrufen.', commentObjectionable: 'Dieser Kommentar enthält möglicherweise anstößige Sprache. Bitte bearbeiten Sie ihn. 💛', commentWait: 'Bitte warten Sie, bis jemand anderes antwortet, bevor Sie erneut kommentieren.', commentFailed: 'Kommentar konnte nicht gesendet werden — bitte versuchen Sie es erneut.', postPinned: 'Beitrag angepinnt 📌', postUnpinned: 'Beitrag abgepinnt', pinFailed: 'Anpinnen fehlgeschlagen', cantLikeOwn: 'Sie können Ihren eigenen Beitrag nicht liken 😊', annOpen: 'Ankündigungen sind bereits geöffnet', genOpen: 'Allgemeiner Chat ist bereits geöffnet', reactWait: 'Bitte warten Sie, bis jemand anderes auf Ihre Nachricht reagiert oder eine weitere postet.', postObjectionable: 'Dieser Beitrag enthält möglicherweise anstößige Sprache. Bitte bearbeiten Sie ihn, um die Community sicher zu halten. 💛', sosSent: 'SOS an die Moderatoren gesendet 🆘', reportSubmitted: 'Meldung gesendet — danke 🙏', mutedNamed: '{name} stummgeschaltet — Stummschaltung über den Info-Bildschirm aufheben 🙈', postRemoved: 'Beitrag entfernt ✓', postDeleted: 'Beitrag gelöscht 🛡️', bannedNamed: '{name} gesperrt und entfernt 🚫', accountDeleted: 'Ihr Konto wurde gelöscht', monikaTooShort: 'Der Moniker muss mindestens 2 Zeichen lang sein', nameTaken: 'Dieser Name ist bereits vergeben', monikaUpdated: 'Moniker aktualisiert ✓', suggSent: "Zur Freigabe an den Admin gesendet 🙏", suggPublished: "Ankündigung veröffentlicht 📢", suggRejected: "Vorschlag abgelehnt", suggFailed: "Senden fehlgeschlagen — bitte erneut versuchen." },
         verifyMsg: { demoCode: 'Geben Sie Ihren Demo-Zugangscode ein, um fortzufahren.', serviceUnavailable: 'Verifizierungsdienst nicht verfügbar — bitte versuchen Sie es gleich noch einmal.', codeSent: 'Code an {email} gesendet. Prüfen Sie Ihren Posteingang (und den Spam-Ordner).', tooManyRequests: 'Zu viele Code-Anfragen. Bitte warten Sie 10 Minuten und versuchen Sie es erneut.', invalidEmail: 'Bitte geben Sie eine gültige E-Mail-Adresse ein.', couldNotSend: 'Bestätigungscode konnte nicht gesendet werden. Bitte versuchen Sie es erneut.', incorrectDemo: 'Falscher Demo-Code. Bitte versuchen Sie es erneut.', incorrectCode: 'Falscher Code. Bitte versuchen Sie es erneut.', codeExpired: 'Dieser Code ist abgelaufen. Ein neuer wird gesendet…', tooManyAttempts: 'Zu viele falsche Versuche. Bitte fordern Sie einen neuen Code an.', sessionNotFound: 'Verifizierungssitzung nicht gefunden. Bitte beginnen Sie erneut.', verifyFailed: 'Verifizierung fehlgeschlagen. Bitte versuchen Sie es erneut.' },
         deleteAccount: {
           title: 'Ihr Konto löschen?',
@@ -7205,7 +7261,21 @@
         ban: { title: 'Bandire questo utente?', body: 'I suoi post esistenti saranno rimossi e non potrà più pubblicare né commentare.', bodyNamed: 'Bandire {name}? I suoi post esistenti saranno rimossi e non potrà più pubblicare né commentare.', confirm: 'Bandisci 🚫' },
         thread: { title: 'Commenti', placeholder: 'Aggiungi un commento…', send: 'Invia 💛' },
         tips: { moniker: 'Impostazioni del tuo moniker', about: 'Informazioni su Bipolar Anonymous', announcements: 'Annunci', compose: 'Scrivi un post', search: 'Cerca nella wiki', general: 'Chat generale', privacy: 'Info sulla privacy' },
-        toast: { medUpdated: 'Farmaci aggiornati ✓', accessRevoked: 'Il tuo accesso alla comunità è stato revocato.', commentObjectionable: 'Questo commento potrebbe contenere linguaggio offensivo. Modificalo, per favore. 💛', commentWait: 'Attendi che qualcun altro risponda prima di commentare di nuovo.', commentFailed: 'Invio del commento non riuscito — riprova.', postPinned: 'Post fissato 📌', postUnpinned: 'Post non più fissato', pinFailed: 'Impossibile aggiornare il fissaggio', cantLikeOwn: 'Non puoi mettere mi piace al tuo post 😊', annOpen: 'Gli annunci sono già aperti', genOpen: 'La chat generale è già aperta', reactWait: 'Attendi che qualcun altro reagisca al tuo messaggio o ne pubblichi un altro.', postObjectionable: 'Questo post potrebbe contenere linguaggio offensivo. Modificalo per mantenere la comunità sicura. 💛', sosSent: 'SOS inviato ai moderatori 🆘', reportSubmitted: 'Segnalazione inviata — grazie 🙏', mutedNamed: '{name} silenziato — riattivalo dalla schermata Informazioni 🙈', postRemoved: 'Post rimosso ✓', postDeleted: 'Post eliminato 🛡️', bannedNamed: '{name} bandito e rimosso 🚫', accountDeleted: 'Il tuo account è stato eliminato', monikaTooShort: 'Il Moniker deve contenere almeno 2 caratteri', nameTaken: 'Questo nome è già in uso', monikaUpdated: 'Moniker aggiornato ✓' },
+        // Member-suggested announcements awaiting the admin (see
+        // visibleSuggestions in js/anonymous.js).
+        sugg: {
+          composeTitle: "Suggerisci un annuncio",
+          composeSub: "Gli annunci vengono pubblicati dall'amministratore di Bipolar Bear. Scrivi il tuo qui: gli verrà inviato per l'approvazione — lo vedrai in attesa in questa scheda.",
+          placeholder: "Cosa dovrebbero sapere tutti?",
+          send: "Invia per l'approvazione",
+          publish: "✅ Pubblica",
+          reject: "✖️ Rifiuta",
+          dismiss: "Ignora",
+          waiting: "In attesa di approvazione",
+          forReview: "Suggerimento — decidi tu",
+          rejected: "Non pubblicato",
+        },
+        toast: { medUpdated: 'Farmaci aggiornati ✓', accessRevoked: 'Il tuo accesso alla comunità è stato revocato.', commentObjectionable: 'Questo commento potrebbe contenere linguaggio offensivo. Modificalo, per favore. 💛', commentWait: 'Attendi che qualcun altro risponda prima di commentare di nuovo.', commentFailed: 'Invio del commento non riuscito — riprova.', postPinned: 'Post fissato 📌', postUnpinned: 'Post non più fissato', pinFailed: 'Impossibile aggiornare il fissaggio', cantLikeOwn: 'Non puoi mettere mi piace al tuo post 😊', annOpen: 'Gli annunci sono già aperti', genOpen: 'La chat generale è già aperta', reactWait: 'Attendi che qualcun altro reagisca al tuo messaggio o ne pubblichi un altro.', postObjectionable: 'Questo post potrebbe contenere linguaggio offensivo. Modificalo per mantenere la comunità sicura. 💛', sosSent: 'SOS inviato ai moderatori 🆘', reportSubmitted: 'Segnalazione inviata — grazie 🙏', mutedNamed: '{name} silenziato — riattivalo dalla schermata Informazioni 🙈', postRemoved: 'Post rimosso ✓', postDeleted: 'Post eliminato 🛡️', bannedNamed: '{name} bandito e rimosso 🚫', accountDeleted: 'Il tuo account è stato eliminato', monikaTooShort: 'Il Moniker deve contenere almeno 2 caratteri', nameTaken: 'Questo nome è già in uso', monikaUpdated: 'Moniker aggiornato ✓', suggSent: "Inviato all'amministratore per l'approvazione 🙏", suggPublished: "Annuncio pubblicato 📢", suggRejected: "Suggerimento rifiutato", suggFailed: "Invio non riuscito — riprova." },
         verifyMsg: { demoCode: 'Inserisci il tuo codice di accesso demo per continuare.', serviceUnavailable: 'Servizio di verifica non disponibile — riprova tra un momento.', codeSent: 'Codice inviato a {email}. Controlla la tua casella di posta (e la cartella spam).', tooManyRequests: 'Troppe richieste di codice. Attendi 10 minuti e riprova.', invalidEmail: 'Inserisci un indirizzo email valido.', couldNotSend: 'Impossibile inviare il codice di verifica. Riprova.', incorrectDemo: 'Codice demo errato. Riprova.', incorrectCode: 'Codice errato. Riprova.', codeExpired: 'Questo codice è scaduto. Ne stiamo inviando uno nuovo…', tooManyAttempts: 'Troppi tentativi errati. Richiedi un nuovo codice.', sessionNotFound: 'Sessione di verifica non trovata. Ricomincia.', verifyFailed: 'Verifica non riuscita. Riprova.' },
         deleteAccount: {
           title: 'Eliminare il tuo account?',
@@ -8839,7 +8909,21 @@
         ban: { title: 'Banir este usuário?', body: 'As suas publicações existentes serão removidas e ele não poderá mais publicar ou comentar.', bodyNamed: 'Banir {name}? As suas publicações existentes serão removidas e ele não poderá mais publicar ou comentar.', confirm: 'Banir 🚫' },
         thread: { title: 'Comentários', placeholder: 'Adicionar um comentário…', send: 'Enviar 💛' },
         tips: { moniker: 'Definições do seu moniker', about: 'Sobre o Bipolar Anonymous', announcements: 'Anúncios', compose: 'Escrever uma publicação', search: 'Pesquisar na wiki', general: 'Chat geral', privacy: 'Informações de privacidade' },
-        toast: { medUpdated: 'Medicação atualizada ✓', accessRevoked: 'O seu acesso à comunidade foi revogado.', commentObjectionable: 'Esse comentário pode conter linguagem ofensiva. Por favor, edite-o. 💛', commentWait: 'Aguarde outra pessoa responder antes de comentar novamente.', commentFailed: 'Falha ao enviar o comentário — tente novamente.', postPinned: 'Publicação fixada 📌', postUnpinned: 'Publicação desafixada', pinFailed: 'Falha ao atualizar a fixação', cantLikeOwn: 'Você não pode curtir a sua própria publicação 😊', annOpen: 'Os anúncios já estão abertos', genOpen: 'O chat geral já está aberto', reactWait: 'Aguarde outra pessoa reagir à sua mensagem ou publicar outra.', postObjectionable: 'Essa publicação pode conter linguagem ofensiva. Por favor, edite-a para manter a comunidade segura. 💛', sosSent: 'SOS enviado aos moderadores 🆘', reportSubmitted: 'Denúncia enviada — obrigado 🙏', mutedNamed: '{name} silenciado — reative na tela Sobre 🙈', postRemoved: 'Publicação removida ✓', postDeleted: 'Publicação excluída 🛡️', bannedNamed: '{name} banido e removido 🚫', accountDeleted: 'A sua conta foi excluída', monikaTooShort: 'O Moniker deve ter pelo menos 2 caracteres', nameTaken: 'Esse nome já está em uso', monikaUpdated: 'Moniker atualizado ✓' },
+        // Member-suggested announcements awaiting the admin (see
+        // visibleSuggestions in js/anonymous.js).
+        sugg: {
+          composeTitle: "Sugerir um anúncio",
+          composeSub: "Os anúncios são publicados pelo administrador do Bipolar Bear. Escreva o seu aqui e ele será enviado para aprovação — você o verá aguardando nesta aba.",
+          placeholder: "O que todos deveriam saber?",
+          send: "Enviar para aprovação",
+          publish: "✅ Publicar",
+          reject: "✖️ Recusar",
+          dismiss: "Dispensar",
+          waiting: "Aguardando aprovação",
+          forReview: "Sugestão — você decide",
+          rejected: "Não publicado",
+        },
+        toast: { medUpdated: 'Medicação atualizada ✓', accessRevoked: 'O seu acesso à comunidade foi revogado.', commentObjectionable: 'Esse comentário pode conter linguagem ofensiva. Por favor, edite-o. 💛', commentWait: 'Aguarde outra pessoa responder antes de comentar novamente.', commentFailed: 'Falha ao enviar o comentário — tente novamente.', postPinned: 'Publicação fixada 📌', postUnpinned: 'Publicação desafixada', pinFailed: 'Falha ao atualizar a fixação', cantLikeOwn: 'Você não pode curtir a sua própria publicação 😊', annOpen: 'Os anúncios já estão abertos', genOpen: 'O chat geral já está aberto', reactWait: 'Aguarde outra pessoa reagir à sua mensagem ou publicar outra.', postObjectionable: 'Essa publicação pode conter linguagem ofensiva. Por favor, edite-a para manter a comunidade segura. 💛', sosSent: 'SOS enviado aos moderadores 🆘', reportSubmitted: 'Denúncia enviada — obrigado 🙏', mutedNamed: '{name} silenciado — reative na tela Sobre 🙈', postRemoved: 'Publicação removida ✓', postDeleted: 'Publicação excluída 🛡️', bannedNamed: '{name} banido e removido 🚫', accountDeleted: 'A sua conta foi excluída', monikaTooShort: 'O Moniker deve ter pelo menos 2 caracteres', nameTaken: 'Esse nome já está em uso', monikaUpdated: 'Moniker atualizado ✓', suggSent: "Enviado ao administrador para aprovação 🙏", suggPublished: "Anúncio publicado 📢", suggRejected: "Sugestão recusada", suggFailed: "Não foi possível enviar — tente novamente." },
         verifyMsg: { demoCode: 'Digite seu código de acesso de demonstração para continuar.', serviceUnavailable: 'Serviço de verificação indisponível — tente novamente em instantes.', codeSent: 'Código enviado para {email}. Verifique sua caixa de entrada (e a pasta de spam).', tooManyRequests: 'Muitas solicitações de código. Aguarde 10 minutos e tente novamente.', invalidEmail: 'Digite um endereço de e-mail válido.', couldNotSend: 'Não foi possível enviar o código de verificação. Tente novamente.', incorrectDemo: 'Código de demonstração incorreto. Tente novamente.', incorrectCode: 'Código incorreto. Tente novamente.', codeExpired: 'Este código expirou. Enviando um novo…', tooManyAttempts: 'Muitas tentativas incorretas. Solicite um novo código.', sessionNotFound: 'Sessão de verificação não encontrada. Comece novamente.', verifyFailed: 'A verificação falhou. Tente novamente.' },
         deleteAccount: {
           title: 'Excluir sua conta?',
@@ -10473,7 +10557,21 @@
         ban: { title: 'Deze gebruiker verbannen?', body: 'Hun bestaande berichten worden verwijderd en ze kunnen niet meer plaatsen of reageren.', bodyNamed: '{name} verbannen? Hun bestaande berichten worden verwijderd en ze kunnen niet meer plaatsen of reageren.', confirm: 'Verbannen 🚫' },
         thread: { title: 'Reacties', placeholder: 'Een reactie toevoegen…', send: 'Verzenden 💛' },
         tips: { moniker: 'Uw moniker-instellingen', about: 'Over Bipolar Anonymous', announcements: 'Aankondigingen', compose: 'Een bericht schrijven', search: 'Wiki doorzoeken', general: 'Algemene chat', privacy: 'Privacy-info' },
-        toast: { medUpdated: 'Medicatie bijgewerkt ✓', accessRevoked: 'Uw toegang tot de community is ingetrokken.', commentObjectionable: 'Deze reactie bevat mogelijk aanstootgevende taal. Bewerk deze alstublieft. 💛', commentWait: 'Wacht tot iemand anders reageert voordat u opnieuw reageert.', commentFailed: 'Verzenden van reactie mislukt — probeer het opnieuw.', postPinned: 'Bericht vastgezet 📌', postUnpinned: 'Bericht losgemaakt', pinFailed: 'Vastzetten mislukt', cantLikeOwn: 'U kunt uw eigen bericht niet leuk vinden 😊', annOpen: 'Aankondigingen zijn al geopend', genOpen: 'Algemene chat is al geopend', reactWait: 'Wacht tot iemand anders op uw bericht reageert of een nieuw bericht plaatst.', postObjectionable: 'Dit bericht bevat mogelijk aanstootgevende taal. Bewerk het alstublieft om de community veilig te houden. 💛', sosSent: 'SOS verzonden naar de moderators 🆘', reportSubmitted: 'Melding verzonden — bedankt 🙏', mutedNamed: '{name} gedempt — dempen ongedaan maken via het scherm Over 🙈', postRemoved: 'Bericht verwijderd ✓', postDeleted: 'Bericht gewist 🛡️', bannedNamed: '{name} verbannen en verwijderd 🚫', accountDeleted: 'Uw account is verwijderd', monikaTooShort: 'De Moniker moet minstens 2 tekens bevatten', nameTaken: 'Die naam is al in gebruik', monikaUpdated: 'Moniker bijgewerkt ✓' },
+        // Member-suggested announcements awaiting the admin (see
+        // visibleSuggestions in js/anonymous.js).
+        sugg: {
+          composeTitle: "Een mededeling voorstellen",
+          composeSub: "Mededelingen worden geplaatst door de Bipolar Bear-beheerder. Schrijf de jouwe hier; hij gaat ter goedkeuring naar de beheerder — je ziet hem wachten op dit tabblad.",
+          placeholder: "Wat moet iedereen weten?",
+          send: "Ter goedkeuring versturen",
+          publish: "✅ Plaatsen",
+          reject: "✖️ Weigeren",
+          dismiss: "Sluiten",
+          waiting: "Wacht op goedkeuring",
+          forReview: "Voorstel — jouw keuze",
+          rejected: "Niet geplaatst",
+        },
+        toast: { medUpdated: 'Medicatie bijgewerkt ✓', accessRevoked: 'Uw toegang tot de community is ingetrokken.', commentObjectionable: 'Deze reactie bevat mogelijk aanstootgevende taal. Bewerk deze alstublieft. 💛', commentWait: 'Wacht tot iemand anders reageert voordat u opnieuw reageert.', commentFailed: 'Verzenden van reactie mislukt — probeer het opnieuw.', postPinned: 'Bericht vastgezet 📌', postUnpinned: 'Bericht losgemaakt', pinFailed: 'Vastzetten mislukt', cantLikeOwn: 'U kunt uw eigen bericht niet leuk vinden 😊', annOpen: 'Aankondigingen zijn al geopend', genOpen: 'Algemene chat is al geopend', reactWait: 'Wacht tot iemand anders op uw bericht reageert of een nieuw bericht plaatst.', postObjectionable: 'Dit bericht bevat mogelijk aanstootgevende taal. Bewerk het alstublieft om de community veilig te houden. 💛', sosSent: 'SOS verzonden naar de moderators 🆘', reportSubmitted: 'Melding verzonden — bedankt 🙏', mutedNamed: '{name} gedempt — dempen ongedaan maken via het scherm Over 🙈', postRemoved: 'Bericht verwijderd ✓', postDeleted: 'Bericht gewist 🛡️', bannedNamed: '{name} verbannen en verwijderd 🚫', accountDeleted: 'Uw account is verwijderd', monikaTooShort: 'De Moniker moet minstens 2 tekens bevatten', nameTaken: 'Die naam is al in gebruik', monikaUpdated: 'Moniker bijgewerkt ✓', suggSent: "Naar de beheerder gestuurd ter goedkeuring 🙏", suggPublished: "Mededeling geplaatst 📢", suggRejected: "Voorstel geweigerd", suggFailed: "Versturen mislukt — probeer het opnieuw." },
         verifyMsg: { demoCode: 'Voer uw demo-toegangscode in om door te gaan.', serviceUnavailable: 'Verificatiedienst niet beschikbaar — probeer het zo meteen opnieuw.', codeSent: 'Code verzonden naar {email}. Controleer uw inbox (en de spammap).', tooManyRequests: 'Te veel codeaanvragen. Wacht 10 minuten en probeer het opnieuw.', invalidEmail: 'Voer een geldig e-mailadres in.', couldNotSend: 'Kon de verificatiecode niet verzenden. Probeer het opnieuw.', incorrectDemo: 'Onjuiste democode. Probeer het opnieuw.', incorrectCode: 'Onjuiste code. Probeer het opnieuw.', codeExpired: 'Deze code is verlopen. Er wordt een nieuwe verzonden…', tooManyAttempts: 'Te veel onjuiste pogingen. Vraag een nieuwe code aan.', sessionNotFound: 'Verificatiesessie niet gevonden. Begin opnieuw.', verifyFailed: 'Verificatie mislukt. Probeer het opnieuw.' },
         deleteAccount: {
           title: 'Uw account verwijderen?',
@@ -12107,7 +12205,21 @@
         ban: { title: 'Zbanować tego użytkownika?', body: 'Jego istniejące wpisy zostaną usunięte i nie będzie mógł już publikować ani komentować.', bodyNamed: 'Zbanować użytkownika {name}? Jego istniejące wpisy zostaną usunięte i nie będzie mógł już publikować ani komentować.', confirm: 'Zbanuj 🚫' },
         thread: { title: 'Komentarze', placeholder: 'Dodaj komentarz…', send: 'Wyślij 💛' },
         tips: { moniker: 'Ustawienia Twojej moniker', about: 'O Bipolar Anonymous', announcements: 'Ogłoszenia', compose: 'Napisz wpis', search: 'Przeszukaj wiki', general: 'Czat ogólny', privacy: 'Informacje o prywatności' },
-        toast: { medUpdated: 'Leki zaktualizowane ✓', accessRevoked: 'Twój dostęp do społeczności został cofnięty.', commentObjectionable: 'Ten komentarz może zawierać niestosowny język. Zmień go, proszę. 💛', commentWait: 'Poczekaj, aż ktoś inny odpowie, zanim ponownie skomentujesz.', commentFailed: 'Nie udało się wysłać komentarza — spróbuj ponownie.', postPinned: 'Wpis przypięty 📌', postUnpinned: 'Wpis odpięty', pinFailed: 'Nie udało się zaktualizować przypięcia', cantLikeOwn: 'Nie możesz polubić własnego wpisu 😊', annOpen: 'Ogłoszenia są już otwarte', genOpen: 'Czat ogólny jest już otwarty', reactWait: 'Poczekaj, aż ktoś inny zareaguje na Twoją wiadomość lub opublikuje kolejną.', postObjectionable: 'Ten wpis może zawierać niestosowny język. Zmień go, aby zapewnić bezpieczeństwo społeczności. 💛', sosSent: 'SOS wysłane do moderatorów 🆘', reportSubmitted: 'Zgłoszenie wysłane — dziękujemy 🙏', mutedNamed: '{name} wyciszony — cofnij wyciszenie na ekranie O aplikacji 🙈', postRemoved: 'Wpis usunięty ✓', postDeleted: 'Wpis skasowany 🛡️', bannedNamed: '{name} zbanowany i usunięty 🚫', accountDeleted: 'Twoje konto zostało usunięte', monikaTooShort: 'Moniker musi mieć co najmniej 2 znaki', nameTaken: 'Ta nazwa jest już zajęta', monikaUpdated: 'Moniker zaktualizowany ✓' },
+        // Member-suggested announcements awaiting the admin (see
+        // visibleSuggestions in js/anonymous.js).
+        sugg: {
+          composeTitle: "Zaproponuj ogłoszenie",
+          composeSub: "Ogłoszenia publikuje administrator Bipolar Bear. Napisz swoje tutaj — trafi do niego do zatwierdzenia i zobaczysz je oczekujące w tej zakładce.",
+          placeholder: "Co wszyscy powinni wiedzieć?",
+          send: "Wyślij do zatwierdzenia",
+          publish: "✅ Opublikuj",
+          reject: "✖️ Odrzuć",
+          dismiss: "Ukryj",
+          waiting: "Oczekuje na zatwierdzenie",
+          forReview: "Propozycja — Twoja decyzja",
+          rejected: "Nieopublikowane",
+        },
+        toast: { medUpdated: 'Leki zaktualizowane ✓', accessRevoked: 'Twój dostęp do społeczności został cofnięty.', commentObjectionable: 'Ten komentarz może zawierać niestosowny język. Zmień go, proszę. 💛', commentWait: 'Poczekaj, aż ktoś inny odpowie, zanim ponownie skomentujesz.', commentFailed: 'Nie udało się wysłać komentarza — spróbuj ponownie.', postPinned: 'Wpis przypięty 📌', postUnpinned: 'Wpis odpięty', pinFailed: 'Nie udało się zaktualizować przypięcia', cantLikeOwn: 'Nie możesz polubić własnego wpisu 😊', annOpen: 'Ogłoszenia są już otwarte', genOpen: 'Czat ogólny jest już otwarty', reactWait: 'Poczekaj, aż ktoś inny zareaguje na Twoją wiadomość lub opublikuje kolejną.', postObjectionable: 'Ten wpis może zawierać niestosowny język. Zmień go, aby zapewnić bezpieczeństwo społeczności. 💛', sosSent: 'SOS wysłane do moderatorów 🆘', reportSubmitted: 'Zgłoszenie wysłane — dziękujemy 🙏', mutedNamed: '{name} wyciszony — cofnij wyciszenie na ekranie O aplikacji 🙈', postRemoved: 'Wpis usunięty ✓', postDeleted: 'Wpis skasowany 🛡️', bannedNamed: '{name} zbanowany i usunięty 🚫', accountDeleted: 'Twoje konto zostało usunięte', monikaTooShort: 'Moniker musi mieć co najmniej 2 znaki', nameTaken: 'Ta nazwa jest już zajęta', monikaUpdated: 'Moniker zaktualizowany ✓', suggSent: "Wysłano do administratora do zatwierdzenia 🙏", suggPublished: "Ogłoszenie opublikowane 📢", suggRejected: "Propozycja odrzucona", suggFailed: "Nie udało się wysłać — spróbuj ponownie." },
         verifyMsg: { demoCode: 'Wpisz swój kod dostępu demo, aby kontynuować.', serviceUnavailable: 'Usługa weryfikacji niedostępna — spróbuj ponownie za chwilę.', codeSent: 'Kod wysłany na {email}. Sprawdź swoją skrzynkę odbiorczą (i folder spam).', tooManyRequests: 'Zbyt wiele żądań kodu. Odczekaj 10 minut i spróbuj ponownie.', invalidEmail: 'Podaj prawidłowy adres e-mail.', couldNotSend: 'Nie udało się wysłać kodu weryfikacyjnego. Spróbuj ponownie.', incorrectDemo: 'Nieprawidłowy kod demo. Spróbuj ponownie.', incorrectCode: 'Nieprawidłowy kod. Spróbuj ponownie.', codeExpired: 'Ten kod wygasł. Wysyłanie nowego…', tooManyAttempts: 'Zbyt wiele nieprawidłowych prób. Poproś o nowy kod.', sessionNotFound: 'Nie znaleziono sesji weryfikacji. Zacznij od nowa.', verifyFailed: 'Weryfikacja nie powiodła się. Spróbuj ponownie.' },
         deleteAccount: {
           title: 'Usunąć Twoje konto?',
@@ -13749,7 +13861,21 @@
         ban: { title: 'Stänga av den här användaren?', body: 'Deras befintliga inlägg tas bort och de kommer inte att kunna posta eller kommentera igen.', bodyNamed: 'Stänga av {name}? Deras befintliga inlägg tas bort och de kommer inte att kunna posta eller kommentera igen.', confirm: 'Stäng av 🚫' },
         thread: { title: 'Kommentarer', placeholder: 'Lägg till en kommentar…', send: 'Skicka 💛' },
         tips: { moniker: 'Dina moniker-inställningar', about: 'Om Bipolar Anonymous', announcements: 'Meddelanden', compose: 'Skriv ett inlägg', search: 'Sök i wikin', general: 'Allmän chatt', privacy: 'Integritetsinfo' },
-        toast: { medUpdated: 'Medicinering uppdaterad ✓', accessRevoked: 'Din åtkomst till gemenskapen har återkallats.', commentObjectionable: 'Den kommentaren kan innehålla stötande språk. Redigera den. 💛', commentWait: 'Vänta tills någon annan svarar innan du kommenterar igen.', commentFailed: 'Det gick inte att skicka kommentaren — försök igen.', postPinned: 'Inlägg fäst 📌', postUnpinned: 'Inlägg avfäst', pinFailed: 'Det gick inte att uppdatera fästningen', cantLikeOwn: 'Du kan inte gilla ditt eget inlägg 😊', annOpen: 'Meddelanden är redan öppna', genOpen: 'Allmän chatt är redan öppen', reactWait: 'Vänta tills någon annan reagerar på ditt meddelande eller publicerar ett nytt.', postObjectionable: 'Det inlägget kan innehålla stötande språk. Redigera det för att hålla gemenskapen trygg. 💛', sosSent: 'SOS skickat till moderatorerna 🆘', reportSubmitted: 'Anmälan skickad — tack 🙏', mutedNamed: '{name} tystad — sluta tysta från Om-skärmen 🙈', postRemoved: 'Inlägg borttaget ✓', postDeleted: 'Inlägg raderat 🛡️', bannedNamed: '{name} avstängd och borttagen 🚫', accountDeleted: 'Ditt konto har raderats', monikaTooShort: 'Moniker måste vara minst 2 tecken', nameTaken: 'Det namnet är redan taget', monikaUpdated: 'Moniker uppdaterad ✓' },
+        // Member-suggested announcements awaiting the admin (see
+        // visibleSuggestions in js/anonymous.js).
+        sugg: {
+          composeTitle: "Föreslå ett meddelande",
+          composeSub: "Meddelanden publiceras av Bipolar Bear-administratören. Skriv ditt här så skickas det för godkännande — du ser det vänta i den här fliken.",
+          placeholder: "Vad borde alla veta?",
+          send: "Skicka för godkännande",
+          publish: "✅ Publicera",
+          reject: "✖️ Avslå",
+          dismiss: "Stäng",
+          waiting: "Väntar på godkännande",
+          forReview: "Förslag — du bestämmer",
+          rejected: "Inte publicerat",
+        },
+        toast: { medUpdated: 'Medicinering uppdaterad ✓', accessRevoked: 'Din åtkomst till gemenskapen har återkallats.', commentObjectionable: 'Den kommentaren kan innehålla stötande språk. Redigera den. 💛', commentWait: 'Vänta tills någon annan svarar innan du kommenterar igen.', commentFailed: 'Det gick inte att skicka kommentaren — försök igen.', postPinned: 'Inlägg fäst 📌', postUnpinned: 'Inlägg avfäst', pinFailed: 'Det gick inte att uppdatera fästningen', cantLikeOwn: 'Du kan inte gilla ditt eget inlägg 😊', annOpen: 'Meddelanden är redan öppna', genOpen: 'Allmän chatt är redan öppen', reactWait: 'Vänta tills någon annan reagerar på ditt meddelande eller publicerar ett nytt.', postObjectionable: 'Det inlägget kan innehålla stötande språk. Redigera det för att hålla gemenskapen trygg. 💛', sosSent: 'SOS skickat till moderatorerna 🆘', reportSubmitted: 'Anmälan skickad — tack 🙏', mutedNamed: '{name} tystad — sluta tysta från Om-skärmen 🙈', postRemoved: 'Inlägg borttaget ✓', postDeleted: 'Inlägg raderat 🛡️', bannedNamed: '{name} avstängd och borttagen 🚫', accountDeleted: 'Ditt konto har raderats', monikaTooShort: 'Moniker måste vara minst 2 tecken', nameTaken: 'Det namnet är redan taget', monikaUpdated: 'Moniker uppdaterad ✓', suggSent: "Skickat för godkännande 🙏", suggPublished: "Meddelande publicerat 📢", suggRejected: "Förslag avslaget", suggFailed: "Kunde inte skicka — försök igen." },
         verifyMsg: { demoCode: 'Ange din demo-åtkomstkod för att fortsätta.', serviceUnavailable: 'Verifieringstjänsten är inte tillgänglig — försök igen om en stund.', codeSent: 'Kod skickad till {email}. Kolla din inkorg (och skräppostmappen).', tooManyRequests: 'För många kodförfrågningar. Vänta 10 minuter och försök igen.', invalidEmail: 'Ange en giltig e-postadress.', couldNotSend: 'Det gick inte att skicka verifieringskoden. Försök igen.', incorrectDemo: 'Felaktig demokod. Försök igen.', incorrectCode: 'Felaktig kod. Försök igen.', codeExpired: 'Den här koden har gått ut. Skickar en ny…', tooManyAttempts: 'För många felaktiga försök. Begär en ny kod.', sessionNotFound: 'Verifieringssessionen hittades inte. Börja om.', verifyFailed: 'Verifieringen misslyckades. Försök igen.' },
         deleteAccount: {
           title: 'Radera ditt konto?',
@@ -15383,7 +15509,21 @@
         ban: { title: '封禁此用户？', body: '他们现有的帖子将被移除，并且将无法再发帖或评论。', bodyNamed: '封禁 {name}？他们现有的帖子将被移除，并且将无法再发帖或评论。', confirm: '封禁 🚫' },
         thread: { title: '评论', placeholder: '添加评论…', send: '发送 💛' },
         tips: { moniker: '您的Moniker设置', about: '关于Bipolar Anonymous', announcements: '公告', compose: '写帖子', search: '搜索维基', general: '综合聊天', privacy: '隐私信息' },
-        toast: { medUpdated: '药物已更新 ✓', accessRevoked: '您访问社区的权限已被撤销。', commentObjectionable: '该评论可能包含不当言论。请编辑它。 💛', commentWait: '请等待其他人回复后再发表评论。', commentFailed: '评论发送失败——请重试。', postPinned: '帖子已置顶 📌', postUnpinned: '帖子已取消置顶', pinFailed: '更新置顶失败', cantLikeOwn: '您不能给自己的帖子点赞 😊', annOpen: '公告已经打开', genOpen: '综合聊天已经打开', reactWait: '请等待其他人对您的消息作出回应或发布新消息。', postObjectionable: '该帖子可能包含不当言论。请编辑它以维护社区安全。 💛', sosSent: 'SOS 已发送给版主 🆘', reportSubmitted: '举报已提交——谢谢 🙏', mutedNamed: '{name} 已屏蔽——可在“关于”页面取消屏蔽 🙈', postRemoved: '帖子已移除 ✓', postDeleted: '帖子已删除 🛡️', bannedNamed: '{name} 已封禁并移除 🚫', accountDeleted: '您的账户已被删除', monikaTooShort: 'Moniker 至少需要 2 个字符', nameTaken: '该名称已被占用', monikaUpdated: 'Moniker 已更新 ✓' },
+        // Member-suggested announcements awaiting the admin (see
+        // visibleSuggestions in js/anonymous.js).
+        sugg: {
+          composeTitle: "建议一条公告",
+          composeSub: "公告由 Bipolar Bear 管理员发布。在此撰写你的公告，它会发送给管理员审核——你可以在此标签页看到它正在等待。",
+          placeholder: "大家应该知道什么？",
+          send: "提交审核",
+          publish: "✅ 发布",
+          reject: "✖️ 拒绝",
+          dismiss: "知道了",
+          waiting: "等待审核",
+          forReview: "待审核 — 由你决定",
+          rejected: "未发布",
+        },
+        toast: { medUpdated: '药物已更新 ✓', accessRevoked: '您访问社区的权限已被撤销。', commentObjectionable: '该评论可能包含不当言论。请编辑它。 💛', commentWait: '请等待其他人回复后再发表评论。', commentFailed: '评论发送失败——请重试。', postPinned: '帖子已置顶 📌', postUnpinned: '帖子已取消置顶', pinFailed: '更新置顶失败', cantLikeOwn: '您不能给自己的帖子点赞 😊', annOpen: '公告已经打开', genOpen: '综合聊天已经打开', reactWait: '请等待其他人对您的消息作出回应或发布新消息。', postObjectionable: '该帖子可能包含不当言论。请编辑它以维护社区安全。 💛', sosSent: 'SOS 已发送给版主 🆘', reportSubmitted: '举报已提交——谢谢 🙏', mutedNamed: '{name} 已屏蔽——可在“关于”页面取消屏蔽 🙈', postRemoved: '帖子已移除 ✓', postDeleted: '帖子已删除 🛡️', bannedNamed: '{name} 已封禁并移除 🚫', accountDeleted: '您的账户已被删除', monikaTooShort: 'Moniker 至少需要 2 个字符', nameTaken: '该名称已被占用', monikaUpdated: 'Moniker 已更新 ✓', suggSent: "已发送给管理员审核 🙏", suggPublished: "公告已发布 📢", suggRejected: "已拒绝该建议", suggFailed: "发送失败——请重试。" },
         verifyMsg: { demoCode: '请输入您的演示访问码以继续。', serviceUnavailable: '验证服务不可用 — 请稍后重试。', codeSent: '验证码已发送至 {email}。请检查您的收件箱（以及垃圾邮件文件夹）。', tooManyRequests: '验证码请求过于频繁。请等待 10 分钟后重试。', invalidEmail: '请输入有效的邮箱地址。', couldNotSend: '无法发送验证码。请重试。', incorrectDemo: '演示访问码不正确。请重试。', incorrectCode: '验证码不正确。请重试。', codeExpired: '此验证码已过期。正在发送新的验证码…', tooManyAttempts: '错误尝试次数过多。请重新获取验证码。', sessionNotFound: '未找到验证会话。请重新开始。', verifyFailed: '验证失败。请重试。' },
         deleteAccount: {
           title: '删除您的账户？',

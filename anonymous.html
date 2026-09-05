@@ -266,6 +266,12 @@
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <div id="ov-compose" class="overlay hidden">
   <div class="sheet">
+    <!-- Shown only in suggestion mode (a member composing on the announcements
+         tab). setComposeMode() in js/anonymous.js fills and reveals it. -->
+    <div id="compose-head" style="display:none;margin-bottom:12px;">
+      <div class="sheet-title" id="compose-title" data-i18n="anon.sugg.composeTitle">Suggest an announcement</div>
+      <div class="sheet-sub" id="compose-sub" data-i18n="anon.sugg.composeSub">Announcements are posted by the Bipolar Bear admin. Write yours here and it goes to them for approval — you'll see it waiting on this tab.</div>
+    </div>
     <textarea id="compose-ta" class="compose-ta" placeholder="Share with the community…" rows="4" data-i18n-placeholder="anon.compose.placeholder"></textarea>
     <div class="btn-row">
       <button class="btn-secondary" id="compose-cancel" style="flex:1" data-i18n="anon.compose.cancel">Cancel</button>

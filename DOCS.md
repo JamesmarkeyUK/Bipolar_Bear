@@ -563,6 +563,63 @@ User opens anonymous.html
 - Admin accounts (`profile.isAdmin`) can soft-delete posts
 - `bbAnonLastVisit` timestamp written to localStorage when the board loads; used by `index.html` to show "X new messages" badge under the Anonymous button
 
+#### Announcements are admin-only; members suggest
+
+Publishing to the **Announcements** tab is restricted to the admin account
+(`ADMIN_EMAIL` in `js/anonymous.js`). When anyone else composes on that tab the
+sheet switches to *suggestion* mode (`composeMode()` → `'suggest'`) and the text
+goes to `bbAnonAnnSuggestions` instead of `bbAnonPosts`:
+
+```
+bbAnonAnnSuggestions/{auto}
+  name, initials, grad1, grad2, streak, joinedAt   — author identity, as on a post
+  text                                             — the suggested announcement
+  status: 'pending' | 'approved' | 'rejected'
+  timestamp, reviewedAt
+```
+
+Suggestions render as faded, dashed cards above the published announcements
+(`renderSuggestion`, `.sugg-card`), and only for the two people they concern:
+
+| Viewer | pending | rejected | approved |
+|---|---|---|---|
+| Admin | sees it, with **Publish** / **Refuse** | hidden | hidden (it's a real announcement now) |
+| Author | "Waiting for approval" | "Not published" + Dismiss | hidden |
+| Everyone else | hidden | hidden | sees the announcement |
+
+A suggestion carries a monika, not an account, so "mine" can't be queried —
+the author's own card is driven off `bbAnon_mySuggestions` (ids written on this
+device). Members with no suggestions of their own and no admin flag never start
+the listener at all. Publishing copies the suggestion into `bbAnonPosts` with
+`tab: 'announcements'`, still credited to the member who wrote it (plus
+`suggestedBy`), which is also what fires the new-announcement push.
+
+Required Firestore rules (the console is the source of truth; this is what they
+must say):
+
+```js
+match /bbAnonPosts/{postId} {
+  // …existing read/update rules…
+  allow create: if request.auth != null
+    && (request.resource.data.tab != 'announcements'
+        || request.auth.token.email == 'inbox@jamesmarkey.co.uk');
+}
+
+match /bbAnonAnnSuggestions/{id} {
+  allow read:   if request.auth != null;
+  allow create: if request.auth != null && request.resource.data.status == 'pending';
+  allow update: if request.auth != null
+    && request.auth.token.email == 'inbox@jamesmarkey.co.uk';   // publish / refuse
+  allow delete: if request.auth != null;                        // author dismissing
+}
+```
+
+`request.auth.token.email` only exists on the BipolarBear-account path — the
+standalone email-code path signs in anonymously — so the admin must be signed
+in with their BipolarBear account to publish an announcement or review the
+queue. The client already gates on the same email, so this rule is the
+server-side half of the same check, not a second behaviour.
+
 ### 2.12 Home Screen Badges (index.html)
 
 Three sub-labels appear under the navigation buttons:
