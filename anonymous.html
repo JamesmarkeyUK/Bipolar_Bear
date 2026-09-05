@@ -43,6 +43,7 @@
   <script src="js/shared/medications.js"></script>
   <script src="js/shared/version-check.js"></script>
   <script src="js/shared/user-count.js"></script>
+<script src="js/shared/anon-push.js"></script>
   <link rel="preload" href="fonts/nunito-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/fonts.css">
   <link rel="stylesheet" href="css/theme.css">
@@ -389,6 +390,16 @@
       <div style="font-size:11px;color:var(--muted);" id="ms-birthday-age"></div>
     </div>
 
+    <!-- Notifications quick-access -->
+    <button id="ms-notif-btn" style="width:100%;text-align:left;background:var(--yellow-bg);border:1.5px solid rgba(245,200,0,0.18);border-radius:12px;padding:11px 14px;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;gap:10px;font-family:inherit;">
+      <span style="font-size:20px;">🔔</span>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:700;color:var(--dark);" data-i18n="anon.notif.title">Notifications</div>
+        <div id="ms-notif-status" style="font-size:11px;color:var(--muted);margin-top:1px;" data-i18n="anon.monikaSettings.loading">Loading…</div>
+      </div>
+      <span style="color:var(--muted);font-size:16px;font-weight:300;">›</span>
+    </button>
+
     <!-- Medication quick-access -->
     <button id="ms-med-btn" style="width:100%;text-align:left;background:var(--yellow-bg);border:1.5px solid rgba(245,200,0,0.18);border-radius:12px;padding:11px 14px;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;gap:10px;font-family:inherit;">
       <span style="font-size:20px;">💊</span>
@@ -472,6 +483,36 @@
       <button class="btn-secondary" id="med-ov-cancel" style="flex:1;" data-i18n="anon.medOv.cancel">Cancel</button>
       <button class="btn-primary"   id="med-ov-save"   style="flex:2;" data-i18n="anon.medOv.save">Save ✓</button>
     </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- OVERLAY: Notification opt-in (shown once, after the first post) -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="ov-notif-ask" class="overlay hidden">
+  <div class="sheet">
+    <div class="sheet-icon">🔔</div>
+    <div class="sheet-title" data-i18n="anon.notif.askTitle">Want to know when someone replies?</div>
+    <div class="sheet-sub" data-i18n="anon.notif.askSub">We'll only send what you tick here. You can change it any time in your settings.</div>
+    <div id="notif-ask-rows" class="notif-rows"></div>
+    <button class="btn-primary" id="notif-ask-yes" style="margin-bottom:8px;" data-i18n="anon.notif.enable">Turn on notifications</button>
+    <button class="btn-secondary" id="notif-ask-no" style="width:100%;" data-i18n="anon.notif.notNow">Not now</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- OVERLAY: Notification settings                                 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="ov-notifs" class="overlay hidden">
+  <div class="sheet">
+    <div class="sheet-icon">🔔</div>
+    <div class="sheet-title" data-i18n="anon.notif.title">Notifications</div>
+    <div class="sheet-sub" data-i18n="anon.notif.sub">Choose what's worth interrupting you for.</div>
+    <div id="notif-rows" class="notif-rows"></div>
+    <!-- Shown when the OS is refusing notifications, or this build can't
+         send them yet — populated by openNotifSettings(). -->
+    <div id="notif-note" style="display:none;font-size:12px;color:var(--muted);background:var(--yellow-bg);border-radius:8px;padding:8px 10px;margin-bottom:14px;line-height:1.5;"></div>
+    <button class="btn-primary" id="notif-close" style="width:100%;" data-i18n="anon.notif.done">Done ✓</button>
   </div>
 </div>
 

@@ -22,3 +22,16 @@ window.BB_FIREBASE_CONFIG = {
   appId: "1:566288727451:web:8921f3242193df115df53e",
   measurementId: "G-7TX0FRWEF1"
 };
+
+/**
+ * Web Push (VAPID) public key for browser notifications on the Bipolar
+ * Anonymous board — Firebase console → Project settings → Cloud Messaging →
+ * Web configuration → "Web Push certificates" → Key pair.
+ *
+ * Public by design (it identifies the sender to the browser's push service;
+ * the private half never leaves Google). Left empty until it's generated:
+ * js/shared/anon-push.js treats an empty key as "web push not available", so
+ * the settings sheet says so instead of failing at getToken(). Native builds
+ * don't use it at all — they go through FCM's own registration.
+ */
+window.BB_PUSH_VAPID_KEY = '';

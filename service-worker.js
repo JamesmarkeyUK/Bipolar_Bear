@@ -971,7 +971,18 @@
 //       it. Touches anonymous.html, css/anonymous.css, js/anonymous.js,
 //       js/shared/brand-config.js, js/shared/i18n.js (anon.sugg.* + four
 //       toasts across all ten locales), DOCS.md.
-const CACHE_NAME = 'bipolarbear-v211';
+// v212: anonymous board — notification settings. New js/shared/anon-push.js
+//       (FCM registration + the bbAnonPush token document), a one-time opt-in
+//       sheet after a member's first post, and a Notifications row in the
+//       settings sheet with three switches: replies to your posts, new
+//       announcements, weekly summary. Feature-detected end to end — with no
+//       push plugin and no VAPID key it reports itself unavailable rather
+//       than failing. Touches anonymous.html, css/anonymous.css,
+//       js/anonymous.js, js/shared/anon-push.js (new),
+//       js/shared/firebase-config.js, js/shared/i18n.js,
+//       firebase-messaging-sw.js (new, not precached),
+//       scripts/build-anonymous.js.
+const CACHE_NAME = 'bipolarbear-v212';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
@@ -1006,6 +1017,12 @@ const STATIC_ASSETS = [
   './js/shared/i18n.js',
   './js/shared/guest-data.js',
   './js/shared/user-count.js',
+  './js/shared/anon-push.js',
+
+  // NOTE: firebase-messaging-sw.js is deliberately NOT precached either — it
+  // is a service worker in its own right, registered by js/shared/anon-push.js,
+  // and must be fetched by the browser's own worker update check rather than
+  // served from this cache.
 
   // NOTE: /version.json is deliberately NOT precached. It must always be
   // fetched fresh so a new release reaches stale clients on next page load

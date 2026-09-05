@@ -402,7 +402,7 @@ function renderMutedList() {
       mutedUsers.delete(btn.dataset.unmute);
       saveMuted();
       renderMutedList();
-      renderPosts(currentTab === 'general' ? assembleGeneralPosts(localPosts) : sortPosts(localPosts));
+      renderPosts(currentTab === 'general' ? assembleGeneralPosts(localPosts) : announcementFeed());
     });
   });
 }
@@ -1467,6 +1467,7 @@ function initBoard() {
   listenPosts(); // starts both tab listeners; setTab no longer does this
   listenBanned(); // live ban list — hides banned users + gates compose
   listenSuggestions(); // admin review queue / your own suggestions awaiting it
+  initPush(); // refresh an existing push registration (no-op if unsubscribed)
   cleanOldPosts();
   _anonSaveProfile(); _bbSaveProfile(); // persist profile to Firestore
 }
@@ -1550,7 +1551,7 @@ function _rerenderCurrentTab() {
   if (!document.getElementById('post-list')) return;
   renderPosts(currentTab === 'general'
     ? assembleGeneralPosts(localPosts)
-    : sortPosts(localPosts));
+    : announcementFeed());
 }
 
 // Subscribe to the admin ban list. A ban hides the user's content for everyone
@@ -3770,7 +3771,7 @@ function scheduleTombstoneSweep(nextExpiry, now) {
     _tombstoneSweepTimer = null;
     renderPosts(currentTab === 'general'
       ? assembleGeneralPosts(localPosts)
-      : sortPosts(localPosts));
+      : announcementFeed());
   }, delay);
 }
 
@@ -4205,7 +4206,7 @@ function setupCompose() {
     localPosts.unshift({ id: optimisticId, ...entry });
     renderPosts(currentTab === 'general'
       ? assembleGeneralPosts(localPosts)
-      : sortPosts(localPosts));
+      : announcementFeed());
 
     let docId = null;
     if (db) {
@@ -4258,6 +4259,149 @@ async function submitSuggestion(text) {
     console.error('[Anonymous] suggestion failed', e);
     showHint(_wt('anon.toast.suggFailed'));
   }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Notifications
+//
+// Three things can reach a member: a reply to their post, a new
+// announcement, and the weekly digest. All three are sent by Cloud
+// Functions over FCM; js/shared/anon-push.js owns permission, the
+// registration token and the bbAnonPush document. This is the UI half —
+// the opt-in sheet shown once after a first post, and the settings sheet.
+// ─────────────────────────────────────────────────────────────────
+const NOTIF_ROWS = [
+  { key: 'replies',       icon: '💬', name: 'anon.notif.replies',       sub: 'anon.notif.repliesSub' },
+  { key: 'announcements', icon: '📢', name: 'anon.notif.announcements', sub: 'anon.notif.announcementsSub' },
+  { key: 'weekly',        icon: '📊', name: 'anon.notif.weekly',        sub: 'anon.notif.weeklySub' },
+];
+const NOTIF_SHORT = {
+  replies:       'anon.notif.shortReplies',
+  announcements: 'anon.notif.shortAnnouncements',
+  weekly:        'anon.notif.shortWeekly',
+};
+
+function _push() { return (window.BB && BB.anonPush) || null; }
+
+// sha256 of the member's email, resolved once. It identifies the same person
+// across devices without the server ever holding the address — the same hash
+// anonProfiles is keyed by.
+let _pushEmailHash = null;
+function _resolvePushEmailHash() {
+  const email = (_bbUser && _bbUser.email) || BB.storage.get('Anon_email') || '';
+  if (!email || _pushEmailHash) return;
+  _anonEmailHash(email).then(h => { _pushEmailHash = h; }).catch(() => {});
+}
+
+// Hand the push module the page's Firestore handle and identity, then bring
+// any existing registration up to date (tokens rotate; permission can be
+// revoked between visits).
+function initPush() {
+  const push = _push();
+  if (!push) return;
+  _resolvePushEmailHash();
+  push.configure({
+    db,
+    identity: () => ({ monika: profile.monika, emailHash: _pushEmailHash }),
+    // A push that lands while the board is open belongs in the page, not in
+    // the notification tray.
+    onMessage: payload => {
+      const body = (payload && payload.notification && payload.notification.body) || '';
+      if (body) showHint(body);
+    },
+  });
+  push.refresh().catch(() => {});
+}
+
+// Render the three switches into a container. `prefs` is mutated in place so
+// the caller decides when (or whether) to persist.
+function renderNotifRows(containerId, prefs, onChange) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = NOTIF_ROWS.map(r => `
+    <button type="button" class="notif-row${prefs[r.key] ? ' on' : ''}" data-notif="${r.key}"
+            role="switch" aria-checked="${prefs[r.key] ? 'true' : 'false'}">
+      <span class="notif-ico">${r.icon}</span>
+      <span class="notif-copy">
+        <span class="notif-name">${esc(_wt(r.name))}</span>
+        <span class="notif-sub">${esc(_wt(r.sub))}</span>
+      </span>
+      <span class="notif-sw" aria-hidden="true"></span>
+    </button>`).join('');
+  el.querySelectorAll('[data-notif]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.notif;
+      prefs[key] = !prefs[key];
+      btn.classList.toggle('on', prefs[key]);
+      btn.setAttribute('aria-checked', prefs[key] ? 'true' : 'false');
+      if (onChange) onChange(prefs, key);
+    });
+  });
+}
+
+// One-time opt-in, offered after the first post — the moment a reply is
+// actually likely. Declining is remembered; the settings sheet is always there.
+function maybeAskNotifications() {
+  const push = _push();
+  if (!push || push.hasBeenAsked() || !push.isSupported()) return;
+  const prefs = push.defaultPrefs();
+  renderNotifRows('notif-ask-rows', prefs);
+  document.getElementById('notif-ask-yes').onclick = async () => {
+    closeOv('ov-notif-ask');
+    const res = await push.enable(prefs);
+    showHint(_wt(res.ok ? 'anon.toast.notifOn'
+      : (res.reason === 'denied' ? 'anon.toast.notifDenied' : 'anon.toast.notifFailed')));
+    updateNotifStatus();
+  };
+  document.getElementById('notif-ask-no').onclick = () => {
+    push.markAsked();
+    closeOv('ov-notif-ask');
+  };
+  openOv('ov-notif-ask');
+}
+
+// The status line under "Notifications" in the settings sheet.
+async function updateNotifStatus() {
+  const el = document.getElementById('ms-notif-status');
+  if (!el) return;
+  const push = _push();
+  if (!push || !push.isSupported()) { el.textContent = _wt('anon.notif.statusUnavailable'); return; }
+  const state = await push.permissionState();
+  if (state === 'denied') { el.textContent = _wt('anon.notif.statusBlocked'); return; }
+  const prefs = push.getPrefs();
+  const on = NOTIF_ROWS.filter(r => prefs[r.key]).map(r => _wt(NOTIF_SHORT[r.key]));
+  el.textContent = on.length ? on.join(' · ') : _wt('anon.notif.statusOff');
+}
+
+async function openNotifSettings() {
+  closeOv('ov-monika');
+  const push  = _push();
+  const prefs = push ? push.getPrefs() : { replies: false, announcements: false, weekly: false };
+  const note  = document.getElementById('notif-note');
+
+  renderNotifRows('notif-rows', prefs, async (next, key) => {
+    if (!push) return;
+    const res = await push.savePrefs(next);
+    if (!res.ok) {
+      // Permission refused (or nothing to send with) — re-render from what was
+      // actually stored rather than leaving a switch claiming to be on.
+      showHint(_wt(res.reason === 'denied' ? 'anon.toast.notifDenied' : 'anon.toast.notifFailed'));
+      openNotifSettings();
+      return;
+    }
+    if (!next[key]) showHint(_wt('anon.toast.notifOff'));
+    updateNotifStatus();
+  });
+
+  if (note) {
+    const state = push && push.isSupported() ? await push.permissionState() : 'unsupported';
+    const msg = state === 'unsupported' ? _wt('anon.notif.noteUnavailable')
+              : state === 'denied'      ? _wt('anon.notif.noteBlocked')
+              : '';
+    note.textContent   = msg;
+    note.style.display = msg ? '' : 'none';
+  }
+  openOv('ov-notifs');
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -4323,8 +4467,14 @@ function openStableSettings() {
 // ─────────────────────────────────────────────────────────────────
 function setupOverlayActions() {
   // First post
-  document.getElementById('fp-yes').addEventListener('click', () => closeOv('ov-firstpost'));
-  document.getElementById('fp-no').addEventListener('click',  () => closeOv('ov-firstpost'));
+  // Closing the first-post sheet is the moment to ask about notifications:
+  // they have just written something that can be replied to.
+  document.getElementById('fp-yes').addEventListener('click', () => {
+    closeOv('ov-firstpost'); maybeAskNotifications();
+  });
+  document.getElementById('fp-no').addEventListener('click',  () => {
+    closeOv('ov-firstpost'); maybeAskNotifications();
+  });
 
   // SOS
   document.getElementById('sos-cancel').addEventListener('click',  () => closeOv('ov-sos'));
@@ -4382,7 +4532,7 @@ function setupOverlayActions() {
     if (!muteTargetName) return;
     mutedUsers.add(muteTargetName);
     saveMuted();
-    renderPosts(currentTab === 'general' ? assembleGeneralPosts(localPosts) : sortPosts(localPosts));
+    renderPosts(currentTab === 'general' ? assembleGeneralPosts(localPosts) : announcementFeed());
     showHint(_wt('anon.toast.mutedNamed', { name: `[${muteTargetName}]` }));
     muteTargetName = '';
   });
@@ -4400,7 +4550,7 @@ function setupOverlayActions() {
     if (db && selfDeleteId) {
       db.collection(BB_BRAND.collections.posts).doc(selfDeleteId).delete().catch(() => {});
       localPosts = localPosts.filter(p => p.id !== selfDeleteId);
-      renderPosts(currentTab === 'general' ? assembleGeneralPosts(localPosts) : sortPosts(localPosts));
+      renderPosts(currentTab === 'general' ? assembleGeneralPosts(localPosts) : announcementFeed());
     }
     showHint(_wt('anon.toast.postRemoved'));
   });
@@ -4479,6 +4629,9 @@ function openMonikaSettings() {
   msMonika.value   = profile.monika;
   msCounter.textContent = `${profile.monika.length}/10`;
   msInitials.value = profile.customInit;
+
+  // Notification status row (async — permission state comes from the OS)
+  updateNotifStatus();
 
   // Medication status row
   const msStatus = document.getElementById('ms-med-status');
@@ -4578,7 +4731,9 @@ document.getElementById('ms-cancel').addEventListener('click', () => closeOv('ov
 document.getElementById('ms-signout').addEventListener('click', () => {
   // Standalone sign-out: clear all bbAnon_* identity/session state. Profile
   // data persists in anonProfiles/{sha256email} so the same email re-verifies
-  // back into the same identity.
+  // back into the same identity. The push registration does not: this device
+  // should stop being notified the moment it stops being signed in.
+  if (_push()) _push().unregister();
   Object.keys(localStorage)
     .filter(k => k === 'bbAnonLastVisit' || k === 'bbAnonVisitDate' || k.startsWith('bbAnon_'))
     .forEach(k => localStorage.removeItem(k));
@@ -4649,6 +4804,10 @@ async function deleteAnonAccount() {
           await db.collection('anonProfiles').doc(hash).delete();
         } catch (e) { console.warn('[AnonDelete] anonProfile', e); }
       }
+
+      // 3b. Drop the push registration — nothing should still be notifying a
+      //     member who no longer exists.
+      if (_push()) await _push().unregister();
     }
 
     // 4. Delete the (anonymous) Firebase Auth user. Anonymous users can
@@ -4680,6 +4839,8 @@ if (_isAnonymousApp) {
   _msHomeBtn.textContent = '← ' + _wt('anon.ui.backToBB');
   _msHomeBtn.addEventListener('click', () => { location.href = 'index.html'; });
 }
+document.getElementById('ms-notif-btn').addEventListener('click', openNotifSettings);
+document.getElementById('notif-close').addEventListener('click', () => closeOv('ov-notifs'));
 document.getElementById('ms-med-btn').addEventListener('click', openMedSettings);
 document.getElementById('ms-stable-btn').addEventListener('click', openStableSettings);
 
@@ -4705,6 +4866,9 @@ document.getElementById('ms-save').addEventListener('click', async () => {
   closeOv('ov-monika');
   renderUserPill();
   showHint(_wt('anon.toast.monikaUpdated'));
+  // Reply notifications are addressed by monika, so the token document has to
+  // learn the new one or replies stop arriving.
+  if (_push()) _push().refresh().catch(() => {});
 
   // Update past Firestore posts authored by this user
   if (db && oldMonika) {
