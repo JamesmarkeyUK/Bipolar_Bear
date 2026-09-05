@@ -33,13 +33,13 @@
 (function () {
   'use strict';
 
-  // Per-platform store URLs. The Bipolar Anonymous iOS listing isn't live yet,
-  // so its iOS entry stays null and the banner falls back to "please update
-  // via your app store" copy without a broken tap target.
+  // Per-platform store URLs. Both apps are live on both stores; a null entry
+  // would make the banner fall back to "please update via your app store"
+  // copy rather than offer a broken tap target.
   var STORE_URLS = {
     ios: {
       main:      'https://apps.apple.com/gb/app/bipolar-bear/id6766637453',
-      anonymous: null,
+      anonymous: 'https://apps.apple.com/gb/app/bipolar-anonymous/id6768005853',
     },
     android: {
       main:      'https://play.google.com/store/apps/details?id=com.bipolarbear.app',

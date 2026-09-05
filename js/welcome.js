@@ -326,8 +326,10 @@
     }
   });
 
-  /* ──────────────── 6. Placeholder store links ──────────────── */
-  // Store URLs land later — keep the badges inert (and honest) for now.
+  /* ──────────────── 6. Store links ──────────────── */
+  // All four listings are live, so every badge is a real link now. The guard
+  // stays for the next unreleased build: a badge left on href="#" swallows its
+  // click rather than jumping the visitor to the top of the page.
   [].slice.call(document.querySelectorAll('.store-badge[data-store]')).forEach(function (a) {
     a.addEventListener('click', function (e) {
       if (a.getAttribute('href') === '#') e.preventDefault();

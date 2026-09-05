@@ -994,10 +994,14 @@
 //       store-assets/build-search-cards.mjs. Touches welcome.html,
 //       welcome-anonymous.html, privacy.html (all precached — bump so
 //       returning browsers get the markup).
-// v215: the Bipolar Anonymous Google Play badges on both landing pages are
-//       live links instead of inert placeholders. The four App Store badges
-//       stay inert pending the listing's numeric Apple ID. Touches
-//       welcome.html, welcome-anonymous.html (both precached).
+// v215: the Bipolar Anonymous store badges on both landing pages are live
+//       links instead of inert placeholders — Google Play, then the App Store
+//       listing (id6768005853) once it went live. Every badge on both pages
+//       now points at a real listing. js/shared/version-check.js can offer
+//       iOS Anonymous users their listing too, instead of falling back to
+//       generic "update via your app store" copy. Touches welcome.html,
+//       welcome-anonymous.html, js/welcome.js, js/shared/version-check.js
+//       (all precached).
 const CACHE_NAME = 'bipolarbear-v215';
 
 /**
