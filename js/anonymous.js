@@ -3392,11 +3392,39 @@ async function cleanOldPosts() {
 // ─────────────────────────────────────────────────────────────────
 // Comment threads
 // ─────────────────────────────────────────────────────────────────
+// A thread reads oldest-first, so the part worth seeing is at the bottom.
+// Opening one lands at that end rather than at the top; later snapshots only
+// follow if the reader was already there — someone who scrolled up to re-read
+// something must not be yanked back by a stranger's reply — and always after
+// they send a comment themselves.
+let _threadStickToBottom = true;
+
+function _threadScroller() {
+  return document.querySelector('#ov-thread .thread-scroll');
+}
+
+// Within a comment's height of the end counts as "at the end" — a reader
+// sitting just above the last card is still following the live conversation.
+function _threadAtBottom() {
+  const el = _threadScroller();
+  if (!el) return true;
+  return el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+}
+
+function _scrollThreadToEnd() {
+  const el = _threadScroller();
+  if (!el) return;
+  // After the paint that follows the innerHTML swap, or scrollHeight is still
+  // the old list's.
+  requestAnimationFrame(() => { el.scrollTop = el.scrollHeight; });
+}
+
 async function openThread(postId) {
   const post = localPosts.find(p => p.id === postId);
   if (!post || post.isSeed) return;
   commentTargetId = postId;
   lastCommentAuthor = ''; // reset until the listener reports the thread's newest comment
+  _threadStickToBottom = true; // open on the newest comment, not the top of the thread
 
   document.getElementById('thread-original-post').innerHTML = renderThreadHeader(post);
   document.getElementById('thread-comments-list').innerHTML =
@@ -3439,11 +3467,16 @@ async function openThread(postId) {
       const comments = snap.docs.map(d => ({ id: d.id, ...d.data() }))
         .filter(c => !c.name || (!mutedUsers.has(c.name) && !isBanned(c.name)));
       const el = document.getElementById('thread-comments-list');
+      // Measure before the innerHTML swap — afterwards the old scroll position
+      // means nothing.
+      const stick = _threadStickToBottom || _threadAtBottom();
+      _threadStickToBottom = false;
       if (!comments.length) {
         el.innerHTML = '<div class="empty-state" style="padding:24px 0 16px;">' + esc(_wt('anon.ui.noComments')) + '</div>';
         return;
       }
       el.innerHTML = comments.map(renderComment).join('');
+      if (stick) _scrollThreadToEnd();
     }, err => {
       console.warn('[Thread] comments listener error', err);
       const el = document.getElementById('thread-comments-list');
@@ -3692,6 +3725,7 @@ function setupThread() {
         const postRef = db.collection(BB_BRAND.collections.posts).doc(commentTargetId);
         await postRef.collection('comments').add(comment);
         sent = true;
+        _threadStickToBottom = true; // follow your own comment down to the end
         // Your own reply is read the instant you send it. The thread listener
         // lands on the same number a moment later, but recording it here means
         // a dead listener — or closing the sheet mid-flight — can't leave your

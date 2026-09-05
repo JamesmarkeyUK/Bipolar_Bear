@@ -982,7 +982,12 @@
 //       js/shared/firebase-config.js, js/shared/i18n.js,
 //       firebase-messaging-sw.js (new, not precached),
 //       scripts/build-anonymous.js.
-const CACHE_NAME = 'bipolarbear-v212';
+// v213: anonymous board — opening a comment thread lands on the newest
+//       comment instead of the top. Later replies only follow the reader down
+//       if they were already at the live end (scrolling up to re-read is never
+//       yanked back), and always after they send one themselves. Touches
+//       js/anonymous.js only.
+const CACHE_NAME = 'bipolarbear-v213';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
