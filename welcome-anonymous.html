@@ -30,6 +30,60 @@
 
   <script src="js/shared/i18n.js"></script>
   <link rel="stylesheet" href="css/welcome.css">
+
+  <!-- Structured data. The `image` array is the point: a search thumbnail is a
+       ~92px square, and the 1.91:1 og:image above only fits it letterboxed
+       (grey bars top and bottom). Google picks per surface from the ratios
+       offered here, so all three shapes of the same card are listed —
+       1:1 first, since that is the shape mobile results use.
+       Built by store-assets/build-search-cards.mjs. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://www.bipolaranonymous.app/#website",
+        "url": "https://www.bipolaranonymous.app/",
+        "name": "Bipolar Anonymous",
+        "description": "A free, anonymous peer community for people living with bipolar. Pick a moniker and find people who actually get it.",
+        "inLanguage": "en-GB",
+        "publisher": { "@id": "https://www.bipolaranonymous.app/#organization" },
+        "image": [
+          "https://www.bipolaranonymous.app/images/search/anonymous-1x1.jpg",
+          "https://www.bipolaranonymous.app/images/search/anonymous-4x3.jpg",
+          "https://www.bipolaranonymous.app/images/search/anonymous-16x9.jpg"
+        ]
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://www.bipolaranonymous.app/#organization",
+        "name": "Bipolar Anonymous",
+        "url": "https://www.bipolaranonymous.app/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://www.bipolaranonymous.app/images/search/anonymous-1x1.jpg",
+          "width": 1200,
+          "height": 1200
+        }
+      },
+      {
+        "@type": "MobileApplication",
+        "name": "Bipolar Anonymous",
+        "url": "https://www.bipolaranonymous.app/",
+        "applicationCategory": "HealthApplication",
+        "operatingSystem": "iOS, Android, Web",
+        "description": "A free, anonymous peer community for people living with bipolar. Pick a moniker and find people who actually get it.",
+        "image": [
+          "https://www.bipolaranonymous.app/images/search/anonymous-1x1.jpg",
+          "https://www.bipolaranonymous.app/images/search/anonymous-4x3.jpg",
+          "https://www.bipolaranonymous.app/images/search/anonymous-16x9.jpg"
+        ],
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "GBP" }
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
 

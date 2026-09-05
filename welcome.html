@@ -31,6 +31,60 @@
 
   <script src="js/shared/i18n.js"></script>
   <link rel="stylesheet" href="css/welcome.css">
+
+  <!-- Structured data. The `image` array is the point: a search thumbnail is a
+       ~92px square, and the 1.91:1 og:image above only fits it letterboxed
+       (grey bars top and bottom). Google picks per surface from the ratios
+       offered here, so all three shapes of the same card are listed —
+       1:1 first, since that is the shape mobile results use.
+       Built by store-assets/build-search-cards.mjs. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://www.bipolarbear.app/#website",
+        "url": "https://www.bipolarbear.app/",
+        "name": "Bipolar Bear",
+        "description": "A free, private mood journal and survival kit for living with bipolar disorder — plus Bipolar Anonymous, an anonymous peer-support community.",
+        "inLanguage": "en-GB",
+        "publisher": { "@id": "https://www.bipolarbear.app/#organization" },
+        "image": [
+          "https://www.bipolarbear.app/images/search/bipolarbear-1x1.jpg",
+          "https://www.bipolarbear.app/images/search/bipolarbear-4x3.jpg",
+          "https://www.bipolarbear.app/images/search/bipolarbear-16x9.jpg"
+        ]
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://www.bipolarbear.app/#organization",
+        "name": "Bipolar Bear",
+        "url": "https://www.bipolarbear.app/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://www.bipolarbear.app/images/search/bipolarbear-1x1.jpg",
+          "width": 1200,
+          "height": 1200
+        }
+      },
+      {
+        "@type": "MobileApplication",
+        "name": "Bipolar Bear",
+        "url": "https://www.bipolarbear.app/",
+        "applicationCategory": "HealthApplication",
+        "operatingSystem": "iOS, Android, Web",
+        "description": "A free, private mood journal and survival kit for living with bipolar disorder — plus Bipolar Anonymous, an anonymous peer-support community.",
+        "image": [
+          "https://www.bipolarbear.app/images/search/bipolarbear-1x1.jpg",
+          "https://www.bipolarbear.app/images/search/bipolarbear-4x3.jpg",
+          "https://www.bipolarbear.app/images/search/bipolarbear-16x9.jpg"
+        ],
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "GBP" }
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
 

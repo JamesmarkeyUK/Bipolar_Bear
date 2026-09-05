@@ -987,7 +987,14 @@
 //       if they were already at the live end (scrolling up to re-read is never
 //       yanked back), and always after they send one themselves. Touches
 //       js/anonymous.js only.
-const CACHE_NAME = 'bipolarbear-v213';
+// v214: search-result thumbnails. The landing pages (and privacy.html) gained
+//       JSON-LD carrying the same card in 1:1, 4:3 and 16:9, so Google can fill
+//       its square mobile thumbnail instead of letterboxing the 1.91:1
+//       og:image between grey bars. New images/search/*.jpg, built by
+//       store-assets/build-search-cards.mjs. Touches welcome.html,
+//       welcome-anonymous.html, privacy.html (all precached — bump so
+//       returning browsers get the markup).
+const CACHE_NAME = 'bipolarbear-v214';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
