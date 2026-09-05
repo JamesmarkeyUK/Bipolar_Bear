@@ -8,6 +8,85 @@ For Android-vs-iOS parity gaps specifically, see `ANDROID_TODO.md`.
 
 ---
 
+## Deploy the Firestore rules for announcements, suggestions and push
+
+**Status:** Not started · **Area:** Firebase console (no code) — shipped client code is already live and waiting on these
+
+The announcement-moderation and notification features shipped in `CACHE_NAME`
+v211–v212 and are live on the web build. Their client halves assume three rules
+that are **not** in the console yet. Nothing is in the repo to change — the rules
+live only in Firebase Console → Firestore → Rules — so this is pure account work.
+
+### What's broken until this is done
+
+- **Suggesting an announcement fails.** A member composing on the Announcements
+  tab writes to `bbAnonAnnSuggestions`; no rule matches that collection, so the
+  write is denied and they get the "That didn't send — please try again" toast.
+  This is the user-visible one.
+- **Admin-only announcements is UI-only.** `js/anonymous.js` switches non-admins
+  into suggestion mode, but the existing `bbAnonPosts` create rule still accepts
+  an announcement written straight against the API. The gate isn't enforced
+  server-side until the `tab != 'announcements'` clause below is added.
+- **Push registrations would be denied** once notifications are switched on
+  (`NOTIFICATIONS.md`). Not urgent while `BB_PUSH_VAPID_KEY` is empty and the
+  native plugin isn't synced — no client ever attempts the write — but it must
+  land before that setup completes.
+
+### The rules
+
+Merge the `create` clause into the **existing** `bbAnonPosts` match block; keep
+its current read/update/delete clauses as they are.
+
+```js
+match /bbAnonPosts/{postId} {
+  // …existing read/update/delete rules, unchanged…
+  allow create: if request.auth != null
+    && (request.resource.data.tab != 'announcements'
+        || request.auth.token.email == 'inbox@jamesmarkey.co.uk');
+}
+
+// Member-suggested announcements awaiting review.
+match /bbAnonAnnSuggestions/{id} {
+  allow read:   if request.auth != null;
+  allow create: if request.auth != null && request.resource.data.status == 'pending';
+  allow update: if request.auth != null
+    && request.auth.token.email == 'inbox@jamesmarkey.co.uk';   // publish / refuse
+  allow delete: if request.auth != null;                        // author dismissing
+}
+
+// Push registrations. One doc per FCM token, id = the token itself. Never
+// readable: a client only writes its own, and the token id is unguessable.
+// Cloud Functions read them with the admin SDK, which bypasses rules.
+match /bbAnonPush/{token} {
+  allow read:   if false;
+  allow create, update, delete: if request.auth != null;
+}
+```
+
+### The admin catch
+
+`request.auth.token.email` only exists on the **BipolarBear-account** path — the
+standalone email-code path signs in anonymously, so its token carries no email.
+You must therefore be signed in with your BipolarBear account to publish an
+announcement or review the queue. The client gates on the same address
+(`ADMIN_EMAIL` in `js/anonymous.js`), so this is the server-side half of one
+check, not a second behaviour.
+
+### Verify after publishing
+
+1. On the board as a non-admin, compose on the Announcements tab → expect "Sent
+   to the admin for approval 🙏" and a faded "Waiting for approval" card.
+2. Signed in as the admin, the same card shows **Publish** / **Refuse**.
+   Publish → it appears as a real announcement, credited to the suggester.
+3. Refuse → the author (and only the author) sees one "Not published" card with
+   a Dismiss button that deletes the suggestion.
+
+Reference: `DOCS.md` §2.11 (moderation flow + the same rules) and
+`NOTIFICATIONS.md` §1 (push rules, in the context of the rest of the
+notification setup).
+
+---
+
 ## Save a community post to the shared wiki (admin-validated)
 
 **Status:** Not started · **Area:** Anonymous board (`anonymous.html` / `js/anonymous.js`)
