@@ -371,6 +371,14 @@
        truncating, _fitBoardLogo() drops it entirely — leaving just the logo
        icon so the identity pill (name, streaks, birthday) gets the room. */
     .board-logo.logo-iconly > div { display: none; }
+    /* Back-to-BipolarBear mode (arrived from the main app): the wordmark is
+       the first thing dropped when the row is tight — the "← Go back" line
+       is the reason the logo is tappable, so it stays as long as it fits. */
+    .board-logo.logo-backonly .board-logo-name { display: none; }
+    .board-logo.logo-back .board-logo-sub {
+      font-size: 11px; font-weight: 700; letter-spacing: 0;
+      text-transform: none; opacity: 0.8;
+    }
     .board-logo-name { font-size: 18px; font-weight: 800; color: var(--dark); letter-spacing: -0.3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
     .board-logo-sub  { font-size: 10px; color: var(--dark); letter-spacing: 0.6px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
     /* The identity pill must be allowed to shrink (and its monika name to

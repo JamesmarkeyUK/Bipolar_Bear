@@ -957,7 +957,14 @@
 // v209: auto-complete preview dates are formatted 'en-US' rather than with the
 //       device locale, so they read the same way as the missing-dates list the
 //       preview opens on top of. Touches js/journal.js only.
-const CACHE_NAME = 'bipolarbear-v209';
+// v210: anonymous board — users who arrived from BipolarBear now see the
+//       BipolarBear icon and wordmark in the board's top-left corner with a
+//       small "← Go back" line under it, instead of the Anonymous wordmark
+//       that was silently tappable. Standalone (email-code) users and the
+//       Bipolar Anonymous app are unchanged. Touches anonymous.html,
+//       css/anonymous.css, js/anonymous.js, js/shared/i18n.js (new
+//       anon.ui.goBack across all ten locales).
+const CACHE_NAME = 'bipolarbear-v210';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

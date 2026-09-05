@@ -305,7 +305,7 @@ async function boot(user) {
   // user.emailVerified here. Pre-fill + save-back keeps the BB account and
   // the anon email connected.
   _bbUser = isReal ? user : null;
-  _updateLogoCursor();
+  _updateBoardLogo();
   // Show "← Home" on verify/monika screens only for BB App users (Firebase Auth)
   ['verify-back-btn', 'monika-back-btn'].forEach(id => {
     const btn = document.getElementById(id);
@@ -424,16 +424,37 @@ function _goHome() {
   // they're already at the only "home" their bundle has.
 }
 
-function _updateLogoCursor() {
+// True when the user got here from BipolarBear (signed in on the main bundle),
+// so the board logo can double as the way back. Never true in the standalone
+// Bipolar Anonymous bundle — there is no BipolarBear app to return to.
+function _canGoBackToBB() { return !!_bbUser && !_isAnonymousApp; }
+
+// The board's top-left logo. Standalone users get the plain "Anonymous /
+// BipolarBear" wordmark. Users who arrived from BipolarBear get the
+// BipolarBear icon and wordmark with a small "← Go back" under it, so the
+// route home is visible rather than hidden behind an unlabelled logo tap.
+function _updateBoardLogo() {
   const btn = document.getElementById('board-logo-btn');
   if (!btn) return;
-  if (_bbUser) {
+  const img    = btn.querySelector('img');
+  const nameEl = btn.querySelector('.board-logo-name');
+  const subEl  = btn.querySelector('.board-logo-sub');
+  if (_canGoBackToBB()) {
     btn.style.cursor = 'pointer';
     btn.title = _wt('anon.ui.backToBB');
+    btn.classList.add('logo-back');
+    if (img)    { img.src = 'icons/AppIcon.png'; img.alt = 'BipolarBear'; }
+    if (nameEl) nameEl.textContent = 'BipolarBear';
+    if (subEl)  subEl.textContent  = '\u2190 ' + _wt('anon.ui.goBack');
   } else {
     btn.style.cursor = 'default';
     btn.title = '';
+    btn.classList.remove('logo-back');
+    if (img)    { img.src = 'icons/AppIcon_anonymous.png'; img.alt = ''; }
+    if (nameEl) nameEl.textContent = 'Anonymous';
+    if (subEl)  subEl.textContent  = 'BipolarBear';
   }
+  _fitBoardLogo();
 }
 
 // Close on backdrop tap
@@ -1479,12 +1500,21 @@ function renderUserPill() {
 function _fitBoardLogo() {
   const logo   = document.getElementById('board-logo-btn');
   const nameEl = logo && logo.querySelector('.board-logo-name');
+  const subEl  = logo && logo.querySelector('.board-logo-sub');
   if (!logo || !nameEl) return;
-  logo.classList.remove('logo-iconly');
+  logo.classList.remove('logo-iconly', 'logo-backonly');
   // Board not laid out yet (screen hidden) — nothing to measure.
   if (!nameEl.clientWidth && !nameEl.scrollWidth) return;
-  // Wordmark is being truncated → drop it entirely.
-  if (nameEl.scrollWidth > nameEl.clientWidth + 1) logo.classList.add('logo-iconly');
+  // Wordmark fits — nothing to drop.
+  if (nameEl.scrollWidth <= nameEl.clientWidth + 1) return;
+  // Back-to-BipolarBear mode: the "← Go back" line is the point of the logo,
+  // so drop the wordmark first and only go icon-only if that truncates too.
+  if (logo.classList.contains('logo-back') && subEl) {
+    logo.classList.add('logo-backonly');
+    if (subEl.scrollWidth <= subEl.clientWidth + 1) return;
+    logo.classList.remove('logo-backonly');
+  }
+  logo.classList.add('logo-iconly');
 }
 
 // Record that the user posted (or commented) today, so the BipolarBear home
