@@ -994,7 +994,11 @@
 //       store-assets/build-search-cards.mjs. Touches welcome.html,
 //       welcome-anonymous.html, privacy.html (all precached — bump so
 //       returning browsers get the markup).
-const CACHE_NAME = 'bipolarbear-v214';
+// v215: the Bipolar Anonymous Google Play badges on both landing pages are
+//       live links instead of inert placeholders. The four App Store badges
+//       stay inert pending the listing's numeric Apple ID. Touches
+//       welcome.html, welcome-anonymous.html (both precached).
+const CACHE_NAME = 'bipolarbear-v215';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
