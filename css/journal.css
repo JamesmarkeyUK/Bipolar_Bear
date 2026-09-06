@@ -212,6 +212,7 @@
     body.bb-fm-full .placeholder-fab,
     body.bb-fm-full .coffee-fab,
     body.bb-fm-full .feedback-fab,
+    body.bb-fm-full .review-fab,
     body.bb-fm-full .bb-extra-fab,
     body.bb-fm-full .fab-dot-placeholder,
     body.bb-fm-full .bb-auth-fab { display: none !important; }
