@@ -1002,7 +1002,11 @@
 //       generic "update via your app store" copy. Touches welcome.html,
 //       welcome-anonymous.html, js/welcome.js, js/shared/version-check.js
 //       (all precached).
-const CACHE_NAME = 'bipolarbear-v215';
+// v216: focused mode hides the whole FAB dock again — the "Leave a Review"
+//       star (added in v196) was missing from the bb-fm-full hide list, so it
+//       stayed on screen mid-entry as a lone floating button after the rest of
+//       the dock disappeared. Touches css/journal.css (precached).
+const CACHE_NAME = 'bipolarbear-v216';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
