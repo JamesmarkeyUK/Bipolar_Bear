@@ -689,13 +689,14 @@ Marking:  every entry carries autoFilled:true → an AUTO badge in the entry lis
 
 ### 2.14 Bipolar Anonymous Notifications
 
-Three notifications, each behind its own switch in the board's settings sheet
+Four notifications, each behind its own switch in the board's settings sheet
 (🔔 Notifications) and all sent by Cloud Functions over FCM:
 
 | Preference | Fires on | Function |
 |---|---|---|
 | `replies` | a comment on a post you wrote (never your own comment) | `onAnonCommentCreated` |
 | `announcements` | any post created with `tab: 'announcements'` — posted by the admin, or a member's suggestion they approved | `onAnonAnnouncementCreated` |
+| `posts` | any member post created with `tab: 'general'` — never to the author's own devices; the daily topic (`isTopic`) and system cards don't count. Every one shares the collapse id `anon-new-post`, so a burst replaces the notification in the tray instead of stacking | `onAnonPostCreated` |
 | `weekly` | Sunday 18:00 Europe/London; skipped entirely in a week with no posts | `weeklyAnonDigest` |
 
 **No notification carries post or comment text.** A notification is read on a
@@ -709,7 +710,7 @@ per token:
 
 ```
 bbAnonPush/{fcmToken}
-  prefs: { replies, announcements, weekly }
+  prefs: { replies, announcements, posts, weekly }
   monikaLower   — the reply address: posts carry a monika, not an account
   emailHash     — sha256(email), the same key anonProfiles uses
   platform      — 'ios' | 'android' | 'web'
@@ -729,8 +730,9 @@ push via `firebase-messaging-compat` + `firebase-messaging-sw.js`, gated on
 Lifecycle:
 
 - **Asked once**, right after a member's first post (`maybeAskNotifications`),
-  with the three switches shown so the offer can be narrowed before accepting.
-  Replies and announcements default on, the weekly digest off. Declining sets
+  with the four switches shown so the offer can be narrowed before accepting.
+  Replies and announcements default on; new posts and the weekly digest —
+  the two that can wear out their welcome — default off. Declining sets
   `bbAnon_notifAsked` and is never revisited — settings is the way back in.
 - **`refresh()` on every board init** — tokens rotate and permission can be
   revoked in the OS between visits. A revoked permission clears the local

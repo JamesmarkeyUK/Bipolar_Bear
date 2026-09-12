@@ -1,12 +1,12 @@
 /**
  * Push notifications for the Bipolar Anonymous board.
  *
- * Three things can notify a member — a reply to their post, a new
- * announcement, and the weekly digest — and all three are sent by Cloud
- * Functions through Firebase Cloud Messaging (see `functions/index.js`).
- * This module is the client half: it asks for permission, gets an FCM
- * registration token, and keeps one document per token in `bbAnonPush`
- * carrying the member's monika and which of the three they want.
+ * Four things can notify a member — a reply to their post, a new
+ * announcement, a new post in General Chat, and the weekly digest — and all
+ * four are sent by Cloud Functions through Firebase Cloud Messaging (see
+ * `functions/index.js`). This module is the client half: it asks for
+ * permission, gets an FCM registration token, and keeps one document per
+ * token in `bbAnonPush` carrying the member's monika and which ones they want.
  *
  * Delivery paths, in the order they're tried:
  *
@@ -40,13 +40,21 @@
   var PREF_KEYS   = {
     replies:       'Anon_notifReplies',
     announcements: 'Anon_notifAnn',
+    posts:         'Anon_notifPosts',
     weekly:        'Anon_notifWeekly',
   };
   // What a member gets if they accept the opt-in sheet without touching the
   // rows. Replies and announcements are things that happened *to them* or to
-  // the board; the weekly digest is the one most likely to wear out its
-  // welcome, so it starts off.
-  var DEFAULT_PREFS = { replies: true, announcements: true, weekly: false };
+  // the board. New posts and the weekly digest are the ones most likely to
+  // wear out their welcome — on a busy day every post is a buzz — so both
+  // start off and are there for whoever wants them.
+  var DEFAULT_PREFS = { replies: true, announcements: true, posts: false, weekly: false };
+
+  function allOff() {
+    var out = {};
+    Object.keys(PREF_KEYS).forEach(function (k) { out[k] = false; });
+    return out;
+  }
 
   var _db       = null;
   var _identity = function () { return {}; };  // () => { monika, emailHash }
@@ -237,6 +245,7 @@
       prefs:       {
         replies:       !!prefs.replies,
         announcements: !!prefs.announcements,
+        posts:         !!prefs.posts,
         weekly:        !!prefs.weekly,
       },
       // Replies are addressed by monika: a post carries a name, not an account.
@@ -266,7 +275,7 @@
 
   /**
    * Turn notifications on: ask the OS, get a token, store the preferences.
-   * @param {{replies:boolean, announcements:boolean, weekly:boolean}} prefs
+   * @param {{replies:boolean, announcements:boolean, posts:boolean, weekly:boolean}} prefs
    * @returns {Promise<{ok:boolean, reason?:string}>} reason: 'unsupported' | 'denied' | 'no-token'
    */
   function enable(prefs) {
@@ -291,7 +300,7 @@
    * Persist a preference change made from the settings sheet. Turning the
    * last one off deletes the token document — the server then has nothing to
    * send to, which is the honest meaning of "off".
-   * @param {{replies:boolean, announcements:boolean, weekly:boolean}} prefs
+   * @param {{replies:boolean, announcements:boolean, posts:boolean, weekly:boolean}} prefs
    * @returns {Promise<{ok:boolean, reason?:string}>}
    */
   function savePrefs(prefs) {
@@ -318,7 +327,7 @@
       if (state !== 'granted') {
         // Revoked in Settings — stop claiming they're subscribed, and stop the
         // server sending into the void.
-        writePrefsLocally({ replies: false, announcements: false, weekly: false });
+        writePrefsLocally(allOff());
         var stale = get(TOKEN_KEY);
         remove(TOKEN_KEY);
         return deleteToken(stale);
@@ -340,7 +349,7 @@
     var token = get(TOKEN_KEY);
     remove(TOKEN_KEY);
     remove(ASKED_KEY);
-    writePrefsLocally({ replies: false, announcements: false, weekly: false });
+    writePrefsLocally(allOff());
     return deleteToken(token);
   }
 

@@ -4298,20 +4298,23 @@ async function submitSuggestion(text) {
 // ─────────────────────────────────────────────────────────────────
 // Notifications
 //
-// Three things can reach a member: a reply to their post, a new
-// announcement, and the weekly digest. All three are sent by Cloud
-// Functions over FCM; js/shared/anon-push.js owns permission, the
-// registration token and the bbAnonPush document. This is the UI half —
-// the opt-in sheet shown once after a first post, and the settings sheet.
+// Four things can reach a member: a reply to their post, a new
+// announcement, a new post in General Chat, and the weekly digest. All
+// four are sent by Cloud Functions over FCM; js/shared/anon-push.js owns
+// permission, the registration token and the bbAnonPush document. This is
+// the UI half — the opt-in sheet shown once after a first post, and the
+// settings sheet.
 // ─────────────────────────────────────────────────────────────────
 const NOTIF_ROWS = [
   { key: 'replies',       icon: '💬', name: 'anon.notif.replies',       sub: 'anon.notif.repliesSub' },
   { key: 'announcements', icon: '📢', name: 'anon.notif.announcements', sub: 'anon.notif.announcementsSub' },
+  { key: 'posts',         icon: '🆕', name: 'anon.notif.posts',         sub: 'anon.notif.postsSub' },
   { key: 'weekly',        icon: '📊', name: 'anon.notif.weekly',        sub: 'anon.notif.weeklySub' },
 ];
 const NOTIF_SHORT = {
   replies:       'anon.notif.shortReplies',
   announcements: 'anon.notif.shortAnnouncements',
+  posts:         'anon.notif.shortPosts',
   weekly:        'anon.notif.shortWeekly',
 };
 
@@ -4347,7 +4350,7 @@ function initPush() {
   push.refresh().catch(() => {});
 }
 
-// Render the three switches into a container. `prefs` is mutated in place so
+// Render the switches into a container. `prefs` is mutated in place so
 // the caller decides when (or whether) to persist.
 function renderNotifRows(containerId, prefs, onChange) {
   const el = document.getElementById(containerId);
@@ -4410,7 +4413,7 @@ async function updateNotifStatus() {
 async function openNotifSettings() {
   closeOv('ov-monika');
   const push  = _push();
-  const prefs = push ? push.getPrefs() : { replies: false, announcements: false, weekly: false };
+  const prefs = push ? push.getPrefs() : Object.fromEntries(NOTIF_ROWS.map(r => [r.key, false]));
   const note  = document.getElementById('notif-note');
 
   renderNotifRows('notif-rows', prefs, async (next, key) => {

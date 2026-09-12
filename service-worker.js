@@ -1006,7 +1006,13 @@
 //       star (added in v196) was missing from the bb-fm-full hide list, so it
 //       stayed on screen mid-entry as a lone floating button after the rest of
 //       the dock disappeared. Touches css/journal.css (precached).
-const CACHE_NAME = 'bipolarbear-v216';
+// v217: anonymous-board notifications gain a fourth switch, "New posts" —
+//       every member post in General Chat, off by default, sent by the new
+//       onAnonPostCreated function (never to the author's own devices; one
+//       collapse id so a burst replaces rather than stacks). Touches
+//       js/anonymous.js, js/shared/anon-push.js, js/shared/i18n.js (all
+//       precached).
+const CACHE_NAME = 'bipolarbear-v217';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

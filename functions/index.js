@@ -453,15 +453,16 @@ exports.onBetaSignup = onDocumentCreated(
 // ═══════════════════════════════════════════════════════════════════════════
 // Bipolar Anonymous — push notifications
 //
-// Three things reach a member, each gated on a preference they set in the
+// Four things reach a member, each gated on a preference they set in the
 // board's settings sheet (see js/shared/anon-push.js):
 //
 //   replies       — someone answered a post of theirs
 //   announcements — the admin published (or approved) an announcement
+//   posts         — someone else posted in General Chat
 //   weekly        — one digest of the week, Sunday evening
 //
 // Registrations live in bbAnonPush/{fcmToken}:
-//   { token, prefs: {replies, announcements, weekly}, monikaLower,
+//   { token, prefs: {replies, announcements, posts, weekly}, monikaLower,
 //     emailHash, platform, bundle, lang, updatedAt }
 //
 // Notifications deliberately carry NO post or comment text. The board is a
@@ -482,33 +483,43 @@ const FCM_BATCH       = 500;   // sendEachForMulticast ceiling
 const PUSH_TEXT = {
   en: { replyT: 'New reply',        replyB: 'Someone replied to your post on Bipolar Anonymous.',
         annT:   'New announcement', annB:   'There is a new announcement on the board.',
+        postT:  'New post', postB:  'Someone posted on Bipolar Anonymous.',
         weekT:  'Your week on the board', weekB: '{n} new posts this week. Come and see how everyone is doing.' },
   es: { replyT: 'Nueva respuesta',  replyB: 'Alguien ha respondido a tu publicación en Bipolar Anonymous.',
         annT:   'Nuevo anuncio',    annB:   'Hay un nuevo anuncio en el foro.',
+        postT:  'Nueva publicación', postB:  'Alguien ha publicado en Bipolar Anonymous.',
         weekT:  'Tu semana en el foro', weekB: '{n} publicaciones nuevas esta semana. Ven a ver cómo está todo el mundo.' },
   fr: { replyT: 'Nouvelle réponse', replyB: 'Quelqu’un a répondu à votre post sur Bipolar Anonymous.',
         annT:   'Nouvelle annonce', annB:   'Il y a une nouvelle annonce sur le forum.',
+        postT:  'Nouveau post', postB:  'Quelqu’un a publié sur Bipolar Anonymous.',
         weekT:  'Votre semaine sur le forum', weekB: '{n} nouveaux posts cette semaine. Venez voir comment vont les autres.' },
   de: { replyT: 'Neue Antwort',     replyB: 'Jemand hat auf Ihren Beitrag bei Bipolar Anonymous geantwortet.',
         annT:   'Neue Ankündigung', annB:   'Es gibt eine neue Ankündigung im Forum.',
+        postT:  'Neuer Beitrag', postB:  'Jemand hat etwas bei Bipolar Anonymous gepostet.',
         weekT:  'Ihre Woche im Forum', weekB: '{n} neue Beiträge diese Woche. Schauen Sie, wie es allen geht.' },
   it: { replyT: 'Nuova risposta',   replyB: 'Qualcuno ha risposto al tuo post su Bipolar Anonymous.',
         annT:   'Nuovo annuncio',   annB:   'C’è un nuovo annuncio sulla bacheca.',
+        postT:  'Nuovo post', postB:  'Qualcuno ha pubblicato su Bipolar Anonymous.',
         weekT:  'La tua settimana sulla bacheca', weekB: '{n} nuovi post questa settimana. Vieni a vedere come stanno tutti.' },
   pt: { replyT: 'Nova resposta',    replyB: 'Alguém respondeu à sua publicação no Bipolar Anonymous.',
         annT:   'Novo anúncio',     annB:   'Há um novo anúncio no fórum.',
+        postT:  'Nova publicação', postB:  'Alguém publicou no Bipolar Anonymous.',
         weekT:  'Sua semana no fórum', weekB: '{n} novas publicações esta semana. Venha ver como todos estão.' },
   nl: { replyT: 'Nieuwe reactie',   replyB: 'Iemand heeft gereageerd op je bericht op Bipolar Anonymous.',
         annT:   'Nieuwe mededeling', annB:  'Er staat een nieuwe mededeling op het forum.',
+        postT:  'Nieuw bericht', postB:  'Iemand heeft iets geplaatst op Bipolar Anonymous.',
         weekT:  'Jouw week op het forum', weekB: '{n} nieuwe berichten deze week. Kom kijken hoe het met iedereen gaat.' },
   pl: { replyT: 'Nowa odpowiedź',   replyB: 'Ktoś odpowiedział na Twój wpis na Bipolar Anonymous.',
         annT:   'Nowe ogłoszenie',  annB:   'Na forum pojawiło się nowe ogłoszenie.',
+        postT:  'Nowy wpis', postB:  'Ktoś dodał wpis na Bipolar Anonymous.',
         weekT:  'Twój tydzień na forum', weekB: '{n} nowych wpisów w tym tygodniu. Zobacz, co u innych.' },
   sv: { replyT: 'Nytt svar',        replyB: 'Någon har svarat på ditt inlägg på Bipolar Anonymous.',
         annT:   'Nytt meddelande',  annB:   'Det finns ett nytt meddelande på forumet.',
+        postT:  'Nytt inlägg', postB:  'Någon har skrivit ett inlägg på Bipolar Anonymous.',
         weekT:  'Din vecka på forumet', weekB: '{n} nya inlägg den här veckan. Kom och se hur alla mår.' },
   zh: { replyT: '有新回复',          replyB: '有人回复了你在 Bipolar Anonymous 的帖子。',
         annT:   '新公告',            annB:   '论坛有一条新公告。',
+        postT:  '新帖子', postB:  '有人在 Bipolar Anonymous 发布了新帖子。',
         weekT:  '你这一周的社区',      weekB: '本周有 {n} 条新帖子。来看看大家过得怎么样。' },
 };
 
@@ -521,13 +532,17 @@ function pushText(lang, key, vars) {
 
 /**
  * Registrations that want `pref`, optionally narrowed to one monika.
- * Preferences are filtered in code rather than in the query so a single
- * equality index serves every lookup.
+ * Narrowed to a monika, the query is a single equality on monikaLower and the
+ * preference is checked in code, so no composite index is needed. Board-wide
+ * sends query the preference itself — Firestore's automatic single-field
+ * index on `prefs.<pref>` covers it — so a send on every new post reads only
+ * the devices that asked for it, not every registration.
  * @returns {Promise<Array<{token: string, lang: string, monikaLower: string}>>}
  */
 async function subscribers(pref, monikaLower) {
-  let query = db.collection(PUSH_COLLECTION);
-  if (monikaLower) query = query.where('monikaLower', '==', monikaLower);
+  const query = monikaLower
+    ? db.collection(PUSH_COLLECTION).where('monikaLower', '==', monikaLower)
+    : db.collection(PUSH_COLLECTION).where(`prefs.${pref}`, '==', true);
   const snap = await query.get();
   return snap.docs
     .map((d) => ({ token: d.id, ...d.data() }))
@@ -538,11 +553,24 @@ async function subscribers(pref, monikaLower) {
  * Send one notification to a set of registrations, grouped by language, and
  * clear out tokens FCM tells us are dead. Returns how many were delivered.
  * @param {Array} recipients from subscribers()
- * @param {{titleKey: string, bodyKey: string, vars?: object, data?: object}} msg
+ * `collapse`, when given, makes every send under that id replace the previous
+ * one on the device (APNs collapse id, Android tag, web-push tag) and lets FCM
+ * drop the older ones queued for a device that's offline.
+ * @param {{titleKey: string, bodyKey: string, vars?: object, data?: object, collapse?: string}} msg
  * @returns {Promise<number>}
  */
 async function sendToRecipients(recipients, msg) {
   if (!recipients.length) return 0;
+
+  const apns    = { payload: { aps: { sound: 'default' } } };
+  const android = { notification: { icon: 'ic_stat_icon_config_sample', color: '#f5c800' } };
+  const webpush = {};
+  if (msg.collapse) {
+    apns.headers             = { 'apns-collapse-id': msg.collapse };
+    android.collapseKey      = msg.collapse;
+    android.notification.tag = msg.collapse;
+    webpush.notification     = { tag: msg.collapse };
+  }
 
   const byLang = new Map();
   recipients.forEach((r) => {
@@ -567,8 +595,9 @@ async function sendToRecipients(recipients, msg) {
           tokens,
           notification,
           data: Object.assign({ kind: msg.data && msg.data.kind ? msg.data.kind : 'anon' }, msg.data || {}),
-          apns: { payload: { aps: { sound: 'default' } } },
-          android: { notification: { icon: 'ic_stat_icon_config_sample', color: '#f5c800' } },
+          apns,
+          android,
+          webpush,
         });
       } catch (e) {
         console.error('[anonPush] send failed', e);
@@ -644,6 +673,37 @@ exports.onAnonAnnouncementCreated = onDocumentCreated(
       data:     { kind: 'announcement', postId: event.params.postId, url: '/anonymous.html' },
     });
     console.log(`[anonPush] announcement: ${sent}/${recipients.length}`);
+  }
+);
+
+// ── New posts ────────────────────────────────────────────────────────────────
+// Every member post in General Chat, to everyone who switched it on — except
+// the devices of whoever wrote it. The daily topic (created by whichever client
+// opens the board first that day, under a generated identity) and system cards
+// aren't something a member wrote, so they don't ring anyone's phone.
+// Announcements have their own switch above.
+//
+// This is the noisiest switch on a busy day, so every post notification shares
+// one collapse id: a burst replaces the one already in the tray instead of
+// stacking, and a phone that was offline gets the latest rather than all.
+exports.onAnonPostCreated = onDocumentCreated(
+  { document: 'bbAnonPosts/{postId}', region: REGION },
+  async (event) => {
+    const post = event.data && event.data.data();
+    if (!post || post.tab !== 'general' || post.deleted || post.isSystem || post.isTopic) return;
+
+    const author = (post.name || '').toLowerCase();
+    const recipients = (await subscribers('posts'))
+      .filter((r) => !author || r.monikaLower !== author);
+    if (!recipients.length) return;
+
+    const sent = await sendToRecipients(recipients, {
+      titleKey: 'postT',
+      bodyKey:  'postB',
+      collapse: 'anon-new-post',
+      data:     { kind: 'post', postId: event.params.postId, url: '/anonymous.html' },
+    });
+    console.log(`[anonPush] new post: ${sent}/${recipients.length}`);
   }
 );
 

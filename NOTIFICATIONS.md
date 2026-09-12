@@ -14,6 +14,7 @@ Work through it in any order; the three platforms are independent.
 |---|---|---|
 | Replies to your posts | a comment on a post you wrote | `onAnonCommentCreated` |
 | New announcements | anything published to the Announcements tab (posted by you, or a member's suggestion you approved) | `onAnonAnnouncementCreated` |
+| New posts | any member post in General Chat — not to the author's own devices, not for the daily topic. Off by default | `onAnonPostCreated` |
 | Weekly summary | Sundays 18:00 Europe/London, skipped in a week with no posts | `weeklyAnonDigest` |
 
 Plus `onAnonSuggestionCreated`, which emails you (via Resend, like feedback and
@@ -66,7 +67,7 @@ match /bbAnonPosts/{postId} {
 ```bash
 cd functions
 npm install
-firebase deploy --only functions:onAnonCommentCreated,functions:onAnonAnnouncementCreated,functions:weeklyAnonDigest,functions:onAnonSuggestionCreated
+firebase deploy --only functions:onAnonCommentCreated,functions:onAnonAnnouncementCreated,functions:onAnonPostCreated,functions:weeklyAnonDigest,functions:onAnonSuggestionCreated
 ```
 
 `weeklyAnonDigest` is a scheduled function, so the first deploy also creates a
@@ -148,7 +149,7 @@ Every subscribed device writes one document:
 
 ```
 bbAnonPush/{fcmToken}
-  prefs: { replies, announcements, weekly }
+  prefs: { replies, announcements, posts, weekly }
   monikaLower     — who to notify about replies (a post carries a monika, not an account)
   emailHash       — sha256 of the member's email, same key anonProfiles uses
   platform        — 'ios' | 'android' | 'web'
