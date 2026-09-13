@@ -117,9 +117,13 @@ Per app — `bipolarbear-native` (`com.bipolarbear.app`) and
 
 ## 4. Android (both apps)
 
-1. `google-services.json` for each package id must be in
-   `android/app/google-services.json`. Both apps already have one; if you
-   regenerate it, use the file for that exact package id.
+1. `google-services.json` must be in `android/app/google-services.json`. Both
+   apps have one (downloaded 2026-09-13 with `firebase apps:sdkconfig ANDROID
+   <appId>` — the file lists every Android app in the project, so the same
+   content serves both package ids). Status-bar icon:
+   `res/drawable/ic_stat_notify.xml` in each app — a white silhouette, since
+   Android paints every opaque pixel white — named by the functions'
+   `android.notification.icon` and set as FCM's default in the manifest.
 2. ```bash
    npm install
    npx cap sync android

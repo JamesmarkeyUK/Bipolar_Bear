@@ -563,7 +563,9 @@ async function sendToRecipients(recipients, msg) {
   if (!recipients.length) return 0;
 
   const apns    = { payload: { aps: { sound: 'default' } } };
-  const android = { notification: { icon: 'ic_stat_icon_config_sample', color: '#f5c800' } };
+  // ic_stat_notify is a white silhouette drawable in both Android apps
+  // (res/drawable/ic_stat_notify.xml); the status bar paints it, tinted yellow.
+  const android = { notification: { icon: 'ic_stat_notify', color: '#f5c800' } };
   // Web: the Firebase SDK in firebase-messaging-sw.js displays these itself,
   // so the icon has to travel with the message.
   const webpush = { notification: { icon: '/icons/favicons-anonymous/android-chrome-192x192.png' } };
