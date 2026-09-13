@@ -735,8 +735,8 @@ Lifecycle:
   narrowed before accepting (replies and announcements on, weekly off).
   Members who were subscribed before the posts switch existed, or who posted
   before notifications did, get the same sheet once on their next post
-  (`bbAnon_notifPostsAsked`). Anyone who has declined is never asked again —
-  declining sets `bbAnon_notifAsked` + `bbAnon_notifPostsAsked`, and settings
+  (`bbAnon_notifPostsAsked2`). Anyone who has declined is never asked again —
+  declining sets `bbAnon_notifAsked2` + `bbAnon_notifPostsAsked2`, and settings
   is the way back in. Outside that sheet (`defaultPrefs()`), new posts and the
   weekly digest — the two that can wear out their welcome — start off.
 - **Accepting only sticks if the registration was saved.** The switches are

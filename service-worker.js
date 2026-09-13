@@ -1027,7 +1027,14 @@
 //       opens the board. bbAnonPush writes sign in anonymously first (the
 //       rules require request.auth). Touches js/shared/firebase-config.js,
 //       js/shared/anon-push.js, js/anonymous.js (all precached).
-const CACHE_NAME = 'bipolarbear-v219';
+// v220: the first-post notification sheet could stay hidden for good.
+//       enable() marked the member "asked" before checking the device could
+//       deliver push, so any switch tapped in an older build (or on the web
+//       before v219) read as a past "Not now". It now marks only once the OS
+//       prompt is actually reachable, and the flags are renamed so the stale
+//       ones are ignored. Skipped sheets log why under bbDebug. Touches
+//       js/shared/anon-push.js, js/anonymous.js (all precached).
+const CACHE_NAME = 'bipolarbear-v220';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

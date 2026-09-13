@@ -4388,8 +4388,13 @@ function renderNotifRows(containerId, prefs, onChange, rows = NOTIF_ROWS) {
 // post. A past "Not now" is never re-asked; settings is always there.
 function maybeAskNotifications() {
   const push = _push();
-  if (!push || !push.isSupported() || push.hasBeenAskedAboutPosts()) return;
-  if (push.hasBeenAsked() && !push.anyOn()) return;   // declined before
+  // Every silent exit says why under bbDebug — "the sheet never came up" is
+  // otherwise indistinguishable from a device that can't do push at all.
+  const skip = why => { if (BB.log) BB.log('[notif-ask] skipped:', why); };
+  if (!push)                                { skip('no push module'); return; }
+  if (!push.isSupported())                  { skip('push unsupported on this device/build'); return; }
+  if (push.hasBeenAskedAboutPosts())        { skip('already asked about new posts'); return; }
+  if (push.hasBeenAsked() && !push.anyOn()) { skip('declined before'); return; }
   const prefs = push.anyOn() ? push.getPrefs() : push.defaultPrefs();
   prefs.posts = true;
   const rows = [

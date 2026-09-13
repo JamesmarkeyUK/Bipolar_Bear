@@ -36,11 +36,16 @@
   var SDK_VERSION = '10.7.1';           // must match the compat SDKs in anonymous.html
   var COLLECTION  = 'bbAnonPush';       // one doc per registration token
   var TOKEN_KEY   = 'Anon_pushToken';
-  var ASKED_KEY   = 'Anon_notifAsked';  // '1' once the opt-in sheet has been shown
-  // '1' once the member has seen the opt-in sheet since it started leading
-  // with new posts. Kept apart from ASKED_KEY so members asked before the
-  // posts switch existed can still be offered it — once.
-  var POSTS_ASKED_KEY = 'Anon_notifPostsAsked';
+  // '1' once the member has answered the opt-in sheet, or been shown the OS
+  // permission prompt from settings. The '2' drops flags written before v220:
+  // until then enable() set this even on a device with nothing to deliver
+  // with, so a switch tapped in an older build (or before web push existed)
+  // read as "declined" and hid the sheet for good.
+  var ASKED_KEY   = 'Anon_notifAsked2';
+  // Same, for the sheet since it started leading with new posts. Kept apart
+  // from ASKED_KEY so members asked before the posts switch existed can still
+  // be offered it — once.
+  var POSTS_ASKED_KEY = 'Anon_notifPostsAsked2';
   var PREF_KEYS   = {
     replies:       'Anon_notifReplies',
     announcements: 'Anon_notifAnn',
@@ -300,11 +305,13 @@
    */
   function enable(prefs) {
     prefs = prefs || DEFAULT_PREFS;
-    markAsked();
     // Nothing to deliver with (no plugin installed, no VAPID key): don't
     // store a preference the app can't honour — the settings sheet would
-    // then show a switch that is on while nothing is ever sent.
+    // then show a switch that is on while nothing is ever sent. Nor count it
+    // as having asked: no permission prompt was ever shown, and the
+    // first-post sheet must still appear once push works on this device.
     if (!isSupported()) return Promise.resolve({ ok: false, reason: 'unsupported' });
+    markAsked();
     return requestPermission().then(function (state) {
       if (state !== 'granted') return { ok: false, reason: 'denied' };
       wireNativeListeners();
