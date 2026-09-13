@@ -729,11 +729,20 @@ push via `firebase-messaging-compat` + `firebase-messaging-sw.js`, gated on
 
 Lifecycle:
 
-- **Asked once**, right after a member's first post (`maybeAskNotifications`),
-  with the four switches shown so the offer can be narrowed before accepting.
-  Replies and announcements default on; new posts and the weekly digest —
-  the two that can wear out their welcome — default off. Declining sets
-  `bbAnon_notifAsked` and is never revisited — settings is the way back in.
+- **Asked once**, right after a member's first post (`maybeAskNotifications`):
+  "Would you like to be notified when someone posts?", with New posts listed
+  first and switched on, and the other three beneath it so the offer can be
+  narrowed before accepting (replies and announcements on, weekly off).
+  Members who were subscribed before the posts switch existed, or who posted
+  before notifications did, get the same sheet once on their next post
+  (`bbAnon_notifPostsAsked`). Anyone who has declined is never asked again —
+  declining sets `bbAnon_notifAsked` + `bbAnon_notifPostsAsked`, and settings
+  is the way back in. Outside that sheet (`defaultPrefs()`), new posts and the
+  weekly digest — the two that can wear out their welcome — start off.
+- **Accepting only sticks if the registration was saved.** The switches are
+  written locally after the `bbAnonPush` write succeeds, so a refused write
+  (e.g. the Firestore rule not yet published) shows a failure toast instead
+  of switches that are on while nothing can be delivered.
 - **`refresh()` on every board init** — tokens rotate and permission can be
   revoked in the OS between visits. A revoked permission clears the local
   preferences and deletes the token document, so the sheet can't claim to be

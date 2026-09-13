@@ -4262,7 +4262,9 @@ function setupCompose() {
     if (!profile.hasPosted) {
       if (docId) BB.storage.set('Anon_firstPostId', docId);
       BB.storage.set('Anon_hasPosted', 'true');
-      openOv('ov-firstpost');
+      openOv('ov-firstpost');   // its close offers notifications
+    } else if (docId) {
+      maybeAskNotifications();  // no-op unless they've never seen the posts offer
     }
     _posting = false;
   });
@@ -4351,11 +4353,11 @@ function initPush() {
 }
 
 // Render the switches into a container. `prefs` is mutated in place so
-// the caller decides when (or whether) to persist.
-function renderNotifRows(containerId, prefs, onChange) {
+// the caller decides when (or whether) to persist. `rows` sets the order.
+function renderNotifRows(containerId, prefs, onChange, rows = NOTIF_ROWS) {
   const el = document.getElementById(containerId);
   if (!el) return;
-  el.innerHTML = NOTIF_ROWS.map(r => `
+  el.innerHTML = rows.map(r => `
     <button type="button" class="notif-row${prefs[r.key] ? ' on' : ''}" data-notif="${r.key}"
             role="switch" aria-checked="${prefs[r.key] ? 'true' : 'false'}">
       <span class="notif-ico">${r.icon}</span>
@@ -4376,15 +4378,26 @@ function renderNotifRows(containerId, prefs, onChange) {
   });
 }
 
-// One-time opt-in, offered after the first post — the moment a reply is
-// actually likely. Declining is remembered; the settings sheet is always there.
+// One-time opt-in, offered after a member's first post — "Would you like to
+// be notified when someone posts?" — leading with New posts, switched on, and
+// the other switches beneath it. Members subscribed before the posts switch
+// existed (or who posted before notifications did) get it once on their next
+// post. A past "Not now" is never re-asked; settings is always there.
 function maybeAskNotifications() {
   const push = _push();
-  if (!push || push.hasBeenAsked() || !push.isSupported()) return;
-  const prefs = push.defaultPrefs();
-  renderNotifRows('notif-ask-rows', prefs);
+  if (!push || !push.isSupported() || push.hasBeenAskedAboutPosts()) return;
+  if (push.hasBeenAsked() && !push.anyOn()) return;   // declined before
+  const prefs = push.anyOn() ? push.getPrefs() : push.defaultPrefs();
+  prefs.posts = true;
+  const rows = [
+    ...NOTIF_ROWS.filter(r => r.key === 'posts'),
+    ...NOTIF_ROWS.filter(r => r.key !== 'posts'),
+  ];
+  renderNotifRows('notif-ask-rows', prefs, null, rows);
   document.getElementById('notif-ask-yes').onclick = async () => {
     closeOv('ov-notif-ask');
+    // Every switch turned off is a "no", not a registration with nothing in it.
+    if (!push.anyOn(prefs)) { push.savePrefs(prefs); push.markAsked(); return; }
     const res = await push.enable(prefs);
     showHint(_wt(res.ok ? 'anon.toast.notifOn'
       : (res.reason === 'denied' ? 'anon.toast.notifDenied' : 'anon.toast.notifFailed')));

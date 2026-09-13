@@ -37,6 +37,10 @@
   var COLLECTION  = 'bbAnonPush';       // one doc per registration token
   var TOKEN_KEY   = 'Anon_pushToken';
   var ASKED_KEY   = 'Anon_notifAsked';  // '1' once the opt-in sheet has been shown
+  // '1' once the member has seen the opt-in sheet since it started leading
+  // with new posts. Kept apart from ASKED_KEY so members asked before the
+  // posts switch existed can still be offered it — once.
+  var POSTS_ASKED_KEY = 'Anon_notifPostsAsked';
   var PREF_KEYS   = {
     replies:       'Anon_notifReplies',
     announcements: 'Anon_notifAnn',
@@ -95,7 +99,8 @@
     return Object.keys(PREF_KEYS).some(function (k) { return !!prefs[k]; });
   }
   function hasBeenAsked()  { return get(ASKED_KEY) === '1'; }
-  function markAsked()     { set(ASKED_KEY, '1'); }
+  function hasBeenAskedAboutPosts() { return get(POSTS_ASKED_KEY) === '1'; }
+  function markAsked()     { set(ASKED_KEY, '1'); set(POSTS_ASKED_KEY, '1'); }
 
   // ── Capability ──────────────────────────────────────────────────────────
 
@@ -290,8 +295,19 @@
       wireNativeListeners();
       return fetchToken().then(function (token) {
         if (!token) return { ok: false, reason: 'no-token' };
-        writePrefsLocally(prefs);
-        return writeToken(token, prefs).then(function () { return { ok: true }; });
+        // The server only sends to what it can see. If the registration was
+        // refused (rules not published, offline), don't show switches as on.
+        return writeToken(token, prefs).then(function (ok) {
+          if (!ok) {
+            // Not registered server-side, so not ours to remember either —
+            // otherwise the next settings change would take the "already
+            // registered" path and update a document that doesn't exist.
+            remove(TOKEN_KEY);
+            return { ok: false, reason: 'no-token' };
+          }
+          writePrefsLocally(prefs);
+          return { ok: true };
+        });
       });
     });
   }
@@ -304,14 +320,26 @@
    * @returns {Promise<{ok:boolean, reason?:string}>}
    */
   function savePrefs(prefs) {
+    var before = getPrefs();
     writePrefsLocally(prefs);
     var token = get(TOKEN_KEY);
     if (!anyOn(prefs)) {
       remove(TOKEN_KEY);
       return deleteToken(token).then(function () { return { ok: true }; });
     }
-    if (token) return writeToken(token, prefs).then(function (ok) { return { ok: ok }; });
-    return enable(prefs);   // first row switched on from settings
+    if (token) {
+      // Refused: the server still holds the old preferences, so show those.
+      return writeToken(token, prefs).then(function (ok) {
+        if (!ok) writePrefsLocally(before);
+        return { ok: ok };
+      });
+    }
+    // First row switched on from settings. Nothing was registered before, so a
+    // refusal puts every switch back off rather than leaving one claiming on.
+    return enable(prefs).then(function (res) {
+      if (!res.ok) writePrefsLocally(allOff());
+      return res;
+    });
   }
 
   /**
@@ -349,6 +377,7 @@
     var token = get(TOKEN_KEY);
     remove(TOKEN_KEY);
     remove(ASKED_KEY);
+    remove(POSTS_ASKED_KEY);
     writePrefsLocally(allOff());
     return deleteToken(token);
   }
@@ -376,6 +405,7 @@
     defaultPrefs:    function () { return Object.assign({}, DEFAULT_PREFS); },
     anyOn:           function (p) { return anyOn(p || getPrefs()); },
     hasBeenAsked:    hasBeenAsked,
+    hasBeenAskedAboutPosts: hasBeenAskedAboutPosts,
     markAsked:       markAsked,
     enable:          enable,
     unregister:      unregister,

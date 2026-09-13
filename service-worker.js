@@ -1012,7 +1012,14 @@
 //       collapse id so a burst replaces rather than stacks). Touches
 //       js/anonymous.js, js/shared/anon-push.js, js/shared/i18n.js (all
 //       precached).
-const CACHE_NAME = 'bipolarbear-v217';
+// v218: the first-post notification sheet asks "Would you like to be notified
+//       when someone posts?" and leads with the New posts switch, on. Members
+//       subscribed before that switch existed (or who posted before
+//       notifications did) get it once on their next post; a past "Not now"
+//       is respected. Accepting no longer reports success when the bbAnonPush
+//       write fails. Touches anonymous.html, js/anonymous.js,
+//       js/shared/anon-push.js, js/shared/i18n.js (all precached).
+const CACHE_NAME = 'bipolarbear-v218';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

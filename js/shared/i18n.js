@@ -600,7 +600,7 @@
         notif: {
           title: "Notifications",
           sub: "Choose what's worth interrupting you for.",
-          askTitle: "Want to know when someone replies?",
+          askTitle: "Would you like to be notified when someone posts?",
           askSub: "We'll only send what you tick here. You can change it any time in your settings.",
           enable: "Turn on notifications",
           notNow: "Not now",
@@ -2346,7 +2346,7 @@
         notif: {
           title: "Notificaciones",
           sub: "Elige qué merece interrumpirte.",
-          askTitle: "¿Quieres saber cuándo alguien responde?",
+          askTitle: "¿Quieres recibir un aviso cuando alguien publique?",
           askSub: "Solo enviaremos lo que marques aquí. Puedes cambiarlo cuando quieras en tus ajustes.",
           enable: "Activar notificaciones",
           notNow: "Ahora no",
@@ -4071,7 +4071,7 @@
         notif: {
           title: "Notifications",
           sub: "Choisissez ce qui mérite de vous interrompre.",
-          askTitle: "Voulez-vous savoir quand quelqu’un vous répond ?",
+          askTitle: "Voulez-vous être prévenu quand quelqu’un publie ?",
           askSub: "Nous n'enverrons que ce que vous cochez ici. Vous pouvez le modifier à tout moment dans vos réglages.",
           enable: "Activer les notifications",
           notNow: "Pas maintenant",
@@ -5712,7 +5712,7 @@
         notif: {
           title: "Benachrichtigungen",
           sub: "Wählen Sie, wofür es sich zu stören lohnt.",
-          askTitle: "Möchten Sie erfahren, wenn jemand antwortet?",
+          askTitle: "Möchten Sie benachrichtigt werden, wenn jemand etwas postet?",
           askSub: "Wir senden nur, was Sie hier ankreuzen. Sie können es jederzeit in den Einstellungen ändern.",
           enable: "Benachrichtigungen einschalten",
           notNow: "Jetzt nicht",
@@ -7387,7 +7387,7 @@
         notif: {
           title: "Notifiche",
           sub: "Scegli cosa vale la pena interromperti.",
-          askTitle: "Vuoi sapere quando qualcuno risponde?",
+          askTitle: "Vuoi ricevere una notifica quando qualcuno pubblica?",
           askSub: "Invieremo solo ciò che selezioni qui. Puoi cambiarlo quando vuoi nelle impostazioni.",
           enable: "Attiva le notifiche",
           notNow: "Non ora",
@@ -9062,7 +9062,7 @@
         notif: {
           title: "Notificações",
           sub: "Escolha o que vale a pena interromper você.",
-          askTitle: "Quer saber quando alguém responder?",
+          askTitle: "Quer ser avisado quando alguém publicar?",
           askSub: "Só enviaremos o que você marcar aqui. Você pode mudar isso quando quiser nas configurações.",
           enable: "Ativar notificações",
           notNow: "Agora não",
@@ -10737,7 +10737,7 @@
         notif: {
           title: "Meldingen",
           sub: "Kies waarvoor je gestoord wilt worden.",
-          askTitle: "Wil je weten wanneer iemand reageert?",
+          askTitle: "Wil je een melding krijgen als iemand iets plaatst?",
           askSub: "We sturen alleen wat je hier aanvinkt. Je kunt dit altijd wijzigen in je instellingen.",
           enable: "Meldingen aanzetten",
           notNow: "Niet nu",
@@ -12412,7 +12412,7 @@
         notif: {
           title: "Powiadomienia",
           sub: "Wybierz, co warte jest przerwania Ci dnia.",
-          askTitle: "Chcesz wiedzieć, gdy ktoś odpowie?",
+          askTitle: "Chcesz dostawać powiadomienie, gdy ktoś coś opublikuje?",
           askSub: "Wyślemy tylko to, co tu zaznaczysz. Możesz to zmienić w każdej chwili w ustawieniach.",
           enable: "Włącz powiadomienia",
           notNow: "Nie teraz",
@@ -14095,7 +14095,7 @@
         notif: {
           title: "Notiser",
           sub: "Välj vad som är värt att avbryta dig för.",
-          askTitle: "Vill du veta när någon svarar?",
+          askTitle: "Vill du få en notis när någon skriver ett inlägg?",
           askSub: "Vi skickar bara det du kryssar i här. Du kan ändra det när som helst i inställningarna.",
           enable: "Slå på notiser",
           notNow: "Inte nu",
@@ -15770,7 +15770,7 @@
         notif: {
           title: "通知",
           sub: "选择哪些事值得打扰你。",
-          askTitle: "想在有人回复时收到提醒吗？",
+          askTitle: "想在有人发帖时收到通知吗？",
           askSub: "我们只会发送你在此勾选的内容。你随时可以在设置中更改。",
           enable: "开启通知",
           notNow: "暂不开启",
