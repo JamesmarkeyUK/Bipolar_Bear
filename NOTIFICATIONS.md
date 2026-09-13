@@ -8,6 +8,10 @@ sheet — nothing breaks, it just says so.
 
 Work through it in any order; the three platforms are independent.
 
+**Status (2026-09-13):** Firestore rules (§1) published, Cloud Functions (§2)
+deployed, web push key (§5) set in v219. Remaining: Android (§4) and iOS (§3),
+for both apps.
+
 ## What gets sent
 
 | Setting | Trigger | Cloud Function |

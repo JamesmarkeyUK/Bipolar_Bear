@@ -34,4 +34,4 @@ window.BB_FIREBASE_CONFIG = {
  * the settings sheet says so instead of failing at getToken(). Native builds
  * don't use it at all — they go through FCM's own registration.
  */
-window.BB_PUSH_VAPID_KEY = '';
+window.BB_PUSH_VAPID_KEY = 'BNub0J3a3KbqjXjf6ym4sMVN8D-lHMVhofk_eF0Gq7yEHtEJWM1T1FGYgMN00hWgrqhZ5dpRvpDAr_-OjcQcVGw';

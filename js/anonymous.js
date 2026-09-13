@@ -4342,6 +4342,9 @@ function initPush() {
   push.configure({
     db,
     identity: () => ({ monika: profile.monika, emailHash: _pushEmailHash }),
+    // bbAnonPush writes require request.auth, and standalone members have no
+    // Firebase session until something asks for one.
+    ensureAuth: _ensureAuthSession,
     // A push that lands while the board is open belongs in the page, not in
     // the notification tray.
     onMessage: payload => {

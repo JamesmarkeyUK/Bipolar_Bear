@@ -1019,7 +1019,15 @@
 //       is respected. Accepting no longer reports success when the bbAnonPush
 //       write fails. Touches anonymous.html, js/anonymous.js,
 //       js/shared/anon-push.js, js/shared/i18n.js (all precached).
-const CACHE_NAME = 'bipolarbear-v218';
+// v219: web push for the anonymous board is switched on — BB_PUSH_VAPID_KEY
+//       is filled in. firebase-messaging-sw.js now registers under its own
+//       scope instead of '/', where it would have evicted this worker (and
+//       been evicted back on the next journal visit, dropping pushes). It no
+//       longer double-shows a push Firebase already displayed, and a click
+//       opens the board. bbAnonPush writes sign in anonymously first (the
+//       rules require request.auth). Touches js/shared/firebase-config.js,
+//       js/shared/anon-push.js, js/anonymous.js (all precached).
+const CACHE_NAME = 'bipolarbear-v219';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

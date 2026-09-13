@@ -564,12 +564,14 @@ async function sendToRecipients(recipients, msg) {
 
   const apns    = { payload: { aps: { sound: 'default' } } };
   const android = { notification: { icon: 'ic_stat_icon_config_sample', color: '#f5c800' } };
-  const webpush = {};
+  // Web: the Firebase SDK in firebase-messaging-sw.js displays these itself,
+  // so the icon has to travel with the message.
+  const webpush = { notification: { icon: '/icons/favicons-anonymous/android-chrome-192x192.png' } };
   if (msg.collapse) {
     apns.headers             = { 'apns-collapse-id': msg.collapse };
     android.collapseKey      = msg.collapse;
     android.notification.tag = msg.collapse;
-    webpush.notification     = { tag: msg.collapse };
+    webpush.notification.tag = msg.collapse;
   }
 
   const byLang = new Map();

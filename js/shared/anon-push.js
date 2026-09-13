@@ -63,6 +63,9 @@
   var _db       = null;
   var _identity = function () { return {}; };  // () => { monika, emailHash }
   var _onMessage = null;                       // foreground push handler
+  // () => Promise — makes sure there's a Firebase Auth session before a
+  // bbAnonPush write (the rules require one). Deletes don't need it.
+  var _ensureAuth = function () { return Promise.resolve(); };
   var _wired    = false;                       // native listeners attached once
 
   function store() { return (window.BB && window.BB.storage) || null; }
@@ -196,7 +199,15 @@
   function webToken() {
     return loadMessagingSdk().then(function (ok) {
       if (!ok) return null;
-      return navigator.serviceWorker.register('firebase-messaging-sw.js')
+      // Its own scope, never '/': service-worker.js (the offline cache) owns
+      // '/', and one scope holds one worker — registering this one there
+      // would evict the cache worker, and the next journal visit would evict
+      // this one back, silently dropping every push. Push events reach a
+      // registration whatever its scope; this is the scope Firebase itself
+      // uses when it registers its own worker.
+      return navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+        scope: '/firebase-cloud-messaging-push-scope',
+      })
         .then(function (reg) {
           var messaging = firebase.messaging();
           if (_onMessage && !messaging._bbOnMessageWired) {
@@ -265,8 +276,12 @@
 
   function writeToken(token, prefs) {
     if (!_db || !token) return Promise.resolve(false);
-    return _db.collection(COLLECTION).doc(token)
-      .set(tokenDoc(token, prefs), { merge: true })
+    return Promise.resolve()
+      .then(function () { return _ensureAuth(); })
+      .catch(function () {})   // no session → the write below reports the refusal
+      .then(function () {
+        return _db.collection(COLLECTION).doc(token).set(tokenDoc(token, prefs), { merge: true });
+      })
       .then(function () { return true; })
       .catch(function (e) { log('[anonPush] token write failed', e); return false; });
   }
@@ -394,6 +409,7 @@
     if (opts.db)        _db = opts.db;
     if (opts.identity)  _identity = opts.identity;
     if (opts.onMessage) _onMessage = opts.onMessage;
+    if (opts.ensureAuth) _ensureAuth = opts.ensureAuth;
   }
 
   window.BB = window.BB || {};
