@@ -9,8 +9,18 @@ sheet — nothing breaks, it just says so.
 Work through it in any order; the three platforms are independent.
 
 **Status (2026-09-13):** Firestore rules (§1) published, Cloud Functions (§2)
-deployed, web push key (§5) set in v219. Remaining: Android (§4) and iOS (§3),
-for both apps.
+deployed, web push key (§5) set in v219. Android (§4) done for both apps (debug
+builds verified). iOS (§3): both apps registered in Firebase, and in both
+native repos the plist, plugin, AppDelegate hooks, `aps-environment`
+entitlement and *Remote notifications* background mode are committed — so the
+Xcode half of steps 3–5 is already done. Remaining: the APNs key (steps 1–2)
+and a real-device build.
+
+iOS bundle ids differ from Android for the main app: **`com.app.bipolarbear`**
+(iOS) vs `com.bipolarbear.app` (Android). Both native projects need
+`@capacitor/cli` ≥ 8.4 for the plugin's SPM `packageOptions` symlink (they're on
+8.5.2), and `bipolarbear-native/ios/App/App.xcodeproj` is a symlink to
+`BipolarBear.xcodeproj` so `cap sync` can find the renamed project.
 
 ## What gets sent
 
@@ -90,7 +100,7 @@ firebase functions:log --only weeklyAnonDigest
 
 ## 3. iOS (both apps)
 
-Per app — `bipolarbear-native` (`com.bipolarbear.app`) and
+Per app — `bipolarbear-native` (iOS bundle `com.app.bipolarbear`) and
 `bipolaranonymous-native` (`com.bipolaranonymous.app`):
 
 1. **APNs key** (once for the whole Apple team, not per app):
