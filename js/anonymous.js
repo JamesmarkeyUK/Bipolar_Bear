@@ -3749,6 +3749,10 @@ function setupThread() {
 
     if (sent) {
       ta.value = '';
+      // A reply is posting too — often a member's first contribution — so
+      // offer notifications here as well. No-op once the sheet has been
+      // answered, or on a device that can't do push.
+      maybeAskNotifications();
     } else {
       // Keep the typed text so the user can retry, and say what happened —
       // previously this failed silently and the comment just vanished.
@@ -4381,7 +4385,7 @@ function renderNotifRows(containerId, prefs, onChange, rows = NOTIF_ROWS) {
   });
 }
 
-// One-time opt-in, offered after a member's first post — "Would you like to
+// One-time opt-in, offered after a member's first post or reply — "Would you like to
 // be notified when someone posts?" — leading with New posts, switched on, and
 // the other switches beneath it. Members subscribed before the posts switch
 // existed (or who posted before notifications did) get it once on their next

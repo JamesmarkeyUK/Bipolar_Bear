@@ -1034,7 +1034,12 @@
 //       prompt is actually reachable, and the flags are renamed so the stale
 //       ones are ignored. Skipped sheets log why under bbDebug. Touches
 //       js/shared/anon-push.js, js/anonymous.js (all precached).
-const CACHE_NAME = 'bipolarbear-v220';
+// v221: the notification sheet is offered after a reply too, not only after a
+//       new post, and now stacks above the thread sheet — both overlays were
+//       z-index 100 and the thread comes later in the DOM, so the sheet would
+//       have opened hidden behind it. Touches js/anonymous.js,
+//       css/anonymous.css (both precached).
+const CACHE_NAME = 'bipolarbear-v221';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

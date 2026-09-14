@@ -729,12 +729,12 @@ push via `firebase-messaging-compat` + `firebase-messaging-sw.js`, gated on
 
 Lifecycle:
 
-- **Asked once**, right after a member's first post (`maybeAskNotifications`):
+- **Asked once**, right after a member's first post or reply (`maybeAskNotifications`):
   "Would you like to be notified when someone posts?", with New posts listed
   first and switched on, and the other three beneath it so the offer can be
   narrowed before accepting (replies and announcements on, weekly off).
   Members who were subscribed before the posts switch existed, or who posted
-  before notifications did, get the same sheet once on their next post
+  before notifications did, get the same sheet once on their next post or reply
   (`bbAnon_notifPostsAsked2`). Anyone who has declined is never asked again —
   declining sets `bbAnon_notifAsked2` + `bbAnon_notifPostsAsked2`, and settings
   is the way back in. Outside that sheet (`defaultPrefs()`), new posts and the
