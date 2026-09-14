@@ -8,13 +8,13 @@ sheet — nothing breaks, it just says so.
 
 Work through it in any order; the three platforms are independent.
 
-**Status (2026-09-13):** Firestore rules (§1) published, Cloud Functions (§2)
-deployed, web push key (§5) set in v219. Android (§4) done for both apps (debug
-builds verified). iOS (§3): both apps registered in Firebase, and in both
-native repos the plist, plugin, AppDelegate hooks, `aps-environment`
-entitlement and *Remote notifications* background mode are committed — so the
-Xcode half of steps 3–5 is already done. Remaining: the APNs key (steps 1–2)
-and a real-device build.
+**Status (2026-09-14): all done.** Firestore rules (§1) published, Cloud
+Functions (§2) deployed, web push key (§5) set in v219, Android (§4) set up in
+both apps, and iOS (§3) set up in both apps with the APNs key (Universal
+Simulation Ltd team, `ZH9C5TS86A`) uploaded to Firebase. Verified end to end on
+2026-09-14: a reply notification (`onAnonCommentCreated`, logged `reply → …:
+1/1`) reached a development build of Bipolar Anonymous on an iPhone. None of it reaches store users until the next App Store
+and Play releases of both apps.
 
 iOS bundle ids differ from Android for the main app: **`com.app.bipolarbear`**
 (iOS) vs `com.bipolarbear.app` (Android). Both native projects need
