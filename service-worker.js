@@ -1039,7 +1039,11 @@
 //       z-index 100 and the thread comes later in the DOM, so the sheet would
 //       have opened hidden behind it. Touches js/anonymous.js,
 //       css/anonymous.css (both precached).
-const CACHE_NAME = 'bipolarbear-v221';
+// v222: release 1.34 — in-app changelog: What's New headline for 1.34
+//       (js/index.js) and a v1.34 block in the journal's changelog modal
+//       (journal.html). Bipolar Anonymous native rebumped to 1.34 (build 34)
+//       to match. Touches js/index.js, journal.html (both precached).
+const CACHE_NAME = 'bipolarbear-v222';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
