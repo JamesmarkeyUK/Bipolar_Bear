@@ -14,7 +14,10 @@ const RESEND_API_KEY = defineSecret('RESEND_API_KEY');
 
 const REGION          = 'europe-west1';
 const FROM_ADDRESS    = 'Bipolar Anonymous <bipolar@mail.unisim.co.uk>';
-const FEEDBACK_TO     = 'inbox@jamesmarkey.co.uk';
+// Where admin notifications go (feedback, beta signups, announcement
+// suggestions). Not the admin *account* — that stays inbox@jamesmarkey.co.uk
+// (Firestore rules, ADMIN_EMAIL in js/anonymous.js).
+const FEEDBACK_TO     = 'jamesmarkey@gmail.com';
 const CODE_TTL_MS     = 10 * 60 * 1000; // 10 minutes
 const RATE_LIMIT      = 3;              // max codes per email per window
 const MAX_ATTEMPTS    = 5;             // wrong-code attempts before lockout
