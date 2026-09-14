@@ -1114,11 +1114,19 @@
       screenshot: _fbScreenshotData || null,
     };
     try {
-      const _db = window.db || (window.firebase && window.firebase.firestore ? window.firebase.firestore() : null);
-      if (_db) {
-        if (!window.currentUser && window.auth) { try { await window.auth.signInAnonymously(); } catch (e) {} }
-        await _db.collection('feedback').add(payload);
-      }
+      const _fb   = window.firebase;
+      const _db   = window.db || (_fb && _fb.firestore ? _fb.firestore() : null);
+      // Not every page mirrors its auth handle onto window (survival-kit keeps
+      // `let auth`), so fall back to the SDK's own — and go by the SDK's real
+      // session, not window.currentUser, which pages null out for anonymous users.
+      const _auth = window.auth || (_fb && _fb.auth ? _fb.auth() : null);
+      // No Firestore means nothing gets sent: say so, rather than thanking the
+      // user for feedback that went nowhere.
+      if (!_db) throw new Error('feedback: Firestore unavailable');
+      // The rules only accept feedback from a signed-in session, so a guest
+      // gets an anonymous one first.
+      if (_auth && !_auth.currentUser) { try { await _auth.signInAnonymously(); } catch (e) {} }
+      await _db.collection('feedback').add(payload);
       window.closeFabFeedback();
       alert(_bbT('fab.fb.thanks', 'Thanks for your feedback! 🐻'));
     } catch (e) {

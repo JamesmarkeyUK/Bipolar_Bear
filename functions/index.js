@@ -313,9 +313,10 @@ function feedbackEmailHtml(d) {
       <td style="padding:8px 12px;font-size:13px;color:${DARK};word-break:break-word;">${String(value).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>
     </tr>`).join('');
 
-  const screenshotHtml = d.screenshot
-    ? `<p style="margin:20px 0 8px;font-size:13px;font-weight:600;color:${MUTED};">Screenshot</p>
-       <img src="${d.screenshot}" alt="screenshot" style="max-width:100%;border-radius:10px;border:1px solid #e5e7eb;">`
+  // The screenshot travels as an attachment (screenshotAttachment below):
+  // Gmail and Outlook strip data: URIs from <img>, so inline it showed broken.
+  const screenshotHtml = screenshotAttachment(d.screenshot)
+    ? `<p style="margin:20px 0 0;font-size:13px;font-weight:600;color:${MUTED};">📎 Screenshot attached</p>`
     : '';
 
   return `<!DOCTYPE html>
@@ -355,6 +356,16 @@ function feedbackEmailHtml(d) {
 </html>`;
 }
 
+// A feedback screenshot arrives as a data: URL (fab.js compresses it to a
+// ≤900px JPEG before it's stored). It's sent as an attachment — Gmail and
+// Outlook strip data: URIs from <img>, so inline it only ever showed broken.
+// Anything that isn't a base64 PNG/JPEG data URL is ignored, not trusted.
+function screenshotAttachment(dataUrl) {
+  const m = /^data:image\/(jpeg|jpg|png);base64,([A-Za-z0-9+/=]+)$/.exec(String(dataUrl || ''));
+  if (!m) return null;
+  return { filename: `screenshot.${m[1] === 'png' ? 'png' : 'jpg'}`, content: Buffer.from(m[2], 'base64') };
+}
+
 exports.onFeedbackSubmitted = onDocumentCreated(
   { document: 'feedback/{docId}', region: REGION, secrets: [RESEND_API_KEY] },
   async (event) => {
@@ -363,16 +374,20 @@ exports.onFeedbackSubmitted = onDocumentCreated(
     const subject = `[BipolarBear] New ${typeLabel} from ${d.email || d.uid || 'guest'}`;
 
     const resend = new Resend(RESEND_API_KEY.value());
+    const shot   = screenshotAttachment(d.screenshot);
     const { error } = await resend.emails.send({
       from:    FROM_ADDRESS,
       to:      FEEDBACK_TO,
       subject,
       html:    feedbackEmailHtml(d),
+      ...(shot ? { attachments: [shot] } : {}),
       text:    `Type: ${typeLabel}\nMessage: ${d.message || ''}\nPage: ${d.page || ''}\nPlatform: ${d.platform || ''}\nUID: ${d.uid || 'guest'}\nUser email: ${d.email || '—'}\nNotify: ${d.notify ? 'yes' : 'no'}\nTime: ${d.ts ? new Date(d.ts).toUTCString() : 'unknown'}`,
     });
 
     if (error) {
       console.error('[onFeedbackSubmitted] Resend error:', JSON.stringify(error));
+    } else {
+      console.log(`[onFeedbackSubmitted] emailed ${typeLabel}${shot ? ' + screenshot' : ''} (${event.params.docId})`);
     }
   }
 );

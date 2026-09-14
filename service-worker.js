@@ -1043,7 +1043,12 @@
 //       (js/index.js) and a v1.34 block in the journal's changelog modal
 //       (journal.html). Bipolar Anonymous native rebumped to 1.34 (build 34)
 //       to match. Touches js/index.js, journal.html (both precached).
-const CACHE_NAME = 'bipolarbear-v222';
+// v223: feedback form fixes (fab.js). It no longer thanks the user when
+//       Firestore isn't available (the feedback silently went nowhere), and a
+//       guest is signed in through the SDK's own auth when a page doesn't
+//       mirror window.auth — survival-kit didn't, so guest feedback from there
+//       was refused by the rules. Touches fab.js (precached).
+const CACHE_NAME = 'bipolarbear-v223';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
