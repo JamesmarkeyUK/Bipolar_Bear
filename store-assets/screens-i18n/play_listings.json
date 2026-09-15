@@ -1,0 +1,54 @@
+{
+ "bipolarbear": {
+  "releaseName": "35 (1.35)",
+  "listing": {
+   "es": { "title": "Bipolar Bear (Diario de ánimo)", "shortDescription": "Registra ánimo, sueño y energía. Entiende tu mente bipolar." },
+   "fr": { "title": "Bipolar Bear (suivi d'humeur)", "shortDescription": "Suis ton humeur, ton sommeil et ton énergie. Comprends ton esprit bipolaire." },
+   "de": { "title": "Bipolar Bear (Stimmungs-App)", "shortDescription": "Stimmung, Schlaf & Energie erfassen – und deine Bipolarität verstehen." },
+   "it": { "title": "Bipolar Bear (Diario umore)", "shortDescription": "Registra umore, sonno ed energia. Capisci la tua mente bipolare." },
+   "pt": { "title": "Bipolar Bear (Diário de humor)", "shortDescription": "Regista humor, sono e energia. Compreende a tua mente bipolar." },
+   "nl": { "title": "Bipolar Bear (Humeurdagboek)", "shortDescription": "Volg je stemming, slaap en energie. Begrijp je bipolaire brein." },
+   "pl": { "title": "Bipolar Bear Dziennik nastroju", "shortDescription": "Śledź nastrój, sen i energię. Zrozum swój dwubiegunowy umysł." },
+   "sv": { "title": "Bipolar Bear (Humördagbok)", "shortDescription": "Följ humör, sömn och energi. Förstå ditt bipolära sinne." },
+   "zh": { "title": "Bipolar Bear（情绪日记）", "shortDescription": "记录情绪、睡眠与精力，读懂你的双相心绪。" }
+  },
+  "releaseNotes": {
+   "en": "Journal steps now show “Step 1 of 7” in your language, plus small fixes and improvements.",
+   "es": "Los pasos del diario ahora muestran «Paso 1 de 7» en tu idioma, además de pequeñas correcciones y mejoras.",
+   "fr": "Les étapes du journal affichent désormais « Étape 1 sur 7 » dans ta langue, plus de petites corrections et améliorations.",
+   "de": "Die Schritte im Tagebuch zeigen „Schritt 1 von 7“ jetzt in deiner Sprache – dazu kleine Korrekturen und Verbesserungen.",
+   "it": "I passaggi del diario ora mostrano «Passo 1 di 7» nella tua lingua, più piccole correzioni e miglioramenti.",
+   "pt": "Os passos do diário mostram agora «Passo 1 de 7» no teu idioma, além de pequenas correções e melhorias.",
+   "nl": "De stappen in het dagboek tonen nu ‘Stap 1 van 7’ in jouw taal, plus kleine verbeteringen en oplossingen.",
+   "pl": "Kroki w dzienniku pokazują teraz „Krok 1 z 7” w Twoim języku, do tego drobne poprawki i ulepszenia.",
+   "sv": "Dagbokens steg visar nu ”Steg 1 av 7” på ditt språk, plus små rättningar och förbättringar.",
+   "zh": "日记的分步流程现在会用你的语言显示“第 1 步，共 7 步”，并包含一些小修复和改进。"
+  }
+ },
+ "anonymous": {
+  "releaseName": "35 (1.35)",
+  "listing": {
+   "es": { "title": "Bipolar Anonymous", "shortDescription": "Apoyo anónimo entre iguales para el bipolar: aquí no estás solo" },
+   "fr": { "title": "Bipolar Anonymous", "shortDescription": "Entraide anonyme autour du trouble bipolaire – ici, tu n'es pas seul" },
+   "de": { "title": "Bipolar Anonymous", "shortDescription": "Anonyme Unterstützung bei Bipolarität – hier bist du nicht allein" },
+   "it": { "title": "Bipolar Anonymous", "shortDescription": "Supporto anonimo tra pari per il bipolare: qui non sei solo" },
+   "pt": { "title": "Bipolar Anonymous", "shortDescription": "Apoio anónimo entre pares para a bipolaridade – aqui não estás só" },
+   "nl": { "title": "Bipolar Anonymous", "shortDescription": "Anonieme steun van lotgenoten bij bipolariteit – je bent niet alleen" },
+   "pl": { "title": "Bipolar Anonymous", "shortDescription": "Anonimowe wsparcie w chorobie dwubiegunowej – nie jesteś tu sam" },
+   "sv": { "title": "Bipolar Anonymous", "shortDescription": "Anonymt kamratstöd vid bipolär sjukdom – här är du inte ensam" },
+   "zh": { "title": "Bipolar Anonymous", "shortDescription": "双相情感障碍匿名同伴互助——在这里你并不孤单" }
+  },
+  "releaseNotes": {
+   "en": "Small fixes and improvements to keep the community running smoothly.",
+   "es": "Pequeñas correcciones y mejoras para que la comunidad funcione sin problemas.",
+   "fr": "Petites corrections et améliorations pour que la communauté fonctionne sans accroc.",
+   "de": "Kleine Korrekturen und Verbesserungen, damit die Community reibungslos läuft.",
+   "it": "Piccole correzioni e miglioramenti per far funzionare al meglio la community.",
+   "pt": "Pequenas correções e melhorias para a comunidade funcionar sem problemas.",
+   "nl": "Kleine verbeteringen en oplossingen zodat de community soepel blijft draaien.",
+   "pl": "Drobne poprawki i ulepszenia, by społeczność działała bez zakłóceń.",
+   "sv": "Små rättningar och förbättringar så att gemenskapen fungerar smidigt.",
+   "zh": "细节修复与改进，让社区运行更顺畅。"
+  }
+ }
+}
