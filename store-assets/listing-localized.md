@@ -1012,5 +1012,8 @@ Bipolar Anonymous 提供的是同伴支持，而非专业医疗照护。它不�
   `CFBundleLocalizations` array (all 10 locale codes) to the app's `Info.plist`
   in Xcode, and/or rely on the localised listings above (which is what actually
   drives search visibility).
-- **The other 6 locales (it, pt, nl, pl, sv, zh):** not drafted here — say the
-  word and I'll extend this file to cover them in the same format.
+- **Upload source:** `asc-upload.mjs` doesn't read this file — it reads
+  `screens-i18n/listing_bipolarbear.json`, generated from §1 + §3 above with
+  keywords trimmed to App Store's **100-byte** limit (es/pt/sv/zh lost their last
+  keyword(s); accented letters are 2 bytes, Chinese 3) plus the current
+  release's What's New. Edit the JSON (or both) when the copy changes.
