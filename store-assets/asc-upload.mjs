@@ -193,19 +193,26 @@ for (const lang of langs) {
   console.log(`${lang} → ${locale}`);
   try {
     const isNew = lang !== 'en';
+    // New locales copy name + URLs from the primary locale wherever they're still blank.
+    const fill = (loc, f, v) => (isNew && !loc?.attributes[f] ? v || undefined : undefined);
     const infoLoc = infoLocs.find(l => l.attributes.locale === locale);
     if (info) await syncLoc('App Information', infoLoc, [
-      ['name', L.name ?? (infoLoc || !isNew ? undefined : pInfo.attributes.name)],
+      ['name', L.name ?? fill(infoLoc, 'name', pInfo.attributes.name)],
       ['subtitle', L.subtitle],
-      ['privacyPolicyUrl', infoLoc || !isNew ? undefined : pInfo.attributes.privacyPolicyUrl],
+      ['privacyPolicyUrl', fill(infoLoc, 'privacyPolicyUrl', pInfo.attributes.privacyPolicyUrl)],
     ], a => ({ data: { type: 'appInfoLocalizations', attributes: { locale, ...a },
       relationships: { appInfo: rel('appInfos', info.id) } } }), 'appInfoLocalizations');
 
     let verLoc = verLocs.find(l => l.attributes.locale === locale);
+    // Creating an App Information localisation makes App Store Connect add an empty
+    // version localisation for that locale too — re-read so we update, not re-create.
+    if (!verLoc && ver && APPLY)
+      verLoc = (await listLocs(`/v1/appStoreVersions/${ver.id}/appStoreVersionLocalizations`))
+        .find(l => l.attributes.locale === locale);
     if (ver || !APPLY) verLoc = await syncLoc(`Version ${VERSION}`, verLoc, [
       ...VER_FIELDS.map(f => [f, L[f]]),
-      ['supportUrl', verLoc || !isNew ? undefined : pVer.attributes.supportUrl],
-      ['marketingUrl', verLoc || !isNew ? undefined : (pVer.attributes.marketingUrl || undefined)],
+      ['supportUrl', fill(verLoc, 'supportUrl', pVer.attributes.supportUrl)],
+      ['marketingUrl', fill(verLoc, 'marketingUrl', pVer.attributes.marketingUrl)],
     ], a => ({ data: { type: 'appStoreVersionLocalizations', attributes: { locale, ...a },
       relationships: { appStoreVersion: rel('appStoreVersions', ver.id) } } }), 'appStoreVersionLocalizations');
 
