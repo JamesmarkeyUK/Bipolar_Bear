@@ -1,0 +1,62 @@
+{
+ "en": {
+  "head1": "You're not<br><span class=\"hl\">alone.</span>",
+  "sub1": "An anonymous peer community for bipolar —<br>share, ask, and support. No names, no judgement.",
+  "head2": "Real people<br>who get it",
+  "sub2": "Post anonymously and get honest replies from<br>people living the same highs and lows."
+ },
+ "es": {
+  "head1": "No estás<br><span class=\"hl\">solo.</span>",
+  "sub1": "Una comunidad anónima de apoyo entre iguales —<br>comparte, pregunta y apoya. Sin nombres ni juicios.",
+  "head2": "Gente real<br>que te entiende",
+  "sub2": "Publica en anonimato y recibe respuestas sinceras<br>de quienes viven los mismos altibajos."
+ },
+ "fr": {
+  "head1": "Tu n'es pas<br><span class=\"hl\">seul.</span>",
+  "sub1": "Une communauté d'entraide anonyme —<br>partage, demande, soutiens. Sans nom ni jugement.",
+  "head2": "Des gens qui<br>comprennent",
+  "sub2": "Publie anonymement et reçois des réponses sincères<br>de gens qui vivent les mêmes hauts et bas."
+ },
+ "de": {
+  "head1": "Du bist nicht<br><span class=\"hl\">allein.</span>",
+  "sub1": "Eine anonyme Peer-Community rund um Bipolarität —<br>teilen, fragen, unterstützen. Ohne Namen, ohne Urteil.",
+  "head2": "Echte Menschen,<br>die dich verstehen",
+  "sub2": "Poste anonym und bekomm ehrliche Antworten von<br>Menschen mit denselben Hochs und Tiefs."
+ },
+ "it": {
+  "head1": "Non sei<br><span class=\"hl\">solo.</span>",
+  "sub1": "Una community anonima di supporto tra pari —<br>condividi, chiedi, sostieni. Senza nomi né giudizi.",
+  "head2": "Persone vere<br>che capiscono",
+  "sub2": "Pubblica in anonimato e ricevi risposte sincere<br>da chi vive gli stessi alti e bassi."
+ },
+ "pt": {
+  "head1": "Não estás<br><span class=\"hl\">sozinho.</span>",
+  "sub1": "Uma comunidade anónima de apoio entre pares —<br>partilha, pergunta, apoia. Sem nomes nem julgamentos.",
+  "head2": "Pessoas reais<br>que percebem",
+  "sub2": "Publica anonimamente e recebe respostas sinceras<br>de quem vive os mesmos altos e baixos."
+ },
+ "nl": {
+  "head1": "Je bent niet<br><span class=\"hl\">alleen.</span>",
+  "sub1": "Een anonieme community van lotgenoten —<br>deel, vraag en steun. Geen namen, geen oordeel.",
+  "head2": "Echte mensen<br>die het snappen",
+  "sub2": "Post anoniem en krijg eerlijke antwoorden van<br>mensen met dezelfde pieken en dalen."
+ },
+ "pl": {
+  "head1": "Nie jesteś<br><span class=\"hl\">sam.</span>",
+  "sub1": "Anonimowa społeczność wsparcia rówieśniczego —<br>dziel się, pytaj i wspieraj. Bez imion, bez ocen.",
+  "head2": "Prawdziwi ludzie,<br>którzy rozumieją",
+  "sub2": "Pisz anonimowo i dostawaj szczere odpowiedzi od<br>ludzi z tymi samymi wzlotami i upadkami."
+ },
+ "sv": {
+  "head1": "Du är inte<br><span class=\"hl\">ensam.</span>",
+  "sub1": "En anonym stödgemenskap för bipolär sjukdom —<br>dela, fråga och stötta. Inga namn, inget dömande.",
+  "head2": "Riktiga människor<br>som förstår",
+  "sub2": "Posta anonymt och få ärliga svar från<br>människor med samma toppar och dalar."
+ },
+ "zh": {
+  "head1": "你并不<br><span class=\"hl\">孤单。</span>",
+  "sub1": "一个匿名的双相同伴互助社区 ——<br>分享、提问、互相支持。不留姓名，没有评判。",
+  "head2": "真实的人，<br>真正懂你",
+  "sub2": "匿名发帖，收获正在经历<br>同样起伏的人的真诚回复。"
+ }
+}

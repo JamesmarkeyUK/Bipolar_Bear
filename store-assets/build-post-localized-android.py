@@ -4,10 +4,12 @@
 #  - flatten to RGB (no alpha) for store compliance
 #  - remove the 2× scratch dir
 # Run after:  node build-localized.mjs --android  +  node build-hero-localized.mjs --android
+# Bipolar Anonymous:  python3 build-post-localized-android.py \
+#                       out/localized-frames-anon-android2x out/localized-frames-anon-android
 from PIL import Image
-import glob, os, shutil
+import glob, os, shutil, sys
 
-SRC, DST = 'out/localized-frames-android2x', 'out/localized-frames-android'
+SRC, DST = sys.argv[1:3] if len(sys.argv) > 2 else ('out/localized-frames-android2x', 'out/localized-frames-android')
 
 for p in sorted(glob.glob(f'{SRC}/*/*.png')):
     lang = os.path.basename(os.path.dirname(p))

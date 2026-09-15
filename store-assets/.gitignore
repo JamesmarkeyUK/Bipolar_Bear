@@ -10,6 +10,8 @@ screens/_anon_ipad_hero_*.html
 # 2× Android scratch renders (build-post*.py downsizes then deletes them)
 out/android2x/
 out/localized-frames-android2x/
+out/localized-frames-anon-android2x/
+out/localized-frames-anon/_hero-src/
 
 # Dev-only side-by-side stitch preview (not a store asset)
 out/hero/_stitch-preview.png
