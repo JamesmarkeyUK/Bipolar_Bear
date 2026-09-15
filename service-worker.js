@@ -1048,7 +1048,13 @@
 //       guest is signed in through the SDK's own auth when a page doesn't
 //       mirror window.auth — survival-kit didn't, so guest feedback from there
 //       was refused by the rules. Touches fab.js (precached).
-const CACHE_NAME = 'bipolarbear-v223';
+// v224: release 1.35 (build 35) — iOS widget fix (native only: the App Group
+//       ID in Swift didn't match the entitlements, so the widget never saw a
+//       log). In-app changelog: What's New headline for 1.35 (js/index.js) and
+//       a v1.35 block in the changelog modal (journal.html). Bipolar Anonymous
+//       native rebumped to 1.35 (build 35) to match. Touches js/index.js,
+//       journal.html, js/shared/brand-config.js (all precached).
+const CACHE_NAME = 'bipolarbear-v224';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
