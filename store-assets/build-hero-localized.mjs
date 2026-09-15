@@ -3,8 +3,18 @@
 // pairs come from hero_strings.json and the phones come from the localised
 // captures in out/localized/<lang>/ (01-home.png + 02-journal.png).
 //
-// Usage:  node build-hero-localized.mjs [lang ...]   (default: all)
-import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'node:fs';
+// Usage:  node build-hero-localized.mjs [--android] [lang ...]   (default: all)
+//
+// --android: the rest of the Android set is 9:16, so the design stage keeps the
+// iPhone height (2796) but widens to 9:16 (1572.75). The seam-spanning mood
+// phone stays anchored to the seam edge (same 250px slice on hero 1, same
+// position on hero 2), everything else is re-centred by half the extra width
+// (DX — the feature screens are letterboxed the same way), the headlines take
+// the extra width (so long ones like de "Jede Stimmung erfassen" stay on the
+// translator's two lines), and hero 2's mood faces fan out wider to fill it. Rendered 2× (2160×3840) into
+// out/localized-frames-android2x/; build-post-localized-android.py downsizes
+// to 1080×1920 + flattens to RGB.
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, rmSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import path from 'node:path';
@@ -23,10 +33,22 @@ function findChrome() {
 const CHROME = findChrome();
 const TRDIR = process.env.TRDIR || 'screens-i18n';
 const STR = JSON.parse(readFileSync(path.join(TRDIR, 'hero_strings.json'), 'utf8'));
-const ALL = ['es','fr','de','it','pt','nl','pl','sv','zh'];
-const LANGS = process.argv.slice(2).length ? process.argv.slice(2) : ALL;
+const ALL = ['en','es','fr','de','it','pt','nl','pl','sv','zh'];
+const ARGS = process.argv.slice(2);
+const ANDROID = ARGS.includes('--android');
+const LANG_ARGS = ARGS.filter(a => !a.startsWith('--'));
+const LANGS = LANG_ARGS.length ? LANG_ARGS : ALL;
 
-const W = 1290, H = 2796;
+// Design stage (all coordinates below) vs. rendered output.
+const H = 2796;
+const W = ANDROID ? H * 9 / 16 : 1290;        // 1572.75 on Android
+const [OUT_W, OUT_H, OUT] = ANDROID
+  ? [2160, 3840, 'out/localized-frames-android2x']
+  : [1290, 2796, 'out/localized-frames'];
+const SCALE = OUT_H / H;                       // 1 on iPhone
+const DX = (W - 1290) / 2;                     // re-centre offset for non-seam content (0 on iPhone)
+const FACE_SPREAD = 1.5 * DX;                  // how far right the outermost (manic) face moves
+
 const face = f => pathToFileURL(path.resolve('../images/moods/' + f)).href;
 const phone = (img, w, extra) => `
   <div class="phone" style="width:${w}px;${extra}">
@@ -39,9 +61,11 @@ const SHELL = (inner, bg, tone) => `<!doctype html><html lang="en"><head>
 <style>
   *{ box-sizing:border-box; margin:0; padding:0; }
   html,body{ width:100%; height:100%; }
-  .canvas{ position:relative; width:${W}px; height:${H}px; overflow:hidden;
+  .canvas{ position:relative; width:${OUT_W}px; height:${OUT_H}px; overflow:hidden;
     font-family:'Nunito','Segoe UI',system-ui,sans-serif;
     -webkit-font-smoothing:antialiased; text-rendering:geometricPrecision; }
+  .stage{ position:absolute; left:0; top:0; width:${W}px; height:${H}px;
+    transform:scale(${SCALE}); transform-origin:0 0; }
   .bg-white{ background:#ffffff; }
   .bg-orange{ background:
     radial-gradient(120% 80% at 50% -10%, #ffc266 0%, rgba(255,194,102,0) 55%),
@@ -67,10 +91,22 @@ const SHELL = (inner, bg, tone) => `<!doctype html><html lang="en"><head>
   .face{ position:absolute; }
   .face img{ width:100%; display:block; filter:drop-shadow(0 22px 30px rgba(110,45,0,.34)); }
 </style></head>
-<body><div class="canvas ${bg} ${tone}">${inner}</div></body></html>`;
+<body><div class="canvas ${bg} ${tone}"><div class="stage">${inner}</div></div></body></html>`;
 
 const MOOD_W = 740, MOOD_TOP = 712, MOOD_ROT = 6, SEAM_SHOW = 250;
 const H1_MOOD_LEFT = W - SEAM_SHOW, H2_MOOD_LEFT = H1_MOOD_LEFT - W;
+
+// Hero 2 mood faces, depressed → manic, in iPhone coords: [file, left, top, width, rot].
+// Depressed (left 400) peeks out from behind the phone and stays put; the rest
+// fan out proportionally so manic lands FACE_SPREAD further right.
+const FACES = [
+  ['manic.png',     957,  617, 246, -8],
+  ['elevated.png',  824,  879, 232,  6],
+  ['stable.png',    690, 1145, 220, -4],
+  ['low.png',       555, 1415, 210,  5],
+  ['depressed.png', 400, 1680, 200, -7],
+];
+const faceLeft = x => x + (x - 400) / (957 - 400) * FACE_SPREAD;
 
 const render = (built, out, w, h) => spawnSync(CHROME,
   ['--headless', '--disable-gpu', '--hide-scrollbars', '--no-sandbox',
@@ -85,33 +121,31 @@ for (const lang of LANGS) {
   const home = shot('01-home.png'), mood = shot('02-journal.png');
 
   const hero1 = SHELL(`
-    <div class="disc" style="left:-200px; top:740px; width:1960px; height:1960px;"></div>
-    <div class="head" style="top:300px; left:96px; right:96px; text-align:left; font-size:122px;">${s.head1}</div>
-    <div class="floor" style="left:120px; top:2330px; width:760px; height:150px;"></div>
-    <div class="floor" style="left:980px; top:2120px; width:560px; height:150px;"></div>
+    <div class="disc" style="left:${-200 + DX}px; top:740px; width:1960px; height:1960px;"></div>
+    <div class="head" style="top:300px; left:${96 + DX}px; right:96px; text-align:left; font-size:122px;">${s.head1}</div>
+    <div class="floor" style="left:${120 + DX}px; top:2330px; width:760px; height:150px;"></div>
+    <div class="floor" style="left:${H1_MOOD_LEFT - 60}px; top:2120px; width:560px; height:150px;"></div>
     ${phone(mood, MOOD_W, `left:${H1_MOOD_LEFT}px; top:${MOOD_TOP}px; transform:rotate(${MOOD_ROT}deg); z-index:1;`)}
-    ${phone(home, 700, 'left:150px; top:900px; transform:rotate(-7deg); z-index:2;')}
-    <div class="sub" style="bottom:156px; left:120px; right:120px; text-align:center; font-size:39px; line-height:1.34;">${s.sub1}</div>
+    ${phone(home, 700, `left:${150 + DX}px; top:900px; transform:rotate(-7deg); z-index:2;`)}
+    <div class="sub" style="bottom:156px; left:${120 + DX}px; right:${120 + DX}px; text-align:center; font-size:39px; line-height:1.34;">${s.sub1}</div>
   `, 'bg-white', 'on-light');
 
   const hero2 = SHELL(`
     <div class="head" style="top:300px; left:80px; right:80px; text-align:center; font-size:112px;">${s.head2}</div>
-    <div class="sub" style="bottom:150px; left:140px; right:140px; text-align:center; font-size:40px; line-height:1.32;">${s.sub2}</div>
-    <div class="floor" style="left:-220px; top:2230px; width:760px; height:150px;"></div>
-    <div class="face" style="left:957px; top:617px;  width:246px; transform:rotate(-8deg);"><img src="${face('manic.png')}" alt=""></div>
-    <div class="face" style="left:824px; top:879px;  width:232px; transform:rotate(6deg);"><img src="${face('elevated.png')}" alt=""></div>
-    <div class="face" style="left:690px; top:1145px; width:220px; transform:rotate(-4deg);"><img src="${face('stable.png')}" alt=""></div>
-    <div class="face" style="left:555px; top:1415px; width:210px; transform:rotate(5deg);"><img src="${face('low.png')}" alt=""></div>
-    <div class="face" style="left:400px; top:1680px; width:200px; transform:rotate(-7deg);"><img src="${face('depressed.png')}" alt=""></div>
+    <div class="sub" style="bottom:150px; left:${140 + DX}px; right:${140 + DX}px; text-align:center; font-size:40px; line-height:1.32;">${s.sub2}</div>
+    <div class="floor" style="left:${H2_MOOD_LEFT + 30}px; top:2230px; width:760px; height:150px;"></div>
+    ${FACES.map(([f, x, y, w, r]) =>
+      `<div class="face" style="left:${faceLeft(x)}px; top:${y}px; width:${w}px; transform:rotate(${r}deg);"><img src="${face(f)}" alt=""></div>`).join('\n    ')}
     ${phone(mood, MOOD_W, `left:${H2_MOOD_LEFT}px; top:${MOOD_TOP}px; transform:rotate(${MOOD_ROT}deg); z-index:2;`)}
   `, 'bg-orange', 'on-orange');
 
-  const outDir = `out/localized-frames/${lang}`;
+  const outDir = `${OUT}/${lang}`;
   mkdirSync(outDir, { recursive: true });
   for (const [name, html] of [['01-hero', hero1], ['02-hero', hero2]]) {
-    const built = `screens/_herol_${lang}.built.html`;
+    const built = `screens/_herol_${ANDROID ? 'android' : 'iphone'}_${lang}.built.html`;
     writeFileSync(built, html);
-    render(built, path.resolve(`${outDir}/${name}.png`), W, H);
+    render(built, path.resolve(`${outDir}/${name}.png`), OUT_W, OUT_H);
+    rmSync(built);
     console.log(`${lang}/${name}.png`);
   }
 }
