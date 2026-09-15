@@ -18,6 +18,10 @@ out/localized-frames/<lang>/
 ```
 `<lang>` ∈ en, es, fr, de, it, pt, nl, pl, sv, zh.
 
+**Render on macOS.** The screens use emoji (👟 😴 🍺 …); macOS Chrome draws them
+with Apple Color Emoji, as on an iPhone. Linux Chromium substitutes Noto /
+monochrome glyphs — the first localised set went out like that and was re-rendered.
+
 ## How it's built (the reusable UniSim kit)
 
 Two design layers, both regenerable from source:

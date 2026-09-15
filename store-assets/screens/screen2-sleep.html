@@ -28,7 +28,9 @@
     color:var(--ink-2); font-weight:800; font-size:30px; }
   .rng.sel{ background:var(--sleep-79); color:#fff; box-shadow:0 12px 24px -8px rgba(253,126,20,.6); }
   .rng .sub{ display:block; font-size:22px; font-weight:700; opacity:.85; margin-top:4px; }
-  .hint{ text-align:center; color:var(--muted); font-weight:700; font-size:24px; margin-top:24px; }
+  /* sits just below the visible screen; one line keeps longer translations from peeking up */
+  .hint{ text-align:center; color:var(--muted); font-weight:700; font-size:24px; margin-top:24px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
   /* ── Watches ── */
   .watch-row{ position:absolute; left:0; right:0; top:1882px; height:560px; }
@@ -160,5 +162,14 @@
 
 </div>
 </div>
+<script>
+  // Localised builds: shrink the "Synced from Apple Health" pill until it fits
+  // the card (long translations like fr/pl would run off the phone; en fits at 27px).
+  document.querySelectorAll('.synced').forEach(function (el) {
+    var card = el.parentElement, cs = getComputedStyle(card);
+    var room = card.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    for (var fs = 27; el.offsetWidth > room && fs > 18; fs--) el.style.fontSize = (fs - 1) + 'px';
+  });
+</script>
 </body>
 </html>

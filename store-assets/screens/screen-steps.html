@@ -48,7 +48,9 @@
     color:var(--ink-2); font-weight:800; font-size:30px; }
   .rng.sel{ background:var(--sleep-79); color:#fff; box-shadow:0 12px 24px -8px rgba(253,126,20,.6); }
   .rng .sub{ display:block; font-size:22px; font-weight:700; opacity:.85; margin-top:4px; }
-  .hint{ text-align:center; color:var(--muted); font-weight:700; font-size:24px; margin-top:24px; }
+  /* sits just below the visible screen; one line keeps longer translations from peeking up */
+  .hint{ text-align:center; color:var(--muted); font-weight:700; font-size:24px; margin-top:24px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
   /* ── Watches (now showing steps) ── */
   .watch-row{ position:absolute; left:0; right:0; top:1882px; height:560px; }
@@ -181,5 +183,21 @@
 
 </div>
 </div>
+<script>
+  // Localised builds: shrink text a longer translation would push out of its box
+  // (en fits at the design sizes, so it renders unchanged).
+  function fit(el, room, fs, min) {
+    for (; el.offsetWidth > room && fs > min; fs--) el.style.fontSize = (fs - 1) + 'px';
+  }
+  // "Synced from Apple Health" pill — must stay inside the card (fr/pl ran off the phone)
+  document.querySelectorAll('.synced').forEach(function (el) {
+    var card = el.parentElement, cs = getComputedStyle(card);
+    fit(el, card.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight), 27, 18);
+  });
+  // "steps today" sits 59–97px below the ring centre (inner r=123), where the circle is
+  // only ~150–215px across. en is 160px at 28px; 170 leaves en/pt/pl as-is and pulls
+  // fr/de/nl (212/195/235px) back inside the ring.
+  document.querySelectorAll('.ring .rlbl').forEach(function (el) { fit(el, 170, 28, 18); });
+</script>
 </body>
 </html>
