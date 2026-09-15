@@ -9,9 +9,13 @@
 // This is the reusable UniSim render step: point it at a different template set
 // + translation map + brand and it produces any app's localised set.
 //
-// Usage:  node build-localized.mjs [lang ...]      (default: all LANGS)
+// Usage:  node build-localized.mjs [--android] [lang ...]   (default: all LANGS)
 //         TRDIR=/path node build-localized.mjs fr
-import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'node:fs';
+//
+// --android mirrors build-all.mjs: renders at 2× (2160×3840) with the .android
+// canvas class (enlarged below-the-phone decks) into out/localized-frames-android2x/;
+// build-post-localized-android.py then downsizes to 1080×1920 + flattens to RGB.
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, rmSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import path from 'node:path';
@@ -30,8 +34,11 @@ function findChrome() {
 const CHROME = findChrome();
 const REPO = pathToFileURL(path.resolve('..')).href + '/';
 const TRDIR = process.env.TRDIR || 'screens-i18n';
-const ALL = ['es','fr','de','it','pt','nl','pl','sv','zh'];
-const LANGS = process.argv.slice(2).length ? process.argv.slice(2) : ALL;
+const ALL = ['en','es','fr','de','it','pt','nl','pl','sv','zh'];
+const ARGS = process.argv.slice(2);
+const ANDROID = ARGS.includes('--android');
+const LANG_ARGS = ARGS.filter(a => !a.startsWith('--'));
+const LANGS = LANG_ARGS.length ? LANG_ARGS : ALL;
 
 // screen output name -> source template (feature screens only; heroes handled elsewhere)
 const SCREENS = {
@@ -67,20 +74,25 @@ function render(builtPath, outPath, W, H) {
     pathToFileURL(path.resolve(builtPath)).href], { stdio: 'ignore' });
 }
 
-const W = 1290, H = 2796;
+// target: render W, H, extra canvas class, output root
+const [W, H, CLS, OUT] = ANDROID
+  ? [2160, 3840, 'android', 'out/localized-frames-android2x']
+  : [1290, 2796, '', 'out/localized-frames'];
 const fit = Math.min(W / 1290, H / 2796);
 let n = 0;
 for (const lang of LANGS) {
   const map = JSON.parse(readFileSync(path.join(TRDIR, `screens_${lang}.json`), 'utf8'));
-  const outDir = `out/localized-frames/${lang}`;
+  const outDir = `${OUT}/${lang}`;
   mkdirSync(outDir, { recursive: true });
   for (const [name, tpl] of Object.entries(SCREENS)) {
     let html = readFileSync(tpl, 'utf8').replaceAll('REPO/', REPO)
       .replace('</head>', `<style>.canvas{--fit:${fit}}</style></head>`);
+    if (CLS) html = html.replace('class="canvas ', `class="canvas ${CLS} `);
     html = substitute(html, map[name] || {});
-    const built = `screens/_loc_${lang}_${name}.built.html`;
+    const built = `screens/_loc_${CLS || 'iphone'}_${lang}_${name}.built.html`;
     writeFileSync(built, html);
     render(built, path.join(outDir, `${name}.png`), W, H);
+    rmSync(built);
     n++;
     console.log(`${lang}/${name}.png`);
   }
