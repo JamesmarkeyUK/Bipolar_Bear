@@ -1,0 +1,162 @@
+{
+ "03-steps": {
+  "translate": [
+   "Every step,",
+   "counted by",
+   "your phone",
+   "Energy",
+   "How active were you?",
+   "steps today",
+   "Synced from Apple Health",
+   "Low",
+   "Fine",
+   "Energetic",
+   "suggested",
+   "Auto-filled from your step count",
+   "Steps",
+   "Works with"
+  ],
+  "keep": [
+   "Apple Watch",
+   "Wear OS",
+   "Apple Health&nbsp;&nbsp;·&nbsp;&nbsp;Google Health Connect"
+  ]
+ },
+ "04-sleep": {
+  "translate": [
+   "Sync your sleep",
+   "from your watch",
+   "Sleep",
+   "How did you sleep?",
+   "Synced from Apple Health",
+   "Auto-filled · long-press to rate quality",
+   "Works with"
+  ],
+  "keep": [
+   "Apple Watch",
+   "Wear OS",
+   "Apple Health&nbsp;&nbsp;·&nbsp;&nbsp;Google Health Connect"
+  ]
+ },
+ "05-anonymous": {
+  "translate": [
+   "Share your thoughts,",
+   "not your identity",
+   "📢 Announcements",
+   "💬 General",
+   "📖 Wiki",
+   "12m ago",
+   "Finally told my partner about my diagnosis today. I was terrified — they just hugged me. 💛",
+   "1h ago",
+   "Three days stable after a rough patch. Small wins still count, right?",
+   "3h ago",
+   "Anyone else find mornings the hardest? Looking for routines that actually help.",
+   "✏️ Post 🐻",
+   "People who actually get it",
+   "+ You",
+   "End-to-end encrypted · no real name required"
+  ],
+  "keep": [
+   "Anonymous",
+   "BipolarBear",
+   "QO",
+   "QuietOtter",
+   "SS",
+   "SunflowerSeed",
+   "NW",
+   "NightWatch",
+   "BB",
+   "JR"
+  ]
+ },
+ "06-patterns": {
+  "translate": [
+   "Spot your patterns",
+   "Personalised Feedback",
+   "From your last 90 days",
+   "Depressed",
+   "14-day mood",
+   "Manic",
+   "What we noticed",
+   "Alcohol &amp; Next-Day Mood",
+   "There's a strong correlation between drinking alcohol and your mood the next day.",
+   "After drinking: next-day avg",
+   "&nbsp; · &nbsp;Sober days:",
+   "Sleep &amp; Next-Day Mood",
+   "More sleep tends to lift your mood the following day.",
+   "Energy &amp; Mood",
+   "Your energy and mood rise and fall together.",
+   "Correlates everything you track",
+   "Alcohol",
+   "Sleep",
+   "Caffeine",
+   "Exercise",
+   "Meds",
+   "Steps",
+   "Anxiety",
+   "Insights stay private — computed on your device"
+  ],
+  "keep": [
+   "2.3 (Low)",
+   "3.7 (Elevated)"
+  ]
+ },
+ "07-survivalkit": {
+  "translate": [
+   "Build your own",
+   "survival kit",
+   "Bipolar survival kit",
+   "🧠 My Strategies",
+   "Manic",
+   "Elevated",
+   "Good",
+   "Low",
+   "Depressed",
+   "Get outside for a 10-minute walk",
+   "Call my sister, even just to say hi",
+   "Play a game to break the spiral",
+   "+ Add coping strategy",
+   "💊 My Meds",
+   "Edit",
+   "My current medication",
+   "One kit — all your tools",
+   "Strategies",
+   "Meds",
+   "Goals",
+   "Gratitude",
+   "Reading",
+   "Memories",
+   "Crisis help",
+   "Build it your way — 100% customisable",
+   "❤️‍🩹 People helped: 2,418"
+  ],
+  "keep": [
+   "Lithium · 800mg",
+   "Quetiapine · 200mg"
+  ]
+ },
+ "08-pin": {
+  "translate": [
+   "Full privacy.",
+   "Enter your PIN to continue",
+   "🔐 More info",
+   "Forgot PIN?",
+   "Not even we can",
+   "read your entries",
+   "End-to-end encrypted journal"
+  ],
+  "keep": [
+   "Bipolar Bear"
+  ]
+ },
+ "01-hero": {
+  "translate": [
+   "Every high.",
+   "Every low.",
+   "Your mind, in your pocket"
+  ],
+  "keep": [
+   "Bipolar Bear"
+  ]
+ }
+}

@@ -1,0 +1,62 @@
+{
+ "es": {
+  "head1": "Cada euforia.<br>Cada bajón.",
+  "sub1": "Un diario de ánimo privado y cifrado —<br>observa los patrones, crea tu kit de supervivencia.",
+  "head2": "Registra cada estado<br>en segundos",
+  "sub2": "De la depresión a la manía — capta cómo<br>fue el día de verdad, con un par de toques."
+ },
+ "fr": {
+  "head1": "Chaque euphorie.<br>Chaque déprime.",
+  "sub1": "Un journal d'humeur privé et chiffré —<br>repérez les schémas, préparez votre kit de survie.",
+  "head2": "Notez chaque humeur<br>en quelques secondes",
+  "sub2": "De la dépression à la manie — capturez ce que<br>la journée a vraiment été, en deux clics."
+ },
+ "de": {
+  "head1": "Jedes Hoch.<br>Jedes Tief.",
+  "sub1": "Ein privates, verschlüsseltes Stimmungstagebuch —<br>erkenne die Muster, bau dein Notfallset.",
+  "head2": "Jede Stimmung erfassen<br>in Sekunden",
+  "sub2": "Von depressiv bis manisch — halt fest, wie<br>der Tag wirklich war, mit wenigen Tipps."
+ },
+ "it": {
+  "head1": "Ogni euforia.<br>Ogni caduta.",
+  "sub1": "Un diario dell'umore privato e cifrato —<br>osserva gli schemi, crea il tuo kit di sopravvivenza.",
+  "head2": "Registra ogni umore<br>in pochi secondi",
+  "sub2": "Dalla depressione alla mania — cattura com'è<br>andata davvero la giornata, con pochi tocchi."
+ },
+ "pt": {
+  "head1": "Cada euforia.<br>Cada queda.",
+  "sub1": "Um diário de humor privado e encriptado —<br>vê os padrões, cria o teu kit de sobrevivência.",
+  "head2": "Regista cada humor<br>em segundos",
+  "sub2": "Da depressão à mania — capta como<br>o dia foi mesmo, com uns toques."
+ },
+ "nl": {
+  "head1": "Elke piek.<br>Elk dal.",
+  "sub1": "Een privé, versleuteld stemmingsdagboek —<br>zie de patronen, bouw je noodpakket.",
+  "head2": "Leg elke stemming vast<br>in seconden",
+  "sub2": "Van depressief tot manisch — leg vast hoe<br>de dag echt voelde, met een paar tikken."
+ },
+ "pl": {
+  "head1": "Każdy szczyt.<br>Każdy dół.",
+  "sub1": "Prywatny, szyfrowany dziennik nastroju —<br>śledź wzorce, zbuduj swój zestaw ratunkowy.",
+  "head2": "Zapisz każdy nastrój<br>w kilka sekund",
+  "sub2": "Od depresji do manii — uchwyć, jaki<br>naprawdę był dzień, w kilka dotknięć."
+ },
+ "sv": {
+  "head1": "Varje topp.<br>Varje dal.",
+  "sub1": "En privat, krypterad humördagbok —<br>se mönstren, bygg din krislåda.",
+  "head2": "Fånga varje humör<br>på sekunder",
+  "sub2": "Från deprimerad till manisk — fånga hur<br>dagen verkligen kändes, med några tryck."
+ },
+ "zh": {
+  "head1": "每一次高涨，<br>每一次低落。",
+  "sub1": "私密加密的心情日记 ——<br>追踪规律，打造你的急救包。",
+  "head2": "几秒钟内<br>记录每一种心情",
+  "sub2": "从抑郁到躁狂 —— 捕捉这一天<br>真实的感受，只需轻点几下。"
+ },
+ "en": {
+  "head1": "Every high.<br>Every low.",
+  "sub1": "A private, encrypted mood journal —<br>track the patterns, build your survival kit.",
+  "head2": "Track every mood<br>in seconds",
+  "sub2": "From depressed to manic — capture how<br>the day really felt, in a couple of taps."
+ }
+}
