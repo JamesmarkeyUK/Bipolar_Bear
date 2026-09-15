@@ -12,7 +12,9 @@
     location.replace('/index.html');
   } else try {
     // --- dismiss every first-run coach/overlay (prefix 'bb') ---
-    S('bbLanguage','en');
+    // Language is overridable via ?lang= so the capture harness can shoot the
+    // localised UI in each store locale (defaults to English).
+    S('bbLanguage', new URLSearchParams(location.search).get('lang') || 'en');
     S('bbWelcomeShown','1');
     S('bbFabFirstRunDone','1');
     S('bbWaFabHidden','1');

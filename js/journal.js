@@ -5070,7 +5070,7 @@ window.addEventListener('pageshow', () => {
       _dotsEl.innerHTML = _fmSteps.map((_,i) => `<div class="fm-dot ${i<_fmStepIndex?'done':i===_fmStepIndex?'cur':''}"></div>`).join('');
       if (_topBar) _topBar.style.display = 'flex';
       if (_stepCounter) _stepCounter.style.display = '';
-      document.getElementById('fmStepCounter').textContent = `Step ${_fmStepIndex+1} of ${_fmSteps.length}`;
+      document.getElementById('fmStepCounter').textContent = BB.t('journal.fm.stepCounter', { n: _fmStepIndex+1, total: _fmSteps.length });
       // Summary bar of completed steps (a fresh session has no chips yet on step 0
       // — a lone dashed placeholder would just be noise)
       _fmBuildSummaryBar();

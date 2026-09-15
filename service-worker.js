@@ -1054,7 +1054,7 @@
 //       a v1.35 block in the changelog modal (journal.html). Bipolar Anonymous
 //       native rebumped to 1.35 (build 35) to match. Touches js/index.js,
 //       journal.html, js/shared/brand-config.js (all precached).
-const CACHE_NAME = 'bipolarbear-v224';
+const CACHE_NAME = 'bipolarbear-v225';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
