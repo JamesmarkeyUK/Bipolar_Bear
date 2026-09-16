@@ -444,6 +444,42 @@ Change email    →  re-auth required (current password), then firebase updateEm
 
 **Anonymous board** uses a separate email verification layer on top of Firebase Auth — see section 2.11.
 
+#### Loading splash while a session restores
+
+Firebase Auth resolves asynchronously: the SDK has to download, initialise and
+read its own localStorage record before `onAuthStateChanged` fires. Until it
+does, every page paints its signed-out chrome — the locked Bipolar Anonymous
+button, "Sign in to join the community", the Sign In FAB — so a returning user
+was told they were logged out on every cold load and then corrected a beat
+later.
+
+`js/shared/auth-splash.js` covers that gap with the app icon and a line
+tracing its outline (`#bbAuthSplash` markup, styles in `css/theme.css`):
+
+- **Armed only when a session is actually coming back.** It looks for a
+  populated `firebase:authUser:*` key in localStorage — the same probe the
+  early-paint script in `index.html` uses. A genuine guest has none and goes
+  straight to the signed-out home rather than waiting behind a splash for a
+  sign-in that isn't coming.
+- **Raised before first paint.** The module is loaded synchronously in
+  `<head>`, ahead of the stylesheet links, and only adds a class to `<html>`
+  (`.bb-auth-restoring`) — safe before `<body>` exists. The `#bbAuthSplash`
+  div is the first element in `<body>` so nothing can paint ahead of it.
+- **Dropped on the frame after auth resolves.** `js/index.js` calls
+  `BB.authSplash.hide()` from a `requestAnimationFrame` at the top of its auth
+  listener, so every synchronous chrome update in that listener has already
+  been applied and the page is revealed already correct.
+- **It always comes down.** `hide()` is idempotent and the module sets its own
+  6s timeout, so a Firebase CDN failure or a thrown error in a page script
+  degrades to the old brief flash rather than a page nobody can use.
+- z-index 9998 — under `#guestPinOverlay` (9999), which is an interactive gate
+  that must stay reachable.
+
+Currently wired on `index.html` only. Another page opts in by loading the
+module in `<head>`, carrying the same `#bbAuthSplash` markup as the first
+element in `<body>`, and calling `BB.authSplash.hide()` once its own auth
+listener resolves.
+
 ### 2.7 PIN Lock
 
 - PIN stored as **SHA-256 hash** in `localStorage.bbPinCode` — plaintext never persisted

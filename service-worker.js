@@ -1064,7 +1064,20 @@
 //       mark unless the user changed one of those three values first. Touches
 //       js/journal.js, js/shared/i18n.js (new journal.autofill.day* across all
 //       ten locales) — both precached.
-const CACHE_NAME = 'bipolarbear-v226';
+// v227: loading splash while a cached session restores. Firebase Auth resolves
+//       asynchronously, so the home screen painted its signed-out chrome (the
+//       locked Bipolar Anonymous button, "Sign in to join the community", the
+//       Sign In FAB) and then corrected itself a beat later — a returning user
+//       was told they were logged out every cold load. New shared module
+//       js/shared/auth-splash.js raises a splash (app icon with a line running
+//       round its outline) from <head>, before <body> parses, and only when
+//       localStorage actually holds a Firebase session — a guest never waits
+//       behind it. js/index.js drops it on the frame after auth resolves; the
+//       module's own 6s timeout drops it regardless, so a Firebase failure
+//       degrades to the old flash rather than a stuck page. Touches
+//       index.html, css/theme.css, js/index.js, js/shared/auth-splash.js (new,
+//       precached).
+const CACHE_NAME = 'bipolarbear-v227';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
@@ -1099,6 +1112,7 @@ const STATIC_ASSETS = [
   './js/shared/i18n.js',
   './js/shared/guest-data.js',
   './js/shared/user-count.js',
+  './js/shared/auth-splash.js',
   './js/shared/anon-push.js',
 
   // NOTE: firebase-messaging-sw.js is deliberately NOT precached either — it

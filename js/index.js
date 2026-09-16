@@ -280,6 +280,16 @@ _refreshUserCount();
         currentUser = user && !user.isAnonymous ? user : null;
         window.currentUser = currentUser;
 
+        // Auth has resolved, so the loading splash has done its job. Drop it on
+        // the next frame rather than here: rAF runs after this callback returns,
+        // which is after every synchronous chrome update below has been applied,
+        // so the page is revealed already correct instead of correcting itself
+        // in view — the whole point of the splash. Signing out resolves too, and
+        // the signed-out home is then the honest thing to show.
+        if (window.BB && BB.authSplash) {
+          requestAnimationFrame(() => BB.authSplash.hide());
+        }
+
         // Community size (footer). Runs on every auth state so the Firestore
         // read happens once auth has settled, not before it.
         _refreshUserCount();

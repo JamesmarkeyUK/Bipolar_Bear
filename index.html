@@ -18,6 +18,11 @@
   <script src="js/shared/version-check.js"></script>
   <script src="js/shared/guest-data.js"></script>
   <script src="js/shared/user-count.js"></script>
+  <!-- Raises the loading splash before <body> parses, but only when a cached
+       Firebase session is really coming back. Must stay synchronous and stay
+       ahead of the stylesheet links, or the splash appears over a painted
+       signed-out home instead of replacing it. -->
+  <script src="js/shared/auth-splash.js"></script>
   <meta name="description" content="Checkin with the Bear. Free mood journal and survival kit for people living with bipolar disorder. Track mood, energy, sleep and medication daily.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://www.bipolarbear.app/index.html">
@@ -75,6 +80,23 @@
   <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
+<!-- Loading splash. Hidden by default; css/theme.css reveals it while
+     <html> carries .bb-auth-restoring. First element in <body> so no page
+     content can paint before it. Taken down by BB.authSplash.hide() in
+     js/index.js once auth resolves, or by the module's own timeout. -->
+<div id="bbAuthSplash" role="status" aria-live="polite">
+  <div class="bb-splash-mark">
+    <img src="icons/AppIcon.png" width="92" height="92" alt="">
+    <!-- Rounded-rect path concentric with the icon (see css/theme.css for the
+         geometry). pathLength="100" lets the dash be expressed as a percentage
+         of the outline instead of its real perimeter. -->
+    <svg class="bb-splash-ring" viewBox="0 0 108 108" aria-hidden="true">
+      <path class="bb-ring-track" pathLength="100" d="M 31.5,1.5 H 76.5 A 30,30 0 0 1 106.5,31.5 V 76.5 A 30,30 0 0 1 76.5,106.5 H 31.5 A 30,30 0 0 1 1.5,76.5 V 31.5 A 30,30 0 0 1 31.5,1.5 Z"/>
+      <path class="bb-ring-run"   pathLength="100" d="M 31.5,1.5 H 76.5 A 30,30 0 0 1 106.5,31.5 V 76.5 A 30,30 0 0 1 76.5,106.5 H 31.5 A 30,30 0 0 1 1.5,76.5 V 31.5 A 30,30 0 0 1 31.5,1.5 Z"/>
+    </svg>
+  </div>
+  <div class="bb-splash-label" data-i18n="common.loading">Loading…</div>
+</div>
 <div id="iphone-frame">
   <div class="dynamic-island"></div>
   <div id="app-shell">

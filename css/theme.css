@@ -31,3 +31,104 @@
     var(--brand-primary-mid) 100%
   );
 }
+
+/* ── Auth loading splash ─────────────────────────────────────────────────────
+ * Covers the page while a cached Firebase session is restoring, so a returning
+ * user doesn't watch the signed-out chrome (locked Bipolar Anonymous button,
+ * "Sign in to join the community", the Sign In FAB) paint and then correct
+ * itself a second later.
+ *
+ * Visibility is driven by a class on <html>, set synchronously in <head> by
+ * js/shared/auth-splash.js before <body> is parsed — and only when there is
+ * really a session coming back, so a guest never waits behind it.
+ */
+#bbAuthSplash { display: none; }
+
+html.bb-auth-restoring #bbAuthSplash {
+  display: flex;
+  position: fixed;
+  inset: 0;
+  z-index: 9998;              /* below #guestPinOverlay (9999) */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  background: var(--brand-gradient);
+  opacity: 1;
+  transition: opacity 220ms ease;
+}
+
+/* Set by BB.authSplash.hide() for the length of the fade. */
+html.bb-auth-restoring #bbAuthSplash[data-leaving="1"] { opacity: 0; }
+
+/* Icon, with the loading line running round its own silhouette a few pixels
+ * clear of the artwork. The line is an SVG dash travelling a rounded-rect
+ * path, not a spun gradient: a conic sweep advances by angle, and on a
+ * squircle equal angles cover very unequal lengths, so the highlight visibly
+ * stretches down the flat sides and bunches at the corners. A dash walks the
+ * path itself, so it keeps its length and speed the whole way round.
+ *
+ * Geometry is concentric with the icon: the 92px icon sits 8px inside the
+ * 108px box with a 22px radius, so the stroke's centre-line radius is 30 and
+ * its inner edge clears the artwork by 5px all the way round, corners
+ * included. */
+.bb-splash-mark {
+  position: relative;
+  width: 108px;
+  height: 108px;
+  display: grid;
+  place-items: center;
+}
+
+.bb-splash-mark img {
+  width: 92px;
+  height: 92px;
+  border-radius: 22px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.bb-splash-ring {
+  position: absolute;
+  inset: 0;
+  width: 108px;
+  height: 108px;
+  overflow: visible;
+}
+
+.bb-splash-ring path {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+/* The faint full outline the line runs along. */
+.bb-splash-ring .bb-ring-track { stroke: rgba(255, 255, 255, 0.22); }
+
+/* The line itself. pathLength normalises the path to 100 units, so the dash
+ * is simply "a fifth of the way round" regardless of the real perimeter. */
+.bb-splash-ring .bb-ring-run {
+  stroke: rgba(255, 255, 255, 0.95);
+  stroke-dasharray: 20 80;
+  animation: bb-splash-run 1.3s linear infinite;
+}
+
+@keyframes bb-splash-run {
+  from { stroke-dashoffset: 100; }
+  to   { stroke-dashoffset: 0; }
+}
+
+.bb-splash-label {
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 600;
+  font-size: 0.85em;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+/* A line chasing itself round the icon is exactly the kind of motion this
+ * setting is asking us not to make. Hold it still as a plain outline — the
+ * splash is brief, and the "Loading…" label already says what it is. */
+@media (prefers-reduced-motion: reduce) {
+  .bb-splash-ring .bb-ring-run { animation: none; stroke-dasharray: none; stroke: rgba(255, 255, 255, 0.55); }
+  html.bb-auth-restoring #bbAuthSplash { transition: none; }
+}
