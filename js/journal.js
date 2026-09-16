@@ -2108,6 +2108,15 @@ window.addEventListener('pageshow', () => {
         entry.autoFilledSource = null;
       }
 
+      // A day filled by the first-step auto-fill is a guess in exactly the way
+      // the missing-days auto-complete's are, so it gets the same AUTO mark —
+      // unless the user changed one of the three values it wrote on the way to
+      // saving, which makes the entry theirs.
+      if (!editingEntry && _fmDayFillIntact()) {
+        entry.autoFilled = true;
+        entry.autoFilledSource = 'health';
+      }
+
       // Attach steps from health sync for new entries (backfill only updates existing entries)
       if (!editingEntry && window._healthStepsByDate) {
         const dKey = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth()+1).padStart(2,'0')}-${String(selectedDate.getDate()).padStart(2,'0')}`;
@@ -3841,9 +3850,17 @@ window.addEventListener('pageshow', () => {
     let _fmMoodSuggestion   = null; // best-guess mood derived from synced steps + sleep
     let _fmStepsRaw         = null; // raw synced step count (number) for the hero readout
     let _fmUserExited       = false; // ✕ Exit on an unlogged day — blocks auto-reopen until resume
+    let _fmDayFillBusy      = false; // true while the first-step auto-fill is reading Health
+    let _fmDayFillMsg       = null;  // 'nodata' → the button reports Health had nothing
+    let _fmDayFillSnapshot  = null;  // { mood, energy, sleep } the auto-fill wrote, for the AUTO mark
 
     const _FM_MOOD_COLORS  = { manic:'#ff4444', elevated:'var(--brand-primary)', stable:'#51cf66', good:'#51cf66', low:'#845ef7', depressed:'#5c7cfa' };
     const _FM_MOOD_LABELS  = { manic:BB.t('mood.manic'), elevated:BB.t('mood.elevated'), stable:BB.t('mood.stable'), good:BB.t('mood.stable'), low:BB.t('mood.low'), depressed:BB.t('mood.depressed') };
+
+    // Spectrum (0–10) stand-in for each legacy category — the middle of the band
+    // _moodCat() maps back to, so a value written here round-trips to the same
+    // category it came from.
+    const _FM_SPECTRUM_FOR_CAT = { depressed:1, low:3, stable:5, elevated:7, manic:9 };
 
     const _FM_ENERGY_LEVELS = [
       { val:0,  label:BB.t('journal.energy.notEnough'), color:'#6c757d' },
@@ -4666,6 +4683,9 @@ window.addEventListener('pageshow', () => {
       _fmMoodSuggestion    = null;
       _fmStepsRaw          = null;
       _fmUserExited        = false;
+      _fmDayFillBusy       = false;
+      _fmDayFillMsg        = null;
+      _fmDayFillSnapshot   = null;
       _fmClearExitedView();
       const _rsO = document.getElementById('fmResumeSection');
       if (_rsO) _rsO.style.display = 'none';
@@ -5478,6 +5498,115 @@ window.addEventListener('pageshow', () => {
       if (suggestion) _fmMoodSuggestion = suggestion;
     }
 
+    // ── One-tap auto-fill for yesterday (focused mode, first step) ──────────
+    /*
+     * The missing-days auto-complete fills gaps in bulk from the missing-entries
+     * modal. This is the same idea for the one day the journal is actually
+     * pointed at: a button on the mood step that reads yesterday's sleep and
+     * steps from the phone's health app, derives mood and energy from them with
+     * the same rules (_suggestMoodFromHealth / _energyFromSteps), and drops the
+     * user on the summary step to review and save.
+     *
+     * Offered only where there is health data to fill from — native build,
+     * health sync switched on — and only for yesterday. Today is deliberately
+     * excluded: the night hasn't happened (see _sleepNotYet) and the step count
+     * is still mid-day, so there is nothing honest to estimate from. Older days
+     * are the bulk auto-complete's job.
+     *
+     * Nothing is written without a save, but what the user reviews is still a
+     * guess, so the saved entry carries autoFilled — unless they changed one of
+     * the three values on the way through (see _fmDayFillIntact in saveEntry).
+     */
+    function _fmCanAutoFillDay() {
+      if (!_fmActive || editingEntry) return false;
+      if (!isNative() || BB.storage.get('HealthSyncEnabled') !== '1') return false;
+      const val = document.getElementById('entryDate')?.value;
+      if (!val) return false;
+      const y = new Date(); y.setHours(0, 0, 0, 0); y.setDate(y.getDate() - 1);
+      return val === `${y.getFullYear()}-${String(y.getMonth() + 1).padStart(2, '0')}-${String(y.getDate()).padStart(2, '0')}`;
+    }
+
+    /** True while the three values the auto-fill wrote are still untouched. */
+    function _fmDayFillIntact() {
+      const s = _fmDayFillSnapshot;
+      if (!s) return false;
+      return s.mood === selectedMood && s.energy === selectedEnergy && s.sleep === selectedSleep;
+    }
+
+    function _fmDayFillBtnHtml() {
+      if (!_fmCanAutoFillDay()) return '';
+      const label = _fmDayFillBusy ? BB.t('journal.autofill.dayBusy')
+        : _fmDayFillMsg === 'nodata' ? BB.t('journal.autofill.dayNoData')
+        : BB.t('journal.autofill.dayBtn');
+      return `<button type="button" onclick="_fmAutoFillDay()" ${_fmDayFillBusy ? 'disabled' : ''}
+        style="width:100%;padding:11px 16px;margin-bottom:14px;background:rgba(255,149,0,0.08);border:2px solid rgba(255,149,0,0.35);border-radius:12px;color:var(--brand-primary);font-weight:600;font-size:0.88em;cursor:pointer;-webkit-tap-highlight-color:transparent;${_fmDayFillBusy ? 'opacity:0.6;' : ''}">${label}</button>`;
+    }
+
+    async function _fmAutoFillDay() {
+      if (_fmDayFillBusy || !_fmCanAutoFillDay()) return;
+      _fmDayFillBusy = true;
+      _fmDayFillMsg  = null;
+      _renderFocusedStep();
+
+      try {
+        // Tapping the button is a deliberate action, so raising the OS
+        // permission sheet here is fair game — unlike the silent syncs on
+        // focused-mode open, which only ever check. Asking for both scopes in
+        // one go keeps it to a single sheet; the imports then run in auto mode
+        // (isAuto=true) so neither asks again.
+        window._healthSyncInProgress = true;
+        const Health = getPlugin('HealthPlugin');
+        if (Health) {
+          try {
+            const ck = await Health.checkHealthPermissions({ permissions: ['READ_STEPS', 'READ_SLEEP'] });
+            if (!ck?.permissions?.READ_STEPS || !ck?.permissions?.READ_SLEEP) {
+              skipNextResume = true;
+              await Health.requestHealthPermissions({ permissions: ['READ_STEPS', 'READ_SLEEP'] });
+              skipNextResume = false;
+            }
+          } catch (e) { skipNextResume = false; }
+        }
+        if (_fmSleepImported === null) await importSleepFromHealth(true);
+        if (_fmStepsRaw === null)      await importStepsFromHealth(true);
+      } catch (e) {
+        BB.log('day auto-fill: health read failed', e);
+      } finally {
+        setTimeout(() => { window._healthSyncInProgress = false; }, 800);
+        _fmDayFillBusy = false;
+      }
+
+      const steps  = _fmStepsRaw;
+      const sleepH = _fmSleepImported;
+      if (steps == null && sleepH == null) {
+        _fmDayFillMsg = 'nodata';
+        _renderFocusedStep();
+        setTimeout(() => {
+          if (_fmDayFillMsg !== 'nodata') return;
+          _fmDayFillMsg = null;
+          if (_fmActive) _renderFocusedStep();
+        }, 2500);
+        return;
+      }
+
+      const cat = _suggestMoodFromHealth(steps, sleepH) || 'stable';
+      selectedMood = _spectrumEnabled() ? _FM_SPECTRUM_FOR_CAT[cat] : cat;
+      selectedLinkedMood = null;
+      if (steps != null) {
+        selectedEnergy  = _energyFromSteps(steps);
+        _fmEnergyClear  = false;
+      }
+      if (sleepH != null) {
+        selectedSleep      = sleepH;
+        _fmSleepClear      = false;
+        _sleepHealthSynced = true;
+      }
+      _fmDayFillSnapshot = { mood: selectedMood, energy: selectedEnergy, sleep: selectedSleep };
+      nativeHaptic('success');
+      scheduleDraftSave();
+      _fmGoToDone();
+    }
+    window._fmAutoFillDay = _fmAutoFillDay;
+
     // ── Regular (full) form: synced badge on the energy + sleep steps ──
     // The big floating emoji + value readout were removed by request; the step
     // count / sleep time already live in the section headers. Only the compact
@@ -5618,7 +5747,7 @@ window.addEventListener('pageshow', () => {
                   <span class="label">${BB.t('mood.' + m)}</span>
                 </button>`).join('')}</div>`;
             }
-            return `${_quickNotesHtml}${_prevIntentionHtml}${_moodControl}
+            return `${_quickNotesHtml}${_prevIntentionHtml}${_fmDayFillBtnHtml()}${_moodControl}
             ${_linkedChip}
             ${selectedLinkedMood ? `<button onclick="_fmAdvance()" style="width:100%;margin-top:14px;padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:14px;font-size:0.95em;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">${BB.t('common.continue')} →</button>` : ''}
             ${_chooseHint}${_tapHoldHint}`;
@@ -5640,7 +5769,7 @@ window.addEventListener('pageshow', () => {
               init: n === _initN,
               onclick: `_fmSpectrumTap(${n})`,
             })));
-            return `${_quickNotesHtml}${_prevIntentionHtml}${_fmHeroHtml()}<div class="fm-spectrum-wheel">${_spectrumWheel}</div>
+            return `${_quickNotesHtml}${_prevIntentionHtml}${_fmDayFillBtnHtml()}${_fmHeroHtml()}<div class="fm-spectrum-wheel">${_spectrumWheel}</div>
             ${_showChooseMoodHint ? `<div id="_fmChooseMoodHintEl" style="display:flex;flex-direction:column;align-items:center;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-top:8px;">
               <svg width="24" height="22" viewBox="0 0 24 22" fill="none">
                 <path d="M 12,20 Q 8,10 12,2" stroke="rgba(255,149,0,0.7)" stroke-width="2" stroke-linecap="round" fill="none"/>
@@ -5660,7 +5789,7 @@ window.addEventListener('pageshow', () => {
             onclick: `_fmMoodTap('${m}')`,
             extra: `ontouchstart="_fmLongPressStart('${m}',event)" ontouchend="_fmLongPressCancel()" ontouchmove="_fmLongPressCancel()" onmousedown="_fmLongPressStart('${m}',event)" onmouseup="_fmLongPressCancel()" onmouseleave="_fmLongPressCancel()"`,
           })));
-          return `${_quickNotesHtml}${_prevIntentionHtml}${_fmHeroHtml()}${_moodWheel}
+          return `${_quickNotesHtml}${_prevIntentionHtml}${_fmDayFillBtnHtml()}${_fmHeroHtml()}${_moodWheel}
           ${_linkedChip}
           ${selectedLinkedMood ? `<button onclick="_fmAdvance()" style="width:100%;margin-top:14px;padding:12px;background:var(--brand-primary);color:white;border:none;border-radius:14px;font-size:0.95em;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">${BB.t('common.continue')} →</button>` : ''}
           ${_showChooseMoodHint ? `<div id="_fmChooseMoodHintEl" style="display:flex;flex-direction:column;align-items:center;pointer-events:none;animation:hintFade 2.4s ease-in-out infinite;margin-top:8px;">
@@ -6346,6 +6475,11 @@ window.addEventListener('pageshow', () => {
               <label class="bb-switch" style="margin:0;"><input type="checkbox" ${selectedPdfHide?'checked':''} onchange="_fmTogglePdfHide()"><span class="bb-slider"></span></label>
             </div>` : '';
           const _doneDate = (() => { try { const _dv = document.getElementById('entryDate')?.value; if (!_dv) return ''; const _dd = new Date(_dv+'T00:00:00'); return _dd.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'}); } catch(_){return '';} })();
+          // Auto-filled from Health and untouched since: say so here, where the
+          // user is looking at the values just before saving them.
+          const _dayFillNote = _fmDayFillIntact()
+            ? `<div style="background:var(--brand-tint,#fff6ec);border:1px solid rgba(255,149,0,0.3);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:0.82em;color:#6c757d;line-height:1.45;text-align:left;">${BB.t('journal.autofill.dayReview')}</div>`
+            : '';
           // Bear hero: the chosen mood shown big, instead of as a summary row.
           const _linkedHero = selectedLinkedMood ? ` <span style="color:#adb5bd;font-weight:600;">/</span> <img src="images/moods/${selectedLinkedMood}.png" style="width:34px;height:34px;object-fit:contain;vertical-align:middle;opacity:0.9;"> ${cap(selectedLinkedMood)}` : '';
           const _doneAura = _FM_AURAS[_moodCat(selectedMood)] || '';
@@ -6368,7 +6502,7 @@ window.addEventListener('pageshow', () => {
                 <span class="fm-wheel-emoji">${_saveEmoji}</span><span class="fm-wheel-label">${_saveLabel}</span>
               </button>
             </div>`;
-          return `${_heroHtml}${_doneDate ? `<div style="text-align:center;font-size:0.92em;color:#6c757d;margin-bottom:10px;">📅 ${_doneDate}</div>` : ''}<div style="display:block;background:#f8f9fa;border-radius:14px;padding:16px;border-left:4px solid ${mc};max-width:100%;text-align:left;">
+          return `${_heroHtml}${_doneDate ? `<div style="text-align:center;font-size:0.92em;color:#6c757d;margin-bottom:10px;">📅 ${_doneDate}</div>` : ''}${_dayFillNote}<div style="display:block;background:#f8f9fa;border-radius:14px;padding:16px;border-left:4px solid ${mc};max-width:100%;text-align:left;">
             ${rows.map(r=>{const idx=_fmSteps.findIndex(s=>s.id===r.step);const editBtn=idx>=0?`<button onclick="_fmReturnToDone=true;_fmGoTo(${idx})" style="background:none;border:none;color:#6c757d;font-size:0.82em;cursor:pointer;padding:2px 4px;-webkit-tap-highlight-color:transparent;flex-shrink:0;" title="${BB.t('journal.ui.editTitle')}">✏️</button>`:'';if(r.note){return `<details style="padding:3px 0;"><summary style="display:flex;align-items:center;flex-wrap:nowrap;gap:6px;font-size:0.9em;color:#495057;min-width:0;cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;">${r.wrap?`<span style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap;word-break:break-word;flex:1;">${r.text}</span>`:`<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;">${r.text}</span>`}${editBtn}<span style="font-size:0.65em;color:#adb5bd;flex-shrink:0;margin-left:2px;transition:transform 0.15s;" class="bb-note-chev">▶</span></summary><div style="font-size:0.82em;color:#495057;padding:5px 0 3px 12px;font-style:italic;word-break:break-word;line-height:1.4;">📝 ${r.note}</div></details>`;}return r.wrap?`<div style="padding:3px 0;"><div style="display:flex;align-items:center;gap:8px;font-size:0.9em;color:#495057;"><span style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap;word-break:break-word;flex:1;">${r.text}</span>${editBtn}</div></div>`:`<div style="padding:3px 0;"><div style="display:flex;align-items:center;flex-wrap:nowrap;gap:6px;font-size:0.9em;color:#495057;min-width:0;"><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;">${r.text}</span>${editBtn}</div></div>`;}).join('')}
           </div>${_privRow}${_suggestion}${_actions}`;
         }
@@ -8428,6 +8562,8 @@ window.addEventListener('pageshow', () => {
 
     function resetEntryForm() {
       _editOriginalState = null;
+      _fmDayFillSnapshot = null;
+      _fmDayFillMsg      = null;
       const _sleepBtn = document.getElementById('healthSleepBtn');
       if (_sleepBtn) _sleepBtn.textContent = '😴 Sleep Hours';
       const _energyBtnText = document.getElementById('healthEnergyBtnText');
@@ -12031,6 +12167,10 @@ Medication: ${entry.medication === 'not-taken' ? 'No / Forgot' : entry.medicatio
     }
 
     function onEntryDateChange(input) {
+      // The filled values describe the day they were read for — once the date
+      // moves they are the user's own again, not an auto-fill of this day.
+      _fmDayFillSnapshot = null;
+      _fmDayFillMsg = null;
       updateFormHeading();
       checkMissingEntry(input);
       _applySleepLock();
