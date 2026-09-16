@@ -235,8 +235,9 @@ is maintained incrementally instead:
 - **Counting is idempotent per account.** The increment and the account's
   one-time `counted` flag are written in the same Firestore transaction, so two
   devices racing on the same account can only produce one increment.
-- **No backfill migration.** Accounts that predate the feature carry no flag,
-  so they count themselves the first time they open the app / board.
+- **Accounts that predate the feature** carry no flag, so they count themselves
+  the first time they open the app / board — and a dormant one that never comes
+  back is swept up by the `backfillUserCounts` Cloud Function below.
 - **Anonymous members are keyed on `anonProfiles/{sha256(email)}`** — the one
   document shared by both entry paths (BipolarBear account and standalone
   email-code), so the same person can't be counted twice.
@@ -246,6 +247,45 @@ is maintained incrementally instead:
 - Displayed values are cached in `localStorage` (`bbUserCountCache`,
   `bbAnonUserCountCache`) and both lines stay hidden until a real, non-zero
   number resolves.
+
+##### Backfilling accounts that predate the counters
+
+`backfillUserCounts` (`functions/index.js`, callable, `europe-west1`) exists
+because incremental counting starts from zero: everyone who joined before the
+feature shipped is missing from the total until they next open the app, which
+for a dormant account may be never. The client can't fix it — `userSettings`
+and `anonProfiles` are readable only by their owner — so this runs with the
+Admin SDK.
+
+What it counts, matching the client's definitions exactly:
+
+| Counter          | Population                                                                                                   |
+|------------------|--------------------------------------------------------------------------------------------------------------|
+| `userCount`      | One per `userSettings/{uid}` whose uid still exists in Firebase Auth                                          |
+| `anonUserCount`  | One per `sha256(email)` across `userSettings/{uid}.anonProfile.monika` **and** `anonProfiles/{hash}.monika`   |
+
+Both are de-duplicated by key, so a member who uses both entry paths counts
+once. `userSettings` documents whose Auth account is gone are leftovers from a
+deleted account — reported as `orphaned`, not counted.
+
+It writes each account's `counted` flag **before** setting the counters to the
+computed totals, so a backfilled account can never count itself again on its
+next visit. Run it signed in as `inbox@jamesmarkey.co.uk` (any other caller is
+refused), dry-run first:
+
+```js
+const fn = firebase.app().functions('europe-west1')
+             .httpsCallable('backfillUserCounts');
+(await fn({ apply: false })).data   // report only — writes nothing
+(await fn({ apply: true  })).data   // write the flags, set the counters
+```
+
+Both modes return `{bear, anon}` with `total`, `alreadyCounted`, `toCount`,
+`was` (the counter's value before the run) and, for `bear`, `orphaned`.
+Repeatable: it recomputes the same totals and only flags what is still
+unflagged, so it's also the way to repair a counter that has drifted.
+
+Deploy with `firebase deploy --only functions:backfillUserCounts`.
 
 #### Live counts ("(N live)")
 

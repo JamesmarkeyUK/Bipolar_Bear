@@ -815,3 +815,176 @@ exports.onAnonSuggestionCreated = onDocumentCreated(
     }
   }
 );
+
+// ── backfillUserCounts ───────────────────────────────────────────────────────
+// One-shot (but safely repeatable) reconciliation of the two community
+// counters with the accounts that already exist.
+//
+// `js/shared/user-count.js` counts incrementally: an account increments
+// `counters/{userCount,anonUserCount}` the first time it opens the app, in the
+// same transaction that writes its one-time "counted" flag. That is correct
+// going forward but it starts from zero — everyone who joined before the
+// feature shipped is missing from the total until they happen to come back,
+// which for a dormant account may be never.
+//
+// The client cannot fix this itself: `userSettings/{uid}` and
+// `anonProfiles/{hash}` are readable only by their owner, so nobody in a
+// browser can enumerate them. This runs with the Admin SDK instead, counts
+// every existing account once, writes each account's flag so the client never
+// counts it a second time, and then sets both counters to the true totals.
+//
+// Call it signed in as the admin account, dry-run first:
+//
+//   const fn = firebase.app().functions('europe-west1')
+//                .httpsCallable('backfillUserCounts');
+//   (await fn({ apply: false })).data   // report only, writes nothing
+//   (await fn({ apply: true  })).data   // write the flags and set the counters
+//
+// Idempotent: re-running recomputes the same totals and only flags accounts
+// that are still unflagged. An account created *during* a run can have its own
+// +1 overwritten by the final absolute set — vanishingly unlikely, and fixed
+// by running it again.
+
+/** The admin *account* — matches ADMIN_EMAIL in js/anonymous.js. */
+const ADMIN_ACCOUNT_EMAIL = 'inbox@jamesmarkey.co.uk';
+/** Documents per scan page, and writes per batch (Firestore's ceiling is 500). */
+const BACKFILL_PAGE  = 400;
+const BACKFILL_BATCH = 400;
+
+/**
+ * SHA-256 of an email, normalised exactly as `_anonEmailHash()` in
+ * js/anonymous.js does it — the key `anonProfiles` is stored under.
+ */
+function anonEmailHash(email) {
+  return crypto.createHash('sha256')
+    .update(String(email).toLowerCase().trim())
+    .digest('hex');
+}
+
+/** uid → email for every Firebase Auth account that has one. */
+async function authEmailsByUid() {
+  const map = new Map();
+  let pageToken;
+  do {
+    const res = await admin.auth().listUsers(1000, pageToken);
+    res.users.forEach((u) => { if (u.email) map.set(u.uid, u.email); });
+    pageToken = res.pageToken;
+  } while (pageToken);
+  return map;
+}
+
+/** Walk a whole collection in id order, page by page, without holding it all. */
+async function scanCollection(name, onDoc) {
+  let cursor = null;
+  for (;;) {
+    let q = db.collection(name)
+      .orderBy(admin.firestore.FieldPath.documentId())
+      .limit(BACKFILL_PAGE);
+    if (cursor) q = q.startAfter(cursor);
+    const snap = await q.get();
+    if (snap.empty) return;
+    snap.forEach(onDoc);
+    if (snap.size < BACKFILL_PAGE) return;
+    cursor = snap.docs[snap.docs.length - 1];
+  }
+}
+
+/** Merge `patch` into every ref, in batches. */
+async function commitPatch(refs, patch) {
+  for (let i = 0; i < refs.length; i += BACKFILL_BATCH) {
+    const batch = db.batch();
+    refs.slice(i, i + BACKFILL_BATCH).forEach((ref) => batch.set(ref, patch, { merge: true }));
+    await batch.commit();
+  }
+}
+
+/** Current value of a counter document, or null if it doesn't exist yet. */
+async function counterValue(id) {
+  const snap = await db.collection('counters').doc(id).get();
+  const n = snap.exists ? snap.data().count : null;
+  return typeof n === 'number' ? n : null;
+}
+
+exports.backfillUserCounts = onCall(
+  { region: REGION, invoker: 'public', timeoutSeconds: 540, memory: '512MiB' },
+  async (request) => {
+    const caller = request.auth && request.auth.token && request.auth.token.email;
+    if (!caller || String(caller).toLowerCase() !== ADMIN_ACCOUNT_EMAIL) {
+      throw new HttpsError('permission-denied', 'Admin only.');
+    }
+    const apply = !!(request.data && request.data.apply === true);
+
+    const emails = await authEmailsByUid();
+
+    // ── Bipolar Bear accounts ────────────────────────────────────────────────
+    // One `userSettings/{uid}` document per account — the same thing the
+    // client flags. A document whose Auth account is gone is leftover from a
+    // deleted account: not a user, so not counted and not flagged.
+    let bearTotal    = 0;
+    let bearOrphans  = 0;
+    const bearToFlag = [];
+
+    // ── Bipolar Anonymous members ────────────────────────────────────────────
+    // Keyed on sha256(email) like the client, from both entry paths: a
+    // BipolarBear account carrying an anon profile, and a standalone
+    // `anonProfiles/{hash}` document. The Set collapses anyone using both.
+    const anonHashes  = new Set();
+    const anonFlagged = new Set();
+
+    await scanCollection('userSettings', (doc) => {
+      const email = emails.get(doc.id);
+      if (!email) { bearOrphans++; return; }
+      bearTotal++;
+      if (doc.get('userCounted') !== true) bearToFlag.push(doc.ref);
+      const ap = doc.get('anonProfile');
+      if (ap && ap.monika) anonHashes.add(anonEmailHash(email));
+    });
+
+    await scanCollection('anonProfiles', (doc) => {
+      if (!doc.get('monika')) return;   // signed up but never picked a monika
+      anonHashes.add(doc.id);
+      if (doc.get('counted') === true) anonFlagged.add(doc.id);
+    });
+
+    const anonToFlag = Array.from(anonHashes)
+      .filter((h) => !anonFlagged.has(h))
+      .map((h) => db.collection('anonProfiles').doc(h));
+
+    const report = {
+      apply,
+      bear: {
+        total:          bearTotal,
+        alreadyCounted: bearTotal - bearToFlag.length,
+        toCount:        bearToFlag.length,
+        orphaned:       bearOrphans,
+        was:            await counterValue('userCount'),
+      },
+      anon: {
+        total:          anonHashes.size,
+        alreadyCounted: anonHashes.size - anonToFlag.length,
+        toCount:        anonToFlag.length,
+        was:            await counterValue('anonUserCount'),
+      },
+    };
+
+    if (!apply) {
+      console.log('[backfillUserCounts] dry run:', JSON.stringify(report));
+      return Object.assign({ dryRun: true }, report);
+    }
+
+    // Flags first, totals last: an account that is already flagged when the
+    // absolute set lands can never be counted twice afterwards. A flag written
+    // for a member whose `anonProfiles` document doesn't exist yet creates it
+    // holding nothing but `counted` — harmless, since every reader of that
+    // document keys off `monika`.
+    await commitPatch(bearToFlag, { userCounted: true });
+    await commitPatch(anonToFlag, { counted: true });
+    await db.collection('counters').doc('userCount')
+      .set({ count: bearTotal }, { merge: true });
+    await db.collection('counters').doc('anonUserCount')
+      .set({ count: anonHashes.size }, { merge: true });
+
+    console.log('[backfillUserCounts] applied:', JSON.stringify(report));
+    return Object.assign({ dryRun: false }, report);
+  }
+);
