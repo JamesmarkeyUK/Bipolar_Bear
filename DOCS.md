@@ -685,6 +685,46 @@ Marking:  every entry carries autoFilled:true → an AUTO badge in the entry lis
           in the PDF a clinician sees.
 ```
 
+**One-day fill — yesterday, from the first step.** The same idea for the day
+the journal is already pointed at, rather than a run of gaps:
+
+```
+Entry point:  ✨ Auto-fill from health — a button on focused mode's FIRST
+              (mood) step → _fmAutoFillDay()
+
+Shown when:   _fmCanAutoFillDay() — focused mode active, a new entry (not an
+              edit), native build, health sync on, and the form's date is
+              YESTERDAY. Today is excluded on purpose: its night hasn't
+              happened (_sleepNotYet) and its step count is still mid-day, so
+              there is nothing honest to estimate from. Older days belong to
+              the bulk auto-complete above.
+
+Reads:        one permission ask for READ_STEPS + READ_SLEEP (a tap is
+              deliberate), then importSleepFromHealth(true) /
+              importStepsFromHealth(true) — the same single-day importers the
+              focused-mode steps use, in auto mode so neither asks again.
+              Both are skipped when the silent sync on open already has the
+              values. Nothing from Health at all → the button reports
+              "No health data for yesterday" and the user stays on step 1.
+
+Fills:        sleep  ← Health, as recorded
+              steps  ← Health (saveEntry attaches it to the entry)
+              mood   ← _suggestMoodFromHealth(steps, sleepH), mapped through
+                       _FM_SPECTRUM_FOR_CAT when full-spectrum mood is on
+              energy ← _energyFromSteps(steps)
+              then jumps to the summary (done) step, which carries a note
+              saying where the values came from.
+
+Marking:      nothing is written without the user's Save, but what they are
+              reviewing is still a guess, so the entry carries the same
+              autoFilled:true / autoFilledSource:'health' as a bulk-filled day
+              — unless they changed the mood, energy or sleep on the way
+              through, which makes it their own report (_fmDayFillSnapshot →
+              _fmDayFillIntact, checked in saveEntry). The snapshot is dropped
+              on form reset, on focused-mode open and whenever the date
+              changes.
+```
+
 ---
 
 ### 2.14 Bipolar Anonymous Notifications

@@ -1054,7 +1054,17 @@
 //       a v1.35 block in the changelog modal (journal.html). Bipolar Anonymous
 //       native rebumped to 1.35 (build 35) to match. Touches js/index.js,
 //       journal.html, js/shared/brand-config.js (all precached).
-const CACHE_NAME = 'bipolarbear-v225';
+// v226: auto-complete for yesterday. Focused mode's first (mood) step now
+//       carries an "✨ Auto-fill from health" button when the entry is a new
+//       one for yesterday on a native build with health sync on. It reads that
+//       day's sleep and steps from the health app, derives mood and energy
+//       from them with the same rules as the missing-days auto-complete
+//       (_suggestMoodFromHealth / _energyFromSteps) and drops the user on the
+//       summary step to review and save. The saved entry carries the same AUTO
+//       mark unless the user changed one of those three values first. Touches
+//       js/journal.js, js/shared/i18n.js (new journal.autofill.day* across all
+//       ten locales) — both precached.
+const CACHE_NAME = 'bipolarbear-v226';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
