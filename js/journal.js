@@ -2212,6 +2212,9 @@ window.addEventListener('pageshow', () => {
           BB.storage.remove('_fmTapHoldHintPending');
           BB.storage.set('_fmTapHoldHintReady', '1');
         }
+        // Only a fresh, hand-logged entry can earn the review prompt — edits and
+        // auto-filled guesses don't count as a win. loadEntries() decides.
+        if (_wasNewEntry && !entry.autoFilled) _reviewCandidateMood = entry.mood;
         loadEntries();
         nativeHaptic('success');
       } catch (error) {
@@ -2524,6 +2527,7 @@ window.addEventListener('pageshow', () => {
         if (isNative()) scheduleWeeklySummary(entries);
         // Check and award achievements
         checkAchievements(entries);
+        _maybeRequestReview(entries);
         // Check for favourite anniversary (show once per day if entries exist from prior years)
         if (isNative()) _checkFavAnniversaryToday(entries);
 
@@ -7527,6 +7531,47 @@ window.addEventListener('pageshow', () => {
         }
       }
       _achievementsInitialized = true;
+    }
+
+    // ── In-app review prompt ──
+    // Asks for a store rating only after a real win: the user has just saved a
+    // new, hand-logged entry on a stable-mood day, with at least 3 different
+    // days logged in total. Never on a low/depressed or elevated/manic day —
+    // asking someone to rate the app mid-episode is the wrong moment. Native
+    // only, at most 3 asks ever, 120 days apart (Apple caps it at 3/year and
+    // Google throttles on its own, so the OS may still show nothing).
+    let _reviewCandidateMood = null;
+    const _REVIEW_MIN_DAYS = 3;
+    const _REVIEW_MAX_ASKS = 3;
+    const _REVIEW_COOLDOWN_MS = 120 * 24 * 60 * 60 * 1000;
+
+    function _maybeRequestReview(entries) {
+      const mood = _reviewCandidateMood;
+      _reviewCandidateMood = null;
+      if (mood == null || !isNative()) return;
+      const InAppReview = getPlugin('InAppReview');
+      if (!InAppReview) return;
+      if (_moodCat(mood) !== 'stable') return;
+
+      const loggedDays = new Set(entries.filter(e => !e.autoFilled).map(e => {
+        const d = new Date(e.date); return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+      }));
+      if (loggedDays.size < _REVIEW_MIN_DAYS) return;
+
+      const asks = parseInt(BB.storage.get('ReviewAskCount') || '0', 10) || 0;
+      const lastAsked = parseInt(BB.storage.get('ReviewLastAsked') || '0', 10) || 0;
+      if (asks >= _REVIEW_MAX_ASKS || Date.now() - lastAsked < _REVIEW_COOLDOWN_MS) return;
+
+      // Let the save haptic and any achievement toast (~4s) finish first.
+      _whenHintsDone(() => {
+        const delay = document.getElementById('achievementToast') ? 4500 : 1500;
+        setTimeout(() => {
+          if (document.visibilityState !== 'visible') return;
+          BB.storage.set('ReviewAskCount', String(asks + 1));
+          BB.storage.set('ReviewLastAsked', String(Date.now()));
+          InAppReview.requestReview().catch(e => console.warn('In-app review error:', e));
+        }, delay);
+      });
     }
 
     function _showCalendarUnlockedHint() {
