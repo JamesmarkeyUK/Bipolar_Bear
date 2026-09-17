@@ -1384,18 +1384,17 @@ function _paintMemberCount() {
   // Two figures share this line: the board's own membership, and the whole
   // UNI·SIM suite's. A tap switches, and the choice is remembered (the same
   // choice the home page's line remembers — one key, one answer per browser).
-  // Whichever was chosen, the other stands in while it is still missing, and
-  // each wording says which figure it is.
   // (`suite` can be missing for the moment a new page script runs beside an
-  // older cached user-count.js — the figure above still shows.)
+  // older cached user-count.js — the membership figure still shows.)
   const suite = BB.userCount.suite;
   let showSuite = !!suite && suite.scope() === 'suite';
   const suiteTotal = suite ? (_mcSuite ? _mcSuite.total : suite.cached()) : null;
   const suiteLive  = _mcSuite ? _mcSuite.live : null;
   const haveSuite = typeof suiteTotal === 'number' && suiteTotal > 0;
-  const haveBoard = typeof _mcTotal === 'number' && _mcTotal > 0;
   if (showSuite && !haveSuite) showSuite = false;
-  if (!showSuite && !haveBoard && haveSuite) showSuite = true;
+  // Deliberately no stand-in the other way: this line is the board's membership,
+  // shown to members. Somebody who has not joined saw nothing here before, and
+  // still sees nothing — unless they have chosen the suite figure themselves.
 
   const total = showSuite ? suiteTotal : _mcTotal;
   const live  = showSuite ? suiteLive : _mcLive;

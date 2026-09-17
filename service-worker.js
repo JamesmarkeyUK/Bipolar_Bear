@@ -1102,7 +1102,15 @@
 //       third-party service" is now plural. Touches js/shared/user-count.js,
 //       js/index.js, js/anonymous.js, js/shared/i18n.js, privacy.html
 //       (all precached).
-const CACHE_NAME = 'bipolarbear-v229';
+// v230: the suite counter reads once on load whatever the scope, so the suite
+//       figure can stand in when this app's own is missing (offline, or
+//       Firestore refused) rather than only when a cache happens to hold one;
+//       after that it still only reads while the line is showing it. The
+//       board's line stays members-only — no stand-in the other way, so
+//       somebody who has not joined still sees nothing there unless they have
+//       chosen the suite figure themselves. Touches js/shared/user-count.js,
+//       js/anonymous.js (both precached).
+const CACHE_NAME = 'bipolarbear-v230';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

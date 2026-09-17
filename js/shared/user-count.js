@@ -530,9 +530,9 @@
      * Firebase having initialised, so it runs on a page whose Firestore
      * counter never resolves.
      *
-     * The READ is skipped entirely unless `wantsSuite()` says the line is
-     * showing the suite figure, so a page nobody taps costs one small POST per
-     * 45 s and nothing else.
+     * After one read on the first tick, the READ is skipped unless `wantsSuite()`
+     * says the line is showing the suite figure — so a page nobody taps costs
+     * one small POST per 45 s and nothing else.
      *
      * @param {'app'|'anon'} kind
      * @param {function(): boolean} wantsSuite  is the line showing the suite figure?
@@ -546,6 +546,7 @@
       var timer = null;
       var stopped = false;
       var beaten = false;
+      var first = true;
 
       function beat() {
         return _suiteRpc('app_presence_beat', { p_product: product, p_install_id: id })
@@ -557,7 +558,12 @@
 
       function read() {
         if (stopped || typeof onCounts !== 'function') return;
-        if (typeof wantsSuite === 'function' && !wantsSuite()) return;
+        // Read once on the first tick whatever the scope — that one read is what
+        // lets the suite figure stand in when this app's own is missing (offline,
+        // or Firestore refused), which a first-time visitor has no cache for.
+        // After that, only while the line is actually showing it.
+        if (first) first = false;
+        else if (typeof wantsSuite === 'function' && !wantsSuite()) return;
         return self.load().then(function (counts) {
           if (stopped || !counts) return;
           // Whoever is reading this is using a suite app right now; a read that
