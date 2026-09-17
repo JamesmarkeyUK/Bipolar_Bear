@@ -7,7 +7,8 @@
 //   PLAY_KEY=~/Bipolar_Keystores/<service-account>.json \
 //   node play-upload.mjs --package com.bipolarbear.app --app bipolarbear \
 //     [--listings] [--shots out/localized-frames-android] \
-//     [--bundle /path/to/app-release.aab [--track production]] [--apply]
+//     [--bundle /path/to/app-release.aab [--track production]]
+//     [--promote <versionCode> [--track production]] [--apply]
 //
 // --listings  title + short description from screens-i18n/play_listings.json, full
 //             description = the App Store copy in screens-i18n/listing_<app>.json, for
@@ -16,6 +17,8 @@
 //             filename order; skipped when the sha256s already match
 // --bundle    uploads the .aab and releases it on --track (default production) to 100%,
 //             with the release notes from play_listings.json ("en" → en-GB)
+// --promote   no upload: releases an already-uploaded versionCode (e.g. one tested on the
+//             internal track) on --track at 100%, with the same release notes
 // Everything happens in ONE edit, so a failure part-way leaves Play untouched.
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { createHash, sign } from 'node:crypto';
@@ -26,7 +29,7 @@ const argv = process.argv.slice(2);
 const arg = k => { const i = argv.indexOf(k); return i > -1 ? argv[i + 1] : undefined; };
 const APPLY = argv.includes('--apply'), LISTINGS = argv.includes('--listings');
 const PKG = arg('--package'), APP = arg('--app'), SHOTS = arg('--shots');
-const BUNDLE = arg('--bundle'), TRACK = arg('--track') || 'production';
+const BUNDLE = arg('--bundle'), PROMOTE = arg('--promote'), TRACK = arg('--track') || 'production';
 const KEYFILE = process.env.PLAY_KEY?.replace(/^~/, os.homedir());
 if (!PKG || !APP || !KEYFILE) {
   console.error('Needs --package --app (+ --listings / --shots / --bundle, --apply) and PLAY_KEY. See the header of this file.');
@@ -37,7 +40,7 @@ const CFG = JSON.parse(readFileSync('screens-i18n/play_listings.json', 'utf8'))[
 const STORE = JSON.parse(readFileSync(`screens-i18n/listing_${APP}.json`, 'utf8'));
 
 // listing key -> Play language code
-const LANGS = { es: 'es-ES', fr: 'fr-FR', de: 'de-DE', it: 'it-IT', pt: 'pt-PT',
+const LANGS = { es: 'es-ES', fr: 'fr-FR', de: 'de-DE', it: 'it-IT', pt: 'pt-PT', 'pt-BR': 'pt-BR',
   nl: 'nl-NL', pl: 'pl-PL', sv: 'sv-SE', zh: 'zh-CN' };
 const LIMITS = { title: 30, shortDescription: 80, fullDescription: 4000 };
 const NOTE_LIMIT = 500;
@@ -120,6 +123,15 @@ try {
     if (cur.length) await call('DELETE', `${E}/listings/${lang}/phoneScreenshots`);
     for (const f of files) await call('POST', `${EU}/listings/${lang}/phoneScreenshots?uploadType=media`,
       { body: readFileSync(f), type: 'image/png' });
+  }
+
+  if (PROMOTE) {
+    const cur = await call('GET', `${E}/tracks/${TRACK}`);
+    console.log(`promote: versionCode ${PROMOTE} → ${TRACK} at 100% as "${CFG.releaseName}", ` +
+      `notes in ${notes.map(n => n.language).join(' ')}`);
+    console.log(`  ${TRACK} now: ` + ((cur.releases || []).map(r => `${r.name} [${r.versionCodes}] ${r.status}`).join('; ') || 'empty'));
+    if (APPLY) await call('PUT', `${E}/tracks/${TRACK}`, { json: { track: TRACK, releases: [{ name: CFG.releaseName,
+      versionCodes: [String(PROMOTE)], status: 'completed', releaseNotes: notes }] } });
   }
 
   if (BUNDLE) {

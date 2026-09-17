@@ -58,5 +58,11 @@
   "sub1": "A private, encrypted mood journal —<br>track the patterns, build your survival kit.",
   "head2": "Track every mood<br>in seconds",
   "sub2": "From depressed to manic — capture how<br>the day really felt, in a couple of taps."
+ },
+ "pt-BR": {
+  "head1": "Cada euforia.<br>Cada queda.",
+  "sub1": "Diário de humor privado e criptografado —<br>veja padrões, monte seu kit de sobrevivência.",
+  "head2": "Registre cada humor<br>em segundos",
+  "sub2": "Da depressão à mania — capte como<br>foi seu dia, com poucos toques."
  }
 }

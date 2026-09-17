@@ -37,7 +37,7 @@ if (!BUNDLE || !VERSION || !LISTING || !ASC_KEY_ID || !ASC_ISSUER_ID || !ASC_KEY
 const KEY = readFileSync(ASC_KEY_PATH.replace(/^~/, os.homedir()), 'utf8');
 
 // listing JSON key -> App Store Connect locale ("en" resolves to the app's primary locale)
-const LOCALES = { es: 'es-ES', fr: 'fr-FR', de: 'de-DE', it: 'it', pt: 'pt-PT',
+const LOCALES = { es: 'es-ES', fr: 'fr-FR', de: 'de-DE', it: 'it', pt: 'pt-PT', 'pt-BR': 'pt-BR',
   nl: 'nl-NL', pl: 'pl', sv: 'sv', zh: 'zh-Hans' };
 // App Store Connect limits (keywords are counted in UTF-8 bytes, the rest in characters)
 const LIMITS = { name: 30, subtitle: 30, promotionalText: 170, description: 4000, whatsNew: 4000 };

@@ -61,5 +61,15 @@
   "keywords": "双相情感障碍,躁郁症,匿名,社区,同伴支持,心理健康,抑郁,躁狂,论坛,互助",
   "description": "Bipolar Anonymous 是一个面向与双相情感障碍共处人群的免费匿名同伴支持社区。\n\n选一个 monika，分享你正在经历的一切，与真正理解你的人建立联系——没有真实姓名，没有需要维护的个人资料，没有评判。\n\n如何运作\n• 用你选择的 monika 匿名发帖和回复\n• 阅读他人的经历并给予支持\n• 一个平静、简洁的留言板，没有社交媒体的喧嚣\n\n关于隐私的说明\n留言板上的帖子对应用的其他用户公开，并以明文形式存储（未采用端到端加密）。请不要分享任何能识别你个人身份的内容。你的账户仅与你邮箱的哈希值关联，用于在不同设备间识别你。\n\nBipolar Anonymous 提供的是同伴支持，而非专业医疗照护。它不提供医疗建议，也不能替代治疗。如果你正处于危机中，请联系你所在地区的紧急服务或危机热线。\n\n免费使用。没有广告。",
   "whatsNew": "细节修复与改进，让社区运行更顺畅。"
+ },
+ "pt-BR": {
+  "subtitle": "Comunidade anônima de pares",
+  "promotionalText": "Um espaço anônimo de apoio entre pares para quem vive com transtorno bipolar. Sem nomes reais, sem julgamentos — apenas pessoas que entendem.",
+  "keywords": "anônimo,comunidade,apoio entre pares,saúde mental,depressão,mania,fórum,apoio,bem-estar",
+  "description": "O Bipolar Anonymous é uma comunidade gratuita e anônima de apoio entre pares para pessoas que vivem com transtorno bipolar.\n\nEscolha um monika, compartilhe o que você está passando e conecte-se com pessoas que realmente entendem — sem nomes reais, sem perfis para manter, sem julgamentos.\n\nCOMO FUNCIONA\n• Publique e responda de forma anônima com o monika que você escolher\n• Leia o que os outros estão passando e ofereça seu apoio\n• Um mural calmo e simples, sem o barulho das redes sociais\n\nUMA NOTA SOBRE PRIVACIDADE\nAs publicações no mural são públicas para outros usuários do app e são armazenadas em texto simples (não são criptografadas de ponta a ponta). Por favor, não compartilhe nada que identifique você. Sua conta está vinculada apenas a um hash do seu e-mail, usado para reconhecer você entre dispositivos.\n\nO Bipolar Anonymous é apoio entre pares, não acompanhamento profissional. Não oferece aconselhamento médico nem substitui tratamento. Se você estiver em crise, entre em contato com os serviços de emergência da sua região ou com uma linha de apoio.\n\nGrátis. Sem anúncios.",
+  "whatsNew": "Pequenas correções e melhorias para manter a comunidade funcionando bem."
+ },
+ "en": {
+  "whatsNew": "Small fixes and improvements to keep the community running smoothly."
  }
 }

@@ -1,42 +1,105 @@
 {
  "bipolarbear": {
-  "releaseName": "35 (1.35)",
+  "releaseName": "36 (1.36)",
   "listing": {
-   "es": { "title": "Bipolar Bear (Diario de ánimo)", "shortDescription": "Registra ánimo, sueño y energía. Entiende tu mente bipolar." },
-   "fr": { "title": "Bipolar Bear (suivi d'humeur)", "shortDescription": "Suis ton humeur, ton sommeil et ton énergie. Comprends ton esprit bipolaire." },
-   "de": { "title": "Bipolar Bear (Stimmungs-App)", "shortDescription": "Stimmung, Schlaf & Energie erfassen – und deine Bipolarität verstehen." },
-   "it": { "title": "Bipolar Bear (Diario umore)", "shortDescription": "Registra umore, sonno ed energia. Capisci la tua mente bipolare." },
-   "pt": { "title": "Bipolar Bear (Diário de humor)", "shortDescription": "Regista humor, sono e energia. Compreende a tua mente bipolar." },
-   "nl": { "title": "Bipolar Bear (Humeurdagboek)", "shortDescription": "Volg je stemming, slaap en energie. Begrijp je bipolaire brein." },
-   "pl": { "title": "Bipolar Bear Dziennik nastroju", "shortDescription": "Śledź nastrój, sen i energię. Zrozum swój dwubiegunowy umysł." },
-   "sv": { "title": "Bipolar Bear (Humördagbok)", "shortDescription": "Följ humör, sömn och energi. Förstå ditt bipolära sinne." },
-   "zh": { "title": "Bipolar Bear（情绪日记）", "shortDescription": "记录情绪、睡眠与精力，读懂你的双相心绪。" }
+   "es": {
+    "title": "Bipolar Bear (Diario de ánimo)",
+    "shortDescription": "Registra ánimo, sueño y energía. Entiende tu mente bipolar."
+   },
+   "fr": {
+    "title": "Bipolar Bear (suivi d'humeur)",
+    "shortDescription": "Suis ton humeur, ton sommeil et ton énergie. Comprends ton esprit bipolaire."
+   },
+   "de": {
+    "title": "Bipolar Bear (Stimmungs-App)",
+    "shortDescription": "Stimmung, Schlaf & Energie erfassen – und deine Bipolarität verstehen."
+   },
+   "it": {
+    "title": "Bipolar Bear (Diario umore)",
+    "shortDescription": "Registra umore, sonno ed energia. Capisci la tua mente bipolare."
+   },
+   "pt": {
+    "title": "Bipolar Bear (Diário de humor)",
+    "shortDescription": "Regista humor, sono e energia. Compreende a tua mente bipolar."
+   },
+   "nl": {
+    "title": "Bipolar Bear (Humeurdagboek)",
+    "shortDescription": "Volg je stemming, slaap en energie. Begrijp je bipolaire brein."
+   },
+   "pl": {
+    "title": "Bipolar Bear Dziennik nastroju",
+    "shortDescription": "Śledź nastrój, sen i energię. Zrozum swój dwubiegunowy umysł."
+   },
+   "sv": {
+    "title": "Bipolar Bear (Humördagbok)",
+    "shortDescription": "Följ humör, sömn och energi. Förstå ditt bipolära sinne."
+   },
+   "zh": {
+    "title": "Bipolar Bear（情绪日记）",
+    "shortDescription": "记录情绪、睡眠与精力，读懂你的双相心绪。"
+   },
+   "pt-BR": {
+    "title": "Bipolar Bear (Diário de humor)",
+    "shortDescription": "Registre humor, sono e energia. Entenda sua mente bipolar."
+   }
   },
   "releaseNotes": {
-   "en": "Journal steps now show “Step 1 of 7” in your language, plus small fixes and improvements.",
-   "es": "Los pasos del diario ahora muestran «Paso 1 de 7» en tu idioma, además de pequeñas correcciones y mejoras.",
-   "fr": "Les étapes du journal affichent désormais « Étape 1 sur 7 » dans ta langue, plus de petites corrections et améliorations.",
-   "de": "Die Schritte im Tagebuch zeigen „Schritt 1 von 7“ jetzt in deiner Sprache – dazu kleine Korrekturen und Verbesserungen.",
-   "it": "I passaggi del diario ora mostrano «Passo 1 di 7» nella tua lingua, più piccole correzioni e miglioramenti.",
-   "pt": "Os passos do diário mostram agora «Passo 1 de 7» no teu idioma, além de pequenas correções e melhorias.",
-   "nl": "De stappen in het dagboek tonen nu ‘Stap 1 van 7’ in jouw taal, plus kleine verbeteringen en oplossingen.",
-   "pl": "Kroki w dzienniku pokazują teraz „Krok 1 z 7” w Twoim języku, do tego drobne poprawki i ulepszenia.",
-   "sv": "Dagbokens steg visar nu ”Steg 1 av 7” på ditt språk, plus små rättningar och förbättringar.",
-   "zh": "日记的分步流程现在会用你的语言显示“第 1 步，共 7 步”，并包含一些小修复和改进。"
+   "en": "No more “signed out” flash when the app opens, and the journal can now fill in yesterday’s mood, energy and sleep from your health data in one tap — clearly marked as an estimate.",
+   "es": "Se acabó el aviso de «sesión cerrada» al abrir la app, y el diario ahora puede rellenar el ánimo, la energía y el sueño de ayer con tus datos de salud en un toque, marcados claramente como estimación.",
+   "fr": "Fini l’écran « déconnecté » à l’ouverture de l’app, et le journal peut désormais remplir l’humeur, l’énergie et le sommeil d’hier à partir de tes données de santé en un geste, clairement indiqués comme estimation.",
+   "de": "Kein kurzes „abgemeldet“ mehr beim Öffnen der App – und das Tagebuch kann Stimmung, Energie und Schlaf von gestern jetzt mit einem Tipp aus deinen Gesundheitsdaten ausfüllen, klar als Schätzung markiert.",
+   "it": "Niente più schermata «disconnesso» all’apertura dell’app, e il diario ora può compilare umore, energia e sonno di ieri dai tuoi dati sulla salute con un tocco, indicati chiaramente come stima.",
+   "pt": "Acabou o aviso de «sessão terminada» ao abrir a app, e o diário pode agora preencher o humor, a energia e o sono de ontem com os teus dados de saúde num toque, claramente marcados como estimativa.",
+   "pt-BR": "Acabou o aviso de “sessão encerrada” ao abrir o app, e o diário agora pode preencher o humor, a energia e o sono de ontem com seus dados de saúde em um toque, marcados claramente como estimativa.",
+   "nl": "Geen ‘uitgelogd’-flits meer bij het openen van de app, en het dagboek kan nu de stemming, energie en slaap van gisteren met één tik invullen uit je gezondheidsgegevens, duidelijk gemarkeerd als schatting.",
+   "pl": "Koniec z mignięciem „wylogowano” przy otwieraniu aplikacji, a dziennik może teraz jednym dotknięciem uzupełnić wczorajszy nastrój, energię i sen na podstawie danych o zdrowiu — wyraźnie oznaczone jako szacunek.",
+   "sv": "Ingen ”utloggad”-blinkning längre när appen öppnas, och dagboken kan nu fylla i gårdagens humör, energi och sömn från dina hälsodata med ett tryck – tydligt markerat som en uppskattning.",
+   "zh": "打开应用时不再闪现“已退出登录”；日记现在还能一键用你的健康数据补填昨天的心情、精力和睡眠，并清楚标注为估算值。"
   }
  },
  "anonymous": {
-  "releaseName": "35 (1.35)",
+  "releaseName": "36 (1.36)",
   "listing": {
-   "es": { "title": "Bipolar Anonymous", "shortDescription": "Apoyo anónimo entre iguales para el bipolar: aquí no estás solo" },
-   "fr": { "title": "Bipolar Anonymous", "shortDescription": "Entraide anonyme autour du trouble bipolaire – ici, tu n'es pas seul" },
-   "de": { "title": "Bipolar Anonymous", "shortDescription": "Anonyme Unterstützung bei Bipolarität – hier bist du nicht allein" },
-   "it": { "title": "Bipolar Anonymous", "shortDescription": "Supporto anonimo tra pari per il bipolare: qui non sei solo" },
-   "pt": { "title": "Bipolar Anonymous", "shortDescription": "Apoio anónimo entre pares para a bipolaridade – aqui não estás só" },
-   "nl": { "title": "Bipolar Anonymous", "shortDescription": "Anonieme steun van lotgenoten bij bipolariteit – je bent niet alleen" },
-   "pl": { "title": "Bipolar Anonymous", "shortDescription": "Anonimowe wsparcie w chorobie dwubiegunowej – nie jesteś tu sam" },
-   "sv": { "title": "Bipolar Anonymous", "shortDescription": "Anonymt kamratstöd vid bipolär sjukdom – här är du inte ensam" },
-   "zh": { "title": "Bipolar Anonymous", "shortDescription": "双相情感障碍匿名同伴互助——在这里你并不孤单" }
+   "es": {
+    "title": "Bipolar Anonymous",
+    "shortDescription": "Apoyo anónimo entre iguales para el bipolar: aquí no estás solo"
+   },
+   "fr": {
+    "title": "Bipolar Anonymous",
+    "shortDescription": "Entraide anonyme autour du trouble bipolaire – ici, tu n'es pas seul"
+   },
+   "de": {
+    "title": "Bipolar Anonymous",
+    "shortDescription": "Anonyme Unterstützung bei Bipolarität – hier bist du nicht allein"
+   },
+   "it": {
+    "title": "Bipolar Anonymous",
+    "shortDescription": "Supporto anonimo tra pari per il bipolare: qui non sei solo"
+   },
+   "pt": {
+    "title": "Bipolar Anonymous",
+    "shortDescription": "Apoio anónimo entre pares para a bipolaridade – aqui não estás só"
+   },
+   "nl": {
+    "title": "Bipolar Anonymous",
+    "shortDescription": "Anonieme steun van lotgenoten bij bipolariteit – je bent niet alleen"
+   },
+   "pl": {
+    "title": "Bipolar Anonymous",
+    "shortDescription": "Anonimowe wsparcie w chorobie dwubiegunowej – nie jesteś tu sam"
+   },
+   "sv": {
+    "title": "Bipolar Anonymous",
+    "shortDescription": "Anonymt kamratstöd vid bipolär sjukdom – här är du inte ensam"
+   },
+   "zh": {
+    "title": "Bipolar Anonymous",
+    "shortDescription": "双相情感障碍匿名同伴互助——在这里你并不孤单"
+   },
+   "pt-BR": {
+    "title": "Bipolar Anonymous",
+    "shortDescription": "Apoio anônimo entre pares para a bipolaridade – aqui você não está só"
+   }
   },
   "releaseNotes": {
    "en": "Small fixes and improvements to keep the community running smoothly.",
@@ -48,7 +111,8 @@
    "nl": "Kleine verbeteringen en oplossingen zodat de community soepel blijft draaien.",
    "pl": "Drobne poprawki i ulepszenia, by społeczność działała bez zakłóceń.",
    "sv": "Små rättningar och förbättringar så att gemenskapen fungerar smidigt.",
-   "zh": "细节修复与改进，让社区运行更顺畅。"
+   "zh": "细节修复与改进，让社区运行更顺畅。",
+   "pt-BR": "Pequenas correções e melhorias para manter a comunidade funcionando bem."
   }
  }
 }

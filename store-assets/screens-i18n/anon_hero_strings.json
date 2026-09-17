@@ -58,5 +58,11 @@
   "sub1": "一个匿名的双相同伴互助社区 ——<br>分享、提问、互相支持。不留姓名，没有评判。",
   "head2": "真实的人，<br>真正懂你",
   "sub2": "匿名发帖，收获正在经历<br>同样起伏的人的真诚回复。"
+ },
+ "pt-BR": {
+  "head1": "Você não está<br><span class=\"hl\">sozinho.</span>",
+  "sub1": "Uma comunidade anônima de apoio entre pares —<br>fale, pergunte, apoie. Sem nomes nem julgamentos.",
+  "head2": "Pessoas reais<br>que entendem",
+  "sub2": "Poste anonimamente e receba respostas sinceras<br>de quem vive os mesmos altos e baixos."
  }
 }

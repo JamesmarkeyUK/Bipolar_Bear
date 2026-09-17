@@ -33,7 +33,7 @@ function findChrome() {
 const CHROME = findChrome();
 const TRDIR = process.env.TRDIR || 'screens-i18n';
 const STR = JSON.parse(readFileSync(path.join(TRDIR, 'hero_strings.json'), 'utf8'));
-const ALL = ['en','es','fr','de','it','pt','nl','pl','sv','zh'];
+const ALL = ['en','es','fr','de','it','pt','pt-BR','nl','pl','sv','zh'];
 const ARGS = process.argv.slice(2);
 const ANDROID = ARGS.includes('--android');
 const LANG_ARGS = ARGS.filter(a => !a.startsWith('--'));
@@ -116,7 +116,8 @@ const render = (built, out, w, h) => spawnSync(CHROME,
 
 for (const lang of LANGS) {
   const s = STR[lang];
-  const dir = path.resolve(`out/localized/${lang}`);
+  // pt-BR reuses the pt captures: the app's own Portuguese UI is already Brazilian.
+  const dir = path.resolve(`out/localized/${lang === 'pt-BR' ? 'pt' : lang}`);
   const shot = f => pathToFileURL(path.join(dir, f)).href;
   const home = shot('01-home.png'), mood = shot('02-journal.png');
 

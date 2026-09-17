@@ -34,7 +34,7 @@ function findChrome() {
 const CHROME = findChrome();
 const REPO = pathToFileURL(path.resolve('..')).href + '/';
 const TRDIR = process.env.TRDIR || 'screens-i18n';
-const ALL = ['en','es','fr','de','it','pt','nl','pl','sv','zh'];
+const ALL = ['en','es','fr','de','it','pt','pt-BR','nl','pl','sv','zh'];
 const ARGS = process.argv.slice(2);
 const ANDROID = ARGS.includes('--android');
 const LANG_ARGS = ARGS.filter(a => !a.startsWith('--'));
