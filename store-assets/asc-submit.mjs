@@ -5,23 +5,28 @@
 //
 //   ASC_KEY_ID=… ASC_ISSUER_ID=… ASC_KEY_PATH=~/Bipolar_Keystores/AuthKey_….p8 \
 //   node asc-submit.mjs --bundle com.app.bipolarbear --version 1.36 \
-//     [--build 36 [--wait 45]] [--submit] [--apply]
+//     [--build 36 [--wait 45]] [--submit | --cancel] [--apply]
 //
 // --build <n>   attach build <n> of <version> to the App Store version, waiting up to
 //               --wait minutes (default 45) for Apple to finish processing it
 // --submit      submit the version for review. Refuses unless a VALID build is attached
-//               and every localization has What's New text. Reuses an open review
-//               submission for the app if there is one.
+//               and every localization has What's New text, and every screenshot set has at
+//               least 3 screenshots in filename order (01-…, 02-…). Uploads through the App
+//               Store Connect website land in upload-finish order, not filename order — fix a
+//               set with asc-screenshots.mjs. Reuses an open review submission if there is one.
+// --cancel      pull the version back out of review (waiting for / in review) so its
+//               metadata and screenshots can be edited again; then --submit to resubmit.
 import { readFileSync } from 'node:fs';
 import { sign } from 'node:crypto';
 import os from 'node:os';
 
 const argv = process.argv.slice(2);
 const arg = k => { const i = argv.indexOf(k); return i > -1 ? argv[i + 1] : undefined; };
-const APPLY = argv.includes('--apply'), SUBMIT = argv.includes('--submit');
+const APPLY = argv.includes('--apply'), SUBMIT = argv.includes('--submit'), CANCEL = argv.includes('--cancel');
 const BUNDLE = arg('--bundle'), VERSION = arg('--version'), BUILD = arg('--build');
 const WAIT_MIN = Number(arg('--wait') || 45);
 const { ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_PATH } = process.env;
+if (SUBMIT && CANCEL) { console.error('--submit and --cancel are exclusive.'); process.exit(1); }
 if (!BUNDLE || !VERSION || !ASC_KEY_ID || !ASC_ISSUER_ID || !ASC_KEY_PATH) {
   console.error('Needs --bundle --version (+ --build / --submit / --apply) and ASC_KEY_ID / ASC_ISSUER_ID / ASC_KEY_PATH.');
   process.exit(1);
@@ -84,7 +89,18 @@ if (SUBMIT) {
   const locs = (await api('GET', `/v1/appStoreVersions/${ver.id}/appStoreVersionLocalizations?limit=50`)).data;
   const noNotes = locs.filter(l => !l.attributes.whatsNew).map(l => l.attributes.locale);
   if (noNotes.length) problems.push(`no What's New in: ${noNotes.join(', ')}`);
-  if (state(ver) !== 'PREPARE_FOR_SUBMISSION') problems.push(`version is ${state(ver)}, not PREPARE_FOR_SUBMISSION`);
+  for (const l of locs) {
+    const sets = (await api('GET', `/v1/appStoreVersionLocalizations/${l.id}/appScreenshotSets?include=appScreenshots&limit=50`));
+    const shots = new Map((sets.included || []).map(s => [s.id, s.attributes.fileName]));
+    for (const set of sets.data) {
+      const names = set.relationships.appScreenshots.data.map(r => shots.get(r.id));
+      const where = `${l.attributes.locale} ${set.attributes.screenshotDisplayType}`;
+      if (names.length < 3) problems.push(`${where} has only ${names.length} screenshot(s): ${names.join(', ')}`);
+      if (names.some((n, i) => i && n.localeCompare(names[i - 1]) < 0)) problems.push(`${where} is out of order: ${names.join(', ')}`);
+    }
+  }
+  const SUBMITTABLE = ['PREPARE_FOR_SUBMISSION', 'DEVELOPER_REJECTED', 'REJECTED', 'METADATA_REJECTED'];
+  if (!SUBMITTABLE.includes(state(ver))) problems.push(`version is ${state(ver)}, not ready to submit`);
   console.log(`  submit check: build ${attached?.attributes.version ?? '—'}, ${locs.length} localizations` +
     (problems.length ? `\n  ✗ ${problems.join('\n  ✗ ')}` : ' — ready'));
   if (problems.length) process.exit(1);
@@ -99,4 +115,18 @@ if (SUBMIT) {
     const after = (await api('GET', `/v1/apps/${app.id}/appStoreVersions?filter[platform]=IOS&filter[versionString]=${VERSION}`)).data[0];
     console.log(`  submitted for review — version now ${state(after)}`);
   } else console.log('  would submit for review (re-run with --apply)');
+}
+
+if (CANCEL) {
+  const open = (await api('GET', `/v1/reviewSubmissions?filter[app]=${app.id}&filter[platform]=IOS&filter[state]=WAITING_FOR_REVIEW,IN_REVIEW,UNRESOLVED_ISSUES&limit=5`)).data;
+  if (!open.length) { console.log('  nothing in review to cancel'); process.exit(0); }
+  for (const sub of open) {
+    console.log(`  ${APPLY ? 'cancelling' : 'would cancel'} review submission ${sub.id} (${sub.attributes.state})`);
+    if (APPLY) await api('PATCH', `/v1/reviewSubmissions/${sub.id}`, { data: { type: 'reviewSubmissions', id: sub.id, attributes: { canceled: true } } });
+  }
+  for (let i = 0; APPLY && i < 20; i++) {
+    const now = (await api('GET', `/v1/apps/${app.id}/appStoreVersions?filter[platform]=IOS&filter[versionString]=${VERSION}`)).data[0];
+    if (!['WAITING_FOR_REVIEW', 'IN_REVIEW'].includes(state(now))) { console.log(`  version now ${state(now)} — editable`); break; }
+    await sleep(6000);
+  }
 }
