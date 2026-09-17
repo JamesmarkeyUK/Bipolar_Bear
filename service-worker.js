@@ -1090,7 +1090,19 @@
 //       js/shared/platform.js, fab.js, css/index.css, js/index.js,
 //       js/shared/i18n.js, js/journal.js, journal.html,
 //       js/shared/brand-config.js (all precached).
-const CACHE_NAME = 'bipolarbear-v228';
+// v229: both apps join the UNI·SIM suite-wide user count. The Firestore
+//       counters are unchanged and stay each app's own figure; alongside them
+//       the app now beats Supabase's app_presence_beat() (migrations 0175 /
+//       0179) so its users are part of "N people use UNI·SIM apps", and the
+//       count line is tappable — tap for the suite figure, tap back, the
+//       choice remembered under the same localStorage key the rest of the
+//       suite uses. New common.suiteCount / common.countTapHint in all ten
+//       languages. Privacy policy §2 and §6 say what the beat sends (a random
+//       install id, nothing else) and who receives it; §6's "the only
+//       third-party service" is now plural. Touches js/shared/user-count.js,
+//       js/index.js, js/anonymous.js, js/shared/i18n.js, privacy.html
+//       (all precached).
+const CACHE_NAME = 'bipolarbear-v229';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

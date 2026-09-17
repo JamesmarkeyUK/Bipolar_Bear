@@ -1370,6 +1370,7 @@ function _updateAnonStreak() {
 let _mcTotal = null;   // members who have ever joined the board
 let _mcLive  = null;   // sessions on the board right now, or null while unknown
 let _mcPresenceStarted = false;
+let _mcSuite = null;   // {total, live} across every UNI·SIM app, or null while unknown
 
 /**
  * Paint the header line from whatever we currently know. The member total is
@@ -1379,13 +1380,44 @@ let _mcPresenceStarted = false;
 function _paintMemberCount() {
   const el = document.getElementById('member-count');
   if (!el || !window.BB || !BB.userCount) return;
-  if (typeof _mcTotal !== 'number' || _mcTotal <= 0) return;
-  let text = _wt('anon.board.memberCount', { n: BB.userCount.format(_mcTotal), count: _mcTotal });
-  if (typeof _mcLive === 'number' && _mcLive > 0) {
-    text += ' ' + _wt('common.live', { n: _mcLive });
+
+  // Two figures share this line: the board's own membership, and the whole
+  // UNI·SIM suite's. A tap switches, and the choice is remembered (the same
+  // choice the home page's line remembers — one key, one answer per browser).
+  // Whichever was chosen, the other stands in while it is still missing, and
+  // each wording says which figure it is.
+  // (`suite` can be missing for the moment a new page script runs beside an
+  // older cached user-count.js — the figure above still shows.)
+  const suite = BB.userCount.suite;
+  let showSuite = !!suite && suite.scope() === 'suite';
+  const suiteTotal = suite ? (_mcSuite ? _mcSuite.total : suite.cached()) : null;
+  const suiteLive  = _mcSuite ? _mcSuite.live : null;
+  const haveSuite = typeof suiteTotal === 'number' && suiteTotal > 0;
+  const haveBoard = typeof _mcTotal === 'number' && _mcTotal > 0;
+  if (showSuite && !haveSuite) showSuite = false;
+  if (!showSuite && !haveBoard && haveSuite) showSuite = true;
+
+  const total = showSuite ? suiteTotal : _mcTotal;
+  const live  = showSuite ? suiteLive : _mcLive;
+  if (typeof total !== 'number' || total <= 0) return;
+
+  let text = showSuite
+    ? _wt('common.suiteCount', { n: BB.userCount.format(total), count: total })
+    : _wt('anon.board.memberCount', { n: BB.userCount.format(total), count: total });
+  if (typeof live === 'number' && live > 0) {
+    text += ' ' + _wt('common.live', { n: live });
   }
   el.textContent = text;
   el.style.display = 'block';
+  if (!suite) return;
+  suite.wireTap(el, _wt('common.countTapHint'), () => {
+    _paintMemberCount();
+    if (suite.scope() === 'suite') {
+      suite.refresh(c => { _mcSuite = c; _paintMemberCount(); });
+    } else {
+      _refreshMemberCount();
+    }
+  });
 }
 
 /**
@@ -1402,6 +1434,26 @@ function _refreshMemberCount() {
   BB.userCount.load(db, 'anon').then(n => {
     if (typeof n === 'number') { _mcTotal = n; _paintMemberCount(); }
   });
+}
+
+// Join the UNI·SIM suite-wide counter (migrations 0175/0177/0179). Out here
+// rather than inside initBoard()'s _ensureAuthSession() chain, and running for
+// anyone who opens the board rather than only for members: the beat has nothing
+// to do with Firestore or with having joined, and "everyone, guests included"
+// is what the suite figure counts (James, 2026-09-17). On bipolarbear.app this
+// shares an install id with the home page, so reading both is one person, not
+// two; the standalone Bipolar Anonymous app has its own storage and is its own.
+if (window.BB && BB.userCount && BB.userCount.suite) {
+  const _mcSuiteCached = BB.userCount.suite.cached();
+  if (typeof _mcSuiteCached === 'number') {
+    _mcSuite = { total: _mcSuiteCached, live: null };
+    _paintMemberCount();
+  }
+  BB.userCount.suite.start(
+    'anon',
+    () => BB.userCount.suite.scope() === 'suite',
+    counts => { _mcSuite = counts; _paintMemberCount(); }
+  );
 }
 
 /**

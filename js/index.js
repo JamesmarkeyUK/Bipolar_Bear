@@ -147,6 +147,7 @@ setTimeout(function () {
 let _ucTotal = null;   // people who have ever used the app (accounts)
 let _ucLive  = null;   // sessions live right now, or null while unknown
 let _ucPresenceStarted = false;
+let _ucSuite = null;   // {total, live} across every UNI·SIM app, or null while unknown
 
 /**
  * Paint the footer line from whatever we currently know. The total is the
@@ -158,18 +159,69 @@ let _ucPresenceStarted = false;
 function _paintUserCount() {
   const el = document.getElementById('userCountLine');
   if (!el || !window.BB || !BB.userCount) return;
-  if (typeof _ucTotal !== 'number' || _ucTotal <= 0) return;  // nothing honest to show yet
-  const n = BB.userCount.format(_ucTotal);
-  let text = _tr(
-    'home.userCount',
-    '🐻 ' + n + ' ' + (_ucTotal === 1 ? 'person uses' : 'people use') + ' Bipolar Bear',
-    { n: n, count: _ucTotal }
-  );
-  if (typeof _ucLive === 'number' && _ucLive > 0) {
-    text += ' ' + _tr('common.live', '(' + _ucLive + ' live)', { n: _ucLive });
+
+  // Two figures share this line: Bipolar Bear's own, and the whole UNI·SIM
+  // suite's. A tap switches, and the choice is remembered. Whichever was
+  // chosen, the other stands in while it is still missing — a returning user
+  // should not meet a blank space, and each wording says plainly which figure
+  // it is, so standing in for the other can't mislead.
+  // (`suite` can be missing for the moment a new page script runs beside an
+  // older cached user-count.js — the figure above still shows.)
+  const suite = BB.userCount.suite;
+  let showSuite = !!suite && suite.scope() === 'suite';
+  const suiteTotal = suite ? (_ucSuite ? _ucSuite.total : suite.cached()) : null;
+  const suiteLive  = _ucSuite ? _ucSuite.live : null;
+  const haveSuite = typeof suiteTotal === 'number' && suiteTotal > 0;
+  const haveApp   = typeof _ucTotal === 'number' && _ucTotal > 0;
+  if (showSuite && !haveSuite) showSuite = false;
+  if (!showSuite && !haveApp && haveSuite) showSuite = true;
+
+  const total = showSuite ? suiteTotal : _ucTotal;
+  const live  = showSuite ? suiteLive : _ucLive;
+  if (typeof total !== 'number' || total <= 0) return;  // nothing honest to show yet
+
+  const n = BB.userCount.format(total);
+  let text = showSuite
+    ? _tr(
+        'common.suiteCount',
+        '🌍 ' + n + ' ' + (total === 1 ? 'person uses' : 'people use') + ' UNI·SIM apps',
+        { n: n, count: total }
+      )
+    : _tr(
+        'home.userCount',
+        '🐻 ' + n + ' ' + (total === 1 ? 'person uses' : 'people use') + ' Bipolar Bear',
+        { n: n, count: total }
+      );
+  if (typeof live === 'number' && live > 0) {
+    text += ' ' + _tr('common.live', '(' + live + ' live)', { n: live });
   }
   el.textContent = text;
   el.style.display = 'block';
+  if (suite) _wireUserCountTap(el);
+}
+
+/**
+ * Make the count line switch between Bipolar Bear's figure and the suite's.
+ * The switching itself lives in the shared module; what belongs here is what
+ * to do afterwards — repaint from what we already have so the tap is instant,
+ * then refresh whichever figure was switched to, so a tap that has been
+ * sitting on a week-old cached number doesn't keep showing it.
+ * @param {HTMLElement} el
+ * @returns {void}
+ */
+function _wireUserCountTap(el) {
+  BB.userCount.suite.wireTap(
+    el,
+    _tr('common.countTapHint', 'Tap to switch between this app and all UNI·SIM apps'),
+    () => {
+      _paintUserCount();
+      if (BB.userCount.suite.scope() === 'suite') {
+        BB.userCount.suite.refresh(c => { _ucSuite = c; _paintUserCount(); });
+      } else {
+        _refreshUserCount();
+      }
+    }
+  );
 }
 
 /**
@@ -194,6 +246,23 @@ function _refreshUserCount() {
   });
 }
 _refreshUserCount();
+
+// Join the UNI·SIM suite-wide counter (migrations 0175/0177/0179). Deliberately
+// out here rather than in the Firebase block below, and not waiting on auth:
+// the beat has nothing to do with Firestore, and a page whose Firebase init
+// fails should still count its reader and still be able to offer the figure.
+if (window.BB && BB.userCount && BB.userCount.suite) {
+  const _ucSuiteCached = BB.userCount.suite.cached();
+  if (typeof _ucSuiteCached === 'number') {
+    _ucSuite = { total: _ucSuiteCached, live: null };
+    _paintUserCount();
+  }
+  BB.userCount.suite.start(
+    'app',
+    () => BB.userCount.suite.scope() === 'suite',
+    counts => { _ucSuite = counts; _paintUserCount(); }
+  );
+}
 
 // ── BLOCK 2: Firebase init + auth listener + onboarding helpers ──
     // ── Firebase init ──

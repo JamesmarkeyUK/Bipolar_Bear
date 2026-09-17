@@ -23,6 +23,12 @@
  * Displayed values are cached in localStorage so a returning user sees the
  * last known number immediately instead of a gap while Firestore resolves.
  *
+ * Below all of that, `userCount.suite` is a second, independent counter: the
+ * UNI·SIM suite-wide figure both apps joined on 2026-09-17, over Supabase
+ * rather than Firestore. It is what puts these users into "a total of X users
+ * across all UNI·SIM apps", and what each app's count line offers on a tap.
+ * The two never mix — see the comment above `userCount.suite`.
+ *
  * @file js/shared/user-count.js
  */
 (function () {
@@ -59,6 +65,12 @@
   function _warn(msg, extra) {
     var f = (window.BB && window.BB.warn) || (window.console && console.warn);
     if (f) extra === undefined ? f(msg) : f(msg, extra);
+  }
+
+  /** True while the page is backgrounded — a hidden tab is not someone using
+   *  the app, so neither counter beats. */
+  function _hidden() {
+    try { return document.visibilityState === 'hidden'; } catch (_) { return false; }
   }
 
   /**
@@ -258,10 +270,6 @@
       var stopped = false;
       var sweeps = 0;
 
-      function hidden() {
-        try { return document.visibilityState === 'hidden'; } catch (_) { return false; }
-      }
-
       function beat() {
         return ref.set(
           { lastSeen: window.firebase.firestore.FieldValue.serverTimestamp() },
@@ -302,7 +310,7 @@
       }
 
       function tick() {
-        if (stopped || hidden()) return;
+        if (stopped || _hidden()) return;
         var beating = beat();
         // Pages that don't show a figure only report themselves — no count
         // query, no sweep. Every open page adding reads would make the live
@@ -315,7 +323,7 @@
       // Coming back to a backgrounded tab should refresh immediately rather
       // than waiting out the rest of the interval.
       try {
-        document.addEventListener('visibilitychange', function () { if (!hidden()) tick(); });
+        document.addEventListener('visibilitychange', function () { if (!_hidden()) tick(); });
       } catch (_) {}
       // Best-effort tidy-up; the 2-minute window covers us when it doesn't land.
       try {
@@ -337,6 +345,289 @@
      * @returns {string}
      */
     format: function (n) { return Number(n).toLocaleString('en-US'); },
+  };
+
+
+  // ── The UNI·SIM suite-wide counter ──────────────────────────────────────────
+  //
+  // Bipolar Bear and Bipolar Anonymous joined the Universal Simulation suite on
+  // 2026-09-17, and with it the count every other suite app shows. Two calls,
+  // both against Supabase's REST endpoint, both deliberately separate from the
+  // Firestore counters above:
+  //
+  //   * a BEAT — app_presence_beat {p_product, p_install_id}, on load and every
+  //     45 s while the page is visible (migration 0175), which is what puts
+  //     this app's users INTO the suite figure;
+  //   * a READ — suite_user_counts {} → {total, live} (migration 0177), for
+  //     when somebody taps the line to see that figure.
+  //
+  // The Firestore counters are untouched and stay what each app says about
+  // ITSELF: they count accounts rather than installs, so they are the better
+  // number, and they have the app's whole history behind them. The suite figure
+  // is the second face of the same line, one tap away, and `scope()` remembers
+  // which face somebody last chose.
+  //
+  // What is sent: a product name, a random install id, nothing else. No uid, no
+  // email, no monika, no journal, nothing about what was read or written. An
+  // account here is a FIREBASE account, unknown to Supabase, so every beat goes
+  // up anonymous — the suite sees a device, never a person, and cannot join one
+  // to the next. See migration 0179's header.
+  //
+  // The key below is a PUBLISHABLE anon key; it ships in every suite web bundle
+  // by design. `app_presence` has RLS on with no policies at all, so this key
+  // reaches that table through these two functions and in no other way.
+  //
+  // All of it is best-effort. Offline, blocked, or refused, every call fails
+  // quietly and the line simply never offers the suite figure.
+
+  var SUITE_URL = 'https://rygfxgalojojppxmhddo.supabase.co';
+  var SUITE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ5Z2Z4Z2Fsb2pvanBweG1oZGRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NTY4MjUsImV4cCI6MjA5NDMzMjgyNX0.hLy_vt9vY_rdPKF3nL32yAuMCD604E3CH5VM7D7CaNE';
+  /** `product_code` enum value per counter kind (migration 0179). */
+  var SUITE_PRODUCT = { app: 'bipolar_bear', anon: 'bipolar_anonymous' };
+  /** Raw localStorage keys, spelled exactly as @unisim/sdk spells them. */
+  var INSTALL_ID_KEY = 'unisim:install-id';
+  var SCOPE_KEY = 'unisim:user-count-scope';
+  /** Last known suite TOTAL (via BB.storage). Never the live figure: a stale
+   *  "live" is a lie, where a stale total is merely a little behind. */
+  var SUITE_CACHE_KEY = 'SuiteUserCountCache';
+
+  /**
+   * A v4 UUID. `crypto.randomUUID` is missing on the older WebViews this app
+   * still runs in (iOS < 15.4, Chrome < 92), so fall back to random bytes, and
+   * to Math.random on the oldest of all — an install id only has to be unique,
+   * not unguessable.
+   * @returns {string}
+   */
+  function _uuid() {
+    try { if (window.crypto && crypto.randomUUID) return crypto.randomUUID(); } catch (_) {}
+    var bytes = new Uint8Array(16);
+    try { crypto.getRandomValues(bytes); }
+    catch (_) { for (var i = 0; i < 16; i++) bytes[i] = Math.floor(Math.random() * 256); }
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;   // version 4
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;   // variant 10x
+    var hex = '';
+    for (var j = 0; j < 16; j++) hex += (bytes[j] + 0x100).toString(16).slice(1);
+    return hex.slice(0, 8) + '-' + hex.slice(8, 12) + '-' + hex.slice(12, 16) + '-' +
+           hex.slice(16, 20) + '-' + hex.slice(20);
+  }
+
+  /**
+   * This device's suite install id, minted once and kept forever.
+   *
+   * Deliberately raw localStorage rather than BB.storage: the key is the
+   * suite's, not this app's, and it is the same key the React apps and
+   * Universal Screens use. Blocked storage (private mode) falls back to a
+   * per-load id, which counts the session and is forgotten — the same trade the
+   * SDK makes.
+   * @returns {string}
+   */
+  function _installId() {
+    try {
+      var existing = localStorage.getItem(INSTALL_ID_KEY);
+      if (existing) return existing;
+      var id = _uuid();
+      localStorage.setItem(INSTALL_ID_KEY, id);
+      return id;
+    } catch (_) {
+      return _uuid();
+    }
+  }
+
+  /**
+   * POST to a Supabase RPC as the anon role. Rejects on anything but a 2xx.
+   * @param {string} fn    function name
+   * @param {object} body  arguments
+   * @returns {Promise<*>}
+   */
+  function _suiteRpc(fn, body) {
+    if (typeof fetch !== 'function') return Promise.reject(new Error('no fetch'));
+    return fetch(SUITE_URL + '/rest/v1/rpc/' + fn, {
+      method: 'POST',
+      headers: {
+        'apikey': SUITE_KEY,
+        'Authorization': 'Bearer ' + SUITE_KEY,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body || {}),
+    }).then(function (res) {
+      if (!res.ok) throw new Error(fn + ': ' + res.status);
+      return res.text();
+    }).then(function (text) {
+      return text ? JSON.parse(text) : null;
+    });
+  }
+
+  userCount.suite = {
+    /**
+     * Which figure the line is currently showing: this app's own, or the whole
+     * suite's. 'app' unless somebody has tapped through — each app's own number
+     * is the one it has always shown, and stays what a first-time visitor sees.
+     * @returns {'app'|'suite'}
+     */
+    scope: function () {
+      try { return localStorage.getItem(SCOPE_KEY) === 'suite' ? 'suite' : 'app'; }
+      catch (_) { return 'app'; }
+    },
+
+    /**
+     * Remember which figure to show. Same key the rest of the suite uses, so a
+     * browser that has both keeps one answer.
+     * @param {'app'|'suite'} s
+     * @returns {'app'|'suite'} what was stored
+     */
+    setScope: function (s) {
+      var v = s === 'suite' ? 'suite' : 'app';
+      try { localStorage.setItem(SCOPE_KEY, v); } catch (_) {}
+      return v;
+    },
+
+    /** Flip between the two figures. @returns {'app'|'suite'} the new scope */
+    toggleScope: function () {
+      return this.setScope(this.scope() === 'suite' ? 'app' : 'suite');
+    },
+
+    /**
+     * Last known suite total, so a tap paints instantly instead of gapping
+     * while the read resolves. No live figure — see SUITE_CACHE_KEY.
+     * @returns {number|null}
+     */
+    cached: function () {
+      var raw = parseInt(window.BB.storage.get(SUITE_CACHE_KEY) || '', 10);
+      return isNaN(raw) || raw <= 0 ? null : raw;
+    },
+
+    /**
+     * Read the suite figure. Never rejects: any failure (offline, blocked,
+     * refused) resolves null and the caller keeps showing whatever it had.
+     * @returns {Promise<{total: number, live: number}|null>}
+     */
+    load: function () {
+      return _suiteRpc('suite_user_counts', {}).then(function (rows) {
+        var row = (rows && rows.length !== undefined) ? rows[0] : rows;
+        var total = row ? Number(row.total) : NaN;
+        var live = row ? Number(row.live) : NaN;
+        if (!isFinite(total) || total <= 0) {
+          _log('[userCount] suite: no usable figure yet');
+          return null;
+        }
+        if (!isFinite(live) || live < 0) live = 0;
+        window.BB.storage.set(SUITE_CACHE_KEY, String(total));
+        _log('[userCount] suite: ' + total + ' total, ' + live + ' live');
+        return { total: total, live: live };
+      }).catch(function (e) {
+        _warn('[userCount] suite_user_counts failed:', e && (e.message || e));
+        return null;
+      });
+    },
+
+    /**
+     * Join the suite counter, and keep the caller supplied with the suite
+     * figure for as long as its line is showing one.
+     *
+     * Mirrors startPresence() above — beat now, then every 45 s while the page
+     * is visible, and again the moment a backgrounded tab comes back — but
+     * against Supabase rather than Firestore, and with no dependency on
+     * Firebase having initialised, so it runs on a page whose Firestore
+     * counter never resolves.
+     *
+     * The READ is skipped entirely unless `wantsSuite()` says the line is
+     * showing the suite figure, so a page nobody taps costs one small POST per
+     * 45 s and nothing else.
+     *
+     * @param {'app'|'anon'} kind
+     * @param {function(): boolean} wantsSuite  is the line showing the suite figure?
+     * @param {function({total: number, live: number})} onCounts  called with a fresh figure
+     * @returns {function()} stop function (clears the timer; the row ages out on its own)
+     */
+    start: function (kind, wantsSuite, onCounts) {
+      var self = this;
+      var product = SUITE_PRODUCT[kind] || SUITE_PRODUCT.app;
+      var id = _installId();
+      var timer = null;
+      var stopped = false;
+      var beaten = false;
+
+      function beat() {
+        return _suiteRpc('app_presence_beat', { p_product: product, p_install_id: id })
+          .then(function () { beaten = true; })
+          .catch(function (e) {
+            _warn('[userCount] suite beat for ' + product + ' failed:', e && (e.message || e));
+          });
+      }
+
+      function read() {
+        if (stopped || typeof onCounts !== 'function') return;
+        if (typeof wantsSuite === 'function' && !wantsSuite()) return;
+        return self.load().then(function (counts) {
+          if (stopped || !counts) return;
+          // Whoever is reading this is using a suite app right now; a read that
+          // raced its own beat must not answer "(0 live)".
+          if (beaten && counts.live < 1) counts.live = 1;
+          onCounts(counts);
+        });
+      }
+
+      function tick() {
+        if (stopped || _hidden()) return;
+        beat().then(read);
+      }
+
+      tick();
+      timer = setInterval(tick, BEAT_MS);
+      try {
+        document.addEventListener('visibilitychange', function () { if (!_hidden()) tick(); });
+      } catch (_) {}
+
+      return function stop() {
+        stopped = true;
+        if (timer) clearInterval(timer);
+      };
+    },
+
+    /**
+     * Make a count line switch between this app's figure and the suite's when
+     * it is tapped, clicked or given Enter/Space.
+     *
+     * Safe to call on every repaint: the hint is re-applied each time so it
+     * follows a language change, and the listeners are attached once (a data
+     * attribute on the element, so it holds across both pages' repaints).
+     *
+     * ⚠ No aria-label. With `role="button"` the accessible name comes from the
+     * element's text, and an aria-label would read the hint out INSTEAD OF THE
+     * NUMBER — exactly what somebody came to the line for. The hint is a
+     * `title`, which assistive tech offers as a description alongside it.
+     *
+     * @param {HTMLElement} el         the line
+     * @param {string} hint            localised "tap to switch" text
+     * @param {function()} onToggle    called once the scope has flipped
+     * @returns {void}
+     */
+    wireTap: function (el, hint, onToggle) {
+      if (!el) return;
+      if (hint) el.title = hint;
+      if (el.getAttribute('data-suite-tap') === '1') return;
+      el.setAttribute('data-suite-tap', '1');
+      el.style.cursor = 'pointer';
+      el.setAttribute('role', 'button');
+      el.setAttribute('tabindex', '0');
+      var fire = function () {
+        userCount.suite.toggleScope();
+        if (typeof onToggle === 'function') onToggle();
+      };
+      el.addEventListener('click', fire);
+      el.addEventListener('keydown', function (e) {
+        var k = e.key;
+        if (k === 'Enter' || k === ' ' || k === 'Spacebar') { e.preventDefault(); fire(); }
+      });
+    },
+
+    /** Read the suite figure once, on demand — for a tap that wants it now. */
+    refresh: function (onCounts) {
+      return this.load().then(function (counts) {
+        if (counts && typeof onCounts === 'function') onCounts(counts);
+        return counts;
+      });
+    },
   };
 
   window.BB.userCount = userCount;

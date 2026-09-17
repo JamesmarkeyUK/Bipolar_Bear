@@ -315,6 +315,50 @@ bbPresence/{sessionId}
 - The session id lives in `sessionStorage`, so moving home → journal → survival
   kit in one tab reuses one presence document and reads as one live person.
 
+#### The UNI·SIM suite-wide count
+
+Both apps moved into the `universal-simulation-ltd` organisation on 2026-09-17
+and joined the counter every Universal Simulation app shows. `BB.userCount.suite`
+is that counter, and it is **entirely separate** from everything above: Supabase
+rather than Firestore, and a second figure rather than a replacement for the
+ones the apps already had.
+
+```
+POST {supabase}/rest/v1/rpc/app_presence_beat  {p_product, p_install_id}
+POST {supabase}/rest/v1/rpc/suite_user_counts  {}  → [{total, live}]
+```
+
+- **The beat is what matters.** It runs on load and every 45 s while the page
+  is visible — same cadence, same hidden-tab rule as `startPresence()` — and is
+  what puts these users into the suite figure. `p_product` is `bipolar_bear`
+  from the home page and `bipolar_anonymous` from the board (migration 0179).
+- **It does not wait for Firebase.** It is started at module scope in
+  `js/index.js` and `js/anonymous.js`, not inside the auth chain: it has nothing
+  to do with Firestore, and a page whose Firebase init fails should still count
+  its reader.
+- **What is sent:** the product name and a random install id. No uid, no email,
+  no monika, nothing read or written. A Bipolar Bear account is a *Firebase*
+  account and means nothing to that server, so every beat is anonymous — which
+  also means the suite sees a device, not a person, and one user on a phone and
+  a laptop counts twice there (the Firestore counters do not have this problem,
+  which is why they stay).
+- **The install id is shared, deliberately:** raw `localStorage['unisim:install-id']`,
+  the same key `@unisim/sdk` uses. On bipolarbear.app the home page and the
+  board are one origin, so reading both is one person suite-wide, not two. The
+  standalone Bipolar Anonymous app has its own storage and is its own install.
+- **The count line is a button.** `BB.userCount.suite.wireTap(el, hint, cb)`
+  makes it switch between this app's figure and the suite's on click, tap or
+  Enter/Space; the choice is remembered in `localStorage['unisim:user-count-scope']`,
+  again the suite's key, so a browser that has both keeps one answer. Default is
+  the app's own figure. No `aria-label` — with `role="button"` that would read
+  the hint out instead of the number.
+- **Everything is best-effort.** Offline or refused, every call fails quietly
+  and the line simply never offers the suite figure. Whichever figure is
+  missing, the other stands in, and the wording always says which is which.
+- The suite side is documented in `universal-platform`: migrations
+  `0175_app_presence_user_counts.sql`, `0177_suite_user_counts.sql` and
+  `0179_product_code_bipolar.sql`.
+
 #### localStorage Keys
 
 ```
@@ -382,6 +426,11 @@ bbWaFabHidden           "1"           — WhatsApp FAB permanently hidden
 bbQuickNoteFabHidden    "1"           — Quick Note FAB permanently hidden
 bbCoffeeFabHidden       "1"           — Buy Me a Coffee FAB permanently hidden
 bbFeedbackFabHidden     "1"           — Feedback FAB permanently hidden
+
+── UNI·SIM suite counter (NOT bb-prefixed — shared with the whole suite) ────
+unisim:install-id       uuid          — this install, as the suite knows it
+unisim:user-count-scope "app"|"suite" — which figure the count line is showing
+bbSuiteUserCountCache   string        — last known suite TOTAL (never the live one)
 
 ── Misc ─────────────────────────────────────────────────────────────────────
 bbWebUnlocked           "true"        — beta gate bypass (web preview)
