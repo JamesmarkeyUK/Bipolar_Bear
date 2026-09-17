@@ -266,6 +266,18 @@
     @media (hover: hover) and (pointer: fine) {
       .bb-auth-fab:hover { transform: translateX(-50%) scale(1.08); }
     }
+    /* Android 15+ draws the WebView edge-to-edge, behind the gesture / nav bar
+       (Play's "edge-to-edge" warning). Lift the whole dock by the bottom inset so
+       its buttons clear the bar. Older WebViews (e.g. Chrome 124) report env() as
+       0, so also read the --safe-area-inset-bottom Capacitor's SystemBars plugin
+       injects; both are 0 on Android 14 and below, where the system still
+       reserves that space. iOS keeps the layout it shipped with. */
+    html.is-android .fab-footer { height: calc(80px + max(env(safe-area-inset-bottom, 0px), var(--safe-area-inset-bottom, 0px))); }
+    html.is-android .whatsapp-fab, html.is-android .placeholder-fab, html.is-android .coffee-fab,
+    html.is-android .feedback-fab, html.is-android .review-fab, html.is-android .bb-extra-fab,
+    html.is-android .fab-dot-placeholder, html.is-android .bb-auth-fab {
+      bottom: calc(24px + max(env(safe-area-inset-bottom, 0px), var(--safe-area-inset-bottom, 0px)));
+    }
     @media (min-width: 520px) {
       .fab-footer { border-bottom-left-radius: 42px; border-bottom-right-radius: 42px; }
     }

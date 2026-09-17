@@ -142,6 +142,10 @@
       0%, 100% { opacity: 0.75; }
       50% { opacity: 1; }
     }
+    /* Android edge-to-edge: keep the dock hint and the home version label above the
+       gesture bar (matching dock rules in fab.js). */
+    html.is-android .fab-hint { bottom: calc(38px + max(env(safe-area-inset-bottom, 0px), var(--safe-area-inset-bottom, 0px))); }
+    html.is-android #bbHomeVersion { bottom: calc(8px + max(env(safe-area-inset-bottom, 0px), var(--safe-area-inset-bottom, 0px))) !important; }
     .fab-hint {
       position: fixed;
       bottom: 38px;

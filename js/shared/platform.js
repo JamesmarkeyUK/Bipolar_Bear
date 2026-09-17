@@ -56,6 +56,9 @@
   // home page also mirrors it onto <body> in js/index.js, which is harmless.
   if (isNative()) {
     document.documentElement.classList.add('is-native');
+    // Per-platform hook for CSS — e.g. the Android-only edge-to-edge bottom
+    // insets on the dock (fab.js) and home version label (css/index.css).
+    document.documentElement.classList.add(isIOS() ? 'is-ios' : 'is-android');
   }
 
   // Canonical namespace.

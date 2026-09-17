@@ -1077,7 +1077,20 @@
 //       degrades to the old flash rather than a stuck page. Touches
 //       index.html, css/theme.css, js/index.js, js/shared/auth-splash.js (new,
 //       precached).
-const CACHE_NAME = 'bipolarbear-v227';
+// v228: release 1.36 (build 36). Android edge-to-edge: Android 15+ draws the
+//       WebView behind the gesture / nav bar, so the dock sat on it.
+//       platform.js now tags <html> with is-android / is-ios, and fab.js +
+//       css/index.css lift the dock, its buttons, the dock hint and the home
+//       version label by the bottom inset on Android only: the larger of
+//       env(safe-area-inset-bottom) and Capacitor's --safe-area-inset-bottom
+//       (older WebViews report env() as 0; both 0 on Android ≤14; iOS unchanged). The home tutorial-progress line is
+//       translated (home.tutorialProgressOne/Many, all ten languages). In-app
+//       store review prompt merged (js/journal.js). In-app changelog: What's
+//       New headline + a v1.36 block in the changelog modal. Touches
+//       js/shared/platform.js, fab.js, css/index.css, js/index.js,
+//       js/shared/i18n.js, js/journal.js, journal.html,
+//       js/shared/brand-config.js (all precached).
+const CACHE_NAME = 'bipolarbear-v228';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

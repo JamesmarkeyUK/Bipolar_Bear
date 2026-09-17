@@ -112,6 +112,7 @@
         anonymous: 'Bipolar Anonymous',
       },
       home: {
+        tutorialProgressOne: '{n} more entry needed to complete tutorial', tutorialProgressMany: '{n} more entries needed to complete tutorial',
         signInNote: 'Sign in to join the community',
         logoHint: '🐻 psst… click me!',
         journalHint: '🐻 Click here to get started!',
@@ -1866,6 +1867,7 @@
         anonymous: 'Bipolar Anonymous',
       },
       home: {
+        tutorialProgressOne: 'Falta {n} entrada para completar el tutorial', tutorialProgressMany: 'Faltan {n} entradas para completar el tutorial',
         signInNote: 'Inicia sesión para unirte a la comunidad',
         logoHint: '🐻 psst… ¡haz clic en mí!',
         journalHint: '🐻 ¡Haz clic aquí para comenzar!',
@@ -3615,6 +3617,7 @@
       },
       nav: { journal: "Journal d'Humeur", survivalKit: 'Votre Kit de Survie', anonymous: 'Bipolar Anonymous' },
       home: {
+        tutorialProgressOne: 'Encore {n} entrée pour terminer le tutoriel', tutorialProgressMany: 'Encore {n} entrées pour terminer le tutoriel',
         signInNote: 'Connectez-vous pour rejoindre la communauté',
         logoHint: '🐻 psst… cliquez sur moi !',
         journalHint: '🐻 Cliquez ici pour commencer !',
@@ -5312,6 +5315,7 @@
       },
       nav: { journal: 'Stimmungstagebuch', survivalKit: 'Ihr Überlebenskit', anonymous: 'Bipolar Anonymous' },
       home: {
+        tutorialProgressOne: 'Noch {n} Eintrag bis zum Abschluss des Tutorials', tutorialProgressMany: 'Noch {n} Einträge bis zum Abschluss des Tutorials',
         signInNote: 'Anmelden, um der Community beizutreten',
         logoHint: '🐻 psst… klick mich!',
         journalHint: '🐻 Hier klicken, um zu beginnen!',
@@ -6992,6 +6996,7 @@
       },
       nav: { journal: "Diario dell'Umore", survivalKit: 'Il Tuo Kit di Sopravvivenza', anonymous: 'Bipolar Anonymous' },
       home: {
+        tutorialProgressOne: 'Manca {n} voce per completare il tutorial', tutorialProgressMany: 'Mancano {n} voci per completare il tutorial',
         signInNote: 'Accedi per unirti alla comunità',
         logoHint: '🐻 psst… cliccami!',
         journalHint: '🐻 Clicca qui per iniziare!',
@@ -8672,6 +8677,7 @@
       },
       nav: { journal: 'Diário de Humor', survivalKit: 'Seu Kit de Sobrevivência', anonymous: 'Bipolar Anonymous' },
       home: {
+        tutorialProgressOne: 'Falta {n} registro para concluir o tutorial', tutorialProgressMany: 'Faltam {n} registros para concluir o tutorial',
         signInNote: 'Faça login para entrar na comunidade',
         logoHint: '🐻 psst… clique em mim!',
         journalHint: '🐻 Clique aqui para começar!',
@@ -10352,6 +10358,7 @@
       },
       nav: { journal: 'Stemmingsdagboek', survivalKit: 'Uw Overlevingskit', anonymous: 'Bipolar Anonymous' },
       home: {
+        tutorialProgressOne: 'Nog {n} dagboekitem nodig om de tutorial af te ronden', tutorialProgressMany: 'Nog {n} dagboekitems nodig om de tutorial af te ronden',
         signInNote: 'Meld u aan om deel te nemen aan de community',
         logoHint: '🐻 psst… klik op mij!',
         journalHint: '🐻 Klik hier om te beginnen!',
@@ -12032,6 +12039,7 @@
       },
       nav: { journal: 'Dziennik Nastroju', survivalKit: 'Twój Zestaw Przetrwania', anonymous: 'Bipolar Anonymous' },
       home: {
+        tutorialProgressOne: 'Jeszcze {n} wpis do ukończenia samouczka', tutorialProgressMany: 'Jeszcze {n} wpisy do ukończenia samouczka',
         signInNote: 'Zaloguj się, aby dołączyć do społeczności',
         logoHint: '🐻 psst… kliknij mnie!',
         journalHint: '🐻 Kliknij tutaj, aby rozpocząć!',
@@ -13720,6 +13728,7 @@
       },
       nav: { journal: 'Stämningsdagbok', survivalKit: 'Ditt Överlevnadskit', anonymous: 'Bipolar Anonymous' },
       home: {
+        tutorialProgressOne: '{n} anteckning kvar för att slutföra guiden', tutorialProgressMany: '{n} anteckningar kvar för att slutföra guiden',
         signInNote: 'Logga in för att gå med i gemenskapen',
         logoHint: '🐻 psst… klicka på mig!',
         journalHint: '🐻 Klicka här för att komma igång!',
@@ -15400,6 +15409,7 @@
       },
       nav: { journal: '情绪日记', survivalKit: '你的生存工具包', anonymous: 'Bipolar Anonymous' },
       home: {
+        tutorialProgressOne: '还需 {n} 条记录即可完成教程', tutorialProgressMany: '还需 {n} 条记录即可完成教程',
         signInNote: '登录以加入社区',
         logoHint: '🐻 嘿……点击我！',
         journalHint: '🐻 点击这里开始！',

@@ -913,7 +913,10 @@ _refreshUserCount();
         } else {
           const _done = [_e1, _e2, _e3].filter(Boolean).length;
           const _remaining = 4 - _done;
-          _prog.textContent = _remaining + ' more ' + (_remaining === 1 ? 'entry' : 'entries') + ' needed to complete tutorial';
+          const _progKey = _remaining === 1 ? 'home.tutorialProgressOne' : 'home.tutorialProgressMany';
+          const _progTxt = window.BB && window.BB.t ? window.BB.t(_progKey, { n: _remaining }) : '';
+          _prog.textContent = (_progTxt && _progTxt !== _progKey) ? _progTxt
+            : _remaining + ' more ' + (_remaining === 1 ? 'entry' : 'entries') + ' needed to complete tutorial';
           _prog.style.display = '';
         }
       }
@@ -2246,6 +2249,7 @@ function _handleIndexJournalNav() {
     // (and fab.js) reads the same value without depending on this script.
     const _APP_VERSION = window._APP_VERSION;
     const _WHATS_NEW_HEADLINES = {
+      '1.36': 'Opening the app no longer flashes “signed out” while your session loads, and yesterday’s entry can now be filled from your health data in one tap.',
       '1.35': 'The iPhone home-screen widget now updates as soon as you log — it no longer gets stuck on "Yesterday needs logging", and it resets properly at midnight.',
       '1.34': 'Missed a few days? The journal can now fill the gaps in one go from your health data and recent entries — each clearly marked as an estimate. And the Bipolar Anonymous board can now notify you about new posts, replies and announcements, without ever showing what anyone wrote.',
       '1.33': 'The home screen now shows how many people use Bipolar Bear and how many are using it right now, and the Bipolar Anonymous board does the same for its members. The live figure is an anonymous heartbeat that expires after two minutes — it stores nothing about who you are.',
