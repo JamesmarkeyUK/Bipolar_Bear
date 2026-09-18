@@ -1018,18 +1018,29 @@ ceiling that actually holds.
 
 #### Setup — owner-gated
 
-The function needs the **Cloud Translation API** enabled on the Firebase
-project, with billing active:
+The function needs the **Cloud Translation API** enabled, with billing active.
 
-1. Google Cloud console → **APIs & Services → Enable APIs** → "Cloud
-   Translation API" → Enable (same project as Firebase).
-2. **Lower the API's quota to a number you are happy to pay for** — IAM &
-   Admin → **Quotas** → filter to Cloud Translation API → the characters-per-day
-   quota → Edit. See "What it costs" below for why this step, not a budget
-   alert, is the actual ceiling.
-3. Nothing else: the function authenticates as its own default service
-   account through `google-auth-library`. No API key, no secret.
-4. Deploy: `firebase deploy --only functions:translateAnonTexts`.
+⚠️ **Both console steps are in the Google Cloud console, not Firebase.** They
+are two consoles onto the same project (`bipolarbear-app`); quotas exist only
+on the Cloud side. Firebase's Project settings → Users and permissions tab
+looks like the right place and is not — it only does roles.
+
+1. **Enable it** — [console.cloud.google.com/apis/library/translate.googleapis.com?project=bipolarbear-app](https://console.cloud.google.com/apis/library/translate.googleapis.com?project=bipolarbear-app)
+   (the long way: Google Cloud console → project `bipolarbear-app` → APIs &
+   Services → Enable APIs → "Cloud Translation API").
+2. **Cap it** — [console.cloud.google.com/apis/api/translate.googleapis.com/quotas?project=bipolarbear-app](https://console.cloud.google.com/apis/api/translate.googleapis.com/quotas?project=bipolarbear-app),
+   which is the Quotas tab on the Translation API itself, already filtered to
+   it (the long way: ☰ → IAM & Admin → **Quotas** → filter by service). Find
+   **Characters per day**, tick it, **Edit Quotas**, set a number you are happy
+   to pay for. The default is effectively unlimited — a billion characters a
+   day — so this is putting a ceiling where there isn't one, not tightening a
+   sensible default. See "What it costs" below for why this step, and not a
+   budget alert, is the ceiling that holds.
+3. Nothing else in the console: the function authenticates as its own default
+   service account through `google-auth-library`. No API key, no secret.
+4. Deploy: `firebase deploy --only functions:translateAnonTexts`. Pushing to
+   `main` deploys the web build through Cloudflare Pages; it does **not**
+   deploy Cloud Functions.
 
 Until that is done the function returns `unavailable: true`, the client stops
 asking, and **every post reads exactly as it was written** — the board works as
