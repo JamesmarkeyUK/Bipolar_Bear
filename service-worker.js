@@ -1124,7 +1124,12 @@
 //       post simply reads as written. New js/shared/translate.js (precached),
 //       touches anonymous.html, css/anonymous.css, js/anonymous.js,
 //       js/shared/i18n.js, functions/index.js, scripts/build-anonymous.js.
-const CACHE_NAME = 'bipolarbear-v231';
+// v232: the home community count now sits under the "Being built by James
+//       Markey MBE" chip rather than above it, so the credit chip closes the
+//       page and the count reads as a footnote to it. Spacing moved with it —
+//       the chip's own bottom margin carries the gap. Touches index.html,
+//       css/index.css (both precached).
+const CACHE_NAME = 'bipolarbear-v232';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.

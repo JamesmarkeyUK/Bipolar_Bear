@@ -366,17 +366,17 @@
 
     .features { display: none !important; }
 
-    /* Global user count, above the footer credit. Sits on the brand gradient,
-       so it borrows the footer link's white-on-orange treatment at a smaller,
-       quieter weight. */
+    /* Global user count, below the footer credit chip. Sits on the brand
+       gradient, so it borrows the footer link's white-on-orange treatment at a
+       smaller, quieter weight. */
     .user-count {
       font-size: 0.78em;
       font-weight: 700;
       color: rgba(255, 255, 255, 0.85);
       letter-spacing: 0.02em;
-      /* Negative bottom margin pulls the footer link's own 20px top margin
-         back in, so the pair reads as one block rather than two. */
-      margin: 18px 0 -8px;
+      /* Small top margin only — the credit chip's own 10px bottom margin
+         supplies the rest of the gap, so the pair reads as one block. */
+      margin: 2px 0 0;
     }
 
     .footer-link {
