@@ -17,13 +17,14 @@
 #     main app (real Xcode project is BipolarBear.xcodeproj, not App.xcodeproj) and
 #     is only needed when NATIVE PLUGINS change — for a plain JS/CSS update, copy is
 #     enough. If you changed plugins, run `npx cap sync` in the native dir by hand.
-#   * Native projects live under ~/Github/James/Bipolar_Bear_Mobile/.
+#   * Native projects live in Bipolar_Bear_Mobile/, a sibling of this repo
+#     (~/Github/UNISIM/Bipolar_Bear_Mobile/). Override with NATIVE_BASE=… .
 #
 set -euo pipefail
 
 # Repo root = parent of this script's dir, resolved absolutely.
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-NATIVE_BASE="$HOME/Github/James/Bipolar_Bear_Mobile"
+NATIVE_BASE="${NATIVE_BASE:-$(cd "$REPO_ROOT/.." && pwd)/Bipolar_Bear_Mobile}"
 BEAR_NATIVE="$NATIVE_BASE/bipolarbear-native"
 ANON_NATIVE="$NATIVE_BASE/bipolaranonymous-native"
 

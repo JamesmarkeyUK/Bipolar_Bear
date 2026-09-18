@@ -69,18 +69,20 @@ on the catch.
 
 ## Native build flow
 
-> **Native project locations.** Both Capacitor projects live side-by-side
-> under `~/Github/James/Bipolar_Bear_Mobile/` — `bipolarbear-native/` and
-> `bipolaranonymous-native/`. (They used to sit directly in the home dir
-> at `~/bipolarbear-native` and `~/bipolaranonymous-native`; those paths
-> are dead — the old home-dir `~/bipolaranonymous-native` is now just an
-> empty `www/` shell, safe to ignore or delete.)
+> **Native project locations.** These repos are part of the UNI·SIM
+> workspace (moved 2026-09-18). The web repo is `~/Github/UNISIM/Bipolar_Bear`
+> and both Capacitor projects sit beside it under
+> `~/Github/UNISIM/Bipolar_Bear_Mobile/` — `bipolarbear-native/` and
+> `bipolaranonymous-native/`. They used to live in `~/Github/James/`; on the
+> Mac that path is now only a symlink to the new place, so don't write it
+> into anything. (Before that they sat directly in the home dir at
+> `~/bipolarbear-native` / `~/bipolaranonymous-native` — dead paths.)
 >
 > **On Windows** the whole Github tree lives on the `D:` drive (not the
 > home dir), so the real paths are
-> `D:\Github\James\Bipolar_Bear_Mobile\bipolarbear-native\` and
+> `D:\Github\UNISIM\Bipolar_Bear_Mobile\bipolarbear-native\` and
 > `…\bipolaranonymous-native\` — siblings of the web repo
-> `D:\Github\James\Bipolar_Bear`. Translate the `~/Github/James/…` paths
+> `D:\Github\UNISIM\Bipolar_Bear`. Translate the `~/Github/UNISIM/…` paths
 > below accordingly. `scripts/bump-version.sh` auto-detects this sibling
 > layout; for other commands pass the `D:` path (or `NATIVE_REPO=…`).
 
@@ -100,13 +102,13 @@ rsync -av --delete \
   --exclude='.git' --exclude='.claude' --exclude='.github' --exclude='.DS_Store' \
   --exclude='www-anonymous' --exclude='scripts' --exclude='functions' \
   --exclude='store-assets' --exclude='.wrangler' --exclude='*.md' \
-  ./ ~/Github/James/Bipolar_Bear_Mobile/bipolarbear-native/www/
+  ./ ~/Github/UNISIM/Bipolar_Bear_Mobile/bipolarbear-native/www/
 
 # On Windows (no rsync) the equivalent is robocopy /MIR with the same excludes
 # via /XD (dirs) + /XF '*.md', then delete any of the above already in www/.
 
 # Then open native IDE:
-cd ~/Github/James/Bipolar_Bear_Mobile/bipolarbear-native && npx cap sync
+cd ~/Github/UNISIM/Bipolar_Bear_Mobile/bipolarbear-native && npx cap sync
 npx cap open ios       # or: npx cap open android
 ```
 
@@ -124,8 +126,8 @@ git pull
 node scripts/build-anonymous.js
 
 # Sync into the separate native project:
-rsync -av --delete ./www-anonymous/ ~/Github/James/Bipolar_Bear_Mobile/bipolaranonymous-native/www/
-cd ~/Github/James/Bipolar_Bear_Mobile/bipolaranonymous-native && npx cap sync
+rsync -av --delete ./www-anonymous/ ~/Github/UNISIM/Bipolar_Bear_Mobile/bipolaranonymous-native/www/
+cd ~/Github/UNISIM/Bipolar_Bear_Mobile/bipolaranonymous-native && npx cap sync
 npx cap open ios       # or: npx cap open android
 ```
 
@@ -136,7 +138,7 @@ check can't fire there — `location.hostname` is `localhost`).
 
 The script is platform-agnostic — it only produces the `www-anonymous/`
 bundle. The same bundle feeds both the iOS and Android targets inside
-`~/Github/James/Bipolar_Bear_Mobile/bipolaranonymous-native/`.
+`~/Github/UNISIM/Bipolar_Bear_Mobile/bipolaranonymous-native/`.
 
 ### Android first-time setup (Bipolar Anonymous)
 
@@ -144,7 +146,7 @@ Only needed once per machine. After this, the normal build flow above
 covers both platforms.
 
 ```bash
-cd ~/Github/James/Bipolar_Bear_Mobile/bipolaranonymous-native
+cd ~/Github/UNISIM/Bipolar_Bear_Mobile/bipolaranonymous-native
 npx cap add android
 ```
 
@@ -175,7 +177,7 @@ project so auth/Firestore accept its package ID:
 3. SHA-1: from Android Studio's Gradle panel → `:app → Tasks → android
    → signingReport` (use the **release** SHA-1, not debug)
 4. Download `google-services.json` → drop into
-   `~/Github/James/Bipolar_Bear_Mobile/bipolaranonymous-native/android/app/google-services.json`
+   `~/Github/UNISIM/Bipolar_Bear_Mobile/bipolaranonymous-native/android/app/google-services.json`
    (overwrites the placeholder Capacitor scaffolded)
 
 The existing Firestore security rules already allow writes from any
