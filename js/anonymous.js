@@ -1905,6 +1905,7 @@ function renderWiki() {
         </div>
         <div class="wiki-pill-row" data-pill-row="1">
           <div class="wiki-pill-track">
+            <button class="wiki-pill" data-wiki="twelveSteps">${esc(_wt('anon.wiki.pillTwelveSteps'))}</button>
             <button class="wiki-pill" data-wiki="workplace">${esc(_wt('anon.wiki.pillWorkplace'))}</button>
             <button class="wiki-pill" data-wiki="pregnancy">${esc(_wt('anon.wiki.pillPregnancy'))}</button>
             <button class="wiki-pill" data-wiki="media">${esc(_wt('anon.wiki.pillMedia'))}</button>
@@ -2008,6 +2009,21 @@ function setWikiSection(section) {
   else if (section === 'lovedOnes')    renderWikiLovedOnes();
   else if (section === 'groups')       renderWikiGroups();
   else if (section === 'wisdom')       renderWikiWisdom();
+  else if (section === 'twelveSteps')  renderWikiTwelveSteps();
+}
+
+// Open the wiki tab straight onto a named section. Used by the announcement
+// cards that link to a wiki page. _wikiSection is set BEFORE setTab because a
+// first-ever wiki render calls setWikiSection(_wikiSection) itself — without
+// this the pill would land on the default section for one frame.
+function openWikiSection(section) {
+  _wikiSection = section;
+  setTab('wiki');
+  setWikiSection(section);
+  const pill = document.querySelector(`.wiki-pill[data-wiki="${section}"]`);
+  if (pill) _slideWikiPillLeft(pill);
+  const wiki = document.getElementById('wiki-section');
+  if (wiki) wiki.scrollTop = 0;
 }
 
 // Slide the tapped pill so it aligns with the left edge of its scrollable
@@ -2832,6 +2848,131 @@ async function renderWikiWisdom() {
 }
 
 // ─────────────────────────────────────────────────────────────────
+// Bipolar Anonymous 12 Steps
+//
+// The same twelve steps the main app carries in the Survival Kit — kept here
+// as the board's own reference page so members can read, search and link to
+// them without leaving Anonymous.
+//
+// Only the card headings, the search keys and the "in practice" notes live in
+// this array. The step statements themselves are read from sk.steps.text (see
+// _stepStatement) so the two apps can't drift apart, and the three group
+// headings from sk.steps.modal — both already hand-translated in all ten
+// languages. Headings and practice notes are translated the way every other
+// wiki article is: anon.wiki.a.<slug of the English title>_<field>.
+// ─────────────────────────────────────────────────────────────────
+const _TWELVE_STEPS = [
+  {
+    group: 1, n: 1,
+    keys: ['step 1', 'powerless', 'unmanageable', 'admitting', 'acceptance'],
+    title: 'Step 1 · Admitting powerlessness',
+    practice: 'This isn\'t giving up, and it isn\'t saying you are your illness. It\'s the end of pretending you can white-knuckle a mood episode away. Bipolar is a medical condition, not a character flaw or a willpower problem — naming that honestly is what makes room for treatment, support and self-compassion.'
+  },
+  {
+    group: 1, n: 2,
+    keys: ['step 2', 'hope', 'higher power', 'restore', 'sanity', 'believe'],
+    title: 'Step 2 · Coming to believe',
+    practice: 'A higher power means whatever is bigger than you and genuinely helps: faith, if you have it — but equally your care team, your medication, this community, nature, or simply the accumulated experience of people who have lived with this longer than you have. You do not have to be religious to work these steps.'
+  },
+  {
+    group: 1, n: 3,
+    keys: ['step 3', 'letting go', 'turn it over', 'decision', 'trust', 'control'],
+    title: 'Step 3 · Letting go of the wheel',
+    practice: 'In practice this often looks very ordinary: taking the medication as prescribed even on the days you feel fine, keeping the appointment you\'d rather cancel, letting someone else drive when you\'re not safe to. Trusting a plan you made when you were well is a way of handing the wheel over to the steadiest version of you.'
+  },
+  {
+    group: 2, n: 4,
+    keys: ['step 4', 'inventory', 'moral inventory', 'honesty', 'self examination', 'triggers'],
+    title: 'Step 4 · An honest inventory',
+    practice: 'Write it down — patterns, triggers, resentments, the things done during an episode you\'ve never said out loud. Be fair as well as fearless: an inventory that only lists your failures isn\'t honest either. Separating "what I did" from "what the illness did" is slow, uncomfortable work, and it is where most of the relief in these steps lives.'
+  },
+  {
+    group: 2, n: 5,
+    keys: ['step 5', 'confession', 'telling someone', 'shame', 'honesty', 'sharing'],
+    title: 'Step 5 · Saying it out loud',
+    practice: 'Shame survives on secrecy. Telling one trusted person — a sponsor, therapist, friend, or the board here under a moniker — is what takes the inventory out of your own head, where it distorts, and into the open, where it can be answered. Choose someone safe; this step doesn\'t require an audience.'
+  },
+  {
+    group: 2, n: 6,
+    keys: ['step 6', 'ready', 'willingness', 'defects', 'change', 'patterns'],
+    title: 'Step 6 · Becoming ready',
+    practice: 'Readiness comes before change and usually lags behind wanting it. Some habits — the spending, the isolating, the 3am messages, the way you test people who love you — have been protecting you from something. Being ready means being willing to let go of them anyway, before you have proof of what comes next.'
+  },
+  {
+    group: 2, n: 7,
+    keys: ['step 7', 'humility', 'asking for help', 'shortcomings', 'support'],
+    title: 'Step 7 · Asking humbly',
+    practice: 'Humility here is practical: asking is a skill, and most of us are worse at it than we think. Asking your GP for a medication review, asking a friend to check in on you this week, asking the board for experience rather than advice — all of it counts. Nothing about this condition is meant to be carried alone.'
+  },
+  {
+    group: 2, n: 8,
+    keys: ['step 8', 'list', 'harmed', 'amends', 'willing', 'relationships'],
+    title: 'Step 8 · Making the list',
+    practice: 'Put yourself on that list too — people living with bipolar have usually been hardest on themselves. The list is just a list at this stage; nothing is owed to anyone yet. Willingness can take months to arrive for some names, and that\'s allowed.'
+  },
+  {
+    group: 2, n: 9,
+    keys: ['step 9', 'amends', 'apology', 'repair', 'making it right'],
+    title: 'Step 9 · Making amends',
+    practice: 'An amend is not the same as an apology: it\'s changed behaviour, and sometimes repayment or repair. The exception matters as much as the rule — if contacting someone would reopen a wound, frighten them, or is mainly about easing your own guilt, the amend is to leave them in peace and live differently instead.'
+  },
+  {
+    group: 2, n: 10,
+    keys: ['step 10', 'daily inventory', 'mood tracking', 'promptly admitted', 'maintenance'],
+    title: 'Step 10 · Keeping short accounts',
+    practice: 'This is the maintenance step, and it maps neatly onto mood tracking: a daily check of how you are, what you did, and what needs putting right before it hardens. Catching a slipping sleep pattern or an unfair word the same day is far easier than unpicking a month of it.'
+  },
+  {
+    group: 3, n: 11,
+    keys: ['step 11', 'prayer', 'meditation', 'mindfulness', 'grounding', 'conscious contact'],
+    title: 'Step 11 · Staying connected',
+    practice: 'Prayer and meditation are one route; so are mindfulness, breathwork, walking, journalling, or ten quiet minutes before the day starts. The point is a regular practice of stepping back from your own thoughts — which is precisely the skill that lets you notice a mood shift as weather passing through rather than as the truth about your life.'
+  },
+  {
+    group: 3, n: 12,
+    keys: ['step 12', 'carrying the message', 'helping others', 'service', 'peer support', 'awakening'],
+    title: 'Step 12 · Carrying it to others',
+    practice: 'This is why the board exists. Answering someone at their worst with "me too, and here\'s what helped" is the whole of Step 12, and it turns out to be one of the most reliably stabilising things you can do for yourself. You don\'t need to be recovered to be useful — you just need to be honest about where you are.'
+  }
+];
+
+// The step statements and the three group headings are NOT duplicated here —
+// they are read from the Survival Kit's own strings (sk.steps.*), which are
+// hand-translated in all ten languages and are the canonical wording. Editing a
+// step in js/shared/i18n.js changes it in both apps at once. sk.steps.text
+// carries <strong> markup for the Survival Kit's card, which this page strips.
+function _stepStatement(n) {
+  return _wt('sk.steps.text.s' + n).replace(/<[^>]*>/g, '');
+}
+
+function renderWikiTwelveSteps() {
+  const body = document.getElementById('wiki-body');
+  if (!body) return;
+  const groups = [1, 2, 3].map(g => {
+    const region = _wt('sk.steps.modal.group' + g + 'Title');
+    const cards = _TWELVE_STEPS.filter(st => st.group === g).map(st => {
+      const _t = _wikiTxt(st, 'title'), _b = _stepStatement(st.n), _p = _wikiTxt(st, 'practice');
+      const search = (_t + ' ' + st.title + ' ' + _b + ' ' + _p + ' ' + st.keys.join(' ')).toLowerCase();
+      return `
+        <details class="wiki-card" data-wiki-search="${esc(search)}" data-wiki-region-card="${esc(region)}">
+          <summary>${esc(_t)}<span class="wiki-chev">▼</span></summary>
+          <div class="wiki-card-body">
+            <p class="wiki-step-text">${esc(_b)}</p>
+            <p class="wiki-notes">${esc(_p)}</p>
+          </div>
+        </details>`;
+    }).join('');
+    return `<h3 class="wiki-region-heading" data-wiki-region="${esc(region)}">${esc(region)}</h3>${cards}`;
+  }).join('');
+  body.innerHTML = `
+    <div class="wiki-disclaimer">${esc(_wt('anon.wiki.twelveStepsIntro'))}<br><span class="wiki-disclaimer-src">${esc(_wt('anon.wiki.twelveStepsNote'))}</span></div>
+    ${groups}
+    <div class="wiki-disclaimer wiki-steps-outro">${esc(_wt('anon.wiki.twelveStepsOutro'))}</div>
+  `;
+  applyWikiFilter();
+}
+
+// ─────────────────────────────────────────────────────────────────
 // Posts — Firestore real-time listener
 // ─────────────────────────────────────────────────────────────────
 function sortPosts(posts) {
@@ -3259,7 +3400,25 @@ function demoData() {
 // through here so the faded cards can't be dropped by one code path.
 function announcementFeed() {
   const published = localPosts.length ? sortPosts(localPosts) : announcementPosts();
-  return [...visibleSuggestions(), ...published];
+  return [...visibleSuggestions(), ...builtInAnnouncements(), ...published];
+}
+
+// Announcements that ship with the app rather than being published to
+// Firestore by the admin. Unlike announcementPosts() (a demo fallback shown
+// only while the collection is empty) these always render, at the top of the
+// tab — they point at app features that exist in this build, so they can't go
+// stale the way a stored post can. `wikiLink` renders a button that opens the
+// named wiki section (see renderAnnouncement / openWikiSection).
+function builtInAnnouncements() {
+  return [
+    {
+      id: 'ann_twelve_steps',
+      isAnnouncement: true,
+      text: _wt('anon.feed.annTwelveSteps'),
+      wikiLink: 'twelveSteps',
+      timestamp: null,
+    },
+  ];
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -3993,6 +4152,10 @@ function renderPosts(posts) {
   list.querySelectorAll('[data-comment]').forEach(btn => {
     btn.addEventListener('click', () => openThread(btn.dataset.comment));
   });
+  // Announcement → wiki page links
+  list.querySelectorAll('[data-wiki-open]').forEach(btn => {
+    btn.addEventListener('click', () => openWikiSection(btn.dataset.wikiOpen));
+  });
   // Admin pin buttons
   list.querySelectorAll('[data-pin]').forEach(btn => {
     btn.addEventListener('click', () => handlePin(btn.dataset.pin, btn.dataset.tab));
@@ -4080,12 +4243,16 @@ function renderFeedFooter() {
 }
 
 function renderAnnouncement(p) {
+  const wikiBtn = p.wikiLink
+    ? `<button class="ann-wiki-link" data-wiki-open="${esc(p.wikiLink)}">${esc(_wt('anon.feed.annReadWiki'))}</button>`
+    : '';
   return `<div class="ann-card">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
       <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,${YELLOW_LT},${YELLOW_DARK});display:flex;align-items:center;justify-content:center;font-size:16px;">🐻</div>
       <div style="font-size:13px;font-weight:700;color:var(--dark);">BipolarBear</div>
     </div>
     <div class="post-text" data-tt>${esc(p.text)}</div>
+    ${wikiBtn}
   </div>`;
 }
 

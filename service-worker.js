@@ -1124,7 +1124,15 @@
 //       post simply reads as written. New js/shared/translate.js (precached),
 //       touches anonymous.html, css/anonymous.css, js/anonymous.js,
 //       js/shared/i18n.js, functions/index.js, scripts/build-anonymous.js.
-const CACHE_NAME = 'bipolarbear-v231';
+// v232: Bipolar Anonymous 12 Steps — a new "🙏 12 Steps" wiki section
+//       carrying the twelve steps from the main app's Survival Kit, grouped
+//       1–3 / 4–10 / 11–12 with a "what this looks like in practice" note per
+//       step, plus a built-in announcement that links straight to it. Built-in
+//       announcements always render at the top of the Announcements tab (the
+//       existing announcementPosts() demo pair still only shows while the
+//       collection is empty). Touches js/anonymous.js, css/anonymous.css,
+//       js/shared/i18n.js.
+const CACHE_NAME = 'bipolarbear-v232';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
