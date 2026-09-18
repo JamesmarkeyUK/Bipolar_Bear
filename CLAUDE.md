@@ -218,6 +218,8 @@ bbAnonPosts/{auto}          Community posts (plaintext)
 bbAnonAnnSuggestions/{auto} Member-suggested announcements awaiting the admin
 bbAnonPush/{fcmToken}       Push registration + notification prefs (never client-readable)
 bbAnonMonikas/{lowercase}   Monika reservation (uniqueness)
+bbAnonTranslations/{hash}   Cached post/comment translations (server-written only)
+bbAnonTranslateUsage/{uid}  Per-reader daily translation budget (server-written only)
 anonProfiles/{sha256email}  Cross-device anon profile lookup (standalone path)
 bbPresence/{sessionId}      Live-now heartbeat, main app (lastSeen only)
 bbAnonPresence/{sessionId}  Live-now heartbeat, anonymous board
@@ -231,6 +233,10 @@ Push notifications for the anonymous board (replies / announcements /
 weekly digest) need account + native setup that isn't in the repo — see
 `NOTIFICATIONS.md`. Until it's done the app reports them unavailable
 rather than failing.
+
+Auto-translation of board posts (`translateAnonTexts`) needs the **Cloud
+Translation API** enabled on the Firebase project — see `DOCS.md` §2.15.
+Until it's done every post reads as written; nothing breaks.
 
 ## localStorage key categories
 

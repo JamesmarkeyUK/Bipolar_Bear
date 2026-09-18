@@ -6,6 +6,7 @@ const { defineSecret }         = require('firebase-functions/params');
 const admin                    = require('firebase-admin');
 const crypto                   = require('crypto');
 const { Resend }               = require('resend');
+const { GoogleAuth }           = require('google-auth-library');
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -986,5 +987,210 @@ exports.backfillUserCounts = onCall(
 
     console.log('[backfillUserCounts] applied:', JSON.stringify(report));
     return Object.assign({ dryRun: false }, report);
+  }
+);
+
+// ── translateAnonTexts ───────────────────────────────────────────────────────
+// On-demand translation for member-written text on the anonymous board (posts,
+// daily topics, announcements and comments). The board is one community reading
+// in ten languages, so a Portuguese post is unreadable to most of it — this
+// translates it into whatever language the reader has the app set to, and the
+// client keeps the original one tap away.
+//
+// Everything is translated on read, never on write: a post is stored once, in
+// the language it was written in, and only the languages someone actually reads
+// it in are ever paid for.
+//
+// Requires the **Cloud Translation API** to be enabled on the Firebase project
+// (console → APIs & Services → Enable APIs → "Cloud Translation API") with
+// billing active. Until it is, this returns `unavailable: true` and the client
+// quietly leaves every post in the language it was written in — the board works
+// exactly as it did before. See DOCS.md §2.15.
+
+// The ten languages the app's UI is translated into (js/shared/i18n.js). A
+// target outside that set is refused: no reader can have asked for it.
+const TRANSLATE_TARGETS   = ['en', 'es', 'fr', 'de', 'it', 'pt', 'nl', 'pl', 'sv', 'zh'];
+const TRANSLATE_MAX_ITEMS = 40;      // texts per call (about one screen of posts)
+const TRANSLATE_MAX_CHARS = 2000;    // characters per text
+const TRANSLATE_MAX_TOTAL = 16000;   // characters per call
+// Per-caller daily budget. The shared cache means the board pays for each
+// (text, language) pair once for everybody, so a genuine reader never comes
+// near this; it is here so a scripted client can't run up a bill on a paid API.
+const TRANSLATE_DAILY_CHARS = 120000;
+const TRANSLATE_CACHE_COL   = 'bbAnonTranslations';
+const TRANSLATE_USAGE_COL   = 'bbAnonTranslateUsage';
+const TRANSLATE_API_URL     = 'https://translation.googleapis.com/language/translate/v2';
+
+// Content-addressed cache id: same text + same target language → same document,
+// so a translation is bought once and then read by everyone who needs it.
+function translateCacheId(text, target) {
+  return crypto.createHash('sha256').update(target + '\n' + text).digest('hex').slice(0, 40);
+}
+
+// The v2 API HTML-escapes a handful of characters even with format:'text'
+// (most visibly apostrophes, which are everywhere in ordinary writing).
+function decodeEntities(s) {
+  return String(s)
+    .replace(/&#(\d+);/g,         (_, d) => String.fromCharCode(Number(d)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCharCode(parseInt(h, 16)))
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&lt;/g,   '<')
+    .replace(/&gt;/g,   '>')
+    .replace(/&amp;/g,  '&');   // last, so &amp;lt; survives as &lt;
+}
+
+let _translateAuth = null;
+function translateAuth() {
+  if (!_translateAuth) {
+    _translateAuth = new GoogleAuth({ scopes: 'https://www.googleapis.com/auth/cloud-platform' });
+  }
+  return _translateAuth;
+}
+
+/**
+ * Translate a batch of strings, auto-detecting each one's source language.
+ * @returns {Promise<Array<{translatedText: string, detectedSourceLanguage: string}>>}
+ */
+async function callTranslateApi(texts, target) {
+  const client = await translateAuth().getClient();
+  const token  = await client.getAccessToken();
+  const res = await fetch(TRANSLATE_API_URL, {
+    method:  'POST',
+    headers: {
+      'Authorization': `Bearer ${token && token.token ? token.token : token}`,
+      'Content-Type':  'application/json',
+    },
+    body: JSON.stringify({ q: texts, target, format: 'text' }),
+  });
+  if (!res.ok) {
+    throw new Error(`Cloud Translation API ${res.status}: ${(await res.text()).slice(0, 300)}`);
+  }
+  const body = await res.json();
+  return (body.data && body.data.translations) || [];
+}
+
+/**
+ * Today's translated-character count for this caller, plus a writer for it.
+ * Keyed by UTC day, so the budget resets at midnight with no scheduled sweep.
+ */
+async function translateBudget(uid) {
+  const day  = new Date().toISOString().slice(0, 10);
+  const ref  = db.collection(TRANSLATE_USAGE_COL).doc(uid);
+  const snap = await ref.get();
+  const d    = snap.exists ? snap.data() : {};
+  const used = d.day === day && typeof d.chars === 'number' ? d.chars : 0;
+  return {
+    used,
+    spend: (chars) => ref.set(
+      { day, chars: used + chars, updatedAt: admin.firestore.FieldValue.serverTimestamp() },
+      { merge: true },
+    ).catch(() => {}),
+  };
+}
+
+exports.translateAnonTexts = onCall(
+  { region: REGION, invoker: 'public' },
+  async (request) => {
+    // Anonymous auth counts — every board reader has a session by the time they
+    // can read a post (see _ensureAuthSession in js/anonymous.js). What this
+    // rules out is a caller with no Firebase session at all.
+    if (!request.auth || !request.auth.uid) {
+      throw new HttpsError('unauthenticated', 'Sign-in required.');
+    }
+    const data   = request.data || {};
+    const target = String(data.target || '').trim().toLowerCase();
+    const texts  = Array.isArray(data.texts) ? data.texts : null;
+
+    if (!TRANSLATE_TARGETS.includes(target)) {
+      throw new HttpsError('invalid-argument', 'Unsupported target language.');
+    }
+    if (!texts || !texts.length) {
+      throw new HttpsError('invalid-argument', 'texts must be a non-empty array.');
+    }
+    if (texts.length > TRANSLATE_MAX_ITEMS) {
+      throw new HttpsError('invalid-argument', `At most ${TRANSLATE_MAX_ITEMS} texts per call.`);
+    }
+
+    // Normalise: anything that isn't a usable string becomes a null result in
+    // the same position, so the client can zip the response onto its inputs.
+    const clean = texts.map((t) => {
+      const s = typeof t === 'string' ? t.trim() : '';
+      return s && s.length <= TRANSLATE_MAX_CHARS ? s : null;
+    });
+    const totalChars = clean.reduce((n, s) => n + (s ? s.length : 0), 0);
+    if (totalChars > TRANSLATE_MAX_TOTAL) {
+      throw new HttpsError('invalid-argument', `At most ${TRANSLATE_MAX_TOTAL} characters per call.`);
+    }
+
+    const results = clean.map(() => null);
+
+    // ── 1. Cache ────────────────────────────────────────────────────────────
+    // One document per (text, target). Identical texts in the same batch share
+    // a lookup, and the whole board shares the document.
+    const unique = new Map();               // text → [result indexes]
+    clean.forEach((s, i) => {
+      if (!s) return;
+      if (!unique.has(s)) unique.set(s, []);
+      unique.get(s).push(i);
+    });
+    const uniqueTexts = Array.from(unique.keys());
+    if (!uniqueTexts.length) return { results };
+
+    const cacheRefs = uniqueTexts.map(
+      (s) => db.collection(TRANSLATE_CACHE_COL).doc(translateCacheId(s, target)),
+    );
+    const cached = await db.getAll(...cacheRefs);
+
+    const misses = [];                      // indexes into uniqueTexts
+    cached.forEach((snap, i) => {
+      const d = snap.exists ? (snap.data() || {}) : {};
+      if (typeof d.out !== 'string') { misses.push(i); return; }
+      const hit = { text: d.out, src: d.src || '', same: !!d.same };
+      for (const idx of unique.get(uniqueTexts[i])) results[idx] = hit;
+    });
+    if (!misses.length) return { results, cached: true };
+
+    // ── 2. Budget ───────────────────────────────────────────────────────────
+    // Only cache misses are charged, so a reader scrolling a board everyone
+    // else has already read spends nothing.
+    const missChars = misses.reduce((n, i) => n + uniqueTexts[i].length, 0);
+    const budget    = await translateBudget(request.auth.uid);
+    if (budget.used + missChars > TRANSLATE_DAILY_CHARS) {
+      console.warn(`[translateAnonTexts] daily budget reached for ${request.auth.uid}`);
+      return { results, budgetReached: true };
+    }
+
+    // ── 3. Translate ────────────────────────────────────────────────────────
+    let translations;
+    try {
+      translations = await callTranslateApi(misses.map((i) => uniqueTexts[i]), target);
+    } catch (e) {
+      // Most likely the API isn't enabled, or billing is off. Say so rather
+      // than failing the call — the board reads fine untranslated.
+      console.error('[translateAnonTexts] translation failed', e);
+      return { results, unavailable: true };
+    }
+    await budget.spend(missChars);
+
+    const writes = db.batch();
+    misses.forEach((uIdx, n) => {
+      const source = uniqueTexts[uIdx];
+      const tr     = translations[n] || {};
+      const out    = decodeEntities(tr.translatedText || source);
+      const src    = String(tr.detectedSourceLanguage || '').toLowerCase();
+      // Already in the reader's language (detected as the target, or came back
+      // unchanged) → the client shows it as written, with no translation line.
+      const same   = src === target || out === source;
+      const entry  = { text: out, src, same };
+      for (const idx of unique.get(source)) results[idx] = entry;
+      writes.set(cacheRefs[uIdx], {
+        out, src, same, target,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+    });
+    await writes.commit().catch((e) => console.warn('[translateAnonTexts] cache write failed', e));
+
+    return { results };
   }
 );

@@ -236,6 +236,16 @@ function initFirebase() {
     window._anonVerifyCode = _fns.httpsCallable('verifyAnonCode');
     window._anonGetBBStats = _fns.httpsCallable('getBBStats');
 
+    // Auto-translation of member-written text (js/shared/translate.js). Wired
+    // from here rather than inside the module so a page that never reaches
+    // Firebase simply shows every post as written, instead of erroring.
+    if (window.BB && BB.translate) {
+      BB.translate.init({
+        callable:   _fns.httpsCallable('translateAnonTexts'),
+        ensureAuth: _ensureAuthSession,
+      });
+    }
+
     // Auth state handler — routes on first load, handles sign-out while on board
     firebase.auth().onAuthStateChanged(async function(user) {
       const isReal = user && !user.isAnonymous;
@@ -3340,7 +3350,7 @@ function renderSuggestion(x) {
       </div>
       <span class="post-time">${x.timestamp ? timeAgo(x.timestamp) : _wt('anon.time.now')}</span>
     </div>
-    <div class="post-text">${esc(x.text || '')}</div>
+    <div class="post-text" data-tt>${esc(x.text || '')}</div>
     ${actions ? `<div class="sugg-actions">${actions}</div>` : ''}
   </div>`;
 }
@@ -3478,6 +3488,7 @@ async function openThread(postId) {
   _threadStickToBottom = true; // open on the newest comment, not the top of the thread
 
   document.getElementById('thread-original-post').innerHTML = renderThreadHeader(post);
+  if (window.BB && BB.translate) BB.translate.scan(document.getElementById('thread-original-post'));
   document.getElementById('thread-comments-list').innerHTML =
     '<div class="empty-state" style="padding:24px 0;">' + esc(_wt('anon.ui.loadingComments')) + '</div>';
 
@@ -3527,6 +3538,7 @@ async function openThread(postId) {
         return;
       }
       el.innerHTML = comments.map(renderComment).join('');
+      if (window.BB && BB.translate) BB.translate.scan(el);
       if (stick) _scrollThreadToEnd();
     }, err => {
       console.warn('[Thread] comments listener error', err);
@@ -3617,7 +3629,7 @@ function renderThreadHeader(p) {
         </div>
         <span class="post-time">${p.timestamp ? timeAgo(p.timestamp) : _wt('anon.time.now')}</span>
       </div>
-      <div class="post-text">${esc(p.text)}</div>
+      <div class="post-text" data-tt>${esc(p.text)}</div>
     </div>`;
   }
   const g1 = safeColor(p.grad1, YELLOW_LT);
@@ -3638,7 +3650,7 @@ function renderThreadHeader(p) {
       </div>
       <span class="post-time">${p.timestamp ? timeAgo(p.timestamp) : _wt('anon.time.now')}</span>
     </div>
-    <div class="post-text">${esc(p.text)}</div>
+    <div class="post-text" data-tt>${esc(p.text)}</div>
   </div>`;
 }
 
@@ -3669,7 +3681,7 @@ function renderComment(c) {
         <span style="font-size:11px;color:var(--muted);margin-left:6px;">${c.timestamp ? timeAgo(c.timestamp) : _wt('anon.time.now')}</span>
       </div>
     </div>
-    <div class="comment-text">${esc(c.text)}</div>
+    <div class="comment-text" data-tt>${esc(c.text)}</div>
     <div class="comment-actions">
       <div style="flex:1"></div>
       ${selfDeleteBtn}
@@ -3995,6 +4007,9 @@ function renderPosts(posts) {
   list.querySelectorAll('[data-sugg-dismiss]').forEach(btn => {
     btn.addEventListener('click', () => dismissSuggestion(btn.dataset.suggDismiss));
   });
+  // Member-written text into the reader's language. Cached texts swap in
+  // synchronously, so a re-render doesn't flash back to the original.
+  if (window.BB && BB.translate) BB.translate.scan(list);
 }
 
 function renderSystem(p) {
@@ -4015,7 +4030,7 @@ function renderTopic(p) {
   // translate, and it matches the name the thread header shows.
   return `<div class="topic-card${threadHasUnread(p) ? ' has-unread' : ''}" data-comment="${esc(p.id)}">
     <div class="topic-head"><span class="topic-emoji">💬</span><span class="topic-label">${esc(_wt('anon.feed.todayTopic'))}</span><span class="topic-by">· ${esc(a.name)}</span></div>
-    <div class="topic-text">${esc(p.text)}</div>
+    <div class="topic-text" data-tt>${esc(p.text)}</div>
     <div class="topic-cta">${cta}</div>
   </div>`;
 }
@@ -4043,7 +4058,7 @@ function renderArchivedTopic(p) {
       </div>
       <span class="post-time">${p.timestamp ? timeAgo(p.timestamp) : _wt('anon.time.now')}</span>
     </div>
-    <div class="post-text">${esc(p.text)}</div>
+    <div class="post-text" data-tt>${esc(p.text)}</div>
     <div class="post-actions">
       <button class="like-btn ${liked ? 'liked' : ''}" data-id="${esc(p.id)}" data-likes="${likes}" data-author="${esc(a.name)}">
         💛 <span>${likes}</span>
@@ -4070,7 +4085,7 @@ function renderAnnouncement(p) {
       <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,${YELLOW_LT},${YELLOW_DARK});display:flex;align-items:center;justify-content:center;font-size:16px;">🐻</div>
       <div style="font-size:13px;font-weight:700;color:var(--dark);">BipolarBear</div>
     </div>
-    <div class="post-text">${esc(p.text)}</div>
+    <div class="post-text" data-tt>${esc(p.text)}</div>
   </div>`;
 }
 
@@ -4111,7 +4126,7 @@ function renderPost(p) {
       </div>
       <span class="post-time">${p.timestamp ? timeAgo(p.timestamp) : _wt('anon.time.now')}</span>
     </div>
-    <div class="post-text">${esc(p.text)}</div>
+    <div class="post-text" data-tt>${esc(p.text)}</div>
     <div class="post-actions">
       <button class="like-btn ${liked ? 'liked' : ''}" data-id="${esc(p.id)}" data-likes="${likes}" data-author="${esc(p.name)}"${p.name === profile.monika ? ` data-self="true" style="opacity:0.35;cursor:default;" title="${esc(_wt('anon.modbtn.cannotLikeOwn'))}"` : ''}>
         💛 <span>${likes}</span>
@@ -4729,6 +4744,77 @@ function adminBanUser(name) {
 }
 
 // ─────────────────────────────────────────────────────────────────
+// Language & translation settings
+// ─────────────────────────────────────────────────────────────────
+
+/** The one-line summary under "Language & translation" in the settings sheet. */
+function _translateStatusText() {
+  const lang = (window.BB && BB.i18n) ? BB.i18n.languageName(BB.i18n.getLang()) : 'English';
+  if (window.BB && BB.translate && !BB.translate.isAvailable()) return _wt('anon.xlate.unavailable');
+  const on = !(window.BB && BB.translate) || BB.translate.isOn();
+  return on ? _wt('anon.xlate.statusOn', { lang }) : _wt('anon.xlate.statusOff');
+}
+
+function _paintTranslateStatus() {
+  const el = document.getElementById('ms-lang-status');
+  if (el) el.textContent = _translateStatusText();
+}
+
+function openTranslateSettings() {
+  // App language — the board's own yellow-themed chips rather than the shared
+  // (orange) BB.i18n.showPicker() overlay.
+  const wrap = document.getElementById('xlate-langs');
+  if (wrap && window.BB && BB.i18n) {
+    const current = BB.i18n.getLang();
+    wrap.innerHTML = BB.i18n.getLanguages().map(lg =>
+      `<button type="button" class="xlate-lang${lg.code === current ? ' selected' : ''}" data-lang="${esc(lg.code)}">${esc(lg.name)}</button>`
+    ).join('');
+    wrap.querySelectorAll('[data-lang]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        // setLanguage re-applies every data-i18n string and fires
+        // bb:languagechange, which re-renders the feed and re-translates it.
+        BB.i18n.setLanguage(btn.dataset.lang);
+        wrap.querySelectorAll('[data-lang]').forEach(b =>
+          b.classList.toggle('selected', b.dataset.lang === btn.dataset.lang));
+        _paintTranslateNote();
+        _paintTranslateStatus();
+      });
+    });
+  }
+
+  // Auto-translate switch, in the same style as the notification switches.
+  const prefs = { auto: !(window.BB && BB.translate) || BB.translate.isOn() };
+  renderNotifRows('xlate-rows', prefs, (p) => {
+    if (window.BB && BB.translate) BB.translate.setOn(p.auto);
+    _paintTranslateStatus();
+  }, [{ key: 'auto', icon: '🌐', name: 'anon.xlate.autoLabel', sub: 'anon.xlate.autoSub' }]);
+
+  _paintTranslateNote();
+  openOv('ov-translate');
+}
+
+/** Say so when the backend has told us it can't translate right now. */
+function _paintTranslateNote() {
+  const note = document.getElementById('xlate-note');
+  if (!note) return;
+  const down = window.BB && BB.translate && !BB.translate.isAvailable();
+  note.style.display = down ? '' : 'none';
+  if (down) note.textContent = _wt('anon.xlate.unavailable');
+}
+
+// A language change rewrites every data-i18n string, but the feed is built
+// from data — post times, streak labels, the empty state — so it has to be
+// drawn again. js/shared/translate.js listens for the same event and puts the
+// posts back into the language they were written in before re-translating.
+document.addEventListener('bb:languagechange', () => {
+  try {
+    renderUserPill();
+    _rerenderCurrentTab();
+    _paintTranslateStatus();
+  } catch (e) { console.warn('[Anonymous] language change re-render failed', e); }
+});
+
+// ─────────────────────────────────────────────────────────────────
 // Monika settings
 // ─────────────────────────────────────────────────────────────────
 function openMonikaSettings() {
@@ -4745,6 +4831,9 @@ function openMonikaSettings() {
 
   // Notification status row (async — permission state comes from the OS)
   updateNotifStatus();
+
+  // Language & translation status row
+  _paintTranslateStatus();
 
   // Medication status row
   const msStatus = document.getElementById('ms-med-status');
@@ -4954,6 +5043,8 @@ if (_isAnonymousApp) {
 }
 document.getElementById('ms-notif-btn').addEventListener('click', openNotifSettings);
 document.getElementById('notif-close').addEventListener('click', () => closeOv('ov-notifs'));
+document.getElementById('ms-lang-btn').addEventListener('click', openTranslateSettings);
+document.getElementById('xlate-close').addEventListener('click', () => closeOv('ov-translate'));
 document.getElementById('ms-med-btn').addEventListener('click', openMedSettings);
 document.getElementById('ms-stable-btn').addEventListener('click', openStableSettings);
 

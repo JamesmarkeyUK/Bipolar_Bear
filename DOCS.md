@@ -936,6 +936,124 @@ Setup that isn't in the repo — APNs key, `GoogleService-Info.plist` per bundle
 id, plugin install + `cap sync`, and the Web Push VAPID key — is in
 `NOTIFICATIONS.md`, along with the Firestore rules for `bbAnonPush`.
 
+### 2.15 Bipolar Anonymous Auto-translation
+
+The board is one community reading in ten languages. Before this, a post
+written in Portuguese was simply unreadable to most of the people who might
+have answered it. Member-written text is now translated into whatever language
+the reader has the app set to, with **the original always one tap away** —
+nothing is ever quietly swapped for a machine's version of it.
+
+What is translated: posts, daily topics, announcements, member-suggested
+announcements and comments. What is not: the app's own copy, which is
+hand-translated in `js/shared/i18n.js`, and the Wiki tab, which is curated UK
+resources (NHS, Bipolar UK, Mind) whose wording is deliberately theirs.
+
+#### How it hangs together
+
+```
+renderPosts() / openThread()          markup carries data-tt on member text
+        ↓
+BB.translate.scan(el)                 js/shared/translate.js
+        ↓  cache hit → applied synchronously (no flicker on re-render)
+        ↓  miss → batched (60ms, ≤30 texts, ≤10k chars per call)
+translateAnonTexts                    callable, europe-west1
+        ↓  Firestore cache hit → returned
+        ↓  miss → Cloud Translation API v2 (auto-detect source)
+bbAnonTranslations/{sha256(target+text)[:40]}
+```
+
+**Translation happens on read, never on write.** A post is stored once, in the
+language it was written in; only the languages someone actually reads it in are
+ever paid for. Nothing about a post changes when it is translated — no new
+field, no second copy on the post document.
+
+#### The DOM contract
+
+`js/shared/translate.js` translates any element carrying `data-tt`, wherever it
+came from. A new kind of card gets translation by adding that one attribute and
+calling `BB.translate.scan()` on its container after rendering — the render
+functions don't know translation exists.
+
+| Attribute | Written by | Means |
+|---|---|---|
+| `data-tt` | the render functions | this element holds member-written text |
+| `data-tt-orig` | `scan()` | the text as written, kept for the toggle |
+| `data-tt-key` | `scan()` | `<lang>:<hash>` — the cache key, and what the toggle acts on |
+
+A translated element gets a `.tt-bar` inserted after it: "Translated from
+Português" and a **Show original** / **Show translation** button. Toggling acts
+on the *key*, so the same text showing twice (a post and a quote of it) moves
+together. A text already in the reader's language gets no bar at all — the
+backend reports it unchanged and nothing on screen moves.
+
+#### Caching, in three places
+
+1. **Firestore** (`bbAnonTranslations`, server-written only) — content
+   addressed on `sha256(target + text)`, so the board buys each (text,
+   language) pair **once, for everybody**. On a board where most posts have
+   already been read, almost every call is a Firestore read rather than a
+   translation.
+2. **localStorage** (`bbAnonXlateCache`, 400 entries, oldest dropped) — so a
+   re-render, a tab switch or the next visit applies translations
+   synchronously and never flickers back to the original.
+3. **In memory**, for the life of the page.
+
+A result marked `same` (already in the reader's language) is cached too — an
+English post on an English board is asked about once per device, ever.
+
+#### Cost control
+
+- Per call: ≤40 texts, ≤2000 characters each, ≤16000 total.
+- Per caller: 120 000 translated characters a day
+  (`bbAnonTranslateUsage/{uid}`, keyed by UTC day so it resets without a
+  sweep). Only cache **misses** are charged, so a reader scrolling a board
+  everyone else has read spends nothing. Over budget → the client is told, and
+  stops asking for the rest of the session.
+- Auth is required (anonymous Firebase auth counts — every board reader has a
+  session by the time they can read a post).
+
+#### Setup — owner-gated
+
+The function needs the **Cloud Translation API** enabled on the Firebase
+project, with billing active:
+
+1. Google Cloud console → **APIs & Services → Enable APIs** → "Cloud
+   Translation API" → Enable (same project as Firebase).
+2. Nothing else: the function authenticates as its own default service
+   account through `google-auth-library`. No API key, no secret.
+3. Deploy: `firebase deploy --only functions:translateAnonTexts`.
+
+Until that is done the function returns `unavailable: true`, the client stops
+asking, and **every post reads exactly as it was written** — the board works as
+it did before, and the settings sheet says translation is unavailable rather
+than pretending.
+
+No Firestore rules change is needed: both new collections are written by the
+Admin SDK, which bypasses rules, and no client reads them directly.
+
+#### Settings
+
+A new **🌐 Language & translation** sheet (`ov-translate`), reached from the
+moniker settings sheet, holds two things:
+
+- **App language** — the board had no language picker at all before this; the
+  shared `BB.i18n.showPicker()` overlay is the main app's orange, so the board
+  renders the same ten languages as yellow-themed chips. Choosing one fires
+  `bb:languagechange`, which re-applies every `data-i18n` string, re-renders
+  the feed, and puts translated posts back to the language they were written in
+  before translating them into the new one.
+- **Auto-translate posts** — on by default. Off restores every visible post to
+  the text as written and removes the translation bars; nothing further is
+  sent.
+
+#### Privacy
+
+Post text is sent to Google Cloud Translation, and nothing else is: no email
+address, no moniker, no post id. It is disclosed in the privacy policy §6
+(`privacy.s6li3`, all ten languages). Board posts were already plaintext on
+Firestore — this does not change what a post is, only where its text is read.
+
 ## 3. Algorithm Flowcharts
 
 ### 3.1 Entry Save Flow

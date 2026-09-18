@@ -1110,7 +1110,21 @@
 //       somebody who has not joined still sees nothing there unless they have
 //       chosen the suite figure themselves. Touches js/shared/user-count.js,
 //       js/anonymous.js (both precached).
-const CACHE_NAME = 'bipolarbear-v230';
+// v231: Bipolar Anonymous auto-translates what members write. A post, daily
+//       topic, announcement or reply written in another language is shown in
+//       the reader's, with a "Show original" toggle under it naming the
+//       language it was written in — nothing is ever swapped silently.
+//       Translation happens on read through a new `translateAnonTexts`
+//       callable, which caches every result in Firestore so the board pays
+//       for each (text, language) pair once; the client caches locally too, so
+//       a re-render never flickers back to the original. A new Language &
+//       translation sheet in settings carries the app-language picker (the
+//       board had none) and the auto-translate switch. Needs the Cloud
+//       Translation API enabled on the Firebase project — until it is, every
+//       post simply reads as written. New js/shared/translate.js (precached),
+//       touches anonymous.html, css/anonymous.css, js/anonymous.js,
+//       js/shared/i18n.js, functions/index.js, scripts/build-anonymous.js.
+const CACHE_NAME = 'bipolarbear-v231';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
@@ -1143,6 +1157,7 @@ const STATIC_ASSETS = [
   './js/shared/medications.js',
   './js/shared/version-check.js',
   './js/shared/i18n.js',
+  './js/shared/translate.js',
   './js/shared/guest-data.js',
   './js/shared/user-count.js',
   './js/shared/auth-splash.js',

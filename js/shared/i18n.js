@@ -7,6 +7,7 @@
  *   BB.i18n.applyAll()         — walk DOM for data-i18n* attributes and apply translations
  *   BB.i18n.getLang()          — return current language code
  *   BB.i18n.getLanguages()     — return [{code, name}] list
+ *   BB.i18n.languageName(code) — a language's name in that language
  *   BB.i18n.showPicker(cb)     — show full-screen language picker overlay
  *
  * HTML attributes processed by applyAll():
@@ -78,6 +79,7 @@
         s6p1: "We do not sell, rent or share your personal data with third parties for marketing or advertising purposes. The third-party services that may receive your data are:",
         s6li1: "<strong>Google Firebase</strong> — for cloud sync and authentication, if you create an account",
         s6li2: "<strong>Universal Simulation Ltd (UNI·SIM)</strong> — a randomly generated install ID and nothing else, so the community counter can be shown",
+        s6li3: "<strong>Google Cloud Translation</strong> — the text of a Bipolar Anonymous post or reply, when a member reading in another language has automatic translation switched on. Only the text of the post is sent: never your email address, your moniker or anything that identifies you.",
         s6p2: "We do not use analytics services, advertising networks or any other third-party tracking.",
         s7Heading: "7. Deleting your account and data",
         s7p1: "You can permanently delete your Bipolar Bear account and all associated data at any time.",
@@ -532,6 +534,20 @@
           privateStatus: 'Private',
           medSubBbList: 'These are your current medications from BipolarBear. Edit or add more, then continue.',
           medSubBbAdd: 'Add your current medications. Changes will also update your BipolarBear app.',
+        },
+        xlate: {
+          from: 'Translated from {lang}',
+          original: 'Original · {lang}',
+          showOriginal: 'Show original',
+          showTranslation: 'Show translation',
+          title: 'Language & translation',
+          appLang: 'App language',
+          autoLabel: 'Auto-translate posts',
+          autoSub: 'Posts and replies written in another language are shown in yours. The original is always one tap away.',
+          statusOn: 'On · posts shown in {lang}',
+          statusOff: 'Off · posts shown as written',
+          unavailable: 'Translation is unavailable right now — posts show as written.',
+          done: 'Done',
         },
         time: { now: 'now' },
         modbtn: {
@@ -1837,6 +1853,7 @@
         s6p1: "No vendemos, alquilamos ni compartimos sus datos personales con terceros con fines de marketing o publicidad. Los servicios de terceros que pueden recibir sus datos son:",
         s6li1: "<strong>Google Firebase</strong>, para la sincronización en la nube y la autenticación, si crea una cuenta",
         s6li2: "<strong>Universal Simulation Ltd (UNI·SIM)</strong>, un ID de instalación generado aleatoriamente y nada más, para poder mostrar el contador comunitario",
+        s6li3: "<strong>Google Cloud Translation</strong> — el texto de una publicación o respuesta de Bipolar Anonymous, cuando un miembro que lee en otro idioma tiene activada la traducción automática. Solo se envía el texto de la publicación: nunca tu correo electrónico, tu apodo ni nada que te identifique.",
         s6p2: "No utilizamos servicios de análisis, redes publicitarias ni ningún otro seguimiento de terceros.",
         s7Heading: "7. Eliminar su cuenta y sus datos",
         s7p1: "Puede eliminar de forma permanente su cuenta de Bipolar Bear y todos los datos asociados en cualquier momento.",
@@ -2391,6 +2408,20 @@
           body: 'Esto elimina permanentemente tu cuenta — tu nombre, tu perfil y todas las publicaciones que has hecho. No se puede deshacer. Puedes volver a registrarte en cualquier momento con el mismo correo.',
           cancel: 'Cancelar',
           confirm: 'Eliminar para siempre',
+        },
+        xlate: {
+          from: 'Traducido de {lang}',
+          original: 'Original · {lang}',
+          showOriginal: 'Ver original',
+          showTranslation: 'Ver traducción',
+          title: 'Idioma y traducción',
+          appLang: 'Idioma de la aplicación',
+          autoLabel: 'Traducir publicaciones automáticamente',
+          autoSub: 'Las publicaciones y respuestas escritas en otro idioma se muestran en el tuyo. El original está siempre a un toque.',
+          statusOn: 'Activado · publicaciones en {lang}',
+          statusOff: 'Desactivado · publicaciones tal como se escribieron',
+          unavailable: 'La traducción no está disponible ahora mismo: las publicaciones se muestran tal como se escribieron.',
+          done: 'Listo',
         },
         time: {
           now: 'ahora',
@@ -3595,6 +3626,7 @@
         s6p1: "Nous ne vendons, ne louons ni ne partageons vos données personnelles avec des tiers à des fins de marketing ou de publicité. Les services tiers susceptibles de recevoir vos données sont :",
         s6li1: "<strong>Google Firebase</strong>, pour la synchronisation dans le cloud et l'authentification, si vous créez un compte",
         s6li2: "<strong>Universal Simulation Ltd (UNI·SIM)</strong>, un identifiant d'installation généré aléatoirement et rien d'autre, afin d'afficher le compteur communautaire",
+        s6li3: "<strong>Google Cloud Translation</strong> — le texte d'une publication ou d'une réponse de Bipolar Anonymous, lorsqu'un membre lisant dans une autre langue a activé la traduction automatique. Seul le texte de la publication est envoyé : jamais votre adresse e-mail, votre pseudonyme ni quoi que ce soit qui vous identifie.",
         s6p2: "Nous n'utilisons aucun service d'analyse, aucun réseau publicitaire ni aucun autre suivi par des tiers.",
         s7Heading: "7. Supprimer votre compte et vos données",
         s7p1: "Vous pouvez supprimer définitivement votre compte Bipolar Bear et toutes les données associées à tout moment.",
@@ -4023,6 +4055,20 @@
           medSubBbAdd: 'Ajoutez vos médicaments actuels. Les modifications mettront aussi à jour votre application BipolarBear.',
           loading: "Chargement…",
           loadingComments: "Chargement des commentaires…",
+        },
+        xlate: {
+          from: 'Traduit de {lang}',
+          original: 'Original · {lang}',
+          showOriginal: "Voir l'original",
+          showTranslation: 'Voir la traduction',
+          title: 'Langue et traduction',
+          appLang: "Langue de l'application",
+          autoLabel: 'Traduire les publications automatiquement',
+          autoSub: "Les publications et réponses écrites dans une autre langue s'affichent dans la vôtre. L'original reste accessible d'un seul geste.",
+          statusOn: 'Activé · publications en {lang}',
+          statusOff: "Désactivé · publications telles qu'elles ont été écrites",
+          unavailable: "La traduction est indisponible pour le moment — les publications s'affichent telles quelles.",
+          done: 'Terminé',
         },
         time: { now: 'à l\'instant' },
         modbtn: {
@@ -5297,6 +5343,7 @@
         s6p1: "Wir verkaufen, vermieten oder teilen Ihre personenbezogenen Daten nicht mit Dritten zu Marketing- oder Werbezwecken. Die Drittanbieterdienste, die Ihre Daten erhalten können, sind:",
         s6li1: "<strong>Google Firebase</strong> – für die Cloud-Synchronisierung und Authentifizierung, wenn Sie ein Konto erstellen",
         s6li2: "<strong>Universal Simulation Ltd (UNI·SIM)</strong> – ausschließlich eine zufällig erzeugte Installationskennung, damit der Community-Zähler angezeigt werden kann",
+        s6li3: "<strong>Google Cloud Translation</strong> — der Text eines Beitrags oder einer Antwort auf Bipolar Anonymous, wenn ein Mitglied, das in einer anderen Sprache liest, die automatische Übersetzung eingeschaltet hat. Gesendet wird ausschließlich der Text des Beitrags: niemals deine E-Mail-Adresse, dein Pseudonym oder irgendetwas, das dich identifiziert.",
         s6p2: "Wir verwenden keine Analysedienste, Werbenetzwerke oder sonstiges Tracking durch Dritte.",
         s7Heading: "7. Löschen Ihres Kontos und Ihrer Daten",
         s7p1: "Sie können Ihr Bipolar-Bear-Konto und alle zugehörigen Daten jederzeit dauerhaft löschen.",
@@ -5777,6 +5824,20 @@
           body: 'Dies löscht Ihr Konto dauerhaft — Ihren Namen, Ihr Profil und jeden Beitrag, den Sie verfasst haben. Das kann nicht rückgängig gemacht werden. Sie können sich jederzeit mit derselben E-Mail-Adresse erneut registrieren.',
           cancel: 'Abbrechen',
           confirm: 'Endgültig löschen',
+        },
+        xlate: {
+          from: 'Übersetzt aus {lang}',
+          original: 'Original · {lang}',
+          showOriginal: 'Original anzeigen',
+          showTranslation: 'Übersetzung anzeigen',
+          title: 'Sprache & Übersetzung',
+          appLang: 'App-Sprache',
+          autoLabel: 'Beiträge automatisch übersetzen',
+          autoSub: 'Beiträge und Antworten in einer anderen Sprache erscheinen in deiner. Das Original ist immer einen Tipp entfernt.',
+          statusOn: 'An · Beiträge auf {lang}',
+          statusOff: 'Aus · Beiträge im Original',
+          unavailable: 'Die Übersetzung ist gerade nicht verfügbar — Beiträge erscheinen im Original.',
+          done: 'Fertig',
         },
         time: {
           now: 'jetzt',
@@ -6982,6 +7043,7 @@
         s6p1: "Non vendiamo, noleggiamo né condividiamo i vostri dati personali con terze parti per finalità di marketing o pubblicitarie. I servizi di terze parti che possono ricevere i vostri dati sono:",
         s6li1: "<strong>Google Firebase</strong> — per la sincronizzazione cloud e l'autenticazione, se create un account",
         s6li2: "<strong>Universal Simulation Ltd (UNI·SIM)</strong> — solo un identificativo di installazione generato casualmente, perché il contatore della community possa essere mostrato",
+        s6li3: "<strong>Google Cloud Translation</strong> — il testo di un post o di una risposta su Bipolar Anonymous, quando un membro che legge in un'altra lingua ha attivato la traduzione automatica. Viene inviato solo il testo del post: mai il tuo indirizzo email, il tuo soprannome o qualsiasi cosa che ti identifichi.",
         s6p2: "Non utilizziamo servizi di analisi, reti pubblicitarie o qualsiasi altro tracciamento di terze parti.",
         s7Heading: "7. Eliminazione dell'account e dei dati",
         s7p1: "Potete eliminare in modo permanente il vostro account Bipolar Bear e tutti i dati associati in qualsiasi momento.",
@@ -7462,6 +7524,20 @@
           body: 'Questo elimina definitivamente il tuo account — il tuo nome, il profilo e ogni post che hai pubblicato. Non può essere annullato. Puoi registrarti di nuovo in qualsiasi momento con la stessa email.',
           cancel: 'Annulla',
           confirm: 'Elimina per sempre',
+        },
+        xlate: {
+          from: 'Tradotto da {lang}',
+          original: 'Originale · {lang}',
+          showOriginal: "Mostra l'originale",
+          showTranslation: 'Mostra la traduzione',
+          title: 'Lingua e traduzione',
+          appLang: "Lingua dell'app",
+          autoLabel: 'Traduci automaticamente i post',
+          autoSub: "I post e le risposte scritti in un'altra lingua vengono mostrati nella tua. L'originale è sempre a portata di tocco.",
+          statusOn: 'Attivo · post in {lang}',
+          statusOff: 'Disattivato · post come sono stati scritti',
+          unavailable: 'La traduzione non è disponibile al momento: i post vengono mostrati come sono stati scritti.',
+          done: 'Fatto',
         },
         time: {
           now: 'adesso',
@@ -8667,6 +8743,7 @@
         s6p1: "Não vendemos, alugamos nem partilhamos os seus dados pessoais com terceiros para fins de marketing ou publicidade. Os serviços de terceiros que poderão receber os seus dados são:",
         s6li1: "<strong>Google Firebase</strong> — para sincronização na nuvem e autenticação, se criar uma conta",
         s6li2: "<strong>Universal Simulation Ltd (UNI·SIM)</strong> — apenas um ID de instalação gerado aleatoriamente, para que o contador da comunidade possa ser mostrado",
+        s6li3: "<strong>Google Cloud Translation</strong> — o texto de uma publicação ou resposta do Bipolar Anonymous, quando um membro que lê noutro idioma tem a tradução automática ligada. Apenas o texto da publicação é enviado: nunca o seu email, a sua alcunha ou algo que o identifique.",
         s6p2: "Não utilizamos serviços de análise, redes de publicidade nem qualquer outro rastreio de terceiros.",
         s7Heading: "7. Eliminar a sua conta e os seus dados",
         s7p1: "Pode eliminar permanentemente a sua conta Bipolar Bear e todos os dados associados a qualquer momento.",
@@ -9147,6 +9224,20 @@
           body: 'Isso exclui permanentemente sua conta — seu nome, perfil e todas as publicações que você fez. Não pode ser desfeito. Você pode se cadastrar novamente a qualquer momento com o mesmo e-mail.',
           cancel: 'Cancelar',
           confirm: 'Excluir para sempre',
+        },
+        xlate: {
+          from: 'Traduzido de {lang}',
+          original: 'Original · {lang}',
+          showOriginal: 'Ver original',
+          showTranslation: 'Ver tradução',
+          title: 'Idioma e tradução',
+          appLang: 'Idioma da aplicação',
+          autoLabel: 'Traduzir publicações automaticamente',
+          autoSub: 'As publicações e respostas escritas noutro idioma aparecem no seu. O original está sempre a um toque.',
+          statusOn: 'Ligado · publicações em {lang}',
+          statusOff: 'Desligado · publicações tal como foram escritas',
+          unavailable: 'A tradução não está disponível de momento — as publicações aparecem tal como foram escritas.',
+          done: 'Concluído',
         },
         time: {
           now: 'agora',
@@ -10352,6 +10443,7 @@
         s6p1: "Wij verkopen, verhuren of delen uw persoonlijke gegevens niet met derden voor marketing- of reclamedoeleinden. De diensten van derden die uw gegevens kunnen ontvangen, zijn:",
         s6li1: "<strong>Google Firebase</strong> — voor cloudsynchronisatie en authenticatie, als u een account aanmaakt",
         s6li2: "<strong>Universal Simulation Ltd (UNI·SIM)</strong> — uitsluitend een willekeurig gegenereerde installatie-ID, zodat de communityteller getoond kan worden",
+        s6li3: "<strong>Google Cloud Translation</strong> — de tekst van een bericht of reactie op Bipolar Anonymous, wanneer een lid dat in een andere taal leest automatisch vertalen aan heeft staan. Alleen de tekst van het bericht wordt verstuurd: nooit je e-mailadres, je bijnaam of iets anders waaraan je te herkennen bent.",
         s6p2: "Wij maken geen gebruik van analysediensten, advertentienetwerken of enige andere tracking door derden.",
         s7Heading: "7. Uw account en gegevens verwijderen",
         s7p1: "U kunt uw Bipolar Bear-account en alle bijbehorende gegevens op elk moment permanent verwijderen.",
@@ -10832,6 +10924,20 @@
           body: 'Hiermee wordt uw account permanent verwijderd — uw naam, profiel en elk bericht dat u hebt geplaatst. Dit kan niet ongedaan worden gemaakt. U kunt zich op elk moment opnieuw registreren met hetzelfde e-mailadres.',
           cancel: 'Annuleren',
           confirm: 'Definitief verwijderen',
+        },
+        xlate: {
+          from: 'Vertaald uit {lang}',
+          original: 'Origineel · {lang}',
+          showOriginal: 'Origineel tonen',
+          showTranslation: 'Vertaling tonen',
+          title: 'Taal en vertaling',
+          appLang: 'Taal van de app',
+          autoLabel: 'Berichten automatisch vertalen',
+          autoSub: 'Berichten en reacties in een andere taal worden in die van jou getoond. Het origineel is altijd één tik verwijderd.',
+          statusOn: 'Aan · berichten in {lang}',
+          statusOff: 'Uit · berichten zoals ze geschreven zijn',
+          unavailable: 'Vertalen kan op dit moment niet — berichten worden getoond zoals ze geschreven zijn.',
+          done: 'Klaar',
         },
         time: {
           now: 'nu',
@@ -12037,6 +12143,7 @@
         s6p1: "Nie sprzedajemy, nie wynajmujemy ani nie udostępniamy Twoich danych osobowych stronom trzecim w celach marketingowych lub reklamowych. Usługi zewnętrzne, które mogą otrzymać Twoje dane, to:",
         s6li1: "<strong>Google Firebase</strong> — do synchronizacji w chmurze i uwierzytelniania, jeśli utworzysz konto",
         s6li2: "<strong>Universal Simulation Ltd (UNI·SIM)</strong> — wyłącznie losowo wygenerowany identyfikator instalacji, aby móc pokazać licznik społeczności",
+        s6li3: "<strong>Google Cloud Translation</strong> — treść posta lub odpowiedzi w Bipolar Anonymous, gdy czytający w innym języku ma włączone automatyczne tłumaczenie. Wysyłana jest wyłącznie treść posta: nigdy Twój adres e-mail, pseudonim ani nic, co pozwala Cię zidentyfikować.",
         s6p2: "Nie korzystamy z usług analitycznych, sieci reklamowych ani żadnego innego śledzenia przez strony trzecie.",
         s7Heading: "7. Usuwanie konta i danych",
         s7p1: "W dowolnym momencie możesz trwale usunąć swoje konto Bipolar Bear i wszystkie powiązane dane.",
@@ -12517,6 +12624,20 @@
           body: 'To trwale usunie Twoje konto — nazwę, profil i każdy wpis, który opublikowałeś. Nie można tego cofnąć. Możesz w każdej chwili zarejestrować się ponownie z tym samym e-mailem.',
           cancel: 'Anuluj',
           confirm: 'Usuń na zawsze',
+        },
+        xlate: {
+          from: 'Przetłumaczono z: {lang}',
+          original: 'Oryginał · {lang}',
+          showOriginal: 'Pokaż oryginał',
+          showTranslation: 'Pokaż tłumaczenie',
+          title: 'Język i tłumaczenie',
+          appLang: 'Język aplikacji',
+          autoLabel: 'Automatycznie tłumacz posty',
+          autoSub: 'Posty i odpowiedzi napisane w innym języku są pokazywane w Twoim. Oryginał zawsze jest o jedno dotknięcie.',
+          statusOn: 'Włączone · posty w: {lang}',
+          statusOff: 'Wyłączone · posty w oryginale',
+          unavailable: 'Tłumaczenie jest teraz niedostępne — posty są pokazywane w oryginale.',
+          done: 'Gotowe',
         },
         time: {
           now: 'teraz',
@@ -13730,6 +13851,7 @@
         s6p1: "Vi säljer, hyr ut eller delar inte dina personuppgifter med tredje part för marknadsförings- eller reklamändamål. De tredjepartstjänster som kan ta emot dina uppgifter är:",
         s6li1: "<strong>Google Firebase</strong> — för molnsynkronisering och autentisering, om du skapar ett konto",
         s6li2: "<strong>Universal Simulation Ltd (UNI·SIM)</strong> — enbart ett slumpmässigt genererat installations-ID, så att gemenskapsräknaren kan visas",
+        s6li3: "<strong>Google Cloud Translation</strong> — texten i ett inlägg eller svar på Bipolar Anonymous, när en medlem som läser på ett annat språk har automatisk översättning påslagen. Endast inläggets text skickas: aldrig din e-postadress, ditt alias eller något annat som identifierar dig.",
         s6p2: "Vi använder inga analystjänster, annonsnätverk eller någon annan spårning från tredje part.",
         s7Heading: "7. Radera ditt konto och dina uppgifter",
         s7p1: "Du kan permanent radera ditt Bipolar Bear-konto och alla tillhörande uppgifter när som helst.",
@@ -14210,6 +14332,20 @@
           body: 'Detta raderar ditt konto permanent — ditt namn, din profil och varje inlägg du har gjort. Det går inte att ångra. Du kan registrera dig igen när som helst med samma e-post.',
           cancel: 'Avbryt',
           confirm: 'Radera för alltid',
+        },
+        xlate: {
+          from: 'Översatt från {lang}',
+          original: 'Original · {lang}',
+          showOriginal: 'Visa originalet',
+          showTranslation: 'Visa översättningen',
+          title: 'Språk och översättning',
+          appLang: 'Appens språk',
+          autoLabel: 'Översätt inlägg automatiskt',
+          autoSub: 'Inlägg och svar som skrivits på ett annat språk visas på ditt. Originalet är alltid ett tryck bort.',
+          statusOn: 'På · inlägg på {lang}',
+          statusOff: 'Av · inlägg som de skrevs',
+          unavailable: 'Översättning är inte tillgänglig just nu — inlägg visas som de skrevs.',
+          done: 'Klart',
         },
         time: {
           now: 'nu',
@@ -15415,6 +15551,7 @@
         s6p1: "我们不会为了营销或广告目的，向第三方出售、出租或共享您的个人数据。可能接收您数据的第三方服务是：",
         s6li1: "<strong>Google Firebase</strong>——用于云同步和身份验证（如果您创建账户）",
         s6li2: "<strong>Universal Simulation Ltd (UNI·SIM)</strong>——仅一个随机生成的安装 ID，用于显示社区计数器",
+        s6li3: "<strong>Google Cloud Translation</strong> — 当使用其他语言阅读的成员开启了自动翻译时，会发送 Bipolar Anonymous 帖子或回复的文字。只发送帖子的文字内容：绝不发送你的电子邮件地址、昵称或任何可识别你身份的信息。",
         s6p2: "我们不使用分析服务、广告网络或任何其他第三方跟踪。",
         s7Heading: "7. 删除您的账户和数据",
         s7p1: "您可以随时永久删除您的 Bipolar Bear 账户及所有相关数据。",
@@ -15895,6 +16032,20 @@
           body: '这将永久删除您的账户——您的名称、个人资料以及您发布的每一条帖子。此操作无法撤销。您随时可以用同一邮箱重新注册。',
           cancel: '取消',
           confirm: '永久删除',
+        },
+        xlate: {
+          from: '译自{lang}',
+          original: '原文 · {lang}',
+          showOriginal: '查看原文',
+          showTranslation: '查看译文',
+          title: '语言与翻译',
+          appLang: '应用语言',
+          autoLabel: '自动翻译帖子',
+          autoSub: '用其他语言写的帖子和回复会显示为你的语言，原文随时一点即看。',
+          statusOn: '已开启 · 帖子显示为{lang}',
+          statusOff: '已关闭 · 按原文显示',
+          unavailable: '翻译暂时不可用 — 帖子按原文显示。',
+          done: '完成',
         },
         time: {
           now: '刚刚',
@@ -17060,6 +17211,22 @@
     { code: 'zh', name: '中文' },
   ];
 
+  // Native names for languages the app's UI is NOT translated into. Used when
+  // naming the language a member wrote a post in — auto-translation detects
+  // any language, not just the ten the interface speaks. A language's own name
+  // is the one form every reader recognises, so these are deliberately not
+  // translated; an unlisted code falls back to the code itself.
+  var _otherLangNames = {
+    ar: 'العربية',  bg: 'Български', bn: 'বাংলা',     ca: 'Català',   cs: 'Čeština',
+    cy: 'Cymraeg',  da: 'Dansk',     el: 'Ελληνικά',  et: 'Eesti',    fa: 'فارسی',
+    fi: 'Suomi',    ga: 'Gaeilge',   gl: 'Galego',    he: 'עברית',    hi: 'हिन्दी',
+    hr: 'Hrvatski', hu: 'Magyar',    id: 'Indonesia', is: 'Íslenska', ja: '日本語',
+    ko: '한국어',    lt: 'Lietuvių',  lv: 'Latviešu',  ms: 'Melayu',   no: 'Norsk',
+    pa: 'ਪੰਜਾਬੀ',     ro: 'Română',    ru: 'Русский',   sk: 'Slovenčina', sl: 'Slovenščina',
+    sq: 'Shqip',    sr: 'Српски',    sw: 'Kiswahili', ta: 'தமிழ்',     th: 'ไทย',
+    tl: 'Tagalog',  tr: 'Türkçe',    uk: 'Українська', ur: 'اردو',     vi: 'Tiếng Việt',
+  };
+
   // ── Engine ────────────────────────────────────────────────────────────────
 
   var _lang = 'en';
@@ -17127,13 +17294,35 @@
 
   function setLanguage(code) {
     if (!_locales[code]) return;
+    var changed = _lang !== code;
     _lang = code;
     try { localStorage.setItem('bbLanguage', code); } catch (_) {}
     applyAll();
+    // Anything rendered from data rather than from data-i18n attributes has to
+    // redraw itself — member-written text translated into the old language, for
+    // one (js/shared/translate.js listens for this).
+    if (changed) {
+      try {
+        document.dispatchEvent(new CustomEvent('bb:languagechange', { detail: { lang: code } }));
+      } catch (_) {}
+    }
   }
 
   function getLang() { return _lang; }
   function getLanguages() { return _languages; }
+
+  /**
+   * The name of a language, in that language. Covers the ten the UI speaks
+   * plus the common ones auto-translation may detect; anything else comes
+   * back as its own code, upper-cased.
+   */
+  function languageName(code) {
+    var c = String(code || '').toLowerCase().split('-')[0];
+    for (var i = 0; i < _languages.length; i++) {
+      if (_languages[i].code === c) return _languages[i].name;
+    }
+    return _otherLangNames[c] || c.toUpperCase();
+  }
 
   // ── Language picker overlay ───────────────────────────────────────────────
 
@@ -17238,6 +17427,7 @@
     setLanguage: setLanguage,
     getLang: getLang,
     getLanguages: getLanguages,
+    languageName: languageName,
     showPicker: showPicker,
   };
   window.BB.t = t;
