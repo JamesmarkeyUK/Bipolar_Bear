@@ -1002,7 +1002,10 @@ backend reports it unchanged and nothing on screen moves.
 A result marked `same` (already in the reader's language) is cached too — an
 English post on an English board is asked about once per device, ever.
 
-#### Cost control
+#### Limits in the code
+
+These bound a single caller, not the bill — see "What it costs" for the
+ceiling that actually holds.
 
 - Per call: ≤40 texts, ≤2000 characters each, ≤16000 total.
 - Per caller: 120 000 translated characters a day
@@ -1020,9 +1023,13 @@ project, with billing active:
 
 1. Google Cloud console → **APIs & Services → Enable APIs** → "Cloud
    Translation API" → Enable (same project as Firebase).
-2. Nothing else: the function authenticates as its own default service
+2. **Lower the API's quota to a number you are happy to pay for** — IAM &
+   Admin → **Quotas** → filter to Cloud Translation API → the characters-per-day
+   quota → Edit. See "What it costs" below for why this step, not a budget
+   alert, is the actual ceiling.
+3. Nothing else: the function authenticates as its own default service
    account through `google-auth-library`. No API key, no secret.
-3. Deploy: `firebase deploy --only functions:translateAnonTexts`.
+4. Deploy: `firebase deploy --only functions:translateAnonTexts`.
 
 Until that is done the function returns `unavailable: true`, the client stops
 asking, and **every post reads exactly as it was written** — the board works as
@@ -1031,6 +1038,35 @@ than pretending.
 
 No Firestore rules change is needed: both new collections are written by the
 Admin SDK, which bypasses rules, and no client reads them directly.
+
+#### What it costs
+
+Cloud Translation Basic (v2) is **$20 per million characters**, with the first
+**500 000 characters a month free** — a standing monthly allowance, not a
+trial credit. Characters are counted on what is *sent*; auto-detection is part
+of the translate call, not a separate charge. A text that turns out to be
+already in the reader's language **still costs** the characters it took to
+find that out — once per language, after which the cache answers for ever.
+
+Because `bbAnonTranslations` is keyed on the text rather than the post, the
+board pays for each (text, language) pair **once, for everybody**. Only the
+first reader of a post in a given language costs anything; every reader after
+them is a Firestore read. At roughly 20 new posts and replies a day of about
+150 characters each:
+
+| Who is reading | Characters/month | Cost |
+|---|---|---|
+| members across ~3 languages | ~270k | £0 — inside the free tier |
+| all ten languages represented | ~900k | ~$8/month |
+| ten times the posting volume, all ten languages | ~9M | ~$170/month |
+
+**The per-caller daily budget is not a spending cap.** 120 000 characters a day
+per uid raises the bar against a scripted client, but anonymous Firebase uids
+are free to mint, so it bounds one caller, not the bill. A Cloud **budget
+alert** doesn't stop anything either — it emails after the money is spent. The
+only hard ceiling is the API **quota** in step 2: past it the API refuses, the
+function reports `unavailable`, and the board falls back to reading as written,
+which is the same degraded state it already handles.
 
 #### Settings
 
