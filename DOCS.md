@@ -346,6 +346,15 @@ POST {supabase}/rest/v1/rpc/suite_user_counts  {}  → [{total, live}]
   the same key `@unisim/sdk` uses. On bipolarbear.app the home page and the
   board are one origin, so reading both is one person suite-wide, not two. The
   standalone Bipolar Anonymous app has its own storage and is its own install.
+- ⚠ **These two apps open on their OWN figure — do not "fix" this.** Every
+  other app in the suite opens on the suite figure and taps through to its own
+  (SDK 0.150.0, James: *"show across unisim first"*). Asked directly on
+  2026-09-17 whether these should follow, James chose **the bear first**: this
+  app's number is a different kind of number — Firestore counts *accounts*, a
+  real headcount, where the suite figure can only count devices here — and it is
+  the line the suite's counter was copied from. So an absent
+  `unisim:user-count-scope` means **the app** in these two, the opposite of
+  everywhere else; only an explicit `'suite'` opens on the globe.
 - **The count line is a button.** `BB.userCount.suite.wireTap(el, hint, cb)`
   makes it switch between this app's figure and the suite's on click, tap or
   Enter/Space; the choice is remembered in `localStorage['unisim:user-count-scope']`,
