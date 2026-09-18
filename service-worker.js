@@ -1129,7 +1129,15 @@
 //       page and the count reads as a footnote to it. Spacing moved with it —
 //       the chip's own bottom margin carries the gap. Touches index.html,
 //       css/index.css (both precached).
-const CACHE_NAME = 'bipolarbear-v232';
+// v233: Bipolar Anonymous 12 Steps — a new "🙏 12 Steps" wiki section
+//       carrying the twelve steps from the main app's Survival Kit, grouped
+//       1–3 / 4–10 / 11–12 with a "what this looks like in practice" note per
+//       step, plus a built-in announcement that links straight to it. Built-in
+//       announcements always render at the top of the Announcements tab (the
+//       existing announcementPosts() demo pair still only shows while the
+//       collection is empty). Touches js/anonymous.js, css/anonymous.css,
+//       js/shared/i18n.js.
+const CACHE_NAME = 'bipolarbear-v233';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
