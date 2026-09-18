@@ -70,6 +70,13 @@ firebase functions:secrets:set RESEND_API_KEY
 firebase deploy --only functions
 ```
 
+The repo carries a `.firebaserc` naming `bipolarbear-app` as the default
+project, so these run bare. Without it every `firebase` command in this repo
+fails with "No currently active project" until you pass
+`--project bipolarbear-app` or run `firebase use --add` — which is what
+happened for the first eighteen months of this project's life. The file holds
+only the project id, which is already public in `js/shared/firebase-config.js`.
+
 After deploying, go to **Google Cloud Console → Cloud Run** and set each function's security to **Allow unauthenticated invocations** (the `invoker: 'public'` option in code is correct but org policy may require the console override).
 
 ---
