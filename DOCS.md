@@ -1030,12 +1030,25 @@ looks like the right place and is not — it only does roles.
    Services → Enable APIs → "Cloud Translation API").
 2. **Cap it** — [console.cloud.google.com/apis/api/translate.googleapis.com/quotas?project=bipolarbear-app](https://console.cloud.google.com/apis/api/translate.googleapis.com/quotas?project=bipolarbear-app),
    which is the Quotas tab on the Translation API itself, already filtered to
-   it (the long way: ☰ → IAM & Admin → **Quotas** → filter by service). Find
-   **Characters per day**, tick it, **Edit Quotas**, set a number you are happy
-   to pay for. The default is effectively unlimited — a billion characters a
-   day — so this is putting a ceiling where there isn't one, not tightening a
-   sensible default. See "What it costs" below for why this step, and not a
-   budget alert, is the ceiling that holds.
+   it (the long way: ☰ → IAM & Admin → **Quotas** → filter by service). The row
+   is **"v2 and v3 general model characters per day"** — the function calls the
+   v2 endpoint with no `model` parameter, so the general (NMT) model is what it
+   bills against. Tick it → **Edit Quotas** → a number you are happy to pay
+   for. Ignore anything saying *custom model*, *AutoML* or *Translation LLM*
+   (different products, unused here), and leave the **per minute** sibling
+   alone — that is a burst limiter, and lowering it makes normal use fail
+   intermittently without capping anything.
+
+   **A number to start from: 50 000/day.** The free tier works out at ~16 400
+   a day; this board today runs ~9 000 across three languages, or ~30 000 if
+   all ten are represented. 50 000 leaves real headroom and caps the worst case
+   near $20/month. The default is effectively unlimited — a billion a day — so
+   this is adding a ceiling, not tightening a sensible one. See "What it costs"
+   below for why this, and not a budget alert, is the ceiling that holds.
+
+   Hitting the cap is safe but **silent**: the API refuses, the function
+   reports `unavailable`, and posts read as written. If translation ever seems
+   to have stopped, check this quota first.
 3. Nothing else in the console: the function authenticates as its own default
    service account through `google-auth-library`. No API key, no secret.
 4. Deploy: `firebase deploy --only functions:translateAnonTexts`. Pushing to
