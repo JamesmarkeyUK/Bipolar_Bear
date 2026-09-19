@@ -2318,6 +2318,7 @@ function _handleIndexJournalNav() {
     // (and fab.js) reads the same value without depending on this script.
     const _APP_VERSION = window._APP_VERSION;
     const _WHATS_NEW_HEADLINES = {
+      '1.37': 'Bipolar Bear is now part of the UNI·SIM suite — tap the community count to see how many people use UNI·SIM apps. Bipolar Anonymous now shows posts in your language.',
       '1.36': 'Opening the app no longer flashes “signed out” while your session loads, and yesterday’s entry can now be filled from your health data in one tap.',
       '1.35': 'The iPhone home-screen widget now updates as soon as you log — it no longer gets stuck on "Yesterday needs logging", and it resets properly at midnight.',
       '1.34': 'Missed a few days? The journal can now fill the gaps in one go from your health data and recent entries — each clearly marked as an estimate. And the Bipolar Anonymous board can now notify you about new posts, replies and announcements, without ever showing what anyone wrote.',

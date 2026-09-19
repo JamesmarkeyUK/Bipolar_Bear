@@ -1,6 +1,6 @@
 {
  "bipolarbear": {
-  "releaseName": "36 (1.36)",
+  "releaseName": "37 (1.37)",
   "listing": {
    "es": {
     "title": "Bipolar Bear (Diario de ánimo)",
@@ -44,21 +44,21 @@
    }
   },
   "releaseNotes": {
-   "en": "No more “signed out” flash when the app opens, and the journal can now fill in yesterday’s mood, energy and sleep from your health data in one tap — clearly marked as an estimate.",
-   "es": "Se acabó el aviso de «sesión cerrada» al abrir la app, y el diario ahora puede rellenar el ánimo, la energía y el sueño de ayer con tus datos de salud en un toque, marcados claramente como estimación.",
-   "fr": "Fini l’écran « déconnecté » à l’ouverture de l’app, et le journal peut désormais remplir l’humeur, l’énergie et le sommeil d’hier à partir de tes données de santé en un geste, clairement indiqués comme estimation.",
-   "de": "Kein kurzes „abgemeldet“ mehr beim Öffnen der App – und das Tagebuch kann Stimmung, Energie und Schlaf von gestern jetzt mit einem Tipp aus deinen Gesundheitsdaten ausfüllen, klar als Schätzung markiert.",
-   "it": "Niente più schermata «disconnesso» all’apertura dell’app, e il diario ora può compilare umore, energia e sonno di ieri dai tuoi dati sulla salute con un tocco, indicati chiaramente come stima.",
-   "pt": "Acabou o aviso de «sessão terminada» ao abrir a app, e o diário pode agora preencher o humor, a energia e o sono de ontem com os teus dados de saúde num toque, claramente marcados como estimativa.",
-   "pt-BR": "Acabou o aviso de “sessão encerrada” ao abrir o app, e o diário agora pode preencher o humor, a energia e o sono de ontem com seus dados de saúde em um toque, marcados claramente como estimativa.",
-   "nl": "Geen ‘uitgelogd’-flits meer bij het openen van de app, en het dagboek kan nu de stemming, energie en slaap van gisteren met één tik invullen uit je gezondheidsgegevens, duidelijk gemarkeerd als schatting.",
-   "pl": "Koniec z mignięciem „wylogowano” przy otwieraniu aplikacji, a dziennik może teraz jednym dotknięciem uzupełnić wczorajszy nastrój, energię i sen na podstawie danych o zdrowiu — wyraźnie oznaczone jako szacunek.",
-   "sv": "Ingen ”utloggad”-blinkning längre när appen öppnas, och dagboken kan nu fylla i gårdagens humör, energi och sömn från dina hälsodata med ett tryck – tydligt markerat som en uppskattning.",
-   "zh": "打开应用时不再闪现“已退出登录”；日记现在还能一键用你的健康数据补填昨天的心情、精力和睡眠，并清楚标注为估算值。"
+   "en": "Bipolar Bear is now part of the UNI·SIM suite: tap the community count on the home screen to see how many people use UNI·SIM apps.",
+   "es": "Bipolar Bear ya forma parte de la suite UNI·SIM: toca el contador de la comunidad en la pantalla de inicio para ver cuántas personas usan las apps de UNI·SIM.",
+   "fr": "Bipolar Bear fait désormais partie de la suite UNI·SIM : touche le compteur de la communauté sur l’écran d’accueil pour voir combien de personnes utilisent les applis UNI·SIM.",
+   "de": "Bipolar Bear gehört jetzt zur UNI·SIM-Suite: Tippe auf dem Startbildschirm auf den Community-Zähler, um zu sehen, wie viele Menschen UNI·SIM-Apps nutzen.",
+   "it": "Bipolar Bear ora fa parte della suite UNI·SIM: tocca il contatore della community nella schermata iniziale per vedere quante persone usano le app UNI·SIM.",
+   "pt": "O Bipolar Bear faz agora parte da suite UNI·SIM: toca no contador da comunidade no ecrã inicial para veres quantas pessoas usam as apps UNI·SIM.",
+   "pt-BR": "O Bipolar Bear agora faz parte da suíte UNI·SIM: toque no contador da comunidade na tela inicial para ver quantas pessoas usam os apps UNI·SIM.",
+   "nl": "Bipolar Bear hoort nu bij de UNI·SIM-suite: tik op de communityteller op het startscherm om te zien hoeveel mensen UNI·SIM-apps gebruiken.",
+   "pl": "Bipolar Bear jest teraz częścią pakietu UNI·SIM: stuknij licznik społeczności na ekranie głównym, aby zobaczyć, ile osób korzysta z aplikacji UNI·SIM.",
+   "sv": "Bipolar Bear är nu en del av UNI·SIM-sviten: tryck på gemenskapsräknaren på startskärmen för att se hur många som använder UNI·SIM-appar.",
+   "zh": "Bipolar Bear 现已加入 UNI·SIM 应用套件：在主屏幕上点按社区人数，即可查看有多少人在使用 UNI·SIM 应用。"
   }
  },
  "anonymous": {
-  "releaseName": "36 (1.36)",
+  "releaseName": "37 (1.37)",
   "listing": {
    "es": {
     "title": "Bipolar Anonymous",
@@ -102,17 +102,17 @@
    }
   },
   "releaseNotes": {
-   "en": "Small fixes and improvements to keep the community running smoothly.",
-   "es": "Pequeñas correcciones y mejoras para que la comunidad funcione sin problemas.",
-   "fr": "Petites corrections et améliorations pour que la communauté fonctionne sans accroc.",
-   "de": "Kleine Korrekturen und Verbesserungen, damit die Community reibungslos läuft.",
-   "it": "Piccole correzioni e miglioramenti per far funzionare al meglio la community.",
-   "pt": "Pequenas correções e melhorias para a comunidade funcionar sem problemas.",
-   "nl": "Kleine verbeteringen en oplossingen zodat de community soepel blijft draaien.",
-   "pl": "Drobne poprawki i ulepszenia, by społeczność działała bez zakłóceń.",
-   "sv": "Små rättningar och förbättringar så att gemenskapen fungerar smidigt.",
-   "zh": "细节修复与改进，让社区运行更顺畅。",
-   "pt-BR": "Pequenas correções e melhorias para manter a comunidade funcionando bem."
+   "en": "Posts now appear in your language — tap “Show original” under any translated post to read it as it was written. And the Bipolar Anonymous 12 Steps have their own page in the Wiki.",
+   "es": "Las publicaciones ahora aparecen en tu idioma: toca «Ver original» bajo cualquier publicación traducida para leerla tal como se escribió. Y los 12 Pasos de Bipolar Anonymous tienen su propia página en la Wiki.",
+   "fr": "Les messages s’affichent désormais dans ta langue — touche « Voir l’original » sous un message traduit pour le lire tel qu’il a été écrit. Et les 12 Étapes de Bipolar Anonymous ont leur propre page dans le Wiki.",
+   "de": "Beiträge erscheinen jetzt in deiner Sprache – tippe unter einem übersetzten Beitrag auf „Original anzeigen“, um ihn so zu lesen, wie er geschrieben wurde. Und die 12 Schritte von Bipolar Anonymous haben eine eigene Seite im Wiki.",
+   "it": "I post ora compaiono nella tua lingua: tocca «Mostra l’originale» sotto un post tradotto per leggerlo com’è stato scritto. E i 12 Passi di Bipolar Anonymous hanno una pagina tutta loro nella Wiki.",
+   "pt": "As publicações aparecem agora no teu idioma — toca em «Ver original» por baixo de qualquer publicação traduzida para a leres tal como foi escrita. E os 12 Passos do Bipolar Anonymous têm a sua própria página na Wiki.",
+   "nl": "Berichten verschijnen nu in jouw taal — tik op ‘Origineel tonen’ onder een vertaald bericht om het te lezen zoals het is geschreven. En de 12 Stappen van Bipolar Anonymous hebben een eigen pagina in de Wiki.",
+   "pl": "Posty wyświetlają się teraz w twoim języku — stuknij „Pokaż oryginał” pod przetłumaczonym postem, aby przeczytać go tak, jak został napisany. A 12 Kroków Bipolar Anonymous ma własną stronę w Wiki.",
+   "sv": "Inlägg visas nu på ditt språk – tryck på ”Visa originalet” under ett översatt inlägg för att läsa det som det skrevs. Och Bipolar Anonymous tolv steg har en egen sida i wikin.",
+   "zh": "帖子现在会以你的语言显示——在任何翻译过的帖子下点按“查看原文”即可阅读原文。Bipolar Anonymous 十二步也在 Wiki 里有了自己的页面。",
+   "pt-BR": "As publicações agora aparecem no seu idioma — toque em “Ver original” abaixo de qualquer publicação traduzida para ler como foi escrita. E os 12 Passos do Bipolar Anonymous ganharam uma página própria na Wiki."
   }
  }
 }

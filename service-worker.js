@@ -1137,7 +1137,10 @@
 //       existing announcementPosts() demo pair still only shows while the
 //       collection is empty). Touches js/anonymous.js, css/anonymous.css,
 //       js/shared/i18n.js.
-const CACHE_NAME = 'bipolarbear-v233';
+// v234: release 1.37 — _APP_VERSION 1.37, What's New headline and the
+//       changelog modal's v1.37 block. Touches js/shared/brand-config.js,
+//       js/index.js, journal.html.
+const CACHE_NAME = 'bipolarbear-v234';
 
 /**
  * Files that should be available offline. Each entry is precached on `install`.
